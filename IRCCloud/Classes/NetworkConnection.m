@@ -473,10 +473,13 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     }
     OOBFetcher *fetcher = [[OOBFetcher alloc] initWithURL:url parser:_parser];
     [_oobQueue addObject:fetcher];
-    if(_oobQueue.count == 1)
-        [fetcher performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:YES];
-    else
+    if(_oobQueue.count == 1) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [fetcher start];
+        }];
+    } else {
         NSLog(@"OOB Request has been queued");
+    }
     return fetcher;
 }
 
@@ -494,6 +497,15 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     if(fetcher.bid > 0)
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     [_oobQueue removeObject:fetcher];
+    [self _scheduleTimedoutBuffers];
+}
+
+-(void)_backlogFailed:(NSNotification *)notification {
+    [_oobQueue removeObject:notification.object];
+    [self _scheduleTimedoutBuffers];
+}
+
+-(void)_scheduleTimedoutBuffers {
     for(Buffer *buffer in [_buffers getBuffers]) {
         if(buffer.timeout > 0) {
             NSLog(@"Requesting backlog for timed-out buffer: %@", buffer.name);
@@ -501,12 +513,9 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         }
     }
     if(_oobQueue.count > 0) {
-        [[_oobQueue objectAtIndex:0] performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:YES];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [(OOBFetcher *)[_oobQueue objectAtIndex:0] start];
+        }];
     }
-}
-
--(void)_backlogFailed:(NSNotification *)notification {
-    [_oobQueue removeObject:notification.object];
-    //TODO: search for any new delayed buffers
 }
 @end
