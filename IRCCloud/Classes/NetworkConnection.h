@@ -78,8 +78,8 @@ typedef enum {
 
 @interface NetworkConnection : NSObject<WebSocketDelegate, SBJsonStreamParserAdapterDelegate> {
     WebSocket *_socket;
-    SBJsonStreamParser *_parser;
     SBJsonStreamParserAdapter *_adapter;
+    SBJsonStreamParser *_parser;
     ServersDataSource *_servers;
     BuffersDataSource *_buffers;
     NSMutableArray *_oobQueue;

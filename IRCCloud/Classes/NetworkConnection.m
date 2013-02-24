@@ -22,6 +22,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 @interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
     SBJsonStreamParser *_parser;
+    SBJsonStreamParserAdapter *_adapter;
     NSString *_url;
     BOOL _cancelled;
     BOOL _running;
@@ -30,18 +31,21 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 @property (readonly) NSString *url;
 @property int bid;
--(id)initWithURL:(NSString *)URL parser:(SBJsonStreamParser *)parser;
+-(id)initWithURL:(NSString *)URL;
 -(void)cancel;
 -(void)start;
 @end
 
 @implementation OOBFetcher
 
--(id)initWithURL:(NSString *)URL parser:(SBJsonStreamParser *)parser {
+-(id)initWithURL:(NSString *)URL {
     self = [super init];
     _url = URL;
     _bid = -1;
-    _parser = parser;
+    _adapter = [[SBJsonStreamParserAdapter alloc] init];
+    _adapter.delegate = [NetworkConnection sharedInstance];
+    _parser = [[SBJsonStreamParser alloc] init];
+    _parser.delegate = _adapter;
     _cancelled = NO;
     _running = NO;
     return self;
@@ -471,7 +475,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             return fetcher;
         }
     }
-    OOBFetcher *fetcher = [[OOBFetcher alloc] initWithURL:url parser:_parser];
+    OOBFetcher *fetcher = [[OOBFetcher alloc] initWithURL:url];
     [_oobQueue addObject:fetcher];
     if(_oobQueue.count == 1) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
