@@ -102,4 +102,6 @@ typedef enum {
 -(void)disconnect;
 -(void)scheduleIdleTimer;
 -(void)cancelIdleTimer;
+-(void)requestBacklogForBuffer:(int)bid server:(int)cid;
+-(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid;
 @end

@@ -24,9 +24,12 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     SBJsonStreamParser *_parser;
     NSString *_url;
     BOOL _cancelled;
+    BOOL _running;
     NSURLConnection *_connection;
+    int _bid;
 }
 @property (readonly) NSString *url;
+@property int bid;
 -(id)initWithURL:(NSString *)URL parser:(SBJsonStreamParser *)parser;
 -(void)cancel;
 -(void)start;
@@ -37,8 +40,10 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 -(id)initWithURL:(NSString *)URL parser:(SBJsonStreamParser *)parser {
     self = [super init];
     _url = URL;
+    _bid = -1;
     _parser = parser;
     _cancelled = NO;
+    _running = NO;
     return self;
 }
 -(void)cancel {
@@ -46,6 +51,9 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     [_connection cancel];
 }
 -(void)start {
+    if(_cancelled || _running)
+        return;
+    
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
@@ -53,6 +61,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     
     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     if(_connection) {
+        _running = YES;
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
     } else {
         NSLog(@"Failed to create NSURLConnection");
@@ -440,11 +449,26 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     [self connect];
 }
 
--(void)fetchOOB:(NSString *)url {
+-(void)requestBacklogForBuffer:(int)bid server:(int)cid {
+    [self requestBacklogForBuffer:bid server:cid beforeId:-1];
+}
+
+-(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid {
+    NSString *URL = nil;
+    if(eid > 0)
+        URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i&beforeId=%g", IRCCLOUD_HOST, cid, bid, eid];
+    else
+        URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i", IRCCLOUD_HOST, cid, bid];
+    OOBFetcher *fetcher = [self fetchOOB:URL];
+    fetcher.bid = bid;
+}
+
+
+-(OOBFetcher *)fetchOOB:(NSString *)url {
     for(OOBFetcher *fetcher in _oobQueue) {
         if([fetcher.url isEqualToString:url]) {
             NSLog(@"Ignoring duplicate OOB request");
-            return;
+            return fetcher;
         }
     }
     OOBFetcher *fetcher = [[OOBFetcher alloc] initWithURL:url parser:_parser];
@@ -453,6 +477,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         [fetcher performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:YES];
     else
         NSLog(@"OOB Request has been queued");
+    return fetcher;
 }
 
 -(void)clearOOB {
@@ -465,8 +490,16 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 -(void)_backlogCompleted:(NSNotification *)notification {
     NSLog(@"Buffers: %@", [_buffers getBuffers]);
-    [_oobQueue removeObject:notification.object];
-    //TODO: search for any new delayed buffers
+    OOBFetcher *fetcher = notification.object;
+    if(fetcher.bid > 0)
+        [_buffers updateTimeout:0 buffer:fetcher.bid];
+    [_oobQueue removeObject:fetcher];
+    for(Buffer *buffer in [_buffers getBuffers]) {
+        if(buffer.timeout > 0) {
+            NSLog(@"Requesting backlog for timed-out buffer: %@", buffer.name);
+            [self requestBacklogForBuffer:buffer.bid server:buffer.cid];
+        }
+    }
     if(_oobQueue.count > 0) {
         [[_oobQueue objectAtIndex:0] performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:YES];
     }
