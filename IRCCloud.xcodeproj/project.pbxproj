@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
+		2236F5FB16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
+		2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
+		2236F5FF16DA8928007BE535 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -85,6 +89,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2236F5F816DA765C007BE535 /* ServersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServersDataSource.h; sourceTree = "<group>"; };
+		2236F5F916DA765C007BE535 /* ServersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServersDataSource.m; sourceTree = "<group>"; };
+		2236F5FC16DA8928007BE535 /* BuffersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuffersDataSource.h; sourceTree = "<group>"; };
+		2236F5FD16DA8928007BE535 /* BuffersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BuffersDataSource.m; sourceTree = "<group>"; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A056F16D3DABA0029769C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -278,6 +286,10 @@
 				22B4284716D7E36300498507 /* NetworkConnection.m */,
 				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
+				2236F5F816DA765C007BE535 /* ServersDataSource.h */,
+				2236F5F916DA765C007BE535 /* ServersDataSource.m */,
+				2236F5FC16DA8928007BE535 /* BuffersDataSource.h */,
+				2236F5FD16DA8928007BE535 /* BuffersDataSource.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -494,6 +506,8 @@
 				22B4287C16D831A800498507 /* WebSocketFragment.m in Sources */,
 				22B4287E16D831A800498507 /* WebSocketMessage.m in Sources */,
 				22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */,
+				2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */,
+				2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -523,6 +537,8 @@
 				22B4287D16D831A800498507 /* WebSocketFragment.m in Sources */,
 				22B4287F16D831A800498507 /* WebSocketMessage.m in Sources */,
 				22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */,
+				2236F5FB16DA765C007BE535 /* ServersDataSource.m in Sources */,
+				2236F5FF16DA8928007BE535 /* BuffersDataSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

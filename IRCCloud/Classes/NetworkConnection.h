@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "WebSocket.h"
 #import "SBJson.h"
+#import "ServersDataSource.h"
+#import "BuffersDataSource.h"
 
 #define IRCCLOUD_HOST @"www.irccloud.com"
 
@@ -78,22 +80,26 @@ typedef enum {
     WebSocket *_socket;
     SBJsonStreamParser *_parser;
     SBJsonStreamParserAdapter *_adapter;
+    ServersDataSource *_servers;
+    BuffersDataSource *_buffers;
     NSMutableArray *_oobQueue;
-    long _idleInterval;
+    NSTimer *_idleTimer;
+    NSTimeInterval _idleInterval;
     int _totalBuffers;
     int _numBuffers;
     
-    kIRCCloudState state;
-    NSDictionary *userInfo;
-    NSTimeInterval clockOffset;
+    kIRCCloudState _state;
+    NSDictionary *_userInfo;
+    NSTimeInterval _clockOffset;
 }
 @property (readonly) kIRCCloudState state;
 @property (readonly) NSDictionary *userInfo;
 @property (readonly) NSTimeInterval clockOffset;
-@property (nonatomic) NSString *session;
 
 +(NetworkConnection*)sharedInstance;
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password;
 -(void)connect;
 -(void)disconnect;
+-(void)scheduleIdleTimer;
+-(void)cancelIdleTimer;
 @end

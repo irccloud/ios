@@ -13,13 +13,13 @@
     NSString *_type;
     int _cid;
     int _bid;
-    long _eid;
+    NSTimeInterval _eid;
 }
 -(id)initWithDictionary:(NSDictionary *)dict;
 -(NSString *)type;
 -(int)cid;
 -(int)bid;
--(long)eid;
+-(NSTimeInterval)eid;
 -(id)objectForKey:(NSString *)key;
 -(NSDictionary *)dictionary;
 @end

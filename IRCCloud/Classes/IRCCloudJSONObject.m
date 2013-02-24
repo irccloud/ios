@@ -22,7 +22,7 @@
     else
         _bid = -1;
     if([_dict objectForKey:@"eid"])
-        _eid = [[_dict objectForKey:@"eid"] longValue];
+        _eid = [[_dict objectForKey:@"eid"] doubleValue];
     else
         _eid = -1;
     return self;
@@ -36,7 +36,7 @@
 -(int)bid {
     return _bid;
 }
--(long)eid {
+-(NSTimeInterval)eid {
     return _eid;
 }
 -(id)objectForKey:(NSString *)key {

@@ -22,7 +22,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 @interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
     SBJsonStreamParser *_parser;
-    NSString *url;
+    NSString *_url;
     BOOL _cancelled;
     NSURLConnection *_connection;
 }
@@ -33,11 +33,10 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 @end
 
 @implementation OOBFetcher
-@synthesize url;
 
 -(id)initWithURL:(NSString *)URL parser:(SBJsonStreamParser *)parser {
     self = [super init];
-    url = URL;
+    _url = URL;
     _parser = parser;
     _cancelled = NO;
     return self;
@@ -47,7 +46,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     [_connection cancel];
 }
 -(void)start {
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
@@ -89,9 +88,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 @implementation NetworkConnection
 
-@synthesize state, userInfo, clockOffset;
-
-+ (NetworkConnection *)sharedInstance {
++(NetworkConnection *)sharedInstance {
     static NetworkConnection *sharedInstance;
 	
     @synchronized(self) {
@@ -105,13 +102,17 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 -(id)init {
     self = [super init];
-    state = kIRCCloudStateDisconnected;
+    _servers = [ServersDataSource sharedInstance];
+    _buffers = [BuffersDataSource sharedInstance];
+    _state = kIRCCloudStateDisconnected;
     _oobQueue = [[NSMutableArray alloc] init];
     _adapter = [[SBJsonStreamParserAdapter alloc] init];
     _adapter.delegate = self;
     _parser = [[SBJsonStreamParser alloc] init];
     _parser.supportMultipleDocuments = YES;
     _parser.delegate = _adapter;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey];
     _userAgent = [NSString stringWithFormat:@"IRCCloud/%@ (%@; %@; %@ %@)", version, [UIDevice currentDevice].model, [[[NSUserDefaults standardUserDefaults] objectForKey: @"AppleLanguages"] objectAtIndex:0], [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
     NSLog(@"%@", _userAgent);
@@ -137,7 +138,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(void)connect {
-    state = kIRCCloudStateConnecting;
+    _state = kIRCCloudStateConnecting;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
     WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:[NSString stringWithFormat:@"wss://%@",IRCCLOUD_HOST] origin:nil protocols:nil
                                                                      tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: [NSNull null],
@@ -152,7 +153,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(void)disconnect {
-    state = kIRCCloudStateDisconnecting;
+    _state = kIRCCloudStateDisconnecting;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
     [_socket close];
 }
@@ -171,7 +172,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 -(void)didOpen {
     NSLog(@"Socket connected");
-    state = kIRCCloudStateConnected;
+    _state = kIRCCloudStateConnected;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
 }
 
@@ -179,13 +180,13 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     NSLog(@"Status Code: %i", aStatusCode);
     NSLog(@"Close Message: %@", aMessage);
     NSLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
-    state = kIRCCloudStateDisconnected;
+    _state = kIRCCloudStateDisconnected;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
 }
 
 -(void)didReceiveError: (NSError*) aError {
     NSLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
-    state = kIRCCloudStateDisconnected;
+    _state = kIRCCloudStateDisconnected;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
 }
 
@@ -203,31 +204,72 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(void)parse:(NSDictionary *)dict backlog:(BOOL)backlog {
+    [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
     IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
     if(object.type) {
         //NSLog(@"New event (%@)", object.type);
         if([object.type isEqualToString:@"header"]) {
-            _idleInterval = [[object objectForKey:@"idle_interval"] longValue];
-            clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] longValue];
-            NSLog(@"idle interval: %li clock offset: %f", _idleInterval, clockOffset);
+            _idleInterval = [[object objectForKey:@"idle_interval"] doubleValue] / 1000.0;
+            _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
+            NSLog(@"idle interval: %f clock offset: %f", _idleInterval, _clockOffset);
         } else if([object.type isEqualToString:@"oob_include"]) {
             [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
         } else if([object.type isEqualToString:@"stat_user"]) {
-            userInfo = object.dictionary;
+            _userInfo = object.dictionary;
             [self postObject:object forEvent:kIRCEventUserInfo];
         } else if([object.type isEqualToString:@"backlog_starts"]) {
             _numBuffers = [[object objectForKey:@"numbuffers"] intValue];
             _totalBuffers = 0;
         } else if([object.type isEqualToString:@"makeserver"] || [object.type isEqualToString:@"server_details_changed"]) {
-            NSLog(@"New server: %@", [object objectForKey:@"hostname"]);
+            Server *server = [_servers getServer:object.cid];
+            if(!server) {
+                server = [[Server alloc] init];
+                [_servers addServer:server];
+            }
+            server.cid = object.cid;
+            server.name = [object objectForKey:@"name"];
+            server.hostname = [object objectForKey:@"hostname"];
+            server.port = [[object objectForKey:@"port"] intValue];
+            server.nick = [object objectForKey:@"nick"];
+            server.status = [object objectForKey:@"status"];
+            server.lag = [[object objectForKey:@"lag"] intValue];
+            server.ssl = [[object objectForKey:@"ssl"] intValue];
+            server.realname = [object objectForKey:@"realname"];
+            server.server_pass = [object objectForKey:@"server_pass"];
+            server.nickserv_pass = [object objectForKey:@"nickserv_pass"];
+            server.join_commands = [object objectForKey:@"join_commands"];
+            server.fail_info = [object objectForKey:@"fail_info"];
+            server.away = [object objectForKey:@"away"];
+            server.ignores = [object objectForKey:@"ignores"];
+            if(!backlog)
+                [self postObject:server forEvent:kIRCEventMakeServer];
         } else if([object.type isEqualToString:@"makebuffer"]) {
-            NSLog(@"New buffer: %@", [object objectForKey:@"name"]);
-            _totalBuffers++;
-            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogProgressNotification object:[NSNumber numberWithFloat:(float)_totalBuffers / (float)_numBuffers]];
+            Buffer *buffer = [_buffers getBuffer:object.bid];
+            if(!buffer) {
+                buffer = [[Buffer alloc] init];
+                [_buffers addBuffer:buffer];
+            }
+            buffer.bid = object.bid;
+            buffer.cid = object.cid;
+            buffer.min_eid = [[object objectForKey:@"min_eid"] doubleValue];
+            buffer.last_seen_eid = [[object objectForKey:@"last_seen_eid"] doubleValue];
+            buffer.name = [object objectForKey:@"name"];
+            buffer.type = [object objectForKey:@"buffer_type"];
+            buffer.archived = [[object objectForKey:@"archived"] intValue];
+            buffer.deferred = [[object objectForKey:@"deferred"] intValue];
+            buffer.timeout = [[object objectForKey:@"timeout"] intValue];
+            if(!backlog)
+                [self postObject:buffer forEvent:kIRCEventMakeBuffer];
+            if(_numBuffers > 0) {
+                _totalBuffers++;
+                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogProgressNotification object:[NSNumber numberWithFloat:(float)_totalBuffers / (float)_numBuffers]];
+            }
         } else if([object.type isEqualToString:@"global_system_message"]) {
         } else if([object.type isEqualToString:@"idle"] || [object.type isEqualToString:@"end_of_backlog"] || [object.type isEqualToString:@"backlog_complete"]) {
         } else if([object.type isEqualToString:@"num_invites"]) {
         } else if([object.type isEqualToString:@"bad_channel_key"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventBadChannelKey];
         } else if([object.type isEqualToString:@"too_many_channels"] || [object.type isEqualToString:@"no_such_channel"] ||
                   [object.type isEqualToString:@"no_such_nick"] || [object.type isEqualToString:@"invalid_nick_change"] ||
                   [object.type isEqualToString:@"chan_privs_needed"] || [object.type isEqualToString:@"accept_exists"] ||
@@ -249,21 +291,59 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                   [object.type isEqualToString:@"no_origin"] || [object.type isEqualToString:@"only_servers_can_change_mode"] ||
                   [object.type isEqualToString:@"silence"] || [object.type isEqualToString:@"no_channel_topic"] ||
                   [object.type isEqualToString:@"invite_only_chan"] || [object.type isEqualToString:@"channel_full"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventAlert];
         } else if([object.type isEqualToString:@"open_buffer"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventOpenBuffer];
         } else if([object.type isEqualToString:@"invalid_nick"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventInvalidNick];
         } else if([object.type isEqualToString:@"ban_list"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventBanList];
         } else if([object.type isEqualToString:@"accept_list"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventAcceptList];
         } else if([object.type isEqualToString:@"who_response"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventWhoList];
         } else if([object.type isEqualToString:@"whois_response"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventWhois];
         } else if([object.type isEqualToString:@"list_response_fetching"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventListResponseFetching];
         } else if([object.type isEqualToString:@"list_response_toomany"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventListResponseTooManyChannels];
         } else if([object.type isEqualToString:@"list_response"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventListResponse];
         } else if([object.type isEqualToString:@"connection_deleted"]) {
+            [_servers removeAllDataForServer:object.cid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventConnectionDeleted];
         } else if([object.type isEqualToString:@"delete_buffer"]) {
+            [_buffers removeBuffer:object.bid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventDeleteBuffer];
         } else if([object.type isEqualToString:@"buffer_archived"]) {
+            [_buffers updateArchived:1 buffer:object.bid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventBufferArchived];
         } else if([object.type isEqualToString:@"buffer_unarchived"]) {
+            [_buffers updateArchived:0 buffer:object.bid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventBufferUnarchived];
         } else if([object.type isEqualToString:@"rename_conversation"]) {
+            [_buffers updateName:[object objectForKey:@"new_name"] buffer:object.bid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventRenameConversation];
         } else if([object.type isEqualToString:@"status_changed"]) {
+            [_servers updateStatus:[object objectForKey:@"status"] failInfo:[object objectForKey:@"fail_info"] server:object.cid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventStatusChanged];
         } else if([object.type isEqualToString:@"buffer_msg"] || [object.type isEqualToString:@"buffer_me_msg"] || [object.type isEqualToString:@"server_motdstart"] || [object.type isEqualToString:@"wait"] || [object.type isEqualToString:@"banned"] || [object.type isEqualToString:@"kill"] || [object.type isEqualToString:@"connecting_cancelled"] || [object.type isEqualToString:@"target_callerid"]
                   || [object.type isEqualToString:@"notice"] || [object.type isEqualToString:@"server_welcome"] || [object.type isEqualToString:@"server_motd"] || [object.type isEqualToString:@"server_endofmotd"] || [object.type isEqualToString:@"services_down"] || [object.type isEqualToString:@"your_unique_id"] || [object.type isEqualToString:@"callerid"] || [object.type isEqualToString:@"target_notified"]
                   || [object.type isEqualToString:@"server_luserclient"] || [object.type isEqualToString:@"server_luserop"] || [object.type isEqualToString:@"server_luserconns"] || [object.type isEqualToString:@"myinfo"] || [object.type isEqualToString:@"hidden_host_set"] || [object.type isEqualToString:@"unhandled_line"] || [object.type isEqualToString:@"unparsed_line"]
@@ -282,23 +362,82 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         } else if([object.type isEqualToString:@"quit_server"]) {
         } else if([object.type isEqualToString:@"kicked_channel"] || [object.type isEqualToString:@"you_kicked_channel"]) {
         } else if([object.type isEqualToString:@"nickchange"] || [object.type isEqualToString:@"you_nickchange"]) {
+            if(!backlog) {
+                if([object.type isEqualToString:@"you_nickchange"])
+                    [_servers updateNick:[object objectForKey:@"new_nick"] server:object.cid];
+                [self postObject:object forEvent:kIRCEventNickChange];
+            }
         } else if([object.type isEqualToString:@"user_channel_mode"]) {
         } else if([object.type isEqualToString:@"member_updates"]) {
         } else if([object.type isEqualToString:@"user_away"] || [object.type isEqualToString:@"away"]) {
+            [_buffers updateAway:[object objectForKey:@"msg"] buffer:object.bid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventAway];
         } else if([object.type isEqualToString:@"self_away"]) {
+            [_servers updateAway:[object objectForKey:@"away_msg"] server:object.cid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventAway];
         } else if([object.type isEqualToString:@"self_back"]) {
+            [_servers updateAway:@"" server:object.cid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventSelfBack];
         } else if([object.type isEqualToString:@"self_details"]) {
+            [_servers updateUsermask:[object objectForKey:@"usermask"] server:object.bid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventSelfDetails];
         } else if([object.type isEqualToString:@"user_mode"]) {
+            if(!backlog) {
+                [_servers updateMode:[object objectForKey:@"newmode"] server:object.cid];
+                [self postObject:object forEvent:kIRCEventUserMode];
+            }
         } else if([object.type isEqualToString:@"connection_lag"]) {
+            [_servers updateLag:[[object objectForKey:@"lag"] intValue] server:object.cid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventConnectionLag];
         } else if([object.type isEqualToString:@"isupport_params"]) {
+            [_servers updateIsupport:[object objectForKey:@"params"] server:object.cid];
         } else if([object.type isEqualToString:@"set_ignores"] || [object.type isEqualToString:@"ignore_list"]) {
+            [_servers updateIgnores:[object objectForKey:@"masks"] server:object.cid];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventSetIgnores];
         } else if([object.type isEqualToString:@"heartbeat_echo"]) {
+            NSDictionary *seenEids = [object objectForKey:@"seenEids"];
+            for(NSNumber *cid in seenEids.allKeys) {
+                NSDictionary *eids = [seenEids objectForKey:cid];
+                for(NSNumber *bid in eids.allKeys) {
+                    NSTimeInterval eid = [[eids objectForKey:bid] doubleValue];
+                    [_buffers updateLastSeenEID:eid buffer:[bid intValue]];
+                }
+            }
         } else {
             NSLog(@"Unhandled type: %@", object);
         }
     } else {
         NSLog(@"Repsonse: %@", object);
     }
+    if(_idleInterval > 0)
+        [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
+}
+
+-(void)cancelIdleTimer {
+    [_idleTimer invalidate];
+    _idleTimer = nil;
+}
+
+-(void)scheduleIdleTimer {
+    [_idleTimer invalidate];
+    _idleTimer = nil;
+    if(_idleInterval <= 0)
+        return;
+    
+    _idleTimer = [NSTimer scheduledTimerWithTimeInterval:_idleInterval+10 target:self selector:@selector(_idle) userInfo:nil repeats:NO];
+}
+
+-(void)_idle {
+    _idleTimer = nil;
+    NSLog(@"Websocket idle time exceeded, reconnecting...");
+    [_socket close];
+    [self connect];
 }
 
 -(void)fetchOOB:(NSString *)url {
@@ -322,5 +461,19 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     for(OOBFetcher *fetcher in oldQueue) {
         [fetcher cancel];
     }
+}
+
+-(void)_backlogCompleted:(NSNotification *)notification {
+    NSLog(@"Buffers: %@", [_buffers getBuffers]);
+    [_oobQueue removeObject:notification.object];
+    //TODO: search for any new delayed buffers
+    if(_oobQueue.count > 0) {
+        [[_oobQueue objectAtIndex:0] performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:YES];
+    }
+}
+
+-(void)_backlogFailed:(NSNotification *)notification {
+    [_oobQueue removeObject:notification.object];
+    //TODO: search for any new delayed buffers
 }
 @end
