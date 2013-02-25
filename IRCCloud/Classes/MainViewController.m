@@ -25,7 +25,6 @@
     [super viewDidLoad];
     if(_contentView != nil) {
         [(UIScrollView *)self.view addSubview:_contentView];
-        ((UIScrollView *)self.view).contentSize = _contentView.frame.size;
     } else {
         _contentView = self.view;
     }
@@ -41,6 +40,9 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [_buffersView viewWillAppear:animated];
+    if([self.view isKindOfClass:[UIScrollView class]]) {
+        ((UIScrollView *)self.view).contentSize = _contentView.bounds.size;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

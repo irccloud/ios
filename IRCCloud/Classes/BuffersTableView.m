@@ -70,8 +70,8 @@
     }
     _bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
     _unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
-    _icon.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.height, frame.size.height);
-    _label.frame = CGRectMake(frame.origin.x + 6 + frame.size.height, frame.origin.y, frame.size.width - 6 - frame.size.height, frame.size.height);
+    _icon.frame = CGRectMake(frame.origin.x + 6, frame.origin.y + 4, frame.size.height - 8, frame.size.height - 8);
+    _label.frame = CGRectMake(frame.origin.x + 6 + frame.size.height - 8, frame.origin.y, frame.size.width - 6 - frame.size.height, frame.size.height);
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {

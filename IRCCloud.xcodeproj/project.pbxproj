@@ -29,6 +29,8 @@
 		2236F63916DBE89E007BE535 /* world.png in Resources */ = {isa = PBXBuildFile; fileRef = 2236F63516DBE89E007BE535 /* world.png */; };
 		2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		2236F63D16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
+		2236F64216DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
+		2236F64316DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -124,6 +126,7 @@
 		2236F63516DBE89E007BE535 /* world.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = world.png; sourceTree = "<group>"; };
 		2236F63A16DBF3CA007BE535 /* UIColor+IRCCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+IRCCloud.h"; sourceTree = "<group>"; };
 		2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+IRCCloud.m"; sourceTree = "<group>"; };
+		2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainViewController_iPad.xib; path = Classes/MainViewController_iPad.xib; sourceTree = "<group>"; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A056F16D3DABA0029769C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -267,6 +270,7 @@
 			children = (
 				228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */,
 				2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */,
+				2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */,
 				228A05AD16D3DB7B0029769C /* Classes */,
 				228A05B416D3DB930029769C /* Resources */,
 				228A057616D3DABA0029769C /* Supporting Files */,
@@ -496,6 +500,7 @@
 				2236F63216DBE881007BE535 /* world@2x.png in Resources */,
 				2236F63616DBE89E007BE535 /* lock.png in Resources */,
 				2236F63816DBE89E007BE535 /* world.png in Resources */,
+				2236F64216DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -509,6 +514,7 @@
 				2236F63316DBE881007BE535 /* world@2x.png in Resources */,
 				2236F63716DBE89E007BE535 /* lock.png in Resources */,
 				2236F63916DBE89E007BE535 /* world.png in Resources */,
+				2236F64316DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
