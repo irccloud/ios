@@ -214,7 +214,9 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(void)postObject:(id)object forEvent:(kIRCEvent)event {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:object userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:event]}];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:object userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:event]}];
+    }];
 }
 
 -(void)parse:(NSDictionary *)dict backlog:(BOOL)backlog {

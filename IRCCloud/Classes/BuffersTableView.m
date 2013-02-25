@@ -109,14 +109,8 @@
 
 - (void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-    switch(event) {
-        case kIRCEventJoin:
-        case kIRCEventPart:
-            [self refresh];
-            break;
-        default:
-            break;
-    }
+    NSLog(@"Got event: %i: %@", event, notification.object);
+    [self refresh];
 }
 
 - (void)refresh {
