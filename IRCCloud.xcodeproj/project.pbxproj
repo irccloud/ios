@@ -11,6 +11,24 @@
 		2236F5FB16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
 		2236F5FF16DA8928007BE535 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
+		2236F60216DBC021007BE535 /* ChannelsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60116DBC021007BE535 /* ChannelsDataSource.m */; };
+		2236F60316DBC021007BE535 /* ChannelsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60116DBC021007BE535 /* ChannelsDataSource.m */; };
+		2236F60616DBCA85007BE535 /* BuffersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60516DBCA85007BE535 /* BuffersTableView.m */; };
+		2236F60716DBCA85007BE535 /* BuffersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60516DBCA85007BE535 /* BuffersTableView.m */; };
+		2236F60B16DBCBC6007BE535 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60916DBCBC6007BE535 /* MainViewController.m */; };
+		2236F60C16DBCBC6007BE535 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60916DBCBC6007BE535 /* MainViewController.m */; };
+		2236F61016DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */; };
+		2236F61116DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */; };
+		2236F63016DBE881007BE535 /* lock@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2236F62E16DBE881007BE535 /* lock@2x.png */; };
+		2236F63116DBE881007BE535 /* lock@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2236F62E16DBE881007BE535 /* lock@2x.png */; };
+		2236F63216DBE881007BE535 /* world@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2236F62F16DBE881007BE535 /* world@2x.png */; };
+		2236F63316DBE881007BE535 /* world@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2236F62F16DBE881007BE535 /* world@2x.png */; };
+		2236F63616DBE89E007BE535 /* lock.png in Resources */ = {isa = PBXBuildFile; fileRef = 2236F63416DBE89E007BE535 /* lock.png */; };
+		2236F63716DBE89E007BE535 /* lock.png in Resources */ = {isa = PBXBuildFile; fileRef = 2236F63416DBE89E007BE535 /* lock.png */; };
+		2236F63816DBE89E007BE535 /* world.png in Resources */ = {isa = PBXBuildFile; fileRef = 2236F63516DBE89E007BE535 /* world.png */; };
+		2236F63916DBE89E007BE535 /* world.png in Resources */ = {isa = PBXBuildFile; fileRef = 2236F63516DBE89E007BE535 /* world.png */; };
+		2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
+		2236F63D16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -31,7 +49,7 @@
 		228A05D416D3DFB80029769C /* TTTAttributedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05D316D3DFB80029769C /* TTTAttributedLabel.m */; };
 		228A05D716D3DFDA0029769C /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
 		228A05DE16D3E40F0029769C /* LoginSplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05DC16D3E40E0029769C /* LoginSplashViewController.m */; };
-		228A05DF16D3E40F0029769C /* LoginSplashViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 228A05DD16D3E40F0029769C /* LoginSplashViewController.xib */; };
+		228A05DF16D3E40F0029769C /* LoginSplashViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */; };
 		228A05E116D3E4B70029769C /* splashlogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 228A05E016D3E4B70029769C /* splashlogo@2x.png */; };
 		228A05E316D3E53F0029769C /* splashlogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 228A05E216D3E53F0029769C /* splashlogo.png */; };
 		22B4281A16D7E21200498507 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280716D7E21200498507 /* SBJsonParser.m */; };
@@ -93,6 +111,19 @@
 		2236F5F916DA765C007BE535 /* ServersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServersDataSource.m; sourceTree = "<group>"; };
 		2236F5FC16DA8928007BE535 /* BuffersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuffersDataSource.h; sourceTree = "<group>"; };
 		2236F5FD16DA8928007BE535 /* BuffersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BuffersDataSource.m; sourceTree = "<group>"; };
+		2236F60016DBC020007BE535 /* ChannelsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelsDataSource.h; sourceTree = "<group>"; };
+		2236F60116DBC021007BE535 /* ChannelsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelsDataSource.m; sourceTree = "<group>"; };
+		2236F60416DBCA85007BE535 /* BuffersTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuffersTableView.h; sourceTree = "<group>"; };
+		2236F60516DBCA85007BE535 /* BuffersTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BuffersTableView.m; sourceTree = "<group>"; };
+		2236F60816DBCBC6007BE535 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		2236F60916DBCBC6007BE535 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
+		2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainViewController_iPhone.xib; path = Classes/MainViewController_iPhone.xib; sourceTree = "<group>"; };
+		2236F62E16DBE881007BE535 /* lock@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "lock@2x.png"; sourceTree = "<group>"; };
+		2236F62F16DBE881007BE535 /* world@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "world@2x.png"; sourceTree = "<group>"; };
+		2236F63416DBE89E007BE535 /* lock.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = lock.png; sourceTree = "<group>"; };
+		2236F63516DBE89E007BE535 /* world.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = world.png; sourceTree = "<group>"; };
+		2236F63A16DBF3CA007BE535 /* UIColor+IRCCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+IRCCloud.h"; sourceTree = "<group>"; };
+		2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+IRCCloud.m"; sourceTree = "<group>"; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A056F16D3DABA0029769C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -120,7 +151,7 @@
 		228A05D516D3DFD00029769C /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		228A05DB16D3E40E0029769C /* LoginSplashViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginSplashViewController.h; sourceTree = "<group>"; };
 		228A05DC16D3E40E0029769C /* LoginSplashViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginSplashViewController.m; sourceTree = "<group>"; };
-		228A05DD16D3E40F0029769C /* LoginSplashViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LoginSplashViewController.xib; path = Classes/LoginSplashViewController.xib; sourceTree = "<group>"; };
+		228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LoginSplashViewController_iPhone.xib; path = Classes/LoginSplashViewController_iPhone.xib; sourceTree = "<group>"; };
 		228A05E016D3E4B70029769C /* splashlogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "splashlogo@2x.png"; sourceTree = "<group>"; };
 		228A05E216D3E53F0029769C /* splashlogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splashlogo.png; sourceTree = "<group>"; };
 		22B4280516D7E21200498507 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJson.h; sourceTree = "<group>"; };
@@ -234,7 +265,8 @@
 		228A057516D3DABA0029769C /* IRCCloud */ = {
 			isa = PBXGroup;
 			children = (
-				228A05DD16D3E40F0029769C /* LoginSplashViewController.xib */,
+				228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */,
+				2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */,
 				228A05AD16D3DB7B0029769C /* Classes */,
 				228A05B416D3DB930029769C /* Resources */,
 				228A057616D3DABA0029769C /* Supporting Files */,
@@ -280,16 +312,24 @@
 			children = (
 				228A05AE16D3DB7B0029769C /* AppDelegate.h */,
 				228A05AF16D3DB7B0029769C /* AppDelegate.m */,
-				228A05DB16D3E40E0029769C /* LoginSplashViewController.h */,
-				228A05DC16D3E40E0029769C /* LoginSplashViewController.m */,
-				22B4284616D7E36300498507 /* NetworkConnection.h */,
-				22B4284716D7E36300498507 /* NetworkConnection.m */,
-				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
-				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
-				2236F5F816DA765C007BE535 /* ServersDataSource.h */,
-				2236F5F916DA765C007BE535 /* ServersDataSource.m */,
 				2236F5FC16DA8928007BE535 /* BuffersDataSource.h */,
 				2236F5FD16DA8928007BE535 /* BuffersDataSource.m */,
+				2236F60416DBCA85007BE535 /* BuffersTableView.h */,
+				2236F60516DBCA85007BE535 /* BuffersTableView.m */,
+				2236F60016DBC020007BE535 /* ChannelsDataSource.h */,
+				2236F60116DBC021007BE535 /* ChannelsDataSource.m */,
+				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
+				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
+				228A05DB16D3E40E0029769C /* LoginSplashViewController.h */,
+				228A05DC16D3E40E0029769C /* LoginSplashViewController.m */,
+				2236F60816DBCBC6007BE535 /* MainViewController.h */,
+				2236F60916DBCBC6007BE535 /* MainViewController.m */,
+				22B4284616D7E36300498507 /* NetworkConnection.h */,
+				22B4284716D7E36300498507 /* NetworkConnection.m */,
+				2236F5F816DA765C007BE535 /* ServersDataSource.h */,
+				2236F5F916DA765C007BE535 /* ServersDataSource.m */,
+				2236F63A16DBF3CA007BE535 /* UIColor+IRCCloud.h */,
+				2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -297,6 +337,10 @@
 		228A05B416D3DB930029769C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				2236F63416DBE89E007BE535 /* lock.png */,
+				2236F63516DBE89E007BE535 /* world.png */,
+				2236F62E16DBE881007BE535 /* lock@2x.png */,
+				2236F62F16DBE881007BE535 /* world@2x.png */,
 				228A05E216D3E53F0029769C /* splashlogo.png */,
 				228A05E016D3E4B70029769C /* splashlogo@2x.png */,
 				228A05B516D3DB930029769C /* Default-568h@2x.png */,
@@ -444,9 +488,14 @@
 				228A05B816D3DB930029769C /* Default-568h@2x.png in Resources */,
 				228A05B916D3DB930029769C /* Default.png in Resources */,
 				228A05BA16D3DB930029769C /* Default@2x.png in Resources */,
-				228A05DF16D3E40F0029769C /* LoginSplashViewController.xib in Resources */,
+				228A05DF16D3E40F0029769C /* LoginSplashViewController_iPhone.xib in Resources */,
 				228A05E116D3E4B70029769C /* splashlogo@2x.png in Resources */,
 				228A05E316D3E53F0029769C /* splashlogo.png in Resources */,
+				2236F61016DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */,
+				2236F63016DBE881007BE535 /* lock@2x.png in Resources */,
+				2236F63216DBE881007BE535 /* world@2x.png in Resources */,
+				2236F63616DBE89E007BE535 /* lock.png in Resources */,
+				2236F63816DBE89E007BE535 /* world.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -455,6 +504,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				228A05A116D3DABB0029769C /* InfoPlist.strings in Resources */,
+				2236F61116DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */,
+				2236F63116DBE881007BE535 /* lock@2x.png in Resources */,
+				2236F63316DBE881007BE535 /* world@2x.png in Resources */,
+				2236F63716DBE89E007BE535 /* lock.png in Resources */,
+				2236F63916DBE89E007BE535 /* world.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -508,6 +562,10 @@
 				22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */,
 				2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */,
 				2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */,
+				2236F60216DBC021007BE535 /* ChannelsDataSource.m in Sources */,
+				2236F60616DBCA85007BE535 /* BuffersTableView.m in Sources */,
+				2236F60B16DBCBC6007BE535 /* MainViewController.m in Sources */,
+				2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -539,6 +597,10 @@
 				22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */,
 				2236F5FB16DA765C007BE535 /* ServersDataSource.m in Sources */,
 				2236F5FF16DA8928007BE535 /* BuffersDataSource.m in Sources */,
+				2236F60316DBC021007BE535 /* ChannelsDataSource.m in Sources */,
+				2236F60716DBCA85007BE535 /* BuffersTableView.m in Sources */,
+				2236F60C16DBCBC6007BE535 /* MainViewController.m in Sources */,
+				2236F63D16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

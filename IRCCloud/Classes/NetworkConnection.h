@@ -11,6 +11,7 @@
 #import "SBJson.h"
 #import "ServersDataSource.h"
 #import "BuffersDataSource.h"
+#import "ChannelsDataSource.h"
 
 #define IRCCLOUD_HOST @"www.irccloud.com"
 
@@ -82,6 +83,7 @@ typedef enum {
     SBJsonStreamParser *_parser;
     ServersDataSource *_servers;
     BuffersDataSource *_buffers;
+    ChannelsDataSource *_channels;
     NSMutableArray *_oobQueue;
     NSTimer *_idleTimer;
     NSTimeInterval _idleInterval;

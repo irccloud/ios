@@ -10,9 +10,9 @@
 
 @implementation Server
 -(NSComparisonResult)compare:(Server *)aServer {
-    if(aServer.cid < _cid)
+    if(aServer.cid > _cid)
         return NSOrderedAscending;
-    else if(aServer.cid > _cid)
+    else if(aServer.cid < _cid)
         return NSOrderedDescending;
     else
         return NSOrderedSame;
@@ -50,13 +50,12 @@
 -(void)addServer:(Server *)server {
     @synchronized(_servers) {
         [_servers addObject:server];
-        [_servers sortUsingSelector:@selector(compare:)];
     }
 }
 
 -(NSArray *)getServers {
     @synchronized(_servers) {
-        return (NSArray *)_servers;
+        return [_servers sortedArrayUsingSelector:@selector(compare:)];
     }
 }
 

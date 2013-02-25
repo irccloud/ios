@@ -117,6 +117,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     self = [super init];
     _servers = [ServersDataSource sharedInstance];
     _buffers = [BuffersDataSource sharedInstance];
+    _channels = [ChannelsDataSource sharedIntance];
     _state = kIRCCloudStateDisconnected;
     _oobQueue = [[NSMutableArray alloc] init];
     _adapter = [[SBJsonStreamParserAdapter alloc] init];
@@ -365,15 +366,55 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                   || [object.type isEqualToString:@"server_yourhost"] || [object.type isEqualToString:@"server_created"] || [object.type isEqualToString:@"inviting_to_channel"] || [object.type isEqualToString:@"error"] || [object.type isEqualToString:@"too_fast"] || [object.type isEqualToString:@"no_bots"] || [object.type isEqualToString:@"wallops"]) {
         } else if([object.type isEqualToString:@"link_channel"]) {
         } else if([object.type isEqualToString:@"channel_init"]) {
+            Channel *channel = [_channels channelForBuffer:object.bid];
+            if(!channel) {
+                channel = [[Channel alloc] init];
+                [_channels addChannel:channel];
+            }
+            channel.cid = object.cid;
+            channel.bid = object.bid;
+            channel.name = [object objectForKey:@"chan"];
+            channel.type = [object objectForKey:@"channel_type"];
+            channel.mode = [object objectForKey:@"mode"];
+            channel.timestamp = [[object objectForKey:@"timestamp"] doubleValue];
+            channel.topic_text = [[object objectForKey:@"topic"] objectForKey:@"text"];
+            channel.topic_author = [[object objectForKey:@"topic"] objectForKey:@"nick"];
+            channel.topic_time = [[[object objectForKey:@"topic"] objectForKey:@"time"] doubleValue];
+            if(!backlog)
+                [self postObject:channel forEvent:kIRCEventChannelInit];
         } else if([object.type isEqualToString:@"channel_topic"]) {
+            if(!backlog) {
+                [_channels updateTopic:[object objectForKey:@"topic"] time:object.eid author:[object objectForKey:@"author"] buffer:object.bid];
+                [self postObject:object forEvent:kIRCEventChannelTopic];
+            }
         } else if([object.type isEqualToString:@"channel_url"]) {
+            if(!backlog)
+                [_channels updateURL:[object objectForKey:@"url"] buffer:object.bid];
         } else if([object.type isEqualToString:@"channel_mode"] || [object.type isEqualToString:@"channel_mode_is"]) {
+            if(!backlog) {
+                [_channels updateMode:[object objectForKey:@"newmode"] buffer:object.bid];
+                [self postObject:object forEvent:kIRCEventChannelMode];
+            }
         } else if([object.type isEqualToString:@"channel_timestamp"]) {
+            if(!backlog) {
+                [_channels updateTimestamp:[[object objectForKey:@"timestamp"] doubleValue] buffer:object.bid];
+                [self postObject:object forEvent:kIRCEventChannelTimestamp];
+            }
         } else if([object.type isEqualToString:@"joined_channel"] || [object.type isEqualToString:@"you_joined_channel"]) {
         } else if([object.type isEqualToString:@"parted_channel"] || [object.type isEqualToString:@"you_parted_channel"]) {
+            if(!backlog) {
+                if([object.type isEqualToString:@"you_parted_channel"]) {
+                    [_channels removeChannelForBuffer:object.bid];
+                }
+            }
         } else if([object.type isEqualToString:@"quit"]) {
         } else if([object.type isEqualToString:@"quit_server"]) {
         } else if([object.type isEqualToString:@"kicked_channel"] || [object.type isEqualToString:@"you_kicked_channel"]) {
+            if(!backlog) {
+                if([object.type isEqualToString:@"you_kicked_channel"]) {
+                    [_channels removeChannelForBuffer:object.bid];
+                }
+            }
         } else if([object.type isEqualToString:@"nickchange"] || [object.type isEqualToString:@"you_nickchange"]) {
             if(!backlog) {
                 if([object.type isEqualToString:@"you_nickchange"])
@@ -496,7 +537,6 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(void)_backlogCompleted:(NSNotification *)notification {
-    NSLog(@"Buffers: %@", [_buffers getBuffers]);
     OOBFetcher *fetcher = notification.object;
     if(fetcher.bid > 0)
         [_buffers updateTimeout:0 buffer:fetcher.bid];

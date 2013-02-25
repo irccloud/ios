@@ -10,22 +10,19 @@
 
 @implementation LoginSplashViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
+        _conn = [NetworkConnection sharedInstance];
     }
     return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 
     // Do any additional setup after loading the view from its nib.
     [version setText:[NSString stringWithFormat:@"Version %@",[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey]]];
-    _conn = [NetworkConnection sharedInstance];
 
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if(session != nil && [session length] > 0) {
@@ -41,7 +38,9 @@
         loadingView.alpha = 0;
         loginView.alpha = 1;
     }
-    
+}
+
+-(void)viewDidAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
                                                  name:UIKeyboardWillShowNotification object:nil];
@@ -57,6 +56,10 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogProgress:)
                                                  name:kIRCCloudBacklogProgressNotification object:nil];
+}
+
+-(void)viewDidDisappear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 -(void)backlogStarted:(NSNotification *)notification {

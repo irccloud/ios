@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "LoginSplashViewController.h"
+#import "MainViewController.h"
 
 @class ViewController;
 
@@ -16,5 +17,9 @@
 @property (strong, nonatomic) UIWindow *window;
 
 @property (strong, nonatomic) LoginSplashViewController *loginSplashViewController;
+@property (strong, nonatomic) MainViewController *mainViewController;
+
+-(void)showLoginView;
+-(void)showMainView;
 
 @end

@@ -10,15 +10,25 @@
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
-    //if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-    self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController" bundle:nil];
-    self.window.rootViewController = self.loginSplashViewController;
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPhone" bundle:nil];
+        self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPhone" bundle:nil];
+    }
+    [self showLoginView];
     [self.window makeKeyAndVisible];
     return YES;
+}
+
+-(void)showLoginView {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
+    self.window.rootViewController = self.loginSplashViewController;
+}
+
+-(void)showMainView {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
+    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
