@@ -96,20 +96,16 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    NSLog(@"buffers table appear");
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    NSLog(@"buffers table disappear");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-    NSLog(@"Got event: %i: %@", event, notification.object);
     [self refresh];
 }
 
@@ -313,6 +309,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     _selectedRow = indexPath.row;
+    if(_delegate)
+        [_delegate bufferSelected:[[[_data objectAtIndex:_selectedRow] objectForKey:@"bid"] intValue]];
     [tableView reloadData];
 }
 

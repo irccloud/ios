@@ -31,6 +31,10 @@
 		2236F63D16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		2236F64216DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
 		2236F64316DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
+		2236F64616DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
+		2236F64716DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
+		2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
+		2236F64B16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -127,6 +131,10 @@
 		2236F63A16DBF3CA007BE535 /* UIColor+IRCCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+IRCCloud.h"; sourceTree = "<group>"; };
 		2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+IRCCloud.m"; sourceTree = "<group>"; };
 		2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainViewController_iPad.xib; path = Classes/MainViewController_iPad.xib; sourceTree = "<group>"; };
+		2236F64416DD138A007BE535 /* UsersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersDataSource.h; sourceTree = "<group>"; };
+		2236F64516DD138B007BE535 /* UsersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersDataSource.m; sourceTree = "<group>"; };
+		2236F64816DD30E0007BE535 /* UsersTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersTableView.h; sourceTree = "<group>"; };
+		2236F64916DD30E3007BE535 /* UsersTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersTableView.m; sourceTree = "<group>"; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A056F16D3DABA0029769C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -334,6 +342,10 @@
 				2236F5F916DA765C007BE535 /* ServersDataSource.m */,
 				2236F63A16DBF3CA007BE535 /* UIColor+IRCCloud.h */,
 				2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */,
+				2236F64416DD138A007BE535 /* UsersDataSource.h */,
+				2236F64516DD138B007BE535 /* UsersDataSource.m */,
+				2236F64816DD30E0007BE535 /* UsersTableView.h */,
+				2236F64916DD30E3007BE535 /* UsersTableView.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -572,6 +584,8 @@
 				2236F60616DBCA85007BE535 /* BuffersTableView.m in Sources */,
 				2236F60B16DBCBC6007BE535 /* MainViewController.m in Sources */,
 				2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */,
+				2236F64616DD138C007BE535 /* UsersDataSource.m in Sources */,
+				2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -607,6 +621,8 @@
 				2236F60716DBCA85007BE535 /* BuffersTableView.m in Sources */,
 				2236F60C16DBCBC6007BE535 /* MainViewController.m in Sources */,
 				2236F63D16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */,
+				2236F64716DD138C007BE535 /* UsersDataSource.m in Sources */,
+				2236F64B16DD30E5007BE535 /* UsersTableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

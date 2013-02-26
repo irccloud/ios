@@ -11,4 +11,15 @@
 @interface UIColor (IRCCloud)
 +(UIColor *)backgroundBlueColor;
 +(UIColor *)selectedBlueColor;
++(UIColor *)ownersGroupColor;
++(UIColor *)adminsGroupColor;
++(UIColor *)opsGroupColor;
++(UIColor *)halfopsGroupColor;
++(UIColor *)voicedGroupColor;
++(UIColor *)ownersHeadingColor;
++(UIColor *)adminsHeadingColor;
++(UIColor *)opsHeadingColor;
++(UIColor *)halfopsHeadingColor;
++(UIColor *)voicedHeadingColor;
++(UIColor *)membersHeadingColor;
 @end

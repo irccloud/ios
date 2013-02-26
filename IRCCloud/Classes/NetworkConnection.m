@@ -118,6 +118,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _servers = [ServersDataSource sharedInstance];
     _buffers = [BuffersDataSource sharedInstance];
     _channels = [ChannelsDataSource sharedIntance];
+    _users = [UsersDataSource sharedInstance];
     _state = kIRCCloudStateDisconnected;
     _oobQueue = [[NSMutableArray alloc] init];
     _adapter = [[SBJsonStreamParserAdapter alloc] init];
@@ -382,6 +383,17 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             channel.topic_text = [[object objectForKey:@"topic"] objectForKey:@"text"];
             channel.topic_author = [[object objectForKey:@"topic"] objectForKey:@"nick"];
             channel.topic_time = [[[object objectForKey:@"topic"] objectForKey:@"time"] doubleValue];
+            [_users removeUsersForBuffer:object.bid];
+            for(NSDictionary *member in [object objectForKey:@"members"]) {
+                User *user = [[User alloc] init];
+                user.cid = object.cid;
+                user.bid = object.bid;
+                user.nick = [member objectForKey:@"nick"];
+                user.hostmask = [member objectForKey:@"usermask"];
+                user.mode = [member objectForKey:@"mode"];
+                user.away = [[member objectForKey:@"away"] intValue];
+                [_users addUser:user];
+            }
             if(!backlog)
                 [self postObject:channel forEvent:kIRCEventChannelInit];
         } else if([object.type isEqualToString:@"channel_topic"]) {
@@ -403,37 +415,73 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 [self postObject:object forEvent:kIRCEventChannelTimestamp];
             }
         } else if([object.type isEqualToString:@"joined_channel"] || [object.type isEqualToString:@"you_joined_channel"]) {
+            if(!backlog) {
+                User *user = [_users getUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                if(!user) {
+                    user = [[User alloc] init];
+                    [_users addUser:user];
+                }
+                if(user.nick)
+                    user.old_nick = user.nick;
+                user.nick = [object objectForKey:@"nick"];
+                user.hostmask = [object objectForKey:@"hostmask"];
+                user.mode = @"";
+                user.away = 0;
+                user.away_msg = @"";
+                [self postObject:object forEvent:kIRCEventJoin];
+            }
         } else if([object.type isEqualToString:@"parted_channel"] || [object.type isEqualToString:@"you_parted_channel"]) {
             if(!backlog) {
+                [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                 if([object.type isEqualToString:@"you_parted_channel"]) {
                     [_channels removeChannelForBuffer:object.bid];
+                    [_users removeUsersForBuffer:object.bid];
                 }
+                [self postObject:object forEvent:kIRCEventPart];
             }
         } else if([object.type isEqualToString:@"quit"]) {
+            if(!backlog) {
+                [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                [self postObject:object forEvent:kIRCEventQuit];
+            }
         } else if([object.type isEqualToString:@"quit_server"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventQuit];
         } else if([object.type isEqualToString:@"kicked_channel"] || [object.type isEqualToString:@"you_kicked_channel"]) {
             if(!backlog) {
+                [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                 if([object.type isEqualToString:@"you_kicked_channel"]) {
                     [_channels removeChannelForBuffer:object.bid];
+                    [_users removeUsersForBuffer:object.bid];
                 }
+                [self postObject:object forEvent:kIRCEventKick];
             }
         } else if([object.type isEqualToString:@"nickchange"] || [object.type isEqualToString:@"you_nickchange"]) {
             if(!backlog) {
+                [_users updateNick:[object objectForKey:@"newnick"] oldNick:[object objectForKey:@"oldnick"] cid:object.cid bid:object.bid];
                 if([object.type isEqualToString:@"you_nickchange"])
                     [_servers updateNick:[object objectForKey:@"new_nick"] server:object.cid];
                 [self postObject:object forEvent:kIRCEventNickChange];
             }
         } else if([object.type isEqualToString:@"user_channel_mode"]) {
+            if(!backlog) {
+                [_users updateMode:[object objectForKey:@"newmode"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                [self postObject:object forEvent:kIRCEventUserChannelMode];
+            }
         } else if([object.type isEqualToString:@"member_updates"]) {
+            NSLog(@"TODO: member_updates: %@", object);
         } else if([object.type isEqualToString:@"user_away"] || [object.type isEqualToString:@"away"]) {
+            [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             [_buffers updateAway:[object objectForKey:@"msg"] buffer:object.bid];
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventAway];
         } else if([object.type isEqualToString:@"self_away"]) {
+            [_users updateAway:1 msg:[object objectForKey:@"away_msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             [_servers updateAway:[object objectForKey:@"away_msg"] server:object.cid];
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventAway];
         } else if([object.type isEqualToString:@"self_back"]) {
+            [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             [_servers updateAway:@"" server:object.cid];
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventSelfBack];

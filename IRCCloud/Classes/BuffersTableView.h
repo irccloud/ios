@@ -8,9 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol BuffersTableViewDelegate<NSObject>
+-(void)bufferSelected:(int)bid;
+@end
+
 @interface BuffersTableView : UITableViewController {
     NSMutableArray *_data;
     int _selectedRow;
+    IBOutlet id<BuffersTableViewDelegate> _delegate;
 }
 
 @end
