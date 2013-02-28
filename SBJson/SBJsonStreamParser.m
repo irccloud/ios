@@ -276,10 +276,10 @@
     }
 }
 
-- (unichar)decodeHexQuad:(char *)quad {
+- (unichar)decodeHexQuad:(NSString *)quad offset:(int)offset {
     unichar ch = 0;
     for (NSUInteger i = 0; i < 4; i++) {
-        int c = quad[i];
+        int c = [quad characterAtIndex:i+offset];
         ch *= 16;
         switch (c) {
             case '0' ... '9': ch += c - '0'; break;
@@ -292,12 +292,13 @@
 }
 
 - (NSString*)decodeStringToken:(char*)bytes length:(NSUInteger)len {
+    NSString *input = [[NSString alloc] initWithBytes:bytes length:len encoding:NSUTF8StringEncoding];
     NSMutableString *string = [NSMutableString stringWithCapacity:len];
 
-    for (NSUInteger i = 0; i < len;) {
-        switch (bytes[i]) {
+    for (NSUInteger i = 0; i < input.length;) {
+        switch ([input characterAtIndex:i]) {
             case '\\': {
-                switch (bytes[++i]) {
+                switch ([input characterAtIndex:++i]) {
                     case '"': [string appendString:@"\""]; i++; break;
                     case '/': [string appendString:@"/"]; i++; break;
                     case '\\': [string appendString:@"\\"]; i++; break;
@@ -307,11 +308,11 @@
                     case 'r': [string appendString:@"\r"]; i++; break;
                     case 't': [string appendString:@"\t"]; i++; break;
                     case 'u': {
-                        unichar hi = [self decodeHexQuad:bytes + i + 1];
+                        unichar hi = [self decodeHexQuad:input offset:i+1];
                         i += 5;
                         if (SBStringIsSurrogateHighCharacter(hi)) {
                             // Skip past \u that we know is there..
-                            unichar lo = [self decodeHexQuad:bytes + i + 2];
+                            unichar lo = [self decodeHexQuad:input offset:i+2];
                             i += 6;
                             [string appendFormat:@"%C%C", hi, lo];
                         } else {
@@ -323,7 +324,7 @@
                 }
                 break;
             }
-            default: [string appendFormat:@"%c", bytes[i++]]; break;
+            default: [string appendFormat:@"%C", [input characterAtIndex:i++]]; break;
         }
     }
     return string;
