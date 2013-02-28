@@ -11,7 +11,7 @@
 #import "UsersTableView.h"
 #import "EventsTableView.h"
 
-@interface MainViewController : UIViewController<BuffersTableViewDelegate> {
+@interface MainViewController : UIViewController<BuffersTableViewDelegate, UIScrollViewDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;

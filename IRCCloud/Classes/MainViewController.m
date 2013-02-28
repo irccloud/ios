@@ -107,13 +107,34 @@
     return YES;
 }
 
-- (void)bufferSelected:(int)bid {
+-(void)bufferSelected:(int)bid {
     NSLog(@"BID selected: %i", bid);
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    self.navigationItem.title = _buffer.name;
     [_usersView setBuffer:_buffer];
     [_eventsView setBuffer:_buffer];
     if([self.view isKindOfClass:[UIScrollView class]]) {
         [((UIScrollView *)self.view) scrollRectToVisible:_eventsView.tableView.frame animated:YES];
+    }
+}
+
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    if(!decelerate) {
+        [self scrollViewWillBeginDecelerating:scrollView];
+    }
+}
+
+-(void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView{
+    NSLog(@"Finished scrolling: %f", scrollView.contentOffset.x);
+    if(scrollView.contentOffset.x < _buffersView.tableView.bounds.size.width - _buffersView.tableView.bounds.size.width/2) {
+        [scrollView scrollRectToVisible:_buffersView.tableView.frame animated:YES];
+        NSLog(@"Scroll to buffers list");
+    } else if(scrollView.contentOffset.x > _buffersView.tableView.bounds.size.width + _buffersView.tableView.bounds.size.width/2) {
+        [scrollView scrollRectToVisible:_usersView.tableView.frame animated:YES];
+        NSLog(@"Scroll to users list");
+    } else {
+        [scrollView scrollRectToVisible:_eventsView.tableView.frame animated:YES];
+        NSLog(@"Scroll to events list");
     }
 }
 @end
