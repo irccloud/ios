@@ -112,5 +112,8 @@
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     [_usersView setBuffer:_buffer];
     [_eventsView setBuffer:_buffer];
+    if([self.view isKindOfClass:[UIScrollView class]]) {
+        [((UIScrollView *)self.view) scrollRectToVisible:_eventsView.tableView.frame animated:YES];
+    }
 }
 @end
