@@ -314,7 +314,7 @@ WebSocketWaitingState waitingState;
             }
             break;
         case MessageOpCodeText:
-            if (aFragment.isFinal) {
+            /*if (aFragment.isFinal) {
                 if (aFragment.payloadData.length) {
                     NSString *textMsg = [[NSString alloc] initWithData:aFragment.payloadData encoding:NSUTF8StringEncoding];
                     if (textMsg) {
@@ -328,7 +328,7 @@ WebSocketWaitingState waitingState;
                     [self dispatchTextMessageReceived:@""];
                 }
             }
-            break;
+            break;*/
         case MessageOpCodeBinary:
             if (aFragment.isFinal) {
                 [self dispatchBinaryMessageReceived:aFragment.payloadData];
