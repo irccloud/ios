@@ -22,4 +22,5 @@
 +(UIColor *)halfopsHeadingColor;
 +(UIColor *)voicedHeadingColor;
 +(UIColor *)membersHeadingColor;
++(UIColor *)timestampColor;
 @end

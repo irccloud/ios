@@ -48,4 +48,7 @@
 +(UIColor *)membersHeadingColor {
     return [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
 }
++(UIColor *)timestampColor {
+    return [UIColor colorWithRed:0.667 green:0.667 blue:0.667 alpha:1];
+}
 @end

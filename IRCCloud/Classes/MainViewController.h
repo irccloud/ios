@@ -9,10 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "BuffersTableView.h"
 #import "UsersTableView.h"
+#import "EventsTableView.h"
 
 @interface MainViewController : UIViewController<BuffersTableViewDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
+    IBOutlet EventsTableView *_eventsView;
     IBOutlet UIView *_contentView;
 }
 

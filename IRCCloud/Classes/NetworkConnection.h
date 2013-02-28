@@ -13,6 +13,7 @@
 #import "BuffersDataSource.h"
 #import "ChannelsDataSource.h"
 #import "UsersDataSource.h"
+#import "EventsDataSource.h"
 
 #define IRCCLOUD_HOST @"www.irccloud.com"
 
@@ -86,6 +87,7 @@ typedef enum {
     BuffersDataSource *_buffers;
     ChannelsDataSource *_channels;
     UsersDataSource *_users;
+    EventsDataSource *_events;
     NSMutableArray *_oobQueue;
     NSTimer *_idleTimer;
     NSTimeInterval _idleInterval;

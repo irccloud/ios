@@ -119,6 +119,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _buffers = [BuffersDataSource sharedInstance];
     _channels = [ChannelsDataSource sharedIntance];
     _users = [UsersDataSource sharedInstance];
+    _events = [EventsDataSource sharedInstance];
     _state = kIRCCloudStateDisconnected;
     _oobQueue = [[NSMutableArray alloc] init];
     _adapter = [[SBJsonStreamParserAdapter alloc] init];
@@ -155,7 +156,10 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 -(void)connect {
     _state = kIRCCloudStateConnecting;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
-    WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:[NSString stringWithFormat:@"wss://%@",IRCCLOUD_HOST] origin:nil protocols:nil
+    NSString *url = [NSString stringWithFormat:@"wss://%@",IRCCLOUD_HOST];
+    if(_events.highestEid > 0)
+        url = [url stringByAppendingFormat:@"?since_id=%g", _events.highestEid];
+    WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:nil protocols:nil
                                                                      tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: [NSNull null],
                                                                                   (NSString *)kCFStreamSSLAllowsAnyRoot: @YES,
                                                                                   (NSString *)kCFStreamSSLValidatesCertificateChain: @NO} mutableCopy]
@@ -212,6 +216,9 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 - (void) didReceiveBinaryMessage: (NSData*) aMessage {
+    if(aMessage) {
+        [_parser parse:aMessage];
+    }
 }
 
 -(void)postObject:(id)object forEvent:(kIRCEvent)event {
@@ -367,7 +374,13 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                   || [object.type isEqualToString:@"server_luserme"] || [object.type isEqualToString:@"server_n_local"] || [object.type isEqualToString:@"server_luserchannels"] || [object.type isEqualToString:@"connecting_failed"] || [object.type isEqualToString:@"nickname_in_use"] || [object.type isEqualToString:@"channel_invite"] || [object.type hasPrefix:@"stats"]
                   || [object.type isEqualToString:@"server_n_global"] || [object.type isEqualToString:@"motd_response"] || [object.type isEqualToString:@"server_luserunknown"] || [object.type isEqualToString:@"socket_closed"] || [object.type isEqualToString:@"channel_mode_list_change"] || [object.type isEqualToString:@"msg_services"] || [object.type isEqualToString:@"endofstats"]
                   || [object.type isEqualToString:@"server_yourhost"] || [object.type isEqualToString:@"server_created"] || [object.type isEqualToString:@"inviting_to_channel"] || [object.type isEqualToString:@"error"] || [object.type isEqualToString:@"too_fast"] || [object.type isEqualToString:@"no_bots"] || [object.type isEqualToString:@"wallops"]) {
+            Event *event = [_events addJSONObject:object];
+            if(!backlog)
+                [self postObject:event forEvent:kIRCEventBufferMsg];
         } else if([object.type isEqualToString:@"link_channel"]) {
+            [_events addJSONObject:object];
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventLinkChannel];
         } else if([object.type isEqualToString:@"channel_init"]) {
             Channel *channel = [_channels channelForBuffer:object.bid];
             if(!channel) {
@@ -397,6 +410,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             if(!backlog)
                 [self postObject:channel forEvent:kIRCEventChannelInit];
         } else if([object.type isEqualToString:@"channel_topic"]) {
+            [_events addJSONObject:object];
             if(!backlog) {
                 [_channels updateTopic:[object objectForKey:@"topic"] time:object.eid author:[object objectForKey:@"author"] buffer:object.bid];
                 [self postObject:object forEvent:kIRCEventChannelTopic];
@@ -405,6 +419,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             if(!backlog)
                 [_channels updateURL:[object objectForKey:@"url"] buffer:object.bid];
         } else if([object.type isEqualToString:@"channel_mode"] || [object.type isEqualToString:@"channel_mode_is"]) {
+            [_events addJSONObject:object];
             if(!backlog) {
                 [_channels updateMode:[object objectForKey:@"newmode"] buffer:object.bid];
                 [self postObject:object forEvent:kIRCEventChannelMode];
@@ -415,6 +430,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 [self postObject:object forEvent:kIRCEventChannelTimestamp];
             }
         } else if([object.type isEqualToString:@"joined_channel"] || [object.type isEqualToString:@"you_joined_channel"]) {
+            [_events addJSONObject:object];
             if(!backlog) {
                 User *user = [_users getUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                 if(!user) {
@@ -431,6 +447,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 [self postObject:object forEvent:kIRCEventJoin];
             }
         } else if([object.type isEqualToString:@"parted_channel"] || [object.type isEqualToString:@"you_parted_channel"]) {
+            [_events addJSONObject:object];
             if(!backlog) {
                 [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                 if([object.type isEqualToString:@"you_parted_channel"]) {
@@ -440,14 +457,17 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 [self postObject:object forEvent:kIRCEventPart];
             }
         } else if([object.type isEqualToString:@"quit"]) {
+            [_events addJSONObject:object];
             if(!backlog) {
                 [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                 [self postObject:object forEvent:kIRCEventQuit];
             }
         } else if([object.type isEqualToString:@"quit_server"]) {
+            [_events addJSONObject:object];
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventQuit];
         } else if([object.type isEqualToString:@"kicked_channel"] || [object.type isEqualToString:@"you_kicked_channel"]) {
+            [_events addJSONObject:object];
             if(!backlog) {
                 [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                 if([object.type isEqualToString:@"you_kicked_channel"]) {
@@ -457,6 +477,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 [self postObject:object forEvent:kIRCEventKick];
             }
         } else if([object.type isEqualToString:@"nickchange"] || [object.type isEqualToString:@"you_nickchange"]) {
+            [_events addJSONObject:object];
             if(!backlog) {
                 [_users updateNick:[object objectForKey:@"newnick"] oldNick:[object objectForKey:@"oldnick"] cid:object.cid bid:object.bid];
                 if([object.type isEqualToString:@"you_nickchange"])
@@ -464,6 +485,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 [self postObject:object forEvent:kIRCEventNickChange];
             }
         } else if([object.type isEqualToString:@"user_channel_mode"]) {
+            [_events addJSONObject:object];
             if(!backlog) {
                 [_users updateMode:[object objectForKey:@"newmode"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                 [self postObject:object forEvent:kIRCEventUserChannelMode];
@@ -486,10 +508,12 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventSelfBack];
         } else if([object.type isEqualToString:@"self_details"]) {
+            [_events addJSONObject:object];
             [_servers updateUsermask:[object objectForKey:@"usermask"] server:object.bid];
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventSelfDetails];
         } else if([object.type isEqualToString:@"user_mode"]) {
+            [_events addJSONObject:object];
             if(!backlog) {
                 [_servers updateMode:[object objectForKey:@"newmode"] server:object.cid];
                 [self postObject:object forEvent:kIRCEventUserMode];

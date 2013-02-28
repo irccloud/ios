@@ -96,17 +96,12 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-- (void)handleEvent:(NSNotification *)notification {
-    kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-    [self refresh];
 }
 
 - (void)refresh {
@@ -123,6 +118,9 @@
                     NSString *name = server.name;
                     if(!name || name.length == 0)
                         name = server.hostname;
+                    //TODO: check the disabled map
+                    unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     [_data addObject:@{
                      @"type":@TYPE_SERVER,
                      @"cid":@(buffer.cid),
@@ -151,8 +149,11 @@
                     type = TYPE_CONVERSATION;
                 }
                 if(type > 0 && buffer.archived == 0) {
-                    int unread = (_data.count % 3 == 0)?1:0;
+                    int unread = 0;
                     int highlights = 0;
+                    //TODO: check the disabled map
+                    unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     [_data addObject:@{
                      @"type":@(type),
                      @"cid":@(buffer.cid),

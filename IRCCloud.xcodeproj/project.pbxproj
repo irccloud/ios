@@ -35,6 +35,8 @@
 		2236F64716DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
 		2236F64B16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
+		223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
+		223DA90D16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -100,6 +102,8 @@
 		22B4287F16D831A800498507 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
 		22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
+		22F9EE1D16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -135,6 +139,8 @@
 		2236F64516DD138B007BE535 /* UsersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersDataSource.m; sourceTree = "<group>"; };
 		2236F64816DD30E0007BE535 /* UsersTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersTableView.h; sourceTree = "<group>"; };
 		2236F64916DD30E3007BE535 /* UsersTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersTableView.m; sourceTree = "<group>"; };
+		223DA90A16DFC626006FF808 /* EventsTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsTableView.h; sourceTree = "<group>"; };
+		223DA90B16DFC626006FF808 /* EventsTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsTableView.m; sourceTree = "<group>"; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A056F16D3DABA0029769C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -209,6 +215,8 @@
 		22B4286516D831A800498507 /* WebSocketMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebSocketMessage.m; sourceTree = "<group>"; };
 		22B4288416D846BF00498507 /* IRCCloudJSONObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudJSONObject.h; sourceTree = "<group>"; };
 		22B4288516D846BF00498507 /* IRCCloudJSONObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudJSONObject.m; sourceTree = "<group>"; };
+		22F9EE1A16DE6F21004615C0 /* EventsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsDataSource.h; sourceTree = "<group>"; };
+		22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsDataSource.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -330,6 +338,10 @@
 				2236F60516DBCA85007BE535 /* BuffersTableView.m */,
 				2236F60016DBC020007BE535 /* ChannelsDataSource.h */,
 				2236F60116DBC021007BE535 /* ChannelsDataSource.m */,
+				22F9EE1A16DE6F21004615C0 /* EventsDataSource.h */,
+				22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */,
+				223DA90A16DFC626006FF808 /* EventsTableView.h */,
+				223DA90B16DFC626006FF808 /* EventsTableView.m */,
 				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
 				228A05DB16D3E40E0029769C /* LoginSplashViewController.h */,
@@ -586,6 +598,8 @@
 				2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */,
 				2236F64616DD138C007BE535 /* UsersDataSource.m in Sources */,
 				2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */,
+				22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */,
+				223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -623,6 +637,8 @@
 				2236F63D16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */,
 				2236F64716DD138C007BE535 /* UsersDataSource.m in Sources */,
 				2236F64B16DD30E5007BE535 /* UsersTableView.m in Sources */,
+				22F9EE1D16DE6F21004615C0 /* EventsDataSource.m in Sources */,
+				223DA90D16DFC626006FF808 /* EventsTableView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
