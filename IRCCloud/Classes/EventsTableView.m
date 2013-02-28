@@ -184,8 +184,10 @@
 
     [self _addItem:event eid:event.eid];
     
-    if(!backlog)
+    if(!backlog) {
         [self.tableView reloadData];
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+    }
 }
 
 -(void)_addItem:(Event *)e eid:(NSTimeInterval)eid {
@@ -296,15 +298,8 @@
     }
 }
 
--(void)setBuffer:(int)bid cid:(int)cid name:(NSString *)name type:(NSString *)type {
-    _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
-    if(!_buffer) {
-        _buffer = [[Buffer alloc] init];
-        _buffer.bid = -1;
-        _buffer.cid = cid;
-        _buffer.name = name;
-        _buffer.type = type;
-    }
+-(void)setBuffer:(Buffer *)buffer {
+    _buffer = buffer;
     [self refresh];
 }
 
@@ -340,7 +335,7 @@
         }
         
         [self.tableView reloadData];
-        
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
     }
 }
@@ -372,9 +367,9 @@
     @synchronized(_data) {
         Event *e = [_data objectAtIndex:indexPath.row];
         if(e.rowType == ROW_MESSAGE) {
-            if(e.formatted == nil && e.formattedMsg) {
+            if(e.formatted == nil && e.formattedMsg.length > 0) {
                 e.formatted = [[NSAttributedString alloc] initWithString:e.formattedMsg]; //TODO: parse IRC color codes here
-            } else if(!e.formattedMsg) {
+            } else if(e.formattedMsg.length == 0) {
                 NSLog(@"No formatted message: %@", e);
                 return 26;
             }

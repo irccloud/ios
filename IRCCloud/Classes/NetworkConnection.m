@@ -127,6 +127,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _parser = [[SBJsonStreamParser alloc] init];
     _parser.supportMultipleDocuments = YES;
     _parser.delegate = _adapter;
+    _lastReqId = 0;
+    _writer = [[SBJsonWriter alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey];
@@ -151,6 +153,23 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     
     return [[[SBJsonParser alloc] init] objectWithData:data];
+}
+
+-(int)_sendRequest:(NSString *)method args:(NSDictionary *)args {
+    @synchronized(_writer) {
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:args];
+        [dict setObject:method forKey:@"_method"];
+        [dict setObject:@(_lastReqId++) forKey:@"_reqid"];
+        [_socket sendText:[_writer stringWithObject:dict]];
+        return _lastReqId;
+    }
+}
+
+-(int)say:(NSString *)message to:(NSString *)to cid:(int)cid {
+    if(to)
+        return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":to}];
+    else
+        return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message}];
 }
 
 -(void)connect {

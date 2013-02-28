@@ -83,6 +83,7 @@ typedef enum {
     WebSocket *_socket;
     SBJsonStreamParserAdapter *_adapter;
     SBJsonStreamParser *_parser;
+    SBJsonWriter *_writer;
     ServersDataSource *_servers;
     BuffersDataSource *_buffers;
     ChannelsDataSource *_channels;
@@ -93,6 +94,7 @@ typedef enum {
     NSTimeInterval _idleInterval;
     int _totalBuffers;
     int _numBuffers;
+    int _lastReqId;
     
     kIRCCloudState _state;
     NSDictionary *_userInfo;
@@ -110,4 +112,5 @@ typedef enum {
 -(void)cancelIdleTimer;
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid;
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid;
+-(int)say:(NSString *)message to:(NSString *)cid cid:(int)cid;
 @end

@@ -76,7 +76,7 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         _data = [[NSMutableArray alloc] init];
-        _bid = -1;
+        _buffer = nil;
     }
     return self;
 }
@@ -133,8 +133,8 @@
     }
 }
 
-- (void)setBuffer:(int)bid {
-    _bid = bid;
+- (void)setBuffer:(Buffer *)buffer {
+    _buffer = buffer;
     [self refresh];
 }
 
@@ -148,7 +148,7 @@
         NSMutableArray *voiced = [[NSMutableArray alloc] init];
         NSMutableArray *members = [[NSMutableArray alloc] init];
         
-        for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_bid]) {
+        for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
             if([user.mode rangeOfString:@"q"].location != NSNotFound)
                 [owners addObject:user];
             else if([user.mode rangeOfString:@"a"].location != NSNotFound)

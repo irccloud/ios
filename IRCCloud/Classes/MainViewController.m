@@ -7,6 +7,7 @@
 //
 
 #import "MainViewController.h"
+#import "NetworkConnection.h"
 
 @implementation MainViewController
 
@@ -25,6 +26,42 @@
         _contentView = self.view;
     }
     [self bufferSelected:[BuffersDataSource sharedInstance].firstBid];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardWillShowNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillBeHidden:)
+                                                 name:UIKeyboardWillHideNotification object:nil];
+}
+
+-(void)keyboardWillShow:(NSNotification*)notification {
+    CGSize keyboardSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue] toView:nil].size;
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [UIView setAnimationDuration:0.3];
+    
+    CGRect frame = self.view.frame;
+    frame.size.height -= keyboardSize.height;
+    self.view.frame = frame;
+    
+    [UIView commitAnimations];
+}
+
+-(void)keyboardWillBeHidden:(NSNotification*)notification {
+    CGSize keyboardSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue] toView:nil].size;
+    
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [UIView setAnimationDuration:0.3];
+    
+    CGRect frame = self.view.frame;
+    frame.size.height += keyboardSize.height;
+    self.view.frame = frame;
+    
+    [UIView commitAnimations];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -60,10 +97,20 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(IBAction)sendButtonPressed:(id)sender {
+    [[NetworkConnection sharedInstance] say:_message.text to:_buffer.name cid:_buffer.cid];
+    _message.text = @"";
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [self sendButtonPressed:textField];
+    return YES;
+}
+
 - (void)bufferSelected:(int)bid {
     NSLog(@"BID selected: %i", bid);
-    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
-    [_usersView setBuffer:bid];
-    [_eventsView setBuffer:b.bid cid:b.cid name:b.name type:b.type];
+    _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    [_usersView setBuffer:_buffer];
+    [_eventsView setBuffer:_buffer];
 }
 @end

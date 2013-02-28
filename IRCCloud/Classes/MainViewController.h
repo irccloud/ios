@@ -16,6 +16,8 @@
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
     IBOutlet UIView *_contentView;
+    IBOutlet UITextField *_message;
+    Buffer *_buffer;
 }
-
+-(IBAction)sendButtonPressed:(id)sender;
 @end

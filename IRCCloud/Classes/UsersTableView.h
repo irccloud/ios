@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "BuffersDataSource.h"
 
 @interface UsersTableView : UITableViewController {
     NSMutableArray *_data;
-    int _bid;
+    Buffer *_buffer;
 }
--(void)setBuffer:(int)bid;
+-(void)setBuffer:(Buffer *)buffer;
 @end

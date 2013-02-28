@@ -19,5 +19,5 @@
     int _currentGroupPosition;
 }
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
--(void)setBuffer:(int)bid cid:(int)cid name:(NSString *)name type:(NSString *)type;
+-(void)setBuffer:(Buffer *)buffer;
 @end
