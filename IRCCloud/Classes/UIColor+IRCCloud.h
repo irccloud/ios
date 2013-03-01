@@ -23,4 +23,6 @@
 +(UIColor *)voicedHeadingColor;
 +(UIColor *)membersHeadingColor;
 +(UIColor *)timestampColor;
++(UIColor *) colorFromHexString:(NSString *)hexString;
++(UIColor *)mIRCColor:(int)color;
 @end

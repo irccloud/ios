@@ -10,6 +10,7 @@
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
 #import "TTTAttributedLabel.h"
+#import "ColorFormatter.h"
 
 #define ROW_MESSAGE 0
 #define ROW_TIMESTAMP 1
@@ -18,12 +19,12 @@
 
 @interface EventsTableCell : UITableViewCell {
     UILabel *_timestamp;
-    UILabel *_message;
+    TTTAttributedLabel *_message;
     int _type;
 }
 @property int type;
 @property (readonly) UILabel *timestamp;
-@property (readonly) UILabel *message;
+@property (readonly) TTTAttributedLabel *message;
 @end
 
 @implementation EventsTableCell
@@ -42,7 +43,7 @@
         _timestamp.textColor = [UIColor timestampColor];
         [self.contentView addSubview:_timestamp];
 
-        _message = [[UILabel alloc] init];
+        _message = [[TTTAttributedLabel alloc] init];
         _message.font = [UIFont systemFontOfSize:16];
         _message.numberOfLines = 0;
         _message.lineBreakMode = NSLineBreakByWordWrapping;
@@ -57,9 +58,11 @@
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
-    frame.origin.x = 6;
     frame.size.width -= 12;
-    frame.size.height -= 6;
+    if(_type == ROW_MESSAGE) {
+        frame.origin.x = 6;
+        frame.size.height -= 6;
+    }
     
     if(_type == ROW_TIMESTAMP) {
         _timestamp.frame = frame;
@@ -153,7 +156,7 @@
     }
     
     if(event.from) {
-        event.formattedMsg = [NSString stringWithFormat:@"%c%@\%c %@", 2, event.from, 2, event.msg];
+        event.formattedMsg = [NSString stringWithFormat:@"%c%@\%c %@", BOLD, event.from, CLEAR, event.msg];
     } else {
         event.formattedMsg = event.msg;
     }
@@ -161,25 +164,25 @@
     //TODO: check ignores
     
     if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
-        event.formattedMsg = [NSString stringWithFormat:@"%@ by %c%@%c", event.msg, 2, event.from, 2];
-    } else if([type isEqualToString:@"buffer_msg_msg"]) {
-        event.formattedMsg = [NSString stringWithFormat:@"— %c%c%@%c %@%c", 16, 2, event.from, 2, event.msg, 16];
+        event.formattedMsg = [NSString stringWithFormat:@"%@ by %c%@", event.msg, BOLD, event.from];
+    } else if([type isEqualToString:@"buffer_me_msg"]) {
+        event.formattedMsg = [NSString stringWithFormat:@"— %c%c%@%c %@", ITALICS, BOLD, event.from, BOLD, event.msg];
     } else if([type isEqualToString:@"kicked_channel"]) {
         event.formattedMsg = @"← ";
         if([event.type hasPrefix:@"you_"])
             event.formattedMsg = [event.formattedMsg stringByAppendingString:@"You"];
         else
-            event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c", 2, event.oldNick, 2];
+            event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c", BOLD, event.oldNick, CLEAR];
         if([event.type hasPrefix:@"you_"])
             event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
         else
             event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
-        event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %c%@%c (%@)", 2, event.nick, 2, event.hostmask];
+        event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %c%@%c (%@)", BOLD, event.nick, CLEAR, event.hostmask];
         if(event.msg.length > 0)
             event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
     } else if([type isEqualToString:@"channel_mode_list_change"]) {
         if(event.from.length == 0)
-            event.formattedMsg = [NSString stringWithFormat:@"%@ %c%@%c", event.msg, 2, event.nick, 2];
+            event.formattedMsg = [NSString stringWithFormat:@"%@ %c%@", event.msg, BOLD, event.nick];
     }
 
     [self _addItem:event eid:event.eid];
@@ -291,7 +294,7 @@
         d.rowType = ROW_TIMESTAMP;
         d.eid = eid;
         d.timestamp = [_formatter stringFromDate:date];
-        d.bgColor = [UIColor grayColor];
+        d.bgColor = [UIColor timestampColor];
         [_data insertObject:d atIndex:insertPos];
         if(_currentGroupPosition > -1)
             _currentGroupPosition++;
@@ -368,7 +371,7 @@
         Event *e = [_data objectAtIndex:indexPath.row];
         if(e.rowType == ROW_MESSAGE) {
             if(e.formatted == nil && e.formattedMsg.length > 0) {
-                e.formatted = [[NSAttributedString alloc] initWithString:e.formattedMsg]; //TODO: parse IRC color codes here
+                e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color];
             } else if(e.formattedMsg.length == 0) {
                 NSLog(@"No formatted message: %@", e);
                 return 26;
@@ -388,9 +391,13 @@
         Event *e = [_data objectAtIndex:[indexPath row]];
         cell.type = e.rowType;
         cell.contentView.backgroundColor = e.bgColor;
-        cell.message.textColor = e.color;
-        cell.message.text = [e.formatted string];
+        cell.message.text = e.formatted;
         cell.timestamp.text = e.timestamp;
+        if(e.rowType == ROW_TIMESTAMP) {
+            cell.timestamp.textColor = [UIColor blackColor];
+        } else {
+            cell.timestamp.textColor = [UIColor timestampColor];
+        }
         return cell;
     }
 }

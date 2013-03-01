@@ -35,6 +35,8 @@
 		2236F64716DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
 		2236F64B16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
+		2237E13D16E1214A00CA188F /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
+		2237E13E16E1214A00CA188F /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
 		223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		223DA90D16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
@@ -139,6 +141,8 @@
 		2236F64516DD138B007BE535 /* UsersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersDataSource.m; sourceTree = "<group>"; };
 		2236F64816DD30E0007BE535 /* UsersTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersTableView.h; sourceTree = "<group>"; };
 		2236F64916DD30E3007BE535 /* UsersTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersTableView.m; sourceTree = "<group>"; };
+		2237E13B16E1214A00CA188F /* ColorFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorFormatter.h; sourceTree = "<group>"; };
+		2237E13C16E1214A00CA188F /* ColorFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorFormatter.m; sourceTree = "<group>"; };
 		223DA90A16DFC626006FF808 /* EventsTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsTableView.h; sourceTree = "<group>"; };
 		223DA90B16DFC626006FF808 /* EventsTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsTableView.m; sourceTree = "<group>"; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -338,6 +342,8 @@
 				2236F60516DBCA85007BE535 /* BuffersTableView.m */,
 				2236F60016DBC020007BE535 /* ChannelsDataSource.h */,
 				2236F60116DBC021007BE535 /* ChannelsDataSource.m */,
+				2237E13B16E1214A00CA188F /* ColorFormatter.h */,
+				2237E13C16E1214A00CA188F /* ColorFormatter.m */,
 				22F9EE1A16DE6F21004615C0 /* EventsDataSource.h */,
 				22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */,
 				223DA90A16DFC626006FF808 /* EventsTableView.h */,
@@ -600,6 +606,7 @@
 				2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */,
 				22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */,
 				223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */,
+				2237E13D16E1214A00CA188F /* ColorFormatter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -639,6 +646,7 @@
 				2236F64B16DD30E5007BE535 /* UsersTableView.m in Sources */,
 				22F9EE1D16DE6F21004615C0 /* EventsDataSource.m in Sources */,
 				223DA90D16DFC626006FF808 /* EventsTableView.m in Sources */,
+				2237E13E16E1214A00CA188F /* ColorFormatter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -51,4 +51,65 @@
 +(UIColor *)timestampColor {
     return [UIColor colorWithRed:0.667 green:0.667 blue:0.667 alpha:1];
 }
++(UIColor *) colorFromHexString:(NSString *)hexString {
+    //From: http://stackoverflow.com/a/3805354
+    
+    NSString *cleanString = [hexString stringByReplacingOccurrencesOfString:@"#" withString:@""];
+    if([cleanString length] == 3) {
+        cleanString = [NSString stringWithFormat:@"%@%@%@%@%@%@",
+                       [cleanString substringWithRange:NSMakeRange(0, 1)],[cleanString substringWithRange:NSMakeRange(0, 1)],
+                       [cleanString substringWithRange:NSMakeRange(1, 1)],[cleanString substringWithRange:NSMakeRange(1, 1)],
+                       [cleanString substringWithRange:NSMakeRange(2, 1)],[cleanString substringWithRange:NSMakeRange(2, 1)]];
+    }
+    if([cleanString length] == 6) {
+        cleanString = [cleanString stringByAppendingString:@"ff"];
+    }
+    
+    unsigned int baseValue;
+    [[NSScanner scannerWithString:cleanString] scanHexInt:&baseValue];
+    
+    float red = ((baseValue >> 24) & 0xFF)/255.0f;
+    float green = ((baseValue >> 16) & 0xFF)/255.0f;
+    float blue = ((baseValue >> 8) & 0xFF)/255.0f;
+    float alpha = ((baseValue >> 0) & 0xFF)/255.0f;
+    
+    return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
+}
++(UIColor *)mIRCColor:(int)color {
+    switch(color) {
+        case 0:
+            return [UIColor colorFromHexString:@"FFFFFF"]; //white
+        case 1:
+            return [UIColor colorFromHexString:@"000000"]; //black
+        case 2:
+            return [UIColor colorFromHexString:@"000080"]; //navy
+        case 3:
+            return [UIColor colorFromHexString:@"008000"]; //green
+        case 4:
+            return [UIColor colorFromHexString:@"FF0000"]; //red
+        case 5:
+            return [UIColor colorFromHexString:@"800000"]; //maroon
+        case 6:
+            return [UIColor colorFromHexString:@"800080"]; //purple
+        case 7:
+            return [UIColor colorFromHexString:@"FFA500"]; //orange
+        case 8:
+            return [UIColor colorFromHexString:@"FFFF00"]; //yellow
+        case 9:
+            return [UIColor colorFromHexString:@"00FF00"]; //lime
+        case 10:
+            return [UIColor colorFromHexString:@"008080"]; //teal
+        case 11:
+            return [UIColor colorFromHexString:@"00FFFF"]; //cyan
+        case 12:
+            return [UIColor colorFromHexString:@"0000FF"]; //blue
+        case 13:
+            return [UIColor colorFromHexString:@"FF00FF"]; //magenta
+        case 14:
+            return [UIColor colorFromHexString:@"808080"]; //grey
+        case 15:
+            return [UIColor colorFromHexString:@"C0C0C0"]; //silver
+    }
+    return nil;
+}
 @end
