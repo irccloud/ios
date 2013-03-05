@@ -112,4 +112,19 @@
     }
     return nil;
 }
++(UIColor *)errorBackgroundColor {
+    return [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
+}
++(UIColor *)highlightBackgroundColor {
+    return [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
+}
++(UIColor *)statusBackgroundColor {
+    return [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
+}
++(UIColor *)selfBackgroundColor {
+    return [UIColor colorWithRed:0.929 green:0.957 blue:1 alpha:1];
+}
++(UIColor *)noticeBackgroundColor {
+    return [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
+}
 @end

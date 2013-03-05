@@ -15,6 +15,8 @@
 #define ITALICS 16
 #define UNDERLINE 31
 
+#define FONT_SIZE 14
+
 @interface ColorFormatter : NSObject
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color;
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono;
 @end

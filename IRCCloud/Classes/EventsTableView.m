@@ -38,13 +38,13 @@
         self.backgroundColor = [UIColor whiteColor];
         
         _timestamp = [[UILabel alloc] init];
-        _timestamp.font = [UIFont systemFontOfSize:16];
+        _timestamp.font = [UIFont systemFontOfSize:FONT_SIZE];
         _timestamp.backgroundColor = [UIColor clearColor];
         _timestamp.textColor = [UIColor timestampColor];
         [self.contentView addSubview:_timestamp];
 
         _message = [[TTTAttributedLabel alloc] init];
-        _message.font = [UIFont systemFontOfSize:16];
+        _message.font = [UIFont systemFontOfSize:FONT_SIZE];
         _message.numberOfLines = 0;
         _message.lineBreakMode = NSLineBreakByWordWrapping;
         _message.backgroundColor = [UIColor clearColor];
@@ -155,7 +155,7 @@
         type = [type substringFromIndex:4];
     }
     
-    if(event.from) {
+    if([event.from length]) {
         event.formattedMsg = [NSString stringWithFormat:@"%c%@\%c %@", BOLD, event.from, CLEAR, event.msg];
     } else {
         event.formattedMsg = event.msg;
@@ -166,7 +166,7 @@
     if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
         event.formattedMsg = [NSString stringWithFormat:@"%@ by %c%@", event.msg, BOLD, event.from];
     } else if([type isEqualToString:@"buffer_me_msg"]) {
-        event.formattedMsg = [NSString stringWithFormat:@"— %c%c%@%c %@", ITALICS, BOLD, event.from, BOLD, event.msg];
+        event.formattedMsg = [NSString stringWithFormat:@"— %c%c%@%c %@", ITALICS, BOLD, event.nick, BOLD, event.msg];
     } else if([type isEqualToString:@"kicked_channel"]) {
         event.formattedMsg = @"← ";
         if([event.type hasPrefix:@"you_"])
@@ -371,12 +371,13 @@
         Event *e = [_data objectAtIndex:indexPath.row];
         if(e.rowType == ROW_MESSAGE) {
             if(e.formatted == nil && e.formattedMsg.length > 0) {
-                e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color];
+                e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace];
             } else if(e.formattedMsg.length == 0) {
                 NSLog(@"No formatted message: %@", e);
                 return 26;
             }
-            return [[e.formatted string] sizeWithFont:[UIFont systemFontOfSize:16] constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 76 - 12, 10000) lineBreakMode:NSLineBreakByWordWrapping].height + 6;
+            UIFont *font = e.monospace?[UIFont fontWithName:@"Courier" size:FONT_SIZE]:[UIFont fontWithName:@"Helvetica" size:FONT_SIZE];
+            return [[e.formatted string] sizeWithFont:font constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 76 - 12, 10000) lineBreakMode:NSLineBreakByWordWrapping].height + 6;
         } else {
             return 26;
         }

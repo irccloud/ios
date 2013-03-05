@@ -12,12 +12,21 @@
 #import "UIColor+IRCCloud.h"
 
 @implementation ColorFormatter
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color {
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;
-    UIFont *boldSystemFont = [UIFont boldSystemFontOfSize:16];
-    UIFont *italicSystemFont = [UIFont italicSystemFontOfSize:16];
-    UIFont *boldItalicSystemFont = [UIFont fontWithName:@"Helvetica-BoldOblique" size:16];
+    UIFont *font, *boldFont, *italicFont, *boldItalicFont;
+    if(mono) {
+        font = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        boldFont = [UIFont fontWithName:@"Courier-Bold" size:FONT_SIZE];
+        italicFont = [UIFont fontWithName:@"Courier-Oblique" size:FONT_SIZE];
+        boldItalicFont = [UIFont fontWithName:@"Courier-BoldOblique" size:FONT_SIZE];
+    } else {
+        font = [UIFont fontWithName:@"Helvetica" size:FONT_SIZE];
+        boldFont = [UIFont fontWithName:@"Helvetica-Bold" size:FONT_SIZE];
+        italicFont = [UIFont fontWithName:@"Helvetica-Oblique" size:FONT_SIZE];
+        boldItalicFont = [UIFont fontWithName:@"Helvetica-BoldOblique" size:FONT_SIZE];
+    }
     NSMutableArray *attributes = [[NSMutableArray alloc] init];
     
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", input, CLEAR];
@@ -30,20 +39,20 @@
                     if(italics != -1) {
                         if(italics < bold - 1) {
                             [attributes addObject:@{
-                             (NSString *)kCTFontAttributeName:italicSystemFont,
+                             (NSString *)kCTFontAttributeName:italicFont,
                              @"start":@(italics),
                              @"length":@(bold - italics)
                              }];
                         }
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldItalicSystemFont,
+                         (NSString *)kCTFontAttributeName:boldItalicFont,
                          @"start":@(bold),
                          @"length":@(i - bold)
                          }];
                         italics = i;
                     } else {
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldSystemFont,
+                         (NSString *)kCTFontAttributeName:boldFont,
                          @"start":@(bold),
                          @"length":@(i - bold)
                          }];
@@ -60,19 +69,19 @@
                 } else {
                     if(bold != -1) {
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldSystemFont,
+                         (NSString *)kCTFontAttributeName:boldFont,
                          @"start":@(bold),
                          @"length":@(italics - bold)
                          }];
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldItalicSystemFont,
+                         (NSString *)kCTFontAttributeName:boldItalicFont,
                          @"start":@(italics),
                          @"length":@(i - italics)
                          }];
                         bold = i;
                     } else {
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:italicSystemFont,
+                         (NSString *)kCTFontAttributeName:italicFont,
                          @"start":@(italics),
                          @"length":@(i - italics)
                          }];
@@ -185,36 +194,36 @@
                 if(bold != -1 && italics != -1) {
                     if(bold < italics) {
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldSystemFont,
+                         (NSString *)kCTFontAttributeName:boldFont,
                          @"start":@(bold),
                          @"length":@(italics - bold)
                          }];
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldItalicSystemFont,
+                         (NSString *)kCTFontAttributeName:boldItalicFont,
                          @"start":@(italics),
                          @"length":@(i - italics)
                          }];
                     } else {
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:italicSystemFont,
+                         (NSString *)kCTFontAttributeName:italicFont,
                          @"start":@(italics),
                          @"length":@(bold - italics)
                          }];
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldItalicSystemFont,
+                         (NSString *)kCTFontAttributeName:boldItalicFont,
                          @"start":@(bold),
                          @"length":@(i - bold)
                          }];
                     }
                 } else if(bold != -1) {
                     [attributes addObject:@{
-                     (NSString *)kCTFontAttributeName:boldSystemFont,
+                     (NSString *)kCTFontAttributeName:boldFont,
                      @"start":@(bold),
                      @"length":@(i - bold)
                      }];
                 } else if(italics != -1) {
                     [attributes addObject:@{
-                     (NSString *)kCTFontAttributeName:italicSystemFont,
+                     (NSString *)kCTFontAttributeName:italicFont,
                      @"start":@(italics),
                      @"length":@(i - italics)
                      }];
@@ -235,7 +244,7 @@
     }
     
     NSMutableAttributedString *output = [[NSMutableAttributedString alloc] initWithString:text];
-    [output addAttributes:@{(NSString *)kCTFontAttributeName:[UIFont systemFontOfSize:16]} range:NSMakeRange(0, text.length)];
+    [output addAttributes:@{(NSString *)kCTFontAttributeName:font} range:NSMakeRange(0, text.length)];
     [output addAttributes:@{(NSString *)kCTForegroundColorAttributeName:color} range:NSMakeRange(0, text.length)];
 
     for(NSDictionary *dict in attributes) {
