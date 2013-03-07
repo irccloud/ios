@@ -12,6 +12,37 @@
 #import "UIColor+IRCCloud.h"
 
 @implementation ColorFormatter
++(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode {
+    NSString *output = [NSString stringWithFormat:@"%c%@%c", BOLD, nick, CLEAR];
+    BOOL showSymbol = NO; //TODO: check the prefs
+
+    if(mode) {
+        if(showSymbol) {
+            if([mode rangeOfString:@"q"].location != NSNotFound)
+                output = [NSString stringWithFormat:@"%cE7AA00%c~%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+            else if([mode rangeOfString:@"a"].location != NSNotFound)
+                output = [NSString stringWithFormat:@"%c6500A5%c&%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+            else if([mode rangeOfString:@"o"].location != NSNotFound)
+                output = [NSString stringWithFormat:@"%cBA1719%c@%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+            else if([mode rangeOfString:@"h"].location != NSNotFound)
+                output = [NSString stringWithFormat:@"%cB55900%c%%%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+            else if([mode rangeOfString:@"v"].location != NSNotFound)
+                output = [NSString stringWithFormat:@"%c25B100%c+%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+        } else {
+            if([mode rangeOfString:@"q"].location != NSNotFound)
+                output = [NSString stringWithFormat:@"%cE7AA00%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+            else if([mode rangeOfString:@"a"].location != NSNotFound)
+                output = [NSString stringWithFormat:@"%c6500A5%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+            else if([mode rangeOfString:@"o"].location != NSNotFound)
+                output = [NSString stringWithFormat:@"%cBA1719%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+            else if([mode rangeOfString:@"h"].location != NSNotFound)
+                output = [NSString stringWithFormat:@"%cB55900%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+            else if([mode rangeOfString:@"v"].location != NSNotFound)
+                output = [NSString stringWithFormat:@"%c25B100%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+        }
+    }
+    return output;
+}
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;

@@ -91,6 +91,8 @@
     if (self) {
         _formatter = [[NSDateFormatter alloc] init];
         _data = [[NSMutableArray alloc] init];
+        _expandedSectionEids = [[NSMutableDictionary alloc] init];
+        _collapsedEvents = [[CollapsedEvents alloc] init];
         _buffer = nil;
     }
     return self;
@@ -148,23 +150,80 @@
 }
 
 - (void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped {
-    //TODO: collapse events
+    if(_minEid == 0)
+        _minEid = event.eid;
+    if(event.eid == _minEid) {
+        //TODO: hide the loading header
+    }
+    if(event.eid < _earliestEid)
+        _earliestEid = event.eid;
     
+    NSTimeInterval eid = event.eid;
     NSString *type = event.type;
     if([type hasPrefix:@"you_"]) {
         type = [type substringFromIndex:4];
     }
-    
-    if([event.from length]) {
-        event.formattedMsg = [NSString stringWithFormat:@"%c%@\%c %@", BOLD, event.from, CLEAR, event.msg];
+
+    if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]) {
+        //TODO: check join/part/quit hidden map
+        
+        [_formatter setDateFormat:@"DDD"];
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
+        
+        if(_currentCollapsedEid == -1 || ![[_formatter stringFromDate:date] isEqualToString:_lastCollpasedDay]) {
+            [_collapsedEvents clear];
+            _currentCollapsedEid = eid;
+            _lastCollpasedDay = [_formatter stringFromDate:date];
+        }
+        
+        if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)])
+            [_collapsedEvents clear];
+        
+        if([type isEqualToString:@"user_channel_mode"]) {
+            event.color = [UIColor blackColor];
+            event.bgColor = [UIColor statusBackgroundColor];
+        } else {
+            event.color = [UIColor timestampColor];
+            event.bgColor = [UIColor whiteColor];
+        }
+        
+        if(![_collapsedEvents addEvent:event]) {
+            [_collapsedEvents clear];
+        }
+        
+        NSString *msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse];
+        if(msg == nil && [type isEqualToString:@"nickchange"])
+            msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [ColorFormatter formatNick:event.nick mode:event.fromMode], BOLD];
+        if(msg == nil && [type isEqualToString:@"user_channel_mode"]) {
+            msg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [ColorFormatter formatNick:event.from mode:event.fromMode], BOLD, BOLD, event.diff, [ColorFormatter formatNick:event.nick mode:event.fromMode], BOLD];
+            _currentCollapsedEid = eid;
+        }
+        if(![_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
+            if(eid != _currentCollapsedEid) {
+                msg = [NSString stringWithFormat:@"[+] %@", msg];
+                event.color = [UIColor timestampColor];
+                event.bgColor = [UIColor whiteColor];
+            }
+            eid = _currentCollapsedEid;
+        }
+        event.groupMsg = msg;
+        event.formattedMsg = nil;
+        event.linkify = NO;
     } else {
-        event.formattedMsg = event.msg;
+        _currentCollapsedEid = -1;
+        [_collapsedEvents clear];
+
+        if([event.from length]) {
+            event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [ColorFormatter formatNick:event.from mode:event.fromMode], event.msg];
+        } else {
+            event.formattedMsg = event.msg;
+        }
     }
     
     //TODO: check ignores
     
     if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
-        event.formattedMsg = [NSString stringWithFormat:@"%@ by %c%@", event.msg, BOLD, event.from];
+        event.formattedMsg = [NSString stringWithFormat:@"%@ by %c%@", event.msg, BOLD, event.nick];
     } else if([type isEqualToString:@"buffer_me_msg"]) {
         event.formattedMsg = [NSString stringWithFormat:@"— %c%c%@%c %@", ITALICS, BOLD, event.nick, BOLD, event.msg];
     } else if([type isEqualToString:@"kicked_channel"]) {
@@ -185,7 +244,7 @@
             event.formattedMsg = [NSString stringWithFormat:@"%@ %c%@", event.msg, BOLD, event.nick];
     }
 
-    [self _addItem:event eid:event.eid];
+    [self _addItem:event eid:eid];
     
     if(!backlog) {
         [self.tableView reloadData];
@@ -200,6 +259,11 @@
     //TODO: check date format pref
     [_formatter setDateFormat:@"h:mm a"];
     e.timestamp = [_formatter stringFromDate:date];
+    e.groupEid = _currentCollapsedEid;
+    e.formatted = nil;
+    if(e.groupMsg && !e.formattedMsg)
+        e.formattedMsg = e.groupMsg;
+    
     if(eid > _maxEid || _data.count == 0 || eid > ((Event *)[_data objectAtIndex:_data.count - 1]).eid) {
         //Message at bottom
         if(_data.count) {
@@ -303,7 +367,9 @@
 
 -(void)setBuffer:(Buffer *)buffer {
     _buffer = buffer;
+    [_expandedSectionEids removeAllObjects];
     [self refresh];
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
 }
 
 - (void)refresh {
@@ -312,6 +378,8 @@
         _minEid = _maxEid = _earliestEid = 0;
         _currentCollapsedEid = 0;
         _currentGroupPosition = -1;
+        _lastCollpasedDay = @"";
+        [_collapsedEvents clear];
         
         [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
 
@@ -338,7 +406,6 @@
         }
         
         [self.tableView reloadData];
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
     }
 }
@@ -446,6 +513,15 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    
+    NSTimeInterval group = ((Event *)[_data objectAtIndex:indexPath.row]).groupEid;
+    if(group) {
+        if([_expandedSectionEids objectForKey:@(group)])
+            [_expandedSectionEids removeObjectForKey:@(group)];
+        else
+            [_expandedSectionEids setObject:@(YES) forKey:@(group)];
+        [self refresh];
+    }
 }
 
 @end

@@ -92,7 +92,7 @@
     event.msg = [object objectForKey:@"msg"];
     event.hostmask = [object objectForKey:@"hostmask"];
     event.from = [object objectForKey:@"from"];
-    event.fromMode = [object objectForKey:@"fromMode"];
+    event.fromMode = [object objectForKey:@"from_mode"];
     if([object objectForKey:@"newnick"])
         event.nick = [object objectForKey:@"newnick"];
     else
