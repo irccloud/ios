@@ -47,6 +47,7 @@
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;
     UIFont *font, *boldFont, *italicFont, *boldItalicFont;
+    UIFont *arrowFont = [UIFont fontWithName:@"HiraMinProN-W3" size:FONT_SIZE];
     if(mono) {
         font = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
         boldFont = [UIFont fontWithName:@"Courier-Bold" size:FONT_SIZE];
@@ -59,10 +60,17 @@
         boldItalicFont = [UIFont fontWithName:@"Helvetica-BoldOblique" size:FONT_SIZE];
     }
     NSMutableArray *attributes = [[NSMutableArray alloc] init];
+    NSMutableArray *arrowIndex = [[NSMutableArray alloc] init];
     
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", input, CLEAR];
     for(int i = 0; i < text.length; i++) {
         switch([text characterAtIndex:i]) {
+            case 0x2190:
+            case 0x2192:
+            case 0x2194:
+            case 0x21D0:
+                [arrowIndex addObject:@(i)];
+                break;
             case BOLD:
                 if(bold == -1) {
                     bold = i;
@@ -278,6 +286,20 @@
     [output addAttributes:@{(NSString *)kCTFontAttributeName:font} range:NSMakeRange(0, text.length)];
     [output addAttributes:@{(NSString *)kCTForegroundColorAttributeName:color} range:NSMakeRange(0, text.length)];
 
+    for(NSNumber *i in arrowIndex) {
+        [output addAttributes:@{(NSString *)kCTFontAttributeName:arrowFont} range:NSMakeRange([i intValue], 1)];
+    }
+    
+    float lineSpacing = 6;
+    CTParagraphStyleSetting paragraphStyle;
+    paragraphStyle.spec = kCTParagraphStyleSpecifierLineSpacing;
+    paragraphStyle.valueSize = sizeof(CGFloat);
+    paragraphStyle.value = &lineSpacing;
+    
+    CTParagraphStyleRef style = CTParagraphStyleCreate((const CTParagraphStyleSetting*) &paragraphStyle, 1);
+    [output addAttribute:(NSString*)kCTParagraphStyleAttributeName value:(__bridge id)style range:NSMakeRange(0, [output length])];
+    CFRelease(style);
+    
     for(NSDictionary *dict in attributes) {
         if([dict objectForKey:kTTTBackgroundFillColorAttributeName]) {
             [output addAttribute:kTTTBackgroundFillColorAttributeName value:(id)[[dict objectForKey:kTTTBackgroundFillColorAttributeName] CGColor] range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];

@@ -44,6 +44,7 @@
         [self.contentView addSubview:_timestamp];
 
         _message = [[TTTAttributedLabel alloc] init];
+        _message.verticalAlignment = TTTAttributedLabelVerticalAlignmentTop;
         _message.font = [UIFont systemFontOfSize:FONT_SIZE];
         _message.numberOfLines = 0;
         _message.lineBreakMode = NSLineBreakByWordWrapping;
@@ -61,6 +62,7 @@
     frame.size.width -= 12;
     if(_type == ROW_MESSAGE) {
         frame.origin.x = 6;
+        frame.origin.y = 4;
         frame.size.height -= 6;
     }
     
@@ -443,8 +445,11 @@
                 NSLog(@"No formatted message: %@", e);
                 return 26;
             }
-            UIFont *font = e.monospace?[UIFont fontWithName:@"Courier" size:FONT_SIZE]:[UIFont fontWithName:@"Helvetica" size:FONT_SIZE];
-            return [[e.formatted string] sizeWithFont:font constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 76 - 12, 10000) lineBreakMode:NSLineBreakByWordWrapping].height + 6;
+            CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
+             CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 76 - 12,CGFLOAT_MAX), NULL);
+             float height = ceilf(suggestedSize.height);
+             CFRelease(framesetter);
+            return height + 8;
         } else {
             return 26;
         }

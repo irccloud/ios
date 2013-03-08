@@ -382,6 +382,7 @@
                             break;
                         case kCollapsedEventQuit:
                             [message appendString:@" quit"];
+                            break;
                         case kCollapsedEventPopIn:
                             [message appendString:@" popped in"];
                             break;
