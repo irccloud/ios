@@ -46,18 +46,18 @@
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;
-    UIFont *font, *boldFont, *italicFont, *boldItalicFont;
-    UIFont *arrowFont = [UIFont fontWithName:@"HiraMinProN-W3" size:FONT_SIZE];
+    CTFontRef font, boldFont, italicFont, boldItalicFont;
+    CTFontRef arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL);
     if(mono) {
-        font = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-        boldFont = [UIFont fontWithName:@"Courier-Bold" size:FONT_SIZE];
-        italicFont = [UIFont fontWithName:@"Courier-Oblique" size:FONT_SIZE];
-        boldItalicFont = [UIFont fontWithName:@"Courier-BoldOblique" size:FONT_SIZE];
+        font = CTFontCreateWithName((CFStringRef)@"Courier", FONT_SIZE, NULL);
+        boldFont = CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL);
+        italicFont = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", FONT_SIZE, NULL);
+        boldItalicFont = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", FONT_SIZE, NULL);
     } else {
-        font = [UIFont fontWithName:@"Helvetica" size:FONT_SIZE];
-        boldFont = [UIFont fontWithName:@"Helvetica-Bold" size:FONT_SIZE];
-        italicFont = [UIFont fontWithName:@"Helvetica-Oblique" size:FONT_SIZE];
-        boldItalicFont = [UIFont fontWithName:@"Helvetica-BoldOblique" size:FONT_SIZE];
+        font = CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL);
+        boldFont = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
+        italicFont = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
+        boldItalicFont = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
     }
     NSMutableArray *attributes = [[NSMutableArray alloc] init];
     NSMutableArray *arrowIndex = [[NSMutableArray alloc] init];
@@ -78,20 +78,20 @@
                     if(italics != -1) {
                         if(italics < bold - 1) {
                             [attributes addObject:@{
-                             (NSString *)kCTFontAttributeName:italicFont,
+                             (NSString *)kCTFontAttributeName:(__bridge id)italicFont,
                              @"start":@(italics),
                              @"length":@(bold - italics)
                              }];
                         }
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldItalicFont,
+                         (NSString *)kCTFontAttributeName:(__bridge id)boldItalicFont,
                          @"start":@(bold),
                          @"length":@(i - bold)
                          }];
                         italics = i;
                     } else {
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldFont,
+                         (NSString *)kCTFontAttributeName:(__bridge id)boldFont,
                          @"start":@(bold),
                          @"length":@(i - bold)
                          }];
@@ -108,19 +108,19 @@
                 } else {
                     if(bold != -1) {
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldFont,
+                         (NSString *)kCTFontAttributeName:(__bridge id)boldFont,
                          @"start":@(bold),
                          @"length":@(italics - bold)
                          }];
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldItalicFont,
+                         (NSString *)kCTFontAttributeName:(__bridge id)boldItalicFont,
                          @"start":@(italics),
                          @"length":@(i - italics)
                          }];
                         bold = i;
                     } else {
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:italicFont,
+                         (NSString *)kCTFontAttributeName:(__bridge id)italicFont,
                          @"start":@(italics),
                          @"length":@(i - italics)
                          }];
@@ -148,7 +148,7 @@
             case COLOR_RGB:
                 if(fg != -1) {
                     [attributes addObject:@{
-                     (NSString *)kCTForegroundColorAttributeName:fgColor,
+                     (NSString *)kCTForegroundColorAttributeName:(__bridge id)[fgColor CGColor],
                      @"start":@(fg),
                      @"length":@(i - fg)
                      }];
@@ -156,7 +156,7 @@
                 }
                 if(bg != -1) {
                     [attributes addObject:@{
-                     (NSString *)kTTTBackgroundFillColorAttributeName:bgColor,
+                     (NSString *)kTTTBackgroundFillColorAttributeName:(__bridge id)[bgColor CGColor],
                      @"start":@(bg),
                      @"length":@(i - bg)
                      }];
@@ -216,7 +216,7 @@
             case CLEAR:
                 if(fg != -1) {
                     [attributes addObject:@{
-                     (NSString *)kCTForegroundColorAttributeName:fgColor,
+                     (NSString *)kCTForegroundColorAttributeName:(__bridge id)[fgColor CGColor],
                      @"start":@(fg),
                      @"length":@(i - fg)
                      }];
@@ -224,7 +224,7 @@
                 }
                 if(bg != -1) {
                     [attributes addObject:@{
-                     (NSString *)kTTTBackgroundFillColorAttributeName:bgColor,
+                     (NSString *)kTTTBackgroundFillColorAttributeName:(__bridge id)[bgColor CGColor],
                      @"start":@(bg),
                      @"length":@(i - bg)
                      }];
@@ -233,36 +233,36 @@
                 if(bold != -1 && italics != -1) {
                     if(bold < italics) {
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldFont,
+                         (NSString *)kCTFontAttributeName:(__bridge id)boldFont,
                          @"start":@(bold),
                          @"length":@(italics - bold)
                          }];
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldItalicFont,
+                         (NSString *)kCTFontAttributeName:(__bridge id)boldItalicFont,
                          @"start":@(italics),
                          @"length":@(i - italics)
                          }];
                     } else {
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:italicFont,
+                         (NSString *)kCTFontAttributeName:(__bridge id)italicFont,
                          @"start":@(italics),
                          @"length":@(bold - italics)
                          }];
                         [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:boldItalicFont,
+                         (NSString *)kCTFontAttributeName:(__bridge id)boldItalicFont,
                          @"start":@(bold),
                          @"length":@(i - bold)
                          }];
                     }
                 } else if(bold != -1) {
                     [attributes addObject:@{
-                     (NSString *)kCTFontAttributeName:boldFont,
+                     (NSString *)kCTFontAttributeName:(__bridge id)boldFont,
                      @"start":@(bold),
                      @"length":@(i - bold)
                      }];
                 } else if(italics != -1) {
                     [attributes addObject:@{
-                     (NSString *)kCTFontAttributeName:italicFont,
+                     (NSString *)kCTFontAttributeName:(__bridge id)italicFont,
                      @"start":@(italics),
                      @"length":@(i - italics)
                      }];
@@ -283,11 +283,11 @@
     }
     
     NSMutableAttributedString *output = [[NSMutableAttributedString alloc] initWithString:text];
-    [output addAttributes:@{(NSString *)kCTFontAttributeName:font} range:NSMakeRange(0, text.length)];
-    [output addAttributes:@{(NSString *)kCTForegroundColorAttributeName:color} range:NSMakeRange(0, text.length)];
+    [output addAttributes:@{(NSString *)kCTFontAttributeName:(__bridge id)font} range:NSMakeRange(0, text.length)];
+    [output addAttributes:@{(NSString *)kCTForegroundColorAttributeName:(__bridge id)[color CGColor]} range:NSMakeRange(0, text.length)];
 
     for(NSNumber *i in arrowIndex) {
-        [output addAttributes:@{(NSString *)kCTFontAttributeName:arrowFont} range:NSMakeRange([i intValue], 1)];
+        [output addAttributes:@{(NSString *)kCTFontAttributeName:(__bridge id)arrowFont} range:NSMakeRange([i intValue], 1)];
     }
     
     float lineSpacing = 6;
@@ -301,12 +301,13 @@
     CFRelease(style);
     
     for(NSDictionary *dict in attributes) {
-        if([dict objectForKey:kTTTBackgroundFillColorAttributeName]) {
-            [output addAttribute:kTTTBackgroundFillColorAttributeName value:(id)[[dict objectForKey:kTTTBackgroundFillColorAttributeName] CGColor] range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];
-        } else {
-            [output addAttributes:dict range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];
-        }
+        [output addAttributes:dict range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];
     }
+    
+    CFRelease(font);
+    CFRelease(boldFont);
+    CFRelease(italicFont);
+    CFRelease(boldItalicFont);
     
     return output;
 }
