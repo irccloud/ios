@@ -106,7 +106,6 @@
     activity.hidden = NO;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] login:[username text] password:[password text]];
-        NSLog(@"Result: %@", result);
         if([[result objectForKey:@"success"] intValue] == 1) {
             [[NSUserDefaults standardUserDefaults] setObject:[result objectForKey:@"session"] forKey:@"session"];
             [[NSUserDefaults standardUserDefaults] synchronize];
