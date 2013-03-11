@@ -9,13 +9,11 @@
 #import "EventsTableView.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
-#import "TTTAttributedLabel.h"
 #import "ColorFormatter.h"
 
 #define ROW_MESSAGE 0
 #define ROW_TIMESTAMP 1
 #define TYPE_TIMESTMP @"__timestamp__"
-
 
 @interface EventsTableCell : UITableViewCell {
     UILabel *_timestamp;
@@ -338,7 +336,7 @@
     }
     
     if(insertPos == -1) {
-        NSLog(@"Couldn't insert EID: %f MSG: %@", eid, e.formattedMsg);
+        TFLog(@"Couldn't insert EID: %f MSG: %@", eid, e.formattedMsg);
         return;
     }
     
@@ -442,7 +440,7 @@
             if(e.formatted == nil && e.formattedMsg.length > 0) {
                 e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace];
             } else if(e.formattedMsg.length == 0) {
-                NSLog(@"No formatted message: %@", e);
+                TFLog(@"No formatted message: %@", e);
                 return 26;
             }
             CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
@@ -464,6 +462,11 @@
         Event *e = [_data objectAtIndex:[indexPath row]];
         cell.type = e.rowType;
         cell.contentView.backgroundColor = e.bgColor;
+        cell.message.delegate = self;
+        if(e.linkify)
+            cell.message.dataDetectorTypes = UIDataDetectorTypeLink;
+        else
+            cell.message.dataDetectorTypes = UIDataDetectorTypeNone;
         cell.message.text = e.formatted;
         cell.timestamp.text = e.timestamp;
         if(e.rowType == ROW_TIMESTAMP) {
@@ -473,6 +476,11 @@
         }
         return cell;
     }
+}
+
+- (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {
+    //TODO: check for irc:// URLs
+    [[UIApplication sharedApplication] openURL:url];
 }
 
 /*

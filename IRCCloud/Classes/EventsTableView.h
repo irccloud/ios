@@ -10,8 +10,9 @@
 #import "BuffersDataSource.h"
 #import "EventsDataSource.h"
 #import "CollapsedEvents.h"
+#import "TTTAttributedLabel.h"
 
-@interface EventsTableView : UITableViewController {
+@interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate> {
     NSDateFormatter *_formatter;
     NSMutableArray *_data;
     NSMutableDictionary *_expandedSectionEids;
