@@ -108,7 +108,7 @@
 }
 
 -(void)bufferSelected:(int)bid {
-    NSLog(@"BID selected: %i", bid);
+    TFLog(@"BID selected: %i", bid);
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     self.navigationItem.title = _buffer.name;
     [_usersView setBuffer:_buffer];

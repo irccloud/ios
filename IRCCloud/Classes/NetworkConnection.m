@@ -68,26 +68,26 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         _running = YES;
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
     } else {
-        NSLog(@"Failed to create NSURLConnection");
+        TFLog(@"Failed to create NSURLConnection");
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
     }
 }
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-	NSLog(@"Request failed: %@", error);
+	TFLog(@"Request failed: %@", error);
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-	NSLog(@"Backlog download completed");
+	TFLog(@"Backlog download completed");
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
-	NSLog(@"Fetching: %@", [request URL]);
+	TFLog(@"Fetching: %@", [request URL]);
 	return request;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
 	if([response statusCode] != 200) {
-        NSLog(@"HTTP status code: %i", [response statusCode]);
-		NSLog(@"HTTP headers: %@", [response allHeaderFields]);
+        TFLog(@"HTTP status code: %i", [response statusCode]);
+		TFLog(@"HTTP headers: %@", [response allHeaderFields]);
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
 	}
 }
@@ -133,7 +133,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey];
     _userAgent = [NSString stringWithFormat:@"IRCCloud/%@ (%@; %@; %@ %@)", version, [UIDevice currentDevice].model, [[[NSUserDefaults standardUserDefaults] objectForKey: @"AppleLanguages"] objectAtIndex:0], [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
-    NSLog(@"%@", _userAgent);
+    TFLog(@"%@", _userAgent);
     return self;
 }
 
@@ -209,21 +209,21 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(void)didOpen {
-    NSLog(@"Socket connected");
+    TFLog(@"Socket connected");
     _state = kIRCCloudStateConnected;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
 }
 
 -(void)didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError {
-    NSLog(@"Status Code: %i", aStatusCode);
-    NSLog(@"Close Message: %@", aMessage);
-    NSLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
+    TFLog(@"Status Code: %i", aStatusCode);
+    TFLog(@"Close Message: %@", aMessage);
+    TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
     _state = kIRCCloudStateDisconnected;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
 }
 
 -(void)didReceiveError: (NSError*) aError {
-    NSLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
+    TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
     _state = kIRCCloudStateDisconnected;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
 }
@@ -254,7 +254,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         if([object.type isEqualToString:@"header"]) {
             _idleInterval = [[object objectForKey:@"idle_interval"] doubleValue] / 1000.0;
             _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
-            NSLog(@"idle interval: %f clock offset: %f", _idleInterval, _clockOffset);
+            TFLog(@"idle interval: %f clock offset: %f", _idleInterval, _clockOffset);
         } else if([object.type isEqualToString:@"oob_include"]) {
             [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
         } else if([object.type isEqualToString:@"stat_user"]) {
@@ -510,7 +510,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 [self postObject:object forEvent:kIRCEventUserChannelMode];
             }
         } else if([object.type isEqualToString:@"member_updates"]) {
-            NSLog(@"TODO: member_updates: %@", object);
+            TFLog(@"TODO: member_updates: %@", object);
         } else if([object.type isEqualToString:@"user_away"] || [object.type isEqualToString:@"away"]) {
             [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             [_buffers updateAway:[object objectForKey:@"msg"] buffer:object.bid];
@@ -557,10 +557,10 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 }
             }
         } else {
-            NSLog(@"Unhandled type: %@", object);
+            TFLog(@"Unhandled type: %@", object);
         }
     } else {
-        NSLog(@"Repsonse: %@", object);
+        TFLog(@"Repsonse: %@", object);
     }
     if(_idleInterval > 0)
         [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
@@ -582,7 +582,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 -(void)_idle {
     _idleTimer = nil;
-    NSLog(@"Websocket idle time exceeded, reconnecting...");
+    TFLog(@"Websocket idle time exceeded, reconnecting...");
     [_socket close];
     [self connect];
 }
@@ -605,7 +605,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 -(OOBFetcher *)fetchOOB:(NSString *)url {
     for(OOBFetcher *fetcher in _oobQueue) {
         if([fetcher.url isEqualToString:url]) {
-            NSLog(@"Ignoring duplicate OOB request");
+            TFLog(@"Ignoring duplicate OOB request");
             return fetcher;
         }
     }
@@ -616,7 +616,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             [fetcher start];
         }];
     } else {
-        NSLog(@"OOB Request has been queued");
+        TFLog(@"OOB Request has been queued");
     }
     return fetcher;
 }
@@ -645,7 +645,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 -(void)_scheduleTimedoutBuffers {
     for(Buffer *buffer in [_buffers getBuffers]) {
         if(buffer.timeout > 0) {
-            NSLog(@"Requesting backlog for timed-out buffer: %@", buffer.name);
+            TFLog(@"Requesting backlog for timed-out buffer: %@", buffer.name);
             [self requestBacklogForBuffer:buffer.bid server:buffer.cid];
         }
     }
