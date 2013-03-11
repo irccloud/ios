@@ -369,7 +369,8 @@
     _buffer = buffer;
     [_expandedSectionEids removeAllObjects];
     [self refresh];
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
+    if(_data.count)
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
 }
 
 - (void)refresh {

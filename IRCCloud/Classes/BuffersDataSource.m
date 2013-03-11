@@ -61,7 +61,10 @@
 
 -(int)firstBid {
     @synchronized(_buffers) {
-        return ((Buffer *)[_buffers objectAtIndex:0]).bid;
+        if(_buffers.count)
+            return ((Buffer *)[_buffers objectAtIndex:0]).bid;
+        else
+            return -1;
     }
 }
 

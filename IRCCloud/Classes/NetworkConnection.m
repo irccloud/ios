@@ -67,6 +67,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     if(_connection) {
         _running = YES;
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
+        NSRunLoop *loop = [NSRunLoop currentRunLoop];
+        while(!_cancelled && _running && [loop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
     } else {
         TFLog(@"Failed to create NSURLConnection");
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
@@ -75,10 +77,12 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
 	TFLog(@"Request failed: %@", error);
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
+    _running = NO;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
 	TFLog(@"Backlog download completed");
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
+    _running = NO;
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
 	TFLog(@"Fetching: %@", [request URL]);
@@ -115,6 +119,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 -(id)init {
     self = [super init];
+    _queue = [[NSOperationQueue alloc] init];
     _servers = [ServersDataSource sharedInstance];
     _buffers = [BuffersDataSource sharedInstance];
     _channels = [ChannelsDataSource sharedIntance];
@@ -246,7 +251,14 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     }];
 }
 
+-(void)_postLoadingProgress:(NSNumber *)progress {
+    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogProgressNotification object:progress];
+
+}
+
 -(void)parse:(NSDictionary *)dict backlog:(BOOL)backlog {
+    if([NSThread currentThread].isMainThread)
+        NSLog(@"WARNING: Parsing on main thread");
     [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
     IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
     if(object.type) {
@@ -305,7 +317,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 [self postObject:buffer forEvent:kIRCEventMakeBuffer];
             if(_numBuffers > 0) {
                 _totalBuffers++;
-                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogProgressNotification object:[NSNumber numberWithFloat:(float)_totalBuffers / (float)_numBuffers]];
+                [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:[NSNumber numberWithFloat:(float)_totalBuffers / (float)_numBuffers] waitUntilDone:YES];
+                //[[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogProgressNotification object:@((float)_totalBuffers / (float)_numBuffers)];
             }
         } else if([object.type isEqualToString:@"global_system_message"]) {
         } else if([object.type isEqualToString:@"idle"] || [object.type isEqualToString:@"end_of_backlog"] || [object.type isEqualToString:@"backlog_complete"]) {
@@ -612,7 +625,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     OOBFetcher *fetcher = [[OOBFetcher alloc] initWithURL:url];
     [_oobQueue addObject:fetcher];
     if(_oobQueue.count == 1) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [_queue addOperationWithBlock:^{
             [fetcher start];
         }];
     } else {
@@ -650,7 +663,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         }
     }
     if(_oobQueue.count > 0) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [_queue addOperationWithBlock:^{
             [(OOBFetcher *)[_oobQueue objectAtIndex:0] start];
         }];
     }

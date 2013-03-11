@@ -70,7 +70,7 @@
 }
 
 -(void)backlogProgress:(NSNotification *)notification {
-    progress.progress = [notification.object floatValue];
+    [progress setProgress:[notification.object floatValue] animated:YES];
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {

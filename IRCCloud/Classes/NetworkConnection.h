@@ -99,6 +99,7 @@ typedef enum {
     kIRCCloudState _state;
     NSDictionary *_userInfo;
     NSTimeInterval _clockOffset;
+    NSOperationQueue *_queue;
 }
 @property (readonly) kIRCCloudState state;
 @property (readonly) NSDictionary *userInfo;
