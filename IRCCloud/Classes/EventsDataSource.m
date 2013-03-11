@@ -169,7 +169,10 @@
         //event.row_type = MessageViewFragment.ROW_SOCKETCLOSED;
         event.color = [UIColor timestampColor];
         event.from = @"";
-        event.msg = [@"Failed to connect: " stringByAppendingString:[object objectForKey:@"reason"]];
+        if([object objectForKey:@"reason"])
+            event.msg = [@"Failed to connect: " stringByAppendingString:[object objectForKey:@"reason"]];
+        else
+            event.msg = @"Failed to connect.";
     } else if([object.type isEqualToString:@"quit_server"]) {
         event.from = @"";
         event.msg = @"⇐ You disconnected";
