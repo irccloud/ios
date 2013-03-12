@@ -17,6 +17,11 @@
     IBOutlet EventsTableView *_eventsView;
     IBOutlet UIView *_contentView;
     IBOutlet UITextField *_message;
+    IBOutlet UIView *_connectingView;
+    IBOutlet UIProgressView *_connectingProgress;
+    IBOutlet UILabel *_connectingStatus;
+    IBOutlet UILabel *_connectingError;
+    IBOutlet UIActivityIndicatorView *_connectingActivity;
     Buffer *_buffer;
 }
 -(IBAction)sendButtonPressed:(id)sender;

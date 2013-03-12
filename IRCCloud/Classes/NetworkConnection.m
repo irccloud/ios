@@ -317,8 +317,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 [self postObject:buffer forEvent:kIRCEventMakeBuffer];
             if(_numBuffers > 0) {
                 _totalBuffers++;
-                [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:[NSNumber numberWithFloat:(float)_totalBuffers / (float)_numBuffers] waitUntilDone:YES];
-                //[[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogProgressNotification object:@((float)_totalBuffers / (float)_numBuffers)];
+                [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@((float)_totalBuffers / (float)_numBuffers) waitUntilDone:YES];
             }
         } else if([object.type isEqualToString:@"global_system_message"]) {
         } else if([object.type isEqualToString:@"idle"] || [object.type isEqualToString:@"end_of_backlog"] || [object.type isEqualToString:@"backlog_complete"]) {

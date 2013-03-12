@@ -25,7 +25,24 @@
     } else {
         _contentView = self.view;
     }
+    //TODO: check the user info for the last BID
     [self bufferSelected:[BuffersDataSource sharedInstance].firstBid];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogStarted:)
+                                                 name:kIRCCloudBacklogStartedNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogProgress:)
+                                                 name:kIRCCloudBacklogProgressNotification object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogCompleted:)
+                                                 name:kIRCCloudBacklogCompletedNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(connectivityChanged:)
+                                                 name:kIRCCloudConnectivityNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
@@ -34,6 +51,77 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillBeHidden:)
                                                  name:UIKeyboardWillHideNotification object:nil];
+}
+
+-(void)_showConnectingView {
+    if(_connectingView.hidden) {
+        CGRect frame = _connectingView.frame;
+        frame.origin.y = -frame.size.height;
+        _connectingView.frame = frame;
+        _connectingView.hidden = NO;
+        frame.origin.y = 0;
+        [UIView animateWithDuration:0.3
+                         animations:^{_connectingView.frame = frame;}
+                         completion:nil];
+    }
+}
+
+-(void)_hideConnectingView {
+    if(!_connectingView.hidden) {
+        CGRect frame = _connectingView.frame;
+        frame.origin.y = 0;
+        _connectingView.frame = frame;
+        _connectingView.hidden = NO;
+        frame.origin.y = -frame.size.height;
+        [UIView animateWithDuration:0.3
+                         animations:^{_connectingView.frame = frame;}
+                         completion:^(BOOL finished){ _connectingView.hidden = YES; }];
+    }
+}
+
+-(void)connectivityChanged:(NSNotification *)notification {
+    switch([NetworkConnection sharedInstance].state) {
+        case kIRCCloudStateConnecting:
+            [self _showConnectingView];
+            _connectingStatus.text = @"Connecting";
+            [_connectingActivity startAnimating];
+            _connectingActivity.hidden = NO;
+            _connectingProgress.progress = 0;
+            _connectingProgress.hidden = YES;
+            _connectingError.text = @"";
+            break;
+        case kIRCCloudStateDisconnected:
+            [self _showConnectingView];
+            _connectingStatus.text = @"Disconnected";
+            _connectingActivity.hidden = YES;
+            _connectingProgress.progress = 0;
+            _connectingProgress.hidden = YES;
+            _connectingError.text = @"";
+        case kIRCCloudStateDisconnecting:
+        case kIRCCloudStateConnected:
+            [_connectingActivity stopAnimating];
+            break;
+    }
+}
+
+-(void)backlogStarted:(NSNotification *)notification {
+    [_connectingStatus setText:@"Loading"];
+    _connectingActivity.hidden = YES;
+    [_connectingActivity stopAnimating];
+    _connectingProgress.progress = 0;
+    _connectingProgress.hidden = NO;
+}
+
+-(void)backlogProgress:(NSNotification *)notification {
+    [_connectingProgress setProgress:[notification.object floatValue] animated:YES];
+}
+
+-(void)backlogCompleted:(NSNotification *)notification {
+    [self _hideConnectingView];
+    if(!_buffer) {
+        //TODO: check the user info for the last BID
+        [self bufferSelected:[BuffersDataSource sharedInstance].firstBid];
+    }
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
@@ -84,6 +172,9 @@
         ((UIScrollView *)self.view).contentSize = _contentView.bounds.size;
         ((UIScrollView *)self.view).contentOffset = CGPointMake(220, 0);
     }
+    [self connectivityChanged:nil];
+    if([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected)
+        [[NetworkConnection sharedInstance] connect];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
