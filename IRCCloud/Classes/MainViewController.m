@@ -91,13 +91,13 @@
             _connectingError.text = @"";
             break;
         case kIRCCloudStateDisconnected:
-            [self _showConnectingView];
             _connectingStatus.text = @"Disconnected";
             _connectingActivity.hidden = YES;
             _connectingProgress.progress = 0;
             _connectingProgress.hidden = YES;
             _connectingError.text = @"";
         case kIRCCloudStateDisconnecting:
+            [self _showConnectingView];
         case kIRCCloudStateConnected:
             [_connectingActivity stopAnimating];
             break;

@@ -196,6 +196,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(void)disconnect {
+    [self cancelIdleTimer];
     _state = kIRCCloudStateDisconnecting;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
     [_socket close];

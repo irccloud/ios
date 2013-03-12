@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "NetworkConnection.h"
 
 @implementation AppDelegate
 
@@ -47,11 +48,12 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
-    if(session != nil && [session length] > 0)
+    if([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected && session != nil && [session length] > 0)
         [[NetworkConnection sharedInstance] connect];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    [[NetworkConnection sharedInstance] disconnect];
 }
 
 @end
