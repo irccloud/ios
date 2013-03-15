@@ -80,6 +80,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _running = NO;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    //TODO: prune the events array
 	TFLog(@"Backlog download completed");
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
     _running = NO;
@@ -648,11 +649,13 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     [_oobQueue removeObject:fetcher];
     [self _scheduleTimedoutBuffers];
+    //TODO: If this was the initial backlog fetch and we got no buffers, reconnect!
 }
 
 -(void)_backlogFailed:(NSNotification *)notification {
     [_oobQueue removeObject:notification.object];
     [self _scheduleTimedoutBuffers];
+    //TODO: If this was the initial backlog fetch and we got no buffers, reconnect!
 }
 
 -(void)_scheduleTimedoutBuffers {

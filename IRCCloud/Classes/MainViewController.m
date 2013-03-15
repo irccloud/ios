@@ -25,6 +25,9 @@
     } else {
         _contentView = self.view;
     }
+    self.navigationItem.leftBarButtonItem = _navItem.leftBarButtonItem;
+    self.navigationItem.rightBarButtonItem = _navItem.rightBarButtonItem;
+    //TODO: resize if the keyboard is visible
     //TODO: check the user info for the last BID
     [self bufferSelected:[BuffersDataSource sharedInstance].firstBid];
     
@@ -136,6 +139,11 @@
     self.view.frame = frame;
     
     [UIView commitAnimations];
+
+    if([self.view isKindOfClass:[UIScrollView class]]) {
+        UIScrollView *scrollView = (UIScrollView *)self.view;
+        scrollView.contentSize = CGSizeMake(_contentView.frame.size.width,frame.size.height);
+    }
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
@@ -150,6 +158,11 @@
     self.view.frame = frame;
     
     [UIView commitAnimations];
+    
+    if([self.view isKindOfClass:[UIScrollView class]]) {
+        UIScrollView *scrollView = (UIScrollView *)self.view;
+        scrollView.contentSize = CGSizeMake(_contentView.frame.size.width,frame.size.height);
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -212,6 +225,24 @@
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if(!decelerate) {
         [self scrollViewWillBeginDecelerating:scrollView];
+    }
+}
+
+-(IBAction)usersButtonPressed:(id)sender {
+    UIScrollView *scrollView = (UIScrollView *)self.view;
+    if(scrollView.contentOffset.x == _eventsView.tableView.frame.origin.x || scrollView.contentOffset.x == _buffersView.tableView.frame.origin.x) {
+        [scrollView scrollRectToVisible:_usersView.tableView.frame animated:YES];
+    } else {
+        [scrollView scrollRectToVisible:_eventsView.tableView.frame animated:YES];
+    }
+}
+
+-(IBAction)listButtonPressed:(id)sender {
+    UIScrollView *scrollView = (UIScrollView *)self.view;
+    if(scrollView.contentOffset.x == _buffersView.tableView.frame.origin.x) {
+        [scrollView scrollRectToVisible:_eventsView.tableView.frame animated:YES];
+    } else {
+        [scrollView scrollRectToVisible:_buffersView.tableView.frame animated:YES];
     }
 }
 

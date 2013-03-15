@@ -22,7 +22,10 @@
     IBOutlet UILabel *_connectingStatus;
     IBOutlet UILabel *_connectingError;
     IBOutlet UIActivityIndicatorView *_connectingActivity;
+    IBOutlet UINavigationItem *_navItem;
     Buffer *_buffer;
 }
 -(IBAction)sendButtonPressed:(id)sender;
+-(IBAction)usersButtonPressed:(id)sender;
+-(IBAction)listButtonPressed:(id)sender;
 @end
