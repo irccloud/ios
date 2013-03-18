@@ -13,7 +13,9 @@
 
 #define ROW_MESSAGE 0
 #define ROW_TIMESTAMP 1
+#define ROW_BACKLOG 2
 #define TYPE_TIMESTMP @"__timestamp__"
+#define TYPE_BACKLOG @"__backlog__"
 
 @interface EventsTableCell : UITableViewCell {
     UILabel *_timestamp;
@@ -57,24 +59,25 @@
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
-    frame.size.width -= 12;
     if(_type == ROW_MESSAGE) {
         frame.origin.x = 6;
         frame.origin.y = 4;
         frame.size.height -= 6;
-    }
-    
-    if(_type == ROW_TIMESTAMP) {
-        _timestamp.frame = frame;
-        _timestamp.hidden = NO;
-        _timestamp.textAlignment = NSTextAlignmentCenter;
-        _message.hidden = YES;
-    } else {
+        frame.size.width -= 12;
         _timestamp.textAlignment = NSTextAlignmentRight;
         _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, 70, 20);
         _timestamp.hidden = NO;
         _message.frame = CGRectMake(frame.origin.x + 76, frame.origin.y, frame.size.width - 76, frame.size.height);
         _message.hidden = NO;
+    } else {
+        if(_type == ROW_BACKLOG) {
+            frame.origin.y = frame.size.height / 2;
+            frame.size.height = 1;
+        }
+        _timestamp.frame = frame;
+        _timestamp.hidden = NO;
+        _timestamp.textAlignment = NSTextAlignmentCenter;
+        _message.hidden = YES;
     }
 }
 
@@ -89,6 +92,8 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
+        _conn = [NetworkConnection sharedInstance];
+        _ready = NO;
         _formatter = [[NSDateFormatter alloc] init];
         _data = [[NSMutableArray alloc] init];
         _expandedSectionEids = [[NSMutableDictionary alloc] init];
@@ -98,17 +103,31 @@
     return self;
 }
 
+- (void)viewDidLoad {
+    [super viewDidLoad];
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [self refresh];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogCompleted:)
+                                                 name:kIRCCloudBacklogCompletedNotification object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)backlogCompleted:(NSNotification *)notification {
+    if(_buffer && [notification.object bid] == _buffer.bid) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self refresh];
+        }];
+    }
 }
 
 - (void)handleEvent:(NSNotification *)notification {
@@ -155,7 +174,7 @@
     if(event.eid == _minEid) {
         //TODO: hide the loading header
     }
-    if(event.eid < _earliestEid)
+    if(event.eid < _earliestEid || _earliestEid == 0)
         _earliestEid = event.eid;
     
     NSTimeInterval eid = event.eid;
@@ -248,7 +267,8 @@
     
     if(!backlog) {
         [self.tableView reloadData];
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+        if([[[self.tableView indexPathsForVisibleRows] lastObject] row] == _data.count-2)
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
     }
 }
 
@@ -366,7 +386,9 @@
 }
 
 -(void)setBuffer:(Buffer *)buffer {
+    _requestingBacklog = NO;
     _buffer = buffer;
+    _earliestEid = 0;
     [_expandedSectionEids removeAllObjects];
     [self refresh];
     if(_data.count)
@@ -375,6 +397,11 @@
 
 - (void)refresh {
     @synchronized(_data) {
+        int oldPosition = (_requestingBacklog && _data.count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
+        NSTimeInterval backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
+        if(backlogEid < 1)
+            backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
+
         [_data removeAllObjects];
         _minEid = _maxEid = _earliestEid = 0;
         _currentCollapsedEid = 0;
@@ -389,30 +416,50 @@
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
             if(_buffer.bid != -1) {
-                //TODO: request backlog
+                _requestingBacklog = YES;
+                [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
             } else {
-                //TODO: hide the header view
+                self.tableView.tableHeaderView = nil;
             }
         } else if(events.count) {
             //TODO: refresh the ignores array
             _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
             if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0) {
-                //TODO: make header view visible
+                self.tableView.tableHeaderView = _headerView;
             } else {
-                //TODO: hide header view
+                self.tableView.tableHeaderView = nil;
             }
             for(Event *e in events) {
                 [self insertEvent:e backlog:true nextIsGrouped:false];
             }
+            
+        }
+        
+        if(backlogEid > 0) {
+            Event *e = [[Event alloc] init];
+            e.eid = backlogEid;
+            e.type = TYPE_BACKLOG;
+            e.rowType = ROW_BACKLOG;
+            e.formattedMsg = nil;
+            e.bgColor = [UIColor whiteColor];
+            [self _addItem:e eid:backlogEid];
+            e.timestamp = nil;
         }
         
         [self.tableView reloadData];
+        if(_requestingBacklog && backlogEid > 0) {
+            int markerPos = -1;
+            for(Event *e in _data) {
+                if(e.eid == backlogEid)
+                    break;
+                markerPos++;
+            }
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+        }
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
+        _ready = YES;
+        _requestingBacklog = NO;
     }
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -475,6 +522,11 @@
         } else {
             cell.timestamp.textColor = [UIColor timestampColor];
         }
+        if(e.rowType == ROW_BACKLOG) {
+            cell.timestamp.backgroundColor = [UIColor selectedBlueColor];
+        } else {
+            cell.timestamp.backgroundColor = [UIColor clearColor];
+        }
         return cell;
     }
 }
@@ -525,7 +577,25 @@
 
 #pragma mark - Table view delegate
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    if(!_ready)
+        return;
+    
+    if(self.tableView.tableHeaderView && _minEid > 0 && _buffer && _buffer.bid != -1/* TODO: && conn.ready */) {
+        if(!_requestingBacklog && _conn.state == kIRCCloudStateConnected && scrollView.contentOffset.y < _headerView.frame.size.height) {
+            _requestingBacklog = YES;
+            [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
+        }
+    }
+    
+    NSArray *rows = [self.tableView indexPathsForVisibleRows];
+    if(rows.count) {
+        int firstRow = [[rows objectAtIndex:0] row];
+        int lastRow = [[rows lastObject] row];
+    }
+}
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     
     NSTimeInterval group = ((Event *)[_data objectAtIndex:indexPath.row]).groupEid;

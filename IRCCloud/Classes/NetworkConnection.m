@@ -608,7 +608,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid {
     NSString *URL = nil;
     if(eid > 0)
-        URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i&beforeId=%g", IRCCLOUD_HOST, cid, bid, eid];
+        URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i&beforeid=%.0lf", IRCCLOUD_HOST, cid, bid, eid];
     else
         URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i", IRCCLOUD_HOST, cid, bid];
     OOBFetcher *fetcher = [self fetchOOB:URL];
