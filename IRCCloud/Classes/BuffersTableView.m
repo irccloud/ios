@@ -109,6 +109,8 @@
         [_data removeAllObjects];
         int archiveCount = 0;
         
+        NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+        
         for(Server *server in [[ServersDataSource sharedInstance] getServers]) {
             NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:server.cid];
             for(Buffer *buffer in buffers) {
@@ -118,9 +120,10 @@
                     NSString *name = server.name;
                     if(!name || name.length == 0)
                         name = server.hostname;
-                    //TODO: check the disabled map
                     unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        unread = 0;
                     [_data addObject:@{
                      @"type":@TYPE_SERVER,
                      @"cid":@(buffer.cid),
@@ -154,6 +157,15 @@
                     //TODO: check the disabled map
                     unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    if(type == TYPE_CHANNEL) {
+                        if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            unread = 0;
+                    } else {
+                        if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            unread = 0;
+                        if(type == TYPE_CONVERSATION && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            highlights = 0;
+                    }
                     [_data addObject:@{
                      @"type":@(type),
                      @"cid":@(buffer.cid),

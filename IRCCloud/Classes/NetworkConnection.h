@@ -107,6 +107,7 @@ typedef enum {
 
 +(NetworkConnection*)sharedInstance;
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password;
+-(NSDictionary *)prefs;
 -(void)connect;
 -(void)disconnect;
 -(void)scheduleIdleTimer;

@@ -265,6 +265,15 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 }
 
+-(NSDictionary *)prefs {
+    if(_userInfo && [_userInfo objectForKey:@"prefs"]) {
+        SBJsonParser *parser = [[SBJsonParser alloc] init];
+        return [parser objectWithString:[_userInfo objectForKey:@"prefs"]];
+    } else {
+        return nil;
+    }
+}
+
 -(void)parse:(NSDictionary *)dict backlog:(BOOL)backlog {
     if([NSThread currentThread].isMainThread)
         NSLog(@"WARNING: Parsing on main thread");
