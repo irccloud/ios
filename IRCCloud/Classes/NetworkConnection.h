@@ -114,4 +114,5 @@ typedef enum {
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid;
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid;
 -(int)say:(NSString *)message to:(NSString *)cid cid:(int)cid;
+-(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid;
 @end

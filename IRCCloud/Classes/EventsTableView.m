@@ -14,8 +14,10 @@
 #define ROW_MESSAGE 0
 #define ROW_TIMESTAMP 1
 #define ROW_BACKLOG 2
+#define ROW_LASTSEENEID 3
 #define TYPE_TIMESTMP @"__timestamp__"
 #define TYPE_BACKLOG @"__backlog__"
+#define TYPE_LASTSEENEID @"__lastseeneid"
 
 @interface EventsTableCell : UITableViewCell {
     UILabel *_timestamp;
@@ -128,6 +130,21 @@
             [self refresh];
         }];
     }
+}
+
+- (void)_sendHeartbeat {
+    NSTimeInterval eid = [[_data lastObject] eid];
+    if(eid > _buffer.last_seen_eid) {
+        [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
+        _buffer.last_seen_eid = eid;
+    }
+    _heartbeatTimer = nil;
+}
+
+- (void)sendHeartbeat {
+    [_heartbeatTimer invalidate];
+    
+    _heartbeatTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(_sendHeartbeat) userInfo:nil repeats:NO];
 }
 
 - (void)handleEvent:(NSNotification *)notification {
@@ -267,8 +284,27 @@
     
     if(!backlog) {
         [self.tableView reloadData];
-        if([[[self.tableView indexPathsForVisibleRows] lastObject] row] == _data.count-2)
+        if([[[self.tableView indexPathsForVisibleRows] lastObject] row] == _data.count-2) {
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+        } else {
+            _newMsgs++;
+            if(event.isHighlight)
+                _newHighlights++;
+            [self updateUnread];
+        }
+    }
+}
+
+-(void)updateTopUnread:(int)firstRow {
+    //TODO: resize the label and set the highlight indicator if required
+    _topUndreadlabel.text = [NSString stringWithFormat:@"%i unread messages", firstRow - _lastSeenEidPos];
+}
+
+-(void)updateUnread {
+    if(_newMsgs > 0) {
+        //TODO: resize the label and set the highlight indicator if required
+        _bottomUndreadlabel.text = [NSString stringWithFormat:@"%i unread messages", _newMsgs];
+        _bottomUnreadView.alpha = 1; //TODO: animate this
     }
 }
 
@@ -386,17 +422,18 @@
 }
 
 -(void)setBuffer:(Buffer *)buffer {
+    _topUnreadView.alpha = 0;
+    _bottomUnreadView.alpha = 0;
     _requestingBacklog = NO;
     _buffer = buffer;
     _earliestEid = 0;
     [_expandedSectionEids removeAllObjects];
     [self refresh];
-    if(_data.count)
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
 }
 
 - (void)refresh {
     @synchronized(_data) {
+        _ready = NO;
         int oldPosition = (_requestingBacklog && _data.count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
         NSTimeInterval backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
         if(backlogEid < 1)
@@ -404,6 +441,7 @@
 
         [_data removeAllObjects];
         _minEid = _maxEid = _earliestEid = 0;
+        _lastSeenEidPos = -1;
         _currentCollapsedEid = 0;
         _currentGroupPosition = -1;
         _lastCollpasedDay = @"";
@@ -446,6 +484,35 @@
             e.timestamp = nil;
         }
         
+        if(_minEid > 0 && _buffer.last_seen_eid > 0 && _minEid >= _buffer.last_seen_eid) {
+            _lastSeenEidPos = 0;
+        } else {
+            Event *e = [[Event alloc] init];
+            e.eid = _buffer.last_seen_eid;
+            e.type = TYPE_LASTSEENEID;
+            e.rowType = ROW_LASTSEENEID;
+            e.formattedMsg = nil;
+            e.bgColor = [UIColor whiteColor];
+            e.timestamp = @"==== New Messages ====";
+            _lastSeenEidPos = _data.count - 1;
+            NSEnumerator *i = [_data reverseObjectEnumerator];
+            Event *event = [i nextObject];
+            while(event) {
+                if(event.eid <= _buffer.last_seen_eid)
+                    break;
+                event = [i nextObject];
+                _lastSeenEidPos--;
+            }
+            if(_lastSeenEidPos != _data.count - 1) {
+                if(_lastSeenEidPos > 0 && [[_data objectAtIndex:_lastSeenEidPos - 1] rowType] == ROW_TIMESTAMP)
+                    _lastSeenEidPos--;
+                if(_lastSeenEidPos > 0)
+                    [_data insertObject:e atIndex:_lastSeenEidPos + 1];
+            } else {
+                _lastSeenEidPos = -1;
+            }
+        }
+        
         [self.tableView reloadData];
         if(_requestingBacklog && backlogEid > 0) {
             int markerPos = -1;
@@ -455,10 +522,20 @@
                 markerPos++;
             }
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+        } else if(_data.count) {
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
         }
+        
+        int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
+        if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
+            _topUnreadView.alpha = 1; //TODO: animate this
+            [self updateTopUnread:firstRow];
+        }
+        
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
         _ready = YES;
         _requestingBacklog = NO;
+        [self scrollViewDidScroll:self.tableView];
     }
 }
 
@@ -575,6 +652,23 @@
 }
 */
 
+-(IBAction)topUnreadBarClicked:(id)sender {
+    if(_topUnreadView.alpha) {
+        _topUnreadView.alpha = 0; //TODO: animate this
+        if(_lastSeenEidPos > 0)
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_lastSeenEidPos+1 inSection:0] atScrollPosition: UITableViewScrollPositionTop animated: YES];
+        else
+            [self.tableView setContentOffset:CGPointMake(0,0) animated:YES];
+    }
+}
+
+-(IBAction)bottomUnreadBarClicked:(id)sender {
+    if(_bottomUnreadView.alpha) {
+        _bottomUnreadView.alpha = 0; //TODO: animate this
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+    }
+}
+
 #pragma mark - Table view delegate
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
@@ -592,6 +686,27 @@
     if(rows.count) {
         int firstRow = [[rows objectAtIndex:0] row];
         int lastRow = [[rows lastObject] row];
+        
+        if(_bottomUnreadView && _data.count) {
+            if(lastRow == _data.count - 1) {
+                _bottomUnreadView.alpha = 0; //TODO: animate this
+                _newMsgs = 0;
+                _newHighlights = 0;
+                if(_topUnreadView.alpha == 0)
+                    [self _sendHeartbeat];
+            }
+        }
+        
+        if(_topUnreadView && _data.count) {
+            if(_lastSeenEidPos >= 0) {
+                if(_lastSeenEidPos > 0 && firstRow <= _lastSeenEidPos) {
+                    _topUnreadView.alpha = 0; //TODO: animate this
+                    [self _sendHeartbeat];
+                } else {
+                    [self updateTopUnread:firstRow];
+                }
+            }
+        }
     }
 }
 

@@ -178,6 +178,13 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message}];
 }
 
+-(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid {
+    @synchronized(_writer) {
+        NSString *seenEids = [_writer stringWithObject:@{[NSString stringWithFormat:@"%i",cid]:@{[NSString stringWithFormat:@"%i",bid]:@(lastSeenEid)}}];
+        return [self _sendRequest:@"heartbeat" args:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids}];
+    }
+}
+
 -(void)connect {
     _state = kIRCCloudStateConnecting;
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];

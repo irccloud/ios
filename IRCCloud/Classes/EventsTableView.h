@@ -29,10 +29,13 @@
     NetworkConnection *_conn;
     
     NSTimeInterval _maxEid, _minEid, _currentCollapsedEid, _earliestEid;
-    int _currentGroupPosition, _newMsgs, _newHighlights;
+    int _currentGroupPosition, _newMsgs, _newHighlights, _lastSeenEidPos;
     NSString *_lastCollpasedDay;
     BOOL _requestingBacklog, _ready;
+    NSTimer *_heartbeatTimer;
 }
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(void)setBuffer:(Buffer *)buffer;
+-(IBAction)topUnreadBarClicked:(id)sender;
+-(IBAction)bottomUnreadBarClicked:(id)sender;
 @end
