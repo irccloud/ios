@@ -135,8 +135,8 @@
 - (void)_sendHeartbeat {
     NSTimeInterval eid = [[_data lastObject] eid];
     if(eid > _buffer.last_seen_eid) {
-        [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
-        _buffer.last_seen_eid = eid;
+        //[_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
+        //_buffer.last_seen_eid = eid;
     }
     _heartbeatTimer = nil;
 }
@@ -297,7 +297,39 @@
 
 -(void)updateTopUnread:(int)firstRow {
     //TODO: resize the label and set the highlight indicator if required
-    _topUndreadlabel.text = [NSString stringWithFormat:@"%i unread messages", firstRow - _lastSeenEidPos];
+    NSString *msg = @""; // @"highlighst and "; when highlights are unread
+    if(_lastSeenEidPos == 0) {
+        int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
+        int minutes = seconds / 60;
+        int hours = minutes / 60;
+        int days = hours / 24;
+        if(days) {
+            if(days == 1)
+                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About a day of unread messages"];
+            else
+                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About %i days of unread messages", days];
+        } else if(hours) {
+            if(hours == 1)
+                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About an hour of unread messages"];
+            else
+                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About %i hours of unread messages", hours];
+        } else if(minutes) {
+            if(minutes == 1)
+                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About a minute of unread messages"];
+            else
+                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About %i minutes of unread messages", minutes];
+        } else {
+            if(seconds == 1)
+                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About a second of unread messages"];
+            else
+                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About %i seconds of unread messages", seconds];
+        }
+    } else {
+        if(firstRow - _lastSeenEidPos == 1)
+            _topUndreadlabel.text = [msg stringByAppendingFormat:@"%i unread message", firstRow - _lastSeenEidPos];
+        else
+            _topUndreadlabel.text = [msg stringByAppendingFormat:@"%i unread messages", firstRow - _lastSeenEidPos];
+    }
 }
 
 -(void)updateUnread {
