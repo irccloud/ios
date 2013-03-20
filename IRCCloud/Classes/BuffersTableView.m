@@ -11,6 +11,7 @@
 #import "BuffersDataSource.h"
 #import "ServersDataSource.h"
 #import "UIColor+IRCCloud.h"
+#import "HighlightsCountView.h"
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
@@ -23,11 +24,13 @@
     int _type;
     UIView *_unreadIndicator;
     UIView *_bg;
+    HighlightsCountView *_highlights;
 }
 @property int type;
 @property (readonly) UILabel *label;
 @property (readonly) UIImageView *icon;
 @property (readonly) UIView *unreadIndicator, *bg;
+@property (readonly) HighlightsCountView *highlights;
 @end
 
 @implementation BuffersTableCell
@@ -55,6 +58,9 @@
         _label.backgroundColor = [UIColor clearColor];
         _label.textColor = [UIColor selectedBlueColor];
         [self.contentView addSubview:_label];
+        
+        _highlights = [[HighlightsCountView alloc] initWithFrame:CGRectZero];
+        [self.contentView addSubview:_highlights];
     }
     return self;
 }
@@ -71,6 +77,15 @@
     _bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
     _unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
     _icon.frame = CGRectMake(frame.origin.x + 6, frame.origin.y + 4, frame.size.height - 8, frame.size.height - 8);
+    if(!_highlights.hidden) {
+        CGSize size = [_highlights.count sizeWithFont:_highlights.font];
+        size.width += 4;
+        size.height = frame.size.height - 12;
+        if(size.width < size.height)
+            size.width = size.height;
+        frame.size.width -= size.width + 12;
+        _highlights.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 6, size.width, size.height);
+    }
     _label.frame = CGRectMake(frame.origin.x + 6 + frame.size.height - 8, frame.origin.y, frame.size.width - 6 - frame.size.height, frame.size.height);
 }
 
@@ -231,6 +246,12 @@
         NSDictionary *row = [_data objectAtIndex:[indexPath row]];
         cell.type = [[row objectForKey:@"type"] intValue];
         cell.label.text = [row objectForKey:@"name"];
+        if([[row objectForKey:@"highlights"] intValue]) {
+            cell.highlights.hidden = NO;
+            cell.highlights.count = [NSString stringWithFormat:@"%@",[row objectForKey:@"highlights"]];
+        } else {
+            cell.highlights.hidden = YES;
+        }
         if([[row objectForKey:@"unread"] intValue] || selected) {
             cell.unreadIndicator.hidden = NO;
             cell.label.font = [UIFont boldSystemFontOfSize:16.0f];

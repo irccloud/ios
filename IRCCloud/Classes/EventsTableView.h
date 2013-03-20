@@ -12,17 +12,21 @@
 #import "CollapsedEvents.h"
 #import "TTTAttributedLabel.h"
 #import "NetworkConnection.h"
+#import "HighlightsCountView.h"
 
 @interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate> {
     IBOutlet UIView *_headerView;
     
     IBOutlet UIView *_topUnreadView;
-    IBOutlet UILabel *_topUndreadlabel;
+    IBOutlet UILabel *_topUnreadlabel;
+    IBOutlet HighlightsCountView *_topHighlightsCountView;
     IBOutlet UIView *_bottomUnreadView;
     IBOutlet UILabel *_bottomUndreadlabel;
+    IBOutlet HighlightsCountView *_bottomHighlightsCountView;
     
     NSDateFormatter *_formatter;
     NSMutableArray *_data;
+    NSMutableArray *_unseenHighlightPositions;
     NSMutableDictionary *_expandedSectionEids;
     Buffer *_buffer;
     CollapsedEvents *_collapsedEvents;

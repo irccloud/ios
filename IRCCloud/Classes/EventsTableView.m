@@ -100,6 +100,7 @@
         _data = [[NSMutableArray alloc] init];
         _expandedSectionEids = [[NSMutableDictionary alloc] init];
         _collapsedEvents = [[CollapsedEvents alloc] init];
+        _unseenHighlightPositions = [[NSMutableArray alloc] init];
         _buffer = nil;
     }
     return self;
@@ -135,8 +136,8 @@
 - (void)_sendHeartbeat {
     NSTimeInterval eid = [[_data lastObject] eid];
     if(eid > _buffer.last_seen_eid) {
-        //[_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
-        //_buffer.last_seen_eid = eid;
+        [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
+        _buffer.last_seen_eid = eid;
     }
     _heartbeatTimer = nil;
 }
@@ -296,8 +297,32 @@
 }
 
 -(void)updateTopUnread:(int)firstRow {
-    //TODO: resize the label and set the highlight indicator if required
-    NSString *msg = @""; // @"highlighst and "; when highlights are unread
+    int highlights = 0;
+    for(NSNumber *pos in _unseenHighlightPositions) {
+        if([pos intValue] > firstRow)
+            break;
+        highlights++;
+    }
+    NSString *msg = @"";
+    CGRect rect = _topUnreadView.frame;
+    if(highlights) {
+        if(highlights == 1)
+            msg = @"mention and ";
+        else
+            msg = @"mentions and ";
+        _topHighlightsCountView.count = [NSString stringWithFormat:@"%i", highlights];
+        CGSize size = [_topHighlightsCountView.count sizeWithFont:_topHighlightsCountView.font];
+        size.width += 6;
+        size.height = rect.size.height - 12;
+        if(size.width < size.height)
+            size.width = size.height;
+        _topHighlightsCountView.frame = CGRectMake(4,6,size.width,size.height);
+        _topHighlightsCountView.hidden = NO;
+        _topUnreadlabel.frame = CGRectMake(8+size.width,6,rect.size.width - size.width - 8, rect.size.height-12);
+    } else {
+        _topHighlightsCountView.hidden = YES;
+        _topUnreadlabel.frame = CGRectMake(4,6,rect.size.width - 8, rect.size.height-12);
+    }
     if(_lastSeenEidPos == 0) {
         int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
         int minutes = seconds / 60;
@@ -305,37 +330,64 @@
         int days = hours / 24;
         if(days) {
             if(days == 1)
-                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About a day of unread messages"];
+                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i day of unread messages", days];
             else
-                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About %i days of unread messages", days];
+                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i days of unread messages", days];
         } else if(hours) {
             if(hours == 1)
-                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About an hour of unread messages"];
+                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i hour of unread messages", hours];
             else
-                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About %i hours of unread messages", hours];
+                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i hours of unread messages", hours];
         } else if(minutes) {
             if(minutes == 1)
-                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About a minute of unread messages"];
+                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i minute of unread messages", minutes];
             else
-                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About %i minutes of unread messages", minutes];
+                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i minutes of unread messages", minutes];
         } else {
             if(seconds == 1)
-                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About a second of unread messages"];
+                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i second of unread messages", seconds];
             else
-                _topUndreadlabel.text = [msg stringByAppendingFormat:@"About %i seconds of unread messages", seconds];
+                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i seconds of unread messages", seconds];
         }
     } else {
         if(firstRow - _lastSeenEidPos == 1)
-            _topUndreadlabel.text = [msg stringByAppendingFormat:@"%i unread message", firstRow - _lastSeenEidPos];
+            _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i unread message", firstRow - _lastSeenEidPos];
         else
-            _topUndreadlabel.text = [msg stringByAppendingFormat:@"%i unread messages", firstRow - _lastSeenEidPos];
+            _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i unread messages", firstRow - _lastSeenEidPos];
     }
 }
 
 -(void)updateUnread {
-    if(_newMsgs > 0) {
-        //TODO: resize the label and set the highlight indicator if required
-        _bottomUndreadlabel.text = [NSString stringWithFormat:@"%i unread messages", _newMsgs];
+    NSString *msg = @"";
+    CGRect rect = _bottomUnreadView.frame;
+    if(_newHighlights) {
+        if(_newHighlights == 1)
+            msg = @"mention";
+        else
+            msg = @"mentions";
+        _bottomHighlightsCountView.count = [NSString stringWithFormat:@"%i", _newHighlights];
+        CGSize size = [_bottomHighlightsCountView.count sizeWithFont:_bottomHighlightsCountView.font];
+        size.width += 6;
+        size.height = rect.size.height - 12;
+        if(size.width < size.height)
+            size.width = size.height;
+        _bottomHighlightsCountView.frame = CGRectMake(4,6,size.width,size.height);
+        _bottomHighlightsCountView.hidden = NO;
+        _bottomUndreadlabel.frame = CGRectMake(8+size.width,6,rect.size.width - size.width - 8, rect.size.height-12);
+    } else {
+        _bottomHighlightsCountView.hidden = YES;
+        _bottomUndreadlabel.frame = CGRectMake(4,6,rect.size.width - 8, rect.size.height-12);
+    }
+    if(_newMsgs - _newHighlights > 0) {
+        if(_newHighlights)
+            msg = [msg stringByAppendingString:@" and "];
+        if(_newMsgs - _newHighlights == 1)
+            msg = [msg stringByAppendingFormat:@"%i unread message", _newMsgs - _newHighlights];
+        else
+            msg = [msg stringByAppendingFormat:@"%i unread messages", _newMsgs - _newHighlights];
+    }
+    if(msg.length) {
+        _bottomUndreadlabel.text = msg;
         _bottomUnreadView.alpha = 1; //TODO: animate this
     }
 }
@@ -428,7 +480,10 @@
         return;
     }
     
-    //TODO: update unseen highlight positions array
+    if(eid > _buffer.last_seen_eid && e.isHighlight) {
+        [_unseenHighlightPositions addObject:@(insertPos)];
+        [_unseenHighlightPositions sortUsingSelector:@selector(compare:)];
+    }
     
     if(eid < _minEid || _minEid == 0)
         _minEid = eid;
@@ -478,6 +533,7 @@
         _currentGroupPosition = -1;
         _lastCollpasedDay = @"";
         [_collapsedEvents clear];
+        [_unseenHighlightPositions removeAllObjects];
         
         [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
 

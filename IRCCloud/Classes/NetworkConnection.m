@@ -586,6 +586,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                     [_buffers updateLastSeenEID:eid buffer:[bid intValue]];
                 }
             }
+            [self postObject:object forEvent:kIRCEventHeartbeatEcho];
         } else {
             TFLog(@"Unhandled type: %@", object);
         }
