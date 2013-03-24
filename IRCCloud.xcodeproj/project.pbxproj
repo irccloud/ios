@@ -111,6 +111,14 @@
 		22B4287F16D831A800498507 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
 		22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		22DB1D5516FEB25200C5FE6F /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5116FEB25200C5FE6F /* Icon-72.png */; };
+		22DB1D5616FEB25200C5FE6F /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5116FEB25200C5FE6F /* Icon-72.png */; };
+		22DB1D5716FEB25200C5FE6F /* Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5216FEB25200C5FE6F /* Icon-72@2x.png */; };
+		22DB1D5816FEB25200C5FE6F /* Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5216FEB25200C5FE6F /* Icon-72@2x.png */; };
+		22DB1D5916FEB25200C5FE6F /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5316FEB25200C5FE6F /* Icon.png */; };
+		22DB1D5A16FEB25200C5FE6F /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5316FEB25200C5FE6F /* Icon.png */; };
+		22DB1D5B16FEB25200C5FE6F /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5416FEB25200C5FE6F /* Icon@2x.png */; };
+		22DB1D5C16FEB25200C5FE6F /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5416FEB25200C5FE6F /* Icon@2x.png */; };
 		22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
 		22F9EE1D16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
 /* End PBXBuildFile section */
@@ -233,6 +241,10 @@
 		22B4286516D831A800498507 /* WebSocketMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebSocketMessage.m; sourceTree = "<group>"; };
 		22B4288416D846BF00498507 /* IRCCloudJSONObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudJSONObject.h; sourceTree = "<group>"; };
 		22B4288516D846BF00498507 /* IRCCloudJSONObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudJSONObject.m; sourceTree = "<group>"; };
+		22DB1D5116FEB25200C5FE6F /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
+		22DB1D5216FEB25200C5FE6F /* Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72@2x.png"; sourceTree = "<group>"; };
+		22DB1D5316FEB25200C5FE6F /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		22DB1D5416FEB25200C5FE6F /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon@2x.png"; sourceTree = "<group>"; };
 		22F9EE1A16DE6F21004615C0 /* EventsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsDataSource.h; sourceTree = "<group>"; };
 		22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsDataSource.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -395,6 +407,10 @@
 		228A05B416D3DB930029769C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				22DB1D5116FEB25200C5FE6F /* Icon-72.png */,
+				22DB1D5216FEB25200C5FE6F /* Icon-72@2x.png */,
+				22DB1D5316FEB25200C5FE6F /* Icon.png */,
+				22DB1D5416FEB25200C5FE6F /* Icon@2x.png */,
 				2236F63416DBE89E007BE535 /* lock.png */,
 				2236F63516DBE89E007BE535 /* world.png */,
 				2236F62E16DBE881007BE535 /* lock@2x.png */,
@@ -555,6 +571,10 @@
 				2236F63616DBE89E007BE535 /* lock.png in Resources */,
 				2236F63816DBE89E007BE535 /* world.png in Resources */,
 				2236F64216DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */,
+				22DB1D5516FEB25200C5FE6F /* Icon-72.png in Resources */,
+				22DB1D5716FEB25200C5FE6F /* Icon-72@2x.png in Resources */,
+				22DB1D5916FEB25200C5FE6F /* Icon.png in Resources */,
+				22DB1D5B16FEB25200C5FE6F /* Icon@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -569,6 +589,10 @@
 				2236F63716DBE89E007BE535 /* lock.png in Resources */,
 				2236F63916DBE89E007BE535 /* world.png in Resources */,
 				2236F64316DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */,
+				22DB1D5616FEB25200C5FE6F /* Icon-72.png in Resources */,
+				22DB1D5816FEB25200C5FE6F /* Icon-72@2x.png in Resources */,
+				22DB1D5A16FEB25200C5FE6F /* Icon.png in Resources */,
+				22DB1D5C16FEB25200C5FE6F /* Icon@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
