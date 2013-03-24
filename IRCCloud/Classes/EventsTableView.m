@@ -809,6 +809,7 @@
             [_expandedSectionEids setObject:@(YES) forKey:@(group)];
         [self refresh];
     }
+    [_delegate rowSelected:[_data objectAtIndex:indexPath.row]];
 }
 
 @end

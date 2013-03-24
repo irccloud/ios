@@ -14,6 +14,10 @@
 #import "NetworkConnection.h"
 #import "HighlightsCountView.h"
 
+@protocol EventsTableViewDelegate<NSObject>
+-(void)rowSelected:(Event *)event;
+@end
+
 @interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate> {
     IBOutlet UIView *_headerView;
     
@@ -37,6 +41,8 @@
     NSString *_lastCollpasedDay;
     BOOL _requestingBacklog, _ready;
     NSTimer *_heartbeatTimer;
+    
+    IBOutlet id<EventsTableViewDelegate> _delegate;
 }
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(void)setBuffer:(Buffer *)buffer;

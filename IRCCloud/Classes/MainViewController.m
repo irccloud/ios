@@ -259,4 +259,8 @@
         NSLog(@"Scroll to events list");
     }
 }
+
+-(void)rowSelected:(Event *)event {
+    [_message resignFirstResponder];
+}
 @end
