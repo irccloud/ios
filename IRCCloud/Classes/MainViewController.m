@@ -130,14 +130,16 @@
 -(void)keyboardWillShow:(NSNotification*)notification {
     NSArray *rows = [_eventsView.tableView indexPathsForVisibleRows];
     CGSize keyboardSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue] toView:nil].size;
-    
+
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationBeginsFromCurrentState:YES];
-    [UIView setAnimationDuration:0.3];
+    [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
+    [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     
     CGRect frame = self.view.frame;
     frame.size.height -= keyboardSize.height;
     self.view.frame = frame;
+    [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     
     [UIView commitAnimations];
 
@@ -145,7 +147,6 @@
         UIScrollView *scrollView = (UIScrollView *)self.view;
         scrollView.contentSize = CGSizeMake(_contentView.frame.size.width,frame.size.height);
     }
-    [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
@@ -154,11 +155,13 @@
     
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationBeginsFromCurrentState:YES];
-    [UIView setAnimationDuration:0.3];
+    [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
+    [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     
     CGRect frame = self.view.frame;
     frame.size.height += keyboardSize.height;
     self.view.frame = frame;
+    [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     
     [UIView commitAnimations];
     
@@ -166,7 +169,6 @@
         UIScrollView *scrollView = (UIScrollView *)self.view;
         scrollView.contentSize = CGSizeMake(_contentView.frame.size.width,frame.size.height);
     }
-    [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
