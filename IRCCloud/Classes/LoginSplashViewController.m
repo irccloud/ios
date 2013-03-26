@@ -75,15 +75,25 @@
 
 -(void)keyboardWillShow:(NSNotification*)notification {
     [UIView beginAnimations:nil context:nil];
-    logo.frame = CGRectMake(112, 16, 96, 96);
-    loginView.frame = CGRectMake(0, 112, 320, 160);
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        logo.frame = CGRectMake(112, 16, 96, 96);
+        loginView.frame = CGRectMake(0, 112, 320, 160);
+    } else {
+        logo.frame = CGRectMake(128, 246-180, 256, 256);
+        loginView.frame = CGRectMake(392, 302-180, 612, 144);
+    }
     [UIView commitAnimations];
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
     [UIView beginAnimations:nil context:nil];
-    logo.frame = CGRectMake(96, 36, 128, 128);
-    loginView.frame = CGRectMake(0, 200, 320, 160);
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        logo.frame = CGRectMake(96, 36, 128, 128);
+        loginView.frame = CGRectMake(0, 200, 320, 160);
+    } else {
+        logo.frame = CGRectMake(128, 246, 256, 256);
+        loginView.frame = CGRectMake(392, 302, 612, 144);
+    }
     [UIView commitAnimations];
 }
 
