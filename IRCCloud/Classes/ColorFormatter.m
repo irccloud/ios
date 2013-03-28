@@ -10,11 +10,12 @@
 #import "ColorFormatter.h"
 #import "TTTAttributedLabel.h"
 #import "UIColor+IRCCloud.h"
+#import "NetworkConnection.h"
 
 @implementation ColorFormatter
 +(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode {
     NSString *output = [NSString stringWithFormat:@"%c%@%c", BOLD, nick, CLEAR];
-    BOOL showSymbol = NO; //TODO: check the prefs
+    BOOL showSymbol = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue];
 
     if(mode) {
         if(showSymbol) {

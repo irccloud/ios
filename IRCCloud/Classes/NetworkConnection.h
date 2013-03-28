@@ -98,6 +98,7 @@ typedef enum {
     
     kIRCCloudState _state;
     NSDictionary *_userInfo;
+    NSDictionary *_prefs;
     NSTimeInterval _clockOffset;
     NSOperationQueue *_queue;
 }

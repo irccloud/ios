@@ -266,12 +266,11 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(NSDictionary *)prefs {
-    if(_userInfo && [_userInfo objectForKey:@"prefs"]) {
+    if(!_prefs && _userInfo && [_userInfo objectForKey:@"prefs"]) {
         SBJsonParser *parser = [[SBJsonParser alloc] init];
-        return [parser objectWithString:[_userInfo objectForKey:@"prefs"]];
-    } else {
-        return nil;
+        _prefs = [parser objectWithString:[_userInfo objectForKey:@"prefs"]];
     }
+    return _prefs;
 }
 
 -(void)parse:(NSDictionary *)dict backlog:(BOOL)backlog {
@@ -289,6 +288,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
         } else if([object.type isEqualToString:@"stat_user"]) {
             _userInfo = object.dictionary;
+            _prefs = nil;
             [self postObject:object forEvent:kIRCEventUserInfo];
         } else if([object.type isEqualToString:@"backlog_starts"]) {
             _numBuffers = [[object objectForKey:@"numbuffers"] intValue];
