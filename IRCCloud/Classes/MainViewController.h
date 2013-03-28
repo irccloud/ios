@@ -24,6 +24,7 @@
     IBOutlet UIActivityIndicatorView *_connectingActivity;
     IBOutlet UINavigationItem *_navItem;
     Buffer *_buffer;
+    int _startX;
 }
 -(IBAction)sendButtonPressed:(id)sender;
 -(IBAction)usersButtonPressed:(id)sender;

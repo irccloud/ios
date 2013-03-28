@@ -228,6 +228,10 @@
     }
 }
 
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    _startX = scrollView.contentOffset.x;
+}
+
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     if(!decelerate) {
         [self scrollViewWillBeginDecelerating:scrollView];
@@ -252,18 +256,29 @@
     }
 }
 
--(void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView{
-    NSLog(@"Finished scrolling: %f", scrollView.contentOffset.x);
-    if(scrollView.contentOffset.x < _buffersView.tableView.bounds.size.width - _buffersView.tableView.bounds.size.width/2) {
-        [scrollView scrollRectToVisible:_buffersView.tableView.frame animated:YES];
-        NSLog(@"Scroll to buffers list");
-    } else if(scrollView.contentOffset.x > _buffersView.tableView.bounds.size.width + _buffersView.tableView.bounds.size.width/2) {
-        [scrollView scrollRectToVisible:_usersView.tableView.frame animated:YES];
-        NSLog(@"Scroll to users list");
-    } else {
-        [scrollView scrollRectToVisible:_eventsView.tableView.frame animated:YES];
-        NSLog(@"Scroll to events list");
+-(void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
+    int buffersDisplayWidth = _buffersView.tableView.bounds.size.width;
+    int usersDisplayWidth = _usersView.tableView.bounds.size.width;
+    
+    if(abs(_startX - scrollView.contentOffset.x) > buffersDisplayWidth / 4) { //If they've dragged a drawer more than 25% on screen, snap the drawer onto the screen
+        if(_startX < buffersDisplayWidth + usersDisplayWidth / 4 && scrollView.contentOffset.x < _startX) {
+            [scrollView setContentOffset:CGPointMake(0,0) animated:YES];
+            //TODO: set the buffer swipe tip flag
+        } else if(_startX >= buffersDisplayWidth && scrollView.contentOffset.x > _startX) {
+            [scrollView setContentOffset:CGPointMake(buffersDisplayWidth + usersDisplayWidth,0) animated:YES];
+            //TODO: set the buffer swipe tip flag
+        } else {
+            [scrollView setContentOffset:CGPointMake(buffersDisplayWidth,0) animated:YES];
+        }
+    } else { //Snap back
+        if(_startX < buffersDisplayWidth)
+            [scrollView setContentOffset:CGPointMake(0,0) animated:YES];
+        else if(_startX > buffersDisplayWidth + usersDisplayWidth / 4)
+            [scrollView setContentOffset:CGPointMake(buffersDisplayWidth + usersDisplayWidth,0) animated:YES];
+        else
+            [scrollView setContentOffset:CGPointMake(buffersDisplayWidth,0) animated:YES];
     }
+    _startX = 0;
 }
 
 -(void)rowSelected:(Event *)event {
