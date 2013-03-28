@@ -9,6 +9,15 @@
 #import <Foundation/Foundation.h>
 #import "IRCCloudJSONObject.h"
 
+#define ROW_MESSAGE 0
+#define ROW_TIMESTAMP 1
+#define ROW_BACKLOG 2
+#define ROW_LASTSEENEID 3
+#define ROW_SOCKETCLOSED 4
+#define TYPE_TIMESTMP @"__timestamp__"
+#define TYPE_BACKLOG @"__backlog__"
+#define TYPE_LASTSEENEID @"__lastseeneid"
+
 @interface Event : NSObject {
     int _cid;
     int _bid;

@@ -30,4 +30,6 @@
 +(UIColor *)selfBackgroundColor;
 +(UIColor *)highlightBackgroundColor;
 +(UIColor *)noticeBackgroundColor;
++(UIColor *)timestampBackgroundColor;
++(UIColor *)newMsgsBackgroundColor;
 @end

@@ -8,6 +8,9 @@
 
 #import "UIColor+IRCCloud.h"
 
+UIImage *__timestampBackgroundImage;
+UIImage *__newMsgsBackgroundImage;
+
 @implementation UIColor (IRCCloud)
 +(UIColor *)backgroundBlueColor {
     return [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
@@ -126,5 +129,43 @@
 }
 +(UIColor *)noticeBackgroundColor {
     return [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
+}
++(UIColor *)timestampBackgroundColor {
+    if(!__timestampBackgroundImage) {
+        int width = [[UIScreen mainScreen] bounds].size.width;
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        CGContextRef context = CGBitmapContextCreate(NULL, width, 26, 8, 4 * width, colorSpace, kCGImageAlphaNoneSkipFirst);
+        NSArray *colors = [NSArray arrayWithObjects:(id)[UIColor colorWithRed:0.961 green:0.961 blue:0.961 alpha:1].CGColor, (id)[UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1].CGColor, nil];
+        CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)(colors), NULL);
+        CGContextDrawLinearGradient(context, gradient, CGPointMake(0.0f, 26.0f), CGPointMake(0.0f, 0.0f), 0);
+        CGImageRef cgImage = CGBitmapContextCreateImage(context);
+        __timestampBackgroundImage = [UIImage imageWithCGImage:cgImage];
+        CGContextRelease(context);
+        CGColorSpaceRelease(colorSpace);
+    }
+    return [UIColor colorWithPatternImage:__timestampBackgroundImage];
+}
++(UIColor *)newMsgsBackgroundColor {
+    if(!__newMsgsBackgroundImage) {
+        int width = [[UIScreen mainScreen] bounds].size.width;
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        CGContextRef context = CGBitmapContextCreate(NULL, width, 26, 8, 4 * width, colorSpace, kCGImageAlphaNoneSkipFirst);
+        CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+        CGContextFillRect(context, CGRectMake(0,0,width,26));
+        CGContextSetLineCap(context, kCGLineCapSquare);
+        CGContextSetStrokeColorWithColor(context, [UIColor timestampColor].CGColor);
+        CGContextSetLineWidth(context, 1.0);
+        CGContextMoveToPoint(context, 0.0, 11.0);
+        CGContextAddLineToPoint(context, width, 11.0);
+        CGContextStrokePath(context);
+        CGContextMoveToPoint(context, 0.0, 15.0);
+        CGContextAddLineToPoint(context, width, 15.0);
+        CGContextStrokePath(context);
+        CGImageRef cgImage = CGBitmapContextCreateImage(context);
+        __newMsgsBackgroundImage = [UIImage imageWithCGImage:cgImage];
+        CGContextRelease(context);
+        CGColorSpaceRelease(colorSpace);
+    }
+    return [UIColor colorWithPatternImage:__newMsgsBackgroundImage];
 }
 @end

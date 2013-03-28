@@ -121,7 +121,7 @@
     
     if([object.type isEqualToString:@"socket_closed"]) {
         event.from = @"";
-        //event.row_type = MessageViewFragment.ROW_SOCKETCLOSED;
+        event.rowType = ROW_SOCKETCLOSED;
         event.color = [UIColor timestampColor];
         if([object objectForKey:@"pool_lost"])
             event.msg = @"Connection pool lost";
@@ -166,7 +166,7 @@
         event.from = @"";
         event.bgColor = [UIColor errorBackgroundColor];
     } else if([object.type isEqualToString:@"connecting_failed"]) {
-        //event.row_type = MessageViewFragment.ROW_SOCKETCLOSED;
+        event.rowType = ROW_SOCKETCLOSED;
         event.color = [UIColor timestampColor];
         event.from = @"";
         if([object objectForKey:@"reason"])

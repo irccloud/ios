@@ -11,20 +11,13 @@
 #import "UIColor+IRCCloud.h"
 #import "ColorFormatter.h"
 
-#define ROW_MESSAGE 0
-#define ROW_TIMESTAMP 1
-#define ROW_BACKLOG 2
-#define ROW_LASTSEENEID 3
-#define TYPE_TIMESTMP @"__timestamp__"
-#define TYPE_BACKLOG @"__backlog__"
-#define TYPE_LASTSEENEID @"__lastseeneid"
-
 int __timestampWidth;
 
 @interface EventsTableCell : UITableViewCell {
     UILabel *_timestamp;
     TTTAttributedLabel *_message;
     int _type;
+    UIView *_socketClosedBar;
 }
 @property int type;
 @property (readonly) UILabel *timestamp;
@@ -55,6 +48,11 @@ int __timestampWidth;
         _message.backgroundColor = [UIColor clearColor];
         _message.textColor = [UIColor blackColor];
         [self.contentView addSubview:_message];
+        
+        _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
+        _socketClosedBar.backgroundColor = [UIColor newMsgsBackgroundColor];
+        _socketClosedBar.hidden = YES;
+        [self.contentView addSubview:_socketClosedBar];
     }
     return self;
 }
@@ -63,11 +61,18 @@ int __timestampWidth;
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
-    if(_type == ROW_MESSAGE) {
+    if(_type == ROW_MESSAGE || _type == ROW_SOCKETCLOSED) {
         frame.origin.x = 6;
         frame.origin.y = 4;
         frame.size.height -= 6;
         frame.size.width -= 12;
+        if(_type == ROW_SOCKETCLOSED) {
+            frame.size.height -= 26;
+            _socketClosedBar.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height, frame.size.width, 26);
+            _socketClosedBar.hidden = NO;
+        } else {
+            _socketClosedBar.hidden = YES;
+        }
         _timestamp.textAlignment = NSTextAlignmentRight;
         _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, __timestampWidth, 20);
         _timestamp.hidden = NO;
@@ -77,11 +82,16 @@ int __timestampWidth;
         if(_type == ROW_BACKLOG) {
             frame.origin.y = frame.size.height / 2;
             frame.size.height = 1;
+        } else if(_type == ROW_LASTSEENEID) {
+            int width = [_timestamp.text sizeWithFont:_timestamp.font].width + 12;
+            frame.origin.x = (frame.size.width - width) / 2;
+            frame.size.width = width;
         }
         _timestamp.frame = frame;
         _timestamp.hidden = NO;
         _timestamp.textAlignment = NSTextAlignmentCenter;
         _message.hidden = YES;
+        _socketClosedBar.hidden = YES;
     }
 }
 
@@ -194,8 +204,8 @@ int __timestampWidth;
 - (void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped {
     if(_minEid == 0)
         _minEid = event.eid;
-    if(event.eid == _minEid) {
-        _headerView.hidden = YES;
+    if(event.eid == _buffer.min_eid) {
+        self.tableView.tableHeaderView = nil;
     }
     if(event.eid < _earliestEid || _earliestEid == 0)
         _earliestEid = event.eid;
@@ -311,7 +321,7 @@ int __timestampWidth;
     
     if(!backlog) {
         [self.tableView reloadData];
-        if([[[self.tableView indexPathsForVisibleRows] lastObject] row] == _data.count-2) {
+        if([[[self.tableView indexPathsForVisibleRows] lastObject] row] >= _data.count-3) {
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
         } else {
             _newMsgs++;
@@ -536,7 +546,7 @@ int __timestampWidth;
         d.rowType = ROW_TIMESTAMP;
         d.eid = eid;
         d.timestamp = [_formatter stringFromDate:date];
-        d.bgColor = [UIColor timestampColor];
+        d.bgColor = [UIColor timestampBackgroundColor];
         [_data insertObject:d atIndex:insertPos];
         if(_currentGroupPosition > -1)
             _currentGroupPosition++;
@@ -619,8 +629,8 @@ int __timestampWidth;
             e.type = TYPE_LASTSEENEID;
             e.rowType = ROW_LASTSEENEID;
             e.formattedMsg = nil;
-            e.bgColor = [UIColor whiteColor];
-            e.timestamp = @"==== New Messages ====";
+            e.bgColor = [UIColor newMsgsBackgroundColor];
+            e.timestamp = @"New Messages";
             _lastSeenEidPos = _data.count - 1;
             NSEnumerator *i = [_data reverseObjectEnumerator];
             Event *event = [i nextObject];
@@ -688,7 +698,7 @@ int __timestampWidth;
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized(_data) {
         Event *e = [_data objectAtIndex:indexPath.row];
-        if(e.rowType == ROW_MESSAGE) {
+        if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED) {
             if(e.formatted == nil && e.formattedMsg.length > 0) {
                 e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace];
             } else if(e.formattedMsg.length == 0) {
@@ -699,7 +709,7 @@ int __timestampWidth;
              CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth,CGFLOAT_MAX), NULL);
              float height = ceilf(suggestedSize.height);
              CFRelease(framesetter);
-            return height + 8;
+            return height + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
         } else {
             return 26;
         }
@@ -728,6 +738,8 @@ int __timestampWidth;
         }
         if(e.rowType == ROW_BACKLOG) {
             cell.timestamp.backgroundColor = [UIColor selectedBlueColor];
+        } else if(e.rowType == ROW_LASTSEENEID) {
+            cell.timestamp.backgroundColor = [UIColor whiteColor];
         } else {
             cell.timestamp.backgroundColor = [UIColor clearColor];
         }
