@@ -220,7 +220,15 @@
 -(void)bufferSelected:(int)bid {
     TFLog(@"BID selected: %i", bid);
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
-    self.navigationItem.title = _buffer.name;
+    if([_buffer.type isEqualToString:@"console"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+        if(s.name.length)
+            self.navigationItem.title = s.name;
+        else
+            self.navigationItem.title = s.hostname;
+    } else {
+        self.navigationItem.title = _buffer.name;
+    }
     [_usersView setBuffer:_buffer];
     [_eventsView setBuffer:_buffer];
     if([self.view isKindOfClass:[UIScrollView class]]) {
