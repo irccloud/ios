@@ -19,6 +19,8 @@
 #define TYPE_BACKLOG @"__backlog__"
 #define TYPE_LASTSEENEID @"__lastseeneid"
 
+int __timestampWidth;
+
 @interface EventsTableCell : UITableViewCell {
     UILabel *_timestamp;
     TTTAttributedLabel *_message;
@@ -67,9 +69,9 @@
         frame.size.height -= 6;
         frame.size.width -= 12;
         _timestamp.textAlignment = NSTextAlignmentRight;
-        _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, 70, 20);
+        _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, __timestampWidth, 20);
         _timestamp.hidden = NO;
-        _message.frame = CGRectMake(frame.origin.x + 76, frame.origin.y, frame.size.width - 76, frame.size.height);
+        _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
         _message.hidden = NO;
     } else {
         if(_type == ROW_BACKLOG) {
@@ -181,6 +183,9 @@
                 //TODO: clear pending events
                 [self insertEvent:notification.object backlog:NO nextIsGrouped:NO];
             }
+        case kIRCEventUserInfo:
+            [self refresh];
+            break;
         default:
             break;
     }
@@ -396,8 +401,17 @@
     int insertPos = -1;
     NSString *lastDay = nil;
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
-    //TODO: check date format pref
-    [_formatter setDateFormat:@"h:mm a"];
+    if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]) {
+        if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
+            [_formatter setDateFormat:@"H:mm:ss"];
+        else
+            [_formatter setDateFormat:@"H:mm"];
+    } else if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue]) {
+        [_formatter setDateFormat:@"h:mm:ss a"];
+    } else {
+        [_formatter setDateFormat:@"h:mm a"];
+    }
+
     e.timestamp = [_formatter stringFromDate:date];
     e.groupEid = _currentCollapsedEid;
     e.formatted = nil;
@@ -537,7 +551,11 @@
         
         [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
 
-        //TODO: calculate the timestamp width
+        __timestampWidth = [@"88:88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
+        if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
+            __timestampWidth += [@":88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
+        if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
+            __timestampWidth += [@" AM" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
         
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
@@ -657,7 +675,7 @@
                 return 26;
             }
             CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-             CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 76 - 12,CGFLOAT_MAX), NULL);
+             CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth,CGFLOAT_MAX), NULL);
              float height = ceilf(suggestedSize.height);
              CFRelease(framesetter);
             return height + 8;
