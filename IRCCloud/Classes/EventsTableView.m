@@ -195,7 +195,7 @@ int __timestampWidth;
     if(_minEid == 0)
         _minEid = event.eid;
     if(event.eid == _minEid) {
-        //TODO: hide the loading header
+        _headerView.hidden = YES;
     }
     if(event.eid < _earliestEid || _earliestEid == 0)
         _earliestEid = event.eid;
@@ -207,7 +207,28 @@ int __timestampWidth;
     }
 
     if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]) {
-        //TODO: check join/part/quit hidden map
+        NSDictionary *prefs = _conn.prefs;
+        if(prefs) {
+            NSDictionary *hiddenMap;
+            
+            if([_buffer.type isEqualToString:@"channel"]) {
+                hiddenMap = [prefs objectForKey:@"channel-hideJoinPart"];
+            } else {
+                hiddenMap = [prefs objectForKey:@"buffer-hideJoinPart"];
+            }
+            
+            if(hiddenMap && [[hiddenMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) {
+                for(Event *e in _data) {
+                    if(e.eid == event.eid) {
+                        [_data removeObject:e];
+                        break;
+                    }
+                }
+                if(!backlog)
+                    [self.tableView reloadData];
+                return;
+            }
+        }
         
         [_formatter setDateFormat:@"DDD"];
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
