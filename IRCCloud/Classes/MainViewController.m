@@ -31,6 +31,8 @@
     //TODO: check the user info for the last BID
     [self bufferSelected:[BuffersDataSource sharedInstance].firstBid];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogStarted:)
                                                  name:kIRCCloudBacklogStartedNotification object:nil];
@@ -54,6 +56,18 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillBeHidden:)
                                                  name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (void)handleEvent:(NSNotification *)notification {
+    kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
+    switch(event) {
+        case kIRCEventUserInfo:
+        case kIRCEventPart:
+            [self _updateUserListVisibility];
+            break;
+        default:
+            break;
+    }
 }
 
 -(void)_showConnectingView {
@@ -231,8 +245,41 @@
     }
     [_usersView setBuffer:_buffer];
     [_eventsView setBuffer:_buffer];
+    [self _updateUserListVisibility];
+}
+
+-(void)_updateUserListVisibility {
     if([self.view isKindOfClass:[UIScrollView class]]) {
         [((UIScrollView *)self.view) scrollRectToVisible:_eventsView.tableView.frame animated:YES];
+        if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedIntance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+            self.navigationItem.rightBarButtonItem = _navItem.rightBarButtonItem;
+            CGSize size = ((UIScrollView *)self.view).contentSize;
+            size.width = [UIScreen mainScreen].bounds.size.width + _buffersView.view.bounds.size.width + _usersView.view.bounds.size.width;
+            ((UIScrollView *)self.view).contentSize = size;
+        } else {
+            self.navigationItem.rightBarButtonItem = nil;
+            CGSize size = ((UIScrollView *)self.view).contentSize;
+            size.width = [UIScreen mainScreen].bounds.size.width + _buffersView.view.bounds.size.width;
+            ((UIScrollView *)self.view).contentSize = size;
+        }
+    } else {
+        if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedIntance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+            CGRect frame = _eventsView.view.frame;
+            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+            _eventsView.view.frame = frame;
+            frame = _message.superview.frame;
+            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+            _message.superview.frame = frame;
+            _usersView.view.hidden = NO;
+        } else {
+            CGRect frame = _eventsView.view.frame;
+            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+            _eventsView.view.frame = frame;
+            frame = _message.superview.frame;
+            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+            _message.superview.frame = frame;
+            _usersView.view.hidden = YES;
+        }
     }
 }
 

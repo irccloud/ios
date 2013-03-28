@@ -385,7 +385,7 @@
 						<array class="NSMutableArray" key="NSSubviews">
 							<object class="IBUITextField" id="837073416">
 								<reference key="NSNextResponder" ref="555408020"/>
-								<int key="NSvFlags">264</int>
+								<int key="NSvFlags">266</int>
 								<string key="NSFrame">{{12, 7}, {500, 30}}</string>
 								<reference key="NSSuperview" ref="555408020"/>
 								<reference key="NSWindow"/>
