@@ -95,6 +95,9 @@ typedef enum {
     int _totalBuffers;
     int _numBuffers;
     int _lastReqId;
+    int _currentCount;
+    int _currentBid;
+    NSTimeInterval _firstEID;
     
     kIRCCloudState _state;
     NSDictionary *_userInfo;

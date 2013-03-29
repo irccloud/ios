@@ -214,6 +214,7 @@
     [_buffersView viewWillDisappear:animated];
     [_usersView viewWillDisappear:animated];
     [_eventsView viewWillDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)didReceiveMemoryWarning {

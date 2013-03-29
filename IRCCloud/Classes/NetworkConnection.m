@@ -20,6 +20,8 @@ NSString *kIRCCloudBacklogCompletedNotification = @"com.irccloud.notification.ba
 NSString *kIRCCloudBacklogProgressNotification = @"com.irccloud.notification.backlog.progress";
 NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
+#define BACKLOG_BUFFER_MAX 99
+
 @interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
     SBJsonStreamParser *_parser;
     SBJsonStreamParserAdapter *_adapter;
@@ -135,6 +137,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _parser.delegate = _adapter;
     _lastReqId = 0;
     _writer = [[SBJsonWriter alloc] init];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogStarted:) name:kIRCCloudBacklogStartedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey];
@@ -190,7 +193,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:self];
     NSString *url = [NSString stringWithFormat:@"wss://%@",IRCCLOUD_HOST];
     if(_events.highestEid > 0)
-        url = [url stringByAppendingFormat:@"?since_id=%g", _events.highestEid];
+        url = [url stringByAppendingFormat:@"?since_id=%0.f", _events.highestEid];
+    NSLog(@"Connecting: %@", url);
     WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:nil protocols:nil
                                                                      tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: [NSNull null],
                                                                                   (NSString *)kCFStreamSSLAllowsAnyRoot: @YES,
@@ -590,6 +594,19 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         } else {
             TFLog(@"Unhandled type: %@", object);
         }
+        if(backlog) {
+            if(_totalBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
+                if(object.bid != _currentBid) {
+                    if(_currentBid != -1 && _currentCount >= BACKLOG_BUFFER_MAX) {
+                        [_events removeEventsBefore:_firstEID buffer:_currentBid];
+                    }
+                    _currentBid = object.bid;
+                    _currentCount = 0;
+                    _firstEID = object.eid;
+                }
+                _currentCount++;
+            }
+        }
     } else {
         TFLog(@"Repsonse: %@", object);
     }
@@ -658,6 +675,12 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     for(OOBFetcher *fetcher in oldQueue) {
         [fetcher cancel];
     }
+}
+
+-(void)_backlogStarted:(NSNotification *)notification {
+    _currentBid = -1;
+    _currentCount = 0;
+    _firstEID = 0;
 }
 
 -(void)_backlogCompleted:(NSNotification *)notification {
