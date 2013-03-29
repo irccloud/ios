@@ -193,6 +193,7 @@ int __timestampWidth;
                 //TODO: clear pending events
                 [self insertEvent:notification.object backlog:NO nextIsGrouped:NO];
             }
+            break;
         case kIRCEventUserInfo:
             [self refresh];
             break;
