@@ -244,6 +244,7 @@
     } else {
         self.navigationItem.title = _buffer.name;
     }
+    [_buffersView setBuffer:_buffer];
     [_usersView setBuffer:_buffer];
     [_eventsView setBuffer:_buffer];
     [self _updateUserListVisibility];

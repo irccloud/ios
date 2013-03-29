@@ -8,7 +8,6 @@
 
 #import "BuffersTableView.h"
 #import "NetworkConnection.h"
-#import "BuffersDataSource.h"
 #import "ServersDataSource.h"
 #import "UIColor+IRCCloud.h"
 #import "HighlightsCountView.h"
@@ -102,6 +101,7 @@
     if (self) {
         _data = [[NSMutableArray alloc] init];
         _selectedRow = -1;
+        _expandedArchives = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -123,7 +123,7 @@
     @synchronized(_data) {
         [_data removeAllObjects];
         int archiveCount = 0;
-        
+
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         
         for(Server *server in [[ServersDataSource sharedInstance] getServers]) {
@@ -148,6 +148,8 @@
                      @"highlights":@(highlights),
                      @"archived":@0,
                      }];
+                    if(buffer.bid == _selectedBuffer.bid)
+                        _selectedRow = _data.count - 1;
                 }
             }
             for(Buffer *buffer in buffers) {
@@ -169,7 +171,6 @@
                 if(type > 0 && buffer.archived == 0) {
                     int unread = 0;
                     int highlights = 0;
-                    //TODO: check the disabled map
                     unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     if(type == TYPE_CHANNEL) {
@@ -191,13 +192,38 @@
                      @"archived":@0,
                      @"key":@(key),
                      }];
+                    if(buffer.bid == _selectedBuffer.bid)
+                        _selectedRow = _data.count - 1;
                 }
                 if(buffer.archived > 0)
                     archiveCount++;
             }
             if(archiveCount > 0) {
-                [_data addObject:@{@"type":@(TYPE_ARCHIVES_HEADER), @"name":@"Archives"}];
-                //TODO: iterate again and add the expanded archives
+                [_data addObject:@{@"type":@(TYPE_ARCHIVES_HEADER), @"name":@"Archives", @"cid":@(server.cid)}];
+                if([_expandedArchives objectForKey:@(server.cid)]) {
+                    for(Buffer *buffer in buffers) {
+                        int type = -1;
+                        if(buffer.archived) {
+                            if([buffer.type isEqualToString:@"channel"]) {
+                                type = TYPE_CHANNEL;
+                            } else if([buffer.type isEqualToString:@"conversation"]) {
+                                type = TYPE_CONVERSATION;
+                            }
+                            [_data addObject:@{
+                             @"type":@(type),
+                             @"cid":@(buffer.cid),
+                             @"bid":@(buffer.bid),
+                             @"name":buffer.name,
+                             @"unread":@0,
+                             @"highlights":@0,
+                             @"archived":@1,
+                             @"key":@0,
+                             }];
+                            if(buffer.bid == _selectedBuffer.bid)
+                                _selectedRow = _data.count - 1;
+                        }
+                    }
+                }
             }
         }
         [self.tableView reloadData];
@@ -252,7 +278,12 @@
         } else {
             cell.highlights.hidden = YES;
         }
-        if([[row objectForKey:@"unread"] intValue] || selected) {
+        if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
+            if([[row objectForKey:@"archived"] intValue]) {
+                cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+            } else {
+                cell.unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
+            }
             cell.unreadIndicator.hidden = NO;
             cell.label.font = [UIFont boldSystemFontOfSize:16.0f];
         } else {
@@ -281,18 +312,33 @@
                     cell.icon.hidden = YES;
                 }
                 if(selected) {
-                    cell.label.textColor = [UIColor whiteColor];
-                    cell.bg.backgroundColor = [UIColor selectedBlueColor];
+                    if([[row objectForKey:@"archived"] intValue]) {
+                        cell.label.textColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
+                        cell.bg.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+                    } else {
+                        cell.label.textColor = [UIColor whiteColor];
+                        cell.bg.backgroundColor = [UIColor selectedBlueColor];
+                    }
                 } else {
-                    cell.label.textColor = [UIColor selectedBlueColor];
-                    cell.bg.backgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+                    if([[row objectForKey:@"archived"] intValue]) {
+                        cell.label.textColor = [UIColor timestampColor];
+                        cell.bg.backgroundColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
+                    } else {
+                        cell.label.textColor = [UIColor selectedBlueColor];
+                        cell.bg.backgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+                    }
                 }
                 break;
             case TYPE_ARCHIVES_HEADER:
                 cell.icon.image = nil;
                 cell.icon.hidden = YES;
-                cell.label.textColor = [UIColor colorWithRed:0.133 green:0.133 blue:0.133 alpha:1];
-                cell.bg.backgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+                if([_expandedArchives objectForKey:[row objectForKey:@"cid"]]) {
+                    cell.label.textColor = [UIColor blackColor];
+                    cell.bg.backgroundColor = [UIColor timestampColor];
+                } else {
+                    cell.label.textColor = [UIColor colorWithRed:0.133 green:0.133 blue:0.133 alpha:1];
+                    cell.bg.backgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+                }
                 break;
         }
         return cell;
@@ -342,10 +388,22 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    _selectedRow = indexPath.row;
-    if(_delegate)
-        [_delegate bufferSelected:[[[_data objectAtIndex:_selectedRow] objectForKey:@"bid"] intValue]];
+    if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER) {
+        if([_expandedArchives objectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]])
+            [_expandedArchives removeObjectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
+        else
+            [_expandedArchives setObject:@YES forKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
+        [self refresh];
+    } else {
+        _selectedRow = indexPath.row;
+        if(_delegate)
+            [_delegate bufferSelected:[[[_data objectAtIndex:_selectedRow] objectForKey:@"bid"] intValue]];
+    }
     [tableView reloadData];
+}
+
+-(void)setBuffer:(Buffer *)buffer {
+    _selectedBuffer = buffer;
 }
 
 @end

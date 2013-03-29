@@ -664,15 +664,17 @@ int __timestampWidth;
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
         }
         
-        int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
-        if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
-            _topUnreadView.alpha = 1; //TODO: animate this
-            [self updateTopUnread:firstRow];
+        if(_data.count) {
+            int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
+            if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
+                _topUnreadView.alpha = 1; //TODO: animate this
+                [self updateTopUnread:firstRow];
+            }
+            _requestingBacklog = NO;
         }
         
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
         _ready = YES;
-        _requestingBacklog = NO;
         [self scrollViewDidScroll:self.tableView];
     }
 }

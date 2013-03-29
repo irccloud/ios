@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "BuffersDataSource.h"
 
 @protocol BuffersTableViewDelegate<NSObject>
 -(void)bufferSelected:(int)bid;
@@ -16,6 +17,8 @@
     NSMutableArray *_data;
     int _selectedRow;
     IBOutlet id<BuffersTableViewDelegate> _delegate;
+    NSMutableDictionary *_expandedArchives;
+    Buffer *_selectedBuffer;
 }
-
+-(void)setBuffer:(Buffer *)buffer;
 @end
