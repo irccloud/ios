@@ -42,6 +42,10 @@
 
 -(void)viewDidAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateConnecting:)
+                                                 name:kIRCCloudConnectivityNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
                                                  name:UIKeyboardWillShowNotification object:nil];
     
@@ -56,6 +60,30 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogProgress:)
                                                  name:kIRCCloudBacklogProgressNotification object:nil];
+}
+
+-(void)updateConnecting:(NSNotification *)notification {
+    if(_conn.state == kIRCCloudStateConnecting) {
+        [status setText:@"Connecting"];
+        activity.hidden = NO;
+        [activity startAnimating];
+        progress.progress = 0;
+        progress.hidden = YES;
+    } else if(_conn.state == kIRCCloudStateDisconnected) {
+        if(_conn.reconnectTimestamp > 0) {
+            [status setText:[NSString stringWithFormat:@"Reconnecting in %0.f seconds", _conn.reconnectTimestamp - [[NSDate date] timeIntervalSince1970]]];
+            activity.hidden = NO;
+            [activity startAnimating];
+            progress.progress = 0;
+            progress.hidden = YES;
+            [self performSelector:@selector(updateConnecting:) withObject:nil afterDelay:1];
+        } else {
+            [status setText:@"Disconneted"];
+            activity.hidden = YES;
+            progress.progress = 0;
+            progress.hidden = YES;
+        }
+    }
 }
 
 -(void)viewDidDisappear:(BOOL)animated {

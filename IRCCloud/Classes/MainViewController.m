@@ -108,11 +108,20 @@
             _connectingError.text = @"";
             break;
         case kIRCCloudStateDisconnected:
-            _connectingStatus.text = @"Disconnected";
-            _connectingActivity.hidden = YES;
-            _connectingProgress.progress = 0;
-            _connectingProgress.hidden = YES;
-            _connectingError.text = @"";
+            if([NetworkConnection sharedInstance].reconnectTimestamp > 0) {
+                [_connectingStatus setText:[NSString stringWithFormat:@"Reconnecting in %0.f seconds", [NetworkConnection sharedInstance].reconnectTimestamp - [[NSDate date] timeIntervalSince1970]]];
+                _connectingActivity.hidden = NO;
+                [_connectingActivity startAnimating];
+                _connectingProgress.progress = 0;
+                _connectingProgress.hidden = YES;
+                [self performSelector:@selector(connectivityChanged:) withObject:nil afterDelay:1];
+            } else {
+                _connectingStatus.text = @"Disconnected";
+                _connectingActivity.hidden = YES;
+                _connectingProgress.progress = 0;
+                _connectingProgress.hidden = YES;
+                _connectingError.text = @"";
+            }
         case kIRCCloudStateDisconnecting:
             [self _showConnectingView];
         case kIRCCloudStateConnected:

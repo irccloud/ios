@@ -103,11 +103,13 @@ typedef enum {
     NSDictionary *_userInfo;
     NSDictionary *_prefs;
     NSTimeInterval _clockOffset;
+    NSTimeInterval _reconnectTimestamp;
     NSOperationQueue *_queue;
 }
 @property (readonly) kIRCCloudState state;
 @property (readonly) NSDictionary *userInfo;
 @property (readonly) NSTimeInterval clockOffset;
+@property (readonly) NSTimeInterval reconnectTimestamp;
 
 +(NetworkConnection*)sharedInstance;
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password;
