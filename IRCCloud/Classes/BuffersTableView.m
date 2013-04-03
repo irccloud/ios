@@ -107,12 +107,9 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [self refresh];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
+    [self refresh];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

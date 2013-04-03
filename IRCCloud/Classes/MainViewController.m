@@ -25,6 +25,7 @@
     } else {
         _contentView = self.view;
     }
+    _startHeight = self.view.frame.size.height;
     self.navigationItem.leftBarButtonItem = _navItem.leftBarButtonItem;
     self.navigationItem.rightBarButtonItem = _navItem.rightBarButtonItem;
     //TODO: resize if the keyboard is visible
@@ -181,6 +182,14 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [_message resignFirstResponder];
+    CGRect frame = self.view.frame;
+    frame.size.height = _startHeight;
+    self.view.frame = frame;
+    if([self.view isKindOfClass:[UIScrollView class]]) {
+        UIScrollView *scrollView = (UIScrollView *)self.view;
+        scrollView.contentSize = CGSizeMake(_contentView.frame.size.width,frame.size.height);
+    }
     [self connectivityChanged:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     

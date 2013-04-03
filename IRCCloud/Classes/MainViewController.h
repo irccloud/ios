@@ -25,6 +25,7 @@
     IBOutlet UINavigationItem *_navItem;
     Buffer *_buffer;
     int _startX;
+    int _startHeight;
 }
 -(IBAction)sendButtonPressed:(id)sender;
 -(IBAction)usersButtonPressed:(id)sender;
