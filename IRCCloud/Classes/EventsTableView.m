@@ -136,7 +136,7 @@ int __timestampWidth;
 }
 
 - (void)backlogCompleted:(NSNotification *)notification {
-    if(_buffer && [notification.object bid] == _buffer.bid) {
+    if([notification.object bid] == -1 || (_buffer && [notification.object bid] == _buffer.bid)) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self refresh];
         }];

@@ -25,7 +25,7 @@
     } else {
         _contentView = self.view;
     }
-    _startHeight = self.view.frame.size.height;
+    _startHeight = [UIScreen mainScreen].applicationFrame.size.height - 44;
     self.navigationItem.leftBarButtonItem = _navItem.leftBarButtonItem;
     self.navigationItem.rightBarButtonItem = _navItem.rightBarButtonItem;
     //TODO: resize if the keyboard is visible
