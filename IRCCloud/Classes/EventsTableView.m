@@ -322,8 +322,8 @@ int __timestampWidth;
     
     if(!backlog) {
         [self.tableView reloadData];
-        if([[[self.tableView indexPathsForVisibleRows] lastObject] row] >= _data.count-3) {
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+        if([[[self.tableView indexPathsForVisibleRows] lastObject] row] >= _data.count-2 || _scrollTimer) {
+            [self scrollToBottom];
         } else {
             _newMsgs++;
             if(event.isHighlight)
@@ -555,6 +555,8 @@ int __timestampWidth;
 }
 
 -(void)setBuffer:(Buffer *)buffer {
+    [_scrollTimer invalidate];
+    _scrollTimer = nil;
     _topUnreadView.alpha = 0;
     _bottomUnreadView.alpha = 0;
     _requestingBacklog = NO;
@@ -562,6 +564,19 @@ int __timestampWidth;
     _earliestEid = 0;
     [_expandedSectionEids removeAllObjects];
     [self refresh];
+}
+
+- (void)_scrollToBottom {
+    @synchronized(_data) {
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
+        _scrollTimer = nil;
+    }
+}
+
+- (void)scrollToBottom {
+    [_scrollTimer invalidate];
+    
+    _scrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_scrollToBottom) userInfo:nil repeats:NO];
 }
 
 - (void)refresh {
@@ -661,7 +676,7 @@ int __timestampWidth;
             }
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
         } else if(_data.count) {
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
+            [self _scrollToBottom];
         }
         
         if(_data.count) {
@@ -807,7 +822,7 @@ int __timestampWidth;
 -(IBAction)bottomUnreadBarClicked:(id)sender {
     if(_bottomUnreadView.alpha) {
         _bottomUnreadView.alpha = 0; //TODO: animate this
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+        [self scrollToBottom];
     }
 }
 

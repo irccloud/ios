@@ -41,6 +41,7 @@
     NSString *_lastCollpasedDay;
     BOOL _requestingBacklog, _ready;
     NSTimer *_heartbeatTimer;
+    NSTimer *_scrollTimer;
     
     IBOutlet id<EventsTableViewDelegate> _delegate;
 }

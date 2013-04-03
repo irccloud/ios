@@ -30,32 +30,6 @@
     //TODO: resize if the keyboard is visible
     //TODO: check the user info for the last BID
     [self bufferSelected:[BuffersDataSource sharedInstance].firstBid];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(backlogStarted:)
-                                                 name:kIRCCloudBacklogStartedNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(backlogProgress:)
-                                                 name:kIRCCloudBacklogProgressNotification object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(backlogCompleted:)
-                                                 name:kIRCCloudBacklogCompletedNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(connectivityChanged:)
-                                                 name:kIRCCloudConnectivityNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillShow:)
-                                                 name:UIKeyboardWillShowNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillBeHidden:)
-                                                 name:UIKeyboardWillHideNotification object:nil];
 }
 
 - (void)handleEvent:(NSNotification *)notification {
@@ -207,6 +181,32 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [self connectivityChanged:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogStarted:)
+                                                 name:kIRCCloudBacklogStartedNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogProgress:)
+                                                 name:kIRCCloudBacklogProgressNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogCompleted:)
+                                                 name:kIRCCloudBacklogCompletedNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(connectivityChanged:)
+                                                 name:kIRCCloudConnectivityNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardWillShowNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillBeHidden:)
+                                                 name:UIKeyboardWillHideNotification object:nil];
     [_buffersView viewWillAppear:animated];
     [_usersView viewWillAppear:animated];
     [_eventsView viewWillAppear:animated];
@@ -214,8 +214,8 @@
         ((UIScrollView *)self.view).contentSize = _contentView.bounds.size;
         ((UIScrollView *)self.view).contentOffset = CGPointMake(220, 0);
     }
-    [self connectivityChanged:nil];
-    if([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected)
+    NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
+    if(([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected || [NetworkConnection sharedInstance].state == kIRCCloudStateDisconnecting) && session != nil && [session length] > 0)
         [[NetworkConnection sharedInstance] connect];
 }
 

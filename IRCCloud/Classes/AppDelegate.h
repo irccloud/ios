@@ -12,7 +12,9 @@
 
 @class ViewController;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate> {
+    NSTimer *_disconnectTimer;
+}
 
 @property (strong, nonatomic) UIWindow *window;
 

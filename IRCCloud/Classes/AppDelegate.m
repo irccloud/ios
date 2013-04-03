@@ -37,19 +37,34 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    [[NetworkConnection sharedInstance] disconnect];
+    _disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:[NetworkConnection sharedInstance] selector:@selector(disconnect) userInfo:nil repeats:NO];
+    [self.window.rootViewController viewWillDisappear:NO];
+    __block UIBackgroundTaskIdentifier background_task;
+    background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
+        [_disconnectTimer invalidate];
+        [[NetworkConnection sharedInstance] disconnect];
+        [NSThread sleepForTimeInterval:5];
+        [application endBackgroundTask: background_task];
+        background_task = UIBackgroundTaskInvalid;
+    }];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [NSThread sleepForTimeInterval:35];
+        [application endBackgroundTask: background_task];
+        background_task = UIBackgroundTaskInvalid;
+    });
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
+    [self applicationWillResignActive:application];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
+    [self applicationDidBecomeActive:application];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
-    if([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected && session != nil && [session length] > 0)
-        [[NetworkConnection sharedInstance] connect];
+    [_disconnectTimer invalidate];
+    [self.window.rootViewController viewWillAppear:YES];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
