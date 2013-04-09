@@ -9,9 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "BuffersDataSource.h"
 
+@protocol UsersTableViewDelegate<NSObject>
+-(void)userSelected:(NSString *)nick rect:(CGRect)rect;
+@end
+
 @interface UsersTableView : UITableViewController {
     NSMutableArray *_data;
     Buffer *_buffer;
+    IBOutlet id<UsersTableViewDelegate> delegate;
 }
 -(void)setBuffer:(Buffer *)buffer;
 @end

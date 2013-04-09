@@ -14,6 +14,7 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
+        _cidToOpen = -1;
     }
     return self;
 }
@@ -35,7 +36,39 @@
 
 - (void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
+    Buffer *b = nil;
+    IRCCloudJSONObject *o = nil;
     switch(event) {
+        case kIRCEventLinkChannel:
+            o = notification.object;
+            if(_cidToOpen == o.cid && [[o objectForKey:@"invalid_chan"] isEqualToString:_bufferToOpen]) {
+                _bufferToOpen = [o objectForKey:@"valid_chan"];
+                b = [[BuffersDataSource sharedInstance] getBuffer:o.bid];
+            }
+        case kIRCEventMakeBuffer:
+            if(!b)
+                b = notification.object;
+            if(_cidToOpen == b.cid && [b.name isEqualToString:_bufferToOpen] && ![_buffer.name isEqualToString:_bufferToOpen]) {
+                [self bufferSelected:b.bid];
+                _bufferToOpen = nil;
+                _cidToOpen = -1;
+            } else if(_buffer.bid == -1 && b.cid == _buffer.cid && [b.name isEqualToString:_buffer.name]) {
+                [self bufferSelected:b.bid];
+                _bufferToOpen = nil;
+                _cidToOpen = -1;
+            }
+            break;
+        case kIRCEventOpenBuffer:
+            o = notification.object;
+            _bufferToOpen = [o objectForKey:@"name"];
+            _cidToOpen = o.cid;
+            b = [[BuffersDataSource sharedInstance] getBufferWithName:_bufferToOpen server:_cidToOpen];
+            if(b != nil && ![b.name isEqualToString:_buffer.name]) {
+                [self bufferSelected:b.bid];
+                _bufferToOpen = nil;
+                _cidToOpen = -1;
+            }
+            break;
         case kIRCEventUserInfo:
         case kIRCEventPart:
             [self _updateUserListVisibility];
@@ -358,5 +391,62 @@
 
 -(void)rowSelected:(Event *)event {
     [_message resignFirstResponder];
+}
+
+-(void)userSelected:(NSString *)nick rect:(CGRect)rect {
+    _selectedUser = [[UsersDataSource sharedInstance] getUser:nick cid:_buffer.cid];
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:[NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,_selectedUser.hostmask] delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    [sheet addButtonWithTitle:@"Whois…"];
+    [sheet addButtonWithTitle:@"Send a message"];
+    [sheet addButtonWithTitle:@"Mention"];
+    [sheet addButtonWithTitle:@"Invite to channel…"];
+    [sheet addButtonWithTitle:@"Ignore"];
+    if([_buffer.type isEqualToString:@"channel"]) {
+        User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
+        if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
+            if([_selectedUser.mode rangeOfString:@"o"].location != NSNotFound)
+                [sheet addButtonWithTitle:@"Deop"];
+            else
+                [sheet addButtonWithTitle:@"Op"];
+        }
+        if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound || [me.mode rangeOfString:@"h"].location != NSNotFound) {
+            [sheet addButtonWithTitle:@"Kick…"];
+            [sheet addButtonWithTitle:@"Ban…"];
+        }
+    }
+    
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
+        [sheet showInView:self.view];
+    } else {
+        [sheet showFromRect:rect inView:_usersView.tableView animated:NO];
+    }
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
+    
+    if([action isEqualToString:@"Send a message"]) {
+        Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];
+        if(b) {
+            [self bufferSelected:b.bid];
+        } else {
+            b = [[Buffer alloc] init];
+            b.cid = _buffer.cid;
+            b.bid = -1;
+            b.name = _selectedUser.nick;
+            b.type = @"conversation";
+            _buffer = b;
+            self.navigationItem.title = _selectedUser.nick;
+            [_buffersView setBuffer:b];
+            [_usersView setBuffer:b];
+            [_eventsView setBuffer:b];
+            [self _updateUserListVisibility];
+        }
+    } else if([action isEqualToString:@"Op"]) {
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+    } else if([action isEqualToString:@"Deop"]) {
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+    }
 }
 @end

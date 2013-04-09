@@ -11,7 +11,7 @@
 #import "UsersTableView.h"
 #import "EventsTableView.h"
 
-@interface MainViewController : UIViewController<BuffersTableViewDelegate, UIScrollViewDelegate,EventsTableViewDelegate> {
+@interface MainViewController : UIViewController<BuffersTableViewDelegate,UIActionSheetDelegate,UIScrollViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
@@ -23,9 +23,13 @@
     IBOutlet UILabel *_connectingError;
     IBOutlet UIActivityIndicatorView *_connectingActivity;
     IBOutlet UINavigationItem *_navItem;
+    IBOutlet UIToolbar *_toolBar;
     Buffer *_buffer;
     int _startX;
     int _startHeight;
+    User *_selectedUser;
+    int _cidToOpen;
+    NSString *_bufferToOpen;
 }
 -(IBAction)sendButtonPressed:(id)sender;
 -(IBAction)usersButtonPressed:(id)sender;
