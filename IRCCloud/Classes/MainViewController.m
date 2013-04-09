@@ -424,29 +424,31 @@
 }
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
-    
-    if([action isEqualToString:@"Send a message"]) {
-        Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];
-        if(b) {
-            [self bufferSelected:b.bid];
-        } else {
-            b = [[Buffer alloc] init];
-            b.cid = _buffer.cid;
-            b.bid = -1;
-            b.name = _selectedUser.nick;
-            b.type = @"conversation";
-            _buffer = b;
-            self.navigationItem.title = _selectedUser.nick;
-            [_buffersView setBuffer:b];
-            [_usersView setBuffer:b];
-            [_eventsView setBuffer:b];
-            [self _updateUserListVisibility];
+    if(buttonIndex != -1) {
+        NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
+        
+        if([action isEqualToString:@"Send a message"]) {
+            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];
+            if(b) {
+                [self bufferSelected:b.bid];
+            } else {
+                b = [[Buffer alloc] init];
+                b.cid = _buffer.cid;
+                b.bid = -1;
+                b.name = _selectedUser.nick;
+                b.type = @"conversation";
+                _buffer = b;
+                self.navigationItem.title = _selectedUser.nick;
+                [_buffersView setBuffer:b];
+                [_usersView setBuffer:b];
+                [_eventsView setBuffer:b];
+                [self _updateUserListVisibility];
+            }
+        } else if([action isEqualToString:@"Op"]) {
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+        } else if([action isEqualToString:@"Deop"]) {
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
         }
-    } else if([action isEqualToString:@"Op"]) {
-        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
-    } else if([action isEqualToString:@"Deop"]) {
-        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
     }
 }
 @end
