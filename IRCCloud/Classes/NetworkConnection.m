@@ -190,6 +190,122 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     }
 }
 
+-(int)join:(NSString *)channel key:(NSString *)key cid:(int)cid {
+    if(key.length) {
+        return [self _sendRequest:@"join" args:@{@"cid":@(cid), @"channel":channel, @"key":key}];
+    } else {
+        return [self _sendRequest:@"join" args:@{@"cid":@(cid), @"channel":channel}];
+    }
+}
+-(int)part:(NSString *)channel msg:(NSString *)msg cid:(int)cid {
+    if(msg.length) {
+        return [self _sendRequest:@"part" args:@{@"cid":@(cid), @"channel":channel, @"msg":msg}];
+    } else {
+        return [self _sendRequest:@"part" args:@{@"cid":@(cid), @"channel":channel}];
+    }
+}
+
+-(int)kick:(NSString *)nick chan:(NSString *)chan msg:(NSString *)msg cid:(int)cid {
+    return [self say:[NSString stringWithFormat:@"/kick %@ %@",nick,(msg.length)?msg:@""] to:chan cid:cid];
+}
+
+-(int)mode:(NSString *)mode chan:(NSString *)chan cid:(int)cid {
+    return [self say:[NSString stringWithFormat:@"/mode %@ %@",chan,mode] to:chan cid:cid];
+}
+
+-(int)invite:(NSString *)nick chan:(NSString *)chan cid:(int)cid {
+    return [self say:[NSString stringWithFormat:@"/invite %@ %@",nick,chan] to:chan cid:cid];
+}
+
+-(int)archiveBuffer:(int)bid cid:(int)cid {
+    return [self _sendRequest:@"archive-buffer" args:@{@"cid":@(cid),@"id":@(bid)}];
+}
+
+-(int)unarchiveBuffer:(int)bid cid:(int)cid {
+    return [self _sendRequest:@"unarchive-buffer" args:@{@"cid":@(cid),@"id":@(bid)}];
+}
+
+-(int)deleteBuffer:(int)bid cid:(int)cid {
+    return [self _sendRequest:@"delete-buffer" args:@{@"cid":@(cid),@"id":@(bid)}];
+}
+
+-(int)deleteServer:(int)cid {
+    return [self _sendRequest:@"delete-connection" args:@{@"cid":@(cid)}];
+}
+
+-(int)addServer:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands channels:(NSString *)channels {
+    return [self _sendRequest:@"add-server" args:@{
+            @"hostname":hostname,
+            @"port":@(port),
+            @"ssl":[NSString stringWithFormat:@"%i",ssl],
+            @"netname":netname,
+            @"nickname":nick,
+            @"realname":realname,
+            @"server_pass":serverPass,
+            @"nspass":nickservPass,
+            @"joincommands":joinCommands,
+            @"channels":channels}];
+}
+
+-(int)editServer:(int)cid hostname:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands {
+    return [self _sendRequest:@"add-server" args:@{
+            @"hostname":hostname,
+            @"port":@(port),
+            @"ssl":[NSString stringWithFormat:@"%i",ssl],
+            @"netname":netname,
+            @"nickname":nick,
+            @"realname":realname,
+            @"server_pass":serverPass,
+            @"nspass":nickservPass,
+            @"joincommands":joinCommands,
+            @"cid":@(cid)}];
+}
+
+-(int)ignore:(NSString *)mask cid:(int)cid {
+    return [self _sendRequest:@"ignore" args:@{@"cid":@(cid),@"mask":mask}];
+}
+
+-(int)unignore:(NSString *)mask cid:(int)cid {
+    return [self _sendRequest:@"unignore" args:@{@"cid":@(cid),@"mask":mask}];
+}
+
+-(int)setPrefs:(NSString *)prefs {
+    _prefs = nil;
+    return [self _sendRequest:@"set-prefs" args:@{@"prefs":prefs}];
+}
+
+-(int)setEmail:(NSString *)email realname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway {
+    return [self _sendRequest:@"user-settings" args:@{
+            @"email":email,
+            @"realname":realname,
+            @"hwords":highlights,
+            @"autoaway":autoaway?@"1":@"0"}];
+}
+
+-(int)ns_help_register:(int)cid {
+    return [self _sendRequest:@"ns-help-register" args:@{@"cid":@(cid)}];
+}
+
+-(int)setNickservPass:(NSString *)nspass cid:(int)cid {
+    return [self _sendRequest:@"set-nspass" args:@{@"cid":@(cid),@"nspass":nspass}];
+}
+
+-(int)whois:(NSString *)nick server:(NSString *)server cid:(int)cid {
+    if(server.length) {
+        return [self _sendRequest:@"whois" args:@{@"cid":@(cid), @"nick":nick, @"server":server}];
+    } else {
+        return [self _sendRequest:@"whois" args:@{@"cid":@(cid), @"nick":nick}];
+    }
+}
+
+-(int)topic:(NSString *)topic chan:(NSString *)chan cid:(int)cid {
+    return [self _sendRequest:@"topic" args:@{@"cid":@(cid),@"channel":chan,@"topic":topic}];
+}
+
+-(int)back:(int)cid {
+    return [self _sendRequest:@"back" args:@{@"cid":@(cid)}];
+}
+
 -(void)connect {
     if(_socket)
         _socket.delegate = nil;

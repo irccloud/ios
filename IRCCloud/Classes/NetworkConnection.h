@@ -122,4 +122,24 @@ typedef enum {
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid;
 -(int)say:(NSString *)message to:(NSString *)cid cid:(int)cid;
 -(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid;
+-(int)join:(NSString *)channel key:(NSString *)key cid:(int)cid;
+-(int)part:(NSString *)channel msg:(NSString *)msg cid:(int)cid;
+-(int)kick:(NSString *)nick chan:(NSString *)chan msg:(NSString *)msg cid:(int)cid;
+-(int)mode:(NSString *)mode chan:(NSString *)chan cid:(int)cid;
+-(int)invite:(NSString *)nick chan:(NSString *)chan cid:(int)cid;
+-(int)archiveBuffer:(int)bid cid:(int)cid;
+-(int)unarchiveBuffer:(int)bid cid:(int)cid;
+-(int)deleteBuffer:(int)bid cid:(int)cid;
+-(int)deleteServer:(int)cid;
+-(int)addServer:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands channels:(NSString *)channels;
+-(int)editServer:(int)cid hostname:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands;
+-(int)ignore:(NSString *)mask cid:(int)cid;
+-(int)unignore:(NSString *)mask cid:(int)cid;
+-(int)setPrefs:(NSString *)prefs;
+-(int)setEmail:(NSString *)email realname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway;
+-(int)ns_help_register:(int)cid;
+-(int)setNickservPass:(NSString *)nspass cid:(int)cid;
+-(int)whois:(NSString *)nick server:(NSString *)server cid:(int)cid;
+-(int)topic:(NSString *)topic chan:(NSString *)chan cid:(int)cid;
+-(int)back:(int)cid;
 @end
