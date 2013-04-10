@@ -626,6 +626,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 }
                 if(user.nick)
                     user.old_nick = user.nick;
+                user.cid = object.cid;
+                user.bid = object.bid;
                 user.nick = [object objectForKey:@"nick"];
                 user.hostmask = [object objectForKey:@"hostmask"];
                 user.mode = @"";
