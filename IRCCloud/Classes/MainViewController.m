@@ -6,8 +6,15 @@
 //  Copyright (c) 2013 IRCCloud, Ltd. All rights reserved.
 //
 
+#import <MobileCoreServices/UTCoreTypes.h>
 #import "MainViewController.h"
 #import "NetworkConnection.h"
+#import "ColorFormatter.h"
+
+#define TAG_BAN 1
+#define TAG_IGNORE 2
+#define TAG_KICK 3
+#define TAG_INVITE 4
 
 @implementation MainViewController
 
@@ -393,14 +400,15 @@
     [_message resignFirstResponder];
 }
 
--(void)userSelected:(NSString *)nick rect:(CGRect)rect {
-    _selectedUser = [[UsersDataSource sharedInstance] getUser:nick cid:_buffer.cid];
+-(void)_showUserPopupInRect:(CGRect)rect {
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:[NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,_selectedUser.hostmask] delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    if(_selectedEvent)
+        [sheet addButtonWithTitle:@"Copy Message"];
     [sheet addButtonWithTitle:@"Whois…"];
     [sheet addButtonWithTitle:@"Send a message"];
     [sheet addButtonWithTitle:@"Mention"];
     [sheet addButtonWithTitle:@"Invite to channel…"];
-    [sheet addButtonWithTitle:@"Ignore"];
+    [sheet addButtonWithTitle:@"Ignore…"];
     if([_buffer.type isEqualToString:@"channel"]) {
         User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
         if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
@@ -419,15 +427,80 @@
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
         [sheet showInView:self.view];
     } else {
-        [sheet showFromRect:rect inView:_usersView.tableView animated:NO];
+        if(_selectedEvent)
+            [sheet showFromRect:rect inView:_eventsView.tableView animated:NO];
+        else
+            [sheet showFromRect:rect inView:_usersView.tableView animated:NO];
     }
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+-(void)userSelected:(NSString *)nick rect:(CGRect)rect {
+    _selectedEvent = nil;
+    _selectedUser = [[UsersDataSource sharedInstance] getUser:nick cid:_buffer.cid];
+    [self _showUserPopupInRect:rect];
+}
+
+-(void)rowLongPressed:(Event *)event rect:(CGRect)rect {
+    if(event.from) {
+        _selectedEvent = event;
+        _selectedUser = [[UsersDataSource sharedInstance] getUser:event.from cid:_buffer.cid];
+        if(!_selectedUser) {
+            _selectedUser = [[User alloc] init];
+            _selectedUser.cid = _selectedEvent.cid;
+            _selectedUser.bid = _selectedEvent.bid;
+            _selectedUser.nick = _selectedEvent.from;
+            _selectedUser.hostmask = _selectedEvent.hostmask;
+        }
+        [self _showUserPopupInRect:rect];
+    }
+}
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    
+    switch(alertView.tag) {
+        case TAG_BAN:
+            if([title isEqualToString:@"Ban"]) {
+                if([alertView textFieldAtIndex:0].text.length)
+                    [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", [alertView textFieldAtIndex:0].text] chan:_buffer.name cid:_buffer.cid];
+            }
+            break;
+        case TAG_IGNORE:
+            if([title isEqualToString:@"Ignore"]) {
+                if([alertView textFieldAtIndex:0].text.length)
+                    [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:_buffer.cid];
+            }
+            break;
+        case TAG_KICK:
+            if([title isEqualToString:@"Kick"]) {
+               [[NetworkConnection sharedInstance] kick:_selectedUser.nick chan:_buffer.name msg:[alertView textFieldAtIndex:0].text cid:_buffer.cid];
+            }
+            break;
+        case TAG_INVITE:
+            if([title isEqualToString:@"Invite"]) {
+                if([alertView textFieldAtIndex:0].text.length)
+                    [[NetworkConnection sharedInstance] invite:_selectedUser.nick chan:[alertView textFieldAtIndex:0].text cid:_buffer.cid];
+            }
+            break;
+    }
+}
+
+-(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
+    if(alertView.alertViewStyle == UIAlertViewStylePlainTextInput && alertView.tag != TAG_KICK && [alertView textFieldAtIndex:0].text.length == 0)
+        return NO;
+    else
+        return YES;
+}
+
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     if(buttonIndex != -1) {
         NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
         
-        if([action isEqualToString:@"Send a message"]) {
+        if([action isEqualToString:@"Copy Message"]) {
+            UIPasteboard *pb = [UIPasteboard generalPasteboard];
+            NSString *plaintext = [NSString stringWithFormat:@"<%@> %@",_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO] string]];
+            [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+        } else if([action isEqualToString:@"Send a message"]) {
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];
             if(b) {
                 [self bufferSelected:b.bid];
@@ -448,7 +521,35 @@
             [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
         } else if([action isEqualToString:@"Deop"]) {
             [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+        } else if([action isEqualToString:@"Ban…"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
+            alert.tag = TAG_BAN;
+            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [alert textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            [alert show];
+        } else if([action isEqualToString:@"Ignore…"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
+            alert.tag = TAG_IGNORE;
+            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [alert textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            [alert show];
+        } else if([action isEqualToString:@"Kick…"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
+            alert.tag = TAG_KICK;
+            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [alert show];
+        } else if([action isEqualToString:@"Invite to channel…"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
+            alert.tag = TAG_INVITE;
+            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [alert show];
         }
     }
+    _selectedUser = nil;
+    _selectedEvent = nil;
 }
 @end

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2236F5FB16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
@@ -136,6 +137,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		2236F5F816DA765C007BE535 /* ServersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServersDataSource.h; sourceTree = "<group>"; };
 		2236F5F916DA765C007BE535 /* ServersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServersDataSource.m; sourceTree = "<group>"; };
 		2236F5FC16DA8928007BE535 /* BuffersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuffersDataSource.h; sourceTree = "<group>"; };
@@ -257,6 +259,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */,
 				2248DF3916EE375D0086BB42 /* libz.dylib in Frameworks */,
 				228A05D716D3DFDA0029769C /* CoreText.framework in Frameworks */,
 				228A05CF16D3DD540029769C /* libicucore.dylib in Frameworks */,
@@ -286,7 +289,6 @@
 		228A056316D3DABA0029769C = {
 			isa = PBXGroup;
 			children = (
-				2248DF3816EE375D0086BB42 /* libz.dylib */,
 				228A057516D3DABA0029769C /* IRCCloud */,
 				228A059C16D3DABB0029769C /* IRCCloudTests */,
 				228A056E16D3DABA0029769C /* Frameworks */,
@@ -306,6 +308,8 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */,
+				2248DF3816EE375D0086BB42 /* libz.dylib */,
 				228A05D516D3DFD00029769C /* CoreText.framework */,
 				228A05CD16D3DD310029769C /* libicucore.dylib */,
 				228A05CB16D3DCE20029769C /* Security.framework */,

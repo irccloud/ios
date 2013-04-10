@@ -11,7 +11,7 @@
 #import "UsersTableView.h"
 #import "EventsTableView.h"
 
-@interface MainViewController : UIViewController<BuffersTableViewDelegate,UIActionSheetDelegate,UIScrollViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate> {
+@interface MainViewController : UIViewController<BuffersTableViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,UIScrollViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
@@ -28,6 +28,7 @@
     int _startX;
     int _startHeight;
     User *_selectedUser;
+    Event *_selectedEvent;
     int _cidToOpen;
     NSString *_bufferToOpen;
 }
