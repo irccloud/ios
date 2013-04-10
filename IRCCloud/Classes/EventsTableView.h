@@ -13,6 +13,7 @@
 #import "TTTAttributedLabel.h"
 #import "NetworkConnection.h"
 #import "HighlightsCountView.h"
+#import "Ignore.h"
 
 @protocol EventsTableViewDelegate<NSObject>
 -(void)rowSelected:(Event *)event;
@@ -43,6 +44,7 @@
     BOOL _requestingBacklog, _ready, _firstScroll;
     NSTimer *_heartbeatTimer;
     NSTimer *_scrollTimer;
+    Ignore *_ignore;
     
     IBOutlet id<EventsTableViewDelegate> _delegate;
 }

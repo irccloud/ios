@@ -114,6 +114,7 @@ int __timestampWidth;
         _collapsedEvents = [[CollapsedEvents alloc] init];
         _unseenHighlightPositions = [[NSMutableArray alloc] init];
         _buffer = nil;
+        _ignore = [[Ignore alloc] init];
     }
     return self;
 }
@@ -196,6 +197,7 @@ int __timestampWidth;
                 [self insertEvent:notification.object backlog:NO nextIsGrouped:NO];
             }
             break;
+        case kIRCEventSetIgnores:
         case kIRCEventUserInfo:
             [self refresh];
             break;
@@ -296,7 +298,10 @@ int __timestampWidth;
         }
     }
     
-    //TODO: check ignores
+    if(event.from.length && event.hostmask.length && ![type isEqualToString:@"user_channel_mode"] && [type rangeOfString:@"kicked"].location == NSNotFound) {
+        if([_ignore match:[NSString stringWithFormat:@"%@!%@", event.from, event.hostmask]])
+            return;
+    }
     
     if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
         event.formattedMsg = [NSString stringWithFormat:@"%@ by %c%@", event.msg, BOLD, event.nick];
@@ -618,7 +623,8 @@ int __timestampWidth;
                 self.tableView.tableHeaderView = nil;
             }
         } else if(events.count) {
-            //TODO: refresh the ignores array
+            Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [_ignore setIgnores:server.ignores];
             _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
             if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0) {
                 self.tableView.tableHeaderView = _headerView;
