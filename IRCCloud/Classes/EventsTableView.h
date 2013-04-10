@@ -16,9 +16,10 @@
 
 @protocol EventsTableViewDelegate<NSObject>
 -(void)rowSelected:(Event *)event;
+-(void)rowLongPressed:(Event *)event rect:(CGRect)rect;
 @end
 
-@interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate> {
+@interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate,UIGestureRecognizerDelegate> {
     IBOutlet UIView *_headerView;
     
     IBOutlet UIView *_topUnreadView;

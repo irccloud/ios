@@ -120,6 +120,10 @@ int __timestampWidth;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    lp.minimumPressDuration = 1.0;
+    lp.delegate = self;
+    [self.tableView addGestureRecognizer:lp];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -881,4 +885,14 @@ int __timestampWidth;
     }
 }
 
+-(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
+        if(indexPath) {
+            if(indexPath.row < _data.count) {
+                [_delegate rowLongPressed:[_data objectAtIndex:indexPath.row] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+            }
+        }
+    }
+}
 @end
