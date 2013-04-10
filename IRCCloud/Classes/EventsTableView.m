@@ -313,7 +313,7 @@ int __timestampWidth;
             event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
     } else if([type isEqualToString:@"channel_mode_list_change"]) {
         if(event.from.length == 0)
-            event.formattedMsg = [NSString stringWithFormat:@"%@ %c%@", event.msg, BOLD, event.nick];
+            event.formattedMsg = [NSString stringWithFormat:@"%@%@", event.msg, [ColorFormatter formatNick:event.nick mode:event.fromMode]];
     }
 
     [self _addItem:event eid:eid];
