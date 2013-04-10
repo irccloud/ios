@@ -271,7 +271,7 @@
             }
             NSArray *remove = [ops objectForKey:@"remove"];
             if(remove.count > 0) {
-                NSDictionary *op = [add objectAtIndex:0];
+                NSDictionary *op = [remove objectAtIndex:0];
                 if([[[op objectForKey:@"mode"] lowercaseString] isEqualToString:@"b"]) {
                     event.nick = event.from;
                     event.from = @"";
