@@ -868,15 +868,17 @@ int __timestampWidth;
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     
-    NSTimeInterval group = ((Event *)[_data objectAtIndex:indexPath.row]).groupEid;
-    if(group) {
-        if([_expandedSectionEids objectForKey:@(group)])
-            [_expandedSectionEids removeObjectForKey:@(group)];
-        else
-            [_expandedSectionEids setObject:@(YES) forKey:@(group)];
-        [self refresh];
+    if(indexPath.row < _data.count) {
+        NSTimeInterval group = ((Event *)[_data objectAtIndex:indexPath.row]).groupEid;
+        if(group) {
+            if([_expandedSectionEids objectForKey:@(group)])
+                [_expandedSectionEids removeObjectForKey:@(group)];
+            else
+                [_expandedSectionEids setObject:@(YES) forKey:@(group)];
+            [self refresh];
+        }
+        [_delegate rowSelected:[_data objectAtIndex:indexPath.row]];
     }
-    [_delegate rowSelected:[_data objectAtIndex:indexPath.row]];
 }
 
 @end
