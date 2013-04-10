@@ -562,6 +562,7 @@ int __timestampWidth;
     _topUnreadView.alpha = 0;
     _bottomUnreadView.alpha = 0;
     _requestingBacklog = NO;
+    _firstScroll = NO;
     _buffer = buffer;
     _earliestEid = 0;
     [_expandedSectionEids removeAllObjects];
@@ -572,17 +573,19 @@ int __timestampWidth;
     @synchronized(_data) {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
         _scrollTimer = nil;
+        _firstScroll = YES;
     }
 }
 
 - (void)scrollToBottom {
     [_scrollTimer invalidate];
     
-    _scrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_scrollToBottom) userInfo:nil repeats:NO];
+    _scrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(_scrollToBottom) userInfo:nil repeats:NO];
 }
 
 - (void)refresh {
     @synchronized(_data) {
+        [_scrollTimer invalidate];
         _ready = NO;
         int oldPosition = (_requestingBacklog && _data.count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
         NSTimeInterval backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
@@ -677,8 +680,10 @@ int __timestampWidth;
                 markerPos++;
             }
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-        } else if(_data.count) {
+        } else if(_data.count && (_scrollTimer || !_firstScroll)) {
             [self _scrollToBottom];
+            //TODO: Add hyperlinks before calculating the row heights so the scroll will get the correct position the first time
+            [self scrollToBottom];
         }
         
         if(_data.count) {
@@ -831,7 +836,7 @@ int __timestampWidth;
 #pragma mark - Table view delegate
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(!_ready)
+    if(!_ready || !_firstScroll)
         return;
     
     if(self.tableView.tableHeaderView && _minEid > 0 && _buffer && _buffer.bid != -1/* TODO: && conn.ready */) {
@@ -881,7 +886,10 @@ int __timestampWidth;
                 [_expandedSectionEids setObject:@(YES) forKey:@(group)];
             [self refresh];
         }
-        [_delegate rowSelected:[_data objectAtIndex:indexPath.row]];
+        if(indexPath.row < _data.count)
+            [_delegate rowSelected:[_data objectAtIndex:indexPath.row]];
+        else
+            [_delegate rowSelected:[_data objectAtIndex:_data.count - 1]];
     }
 }
 

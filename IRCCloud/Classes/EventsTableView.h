@@ -40,7 +40,7 @@
     NSTimeInterval _maxEid, _minEid, _currentCollapsedEid, _earliestEid;
     int _currentGroupPosition, _newMsgs, _newHighlights, _lastSeenEidPos;
     NSString *_lastCollpasedDay;
-    BOOL _requestingBacklog, _ready;
+    BOOL _requestingBacklog, _ready, _firstScroll;
     NSTimer *_heartbeatTimer;
     NSTimer *_scrollTimer;
     
