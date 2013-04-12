@@ -353,7 +353,7 @@
 								<double key="preferredMaxLayoutWidth">320</double>
 							</object>
 						</array>
-						<string key="NSFrame">{{220, 0}, {320, 44}}</string>
+						<string key="NSFrame">{{320, 0}, {320, 44}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="716307898"/>
