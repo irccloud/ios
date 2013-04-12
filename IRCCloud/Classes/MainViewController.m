@@ -10,6 +10,7 @@
 #import "MainViewController.h"
 #import "NetworkConnection.h"
 #import "ColorFormatter.h"
+#import "BansTableViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -45,7 +46,21 @@
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     Buffer *b = nil;
     IRCCloudJSONObject *o = nil;
+    BansTableViewController *btv = nil;
     switch(event) {
+        case kIRCEventBanList:
+            o = notification.object;
+            if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name]) {
+                btv = [[BansTableViewController alloc] initWithStyle:UITableViewStylePlain];
+                btv.event = o;
+                btv.bans = [o objectForKey:@"bans"];
+                btv.bid = _buffer.bid;
+                btv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:btv];
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
         case kIRCEventLinkChannel:
             o = notification.object;
             if(_cidToOpen == o.cid && [[o objectForKey:@"invalid_chan"] isEqualToString:_bufferToOpen]) {
@@ -343,7 +358,7 @@
     }
 }
 
--(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+/*-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     _startX = scrollView.contentOffset.x;
 }
 
@@ -351,7 +366,7 @@
     if(!decelerate) {
         [self scrollViewWillBeginDecelerating:scrollView];
     }
-}
+}*/
 
 -(IBAction)usersButtonPressed:(id)sender {
     UIScrollView *scrollView = (UIScrollView *)self.view;
