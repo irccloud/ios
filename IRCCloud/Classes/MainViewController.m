@@ -261,7 +261,7 @@
     [_eventsView viewWillAppear:animated];
     if([self.view isKindOfClass:[UIScrollView class]]) {
         ((UIScrollView *)self.view).contentSize = _contentView.bounds.size;
-        ((UIScrollView *)self.view).contentOffset = CGPointMake(220, 0);
+        ((UIScrollView *)self.view).contentOffset = CGPointMake(_buffersView.view.frame.size.width, 0);
     }
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if(([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected || [NetworkConnection sharedInstance].state == kIRCCloudStateDisconnecting) && session != nil && [session length] > 0)
@@ -371,7 +371,7 @@
     }
 }
 
--(void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
+/*-(void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
     int buffersDisplayWidth = _buffersView.tableView.bounds.size.width;
     int usersDisplayWidth = _usersView.tableView.bounds.size.width;
     
@@ -394,7 +394,7 @@
             [scrollView setContentOffset:CGPointMake(buffersDisplayWidth,0) animated:YES];
     }
     _startX = 0;
-}
+}*/
 
 -(void)rowSelected:(Event *)event {
     [_message resignFirstResponder];
