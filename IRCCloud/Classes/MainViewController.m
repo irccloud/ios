@@ -404,9 +404,9 @@
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:[NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,_selectedUser.hostmask] delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     if(_selectedEvent)
         [sheet addButtonWithTitle:@"Copy Message"];
-    [sheet addButtonWithTitle:@"Whois…"];
+    //[sheet addButtonWithTitle:@"Whois…"];
     [sheet addButtonWithTitle:@"Send a message"];
-    [sheet addButtonWithTitle:@"Mention"];
+    //[sheet addButtonWithTitle:@"Mention"];
     [sheet addButtonWithTitle:@"Invite to channel…"];
     [sheet addButtonWithTitle:@"Ignore…"];
     if([_buffer.type isEqualToString:@"channel"]) {
