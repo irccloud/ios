@@ -55,10 +55,15 @@
                 btv.event = o;
                 btv.bans = [o objectForKey:@"bans"];
                 btv.bid = _buffer.bid;
-                btv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
-                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:btv];
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-                [self presentViewController:nc animated:YES completion:nil];
+                if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+                    btv.navigationItem.title = @"Ban List";
+                    [self.navigationController pushViewController:btv animated:YES];
+                } else {
+                    btv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
+                    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:btv];
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    [self presentViewController:nc animated:YES completion:nil];
+                }
             }
             break;
         case kIRCEventLinkChannel:
