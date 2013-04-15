@@ -125,7 +125,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _queue = [[NSOperationQueue alloc] init];
     _servers = [ServersDataSource sharedInstance];
     _buffers = [BuffersDataSource sharedInstance];
-    _channels = [ChannelsDataSource sharedIntance];
+    _channels = [ChannelsDataSource sharedInstance];
     _users = [UsersDataSource sharedInstance];
     _events = [EventsDataSource sharedInstance];
     _state = kIRCCloudStateDisconnected;
@@ -306,6 +306,17 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     return [self _sendRequest:@"back" args:@{@"cid":@(cid)}];
 }
 
+-(int)disconnect:(int)cid msg:(NSString *)msg {
+    if(msg.length)
+        return [self _sendRequest:@"disconnect" args:@{@"cid":@(cid), @"msg":msg}];
+    else
+        return [self _sendRequest:@"disconnect" args:@{@"cid":@(cid)}];
+}
+
+-(int)reconnect:(int)cid {
+    return [self _sendRequest:@"reconnect" args:@{@"cid":@(cid)}];
+}
+
 -(void)connect {
     if(_socket)
         _socket.delegate = nil;
@@ -335,6 +346,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _state = kIRCCloudStateDisconnecting;
     [self _postConnectivityChange];
     [_socket close];
+    _prefs = nil;
+    _userInfo = nil;
 }
 
 -(void)parser:(SBJsonStreamParser *)parser foundArray:(NSArray *)array {

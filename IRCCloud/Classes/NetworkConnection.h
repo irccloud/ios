@@ -142,4 +142,6 @@ typedef enum {
 -(int)whois:(NSString *)nick server:(NSString *)server cid:(int)cid;
 -(int)topic:(NSString *)topic chan:(NSString *)chan cid:(int)cid;
 -(int)back:(int)cid;
+-(int)disconnect:(int)cid msg:(NSString *)msg;
+-(int)reconnect:(int)cid;
 @end

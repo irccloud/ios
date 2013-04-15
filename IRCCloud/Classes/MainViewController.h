@@ -22,8 +22,8 @@
     IBOutlet UILabel *_connectingStatus;
     IBOutlet UILabel *_connectingError;
     IBOutlet UIActivityIndicatorView *_connectingActivity;
-    IBOutlet UINavigationItem *_navItem;
     IBOutlet UIToolbar *_toolBar;
+    UIBarButtonItem *_usersButtonItem;
     Buffer *_buffer;
     int _startX;
     int _startHeight;

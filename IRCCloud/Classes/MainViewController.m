@@ -11,6 +11,7 @@
 #import "NetworkConnection.h"
 #import "ColorFormatter.h"
 #import "BansTableViewController.h"
+#import "AppDelegate.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -35,8 +36,10 @@
         _contentView = self.view;
     }
     _startHeight = [UIScreen mainScreen].applicationFrame.size.height - 44;
-    self.navigationItem.leftBarButtonItem = _navItem.leftBarButtonItem;
-    self.navigationItem.rightBarButtonItem = _navItem.rightBarButtonItem;
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(listButtonPressed:)];
+    }
+    _usersButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"users"] style:UIBarButtonItemStylePlain target:self action:@selector(usersButtonPressed:)];
     //TODO: resize if the keyboard is visible
     //TODO: check the user info for the last BID
     [self bufferSelected:[BuffersDataSource sharedInstance].firstBid];
@@ -331,8 +334,8 @@
 -(void)_updateUserListVisibility {
     if([self.view isKindOfClass:[UIScrollView class]]) {
         [((UIScrollView *)self.view) scrollRectToVisible:_eventsView.tableView.frame animated:YES];
-        if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedIntance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
-            self.navigationItem.rightBarButtonItem = _navItem.rightBarButtonItem;
+        if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+            self.navigationItem.rightBarButtonItem = _usersButtonItem;
             CGSize size = ((UIScrollView *)self.view).contentSize;
             size.width = [UIScreen mainScreen].bounds.size.width + _buffersView.view.bounds.size.width + _usersView.view.bounds.size.width;
             ((UIScrollView *)self.view).contentSize = size;
@@ -343,7 +346,7 @@
             ((UIScrollView *)self.view).contentSize = size;
         }
     } else {
-        if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedIntance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+        if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
             CGRect frame = _eventsView.view.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
             _eventsView.view.frame = frame;
@@ -389,6 +392,43 @@
     } else {
         [scrollView scrollRectToVisible:_buffersView.tableView.frame animated:YES];
     }
+}
+
+-(IBAction)settingsButtonPressed:(id)sender {
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    if([_buffer.type isEqualToString:@"console"]) {
+        //[sheet addButtonWithTitle:@"Edit Connection…"];
+        Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+        if([s.status isEqualToString:@"disconnected"]) {
+            [sheet addButtonWithTitle:@"Reconnect"];
+            [sheet addButtonWithTitle:@"Delete"];
+        } else {
+            //[sheet addButtonWithTitle:@"Identify Nickname…"];
+            [sheet addButtonWithTitle:@"Disconnect"];
+        }
+    } else if([_buffer.type isEqualToString:@"channel"]) {
+        if([[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
+            [sheet addButtonWithTitle:@"Leave"];
+            [sheet addButtonWithTitle:@"Ban List…"];
+        } else {
+            [sheet addButtonWithTitle:@"Rejoin"];
+            [sheet addButtonWithTitle:(_buffer.archived)?@"Unarchive":@"Archive"];
+            [sheet addButtonWithTitle:@"Delete"];
+        }
+    } else {
+        if(_buffer.archived) {
+            [sheet addButtonWithTitle:@"Unarchive"];
+            [sheet addButtonWithTitle:@"Delete"];
+        } else {
+            [sheet addButtonWithTitle:@"Archive"];
+        }
+    }
+    //[sheet addButtonWithTitle:@"Ignore List…"];
+    //[sheet addButtonWithTitle:@"Display Options…"];
+    //[sheet addButtonWithTitle:@"Settings…"];
+    [sheet addButtonWithTitle:@"Logout"];
+    sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
+    [sheet showInView:self.view];
 }
 
 /*-(void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
@@ -567,6 +607,36 @@
             alert.tag = TAG_INVITE;
             alert.alertViewStyle = UIAlertViewStylePlainTextInput;
             [alert show];
+        } else if([action isEqualToString:@"Archive"]) {
+            [[NetworkConnection sharedInstance] archiveBuffer:_buffer.bid cid:_buffer.cid];
+        } else if([action isEqualToString:@"Unarchive"]) {
+            [[NetworkConnection sharedInstance] unarchiveBuffer:_buffer.bid cid:_buffer.cid];
+        } else if([action isEqualToString:@"Delete"]) {
+            //TODO: prompt for confirmation
+            if([_buffer.type isEqualToString:@"console"]) {
+                [[NetworkConnection sharedInstance] deleteServer:_buffer.cid];
+            } else {
+                [[NetworkConnection sharedInstance] deleteBuffer:_buffer.bid cid:_buffer.cid];
+            }
+        } else if([action isEqualToString:@"Leave"]) {
+            [[NetworkConnection sharedInstance] part:_buffer.name msg:nil cid:_buffer.cid];
+        } else if([action isEqualToString:@"Rejoin"]) {
+            [[NetworkConnection sharedInstance] join:_buffer.name key:nil cid:_buffer.cid];
+        } else if([action isEqualToString:@"Ban List…"]) {
+            [[NetworkConnection sharedInstance] mode:@"b" chan:_buffer.name cid:_buffer.cid];
+        } else if([action isEqualToString:@"Disconnect"]) {
+            [[NetworkConnection sharedInstance] disconnect:_buffer.cid msg:nil];
+        } else if([action isEqualToString:@"Reconnect"]) {
+            [[NetworkConnection sharedInstance] reconnect:_buffer.cid];
+        } else if([action isEqualToString:@"Logout"]) {
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            [[NetworkConnection sharedInstance] disconnect];
+            [[ServersDataSource sharedInstance] clear];
+            [[UsersDataSource sharedInstance] clear];
+            [[ChannelsDataSource sharedInstance] clear];
+            [[EventsDataSource sharedInstance] clear];
+            [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
         }
     }
     _selectedUser = nil;

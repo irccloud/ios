@@ -13,7 +13,7 @@
 @end
 
 @implementation ChannelsDataSource
-+(ChannelsDataSource *)sharedIntance {
++(ChannelsDataSource *)sharedInstance {
     static ChannelsDataSource *sharedInstance;
 	
     @synchronized(self) {

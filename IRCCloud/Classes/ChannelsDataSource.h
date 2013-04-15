@@ -28,7 +28,7 @@
 @interface ChannelsDataSource : NSObject {
     NSMutableArray *_channels;
 }
-+(ChannelsDataSource *)sharedIntance;
++(ChannelsDataSource *)sharedInstance;
 -(void)clear;
 -(void)addChannel:(Channel *)channel;
 -(void)removeChannelForBuffer:(int)bid;

@@ -158,7 +158,7 @@
                 int joined = 1;
                 if([buffer.type isEqualToString:@"channel"]) {
                     type = TYPE_CHANNEL;
-                    Channel *channel = [[ChannelsDataSource sharedIntance] channelForBuffer:buffer.bid];
+                    Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid];
                     if(channel) {
                         if([channel.mode rangeOfString:@"k"].location != NSNotFound)
                             key = 1;

@@ -23,7 +23,9 @@
 
     // Do any additional setup after loading the view from its nib.
     [version setText:[NSString stringWithFormat:@"Version %@",[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey]]];
+}
 
+-(void)viewWillAppear:(BOOL)animated {
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if(session != nil && [session length] > 0) {
         loginView.alpha = 0;
@@ -35,6 +37,7 @@
         [status setText:@"Connecting"];
         [_conn connect];
     } else {
+        password.text = @"";
         loadingView.alpha = 0;
         loginView.alpha = 1;
     }
@@ -78,7 +81,7 @@
             progress.hidden = YES;
             [self performSelector:@selector(updateConnecting:) withObject:nil afterDelay:1];
         } else {
-            [status setText:@"Disconneted"];
+            [status setText:@"Disconnected"];
             activity.hidden = YES;
             progress.progress = 0;
             progress.hidden = YES;
