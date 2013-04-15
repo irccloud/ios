@@ -125,6 +125,8 @@
 		22D4309B171C5589003C0684 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 22D43098171C5589003C0684 /* settings.png */; };
 		22D4309C171C5589003C0684 /* settings@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22D43099171C5589003C0684 /* settings@2x.png */; };
 		22D4309D171C5589003C0684 /* settings@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22D43099171C5589003C0684 /* settings@2x.png */; };
+		22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
+		22D430A1171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22DB1D5516FEB25200C5FE6F /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5116FEB25200C5FE6F /* Icon-72.png */; };
 		22DB1D5616FEB25200C5FE6F /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5116FEB25200C5FE6F /* Icon-72.png */; };
 		22DB1D5716FEB25200C5FE6F /* Icon-72@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22DB1D5216FEB25200C5FE6F /* Icon-72@2x.png */; };
@@ -265,6 +267,8 @@
 		22D43093171C53CD003C0684 /* users@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "users@2x.png"; sourceTree = "<group>"; };
 		22D43098171C5589003C0684 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settings.png; sourceTree = "<group>"; };
 		22D43099171C5589003C0684 /* settings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "settings@2x.png"; sourceTree = "<group>"; };
+		22D4309E171C663A003C0684 /* IgnoresTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IgnoresTableViewController.h; sourceTree = "<group>"; };
+		22D4309F171C663A003C0684 /* IgnoresTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IgnoresTableViewController.m; sourceTree = "<group>"; };
 		22DB1D5116FEB25200C5FE6F /* Icon-72.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72.png"; sourceTree = "<group>"; };
 		22DB1D5216FEB25200C5FE6F /* Icon-72@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Icon-72@2x.png"; sourceTree = "<group>"; };
 		22DB1D5316FEB25200C5FE6F /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
@@ -415,6 +419,8 @@
 				227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */,
 				2230F8E617162ACC007F7C98 /* Ignore.h */,
 				2230F8E717162ACC007F7C98 /* Ignore.m */,
+				22D4309E171C663A003C0684 /* IgnoresTableViewController.h */,
+				22D4309F171C663A003C0684 /* IgnoresTableViewController.m */,
 				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
 				228A05DB16D3E40E0029769C /* LoginSplashViewController.h */,
@@ -704,6 +710,7 @@
 				227FF2A116FA128B00DBE3C5 /* HighlightsCountView.m in Sources */,
 				2230F8E817162ACD007F7C98 /* Ignore.m in Sources */,
 				22AD75ED1718567D00141257 /* BansTableViewController.m in Sources */,
+				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -747,6 +754,7 @@
 				22695F5616E8FC9900E01DF8 /* CollapsedEvents.m in Sources */,
 				227FF2A216FA128B00DBE3C5 /* HighlightsCountView.m in Sources */,
 				2230F8E917162ACD007F7C98 /* Ignore.m in Sources */,
+				22D430A1171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

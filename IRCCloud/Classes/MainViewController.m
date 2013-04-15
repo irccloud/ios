@@ -12,6 +12,7 @@
 #import "ColorFormatter.h"
 #import "BansTableViewController.h"
 #import "AppDelegate.h"
+#import "IgnoresTableViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -423,7 +424,7 @@
             [sheet addButtonWithTitle:@"Archive"];
         }
     }
-    //[sheet addButtonWithTitle:@"Ignore List…"];
+    [sheet addButtonWithTitle:@"Ignore List…"];
     //[sheet addButtonWithTitle:@"Display Options…"];
     //[sheet addButtonWithTitle:@"Settings…"];
     [sheet addButtonWithTitle:@"Logout"];
@@ -637,6 +638,19 @@
             [[ChannelsDataSource sharedInstance] clear];
             [[EventsDataSource sharedInstance] clear];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+        } else if([action isEqualToString:@"Ignore List…"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
+            itv.ignores = s.ignores;
+            itv.cid = s.cid;
+            itv.navigationItem.title = @"Ignore List";
+            if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+                [self.navigationController pushViewController:itv animated:YES];
+            } else {
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                [self presentViewController:nc animated:YES completion:nil];
+            }
         }
     }
     _selectedUser = nil;
