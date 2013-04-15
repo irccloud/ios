@@ -121,6 +121,9 @@
         [_data removeAllObjects];
         int archiveCount = 0;
 
+        if(_selectedBuffer.archived)
+            [_expandedArchives setObject:@YES forKey:@(_selectedBuffer.cid)];
+        
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         
         for(Server *server in [[ServersDataSource sharedInstance] getServers]) {
@@ -200,7 +203,7 @@
                 if([_expandedArchives objectForKey:@(server.cid)]) {
                     for(Buffer *buffer in buffers) {
                         int type = -1;
-                        if(buffer.archived) {
+                        if(buffer.archived && ![buffer.type isEqualToString:@"console"]) {
                             if([buffer.type isEqualToString:@"channel"]) {
                                 type = TYPE_CHANNEL;
                             } else if([buffer.type isEqualToString:@"conversation"]) {
