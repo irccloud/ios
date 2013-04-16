@@ -728,20 +728,26 @@ int __timestampWidth;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized(_data) {
-        Event *e = [_data objectAtIndex:indexPath.row];
-        if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED) {
-            if(e.formatted == nil && e.formattedMsg.length > 0) {
-                e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace];
-            } else if(e.formattedMsg.length == 0) {
-                TFLog(@"No formatted message: %@", e);
+        if(indexPath.row < _data.count) {
+            Event *e = [_data objectAtIndex:indexPath.row];
+            if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED) {
+                if(e.formatted == nil && e.formattedMsg.length > 0) {
+                    e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace];
+                } else if(e.formattedMsg.length == 0) {
+                    TFLog(@"No formatted message: %@", e);
+                    return 26;
+                }
+                CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
+                 CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth,CGFLOAT_MAX), NULL);
+                 float height = ceilf(suggestedSize.height);
+                 CFRelease(framesetter);
+                return height + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+            } else {
                 return 26;
             }
-            CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-             CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth,CGFLOAT_MAX), NULL);
-             float height = ceilf(suggestedSize.height);
-             CFRelease(framesetter);
-            return height + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
         } else {
+            //Our data array must have changed, reload all the data
+            [self.tableView reloadData];
             return 26;
         }
     }
