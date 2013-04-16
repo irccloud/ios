@@ -36,9 +36,11 @@
     } else {
         _contentView = self.view;
     }
-    _startHeight = [UIScreen mainScreen].applicationFrame.size.height - 44;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        _startHeight = [UIScreen mainScreen].applicationFrame.size.height - self.navigationController.navigationBar.frame.size.height;
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(listButtonPressed:)];
+    } else {
+        _startHeight = [UIScreen mainScreen].applicationFrame.size.width - self.navigationController.navigationBar.frame.size.height;
     }
     _usersButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"users"] style:UIBarButtonItemStylePlain target:self action:@selector(usersButtonPressed:)];
     //TODO: resize if the keyboard is visible
@@ -199,8 +201,9 @@
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     
     CGRect frame = self.view.frame;
-    frame.size.height -= keyboardSize.height;
+    frame.size.height = _startHeight - keyboardSize.height;
     self.view.frame = frame;
+     
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     
     [UIView commitAnimations];
@@ -221,7 +224,7 @@
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     
     CGRect frame = self.view.frame;
-    frame.size.height += keyboardSize.height;
+    frame.size.height = _startHeight;
     self.view.frame = frame;
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     
@@ -554,6 +557,7 @@
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+//    [_message resignFirstResponder];
     if(buttonIndex != -1) {
         NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
         
