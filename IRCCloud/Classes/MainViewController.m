@@ -429,7 +429,7 @@
     //[sheet addButtonWithTitle:@"Settings…"];
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-    [sheet showInView:self.view];
+    [sheet showInView:self.view.superview];
 }
 
 /*-(void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
@@ -486,7 +486,7 @@
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-        [sheet showInView:self.view];
+        [sheet showInView:self.view.superview];
     } else {
         if(_selectedEvent)
             [sheet showFromRect:rect inView:_eventsView.tableView animated:NO];
