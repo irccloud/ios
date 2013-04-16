@@ -417,7 +417,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(NSDictionary *)prefs {
-    if(!_prefs && _userInfo && [_userInfo objectForKey:@"prefs"]) {
+    if(!_prefs && _userInfo && [[_userInfo objectForKey:@"prefs"] isKindOfClass:[NSString class]] && [[_userInfo objectForKey:@"prefs"] length]) {
         SBJsonParser *parser = [[SBJsonParser alloc] init];
         _prefs = [parser objectWithString:[_userInfo objectForKey:@"prefs"]];
     }
