@@ -847,6 +847,10 @@ int __timestampWidth;
 
 #pragma mark - Table view delegate
 
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    [_delegate rowSelected:nil];
+}
+
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if(!_ready || !_firstScroll)
         return;
