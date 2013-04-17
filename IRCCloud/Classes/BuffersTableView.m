@@ -256,6 +256,12 @@
         }
         [self.tableView reloadData];
         [self _updateUnreadIndicators];
+        if(_firstHighlightPosition != -1 && _firstHighlightPosition != _selectedRow)
+            self.parentViewController.navigationItem.leftBarButtonItem.tintColor = [UIColor redColor];
+        else if(_firstUnreadPosition != -1 && _firstUnreadPosition != _selectedRow)
+            self.parentViewController.navigationItem.leftBarButtonItem.tintColor = [UIColor selectedBlueColor];
+        else
+            self.parentViewController.navigationItem.leftBarButtonItem.tintColor = nil;
     }
 }
 

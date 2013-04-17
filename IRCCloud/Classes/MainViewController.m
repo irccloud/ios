@@ -13,6 +13,7 @@
 #import "BansTableViewController.h"
 #import "AppDelegate.h"
 #import "IgnoresTableViewController.h"
+#import "UIColor+IRCCloud.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -31,6 +32,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self addChildViewController:_buffersView];
+    [self addChildViewController:_eventsView];
+    [self addChildViewController:_usersView];
     if(_contentView != nil) {
         [(UIScrollView *)self.view addSubview:_contentView];
     } else {
@@ -234,18 +238,6 @@
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [_buffersView viewDidAppear:animated];
-    [_usersView viewDidAppear:animated];
-    [_eventsView viewDidAppear:animated];
-}
-
-- (void)viewDidDisappear:(BOOL)animated {
-    [_buffersView viewDidDisappear:animated];
-    [_usersView viewDidDisappear:animated];
-    [_eventsView viewDidDisappear:animated];
-}
-
 - (void)viewWillAppear:(BOOL)animated {
     [_message resignFirstResponder];
     CGRect frame = self.view.frame;
@@ -281,9 +273,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillBeHidden:)
                                                  name:UIKeyboardWillHideNotification object:nil];
-    [_buffersView viewWillAppear:animated];
-    [_usersView viewWillAppear:animated];
-    [_eventsView viewWillAppear:animated];
     if([self.view isKindOfClass:[UIScrollView class]]) {
         ((UIScrollView *)self.view).contentSize = _contentView.bounds.size;
         ((UIScrollView *)self.view).contentOffset = CGPointMake(_buffersView.view.frame.size.width, 0);
@@ -294,9 +283,6 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    [_buffersView viewWillDisappear:animated];
-    [_usersView viewWillDisappear:animated];
-    [_eventsView viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -313,6 +299,10 @@
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
     [self sendButtonPressed:textField];
     return YES;
+}
+
+-(void)setUnreadColor:(UIColor *)color {
+    self.navigationItem.leftBarButtonItem.tintColor = color;
 }
 
 -(void)bufferSelected:(int)bid {
