@@ -216,7 +216,6 @@
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
     NSArray *rows = [_eventsView.tableView indexPathsForVisibleRows];
-    CGSize keyboardSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue] toView:nil].size;
     
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationBeginsFromCurrentState:YES];
@@ -227,7 +226,6 @@
     frame.size.height = _startHeight;
     self.view.frame = frame;
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-    
     [UIView commitAnimations];
     
     if([self.view isKindOfClass:[UIScrollView class]]) {

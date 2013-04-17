@@ -75,7 +75,7 @@
     }
     _bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
     _unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
-    _icon.frame = CGRectMake(frame.origin.x + 6, frame.origin.y + 4, frame.size.height - 8, frame.size.height - 8);
+    _icon.frame = CGRectMake(frame.origin.x + 12, frame.origin.y + 12, 16, 16);
     if(!_highlights.hidden) {
         CGSize size = [_highlights.count sizeWithFont:_highlights.font];
         size.width += 4;
@@ -85,7 +85,7 @@
         frame.size.width -= size.width + 12;
         _highlights.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 6, size.width, size.height);
     }
-    _label.frame = CGRectMake(frame.origin.x + 6 + frame.size.height - 8, frame.origin.y, frame.size.width - 6 - frame.size.height, frame.size.height);
+    _label.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.height + 6, frame.origin.y, frame.size.width - 6 - _icon.frame.size.height - 8, frame.size.height);
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -102,6 +102,10 @@
         _data = [[NSMutableArray alloc] init];
         _selectedRow = -1;
         _expandedArchives = [[NSMutableDictionary alloc] init];
+        _firstHighlightPosition = -1;
+        _firstUnreadPosition = -1;
+        _lastHighlightPosition = -1;
+        _lastUnreadPosition = -1;
     }
     return self;
 }
@@ -120,6 +124,10 @@
     @synchronized(_data) {
         [_data removeAllObjects];
         int archiveCount = 0;
+        _firstHighlightPosition = -1;
+        _firstUnreadPosition = -1;
+        _lastHighlightPosition = -1;
+        _lastUnreadPosition = -1;
 
         if(_selectedBuffer.archived)
             [_expandedArchives setObject:@YES forKey:@(_selectedBuffer.cid)];
@@ -148,8 +156,19 @@
                      @"highlights":@(highlights),
                      @"archived":@0,
                      }];
+                    
+                    if(unread > 0 && _firstUnreadPosition == -1)
+                        _firstUnreadPosition = _data.count - 1;
+                    if(unread > 0 && (_lastUnreadPosition == -1 || _lastUnreadPosition < _data.count - 1))
+                        _lastUnreadPosition = _data.count - 1;
+                    if(highlights > 0 && _firstHighlightPosition == -1)
+                        _firstHighlightPosition = _data.count - 1;
+                    if(highlights > 0 && (_lastHighlightPosition == -1 || _lastHighlightPosition < _data.count - 1))
+                        _lastHighlightPosition = _data.count - 1;
+
                     if(buffer.bid == _selectedBuffer.bid)
                         _selectedRow = _data.count - 1;
+                    break;
                 }
             }
             for(Buffer *buffer in buffers) {
@@ -192,6 +211,15 @@
                      @"archived":@0,
                      @"key":@(key),
                      }];
+                    if(unread > 0 && _firstUnreadPosition == -1)
+                        _firstUnreadPosition = _data.count - 1;
+                    if(unread > 0 && (_lastUnreadPosition == -1 || _lastUnreadPosition < _data.count - 1))
+                        _lastUnreadPosition = _data.count - 1;
+                    if(highlights > 0 && _firstHighlightPosition == -1)
+                        _firstHighlightPosition = _data.count - 1;
+                    if(highlights > 0 && (_lastHighlightPosition == -1 || _lastHighlightPosition < _data.count - 1))
+                        _lastHighlightPosition = _data.count - 1;
+
                     if(buffer.bid == _selectedBuffer.bid)
                         _selectedRow = _data.count - 1;
                 }
@@ -227,6 +255,43 @@
             }
         }
         [self.tableView reloadData];
+        [self _updateUnreadIndicators];
+    }
+}
+
+-(void)_updateUnreadIndicators {
+    NSArray *rows = [self.tableView indexPathsForVisibleRows];
+    int first = [[rows objectAtIndex:0] row];
+    int last = [[rows lastObject] row];
+    
+    if(_firstUnreadPosition != -1 && first > _firstUnreadPosition) {
+        topUnreadIndicator.hidden = NO;
+        topUnreadIndicator.alpha = 1; //TODO: animate this
+        topUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+    } else {
+        topUnreadIndicator.hidden = YES;
+        topUnreadIndicator.alpha = 0; //TODO: animate this
+    }
+    if((_lastHighlightPosition != -1 && first > _lastHighlightPosition) ||
+       (_firstHighlightPosition != -1 && first > _firstHighlightPosition)) {
+        topUnreadIndicator.hidden = NO;
+        topUnreadIndicator.alpha = 1; //TODO: animate this
+        topUnreadIndicatorColor.backgroundColor = [UIColor redColor];
+    }
+
+    if(_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
+        bottomUnreadIndicator.hidden = NO;
+        bottomUnreadIndicator.alpha = 1; //TODO: animate this
+        bottomUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+    } else {
+        bottomUnreadIndicator.hidden = YES;
+        bottomUnreadIndicator.alpha = 0; //TODO: animate this
+    }
+    if((_firstHighlightPosition != -1 && last < _firstHighlightPosition) ||
+       (_lastHighlightPosition != -1 && last < _lastHighlightPosition)) {
+        bottomUnreadIndicator.hidden = NO;
+        bottomUnreadIndicator.alpha = 1; //TODO: animate this
+        bottomUnreadIndicatorColor.backgroundColor = [UIColor redColor];
     }
 }
 
@@ -256,9 +321,9 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized(_data) {
         if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER) {
-            return 40;
+            return 46;
         } else {
-            return 32;
+            return 40;
         }
     }
 }
@@ -404,6 +469,46 @@
 
 -(void)setBuffer:(Buffer *)buffer {
     _selectedBuffer = buffer;
+}
+
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    [self _updateUnreadIndicators];
+}
+
+-(IBAction)topUnreadIndicatorClicked:(id)sender {
+    int first = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row] - 1;
+    int pos = 0;
+    
+    for(int i = first; i >= 0; i--) {
+        NSDictionary *d = [_data objectAtIndex:i];
+        if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue]) {
+            pos = i - 1;
+            break;
+        }
+    }
+
+    if(pos < 0)
+        pos = 0;
+    
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+}
+
+-(IBAction)bottomUnreadIndicatorClicked:(id)sender {
+    int last = [[[self.tableView indexPathsForVisibleRows] lastObject] row] + 1;
+    int pos = _data.count - 1;
+    
+    for(int i = last; i  < _data.count; i++) {
+        NSDictionary *d = [_data objectAtIndex:i];
+        if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue]) {
+            pos = i + 1;
+            break;
+        }
+    }
+
+    if(pos > _data.count - 1)
+        pos = _data.count - 1;
+    
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
 }
 
 @end
