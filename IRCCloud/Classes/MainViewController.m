@@ -116,29 +116,11 @@
 }
 
 -(void)_showConnectingView {
-    if(_connectingView.hidden) {
-        CGRect frame = _connectingView.frame;
-        frame.origin.y = -frame.size.height;
-        _connectingView.frame = frame;
-        _connectingView.hidden = NO;
-        frame.origin.y = 0;
-        [UIView animateWithDuration:0.3
-                         animations:^{_connectingView.frame = frame;}
-                         completion:nil];
-    }
+    self.navigationItem.titleView = _connectingView;
 }
 
 -(void)_hideConnectingView {
-    if(!_connectingView.hidden) {
-        CGRect frame = _connectingView.frame;
-        frame.origin.y = 0;
-        _connectingView.frame = frame;
-        _connectingView.hidden = NO;
-        frame.origin.y = -frame.size.height;
-        [UIView animateWithDuration:0.3
-                         animations:^{_connectingView.frame = frame;}
-                         completion:^(BOOL finished){ _connectingView.hidden = YES; }];
-    }
+    self.navigationItem.titleView = nil;
 }
 
 -(void)connectivityChanged:(NSNotification *)notification {
