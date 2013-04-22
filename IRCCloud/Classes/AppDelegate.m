@@ -27,13 +27,17 @@
 }
 
 -(void)showLoginView {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
-    self.window.rootViewController = self.loginSplashViewController;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
+        self.window.rootViewController = self.loginSplashViewController;
+    }];
 }
 
 -(void)showMainView {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
-    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
+        self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+    }];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
