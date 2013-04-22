@@ -576,7 +576,7 @@
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-//    [_message resignFirstResponder];
+    [_message resignFirstResponder];
     if(buttonIndex != -1) {
         NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
         
