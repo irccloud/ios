@@ -67,11 +67,6 @@
     
     [_toolBar addSubview:_barButtonContainer];
     
-    _message = [[UIExpandingTextView alloc] init];
-    _message.delegate = self;
-    _message.returnKeyType = UIReturnKeySend;
-    [_toolBar addSubview:_message];
-
     [self addChildViewController:_buffersView];
     [self addChildViewController:_eventsView];
     [self addChildViewController:_usersView];
@@ -83,11 +78,15 @@
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.height - self.navigationController.navigationBar.frame.size.height;
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(listButtonPressed:)];
-        _message.frame = CGRectMake(46,8,212,35);
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,212,35)];
+        _message.maximumNumberOfLines = 8;
     } else {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.width - self.navigationController.navigationBar.frame.size.height;
-        _message.frame = CGRectMake(46,10,476,35);
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,10,476,35)];
     }
+    _message.delegate = self;
+    _message.returnKeyType = UIReturnKeySend;
+    [_toolBar addSubview:_message];
     _usersButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"users"] style:UIBarButtonItemStylePlain target:self action:@selector(usersButtonPressed:)];
     //TODO: resize if the keyboard is visible
     //TODO: check the user info for the last BID
