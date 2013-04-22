@@ -106,6 +106,7 @@ int __timestampWidth;
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
+        _lock = [[NSRecursiveLock alloc] init];
         _conn = [NetworkConnection sharedInstance];
         _ready = NO;
         _formatter = [[NSDateFormatter alloc] init];
@@ -437,6 +438,7 @@ int __timestampWidth;
 }
 
 -(void)_addItem:(Event *)e eid:(NSTimeInterval)eid {
+    [_lock lock];
     int insertPos = -1;
     NSString *lastDay = nil;
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
@@ -530,6 +532,7 @@ int __timestampWidth;
     
     if(insertPos == -1) {
         TFLog(@"Couldn't insert EID: %f MSG: %@", eid, e.formattedMsg);
+        [_lock unlock];
         return;
     }
     
@@ -559,6 +562,7 @@ int __timestampWidth;
         if(_currentGroupPosition > -1)
             _currentGroupPosition++;
     }
+    [_lock unlock];
 }
 
 -(void)setBuffer:(Buffer *)buffer {
@@ -575,11 +579,11 @@ int __timestampWidth;
 }
 
 - (void)_scrollToBottom {
-    @synchronized(_data) {
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
-        _scrollTimer = nil;
-        _firstScroll = YES;
-    }
+    [_lock lock];
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
+    _scrollTimer = nil;
+    _firstScroll = YES;
+    [_lock unlock];
 }
 
 - (void)scrollToBottom {
@@ -589,122 +593,122 @@ int __timestampWidth;
 }
 
 - (void)refresh {
-    @synchronized(_data) {
-        [_scrollTimer invalidate];
-        _ready = NO;
-        int oldPosition = (_requestingBacklog && _data.count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
-        NSTimeInterval backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
-        if(backlogEid < 1)
-            backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
+    [_lock lock];
+    [_scrollTimer invalidate];
+    _ready = NO;
+    int oldPosition = (_requestingBacklog && _data.count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
+    NSTimeInterval backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
+    if(backlogEid < 1)
+        backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
 
-        [_data removeAllObjects];
-        _minEid = _maxEid = _earliestEid = 0;
-        _lastSeenEidPos = -1;
-        _currentCollapsedEid = 0;
-        _currentGroupPosition = -1;
-        _lastCollpasedDay = @"";
-        [_collapsedEvents clear];
-        [_unseenHighlightPositions removeAllObjects];
-        
-        [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
+    [_data removeAllObjects];
+    _minEid = _maxEid = _earliestEid = 0;
+    _lastSeenEidPos = -1;
+    _currentCollapsedEid = 0;
+    _currentGroupPosition = -1;
+    _lastCollpasedDay = @"";
+    [_collapsedEvents clear];
+    [_unseenHighlightPositions removeAllObjects];
+    
+    [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
 
-        __timestampWidth = [@"88:88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
-        if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-            __timestampWidth += [@":88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
-        if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
-            __timestampWidth += [@" AM" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
-        
-        NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
-        if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
-            if(_buffer.bid != -1) {
-                _requestingBacklog = YES;
-                [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
-            } else {
-                self.tableView.tableHeaderView = nil;
-            }
-        } else if(events.count) {
-            Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [_ignore setIgnores:server.ignores];
-            _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
-            if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0) {
-                self.tableView.tableHeaderView = _headerView;
-            } else {
-                self.tableView.tableHeaderView = nil;
-            }
-            for(Event *e in events) {
-                [self insertEvent:e backlog:true nextIsGrouped:false];
-            }
-            
-        }
-        
-        if(backlogEid > 0) {
-            Event *e = [[Event alloc] init];
-            e.eid = backlogEid;
-            e.type = TYPE_BACKLOG;
-            e.rowType = ROW_BACKLOG;
-            e.formattedMsg = nil;
-            e.bgColor = [UIColor whiteColor];
-            [self _addItem:e eid:backlogEid];
-            e.timestamp = nil;
-        }
-        
-        if(_minEid > 0 && _buffer.last_seen_eid > 0 && _minEid >= _buffer.last_seen_eid) {
-            _lastSeenEidPos = 0;
+    __timestampWidth = [@"88:88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
+    if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
+        __timestampWidth += [@":88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
+    if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
+        __timestampWidth += [@" AM" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
+    
+    NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
+    if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
+        if(_buffer.bid != -1) {
+            _requestingBacklog = YES;
+            [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
         } else {
-            Event *e = [[Event alloc] init];
-            e.eid = _buffer.last_seen_eid;
-            e.type = TYPE_LASTSEENEID;
-            e.rowType = ROW_LASTSEENEID;
-            e.formattedMsg = nil;
-            e.bgColor = [UIColor newMsgsBackgroundColor];
-            e.timestamp = @"New Messages";
-            _lastSeenEidPos = _data.count - 1;
-            NSEnumerator *i = [_data reverseObjectEnumerator];
-            Event *event = [i nextObject];
-            while(event) {
-                if(event.eid <= _buffer.last_seen_eid)
-                    break;
-                event = [i nextObject];
-                _lastSeenEidPos--;
-            }
-            if(_lastSeenEidPos != _data.count - 1) {
-                if(_lastSeenEidPos > 0 && [[_data objectAtIndex:_lastSeenEidPos - 1] rowType] == ROW_TIMESTAMP)
-                    _lastSeenEidPos--;
-                if(_lastSeenEidPos > 0)
-                    [_data insertObject:e atIndex:_lastSeenEidPos + 1];
-            } else {
-                _lastSeenEidPos = -1;
-            }
+            self.tableView.tableHeaderView = nil;
+        }
+    } else if(events.count) {
+        Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+        [_ignore setIgnores:server.ignores];
+        _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
+        if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0) {
+            self.tableView.tableHeaderView = _headerView;
+        } else {
+            self.tableView.tableHeaderView = nil;
+        }
+        for(Event *e in events) {
+            [self insertEvent:e backlog:true nextIsGrouped:false];
         }
         
-        [self.tableView reloadData];
-        if(_requestingBacklog && backlogEid > 0) {
-            int markerPos = -1;
-            for(Event *e in _data) {
-                if(e.eid == backlogEid)
-                    break;
-                markerPos++;
-            }
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-        } else if(_data.count && (_scrollTimer || !_firstScroll)) {
-            [self _scrollToBottom];
-            //TODO: Add hyperlinks before calculating the row heights so the scroll will get the correct position the first time
-            [self scrollToBottom];
-        }
-        
-        if(_data.count) {
-            int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
-            if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
-                _topUnreadView.alpha = 1; //TODO: animate this
-                [self updateTopUnread:firstRow];
-            }
-            _requestingBacklog = NO;
-        }
-        
-        [[NetworkConnection sharedInstance] scheduleIdleTimer];
-        _ready = YES;
-        [self scrollViewDidScroll:self.tableView];
     }
+    
+    if(backlogEid > 0) {
+        Event *e = [[Event alloc] init];
+        e.eid = backlogEid;
+        e.type = TYPE_BACKLOG;
+        e.rowType = ROW_BACKLOG;
+        e.formattedMsg = nil;
+        e.bgColor = [UIColor whiteColor];
+        [self _addItem:e eid:backlogEid];
+        e.timestamp = nil;
+    }
+    
+    if(_minEid > 0 && _buffer.last_seen_eid > 0 && _minEid >= _buffer.last_seen_eid) {
+        _lastSeenEidPos = 0;
+    } else {
+        Event *e = [[Event alloc] init];
+        e.eid = _buffer.last_seen_eid;
+        e.type = TYPE_LASTSEENEID;
+        e.rowType = ROW_LASTSEENEID;
+        e.formattedMsg = nil;
+        e.bgColor = [UIColor newMsgsBackgroundColor];
+        e.timestamp = @"New Messages";
+        _lastSeenEidPos = _data.count - 1;
+        NSEnumerator *i = [_data reverseObjectEnumerator];
+        Event *event = [i nextObject];
+        while(event) {
+            if(event.eid <= _buffer.last_seen_eid)
+                break;
+            event = [i nextObject];
+            _lastSeenEidPos--;
+        }
+        if(_lastSeenEidPos != _data.count - 1) {
+            if(_lastSeenEidPos > 0 && [[_data objectAtIndex:_lastSeenEidPos - 1] rowType] == ROW_TIMESTAMP)
+                _lastSeenEidPos--;
+            if(_lastSeenEidPos > 0)
+                [_data insertObject:e atIndex:_lastSeenEidPos + 1];
+        } else {
+            _lastSeenEidPos = -1;
+        }
+    }
+    
+    [self.tableView reloadData];
+    if(_requestingBacklog && backlogEid > 0) {
+        int markerPos = -1;
+        for(Event *e in _data) {
+            if(e.eid == backlogEid)
+                break;
+            markerPos++;
+        }
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    } else if(_data.count && (_scrollTimer || !_firstScroll)) {
+        [self _scrollToBottom];
+        //TODO: Add hyperlinks before calculating the row heights so the scroll will get the correct position the first time
+        [self scrollToBottom];
+    }
+    
+    if(_data.count) {
+        int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
+        if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
+            _topUnreadView.alpha = 1; //TODO: animate this
+            [self updateTopUnread:firstRow];
+        }
+        _requestingBacklog = NO;
+    }
+    
+    [[NetworkConnection sharedInstance] scheduleIdleTimer];
+    _ready = YES;
+    [self scrollViewDidScroll:self.tableView];
+    [_lock unlock];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -715,73 +719,66 @@ int __timestampWidth;
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    @synchronized(_data) {
-        return 1;
-    }
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    @synchronized(_data) {
-        return _data.count;
-    }
+    [_lock lock];
+    int count = _data.count;
+    [_lock unlock];
+    return count;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_data) {
-        if(indexPath.row < _data.count) {
-            Event *e = [_data objectAtIndex:indexPath.row];
-            if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED) {
-                if(e.formatted == nil && e.formattedMsg.length > 0) {
-                    e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace];
-                } else if(e.formattedMsg.length == 0) {
-                    TFLog(@"No formatted message: %@", e);
-                    return 26;
-                }
-                CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-                 CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth,CGFLOAT_MAX), NULL);
-                 float height = ceilf(suggestedSize.height);
-                 CFRelease(framesetter);
-                return height + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
-            } else {
-                return 26;
-            }
-        } else {
-            //Our data array must have changed, reload all the data
-            [self.tableView reloadData];
+    [_lock lock];
+    Event *e = [_data objectAtIndex:indexPath.row];
+    [_lock unlock];
+    if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED) {
+        if(e.formatted == nil && e.formattedMsg.length > 0) {
+            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace];
+        } else if(e.formattedMsg.length == 0) {
+            TFLog(@"No formatted message: %@", e);
             return 26;
         }
+        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
+         CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth,CGFLOAT_MAX), NULL);
+         float height = ceilf(suggestedSize.height);
+         CFRelease(framesetter);
+        return height + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+    } else {
+        return 26;
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_data) {
-        EventsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"eventscell"];
-        if(!cell)
-            cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"eventscell"];
-        Event *e = [_data objectAtIndex:[indexPath row]];
-        cell.type = e.rowType;
-        cell.contentView.backgroundColor = e.bgColor;
-        cell.message.delegate = self;
-        if(e.linkify)
-            cell.message.dataDetectorTypes = UIDataDetectorTypeLink;
-        else
-            cell.message.dataDetectorTypes = UIDataDetectorTypeNone;
-        cell.message.text = e.formatted;
-        cell.timestamp.text = e.timestamp;
-        if(e.rowType == ROW_TIMESTAMP) {
-            cell.timestamp.textColor = [UIColor blackColor];
-        } else {
-            cell.timestamp.textColor = [UIColor timestampColor];
-        }
-        if(e.rowType == ROW_BACKLOG) {
-            cell.timestamp.backgroundColor = [UIColor selectedBlueColor];
-        } else if(e.rowType == ROW_LASTSEENEID) {
-            cell.timestamp.backgroundColor = [UIColor whiteColor];
-        } else {
-            cell.timestamp.backgroundColor = [UIColor clearColor];
-        }
-        return cell;
+    EventsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"eventscell"];
+    if(!cell)
+        cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"eventscell"];
+    [_lock lock];
+    Event *e = [_data objectAtIndex:[indexPath row]];
+    [_lock unlock];
+    cell.type = e.rowType;
+    cell.contentView.backgroundColor = e.bgColor;
+    cell.message.delegate = self;
+    if(e.linkify)
+        cell.message.dataDetectorTypes = UIDataDetectorTypeLink;
+    else
+        cell.message.dataDetectorTypes = UIDataDetectorTypeNone;
+    cell.message.text = e.formatted;
+    cell.timestamp.text = e.timestamp;
+    if(e.rowType == ROW_TIMESTAMP) {
+        cell.timestamp.textColor = [UIColor blackColor];
+    } else {
+        cell.timestamp.textColor = [UIColor timestampColor];
     }
+    if(e.rowType == ROW_BACKLOG) {
+        cell.timestamp.backgroundColor = [UIColor selectedBlueColor];
+    } else if(e.rowType == ROW_LASTSEENEID) {
+        cell.timestamp.backgroundColor = [UIColor whiteColor];
+    } else {
+        cell.timestamp.backgroundColor = [UIColor clearColor];
+    }
+    return cell;
 }
 
 - (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {

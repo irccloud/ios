@@ -14,7 +14,7 @@
 @end
 
 @interface UsersTableView : UITableViewController {
-    NSMutableArray *_data;
+    NSArray *_data;
     Buffer *_buffer;
     IBOutlet id<UsersTableViewDelegate> delegate;
 }

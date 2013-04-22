@@ -45,6 +45,7 @@
     NSTimer *_heartbeatTimer;
     NSTimer *_scrollTimer;
     Ignore *_ignore;
+    NSRecursiveLock *_lock;
     
     IBOutlet id<EventsTableViewDelegate> _delegate;
 }

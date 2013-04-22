@@ -75,7 +75,7 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _data = [[NSMutableArray alloc] init];
+        _data = nil;
         _buffer = nil;
     }
     return self;
@@ -110,9 +110,9 @@
     }
 }
 
-- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading headingColor:(UIColor *)headingColor groupColor:(UIColor *)groupColor {
+- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading headingColor:(UIColor *)headingColor groupColor:(UIColor *)groupColor data:(NSMutableArray *)data {
     if(users.count) {
-        [_data addObject:@{
+        [data addObject:@{
          @"type":@TYPE_HEADING,
          @"text":heading,
          @"color":headingColor,
@@ -120,7 +120,7 @@
          @"count":@(users.count)
          }];
         for(User *user in users) {
-            [_data addObject:@{
+            [data addObject:@{
              @"type":@TYPE_HEADING,
              @"text":user.nick,
              @"color":[UIColor blackColor],
@@ -136,39 +136,38 @@
 }
 
 - (void)refresh {
-    @synchronized(_data) {
-        [_data removeAllObjects];
-        NSMutableArray *owners = [[NSMutableArray alloc] init];
-        NSMutableArray *admins = [[NSMutableArray alloc] init];
-        NSMutableArray *ops = [[NSMutableArray alloc] init];
-        NSMutableArray *halfops = [[NSMutableArray alloc] init];
-        NSMutableArray *voiced = [[NSMutableArray alloc] init];
-        NSMutableArray *members = [[NSMutableArray alloc] init];
-        
-        for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
-            if([user.mode rangeOfString:@"q"].location != NSNotFound)
-                [owners addObject:user];
-            else if([user.mode rangeOfString:@"a"].location != NSNotFound)
-                [admins addObject:user];
-            else if([user.mode rangeOfString:@"o"].location != NSNotFound)
-                [ops addObject:user];
-            else if([user.mode rangeOfString:@"h"].location != NSNotFound)
-                [halfops addObject:user];
-            else if([user.mode rangeOfString:@"v"].location != NSNotFound)
-                [voiced addObject:user];
-            else
-                [members addObject:user];
-        }
-        
-        [self _addUsersFromList:owners heading:@"OWNERS" headingColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor]];
-        [self _addUsersFromList:admins heading:@"ADMINS" headingColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor]];
-        [self _addUsersFromList:ops heading:@"OPS" headingColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor]];
-        [self _addUsersFromList:halfops heading:@"HALF OPS" headingColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor]];
-        [self _addUsersFromList:voiced heading:@"VOICED" headingColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor]];
-        [self _addUsersFromList:members heading:@"MEMBERS" headingColor:[UIColor membersHeadingColor] groupColor:[UIColor backgroundBlueColor]];
-        
-        [self.tableView reloadData];
+    NSMutableArray *data = [[NSMutableArray alloc] init];
+    NSMutableArray *owners = [[NSMutableArray alloc] init];
+    NSMutableArray *admins = [[NSMutableArray alloc] init];
+    NSMutableArray *ops = [[NSMutableArray alloc] init];
+    NSMutableArray *halfops = [[NSMutableArray alloc] init];
+    NSMutableArray *voiced = [[NSMutableArray alloc] init];
+    NSMutableArray *members = [[NSMutableArray alloc] init];
+    
+    for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
+        if([user.mode rangeOfString:@"q"].location != NSNotFound)
+            [owners addObject:user];
+        else if([user.mode rangeOfString:@"a"].location != NSNotFound)
+            [admins addObject:user];
+        else if([user.mode rangeOfString:@"o"].location != NSNotFound)
+            [ops addObject:user];
+        else if([user.mode rangeOfString:@"h"].location != NSNotFound)
+            [halfops addObject:user];
+        else if([user.mode rangeOfString:@"v"].location != NSNotFound)
+            [voiced addObject:user];
+        else
+            [members addObject:user];
     }
+    
+    [self _addUsersFromList:owners heading:@"OWNERS" headingColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] data:data];
+    [self _addUsersFromList:admins heading:@"ADMINS" headingColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] data:data];
+    [self _addUsersFromList:ops heading:@"OPS" headingColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] data:data];
+    [self _addUsersFromList:halfops heading:@"HALF OPS" headingColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] data:data];
+    [self _addUsersFromList:voiced heading:@"VOICED" headingColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] data:data];
+    [self _addUsersFromList:members heading:@"MEMBERS" headingColor:[UIColor membersHeadingColor] groupColor:[UIColor backgroundBlueColor] data:data];
+    
+    _data = data;
+    [self.tableView reloadData];
 }
 
 - (void)viewDidLoad {
@@ -183,42 +182,34 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    @synchronized(_data) {
-        return 1;
-    }
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    @synchronized(_data) {
-        return _data.count;
-    }
+    return _data.count;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_data) {
-        /*if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_HEADING) {
-            return 40;
-        } else {
-            return 32;
-        }*/
+    /*if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_HEADING) {
+        return 40;
+    } else {
         return 32;
-    }
+    }*/
+    return 32;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_data) {
-        UsersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"userscell"];
-        if(!cell)
-            cell = [[UsersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"userscell"];
-        NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-        cell.type = [[row objectForKey:@"type"] intValue];
-        cell.contentView.backgroundColor = [row objectForKey:@"bgColor"];
-        cell.label.text = [row objectForKey:@"text"];
-        cell.label.textColor = [row objectForKey:@"color"];
-        cell.count.text = [[row objectForKey:@"count"] description];
-        
-        return cell;
-    }
+    UsersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"userscell"];
+    if(!cell)
+        cell = [[UsersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"userscell"];
+    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    cell.type = [[row objectForKey:@"type"] intValue];
+    cell.contentView.backgroundColor = [row objectForKey:@"bgColor"];
+    cell.label.text = [row objectForKey:@"text"];
+    cell.label.textColor = [row objectForKey:@"color"];
+    cell.count.text = [[row objectForKey:@"count"] description];
+    
+    return cell;
 }
 
 /*
