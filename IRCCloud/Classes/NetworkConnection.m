@@ -78,13 +78,17 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
 	TFLog(@"Request failed: %@", error);
-    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
+    }];
     _running = NO;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     //TODO: prune the events array
 	TFLog(@"Backlog download completed");
-    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
+    }];
     _running = NO;
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
@@ -95,7 +99,9 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 	if([response statusCode] != 200) {
         TFLog(@"HTTP status code: %i", [response statusCode]);
 		TFLog(@"HTTP headers: %@", [response allHeaderFields]);
-        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
+        }];
 	}
 }
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {

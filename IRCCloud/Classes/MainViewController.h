@@ -10,17 +10,17 @@
 #import "BuffersTableView.h"
 #import "UsersTableView.h"
 #import "EventsTableView.h"
+#import "UIExpandingTextView.h"
 
-@interface MainViewController : UIViewController<BuffersTableViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,UIScrollViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate> {
+@interface MainViewController : UIViewController<BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,UIScrollViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
     IBOutlet UIView *_contentView;
-    IBOutlet UITextField *_message;
+    UIExpandingTextView *_message;
     IBOutlet UIView *_connectingView;
     IBOutlet UIProgressView *_connectingProgress;
     IBOutlet UILabel *_connectingStatus;
-    IBOutlet UILabel *_connectingError;
     IBOutlet UIActivityIndicatorView *_connectingActivity;
     IBOutlet UIToolbar *_toolBar;
     UIBarButtonItem *_usersButtonItem;
@@ -31,6 +31,7 @@
     Event *_selectedEvent;
     int _cidToOpen;
     NSString *_bufferToOpen;
+    UIView *_barButtonContainer;
 }
 -(IBAction)sendButtonPressed:(id)sender;
 -(IBAction)usersButtonPressed:(id)sender;

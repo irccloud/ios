@@ -32,6 +32,46 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _barButtonContainer = [[UIView alloc] initWithFrame:CGRectMake(0,0,_toolBar.frame.size.width, _toolBar.frame.size.height)];
+    
+    UIImage *buttonImage = [[UIImage imageNamed:@"UINavigationBarDefaultButton"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
+    UIImage *pressedButtonImage = [[UIImage imageNamed:@"UINavigationBarDefaultButtonPressed"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
+    UIImage *doneButtonImage = [[UIImage imageNamed:@"UINavigationBarDoneButton"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
+    UIImage *donePressedButtonImage = [[UIImage imageNamed:@"UINavigationBarDoneButtonPressed"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
+    
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.titleLabel.font = [UIFont boldSystemFontOfSize:14.0f];
+    button.contentMode = UIViewContentModeScaleToFill;
+    button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    
+    [button setBackgroundImage:buttonImage forState:UIControlStateNormal];
+    [button setBackgroundImage:pressedButtonImage forState:UIControlStateHighlighted];
+    [button setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [button sizeToFit];
+    button.frame = CGRectMake(8,8,button.frame.size.width + 12, button.frame.size.height);
+    [_barButtonContainer addSubview:button];
+
+    button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.titleLabel.font = [UIFont boldSystemFontOfSize:14.0f];
+    button.contentMode = UIViewContentModeScaleToFill;
+    button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    
+    [button setBackgroundImage:doneButtonImage forState:UIControlStateNormal];
+    [button setBackgroundImage:donePressedButtonImage forState:UIControlStateHighlighted];
+    [button setTitle:@"Send" forState:UIControlStateNormal];
+    [button addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [button sizeToFit];
+    button.frame = CGRectMake(_toolBar.frame.size.width - button.frame.size.width - 20,8,button.frame.size.width + 12,button.frame.size.height);
+    [_barButtonContainer addSubview:button];
+    
+    [_toolBar addSubview:_barButtonContainer];
+    
+    _message = [[UIExpandingTextView alloc] init];
+    _message.delegate = self;
+    _message.returnKeyType = UIReturnKeySend;
+    [_toolBar addSubview:_message];
+
     [self addChildViewController:_buffersView];
     [self addChildViewController:_eventsView];
     [self addChildViewController:_usersView];
@@ -43,8 +83,10 @@
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.height - self.navigationController.navigationBar.frame.size.height;
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(listButtonPressed:)];
+        _message.frame = CGRectMake(46,8,212,35);
     } else {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.width - self.navigationController.navigationBar.frame.size.height;
+        _message.frame = CGRectMake(46,10,476,35);
     }
     _usersButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"users"] style:UIBarButtonItemStylePlain target:self action:@selector(usersButtonPressed:)];
     //TODO: resize if the keyboard is visible
@@ -132,7 +174,6 @@
             _connectingActivity.hidden = NO;
             _connectingProgress.progress = 0;
             _connectingProgress.hidden = YES;
-            _connectingError.text = @"";
             break;
         case kIRCCloudStateDisconnected:
             if([NetworkConnection sharedInstance].reconnectTimestamp > 0) {
@@ -147,7 +188,6 @@
                 _connectingActivity.hidden = YES;
                 _connectingProgress.progress = 0;
                 _connectingProgress.hidden = YES;
-                _connectingError.text = @"";
             }
         case kIRCCloudStateDisconnecting:
             [self _showConnectingView];
@@ -278,9 +318,19 @@
     _message.text = @"";
 }
 
--(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [self sendButtonPressed:textField];
-    return YES;
+-(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
+    [self sendButtonPressed:expandingTextView];
+    return NO;
+}
+
+-(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {
+    NSArray *rows = [_eventsView.tableView indexPathsForVisibleRows];
+    CGRect frame = _eventsView.tableView.frame;
+    frame.size.height = self.view.frame.size.height - height - 9;
+    _eventsView.tableView.frame = frame;
+    [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+    _toolBar.frame = CGRectMake(_toolBar.frame.origin.x, self.view.frame.size.height - height - 9, _toolBar.frame.size.width, height + 9);
+    _barButtonContainer.frame = CGRectMake(0,0,_toolBar.frame.size.width, _toolBar.frame.size.height);
 }
 
 -(void)setUnreadColor:(UIColor *)color {

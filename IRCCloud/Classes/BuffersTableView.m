@@ -266,37 +266,39 @@
 
 -(void)_updateUnreadIndicators {
     NSArray *rows = [self.tableView indexPathsForVisibleRows];
-    int first = [[rows objectAtIndex:0] row];
-    int last = [[rows lastObject] row];
-    
-    if(_firstUnreadPosition != -1 && first > _firstUnreadPosition) {
-        topUnreadIndicator.hidden = NO;
-        topUnreadIndicator.alpha = 1; //TODO: animate this
-        topUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
-    } else {
-        topUnreadIndicator.hidden = YES;
-        topUnreadIndicator.alpha = 0; //TODO: animate this
-    }
-    if((_lastHighlightPosition != -1 && first > _lastHighlightPosition) ||
-       (_firstHighlightPosition != -1 && first > _firstHighlightPosition)) {
-        topUnreadIndicator.hidden = NO;
-        topUnreadIndicator.alpha = 1; //TODO: animate this
-        topUnreadIndicatorColor.backgroundColor = [UIColor redColor];
-    }
+    if(rows.count) {
+        int first = [[rows objectAtIndex:0] row];
+        int last = [[rows lastObject] row];
+        
+        if(_firstUnreadPosition != -1 && first > _firstUnreadPosition) {
+            topUnreadIndicator.hidden = NO;
+            topUnreadIndicator.alpha = 1; //TODO: animate this
+            topUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+        } else {
+            topUnreadIndicator.hidden = YES;
+            topUnreadIndicator.alpha = 0; //TODO: animate this
+        }
+        if((_lastHighlightPosition != -1 && first > _lastHighlightPosition) ||
+           (_firstHighlightPosition != -1 && first > _firstHighlightPosition)) {
+            topUnreadIndicator.hidden = NO;
+            topUnreadIndicator.alpha = 1; //TODO: animate this
+            topUnreadIndicatorColor.backgroundColor = [UIColor redColor];
+        }
 
-    if(_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
-        bottomUnreadIndicator.hidden = NO;
-        bottomUnreadIndicator.alpha = 1; //TODO: animate this
-        bottomUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
-    } else {
-        bottomUnreadIndicator.hidden = YES;
-        bottomUnreadIndicator.alpha = 0; //TODO: animate this
-    }
-    if((_firstHighlightPosition != -1 && last < _firstHighlightPosition) ||
-       (_lastHighlightPosition != -1 && last < _lastHighlightPosition)) {
-        bottomUnreadIndicator.hidden = NO;
-        bottomUnreadIndicator.alpha = 1; //TODO: animate this
-        bottomUnreadIndicatorColor.backgroundColor = [UIColor redColor];
+        if(_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
+            bottomUnreadIndicator.hidden = NO;
+            bottomUnreadIndicator.alpha = 1; //TODO: animate this
+            bottomUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+        } else {
+            bottomUnreadIndicator.hidden = YES;
+            bottomUnreadIndicator.alpha = 0; //TODO: animate this
+        }
+        if((_firstHighlightPosition != -1 && last < _firstHighlightPosition) ||
+           (_lastHighlightPosition != -1 && last < _lastHighlightPosition)) {
+            bottomUnreadIndicator.hidden = NO;
+            bottomUnreadIndicator.alpha = 1; //TODO: animate this
+            bottomUnreadIndicatorColor.backgroundColor = [UIColor redColor];
+        }
     }
 }
 

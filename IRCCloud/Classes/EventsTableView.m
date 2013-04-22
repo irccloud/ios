@@ -580,7 +580,9 @@ int __timestampWidth;
 
 - (void)_scrollToBottom {
     [_lock lock];
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
+    if(_data.count) {
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
+    }
     _scrollTimer = nil;
     _firstScroll = YES;
     [_lock unlock];
