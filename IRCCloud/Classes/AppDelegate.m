@@ -21,7 +21,8 @@
         self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPad" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPad" bundle:nil];
     }
-    [self showLoginView];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
+    self.window.rootViewController = self.loginSplashViewController;
     [self.window makeKeyAndVisible];
     return YES;
 }
