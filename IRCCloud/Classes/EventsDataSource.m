@@ -25,7 +25,7 @@
     if(!_type)
         return NO;
     if([_type isEqualToString:@"notice"] && [bufferType isEqualToString:@"console"])
-        if(_server && _toChan)
+        if(_server || _toChan)
             return NO;
     return ([_type isEqualToString:@"buffer_msg"]
             ||[_type isEqualToString:@"buffer_me_msg"]
