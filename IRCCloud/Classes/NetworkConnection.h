@@ -116,6 +116,7 @@ typedef enum {
 -(NSDictionary *)prefs;
 -(void)connect;
 -(void)disconnect;
+-(void)clearPrefs;
 -(void)scheduleIdleTimer;
 -(void)cancelIdleTimer;
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid;

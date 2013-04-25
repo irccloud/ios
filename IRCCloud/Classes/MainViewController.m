@@ -656,6 +656,7 @@
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
             [[NSUserDefaults standardUserDefaults] synchronize];
             [[NetworkConnection sharedInstance] disconnect];
+            [[NetworkConnection sharedInstance] clearPrefs];
             [[ServersDataSource sharedInstance] clear];
             [[UsersDataSource sharedInstance] clear];
             [[ChannelsDataSource sharedInstance] clear];

@@ -352,6 +352,9 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _state = kIRCCloudStateDisconnecting;
     [self _postConnectivityChange];
     [_socket close];
+}
+
+-(void)clearPrefs {
     _prefs = nil;
     _userInfo = nil;
 }
