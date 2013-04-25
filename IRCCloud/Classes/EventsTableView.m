@@ -134,7 +134,8 @@ int __timestampWidth;
                                              selector:@selector(backlogCompleted:)
                                                  name:kIRCCloudBacklogCompletedNotification object:nil];
     [self refresh];
-    [self scrollToBottom];
+    if(!_scrolledUp)
+        [self scrollToBottom];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -574,6 +575,7 @@ int __timestampWidth;
     _firstScroll = NO;
     _buffer = buffer;
     _earliestEid = 0;
+    _scrolledUp = NO;
     [_expandedSectionEids removeAllObjects];
     [self refresh];
 }
@@ -692,7 +694,7 @@ int __timestampWidth;
             markerPos++;
         }
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-    } else if(_data.count && (_scrollTimer || !_firstScroll)) {
+    } else if(!_scrolledUp && _data.count && (_scrollTimer || !_firstScroll)) {
         [self _scrollToBottom];
         //TODO: Add hyperlinks before calculating the row heights so the scroll will get the correct position the first time
         [self scrollToBottom];
@@ -866,17 +868,18 @@ int __timestampWidth;
         int firstRow = [[rows objectAtIndex:0] row];
         int lastRow = [[rows lastObject] row];
         
-        if(_bottomUnreadView && _data.count) {
+        if(_data.count) {
             if(lastRow == _data.count - 1) {
                 _bottomUnreadView.alpha = 0; //TODO: animate this
                 _newMsgs = 0;
                 _newHighlights = 0;
                 if(_topUnreadView.alpha == 0)
                     [self _sendHeartbeat];
+                _scrolledUp = NO;
+            } else {
+                _scrolledUp = YES;
             }
-        }
-        
-        if(_topUnreadView && _data.count) {
+
             if(_lastSeenEidPos >= 0) {
                 if(_lastSeenEidPos > 0 && firstRow <= _lastSeenEidPos) {
                     _topUnreadView.alpha = 0; //TODO: animate this
