@@ -121,7 +121,7 @@
          }];
         for(User *user in users) {
             [data addObject:@{
-             @"type":@TYPE_HEADING,
+             @"type":@TYPE_USER,
              @"text":user.nick,
              @"color":[UIColor blackColor],
              @"bgColor":groupColor
@@ -255,7 +255,8 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    [delegate userSelected:[[_data objectAtIndex:[indexPath row]] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+    if([[[_data objectAtIndex:[indexPath row]] objectForKey:@"type"] intValue] == TYPE_USER)
+        [delegate userSelected:[[_data objectAtIndex:[indexPath row]] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
 }
 
 @end
