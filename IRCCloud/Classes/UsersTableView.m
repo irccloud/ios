@@ -253,6 +253,10 @@
 
 #pragma mark - Table view delegate
 
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    [delegate dismissKeyboard];
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     if([[[_data objectAtIndex:[indexPath row]] objectForKey:@"type"] intValue] == TYPE_USER)

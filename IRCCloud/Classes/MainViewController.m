@@ -479,6 +479,10 @@
     _startX = 0;
 }*/
 
+-(void)dismissKeyboard {
+    [_message resignFirstResponder];
+}
+
 -(void)rowSelected:(Event *)event {
     [_message resignFirstResponder];
 }

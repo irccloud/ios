@@ -18,6 +18,7 @@
 @protocol EventsTableViewDelegate<NSObject>
 -(void)rowSelected:(Event *)event;
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect;
+-(void)dismissKeyboard;
 @end
 
 @interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate,UIGestureRecognizerDelegate> {

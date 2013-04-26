@@ -12,6 +12,7 @@
 @protocol BuffersTableViewDelegate<NSObject>
 -(void)bufferSelected:(int)bid;
 -(void)setUnreadColor:(UIColor *)color;
+-(void)dismissKeyboard;
 @end
 
 @interface BuffersTableView : UITableViewController {

@@ -11,6 +11,7 @@
 
 @protocol UsersTableViewDelegate<NSObject>
 -(void)userSelected:(NSString *)nick rect:(CGRect)rect;
+-(void)dismissKeyboard;
 @end
 
 @interface UsersTableView : UITableViewController {
