@@ -305,6 +305,8 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_doubleTapTimer invalidate];
+    _doubleTapTimer = nil;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -483,8 +485,100 @@
     [_message resignFirstResponder];
 }
 
--(void)rowSelected:(Event *)event {
+-(void)_eventTapped {
+    _doubleTapTimer = nil;
     [_message resignFirstResponder];
+}
+
+-(void)rowSelected:(Event *)event {
+    if(_doubleTapTimer) {
+        [_doubleTapTimer invalidate];
+        _doubleTapTimer = nil;
+        _selectedUser = [[UsersDataSource sharedInstance] getUser:event.from cid:event.cid bid:event.bid];
+        if(!_selectedUser) {
+            _selectedUser = [[User alloc] init];
+            _selectedUser.nick = event.from;
+        }
+        [self _mention];
+    } else {
+        _doubleTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_eventTapped) userInfo:nil repeats:NO];
+    }
+}
+
+-(void)_mention {
+    if(!_selectedUser)
+        return;
+
+    //TODO: set the mention tip flag
+    
+    if([self.view isKindOfClass:[UIScrollView class]]) {
+        ((UIScrollView *)self.view).contentOffset = CGPointMake(_buffersView.view.frame.size.width, 0);
+    }
+    
+    if(_message.text.length == 0) {
+        _message.text = [NSString stringWithFormat:@"%@: ",_selectedUser.nick];
+    } else {
+        NSString *from = _selectedUser.nick;
+        int oldPosition = _message.selectedRange.location;
+        NSString *text = _message.text;
+        int start = oldPosition - 1;
+        if(start > 0 && [text characterAtIndex:start] == ' ')
+            start--;
+        while(start > 0 && [text characterAtIndex:start] != ' ')
+            start--;
+        if(start < 0)
+            start = 0;
+        int match = [text rangeOfString:from options:0 range:NSMakeRange(start, text.length - start)].location;
+        int end = oldPosition + from.length;
+        if(end > text.length - 1)
+            end = text.length - 1;
+        if(match >= 0 && match < end) {
+            NSMutableString *newtext = [[NSMutableString alloc] init];
+            if(match > 1 && [text characterAtIndex:match - 1] == ' ')
+                [newtext appendString:[text substringWithRange:NSMakeRange(0, match - 1)]];
+            else
+                [newtext appendString:[text substringWithRange:NSMakeRange(0, match)]];
+            if(match+from.length < text.length && [text characterAtIndex:match+from.length] == ':' &&
+               match+from.length+1 < text.length && [text characterAtIndex:match+from.length+1] == ' ') {
+                if(match+from.length+2 < text.length)
+                    [newtext appendString:[text substringWithRange:NSMakeRange(match+from.length+2, text.length - (match+from.length+2))]];
+            } else if(match+from.length < text.length) {
+                [newtext appendString:[text substringWithRange:NSMakeRange(match+from.length, text.length - (match+from.length))]];
+            }
+            if([newtext hasSuffix:@" "])
+                newtext = (NSMutableString *)[newtext substringWithRange:NSMakeRange(0, newtext.length - 1)];
+            if([newtext isEqualToString:@":"])
+                newtext = (NSMutableString *)@"";
+            _message.text = newtext;
+            if(match < newtext.length)
+                _message.selectedRange = NSMakeRange(match, 0);
+            else
+                _message.selectedRange = NSMakeRange(newtext.length, 0);
+        } else {
+            if(oldPosition == text.length - 1) {
+                text = [NSString stringWithFormat:@" %@", from];
+            } else {
+                NSMutableString *newtext = [[NSMutableString alloc] initWithString:[text substringWithRange:NSMakeRange(0, oldPosition)]];
+                if(![newtext hasSuffix:@" "])
+                    from = [NSString stringWithFormat:@" %@", from];
+                if(![[text substringWithRange:NSMakeRange(oldPosition, text.length - oldPosition)] hasPrefix:@" "])
+                    from = [NSString stringWithFormat:@"%@ ", from];
+                [newtext appendString:from];
+                [newtext appendString:[text substringWithRange:NSMakeRange(oldPosition, text.length - oldPosition)]];
+                if([newtext hasSuffix:@" "])
+                    newtext = (NSMutableString *)[newtext substringWithRange:NSMakeRange(0, newtext.length - 1)];
+                text = newtext;
+            }
+            _message.text = text;
+            if(text.length > 0) {
+                if(oldPosition + from.length + 2 < text.length)
+                    _message.selectedRange = NSMakeRange(oldPosition + from.length, 0);
+                else
+                    _message.selectedRange = NSMakeRange(text.length, 0);
+            }
+        }
+    }
+    [_message becomeFirstResponder];
 }
 
 -(void)_showUserPopupInRect:(CGRect)rect {
@@ -493,7 +587,7 @@
         [sheet addButtonWithTitle:@"Copy Message"];
     //[sheet addButtonWithTitle:@"Whois…"];
     [sheet addButtonWithTitle:@"Send a message"];
-    //[sheet addButtonWithTitle:@"Mention"];
+    [sheet addButtonWithTitle:@"Mention"];
     [sheet addButtonWithTitle:@"Invite to channel…"];
     [sheet addButtonWithTitle:@"Ignore…"];
     if([_buffer.type isEqualToString:@"channel"]) {
@@ -521,10 +615,22 @@
     }
 }
 
+-(void)_userTapped {
+    _doubleTapTimer = nil;
+    [self _showUserPopupInRect:_selectedRect];
+}
+
 -(void)userSelected:(NSString *)nick rect:(CGRect)rect {
+    _selectedRect = rect;
     _selectedEvent = nil;
     _selectedUser = [[UsersDataSource sharedInstance] getUser:nick cid:_buffer.cid];
-    [self _showUserPopupInRect:rect];
+    if(_doubleTapTimer) {
+        [_doubleTapTimer invalidate];
+        _doubleTapTimer = nil;
+        [self _mention];
+    } else {
+        _doubleTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_userTapped) userInfo:nil repeats:NO];
+    }
 }
 
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect {
@@ -679,6 +785,9 @@
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 [self presentViewController:nc animated:YES completion:nil];
             }
+        } else if([action isEqualToString:@"Mention"]) {
+            //TODO: Show the double-tap tip
+            [self _mention];
         }
     }
     _selectedUser = nil;

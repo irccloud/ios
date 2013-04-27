@@ -439,16 +439,8 @@
     {
 		if ([delegate respondsToSelector:@selector(expandingTextViewShouldReturn:)]) 
         {
-			if (![delegate performSelector:@selector(expandingTextViewShouldReturn:) withObject:self]) 
-            {
-				return YES;
-			} 
-            else 
-            {
-				[textView resignFirstResponder];
-				return NO;
-			}
-		}
+			return [delegate expandingTextViewShouldReturn:self];
+        }
 	}
 	return YES;
 }
@@ -459,6 +451,10 @@
     {
 		[delegate expandingTextViewDidChangeSelection:self];
 	}
+}
+
+- (BOOL)becomeFirstResponder {
+    return [internalTextView becomeFirstResponder];
 }
 
 @end

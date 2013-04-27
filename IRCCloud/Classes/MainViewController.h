@@ -29,9 +29,11 @@
     int _startHeight;
     User *_selectedUser;
     Event *_selectedEvent;
+    CGRect _selectedRect;
     int _cidToOpen;
     NSString *_bufferToOpen;
     UIView *_barButtonContainer;
+    NSTimer *_doubleTapTimer;
 }
 -(IBAction)sendButtonPressed:(id)sender;
 -(IBAction)usersButtonPressed:(id)sender;
