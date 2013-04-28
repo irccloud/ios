@@ -324,6 +324,9 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(void)connect {
+    if(_state == kIRCCloudStateConnecting)
+        return;
+    
     if(_socket)
         _socket.delegate = nil;
 

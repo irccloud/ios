@@ -28,14 +28,16 @@
 -(void)viewWillAppear:(BOOL)animated {
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if(session != nil && [session length] > 0) {
-        loginView.alpha = 0;
-        loadingView.alpha = 1;
-        progress.hidden = YES;
-        progress.progress = 0;
-        [activity startAnimating];
-        activity.hidden = NO;
-        [status setText:@"Connecting"];
-        [_conn connect];
+        if(_conn.state == kIRCCloudStateDisconnected) {
+            loginView.alpha = 0;
+            loadingView.alpha = 1;
+            progress.hidden = YES;
+            progress.progress = 0;
+            [activity startAnimating];
+            activity.hidden = NO;
+            [status setText:@"Connecting"];
+            [_conn connect];
+        }
     } else {
         password.text = @"";
         loadingView.alpha = 0;
