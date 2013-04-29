@@ -350,6 +350,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(void)disconnect {
+    NSLog(@"** disconnect");
     _reconnectTimestamp = 0;
     [self cancelIdleTimer];
     _state = kIRCCloudStateDisconnecting;

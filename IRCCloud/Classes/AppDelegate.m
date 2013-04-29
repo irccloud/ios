@@ -42,11 +42,12 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
+    [_disconnectTimer invalidate];
     _disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:[NetworkConnection sharedInstance] selector:@selector(disconnect) userInfo:nil repeats:NO];
     [self.window.rootViewController viewWillDisappear:NO];
     __block UIBackgroundTaskIdentifier background_task;
     background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
-        [_disconnectTimer invalidate];
+        [_disconnectTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
         [[NetworkConnection sharedInstance] disconnect];
         [NSThread sleepForTimeInterval:5];
         [application endBackgroundTask: background_task];
@@ -68,7 +69,8 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [_disconnectTimer invalidate];
+    [_disconnectTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
+    _disconnectTimer = nil;
     [self.window.rootViewController viewWillAppear:YES];
 }
 
