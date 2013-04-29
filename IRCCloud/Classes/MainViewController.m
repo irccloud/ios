@@ -13,6 +13,7 @@
 #import "BansTableViewController.h"
 #import "AppDelegate.h"
 #import "IgnoresTableViewController.h"
+#import "EditConnectionViewController.h"
 #import "UIColor+IRCCloud.h"
 
 #define TAG_BAN 1
@@ -55,7 +56,7 @@
     button = [UIButton buttonWithType:UIButtonTypeCustom];
     button.titleLabel.font = [UIFont boldSystemFontOfSize:14.0f];
     button.contentMode = UIViewContentModeScaleToFill;
-    button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
     
     [button setBackgroundImage:doneButtonImage forState:UIControlStateNormal];
     [button setBackgroundImage:donePressedButtonImage forState:UIControlStateHighlighted];
@@ -375,17 +376,17 @@
             CGRect frame = _eventsView.view.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
             _eventsView.view.frame = frame;
-            frame = _message.superview.frame;
+            frame = _toolBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
-            _message.superview.frame = frame;
+            _toolBar.frame = frame;
             _usersView.view.hidden = NO;
         } else {
             CGRect frame = _eventsView.view.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
             _eventsView.view.frame = frame;
-            frame = _message.superview.frame;
+            frame = _toolBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
-            _message.superview.frame = frame;
+            _toolBar.frame = frame;
             _usersView.view.hidden = YES;
         }
     }
@@ -431,6 +432,7 @@
             //[sheet addButtonWithTitle:@"Identify Nickname…"];
             [sheet addButtonWithTitle:@"Disconnect"];
         }
+        [sheet addButtonWithTitle:@"Edit Connection…"];
     } else if([_buffer.type isEqualToString:@"channel"]) {
         if([[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             [sheet addButtonWithTitle:@"Leave"];
@@ -788,6 +790,16 @@
         } else if([action isEqualToString:@"Mention"]) {
             //TODO: Show the double-tap tip
             [self _mention];
+        } else if([action isEqualToString:@"Edit Connection…"]) {
+            EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            [ecv setServer:_buffer.cid];
+            if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+                [self.navigationController pushViewController:ecv animated:YES];
+            } else {
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                [self presentViewController:nc animated:YES completion:nil];
+            }
         }
     }
     _selectedUser = nil;

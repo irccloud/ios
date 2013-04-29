@@ -254,7 +254,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(int)editServer:(int)cid hostname:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands {
-    return [self _sendRequest:@"add-server" args:@{
+    return [self _sendRequest:@"edit-server" args:@{
             @"hostname":hostname,
             @"port":@(port),
             @"ssl":[NSString stringWithFormat:@"%i",ssl],

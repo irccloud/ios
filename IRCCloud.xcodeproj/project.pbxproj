@@ -75,6 +75,8 @@
 		228A05E116D3E4B70029769C /* splashlogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 228A05E016D3E4B70029769C /* splashlogo@2x.png */; };
 		228A05E316D3E53F0029769C /* splashlogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 228A05E216D3E53F0029769C /* splashlogo.png */; };
 		22AD75ED1718567D00141257 /* BansTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* BansTableViewController.m */; };
+		22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
+		22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B4281A16D7E21200498507 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280716D7E21200498507 /* SBJsonParser.m */; };
 		22B4281B16D7E21200498507 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280716D7E21200498507 /* SBJsonParser.m */; };
 		22B4281C16D7E21200498507 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280916D7E21200498507 /* SBJsonStreamParser.m */; };
@@ -243,6 +245,8 @@
 		228A05E216D3E53F0029769C /* splashlogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splashlogo.png; sourceTree = "<group>"; };
 		22AD75EB1718567D00141257 /* BansTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BansTableViewController.h; sourceTree = "<group>"; };
 		22AD75EC1718567D00141257 /* BansTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BansTableViewController.m; sourceTree = "<group>"; };
+		22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditConnectionViewController.h; sourceTree = "<group>"; };
+		22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditConnectionViewController.m; sourceTree = "<group>"; };
 		22B4280516D7E21200498507 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJson.h; sourceTree = "<group>"; };
 		22B4280616D7E21200498507 /* SBJsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonParser.h; sourceTree = "<group>"; };
 		22B4280716D7E21200498507 /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonParser.m; sourceTree = "<group>"; };
@@ -453,6 +457,8 @@
 				22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */,
 				2237E13B16E1214A00CA188F /* ColorFormatter.h */,
 				2237E13C16E1214A00CA188F /* ColorFormatter.m */,
+				22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */,
+				22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */,
 				22F9EE1A16DE6F21004615C0 /* EventsDataSource.h */,
 				22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */,
 				223DA90A16DFC626006FF808 /* EventsTableView.h */,
@@ -785,6 +791,7 @@
 				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
 				22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
 				22D430A81725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
+				22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -831,6 +838,7 @@
 				22D430A1171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
 				22D430A71725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
 				22D430A91725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
+				22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
