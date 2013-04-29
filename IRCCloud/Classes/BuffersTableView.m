@@ -128,7 +128,7 @@
     _lastHighlightPosition = -1;
     _lastUnreadPosition = -1;
 
-    if(_selectedBuffer.archived)
+    if(_selectedBuffer.archived && ![_selectedBuffer.type isEqualToString:@"console"])
         [_expandedArchives setObject:@YES forKey:@(_selectedBuffer.cid)];
     
     NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
