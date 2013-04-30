@@ -77,6 +77,10 @@
 		22AD75ED1718567D00141257 /* BansTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* BansTableViewController.m */; };
 		22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
+		22B15CFB17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF817301BAF0075EBA7 /* ECSlidingViewController.m */; };
+		22B15CFC17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF817301BAF0075EBA7 /* ECSlidingViewController.m */; };
+		22B15CFD17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */; };
+		22B15CFE17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */; };
 		22B4281A16D7E21200498507 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280716D7E21200498507 /* SBJsonParser.m */; };
 		22B4281B16D7E21200498507 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280716D7E21200498507 /* SBJsonParser.m */; };
 		22B4281C16D7E21200498507 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280916D7E21200498507 /* SBJsonStreamParser.m */; };
@@ -247,6 +251,10 @@
 		22AD75EC1718567D00141257 /* BansTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BansTableViewController.m; sourceTree = "<group>"; };
 		22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditConnectionViewController.h; sourceTree = "<group>"; };
 		22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditConnectionViewController.m; sourceTree = "<group>"; };
+		22B15CF717301BAF0075EBA7 /* ECSlidingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ECSlidingViewController.h; sourceTree = "<group>"; };
+		22B15CF817301BAF0075EBA7 /* ECSlidingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ECSlidingViewController.m; sourceTree = "<group>"; };
+		22B15CF917301BAF0075EBA7 /* UIImage+ImageWithUIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageWithUIView.h"; sourceTree = "<group>"; };
+		22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageWithUIView.m"; sourceTree = "<group>"; };
 		22B4280516D7E21200498507 /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJson.h; sourceTree = "<group>"; };
 		22B4280616D7E21200498507 /* SBJsonParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonParser.h; sourceTree = "<group>"; };
 		22B4280716D7E21200498507 /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonParser.m; sourceTree = "<group>"; };
@@ -404,6 +412,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22B15CF617301BAE0075EBA7 /* ECSlidingViewController */,
 				22D430A21725AAE9003C0684 /* UIExpandingTextView.h */,
 				22D430A31725AAEA003C0684 /* UIExpandingTextView.m */,
 				22D430A41725AAEA003C0684 /* UIExpandingTextViewInternal.h */,
@@ -530,6 +539,17 @@
 				228A05D316D3DFB80029769C /* TTTAttributedLabel.m */,
 			);
 			path = TTTAttributedLabel;
+			sourceTree = SOURCE_ROOT;
+		};
+		22B15CF617301BAE0075EBA7 /* ECSlidingViewController */ = {
+			isa = PBXGroup;
+			children = (
+				22B15CF717301BAF0075EBA7 /* ECSlidingViewController.h */,
+				22B15CF817301BAF0075EBA7 /* ECSlidingViewController.m */,
+				22B15CF917301BAF0075EBA7 /* UIImage+ImageWithUIView.h */,
+				22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */,
+			);
+			path = ECSlidingViewController;
 			sourceTree = SOURCE_ROOT;
 		};
 		22B4280416D7E21100498507 /* SBJson */ = {
@@ -792,6 +812,8 @@
 				22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
 				22D430A81725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
 				22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
+				22B15CFB17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,
+				22B15CFD17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -839,6 +861,8 @@
 				22D430A71725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
 				22D430A91725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
 				22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
+				22B15CFC17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,
+				22B15CFE17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

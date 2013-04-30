@@ -12,11 +12,10 @@
 #import "EventsTableView.h"
 #import "UIExpandingTextView.h"
 
-@interface MainViewController : UIViewController<BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,UIScrollViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate> {
+@interface MainViewController : UIViewController<BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
-    IBOutlet UIView *_contentView;
     UIExpandingTextView *_message;
     IBOutlet UIView *_connectingView;
     IBOutlet UIProgressView *_connectingProgress;
@@ -25,7 +24,6 @@
     IBOutlet UIToolbar *_toolBar;
     UIBarButtonItem *_usersButtonItem;
     Buffer *_buffer;
-    int _startX;
     int _startHeight;
     User *_selectedUser;
     Event *_selectedEvent;

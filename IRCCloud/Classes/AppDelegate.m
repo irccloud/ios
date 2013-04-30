@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
+#import "ECSlidingViewController.h"
 
 @implementation AppDelegate
 
@@ -37,7 +38,13 @@
 -(void)showMainView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
-        self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            ECSlidingViewController *evc = [[ECSlidingViewController alloc] init];
+            evc.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+            self.window.rootViewController = evc;
+        } else {
+            self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+        }
     }];
 }
 

@@ -11,6 +11,7 @@
 #import "ServersDataSource.h"
 #import "UIColor+IRCCloud.h"
 #import "HighlightsCountView.h"
+#import "ECSlidingViewController.h"
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
@@ -111,6 +112,10 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    if(self.slidingViewController) {
+        topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y,self.view.frame.size.width, 40);
+        bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
+    }
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
     [self refresh];
@@ -256,12 +261,14 @@
     _data = data;
     [self.tableView reloadData];
     [self _updateUnreadIndicators];
-    if(_firstHighlightPosition != -1 && _firstHighlightPosition != _selectedRow)
-        self.parentViewController.navigationItem.leftBarButtonItem.tintColor = [UIColor redColor];
-    else if(_firstUnreadPosition != -1 && _firstUnreadPosition != _selectedRow)
-        self.parentViewController.navigationItem.leftBarButtonItem.tintColor = [UIColor selectedBlueColor];
-    else
-        self.parentViewController.navigationItem.leftBarButtonItem.tintColor = nil;
+    if(self.slidingViewController) {
+        if(_firstHighlightPosition != -1 && _firstHighlightPosition != _selectedRow)
+            _delegate.navigationItem.leftBarButtonItem.tintColor = [UIColor redColor];
+        else if(_firstUnreadPosition != -1 && _firstUnreadPosition != _selectedRow)
+            _delegate.navigationItem.leftBarButtonItem.tintColor = [UIColor selectedBlueColor];
+        else
+            _delegate.navigationItem.leftBarButtonItem.tintColor = nil;
+    }
 }
 
 -(void)_updateUnreadIndicators {
@@ -300,10 +307,48 @@
             bottomUnreadIndicatorColor.backgroundColor = [UIColor redColor];
         }
     }
+    if(self.slidingViewController) {
+        topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y,self.view.frame.size.width, 40);
+        bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
+    }
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    if(self.slidingViewController) {
+        _delegate = (UIViewController<BuffersTableViewDelegate> *)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        self.view.backgroundColor = [UIColor backgroundBlueColor];
+        
+        topUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,16)];
+        topUnreadIndicatorColor.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        topUnreadIndicatorColor.userInteractionEnabled = NO;
+        topUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+        
+        topUnreadIndicator = [[UIControl alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,40)];
+        topUnreadIndicator.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        topUnreadIndicator.autoresizesSubviews = YES;
+        topUnreadIndicator.userInteractionEnabled = YES;
+        topUnreadIndicator.backgroundColor = [UIColor clearColor];
+        [topUnreadIndicator addSubview: topUnreadIndicatorColor];
+        [topUnreadIndicator addTarget:self action:@selector(topUnreadIndicatorClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview: topUnreadIndicator];
+        
+        bottomUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,24,self.view.frame.size.width,16)];
+        bottomUnreadIndicatorColor.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        bottomUnreadIndicatorColor.userInteractionEnabled = NO;
+        bottomUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+        
+        bottomUnreadIndicator = [[UIControl alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,40)];
+        bottomUnreadIndicator.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+        bottomUnreadIndicator.autoresizesSubviews = YES;
+        bottomUnreadIndicator.userInteractionEnabled = YES;
+        bottomUnreadIndicator.backgroundColor = [UIColor clearColor];
+        [bottomUnreadIndicator addSubview: bottomUnreadIndicatorColor];
+        [bottomUnreadIndicator addTarget:self action:@selector(bottomUnreadIndicatorClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [self.view addSubview: bottomUnreadIndicator];
+    }
 }
 
 - (void)didReceiveMemoryWarning {

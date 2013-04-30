@@ -18,13 +18,13 @@
 @interface BuffersTableView : UITableViewController {
     NSArray *_data;
     int _selectedRow;
-    IBOutlet id<BuffersTableViewDelegate> _delegate;
+    IBOutlet UIViewController<BuffersTableViewDelegate> *_delegate;
     NSMutableDictionary *_expandedArchives;
     Buffer *_selectedBuffer;
     
-    IBOutlet UIView *topUnreadIndicator;
+    IBOutlet UIControl *topUnreadIndicator;
     IBOutlet UIView *topUnreadIndicatorColor;
-    IBOutlet UIView *bottomUnreadIndicator;
+    IBOutlet UIControl *bottomUnreadIndicator;
     IBOutlet UIView *bottomUnreadIndicatorColor;
 
     int _firstUnreadPosition;

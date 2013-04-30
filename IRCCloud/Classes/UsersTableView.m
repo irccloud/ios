@@ -10,6 +10,7 @@
 #import "NetworkConnection.h"
 #import "UsersDataSource.h"
 #import "UIColor+IRCCloud.h"
+#import "ECSlidingViewController.h"
 
 #define TYPE_HEADING 0
 #define TYPE_USER 1
@@ -50,8 +51,8 @@
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
-    frame.origin.x = 6;
-    frame.size.width -= 12;
+    frame.origin.x = 12;
+    frame.size.width -= 24;
     
     if(_type == TYPE_HEADING) {
         float countWidth = [_count.text sizeWithFont:_count.font].width;
@@ -75,8 +76,6 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _data = nil;
-        _buffer = nil;
     }
     return self;
 }
@@ -172,6 +171,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    if(self.slidingViewController) {
+        delegate = (id<UsersTableViewDelegate>)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        self.view.backgroundColor = [UIColor backgroundBlueColor];
+    }
 }
 
 - (void)didReceiveMemoryWarning {

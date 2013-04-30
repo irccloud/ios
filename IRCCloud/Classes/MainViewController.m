@@ -15,6 +15,7 @@
 #import "IgnoresTableViewController.h"
 #import "EditConnectionViewController.h"
 #import "UIColor+IRCCloud.h"
+#import "ECSlidingViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -70,16 +71,30 @@
     
     [_toolBar addSubview:_barButtonContainer];
     
-    [self addChildViewController:_buffersView];
+    if(_buffersView)
+        [self addChildViewController:_buffersView];
     [self addChildViewController:_eventsView];
-    [self addChildViewController:_usersView];
-    if(_contentView != nil) {
-        [(UIScrollView *)self.view addSubview:_contentView];
-    } else {
-        _contentView = self.view;
+    
+    if(_usersView)
+        [self addChildViewController:_usersView];
+    
+    if(self.slidingViewController) {
+        _buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
+        _usersView = [[UsersTableView alloc] initWithStyle:UITableViewStylePlain];
+        self.slidingViewController.underLeftViewController = _buffersView;
+        self.slidingViewController.underRightViewController = _usersView;
+        self.slidingViewController.anchorLeftRevealAmount = 240;
+        self.slidingViewController.anchorRightRevealAmount = 240;
+        self.slidingViewController.underLeftWidthLayout = ECFixedRevealWidth;
+        self.slidingViewController.underRightWidthLayout = ECFixedRevealWidth;
+
+        self.navigationController.view.layer.shadowOpacity = 0.75f;
+        self.navigationController.view.layer.shadowRadius = 10.0f;
+        self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
     }
+    
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        _startHeight = [UIScreen mainScreen].applicationFrame.size.height - self.navigationController.navigationBar.frame.size.height;
+        _startHeight = [UIScreen mainScreen].applicationFrame.size.height;
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(listButtonPressed:)];
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,212,35)];
         _message.maximumNumberOfLines = 8;
@@ -228,18 +243,19 @@
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     
-    CGRect frame = self.view.frame;
-    frame.size.height = _startHeight - keyboardSize.height;
-    self.view.frame = frame;
-     
+    if(self.slidingViewController) {
+        CGRect frame = self.slidingViewController.view.frame;
+        frame.size.height = _startHeight - keyboardSize.height;
+        self.slidingViewController.view.frame = frame;
+    } else {
+        CGRect frame = self.view.frame;
+        frame.size.height = _startHeight - keyboardSize.height;
+        self.view.frame = frame;
+    }
+    
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     
     [UIView commitAnimations];
-
-    if([self.view isKindOfClass:[UIScrollView class]]) {
-        UIScrollView *scrollView = (UIScrollView *)self.view;
-        scrollView.contentSize = CGSizeMake(_contentView.frame.size.width,frame.size.height);
-    }
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
@@ -250,27 +266,31 @@
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     
-    CGRect frame = self.view.frame;
-    frame.size.height = _startHeight;
-    self.view.frame = frame;
+    if(self.slidingViewController) {
+        CGRect frame = self.slidingViewController.view.frame;
+        frame.size.height = _startHeight;
+        self.slidingViewController.view.frame = frame;
+    } else {
+        CGRect frame = self.view.frame;
+        frame.size.height = _startHeight;
+        self.view.frame = frame;
+    }
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     [UIView commitAnimations];
-    
-    if([self.view isKindOfClass:[UIScrollView class]]) {
-        UIScrollView *scrollView = (UIScrollView *)self.view;
-        scrollView.contentSize = CGSizeMake(_contentView.frame.size.width,frame.size.height);
-    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [_message resignFirstResponder];
-    CGRect frame = self.view.frame;
-    frame.size.height = _startHeight;
-    self.view.frame = frame;
-    if([self.view isKindOfClass:[UIScrollView class]]) {
-        UIScrollView *scrollView = (UIScrollView *)self.view;
-        scrollView.contentSize = CGSizeMake(_contentView.frame.size.width,frame.size.height);
+    if(self.slidingViewController) {
+        [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
+        CGRect frame = self.navigationController.view.frame;
+        frame.size.height = _startHeight;
+        self.navigationController.view.frame = frame;
+    } else {
+        CGRect frame = self.view.frame;
+        frame.size.height = _startHeight;
+        self.view.frame = frame;
     }
+    [_message resignFirstResponder];
     [self connectivityChanged:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     
@@ -297,16 +317,15 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillBeHidden:)
                                                  name:UIKeyboardWillHideNotification object:nil];
-    if([self.view isKindOfClass:[UIScrollView class]]) {
-        ((UIScrollView *)self.view).contentSize = _contentView.bounds.size;
-        ((UIScrollView *)self.view).contentOffset = CGPointMake(_buffersView.view.frame.size.width, 0);
-    }
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if(([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected || [NetworkConnection sharedInstance].state == kIRCCloudStateDisconnecting) && session != nil && [session length] > 0)
         [[NetworkConnection sharedInstance] connect];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    if(self.slidingViewController) {
+        [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
+    }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_doubleTapTimer invalidate];
     _doubleTapTimer = nil;
@@ -357,22 +376,17 @@
     [_usersView setBuffer:_buffer];
     [_eventsView setBuffer:_buffer];
     [self _updateUserListVisibility];
+    if(self.slidingViewController)
+        [self.slidingViewController resetTopView];
 }
 
 -(void)_updateUserListVisibility {
     [[NSOperationQueue mainQueue]  addOperationWithBlock:^{
-    if([self.view isKindOfClass:[UIScrollView class]]) {
-        [((UIScrollView *)self.view) scrollRectToVisible:_eventsView.tableView.frame animated:YES];
+    if(self.slidingViewController) {
         if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
             self.navigationItem.rightBarButtonItem = _usersButtonItem;
-            CGSize size = ((UIScrollView *)self.view).contentSize;
-            size.width = [UIScreen mainScreen].bounds.size.width + _buffersView.view.bounds.size.width + _usersView.view.bounds.size.width;
-            ((UIScrollView *)self.view).contentSize = size;
         } else {
             self.navigationItem.rightBarButtonItem = nil;
-            CGSize size = ((UIScrollView *)self.view).contentSize;
-            size.width = [UIScreen mainScreen].bounds.size.width + _buffersView.view.bounds.size.width;
-            ((UIScrollView *)self.view).contentSize = size;
         }
     } else {
         if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
@@ -396,32 +410,12 @@
     }];
 }
 
-/*-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    _startX = scrollView.contentOffset.x;
+-(void)usersButtonPressed:(id)sender {
+    [self.slidingViewController anchorTopViewTo:ECLeft];
 }
 
--(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    if(!decelerate) {
-        [self scrollViewWillBeginDecelerating:scrollView];
-    }
-}*/
-
--(IBAction)usersButtonPressed:(id)sender {
-    UIScrollView *scrollView = (UIScrollView *)self.view;
-    if(scrollView.contentOffset.x == _eventsView.tableView.frame.origin.x || scrollView.contentOffset.x == _buffersView.tableView.frame.origin.x) {
-        [scrollView scrollRectToVisible:_usersView.tableView.frame animated:YES];
-    } else {
-        [scrollView scrollRectToVisible:_eventsView.tableView.frame animated:YES];
-    }
-}
-
--(IBAction)listButtonPressed:(id)sender {
-    UIScrollView *scrollView = (UIScrollView *)self.view;
-    if(scrollView.contentOffset.x == _buffersView.tableView.frame.origin.x) {
-        [scrollView scrollRectToVisible:_eventsView.tableView.frame animated:YES];
-    } else {
-        [scrollView scrollRectToVisible:_buffersView.tableView.frame animated:YES];
-    }
+-(void)listButtonPressed:(id)sender {
+    [self.slidingViewController anchorTopViewTo:ECRight];
 }
 
 -(IBAction)settingsButtonPressed:(id)sender {
@@ -459,33 +453,11 @@
     //[sheet addButtonWithTitle:@"Settings…"];
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-    [sheet showInView:self.view.superview];
+    if(self.slidingViewController)
+        [sheet showInView:self.slidingViewController.view.superview];
+    else
+        [sheet showInView:self.view.superview];
 }
-
-/*-(void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
-    int buffersDisplayWidth = _buffersView.tableView.bounds.size.width;
-    int usersDisplayWidth = _usersView.tableView.bounds.size.width;
-    
-    if(abs(_startX - scrollView.contentOffset.x) > buffersDisplayWidth / 4) { //If they've dragged a drawer more than 25% on screen, snap the drawer onto the screen
-        if(_startX < buffersDisplayWidth + usersDisplayWidth / 4 && scrollView.contentOffset.x < _startX) {
-            [scrollView setContentOffset:CGPointMake(0,0) animated:YES];
-            //TODO: set the buffer swipe tip flag
-        } else if(_startX >= buffersDisplayWidth && scrollView.contentOffset.x > _startX) {
-            [scrollView setContentOffset:CGPointMake(buffersDisplayWidth + usersDisplayWidth,0) animated:YES];
-            //TODO: set the buffer swipe tip flag
-        } else {
-            [scrollView setContentOffset:CGPointMake(buffersDisplayWidth,0) animated:YES];
-        }
-    } else { //Snap back
-        if(_startX < buffersDisplayWidth)
-            [scrollView setContentOffset:CGPointMake(0,0) animated:YES];
-        else if(_startX > buffersDisplayWidth + usersDisplayWidth / 4)
-            [scrollView setContentOffset:CGPointMake(buffersDisplayWidth + usersDisplayWidth,0) animated:YES];
-        else
-            [scrollView setContentOffset:CGPointMake(buffersDisplayWidth,0) animated:YES];
-    }
-    _startX = 0;
-}*/
 
 -(void)dismissKeyboard {
     [_message resignFirstResponder];
@@ -517,8 +489,8 @@
 
     //TODO: set the mention tip flag
     
-    if([self.view isKindOfClass:[UIScrollView class]]) {
-        ((UIScrollView *)self.view).contentOffset = CGPointMake(_buffersView.view.frame.size.width, 0);
+    if(self.slidingViewController) {
+        [self.slidingViewController resetTopView];
     }
     
     if(_message.text.length == 0) {
@@ -612,7 +584,7 @@
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-        [sheet showInView:self.view.superview];
+        [sheet showInView:self.slidingViewController.view.superview];
     } else {
         if(_selectedEvent)
             [sheet showFromRect:rect inView:_eventsView.tableView animated:NO];
