@@ -34,6 +34,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     _barButtonContainer = [[UIView alloc] initWithFrame:CGRectMake(0,0,_toolBar.frame.size.width, _toolBar.frame.size.height)];
+    _barButtonContainer.autoresizesSubviews = YES;
+    _barButtonContainer.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
     UIImage *buttonImage = [[UIImage imageNamed:@"UINavigationBarDefaultButton"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
     UIImage *pressedButtonImage = [[UIImage imageNamed:@"UINavigationBarDefaultButtonPressed"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
@@ -358,6 +360,7 @@
 }
 
 -(void)_updateUserListVisibility {
+    [[NSOperationQueue mainQueue]  addOperationWithBlock:^{
     if([self.view isKindOfClass:[UIScrollView class]]) {
         [((UIScrollView *)self.view) scrollRectToVisible:_eventsView.tableView.frame animated:YES];
         if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
@@ -390,6 +393,7 @@
             _usersView.view.hidden = YES;
         }
     }
+    }];
 }
 
 /*-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
