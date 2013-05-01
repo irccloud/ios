@@ -111,6 +111,54 @@
     [self bufferSelected:[BuffersDataSource sharedInstance].firstBid];
 }
 
+- (void)_updateUnreadIndicator {
+    int unreadCount = 0;
+    int highlightCount = 0;
+    NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+    
+    for(Server *server in [[ServersDataSource sharedInstance] getServers]) {
+        NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:server.cid];
+        for(Buffer *buffer in buffers) {
+            int type = -1;
+            int joined = 1;
+            if([buffer.type isEqualToString:@"channel"]) {
+                type = 1;
+                Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid];
+                if(!channel) {
+                    joined = 0;
+                }
+            } else if([buffer.type isEqualToString:@"conversation"]) {
+                type = 2;
+            }
+            if(joined > 0 && buffer.archived == 0) {
+                int unread = 0;
+                int highlights = 0;
+                unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                if(type == 1) {
+                    if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        unread = 0;
+                } else {
+                    if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        unread = 0;
+                    if(type == 2 && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        highlights = 0;
+                }
+                if(buffer.bid != _buffer.bid) {
+                    unreadCount += unread;
+                    highlightCount += highlights;
+                }
+            }
+        }
+    }
+    if(highlightCount)
+        self.navigationItem.leftBarButtonItem.tintColor = [UIColor redColor];
+    else if(unreadCount)
+        self.navigationItem.leftBarButtonItem.tintColor = [UIColor selectedBlueColor];
+    else
+        self.navigationItem.leftBarButtonItem.tintColor = nil;
+}
+
 - (void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     Buffer *b = nil;
@@ -172,6 +220,8 @@
         default:
             break;
     }
+    if(self.slidingViewController)
+        [self _updateUnreadIndicator];
 }
 
 -(void)_showConnectingView {
@@ -285,6 +335,7 @@
         CGRect frame = self.navigationController.view.frame;
         frame.size.height = _startHeight;
         self.navigationController.view.frame = frame;
+        [self _updateUnreadIndicator];
     } else {
         CGRect frame = self.view.frame;
         frame.size.height = _startHeight;
@@ -376,8 +427,10 @@
     [_usersView setBuffer:_buffer];
     [_eventsView setBuffer:_buffer];
     [self _updateUserListVisibility];
-    if(self.slidingViewController)
+    if(self.slidingViewController) {
         [self.slidingViewController resetTopView];
+        [self _updateUnreadIndicator];
+    }
 }
 
 -(void)_updateUserListVisibility {

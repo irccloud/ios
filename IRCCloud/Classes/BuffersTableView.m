@@ -261,14 +261,6 @@
     _data = data;
     [self.tableView reloadData];
     [self _updateUnreadIndicators];
-    if(self.slidingViewController) {
-        if(_firstHighlightPosition != -1 && _firstHighlightPosition != _selectedRow)
-            _delegate.navigationItem.leftBarButtonItem.tintColor = [UIColor redColor];
-        else if(_firstUnreadPosition != -1 && _firstUnreadPosition != _selectedRow)
-            _delegate.navigationItem.leftBarButtonItem.tintColor = [UIColor selectedBlueColor];
-        else
-            _delegate.navigationItem.leftBarButtonItem.tintColor = nil;
-    }
 }
 
 -(void)_updateUnreadIndicators {
