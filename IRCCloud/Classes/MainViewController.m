@@ -332,9 +332,9 @@
 - (void)viewWillAppear:(BOOL)animated {
     if(self.slidingViewController) {
         [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
-        CGRect frame = self.navigationController.view.frame;
+        CGRect frame = self.slidingViewController.view.frame;
         frame.size.height = _startHeight;
-        self.navigationController.view.frame = frame;
+        self.slidingViewController.view.frame = frame;
         [self _updateUnreadIndicator];
     } else {
         CGRect frame = self.view.frame;
