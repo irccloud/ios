@@ -51,7 +51,12 @@
 - (void)applicationWillResignActive:(UIApplication *)application {
     [_disconnectTimer invalidate];
     _disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:[NetworkConnection sharedInstance] selector:@selector(disconnect) userInfo:nil repeats:NO];
-    [self.window.rootViewController viewWillDisappear:NO];
+    if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
+        ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
+        [evc.topViewController viewWillDisappear:NO];
+    } else {
+        [self.window.rootViewController viewWillDisappear:NO];
+    }
     __block UIBackgroundTaskIdentifier background_task;
     background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
         [_disconnectTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
@@ -78,7 +83,12 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     [_disconnectTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
     _disconnectTimer = nil;
-    [self.window.rootViewController viewWillAppear:YES];
+    if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
+        ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
+        [evc.topViewController viewWillAppear:NO];
+    } else {
+        [self.window.rootViewController viewWillAppear:NO];
+    }
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
