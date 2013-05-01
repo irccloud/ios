@@ -326,7 +326,7 @@
                 
                 next = [i nextObject];
                 
-                if(output.length > 0 && e.type < kCollapsedEventNickChange && ((next == nil || next.type != e.type) && last != nil && last.type == e.type)) {
+                if(message.length > 0 && e.type < kCollapsedEventNickChange && ((next == nil || next.type != e.type) && last != nil && last.type == e.type)) {
 					if(groupcount == 1) {
                         [message deleteCharactersInRange:NSMakeRange(message.length - 2, 2)];
                         [message appendString:@" "];
