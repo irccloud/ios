@@ -97,6 +97,20 @@
 
 @implementation BuffersTableView
 
+- (id)initWithStyle:(UITableViewStyle)style {
+    self = [super initWithStyle:style];
+    if (self) {
+        _data = nil;
+        _selectedRow = -1;
+        _expandedArchives = [[NSMutableDictionary alloc] init];
+        _firstHighlightPosition = -1;
+        _firstUnreadPosition = -1;
+        _lastHighlightPosition = -1;
+        _lastUnreadPosition = -1;
+    }
+    return self;
+}
+
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
