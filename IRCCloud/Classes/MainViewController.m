@@ -336,6 +336,7 @@
         frame.size.height = _startHeight;
         self.slidingViewController.view.frame = frame;
         [self _updateUnreadIndicator];
+        [self.slidingViewController resetTopView];
     } else {
         CGRect frame = self.view.frame;
         frame.size.height = _startHeight;
