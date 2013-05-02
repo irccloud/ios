@@ -115,6 +115,15 @@
     }
 }
 
+-(void)updateAway:(int)away nick:(NSString *)nick cid:(int)cid bid:(int)bid {
+    @synchronized(_users) {
+        User *user = [self getUser:nick cid:cid bid:bid];
+        if(user) {
+            user.away = away;
+        }
+    }
+}
+
 -(void)updateHostmask:(NSString *)hostmask nick:(NSString *)nick cid:(int)cid bid:(int)bid {
     @synchronized(_users) {
         User *user = [self getUser:nick cid:cid bid:bid];

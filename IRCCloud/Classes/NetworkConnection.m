@@ -705,7 +705,16 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
                 [self postObject:object forEvent:kIRCEventUserChannelMode];
             }
         } else if([object.type isEqualToString:@"member_updates"]) {
-            TFLog(@"TODO: member_updates: %@", object);
+            NSDictionary *updates = [object objectForKey:@"updates"];
+            NSEnumerator *keys = updates.keyEnumerator;
+            NSString *nick;
+            while((nick = (NSString *)(keys.nextObject))) {
+                NSDictionary *update = [updates objectForKey:nick];
+                [_users updateAway:[[update objectForKey:@"away"] intValue] nick:nick cid:object.cid bid:object.bid];
+                [_users updateHostmask:[update objectForKey:@"usermask"] nick:nick cid:object.cid bid:object.bid];
+            }
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventMemberUpdates];
         } else if([object.type isEqualToString:@"user_away"] || [object.type isEqualToString:@"away"]) {
             [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             [_buffers updateAway:[object objectForKey:@"msg"] buffer:object.bid];
