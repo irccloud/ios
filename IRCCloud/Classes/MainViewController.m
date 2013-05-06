@@ -107,9 +107,12 @@
     _message.returnKeyType = UIReturnKeySend;
     [_toolBar addSubview:_message];
     _usersButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"users"] style:UIBarButtonItemStylePlain target:self action:@selector(usersButtonPressed:)];
-    //TODO: resize if the keyboard is visible
-    //TODO: check the user info for the last BID
-    [self bufferSelected:[BuffersDataSource sharedInstance].firstBid];
+    int bid = [BuffersDataSource sharedInstance].firstBid;
+    if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
+        if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+            bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
+    }
+    [self bufferSelected:bid];
 }
 
 - (void)_updateUnreadIndicator {
@@ -322,8 +325,12 @@
 -(void)backlogCompleted:(NSNotification *)notification {
     [self _hideConnectingView];
     if(!_buffer) {
-        //TODO: check the user info for the last BID
-        [self bufferSelected:[BuffersDataSource sharedInstance].firstBid];
+        int bid = [BuffersDataSource sharedInstance].firstBid;
+        if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
+            if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+                bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
+        }
+        [self bufferSelected:bid];
     }
 }
 
