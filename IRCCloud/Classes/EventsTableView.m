@@ -166,7 +166,8 @@ int __timestampWidth;
 }
 
 - (void)handleEvent:(NSNotification *)notification {
-    IRCCloudJSONObject *e;
+    IRCCloudJSONObject *o;
+    Event *e;
     Buffer *b;
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     switch(event) {
@@ -187,15 +188,44 @@ int __timestampWidth;
         case kIRCEventSelfDetails:
         case kIRCEventUserMode:
         case kIRCEventUserChannelMode:
-            e = notification.object;
-            if(e.bid == _buffer.bid) {
-                Event *event = [[EventsDataSource sharedInstance] event:e.eid buffer:e.bid];
-                [self insertEvent:event backlog:NO nextIsGrouped:NO];
+            o = notification.object;
+            if(o.bid == _buffer.bid) {
+                e = [[EventsDataSource sharedInstance] event:o.eid buffer:o.bid];
+                [self insertEvent:e backlog:NO nextIsGrouped:NO];
             }
             break;
         case kIRCEventBufferMsg:
-            if(((Event *)notification.object).bid == _buffer.bid) {
-                //TODO: clear pending events
+            e = notification.object;
+            if(e.bid == _buffer.bid) {
+                if(((e.from && [[e.from lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) || (e.nick && [[e.nick lowercaseString] isEqualToString:[_buffer.name lowercaseString]])) && e.reqId == -1) {
+                    [_lock lock];
+                    for(int i = 0; i < _data.count; i++) {
+                        e = [_data objectAtIndex:i];
+                        if(e.pending) {
+                            [_data removeObject:e];
+                            i--;
+                        }
+                    }
+                    [_lock unlock];
+                } else if(e.reqId != -1) {
+                    int reqid = e.reqId;
+                    [_lock lock];
+                    for(int i = 0; i < _data.count; i++) {
+                        e = [_data objectAtIndex:i];
+                        if(e.reqId == reqid && e.pending) {
+                            if(i>1) {
+                                Event *p = [_data objectAtIndex:i-1];
+                                if(p.rowType == ROW_TIMESTAMP) {
+                                    [_data removeObject:p];
+                                    i--;
+                                }
+                            }
+                            [_data removeObject:e];
+                            i--;
+                        }
+                    }
+                    [_lock unlock];
+                }
                 [self insertEvent:notification.object backlog:NO nextIsGrouped:NO];
             }
             break;
@@ -339,6 +369,7 @@ int __timestampWidth;
                 _newHighlights++;
             [self updateUnread];
         }
+        [self scrollViewDidScroll:self.tableView];
     }
 }
 

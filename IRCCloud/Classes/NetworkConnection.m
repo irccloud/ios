@@ -176,7 +176,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     @synchronized(_writer) {
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:args];
         [dict setObject:method forKey:@"_method"];
-        [dict setObject:@(_lastReqId++) forKey:@"_reqid"];
+        [dict setObject:@(++_lastReqId) forKey:@"_reqid"];
         [_socket sendText:[_writer stringWithObject:dict]];
         return _lastReqId;
     }
@@ -778,6 +778,11 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             }
         }
     } else {
+        if([object objectForKey:@"success"] && ![[object objectForKey:@"success"] boolValue] && [object objectForKey:@"message"]) {
+            [self postObject:object forEvent:kIRCEventFailureMsg];
+        } else if([object objectForKey:@"success"]) {
+            [self postObject:object forEvent:kIRCEventSuccess];
+        }
         TFLog(@"Repsonse: %@", object);
     }
     if(_idleInterval > 0)

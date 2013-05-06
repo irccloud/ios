@@ -28,6 +28,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         _cidToOpen = -1;
+        _pendingEvents = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -164,6 +165,7 @@
     Buffer *b = nil;
     IRCCloudJSONObject *o = nil;
     BansTableViewController *btv = nil;
+    Event *e = nil;
     switch(event) {
         case kIRCEventBanList:
             o = notification.object;
@@ -217,6 +219,43 @@
         case kIRCEventPart:
             [self _updateUserListVisibility];
             break;
+        case kIRCEventFailureMsg:
+            o = notification.object;
+            if([o objectForKey:@"_reqid"]) {
+                int reqid = [[o objectForKey:@"_reqid"] intValue];
+                for(Event *e in _pendingEvents) {
+                    if(e.reqId == reqid) {
+                        [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                        [_pendingEvents removeObject:e];
+                        e.msg = [e.msg stringByAppendingFormat:@" %c4(FAILED)%c", COLOR_MIRC, CLEAR];
+                        e.formattedMsg = nil;
+                        e.formatted = nil;
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
+                        }];
+                        break;
+                    }
+                }
+            }
+            break;
+        case kIRCEventBufferMsg:
+            e = notification.object;
+            if([[e.from lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
+                for(Event *e in _pendingEvents) {
+                    [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                }
+                [_pendingEvents removeAllObjects];
+            } else {
+                int reqid = e.reqId;
+                for(Event *e in _pendingEvents) {
+                    if(e.reqId == reqid) {
+                        [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                        [_pendingEvents removeObject:e];
+                        break;
+                    }
+                }
+            }
+            break;
         default:
             break;
     }
@@ -260,6 +299,10 @@
             [self _showConnectingView];
         case kIRCCloudStateConnected:
             [_connectingActivity stopAnimating];
+            for(Event *e in _pendingEvents) {
+                [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+            }
+            [_pendingEvents removeAllObjects];
             break;
     }
 }
@@ -389,8 +432,53 @@
 }
 
 -(IBAction)sendButtonPressed:(id)sender {
-    [[NetworkConnection sharedInstance] say:_message.text to:_buffer.name cid:_buffer.cid];
-    _message.text = @"";
+    if([NetworkConnection sharedInstance].state == kIRCCloudStateConnected && _message.text && _message.text.length) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+        if(s) {
+            User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
+            Event *e = [[Event alloc] init];
+            e.cid = s.cid;
+            e.bid = _buffer.bid;
+            e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset + 0.5) * 1000000;
+            e.isSelf = YES;
+            e.from = s.nick;
+            e.nick = s.nick;
+            if(u)
+                e.fromMode = u.mode;
+            NSString *msg = _message.text;
+            if([msg hasPrefix:@"//"])
+                msg = [msg substringFromIndex:1];
+            else if([msg hasPrefix:@"/"] && ![[msg lowercaseString] hasPrefix:@"/me "])
+                msg = nil;
+            e.msg = msg;
+            if(msg && [[msg lowercaseString] hasPrefix:@"/me "]) {
+                e.type = @"buffer_me_msg";
+                e.msg = [msg substringFromIndex:4];
+            } else {
+                e.type = @"buffer_msg";
+            }
+            e.color = [UIColor timestampColor];
+            if([_buffer.name isEqualToString:s.nick])
+                e.bgColor = [UIColor whiteColor];
+            else
+                e.bgColor = [UIColor selfBackgroundColor];
+            e.rowType = 0;
+            e.formatted = nil;
+            e.formattedMsg = nil;
+            e.groupMsg = nil;
+            e.linkify = YES;
+            e.targetMode = nil;
+            e.isHighlight = NO;
+            e.reqId = -1;
+            e.pending = YES;
+            [[EventsDataSource sharedInstance] addEvent:e];
+            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
+            e.reqId = [[NetworkConnection sharedInstance] say:_message.text to:_buffer.name cid:_buffer.cid];
+            if(e.msg)
+                [_pendingEvents addObject:e];
+            _message.text = @"";
+        }
+    }
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {

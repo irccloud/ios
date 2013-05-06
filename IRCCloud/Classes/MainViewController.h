@@ -32,6 +32,7 @@
     NSString *_bufferToOpen;
     UIView *_barButtonContainer;
     NSTimer *_doubleTapTimer;
+    NSMutableArray *_pendingEvents;
 }
 -(IBAction)sendButtonPressed:(id)sender;
 -(IBAction)usersButtonPressed:(id)sender;
