@@ -570,6 +570,7 @@
 }
 
 -(IBAction)settingsButtonPressed:(id)sender {
+    User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     if([_buffer.type isEqualToString:@"console"]) {
         //[sheet addButtonWithTitle:@"Edit Connection…"];
@@ -585,7 +586,9 @@
     } else if([_buffer.type isEqualToString:@"channel"]) {
         if([[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             [sheet addButtonWithTitle:@"Leave"];
-            [sheet addButtonWithTitle:@"Ban List…"];
+            if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
+                [sheet addButtonWithTitle:@"Ban List…"];
+            }
         } else {
             [sheet addButtonWithTitle:@"Rejoin"];
             [sheet addButtonWithTitle:(_buffer.archived)?@"Unarchive":@"Archive"];
