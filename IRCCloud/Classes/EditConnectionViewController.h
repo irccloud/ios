@@ -8,7 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface EditConnectionViewController : UITableViewController<UITextFieldDelegate> {
+@protocol NetworkListDelegate <NSObject>
+-(void)setNetwork:(NSString *)network host:(NSString *)host port:(int)port SSL:(BOOL)SSL;
+@end
+
+@interface EditConnectionViewController : UITableViewController<UITextFieldDelegate,NetworkListDelegate> {
     UITextField *_server;
     UITextField *_port;
     UISwitch *_ssl;

@@ -577,7 +577,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventRenameConversation];
         } else if([object.type isEqualToString:@"status_changed"]) {
-            [_servers updateStatus:[object objectForKey:@"status"] failInfo:[object objectForKey:@"fail_info"] server:object.cid];
+            [_servers updateStatus:[object objectForKey:@"new_status"] failInfo:[object objectForKey:@"fail_info"] server:object.cid];
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventStatusChanged];
         } else if([object.type isEqualToString:@"buffer_msg"] || [object.type isEqualToString:@"buffer_me_msg"] || [object.type isEqualToString:@"server_motdstart"] || [object.type isEqualToString:@"wait"] || [object.type isEqualToString:@"banned"] || [object.type isEqualToString:@"kill"] || [object.type isEqualToString:@"connecting_cancelled"] || [object.type isEqualToString:@"target_callerid"]

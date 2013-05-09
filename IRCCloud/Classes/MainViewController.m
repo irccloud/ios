@@ -573,8 +573,8 @@
     User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     if([_buffer.type isEqualToString:@"console"]) {
-        //[sheet addButtonWithTitle:@"Edit Connection…"];
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+        NSLog(@"Status: %@", s.status);
         if([s.status isEqualToString:@"disconnected"]) {
             [sheet addButtonWithTitle:@"Reconnect"];
             [sheet addButtonWithTitle:@"Delete"];

@@ -12,11 +12,13 @@
 #import "UIColor+IRCCloud.h"
 #import "HighlightsCountView.h"
 #import "ECSlidingViewController.h"
+#import "EditConnectionViewController.h"
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
 #define TYPE_CONVERSATION 2
 #define TYPE_ARCHIVES_HEADER 3
+#define TYPE_ADD_NETWORK 4
 
 @interface BuffersTableCell : UITableViewCell {
     UILabel *_label;
@@ -70,9 +72,9 @@
 	
 	CGRect frame = [self.contentView bounds];
     frame.size.width -= 6;
-    if(_type == TYPE_SERVER) {
+    if(_type == TYPE_SERVER || _type == TYPE_ADD_NETWORK) {
         frame.origin.y += 6;
-        frame.size.height -= 6;
+        frame.size.height -= (_type == TYPE_ADD_NETWORK)?12:6;
     }
     _bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
     _unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
@@ -153,6 +155,7 @@
     NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     
     for(Server *server in [[ServersDataSource sharedInstance] getServers]) {
+        archiveCount = 0;
         NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:server.cid];
         for(Buffer *buffer in buffers) {
             if([buffer.type isEqualToString:@"console"]) {
@@ -241,7 +244,7 @@
                 if(buffer.bid == _selectedBuffer.bid)
                     _selectedRow = data.count - 1;
             }
-            if(buffer.archived > 0)
+            if(type > 0 && buffer.archived > 0)
                 archiveCount++;
         }
         if(archiveCount > 0) {
@@ -272,6 +275,16 @@
             }
         }
     }
+    [data addObject:@{
+     @"type":@TYPE_ADD_NETWORK,
+     @"cid":@-1,
+     @"bid":@-1,
+     @"name":@"Add a Network…",
+     @"unread":@0,
+     @"highlights":@0,
+     @"archived":@0,
+     }];
+
     _data = data;
     [self.tableView reloadData];
     [self _updateUnreadIndicators];
@@ -375,6 +388,8 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER) {
         return 46;
+    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
+        return 52;
     } else {
         return 40;
     }
@@ -456,6 +471,12 @@
                 cell.bg.backgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
             }
             break;
+        case TYPE_ADD_NETWORK:
+            cell.icon.image = [UIImage imageNamed:@"add"];
+            cell.icon.hidden = NO;
+            cell.label.textColor = [UIColor selectedBlueColor];
+            cell.bg.backgroundColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
+            break;
     }
     return cell;
 }
@@ -513,6 +534,16 @@
         else
             [_expandedArchives setObject:@YES forKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
         [self refresh];
+    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
+        EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            [self.slidingViewController resetTopView];
+            [(UINavigationController *)(self.slidingViewController.topViewController) pushViewController:ecv animated:YES];
+        } else {
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:nc animated:YES completion:nil];
+        }
     } else {
         _selectedRow = indexPath.row;
         if(_delegate)
