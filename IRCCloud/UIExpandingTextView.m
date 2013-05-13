@@ -138,9 +138,9 @@
     CGRect backgroundFrame   = aframe;
     backgroundFrame.origin.y = 0;
     backgroundFrame.origin.x = 0;
+    backgroundFrame.size.height  -= 8;
     CGRect textViewFrame = CGRectInset(backgroundFrame, kTextInsetX, 0);
 	internalTextView.frame   = textViewFrame;
-    backgroundFrame.size.height  -= 8;
     textViewBackgroundImage.frame = backgroundFrame;
     forceSizeUpdate = YES;
 	[super setFrame:aframe];
@@ -238,8 +238,8 @@
 			self.frame = r;
 			r.origin.y = 0;
 			r.origin.x = 0;
-            internalTextView.frame = CGRectInset(r, kTextInsetX, 0);
             r.size.height -= 8;
+            internalTextView.frame = CGRectInset(r, kTextInsetX, 0);
             textViewBackgroundImage.frame = r;
             
 			if(animateHeightChange)
