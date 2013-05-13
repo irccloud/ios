@@ -335,7 +335,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         url = [url stringByAppendingFormat:@"?since_id=%.0lf", _events.highestEid];
     TFLog(@"Connecting: %@", url);
     _state = kIRCCloudStateConnecting;
-    [self _postConnectivityChange];
+    [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     _reconnectTimestamp = 0;
     WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:nil protocols:nil
                                                                      tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: [NSNull null],
@@ -353,7 +353,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _reconnectTimestamp = 0;
     [self cancelIdleTimer];
     _state = kIRCCloudStateDisconnecting;
-    [self _postConnectivityChange];
+    [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     [_socket close];
 }
 
@@ -374,40 +374,46 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     [self parse:dict backlog:YES];
 }
 
--(void)didOpen {
-    TFLog(@"Socket connected");
-    _state = kIRCCloudStateConnected;
-    [self _postConnectivityChange];
+-(void)webSocketDidOpen:(WebSocket *)socket {
+    if(socket == _socket) {
+        TFLog(@"Socket connected");
+        _state = kIRCCloudStateConnected;
+        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+    }
 }
 
--(void)didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+-(void)webSocket:(WebSocket *)socket didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError {
+    if(socket == _socket) {
         TFLog(@"Status Code: %i", aStatusCode);
         TFLog(@"Close Message: %@", aMessage);
         TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
-        [self _postConnectivityChange];
-    }];
-}
-
--(void)didReceiveError: (NSError*) aError {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
-        _state = kIRCCloudStateDisconnected;
-        [self scheduleIdleTimer];
-        [self _postConnectivityChange];
-    }];
-}
-
--(void)didReceiveTextMessage:(NSString*)aMessage {
-    if(aMessage) {
-        [_parser parse:[aMessage dataUsingEncoding:NSUTF8StringEncoding]];
+        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }
 }
 
-- (void) didReceiveBinaryMessage: (NSData*) aMessage {
-    if(aMessage) {
-        [_parser parse:aMessage];
+-(void)webSocket:(WebSocket *)socket didReceiveError: (NSError*) aError {
+    if(socket == _socket) {
+        TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
+        _state = kIRCCloudStateDisconnected;
+        [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
+        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+    }
+}
+
+-(void)webSocket:(WebSocket *)socket didReceiveTextMessage:(NSString*)aMessage {
+    if(socket == _socket) {
+        if(aMessage) {
+            [_parser parse:[aMessage dataUsingEncoding:NSUTF8StringEncoding]];
+        }
+    }
+}
+
+- (void)webSocket:(WebSocket *)socket didReceiveBinaryMessage: (NSData*) aMessage {
+    if(socket == _socket) {
+        if(aMessage) {
+            [_parser parse:aMessage];
+        }
     }
 }
 
@@ -423,9 +429,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 }
 
 -(void)_postConnectivityChange {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:nil userInfo:nil];
-    }];
+    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudConnectivityNotification object:nil userInfo:nil];
 }
 
 -(NSDictionary *)prefs {

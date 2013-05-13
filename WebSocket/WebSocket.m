@@ -884,7 +884,7 @@ WebSocketWaitingState waitingState;
 #pragma mark Web Socket Delegate
 - (void)dispatchFailure:(NSError *)aError {
     if (delegate) {
-        [delegate didReceiveError:aError];
+        [delegate webSocket:self didReceiveError:aError];
        /* if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
                 NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -901,7 +901,7 @@ WebSocketWaitingState waitingState;
 - (void)dispatchClosed:(NSUInteger)aStatusCode message:(NSString *)aMessage error:(NSError *)aError {
     [self stopPingTimer];
     if (delegate) {
-        [delegate didClose:aStatusCode message:aMessage error:aError];
+        [delegate webSocket:self didClose:aStatusCode message:aMessage error:aError];
         /*if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
                 NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -917,7 +917,7 @@ WebSocketWaitingState waitingState;
 
 - (void)dispatchOpened {
     if (delegate) {
-        [delegate didOpen];
+        [delegate webSocketDidOpen:self];
         /*if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
                 NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -934,7 +934,7 @@ WebSocketWaitingState waitingState;
 
 - (void)dispatchTextMessageReceived:(NSString *)aMessage {
     if (delegate) {
-        [delegate didReceiveTextMessage:aMessage];
+        [delegate webSocket:self didReceiveTextMessage:aMessage];
         /*if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
                 NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -950,7 +950,7 @@ WebSocketWaitingState waitingState;
 
 - (void)dispatchBinaryMessageReceived:(NSData *)aMessage {
     if (delegate) {
-        [delegate didReceiveBinaryMessage:aMessage];
+        [delegate webSocket:self didReceiveBinaryMessage:aMessage];
         /*if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
                 NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];

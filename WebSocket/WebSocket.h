@@ -76,34 +76,35 @@ enum
 };
 typedef NSUInteger WebSocketReadyState;
 
+@class WebSocket;
 
 @protocol WebSocketDelegate <NSObject>
 
 /**
  * Called when the web socket connects and is ready for reading and writing.
  **/
-- (void) didOpen;
+- (void) webSocketDidOpen:(WebSocket *)socket;
 
 /**
  * Called when the web socket closes. aError will be nil if it closes cleanly.
  **/
-- (void) didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError;
+- (void) webSocket:(WebSocket *)socket didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError;
 
 /**
  * Called when the web socket receives an error. Such an error can result in the
  socket being closed.
  **/
-- (void) didReceiveError:(NSError*) aError;
+- (void) webSocket:(WebSocket *)socket didReceiveError:(NSError*) aError;
 
 /**
  * Called when the web socket receives a message.
  **/
-- (void) didReceiveTextMessage:(NSString*) aMessage;
+- (void) webSocket:(WebSocket *)socket didReceiveTextMessage:(NSString*) aMessage;
 
 /**
  * Called when the web socket receives a message.
  **/
-- (void) didReceiveBinaryMessage:(NSData*) aMessage;
+- (void) webSocket:(WebSocket *)socket didReceiveBinaryMessage:(NSData*) aMessage;
 
 @optional
 /**
