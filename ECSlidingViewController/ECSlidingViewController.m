@@ -269,12 +269,13 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
       [self topViewHorizontalCenterDidChange:newCenterPosition];
     }
   } else if (recognizer.state == UIGestureRecognizerStateEnded || recognizer.state == UIGestureRecognizerStateCancelled) {
+    CGFloat panAmount            = abs(self.initialTouchPositionX - currentTouchPositionX);
     CGPoint currentVelocityPoint = [recognizer velocityInView:self.view];
     CGFloat currentVelocityX     = currentVelocityPoint.x;
     
-    if ([self underLeftShowing] && currentVelocityX > 100) {
+    if ([self underLeftShowing] && (currentVelocityX > 50 || (currentVelocityX == 0 && panAmount >= anchorRightRevealAmount/6.0f))) {
       [self anchorTopViewTo:ECRight];
-    } else if ([self underRightShowing] && currentVelocityX < 100) {
+    } else if ([self underRightShowing] && (currentVelocityX < -50 || (currentVelocityX == 0 && panAmount >= anchorLeftRevealAmount/6.0f))) {
       [self anchorTopViewTo:ECLeft];
     } else {
       [self resetTopView];
