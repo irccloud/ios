@@ -82,6 +82,7 @@
     if(self.slidingViewController) {
         _buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
         _usersView = [[UsersTableView alloc] initWithStyle:UITableViewStylePlain];
+        self.slidingViewController.shouldAllowPanningPastAnchor = NO;
         self.slidingViewController.underLeftViewController = _buffersView;
         self.slidingViewController.underRightViewController = _usersView;
         self.slidingViewController.anchorLeftRevealAmount = 240;

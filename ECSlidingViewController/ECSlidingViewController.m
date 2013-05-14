@@ -272,12 +272,10 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     CGFloat panAmount            = currentTouchPositionX - self.initialTouchPositionX;
     CGPoint currentVelocityPoint = [recognizer velocityInView:self.view];
     CGFloat currentVelocityX     = currentVelocityPoint.x;
-    if((panAmount > 0 && currentVelocityX < 0) || (panAmount < 0 && currentVelocityX > 0))
-        currentVelocityX *= -1;
         
-    if ([self underLeftShowing] && (currentVelocityX > 50 || panAmount >= anchorLeftRevealAmount/6.0f)) {
+    if ([self underLeftShowing] && (currentVelocityX > 50 || (currentVelocityX >= 0 && panAmount >= anchorRightRevealAmount/6.0f))) {
       [self anchorTopViewTo:ECRight];
-    } else if ([self underRightShowing] && (currentVelocityX < -50 || panAmount <= -anchorRightRevealAmount/6.0)) {
+    } else if ([self underRightShowing] && (currentVelocityX < -50 || (currentVelocityX <= 0 && panAmount <= -anchorLeftRevealAmount/6.0))) {
       [self anchorTopViewTo:ECLeft];
     } else {
       [self resetTopView];
