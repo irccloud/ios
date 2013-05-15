@@ -896,6 +896,9 @@
         } else if([action isEqualToString:@"Reconnect"]) {
             [[NetworkConnection sharedInstance] reconnect:_buffer.cid];
         } else if([action isEqualToString:@"Logout"]) {
+            [[NetworkConnection sharedInstance] unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]];
+            //TODO: check the above result, and retry if it fails
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
             [[NSUserDefaults standardUserDefaults] synchronize];
             [[NetworkConnection sharedInstance] disconnect];

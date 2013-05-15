@@ -172,6 +172,62 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     return [[[SBJsonParser alloc] init] objectWithData:data];
 }
 
+//From: http://stackoverflow.com/questions/1305225/best-way-to-serialize-a-nsdata-into-an-hexadeximal-string
+-(NSString *)dataToHex:(NSData *)data {
+    /* Returns hexadecimal string of NSData. Empty string if data is empty.   */
+    
+    const unsigned char *dataBuffer = (const unsigned char *)[data bytes];
+    
+    if (!dataBuffer)
+        return [NSString string];
+    
+    NSUInteger          dataLength  = [data length];
+    NSMutableString     *hexString  = [NSMutableString stringWithCapacity:(dataLength * 2)];
+    
+    for (int i = 0; i < dataLength; ++i)
+        [hexString appendString:[NSString stringWithFormat:@"%02x", (unsigned int)dataBuffer[i]]];
+    
+    return [NSString stringWithString:hexString];
+}
+
+-(NSDictionary *)registerAPNs:(NSData *)token {
+	NSData *data;
+	NSURLResponse *response = nil;
+	NSError *error = nil;
+    NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], [[NSUserDefaults standardUserDefaults] stringForKey:@"session"]];
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-register", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    
+    return [[[SBJsonParser alloc] init] objectWithData:data];
+}
+
+-(NSDictionary *)unregisterAPNs:(NSData *)token {
+	NSData *data;
+	NSURLResponse *response = nil;
+	NSError *error = nil;
+    NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], [[NSUserDefaults standardUserDefaults] stringForKey:@"session"]];
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-unregister", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    
+    return [[[SBJsonParser alloc] init] objectWithData:data];
+}
+
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args {
     @synchronized(_writer) {
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:args];

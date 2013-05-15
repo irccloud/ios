@@ -28,6 +28,7 @@
 -(void)viewWillAppear:(BOOL)animated {
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if(session != nil && [session length] > 0) {
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
         if(_conn.state == kIRCCloudStateDisconnected) {
             loginView.alpha = 0;
             loadingView.alpha = 1;
@@ -152,6 +153,7 @@
         if([[result objectForKey:@"success"] intValue] == 1) {
             [[NSUserDefaults standardUserDefaults] setObject:[result objectForKey:@"session"] forKey:@"session"];
             [[NSUserDefaults standardUserDefaults] synchronize];
+            [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
             [status setText:@"Connecting"];
             [_conn connect];
         } else {

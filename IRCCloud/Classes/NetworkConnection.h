@@ -145,4 +145,6 @@ typedef enum {
 -(int)back:(int)cid;
 -(int)disconnect:(int)cid msg:(NSString *)msg;
 -(int)reconnect:(int)cid;
+-(NSDictionary *)registerAPNs:(NSData *)token;
+-(NSDictionary *)unregisterAPNs:(NSData *)token;
 @end

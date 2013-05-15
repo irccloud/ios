@@ -28,6 +28,18 @@
     return YES;
 }
 
+- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
+    [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSDictionary *result = [[NetworkConnection sharedInstance] registerAPNs:devToken];
+        NSLog(@"Registration result: %@", result);
+    });
+}
+
+- (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)err {
+    TFLog(@"Error in APNs registration. Error: %@", err);
+}
+
 -(void)showLoginView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
