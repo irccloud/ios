@@ -1,0 +1,10 @@
+/* 
+  Localizable.strings
+  IRCCloud
+
+  Created by Sam Steele on 5/15/13.
+  Copyright (c) 2013 IRCCloud, Ltd. All rights reserved.
+*/
+
+"NOTIFICATION_ACTION_BUFFER_MSG" = "View Message"
+"NOTIFICATION_BUFFER_MSG" = "<%@> %@";
