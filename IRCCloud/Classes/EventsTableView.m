@@ -151,7 +151,7 @@ int __timestampWidth;
 }
 
 - (void)_sendHeartbeat {
-    NSTimeInterval eid = [[_data lastObject] eid];
+    NSTimeInterval eid = [[[[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] lastObject] eid];
     if(eid > _buffer.last_seen_eid) {
         [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
         _buffer.last_seen_eid = eid;
@@ -331,8 +331,11 @@ int __timestampWidth;
     }
     
     if(event.from.length && event.hostmask.length && ![type isEqualToString:@"user_channel_mode"] && [type rangeOfString:@"kicked"].location == NSNotFound) {
-        if([_ignore match:[NSString stringWithFormat:@"%@!%@", event.from, event.hostmask]])
+        if([_ignore match:[NSString stringWithFormat:@"%@!%@", event.from, event.hostmask]]) {
+            if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0)
+                [self sendHeartbeat];
             return;
+        }
     }
     
     if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
