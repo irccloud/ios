@@ -479,6 +479,7 @@
             e.isHighlight = NO;
             e.reqId = -1;
             e.pending = YES;
+            [_eventsView scrollToBottom];
             [[EventsDataSource sharedInstance] addEvent:e];
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
             e.reqId = [[NetworkConnection sharedInstance] say:_message.text to:_buffer.name cid:_buffer.cid];
