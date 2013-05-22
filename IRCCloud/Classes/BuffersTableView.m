@@ -27,12 +27,14 @@
     UIView *_unreadIndicator;
     UIView *_bg;
     HighlightsCountView *_highlights;
+    UIActivityIndicatorView *_activity;
 }
 @property int type;
 @property (readonly) UILabel *label;
 @property (readonly) UIImageView *icon;
 @property (readonly) UIView *unreadIndicator, *bg;
 @property (readonly) HighlightsCountView *highlights;
+@property (readonly) UIActivityIndicatorView *activity;
 @end
 
 @implementation BuffersTableCell
@@ -63,6 +65,10 @@
         
         _highlights = [[HighlightsCountView alloc] initWithFrame:CGRectZero];
         [self.contentView addSubview:_highlights];
+        
+        _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        _activity.hidden = YES;
+        [self.contentView addSubview:_activity];
     }
     return self;
 }
@@ -79,6 +85,10 @@
     _bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
     _unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
     _icon.frame = CGRectMake(frame.origin.x + 12, frame.origin.y + 12, 16, 16);
+    if(!_activity.hidden) {
+        frame.size.width -= _activity.frame.size.width + 12;
+        _activity.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 10, _activity.frame.size.width, _activity.frame.size.height);
+    }
     if(!_highlights.hidden) {
         CGSize size = [_highlights.count sizeWithFont:_highlights.font];
         size.width += 4;
@@ -176,6 +186,7 @@
                  @"unread":@(unread),
                  @"highlights":@(highlights),
                  @"archived":@0,
+                 @"status":server.status
                  }];
                 
                 if(unread > 0 && _firstUnreadPosition == -1)
@@ -230,7 +241,10 @@
                  @"unread":@(unread),
                  @"highlights":@(highlights),
                  @"archived":@0,
+                 @"joined":@(joined),
                  @"key":@(key),
+                 @"deferred":@(buffer.deferred),
+                 @"status":server.status
                  }];
                 if(unread > 0 && _firstUnreadPosition == -1)
                     _firstUnreadPosition = data.count - 1;
@@ -401,6 +415,7 @@
     if(!cell)
         cell = [[BuffersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"bufferscell"];
     NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    NSString *status = [row objectForKey:@"status"];
     cell.type = [[row objectForKey:@"type"] intValue];
     cell.label.text = [row objectForKey:@"name"];
     if([[row objectForKey:@"highlights"] intValue]) {
@@ -427,10 +442,29 @@
             cell.icon.hidden = NO;
             if(selected) {
                 cell.label.textColor = [UIColor whiteColor];
-                cell.bg.backgroundColor = [UIColor selectedBlueColor];
+                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
+                    cell.unreadIndicator.backgroundColor = cell.bg.backgroundColor = [UIColor opsHeadingColor];
+                else
+                    cell.bg.backgroundColor = [UIColor selectedBlueColor];
             } else {
-                cell.label.textColor = [UIColor selectedBlueColor];
-                cell.bg.backgroundColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
+                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
+                    cell.label.textColor = [UIColor opsHeadingColor];
+                else if(![status isEqualToString:@"connected_ready"])
+                    cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
+                else
+                    cell.label.textColor = [UIColor selectedBlueColor];
+                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
+                    cell.bg.backgroundColor = [UIColor opsGroupColor];
+                else
+                    cell.bg.backgroundColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
+            }
+            if(![status isEqualToString:@"connected_ready"] && ![status isEqualToString:@"quitting"] && ![status isEqualToString:@"disconnected"]) {
+                [cell.activity startAnimating];
+                cell.activity.hidden = NO;
+                cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
+            } else {
+                [cell.activity stopAnimating];
+                cell.activity.hidden = YES;
             }
             break;
         case TYPE_CHANNEL:
@@ -455,9 +489,20 @@
                     cell.label.textColor = [UIColor timestampColor];
                     cell.bg.backgroundColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
                 } else {
-                    cell.label.textColor = [UIColor selectedBlueColor];
+                    if([row objectForKey:@"joined"] == 0 || ![status isEqualToString:@"connected_ready"])
+                        cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
+                    else
+                        cell.label.textColor = [UIColor selectedBlueColor];
                     cell.bg.backgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
                 }
+            }
+            if([[row objectForKey:@"deferred"] intValue]) {
+                [cell.activity startAnimating];
+                cell.activity.hidden = NO;
+                cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
+            } else {
+                [cell.activity stopAnimating];
+                cell.activity.hidden = YES;
             }
             break;
         case TYPE_ARCHIVES_HEADER:
