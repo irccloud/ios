@@ -28,6 +28,7 @@
     UIView *_bg;
     HighlightsCountView *_highlights;
     UIActivityIndicatorView *_activity;
+    UIButton *_joinBtn;
 }
 @property int type;
 @property (readonly) UILabel *label;
@@ -35,6 +36,7 @@
 @property (readonly) UIView *unreadIndicator, *bg;
 @property (readonly) HighlightsCountView *highlights;
 @property (readonly) UIActivityIndicatorView *activity;
+@property (readonly) UIButton *joinBtn;
 @end
 
 @implementation BuffersTableCell
@@ -69,6 +71,12 @@
         _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         _activity.hidden = YES;
         [self.contentView addSubview:_activity];
+        
+        _joinBtn = [[UIButton alloc] initWithFrame:CGRectZero];
+        _joinBtn.hidden = YES;
+        _joinBtn.adjustsImageWhenHighlighted = YES;
+        [_joinBtn setImage:[UIImage imageNamed:@"add"] forState:UIControlStateNormal];
+        [self.contentView addSubview:_joinBtn];
     }
     return self;
 }
@@ -88,6 +96,10 @@
     if(!_activity.hidden) {
         frame.size.width -= _activity.frame.size.width + 12;
         _activity.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 10, _activity.frame.size.width, _activity.frame.size.height);
+    }
+    if(!_joinBtn.hidden) {
+        frame.size.width -= 24 + 12;
+        _joinBtn.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y, 24, frame.size.height);
     }
     if(!_highlights.hidden) {
         CGSize size = [_highlights.count sizeWithFont:_highlights.font];
@@ -346,6 +358,32 @@
     }
 }
 
+- (void)joinBtnPressed:(UIButton *)sender {
+    Server *s = [[ServersDataSource sharedInstance] getServer:sender.tag];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+    alert.tag = sender.tag;
+    [alert textFieldAtIndex:0].placeholder = @"#example";
+    [alert show];
+}
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+    
+    if([title isEqualToString:@"Join"]) {
+        if([alertView textFieldAtIndex:0].text.length) {
+            NSString *channel = [alertView textFieldAtIndex:0].text;
+            NSString *key = nil;
+            NSUInteger pos = [channel rangeOfString:@" "].location;
+            if(pos != NSNotFound) {
+                key = [channel substringFromIndex:pos + 1];
+                channel = [channel substringToIndex:pos];
+            }
+           [[NetworkConnection sharedInstance] join:channel key:key cid:alertView.tag];
+        }
+    }
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
@@ -412,12 +450,16 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     BOOL selected = (indexPath.row == _selectedRow);
     BuffersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bufferscell"];
-    if(!cell)
+    if(!cell) {
         cell = [[BuffersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"bufferscell"];
+        [cell.joinBtn addTarget:self action:@selector(joinBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
+    }
     NSDictionary *row = [_data objectAtIndex:[indexPath row]];
     NSString *status = [row objectForKey:@"status"];
     cell.type = [[row objectForKey:@"type"] intValue];
     cell.label.text = [row objectForKey:@"name"];
+    cell.activity.hidden = YES;
+    cell.joinBtn.hidden = YES;
     if([[row objectForKey:@"highlights"] intValue]) {
         cell.highlights.hidden = NO;
         cell.highlights.count = [NSString stringWithFormat:@"%@",[row objectForKey:@"highlights"]];
@@ -466,6 +508,8 @@
                 [cell.activity stopAnimating];
                 cell.activity.hidden = YES;
             }
+            cell.joinBtn.hidden = ![status isEqualToString:@"connected_ready"];
+            cell.joinBtn.tag = [[row objectForKey:@"cid"] intValue];
             break;
         case TYPE_CHANNEL:
         case TYPE_CONVERSATION:
@@ -489,7 +533,7 @@
                     cell.label.textColor = [UIColor timestampColor];
                     cell.bg.backgroundColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
                 } else {
-                    if([row objectForKey:@"joined"] == 0 || ![status isEqualToString:@"connected_ready"])
+                    if([[row objectForKey:@"joined"] intValue] == 0 || ![status isEqualToString:@"connected_ready"])
                         cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
                     else
                         cell.label.textColor = [UIColor selectedBlueColor];
