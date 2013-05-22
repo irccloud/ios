@@ -7,18 +7,24 @@
 //
 
 #import "BuffersDataSource.h"
+#import "ChannelsDataSource.h"
+#import "EventsDataSource.h"
+#import "UsersDataSource.h"
 
 @implementation Buffer
 -(NSComparisonResult)compare:(Buffer *)aBuffer {
     int joinedLeft = 1, joinedRight = 1;
-    //TODO: if channelsDataSource has no channel, joined = 0
+    if([_type isEqualToString:@"channel"])
+        joinedLeft = [[ChannelsDataSource sharedInstance] channelForBuffer:_bid] != nil;
+    if([[aBuffer type] isEqualToString:@"channel"])
+        joinedRight = [[ChannelsDataSource sharedInstance] channelForBuffer:aBuffer.bid] != nil;
     if([_type isEqualToString:@"conversation"] && [[aBuffer type] isEqualToString:@"channel"])
         return NSOrderedDescending;
     else if([_type isEqualToString:@"channel"] && [[aBuffer type] isEqualToString:@"conversation"])
         return NSOrderedAscending;
-    else if(joinedLeft < joinedRight)
-        return NSOrderedAscending;
     else if(joinedLeft > joinedRight)
+        return NSOrderedAscending;
+    else if(joinedLeft < joinedRight)
         return NSOrderedDescending;
     else
         return [[_name lowercaseString] compare:aBuffer.name];
@@ -164,7 +170,9 @@
         Buffer *buffer = [self getBuffer:bid];
         if(buffer) {
             [_buffers removeObject:buffer];
-            //TODO: Clear the other data sources
+            [[ChannelsDataSource sharedInstance] removeChannelForBuffer:bid];
+            [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
+            [[UsersDataSource sharedInstance] removeUsersForBuffer:bid];
         }
     }
 }
