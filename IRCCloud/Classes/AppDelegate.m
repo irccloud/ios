@@ -49,13 +49,15 @@
 
 -(void)showMainView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
-        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-            ECSlidingViewController *evc = [[ECSlidingViewController alloc] init];
-            evc.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
-            self.window.rootViewController = evc;
-        } else {
-            self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+        if([[ServersDataSource sharedInstance] count]) {
+            [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
+            if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+                ECSlidingViewController *evc = [[ECSlidingViewController alloc] init];
+                evc.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+                self.window.rootViewController = evc;
+            } else {
+                self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+            }
         }
     }];
 }

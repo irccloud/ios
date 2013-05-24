@@ -926,14 +926,28 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     if(fetcher.bid > 0)
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     [_oobQueue removeObject:fetcher];
-    [self _scheduleTimedoutBuffers];
-    //TODO: If this was the initial backlog fetch and we got no buffers, reconnect!
+    if([_servers count] < 1) {
+        NSLog(@"Initial backlog download failed");
+        [self disconnect];
+        _state = kIRCCloudStateDisconnected;
+        [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
+        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+    } else {
+        [self _scheduleTimedoutBuffers];
+    }
 }
 
 -(void)_backlogFailed:(NSNotification *)notification {
     [_oobQueue removeObject:notification.object];
-    [self _scheduleTimedoutBuffers];
-    //TODO: If this was the initial backlog fetch and we got no buffers, reconnect!
+    if([_servers count] < 1) {
+        NSLog(@"Initial backlog download failed");
+        [self disconnect];
+        _state = kIRCCloudStateDisconnected;
+        [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
+        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+    } else {
+        [self _scheduleTimedoutBuffers];
+    }
 }
 
 -(void)_scheduleTimedoutBuffers {
