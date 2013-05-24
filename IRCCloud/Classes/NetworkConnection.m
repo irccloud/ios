@@ -84,7 +84,6 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _running = NO;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    //TODO: prune the events array
 	TFLog(@"Backlog download completed");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
@@ -781,11 +780,13 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventAway];
         } else if([object.type isEqualToString:@"self_away"]) {
+            NSLog(@"self away: %@", object);
             [_users updateAway:1 msg:[object objectForKey:@"away_msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             [_servers updateAway:[object objectForKey:@"away_msg"] server:object.cid];
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventAway];
         } else if([object.type isEqualToString:@"self_back"]) {
+            NSLog(@"self back: %@", object);
             [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             [_servers updateAway:@"" server:object.cid];
             if(!backlog)

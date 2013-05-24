@@ -7,6 +7,7 @@
 //
 
 #import "ServersDataSource.h"
+#import "BuffersDataSource.h"
 
 @implementation Server
 -(NSComparisonResult)compare:(Server *)aServer {
@@ -101,8 +102,10 @@
     @synchronized(_servers) {
         Server *server = [self getServer:cid];
         if(server) {
+            for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:cid]) {
+                [[BuffersDataSource sharedInstance] removeAllDataForBuffer:b.bid];
+            }
             [_servers removeObject:server];
-            //TODO: Clear the other data sources
         }
     }
 }

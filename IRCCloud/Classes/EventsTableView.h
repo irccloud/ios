@@ -50,6 +50,7 @@
     
     IBOutlet id<EventsTableViewDelegate> _delegate;
 }
+@property (readonly) UIView *bottomUnreadView;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadBarClicked:(id)sender;

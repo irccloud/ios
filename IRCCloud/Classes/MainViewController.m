@@ -171,6 +171,12 @@
     BansTableViewController *btv = nil;
     Event *e = nil;
     switch(event) {
+        case kIRCEventSelfBack:
+        case kIRCEventAway:
+        case kIRCEventStatusChanged:
+        case kIRCEventConnectionLag:
+            [self _updateServerStatus];
+            break;
         case kIRCEventBanList:
             o = notification.object;
             if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name]) {
@@ -439,49 +445,61 @@
     // Dispose of any resources that can be recreated.
 }
 
--(IBAction)sendButtonPressed:(id)sender {
+-(IBAction)serverStatusBarPressed:(id)sender {
+    Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+    if(s) {
+        if([s.status isEqualToString:@"disconnected"])
+            [[NetworkConnection sharedInstance] reconnect:_buffer.cid];
+        else if([s.away isKindOfClass:[NSString class]] && s.away.length)
+            [[NetworkConnection sharedInstance] back:_buffer.cid];
+    }
+}
+
+-(void)sendButtonPressed:(id)sender {
     if([NetworkConnection sharedInstance].state == kIRCCloudStateConnected && _message.text && _message.text.length) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s) {
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
             Event *e = [[Event alloc] init];
-            e.cid = s.cid;
-            e.bid = _buffer.bid;
-            e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset + 0.5) * 1000000;
-            e.isSelf = YES;
-            e.from = s.nick;
-            e.nick = s.nick;
-            if(u)
-                e.fromMode = u.mode;
             NSString *msg = _message.text;
             if([msg hasPrefix:@"//"])
                 msg = [msg substringFromIndex:1];
             else if([msg hasPrefix:@"/"] && ![[msg lowercaseString] hasPrefix:@"/me "])
                 msg = nil;
-            e.msg = msg;
-            if(msg && [[msg lowercaseString] hasPrefix:@"/me "]) {
-                e.type = @"buffer_me_msg";
-                e.msg = [msg substringFromIndex:4];
-            } else {
-                e.type = @"buffer_msg";
+            if(msg) {
+                e.cid = s.cid;
+                e.bid = _buffer.bid;
+                e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset + 0.5) * 1000000;
+                e.isSelf = YES;
+                e.from = s.nick;
+                e.nick = s.nick;
+                if(u)
+                    e.fromMode = u.mode;
+                e.msg = msg;
+                if(msg && [[msg lowercaseString] hasPrefix:@"/me "]) {
+                    e.type = @"buffer_me_msg";
+                    e.msg = [msg substringFromIndex:4];
+                } else {
+                    e.type = @"buffer_msg";
+                }
+                e.color = [UIColor timestampColor];
+                if([_buffer.name isEqualToString:s.nick])
+                    e.bgColor = [UIColor whiteColor];
+                else
+                    e.bgColor = [UIColor selfBackgroundColor];
+                e.rowType = 0;
+                e.formatted = nil;
+                e.formattedMsg = nil;
+                e.groupMsg = nil;
+                e.linkify = YES;
+                e.targetMode = nil;
+                e.isHighlight = NO;
+                e.reqId = -1;
+                e.pending = YES;
+                [_eventsView scrollToBottom];
+                [[EventsDataSource sharedInstance] addEvent:e];
+                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
             }
-            e.color = [UIColor timestampColor];
-            if([_buffer.name isEqualToString:s.nick])
-                e.bgColor = [UIColor whiteColor];
-            else
-                e.bgColor = [UIColor selfBackgroundColor];
-            e.rowType = 0;
-            e.formatted = nil;
-            e.formattedMsg = nil;
-            e.groupMsg = nil;
-            e.linkify = YES;
-            e.targetMode = nil;
-            e.isHighlight = NO;
-            e.reqId = -1;
-            e.pending = YES;
-            [_eventsView scrollToBottom];
-            [[EventsDataSource sharedInstance] addEvent:e];
-            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
             e.reqId = [[NetworkConnection sharedInstance] say:_message.text to:_buffer.name cid:_buffer.cid];
             if(e.msg)
                 [_pendingEvents addObject:e];
@@ -499,7 +517,12 @@
     NSArray *rows = [_eventsView.tableView indexPathsForVisibleRows];
     CGRect frame = _eventsView.tableView.frame;
     frame.size.height = self.view.frame.size.height - height - 9;
+    if(!_serverStatusBar.hidden)
+        frame.size.height -= _serverStatusBar.frame.size.height;
     _eventsView.tableView.frame = frame;
+    frame = _serverStatusBar.frame;
+    frame.origin.y = self.view.frame.size.height - height - 9 - frame.size.height;
+    _serverStatusBar.frame = frame;
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     _toolBar.frame = CGRectMake(_toolBar.frame.origin.x, self.view.frame.size.height - height - 9, _toolBar.frame.size.width, height + 9);
     _barButtonContainer.frame = CGRectMake(0,0,_toolBar.frame.size.width, _toolBar.frame.size.height);
@@ -525,9 +548,96 @@
     [_usersView setBuffer:_buffer];
     [_eventsView setBuffer:_buffer];
     [self _updateUserListVisibility];
+    [self _updateServerStatus];
     if(self.slidingViewController) {
         [self.slidingViewController resetTopView];
         [self _updateUnreadIndicator];
+    }
+}
+
+-(void)_updateServerStatus {
+    Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+    if(s && (![s.status isEqualToString:@"connected_ready"] || s.lag > 2*1000*1000 || ([s.away isKindOfClass:[NSString class]] && s.away.length))) {
+        if(_serverStatusBar.hidden) {
+            CGRect frame = _eventsView.view.frame;
+            frame.size.height -= _serverStatusBar.frame.size.height;
+            _eventsView.view.frame = frame;
+            frame = _eventsView.bottomUnreadView.frame;
+            frame.origin.y -= _serverStatusBar.frame.size.height;
+            _eventsView.bottomUnreadView.frame = frame;
+            _serverStatusBar.hidden = NO;
+        }
+        _serverStatusBar.backgroundColor = [UIColor backgroundBlueColor];
+        _serverStatus.textColor = [UIColor selectedBlueColor];
+        if([s.status isEqualToString:@"connected_ready"]) {
+            if([s.away isKindOfClass:[NSString class]]) {
+                _serverStatusBar.backgroundColor = [UIColor lightGrayColor];
+                _serverStatus.textColor = [UIColor blackColor];
+                if(![[s.away lowercaseString] isEqualToString:@"away"]) {
+                    _serverStatus.text = [NSString stringWithFormat:@"Away (%@). Tap to come back.", s.away];
+                } else {
+                    _serverStatus.text = @"Away. Tap to come back.";
+                }
+            } else {
+                _serverStatus.text = [NSString stringWithFormat:@"Slow ping response from %@ (%is)", s.hostname, s.lag / 1000 / 1000];
+            }
+        } else if([s.status isEqualToString:@"quitting"]) {
+            _serverStatus.text = @"Disconnecting";
+        } else if([s.status isEqualToString:@"disconnected"]) {
+            NSString *reason = [s.fail_info objectForKey:@"reason"];
+            if([reason isKindOfClass:[NSString class]] && [reason length]) {
+                if([reason isEqualToString:@"nxdomain"])
+                    reason = @"Invalid hostname";
+                _serverStatus.text = [NSString stringWithFormat:@"Disconnected: Failed to connect - %@", reason];
+                _serverStatusBar.backgroundColor = [UIColor colorWithRed:0.973 green:0.875 blue:0.149 alpha:1];
+                _serverStatus.textColor = [UIColor colorWithRed:0.388 green:0.157 blue:0 alpha:1];
+            } else {
+                _serverStatus.text = @"Disconnected. Tap to reconnect.";
+            }
+        } else if([s.status isEqualToString:@"queued"]) {
+            _serverStatus.text = @"Connection Queued";
+        } else if([s.status isEqualToString:@"connecting"]) {
+            _serverStatus.text = @"Connecting";
+        } else if([s.status isEqualToString:@"connected"]) {
+            _serverStatus.text = @"Connected";
+        } else if([s.status isEqualToString:@"connected_joining"]) {
+            _serverStatus.text = @"Connected: Joining Channels";
+        } else if([s.status isEqualToString:@"pool_unavailable"]) {
+            _serverStatus.text = @"Connection temporarily unavailable";
+            _serverStatusBar.backgroundColor = [UIColor colorWithRed:0.973 green:0.875 blue:0.149 alpha:1];
+            _serverStatus.textColor = [UIColor colorWithRed:0.388 green:0.157 blue:0 alpha:1];
+        } else if([s.status isEqualToString:@"waiting_to_retry"]) {
+            double seconds = ([[s.fail_info objectForKey:@"timestamp"] doubleValue] + [[s.fail_info objectForKey:@"retry_timeout"] intValue]) - [[NSDate date] timeIntervalSince1970];
+            if(seconds > 0) {
+                NSString *reason = [s.fail_info objectForKey:@"reason"];
+                NSString *text = @"Disconnected";
+                if([reason isKindOfClass:[NSString class]] && [reason length])
+                    text = [text stringByAppendingFormat:@": %@, ", reason];
+                else
+                    text = [text stringByAppendingString:@"; "];
+                text = [text stringByAppendingFormat:@"Reconnecting in %i seconds.", (int)seconds];
+                _serverStatus.text = text;
+                _serverStatusBar.backgroundColor = [UIColor colorWithRed:0.973 green:0.875 blue:0.149 alpha:1];
+                _serverStatus.textColor = [UIColor colorWithRed:0.388 green:0.157 blue:0 alpha:1];
+            } else {
+                _serverStatus.text = @"Ready to connect.  Waiting our turn…";
+            }
+            [self performSelector:@selector(_updateServerStatus) withObject:nil afterDelay:0.5];
+        } else if([s.status isEqualToString:@"ip_retry"]) {
+            _serverStatus.text = @"Trying another IP address";
+        } else {
+            TFLog(@"Unhandled server status: %@", s.status);
+        }
+    } else {
+        if(!_serverStatusBar.hidden) {
+            CGRect frame = _eventsView.view.frame;
+            frame.size.height += _serverStatusBar.frame.size.height;
+            _eventsView.view.frame = frame;
+            frame = _eventsView.bottomUnreadView.frame;
+            frame.origin.y += _serverStatusBar.frame.size.height;
+            _eventsView.bottomUnreadView.frame = frame;
+            _serverStatusBar.hidden = YES;
+        }
     }
 }
 
@@ -549,6 +659,9 @@
             frame = _toolBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
             _toolBar.frame = frame;
+            frame = _serverStatusBar.frame;
+            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+            _serverStatusBar.frame = frame;
             _usersView.view.hidden = NO;
         } else {
             CGRect frame = _eventsView.view.frame;
@@ -557,6 +670,9 @@
             frame = _toolBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
             _toolBar.frame = frame;
+            frame = _serverStatusBar.frame;
+            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+            _serverStatusBar.frame = frame;
             _usersView.view.hidden = YES;
         }
     }

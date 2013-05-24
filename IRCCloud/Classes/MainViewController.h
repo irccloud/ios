@@ -22,6 +22,8 @@
     IBOutlet UILabel *_connectingStatus;
     IBOutlet UIActivityIndicatorView *_connectingActivity;
     IBOutlet UIToolbar *_toolBar;
+    IBOutlet UILabel *_serverStatus;
+    IBOutlet UIView *_serverStatusBar;
     UIBarButtonItem *_usersButtonItem;
     Buffer *_buffer;
     int _startHeight;
@@ -34,7 +36,8 @@
     NSTimer *_doubleTapTimer;
     NSMutableArray *_pendingEvents;
 }
--(IBAction)sendButtonPressed:(id)sender;
--(IBAction)usersButtonPressed:(id)sender;
--(IBAction)listButtonPressed:(id)sender;
+-(void)sendButtonPressed:(id)sender;
+-(void)usersButtonPressed:(id)sender;
+-(void)listButtonPressed:(id)sender;
+-(IBAction)serverStatusBarPressed:(id)sender;
 @end
