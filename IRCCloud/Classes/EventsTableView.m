@@ -406,35 +406,44 @@ int __timestampWidth;
     }
     if(_lastSeenEidPos == 0) {
         int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
-        int minutes = seconds / 60;
-        int hours = minutes / 60;
-        int days = hours / 24;
-        if(days) {
-            if(days == 1)
-                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i day of unread messages", days];
-            else
-                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i days of unread messages", days];
-        } else if(hours) {
-            if(hours == 1)
-                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i hour of unread messages", hours];
-            else
-                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i hours of unread messages", hours];
-        } else if(minutes) {
-            if(minutes == 1)
-                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i minute of unread messages", minutes];
-            else
-                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i minutes of unread messages", minutes];
+        if(seconds < 0) {
+            _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 48);
+            _topUnreadView.alpha = 0;
         } else {
-            if(seconds == 1)
-                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i second of unread messages", seconds];
-            else
-                _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i seconds of unread messages", seconds];
+            int minutes = seconds / 60;
+            int hours = minutes / 60;
+            int days = hours / 24;
+            if(days) {
+                if(days == 1)
+                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i day of unread messages", days];
+                else
+                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i days of unread messages", days];
+            } else if(hours) {
+                if(hours == 1)
+                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i hour of unread messages", hours];
+                else
+                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i hours of unread messages", hours];
+            } else if(minutes) {
+                if(minutes == 1)
+                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i minute of unread messages", minutes];
+                else
+                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i minutes of unread messages", minutes];
+            } else {
+                if(seconds == 1)
+                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i second of unread messages", seconds];
+                else
+                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i seconds of unread messages", seconds];
+            }
         }
     } else {
-        if(firstRow - _lastSeenEidPos == 1)
+        if(firstRow - _lastSeenEidPos == 1) {
             _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i unread message", firstRow - _lastSeenEidPos];
-        else
+        } else if(firstRow - _lastSeenEidPos > 0) {
             _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i unread messages", firstRow - _lastSeenEidPos];
+        } else {
+            _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 48);
+            _topUnreadView.alpha = 0;
+        }
     }
 }
 
