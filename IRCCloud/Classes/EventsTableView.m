@@ -153,7 +153,7 @@ int __timestampWidth;
 - (void)_sendHeartbeat {
     NSTimeInterval eid = [[[[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] lastObject] eid];
     if(eid > _buffer.last_seen_eid) {
-        [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
+        //[_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
         _buffer.last_seen_eid = eid;
     }
     _heartbeatTimer = nil;
@@ -719,6 +719,12 @@ int __timestampWidth;
         }
     }
     
+    if(_lastSeenEidPos == 0) {
+        _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 80);
+    } else {
+        _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 48);
+    }
+    
     [self.tableView reloadData];
     if(_requestingBacklog && backlogEid > 0) {
         int markerPos = -1;
@@ -865,11 +871,12 @@ int __timestampWidth;
 
 -(IBAction)topUnreadBarClicked:(id)sender {
     if(_topUnreadView.alpha) {
-        _topUnreadView.alpha = 0; //TODO: animate this
-        if(_lastSeenEidPos > 0)
+        if(_lastSeenEidPos > 0) {
+            _topUnreadView.alpha = 0; //TODO: animate this
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_lastSeenEidPos+1 inSection:0] atScrollPosition: UITableViewScrollPositionTop animated: YES];
-        else
+        } else {
             [self.tableView setContentOffset:CGPointMake(0,0) animated:YES];
+        }
     }
 }
 
