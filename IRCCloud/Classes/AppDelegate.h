@@ -18,8 +18,8 @@
 
 @property (strong, nonatomic) UIWindow *window;
 
-@property (strong, nonatomic) UIViewController *loginSplashViewController;
-@property (strong, nonatomic) UIViewController *mainViewController;
+@property (strong, nonatomic) LoginSplashViewController *loginSplashViewController;
+@property (strong, nonatomic) MainViewController *mainViewController;
 
 -(void)showLoginView;
 -(void)showMainView;

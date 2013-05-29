@@ -22,6 +22,9 @@
         self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPad" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPad" bundle:nil];
     }
+    if(launchOptions && [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]) {
+        self.mainViewController.bidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:1] intValue];
+    }
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
     self.window.rootViewController = self.loginSplashViewController;
     [self.window makeKeyAndVisible];
@@ -38,6 +41,13 @@
 
 - (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)err {
     TFLog(@"Error in APNs registration. Error: %@", err);
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    NSLog(@"** remote: %@", userInfo);
+    if(_disconnectTimer) {
+        [self.mainViewController bufferSelected:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
+    }
 }
 
 -(void)showLoginView {
@@ -86,16 +96,11 @@
     });
 }
 
-- (void)applicationDidEnterBackground:(UIApplication *)application {
-    [self applicationWillResignActive:application];
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-    [self applicationDidBecomeActive:application];
-}
-
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [_disconnectTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
+    application.applicationIconBadgeNumber = 1;
+    application.applicationIconBadgeNumber = 0;
+    [application cancelAllLocalNotifications];
+    [_disconnectTimer invalidate];
     _disconnectTimer = nil;
     if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
         ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;

@@ -153,7 +153,7 @@ int __timestampWidth;
 - (void)_sendHeartbeat {
     NSTimeInterval eid = [[[[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] lastObject] eid];
     if(eid > _buffer.last_seen_eid) {
-        //[_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
+        [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
         _buffer.last_seen_eid = eid;
     }
     _heartbeatTimer = nil;

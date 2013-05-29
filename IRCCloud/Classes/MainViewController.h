@@ -35,7 +35,10 @@
     UIView *_barButtonContainer;
     NSTimer *_doubleTapTimer;
     NSMutableArray *_pendingEvents;
+    int _bidToOpen;
 }
+@property (nonatomic) int bidToOpen;
+-(void)bufferSelected:(int)bid;
 -(void)sendButtonPressed:(id)sender;
 -(void)usersButtonPressed:(id)sender;
 -(void)listButtonPressed:(id)sender;

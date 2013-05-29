@@ -28,6 +28,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         _cidToOpen = -1;
+        _bidToOpen = -1;
         _pendingEvents = [[NSMutableArray alloc] init];
     }
     return self;
@@ -112,6 +113,10 @@
     if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
         if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
             bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
+    }
+    if(_bidToOpen != -1) {
+        bid = _bidToOpen;
+        _bidToOpen = -1;
     }
     [self bufferSelected:bid];
 }
