@@ -339,9 +339,9 @@ int __timestampWidth;
     }
     
     if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
-        event.formattedMsg = [NSString stringWithFormat:@"%@ by %c%@", event.msg, BOLD, event.nick];
+        event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [ColorFormatter formatNick:event.nick mode:event.fromMode]];
     } else if([type isEqualToString:@"buffer_me_msg"]) {
-        event.formattedMsg = [NSString stringWithFormat:@"— %c%c%@%c %@", ITALICS, BOLD, event.nick, BOLD, event.msg];
+        event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [ColorFormatter formatNick:event.nick mode:event.fromMode], event.msg];
     } else if([type isEqualToString:@"kicked_channel"]) {
         event.formattedMsg = @"← ";
         if([event.type hasPrefix:@"you_"])
@@ -352,7 +352,7 @@ int __timestampWidth;
             event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
         else
             event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
-        event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %c%@%c (%@)", BOLD, event.nick, CLEAR, event.hostmask];
+        event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@ (%@)", [ColorFormatter formatNick:event.nick mode:event.fromMode], event.hostmask];
         if(event.msg.length > 0)
             event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
     } else if([type isEqualToString:@"channel_mode_list_change"]) {
