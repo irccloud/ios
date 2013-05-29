@@ -6,5 +6,10 @@
   Copyright (c) 2013 IRCCloud, Ltd. All rights reserved.
 */
 
-"NOTIFICATION_ACTION_BUFFER_MSG" = "View Message";
-"NOTIFICATION_BUFFER_MSG" = "<%@> %@";
+"NA_MSG"  = "View Message";
+"N_MSGCH" = "‹%@› %@ (%@)";
+"N_MSG"   = "‹%@› %@";
+"N_MECH"  = "— %@ %@ (%@)";
+"N_ME"    = "— %@ %@";
+"N_CHI"   = "%@ invited you to join %@";
+"N_CI"    = "%@ is trying to contact you on %@";

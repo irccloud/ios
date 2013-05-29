@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1ABBCE321743FD0900F81881 /* digit.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1ABBCE311743FD0900F81881 /* digit.caf */; };
+		1ABBCE321743FD0900F81881 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1ABBCE311743FD0900F81881 /* a.caf */; };
 		2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		2230F8E817162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
 		2230F8E917162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
@@ -187,7 +187,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1ABBCE311743FD0900F81881 /* digit.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = digit.caf; sourceTree = "<group>"; };
+		1ABBCE311743FD0900F81881 /* a.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = a.caf; sourceTree = "<group>"; };
 		2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		2230F8E617162ACC007F7C98 /* Ignore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ignore.h; sourceTree = "<group>"; };
 		2230F8E717162ACC007F7C98 /* Ignore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ignore.m; sourceTree = "<group>"; };
@@ -373,7 +373,7 @@
 		228A056316D3DABA0029769C = {
 			isa = PBXGroup;
 			children = (
-				1ABBCE311743FD0900F81881 /* digit.caf */,
+				1ABBCE311743FD0900F81881 /* a.caf */,
 				228A057516D3DABA0029769C /* IRCCloud */,
 				228A059C16D3DABB0029769C /* IRCCloudTests */,
 				228A056E16D3DABA0029769C /* Frameworks */,
@@ -727,7 +727,7 @@
 				224D00A6173C185B00500D70 /* add@2x.png in Resources */,
 				224D00A9173C188100500D70 /* add.png in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
-				1ABBCE321743FD0900F81881 /* digit.caf in Resources */,
+				1ABBCE321743FD0900F81881 /* a.caf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
