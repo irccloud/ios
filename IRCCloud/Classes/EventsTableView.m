@@ -126,6 +126,7 @@ int __timestampWidth;
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
+    _openInChromeController = [[OpenInChromeController alloc] init];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -827,7 +828,10 @@ int __timestampWidth;
 
 - (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {
     //TODO: check for irc:// URLs
-    [[UIApplication sharedApplication] openURL:url];
+    if(![_openInChromeController openInChrome:url
+                          withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                             createNewTab:NO])
+        [[UIApplication sharedApplication] openURL:url];
 }
 
 /*

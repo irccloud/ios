@@ -33,6 +33,21 @@
 	<string>0.9.6</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLIconFile</key>
+			<string>Icon</string>
+			<key>CFBundleURLName</key>
+			<string>com.irccloud.launch</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>irccloud</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>0.9.6</string>
 	<key>LSRequiresIPhoneOS</key>

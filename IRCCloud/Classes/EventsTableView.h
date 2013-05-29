@@ -14,6 +14,7 @@
 #import "NetworkConnection.h"
 #import "HighlightsCountView.h"
 #import "Ignore.h"
+#import "OpenInChromeController.h"
 
 @protocol EventsTableViewDelegate<NSObject>
 -(void)rowSelected:(Event *)event;
@@ -49,6 +50,7 @@
     NSRecursiveLock *_lock;
     
     IBOutlet id<EventsTableViewDelegate> _delegate;
+    OpenInChromeController *_openInChromeController;
 }
 @property (readonly) UIView *bottomUnreadView;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;

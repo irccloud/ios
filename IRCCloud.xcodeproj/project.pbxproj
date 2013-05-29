@@ -54,6 +54,8 @@
 		224D00AA173C188100500D70 /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = 224D00A8173C188100500D70 /* add.png */; };
 		22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		22695F5616E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
+		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
+		2274F4A01756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
 		227FF2A116FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		227FF2A216FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
@@ -225,6 +227,8 @@
 		224D00A8173C188100500D70 /* add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = add.png; sourceTree = "<group>"; };
 		22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollapsedEvents.h; sourceTree = "<group>"; };
 		22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollapsedEvents.m; sourceTree = "<group>"; };
+		2274F49D1756723F0039B4CB /* OpenInChromeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInChromeController.h; path = OpenInChrome/OpenInChromeController.h; sourceTree = SOURCE_ROOT; };
+		2274F49E1756723F0039B4CB /* OpenInChromeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OpenInChromeController.m; path = OpenInChrome/OpenInChromeController.m; sourceTree = SOURCE_ROOT; };
 		227FF29F16FA128A00DBE3C5 /* HighlightsCountView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighlightsCountView.h; sourceTree = "<group>"; };
 		227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HighlightsCountView.m; sourceTree = "<group>"; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -424,6 +428,8 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				2274F49D1756723F0039B4CB /* OpenInChromeController.h */,
+				2274F49E1756723F0039B4CB /* OpenInChromeController.m */,
 				22B15CF617301BAE0075EBA7 /* ECSlidingViewController */,
 				22D430A21725AAE9003C0684 /* UIExpandingTextView.h */,
 				22D430A31725AAEA003C0684 /* UIExpandingTextView.m */,
@@ -836,6 +842,7 @@
 				22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
 				22B15CFB17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,
 				22B15CFD17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
+				2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -885,6 +892,7 @@
 				22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
 				22B15CFC17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,
 				22B15CFE17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
+				2274F4A01756723F0039B4CB /* OpenInChromeController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
