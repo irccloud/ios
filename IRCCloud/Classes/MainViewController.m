@@ -331,7 +331,14 @@
 
 -(void)backlogCompleted:(NSNotification *)notification {
     [self _hideConnectingView];
-    if(!_buffer) {
+    if(_buffer) {
+        [self _updateServerStatus];
+        [self _updateUserListVisibility];
+        if(self.slidingViewController) {
+            [self.slidingViewController resetTopView];
+            [self _updateUnreadIndicator];
+        }
+    } else {
         int bid = [BuffersDataSource sharedInstance].firstBid;
         if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
             if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
