@@ -367,7 +367,7 @@ int __timestampWidth;
         [self.tableView reloadData];
         if([[[self.tableView indexPathsForVisibleRows] lastObject] row] >= _data.count-2 || _scrollTimer) {
             [self scrollToBottom];
-        } else {
+        } else if(!event.isSelf) {
             _newMsgs++;
             if(event.isHighlight)
                 _newHighlights++;
