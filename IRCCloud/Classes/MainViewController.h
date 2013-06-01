@@ -36,6 +36,7 @@
     NSTimer *_doubleTapTimer;
     NSMutableArray *_pendingEvents;
     int _bidToOpen;
+    IRCCloudJSONObject *_alertObject;
 }
 @property (nonatomic) int bidToOpen;
 -(void)bufferSelected:(int)bid;

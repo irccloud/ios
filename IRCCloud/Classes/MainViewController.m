@@ -21,6 +21,8 @@
 #define TAG_IGNORE 2
 #define TAG_KICK 3
 #define TAG_INVITE 4
+#define TAG_BADCHANNELKEY 5
+#define TAG_INVALIDNICK 6
 
 @implementation MainViewController
 
@@ -175,7 +177,104 @@
     IRCCloudJSONObject *o = nil;
     BansTableViewController *btv = nil;
     Event *e = nil;
+    Server *s = nil;
+    UIAlertView *alert = nil;
+    NSString *msg = nil;
+    NSString *type = nil;
     switch(event) {
+        case kIRCEventBadChannelKey:
+            _alertObject = notification.object;
+            s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
+            alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+            alert.tag = TAG_BADCHANNELKEY;
+            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [alert show];
+            break;
+        case kIRCEventInvalidNick:
+            _alertObject = notification.object;
+            s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
+            alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Change", nil];
+            alert.tag = TAG_INVALIDNICK;
+            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [alert show];
+            break;
+        case kIRCEventAlert:
+            o = notification.object;
+            type = o.type;
+            
+            if([type isEqualToString:@"invite_only_chan"])
+                msg = [NSString stringWithFormat:@"You need an invitation to join %@", [o objectForKey:@"chan"]];
+            else if([type isEqualToString:@"channel_full"])
+                msg = [NSString stringWithFormat:@"%@ isn't allowing any more members to join.", [o objectForKey:@"chan"]];
+            else if([type isEqualToString:@"banned_from_channel"])
+                msg = [NSString stringWithFormat:@"You've been banned from %@", [o objectForKey:@"chan"]];
+            else if([type isEqualToString:@"invalid_nickchange"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"ban_channel"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"no_messages_from_non_registered"]) {
+                if([[o objectForKey:@"nick"] length])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
+                else
+                    msg = [o objectForKey:@"msg"];
+            } else if([type isEqualToString:@"not_registered"]) {
+                NSString *first = [o objectForKey:@"first"];
+                if([[o objectForKey:@"rest"] length])
+                    first = [first stringByAppendingString:[o objectForKey:@"rest"]];
+                msg = [NSString stringWithFormat:@"%@: %@", first, [o objectForKey:@"msg"]];
+            } else if([type isEqualToString:@"too_many_channels"])
+                msg = [NSString stringWithFormat:@"Couldn't join %@: %@", [o objectForKey:@"chan"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"too_many_targets"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"description"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"no_such_server"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"server"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"unknown_command"])
+                msg = [NSString stringWithFormat:@"Unknown command: %@", [o objectForKey:@"command"]];
+            else if([type isEqualToString:@"help_not_found"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"topic"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"accept_exists"])
+                msg = [NSString stringWithFormat:@"%@ %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"accept_not"])
+                msg = [NSString stringWithFormat:@"%@ %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"nick_collision"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"collision"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"nick_too_fast"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"save_nick"])
+                msg = [NSString stringWithFormat:@"%@: %@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"], [o objectForKey:@"new_nick"]];
+            else if([type isEqualToString:@"unknown_mode"])
+                msg = [NSString stringWithFormat:@"Missing mode: %@", [o objectForKey:@"params"]];
+            else if([type isEqualToString:@"user_not_in_channel"])
+                msg = [NSString stringWithFormat:@"%@ is not in %@", [o objectForKey:@"nick"], [o objectForKey:@"channel"]];
+            else if([type isEqualToString:@"need_more_params"])
+                msg = [NSString stringWithFormat:@"Missing parameters for command: %@", [o objectForKey:@"command"]];
+            else if([type isEqualToString:@"chan_privs_needed"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"chan"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"not_on_channel"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"ban_on_chan"])
+                msg = [NSString stringWithFormat:@"You cannot change your nick to %@ while banned on %@", [o objectForKey:@"proposed_nick"], [o objectForKey:@"channel"]];
+            else if([type isEqualToString:@"cannot_send_to_chan"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"user_on_channel"])
+                msg = [NSString stringWithFormat:@"%@ is already a member of %@", [o objectForKey:@"nick"], [o objectForKey:@"channel"]];
+            else if([type isEqualToString:@"no_nick_given"])
+                msg = [NSString stringWithFormat:@"No nickname given"];
+            else if([type isEqualToString:@"silence"]) {
+                NSString *mask = [o objectForKey:@"usermask"];
+                if([mask hasPrefix:@"-"])
+                    msg = [NSString stringWithFormat:@"%@ removed from silence list", [mask substringFromIndex:1]];
+                else if([mask hasPrefix:@"+"])
+                    msg = [NSString stringWithFormat:@"%@ added to silence list", [mask substringFromIndex:1]];
+                else
+                    msg = [NSString stringWithFormat:@"Silence list change: %@", mask];
+            } else if([type isEqualToString:@"no_channel_topic"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
+            else
+                msg = [o objectForKey:@"msg"];
+
+            s = [[ServersDataSource sharedInstance] getServer:o.cid];
+            alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [alert show];
+            break;
         case kIRCEventSelfBack:
         case kIRCEventAway:
         case kIRCEventStatusChanged:
@@ -935,6 +1034,18 @@
             if([title isEqualToString:@"Invite"]) {
                 if([alertView textFieldAtIndex:0].text.length)
                     [[NetworkConnection sharedInstance] invite:_selectedUser.nick chan:[alertView textFieldAtIndex:0].text cid:_buffer.cid];
+            }
+            break;
+        case TAG_BADCHANNELKEY:
+            if([title isEqualToString:@"Join"]) {
+                if([alertView textFieldAtIndex:0].text.length)
+                    [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:[alertView textFieldAtIndex:0].text cid:_alertObject.cid];
+            }
+            break;
+        case TAG_INVALIDNICK:
+            if([title isEqualToString:@"Change"]) {
+                if([alertView textFieldAtIndex:0].text.length)
+                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",[alertView textFieldAtIndex:0].text] to:nil cid:_alertObject.cid];
             }
             break;
     }

@@ -933,7 +933,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     } else {
-        [self _scheduleTimedoutBuffers];
+        [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }
 }
 
