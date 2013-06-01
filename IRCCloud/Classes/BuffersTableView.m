@@ -255,7 +255,7 @@
                  @"archived":@0,
                  @"joined":@(joined),
                  @"key":@(key),
-                 @"deferred":@(buffer.deferred),
+                 @"timeout":@(buffer.timeout),
                  @"status":server.status
                  }];
                 if(unread > 0 && _firstUnreadPosition == -1)
@@ -540,7 +540,7 @@
                     cell.bg.backgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
                 }
             }
-            if([[row objectForKey:@"deferred"] intValue]) {
+            if([[row objectForKey:@"timeout"] intValue]) {
                 [cell.activity startAnimating];
                 cell.activity.hidden = NO;
                 cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
