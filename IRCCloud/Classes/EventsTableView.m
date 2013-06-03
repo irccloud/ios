@@ -365,7 +365,7 @@ int __timestampWidth;
     
     if(!backlog) {
         [self.tableView reloadData];
-        if([[[self.tableView indexPathsForVisibleRows] lastObject] row] >= _data.count-2 || _scrollTimer) {
+        if(!_scrolledUp) {
             [self scrollToBottom];
         } else if(!event.isSelf) {
             _newMsgs++;
@@ -478,7 +478,10 @@ int __timestampWidth;
     }
     if(msg.length) {
         _bottomUndreadlabel.text = msg;
-        _bottomUnreadView.alpha = 1; //TODO: animate this
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.1];
+        _bottomUnreadView.alpha = 1;
+        [UIView commitAnimations];
     }
 }
 
@@ -752,7 +755,10 @@ int __timestampWidth;
     if(_data.count) {
         int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
         if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
-            _topUnreadView.alpha = 1; //TODO: animate this
+            [UIView beginAnimations:nil context:nil];
+            [UIView setAnimationDuration:0.1];
+            _topUnreadView.alpha = 1;
+            [UIView commitAnimations];
             [self updateTopUnread:firstRow];
         }
         _requestingBacklog = NO;
@@ -884,7 +890,10 @@ int __timestampWidth;
 -(IBAction)topUnreadBarClicked:(id)sender {
     if(_topUnreadView.alpha) {
         if(_lastSeenEidPos > 0) {
-            _topUnreadView.alpha = 0; //TODO: animate this
+            [UIView beginAnimations:nil context:nil];
+            [UIView setAnimationDuration:0.1];
+            _topUnreadView.alpha = 0;
+            [UIView commitAnimations];
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_lastSeenEidPos+1 inSection:0] atScrollPosition: UITableViewScrollPositionTop animated: YES];
         } else {
             [self.tableView setContentOffset:CGPointMake(0,0) animated:YES];
@@ -894,7 +903,10 @@ int __timestampWidth;
 
 -(IBAction)bottomUnreadBarClicked:(id)sender {
     if(_bottomUnreadView.alpha) {
-        _bottomUnreadView.alpha = 0; //TODO: animate this
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.1];
+        _bottomUnreadView.alpha = 0;
+        [UIView commitAnimations];
         [self scrollToBottom];
     }
 }
@@ -923,7 +935,10 @@ int __timestampWidth;
         
         if(_data.count) {
             if(lastRow == _data.count - 1) {
-                _bottomUnreadView.alpha = 0; //TODO: animate this
+                [UIView beginAnimations:nil context:nil];
+                [UIView setAnimationDuration:0.1];
+                _bottomUnreadView.alpha = 0;
+                [UIView commitAnimations];
                 _newMsgs = 0;
                 _newHighlights = 0;
                 if(_topUnreadView.alpha == 0)
@@ -935,7 +950,10 @@ int __timestampWidth;
 
             if(_lastSeenEidPos >= 0) {
                 if(_lastSeenEidPos > 0 && firstRow <= _lastSeenEidPos) {
-                    _topUnreadView.alpha = 0; //TODO: animate this
+                    [UIView beginAnimations:nil context:nil];
+                    [UIView setAnimationDuration:0.1];
+                    _topUnreadView.alpha = 0;
+                    [UIView commitAnimations];
                     [self _sendHeartbeat];
                 } else {
                     [self updateTopUnread:firstRow];
