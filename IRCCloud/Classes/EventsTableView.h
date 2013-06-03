@@ -52,6 +52,7 @@
     IBOutlet id<EventsTableViewDelegate> _delegate;
     OpenInChromeController *_openInChromeController;
 }
+@property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(void)setBuffer:(Buffer *)buffer;

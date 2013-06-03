@@ -658,13 +658,14 @@
     [_buffersView setBuffer:_buffer];
     [UIView animateWithDuration:0.1 animations:^{
         _eventsView.view.alpha=0;
+        _eventsView.topUnreadView.alpha=0;
+        _eventsView.bottomUnreadView.alpha=0;
         _eventActivity.alpha=1;
         [_eventActivity startAnimating];
     } completion:^(BOOL finished){
         [_usersView setBuffer:_buffer];
         [_eventsView setBuffer:_buffer];
         [self _updateUserListVisibility];
-        [self _updateServerStatus];
         [UIView animateWithDuration:0.1 animations:^{
             _eventsView.view.alpha=1;
             _eventActivity.alpha=0;
@@ -672,6 +673,7 @@
             [_eventActivity stopAnimating];
         }];
     }];
+    [self _updateServerStatus];
     if(self.slidingViewController) {
         [self.slidingViewController resetTopView];
         [self _updateUnreadIndicator];
