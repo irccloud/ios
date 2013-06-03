@@ -44,21 +44,49 @@
     }
     return output;
 }
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono {
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;
+    static CTFontRef Courier, CourierBold, CourierOblique,CourierBoldOblique;
+    static CTFontRef Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
+    static CTFontRef arrowFont;
+    static NSDataDetector *dataDetector;
+    static NSDictionary *linkAttributes;
     CTFontRef font, boldFont, italicFont, boldItalicFont;
-    CTFontRef arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL);
+    
+    if(!Courier) {
+        arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL);
+        Courier = CTFontCreateWithName((CFStringRef)@"Courier", FONT_SIZE, NULL);
+        CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL);
+        CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", FONT_SIZE, NULL);
+        CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", FONT_SIZE, NULL);
+        Helvetica = CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL);
+        HelveticaBold = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
+        HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
+        HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
+        
+        dataDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+        CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
+        CTParagraphStyleSetting paragraphStyles[1] = {
+            {.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
+        };
+        CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 1);
+        NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
+        [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+        [mutableLinkAttributes setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCTUnderlineStyleAttributeName];
+        [mutableLinkAttributes setObject:(__bridge id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
+        linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+    }
     if(mono) {
-        font = CTFontCreateWithName((CFStringRef)@"Courier", FONT_SIZE, NULL);
-        boldFont = CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL);
-        italicFont = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", FONT_SIZE, NULL);
-        boldItalicFont = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", FONT_SIZE, NULL);
+        font = Courier;
+        boldFont = CourierBold;
+        italicFont = CourierOblique;
+        boldItalicFont = CourierBoldOblique;
     } else {
-        font = CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL);
-        boldFont = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
-        italicFont = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
-        boldItalicFont = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
+        font = Helvetica;
+        boldFont = HelveticaBold;
+        italicFont = HelveticaOblique;
+        boldItalicFont = HelveticaBoldOblique;
     }
     NSMutableArray *attributes = [[NSMutableArray alloc] init];
     NSMutableArray *arrowIndex = [[NSMutableArray alloc] init];
@@ -305,11 +333,14 @@
         [output addAttributes:dict range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];
     }
     
-    CFRelease(font);
-    CFRelease(boldFont);
-    CFRelease(italicFont);
-    CFRelease(boldItalicFont);
-    
+    if(linkify) {
+        NSArray *results = [dataDetector matchesInString:[output string] options:0 range:NSMakeRange(0, [output length])];
+        if(results.count) {
+            for (NSTextCheckingResult *result in results) {
+                [output addAttributes:linkAttributes range:result.range];
+            }
+        }
+    }
     return output;
 }
 @end

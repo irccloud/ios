@@ -746,7 +746,6 @@ int __timestampWidth;
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
     } else if(!_scrolledUp && _data.count && (_scrollTimer || !_firstScroll)) {
         [self _scrollToBottom];
-        //TODO: Add hyperlinks before calculating the row heights so the scroll will get the correct position the first time
         [self scrollToBottom];
     }
     
@@ -789,7 +788,7 @@ int __timestampWidth;
     [_lock unlock];
     if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED) {
         if(e.formatted == nil && e.formattedMsg.length > 0) {
-            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace];
+            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify];
         } else if(e.formattedMsg.length == 0) {
             TFLog(@"No formatted message: %@", e);
             return 26;

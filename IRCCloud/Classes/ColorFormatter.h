@@ -19,5 +19,5 @@
 
 @interface ColorFormatter : NSObject
 +(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode;
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono;
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify;
 @end

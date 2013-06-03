@@ -24,6 +24,7 @@
     IBOutlet UIToolbar *_toolBar;
     IBOutlet UILabel *_serverStatus;
     IBOutlet UIView *_serverStatusBar;
+    IBOutlet UIActivityIndicatorView *_eventActivity;
     UIBarButtonItem *_usersButtonItem;
     Buffer *_buffer;
     int _startHeight;

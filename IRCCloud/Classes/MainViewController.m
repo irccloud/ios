@@ -656,10 +656,22 @@
         self.navigationItem.title = _buffer.name;
     }
     [_buffersView setBuffer:_buffer];
-    [_usersView setBuffer:_buffer];
-    [_eventsView setBuffer:_buffer];
-    [self _updateUserListVisibility];
-    [self _updateServerStatus];
+    [UIView animateWithDuration:0.1 animations:^{
+        _eventsView.view.alpha=0;
+        _eventActivity.alpha=1;
+        [_eventActivity startAnimating];
+    } completion:^(BOOL finished){
+        [_usersView setBuffer:_buffer];
+        [_eventsView setBuffer:_buffer];
+        [self _updateUserListVisibility];
+        [self _updateServerStatus];
+        [UIView animateWithDuration:0.1 animations:^{
+            _eventsView.view.alpha=1;
+            _eventActivity.alpha=0;
+        } completion:^(BOOL finished){
+            [_eventActivity stopAnimating];
+        }];
+    }];
     if(self.slidingViewController) {
         [self.slidingViewController resetTopView];
         [self _updateUnreadIndicator];
@@ -1065,7 +1077,7 @@
         
         if([action isEqualToString:@"Copy Message"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            NSString *plaintext = [NSString stringWithFormat:@"<%@> %@",_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO] string]];
+            NSString *plaintext = [NSString stringWithFormat:@"<%@> %@",_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO] string]];
             [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
         } else if([action isEqualToString:@"Send a message"]) {
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];

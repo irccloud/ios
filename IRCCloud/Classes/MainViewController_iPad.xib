@@ -105,6 +105,18 @@
 				<reference key="NSNextResponder"/>
 				<int key="NSvFlags">274</int>
 				<array class="NSMutableArray" key="NSSubviews">
+					<object class="IBUIActivityIndicatorView" id="471207736">
+						<reference key="NSNextResponder" ref="191373211"/>
+						<int key="NSvFlags">301</int>
+						<string key="NSFrame">{{502, 320}, {20, 20}}</string>
+						<reference key="NSSuperview" ref="191373211"/>
+						<reference key="NSWindow"/>
+						<string key="NSReuseIdentifierKey">_NS:9</string>
+						<bool key="IBUIOpaque">NO</bool>
+						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
+						<bool key="IBUIHidesWhenStopped">NO</bool>
+						<int key="IBUIStyle">2</int>
+					</object>
 					<object class="IBUITableView" id="90050312">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">276</int>
@@ -594,6 +606,14 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">_eventActivity</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="471207736"/>
+					</object>
+					<int key="connectionID">98</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">dataSource</string>
 						<reference key="source" ref="90050312"/>
 						<reference key="destination" ref="782725978"/>
@@ -843,6 +863,7 @@
 							<reference ref="524441256"/>
 							<reference ref="694366055"/>
 							<reference ref="597467201"/>
+							<reference ref="471207736"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Content View</string>
@@ -1020,6 +1041,11 @@
 						<reference key="object" ref="270792495"/>
 						<reference key="parent" ref="597467201"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">97</int>
+						<reference key="object" ref="471207736"/>
+						<reference key="parent" ref="191373211"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -1063,12 +1089,13 @@
 				<string key="92.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="94.CustomClassName">UIControl</string>
 				<string key="94.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
+				<string key="97.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">96</int>
+			<int key="maxID">98</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1217,6 +1244,7 @@
 						<string key="_connectingProgress">UIProgressView</string>
 						<string key="_connectingStatus">UILabel</string>
 						<string key="_connectingView">UIView</string>
+						<string key="_eventActivity">UIActivityIndicatorView</string>
 						<string key="_eventsView">EventsTableView</string>
 						<string key="_serverStatus">UILabel</string>
 						<string key="_serverStatusBar">UIView</string>
@@ -1243,6 +1271,10 @@
 						<object class="IBToOneOutletInfo" key="_connectingView">
 							<string key="name">_connectingView</string>
 							<string key="candidateClassName">UIView</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="_eventActivity">
+							<string key="name">_eventActivity</string>
+							<string key="candidateClassName">UIActivityIndicatorView</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="_eventsView">
 							<string key="name">_eventsView</string>
