@@ -53,6 +53,7 @@
     static NSDataDetector *dataDetector;
     static NSDictionary *linkAttributes;
     CTFontRef font, boldFont, italicFont, boldItalicFont;
+    float lineSpacing = 6;
     
     if(!Courier) {
         arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL);
@@ -67,10 +68,11 @@
         
         dataDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
         CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
-        CTParagraphStyleSetting paragraphStyles[1] = {
+        CTParagraphStyleSetting paragraphStyles[2] = {
+            {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
             {.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
         };
-        CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 1);
+        CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
         NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
         [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
         [mutableLinkAttributes setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCTUnderlineStyleAttributeName];
@@ -319,7 +321,6 @@
         [output addAttributes:@{(NSString *)kCTFontAttributeName:(__bridge id)arrowFont} range:NSMakeRange([i intValue], 1)];
     }
     
-    float lineSpacing = 6;
     CTParagraphStyleSetting paragraphStyle;
     paragraphStyle.spec = kCTParagraphStyleSpecifierLineSpacing;
     paragraphStyle.valueSize = sizeof(CGFloat);
