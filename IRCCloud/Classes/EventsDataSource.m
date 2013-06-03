@@ -9,6 +9,9 @@
 #import "EventsDataSource.h"
 #import "UIColor+IRCCloud.h"
 #import "ColorFormatter.h"
+#import "BuffersDataSource.h"
+#import "ServersDataSource.h"
+#import "Ignore.h"
 
 @implementation Event
 -(NSComparisonResult)compare:(Event *)aEvent {
@@ -409,9 +412,16 @@
 -(int)unreadCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
     @synchronized(_events) {
         int count = 0;
+        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
+        Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
+        Ignore *ignore = [[Ignore alloc] init];
+        [ignore setIgnores:s.ignores];
         for(Event *event in [_events objectForKey:@(bid)]) {
-            if(event.eid > lastSeenEid && [event isImportant:type])
+            if(event.eid > lastSeenEid && [event isImportant:type]) {
+                if(event.from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", event.from, event.hostmask]])
+                    continue;
                 count++;
+            }
         }
         return count;
     }
@@ -420,9 +430,16 @@
 -(int)highlightCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
     @synchronized(_events) {
         int count = 0;
+        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
+        Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
+        Ignore *ignore = [[Ignore alloc] init];
+        [ignore setIgnores:s.ignores];
         for(Event *event in [_events objectForKey:@(bid)]) {
-            if(event.eid > lastSeenEid && [event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"]))
+            if(event.eid > lastSeenEid && [event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"])) {
+                if(event.from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", event.from, event.hostmask]])
+                    continue;
                 count++;
+            }
         }
         return count;
     }
