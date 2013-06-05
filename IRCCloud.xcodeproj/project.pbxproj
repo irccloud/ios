@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		1ABBCE321743FD0900F81881 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1ABBCE311743FD0900F81881 /* a.caf */; };
+		2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
+		2212AF89175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
 		2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		2230F8E817162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
 		2230F8E917162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
@@ -190,6 +192,8 @@
 
 /* Begin PBXFileReference section */
 		1ABBCE311743FD0900F81881 /* a.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = a.caf; sourceTree = "<group>"; };
+		2212AF86175F82F900D08C7F /* ChannelInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelInfoViewController.h; sourceTree = "<group>"; };
+		2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelInfoViewController.m; sourceTree = "<group>"; };
 		2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		2230F8E617162ACC007F7C98 /* Ignore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ignore.h; sourceTree = "<group>"; };
 		2230F8E717162ACC007F7C98 /* Ignore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ignore.m; sourceTree = "<group>"; };
@@ -478,6 +482,8 @@
 				2236F5FD16DA8928007BE535 /* BuffersDataSource.m */,
 				2236F60416DBCA85007BE535 /* BuffersTableView.h */,
 				2236F60516DBCA85007BE535 /* BuffersTableView.m */,
+				2212AF86175F82F900D08C7F /* ChannelInfoViewController.h */,
+				2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */,
 				2236F60016DBC020007BE535 /* ChannelsDataSource.h */,
 				2236F60116DBC021007BE535 /* ChannelsDataSource.m */,
 				22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */,
@@ -843,6 +849,7 @@
 				22B15CFB17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,
 				22B15CFD17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
 				2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */,
+				2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -893,6 +900,7 @@
 				22B15CFC17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,
 				22B15CFE17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
 				2274F4A01756723F0039B4CB /* OpenInChromeController.m in Sources */,
+				2212AF89175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

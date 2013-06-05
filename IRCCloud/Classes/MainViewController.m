@@ -16,6 +16,7 @@
 #import "EditConnectionViewController.h"
 #import "UIColor+IRCCloud.h"
 #import "ECSlidingViewController.h"
+#import "ChannelInfoViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -38,6 +39,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.navigationItem.titleView = _titleView;
+    
     _barButtonContainer = [[UIView alloc] initWithFrame:CGRectMake(0,0,_toolBar.frame.size.width, _toolBar.frame.size.height)];
     _barButtonContainer.autoresizesSubviews = YES;
     _barButtonContainer.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -182,6 +185,11 @@
     NSString *msg = nil;
     NSString *type = nil;
     switch(event) {
+        case kIRCEventChannelInit:
+        case kIRCEventChannelTopic:
+            [self _updateTitleArea];
+            [self _updateUserListVisibility];
+            break;
         case kIRCEventBadChannelKey:
             _alertObject = notification.object;
             s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
@@ -382,7 +390,7 @@
 }
 
 -(void)_hideConnectingView {
-    self.navigationItem.titleView = nil;
+    self.navigationItem.titleView = _titleView;
 }
 
 -(void)connectivityChanged:(NSNotification *)notification {
@@ -498,6 +506,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [self _updateTitleArea];
     if(self.slidingViewController) {
         [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
         CGRect frame = self.slidingViewController.view.frame;
@@ -643,18 +652,42 @@
     self.navigationItem.leftBarButtonItem.tintColor = color;
 }
 
--(void)bufferSelected:(int)bid {
-    TFLog(@"BID selected: %i", bid);
-    _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+-(void)_updateTitleArea {
     if([_buffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s.name.length)
-            self.navigationItem.title = s.name;
+            _titleLabel.text = s.name;
         else
-            self.navigationItem.title = s.hostname;
+            _titleLabel.text = s.hostname;
+        self.navigationItem.title = _titleLabel.text;
     } else {
-        self.navigationItem.title = _buffer.name;
+        self.navigationItem.title = _buffer.name = _titleLabel.text = _buffer.name;
+        _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
+        _titleLabel.font = [UIFont boldSystemFontOfSize:20];
+        if([_buffer.type isEqualToString:@"channel"]) {
+            BOOL lock = NO;
+            Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid];
+            if(channel) {
+                if([channel.mode rangeOfString:@"k"].location != NSNotFound)
+                    lock = YES;
+                if([channel.topic_text isKindOfClass:[NSString class]] && channel.topic_text.length) {
+                    _topicLabel.hidden = NO;
+                    _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
+                    _titleLabel.font = [UIFont boldSystemFontOfSize:18];
+                    _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
+                    _topicLabel.text = [[ColorFormatter format:channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:NO] string];
+                } else {
+                    _topicLabel.hidden = YES;
+                }
+            }
+        }
     }
+}
+
+-(void)bufferSelected:(int)bid {
+    TFLog(@"BID selected: %i", bid);
+    _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    [self _updateTitleArea];
     [_buffersView setBuffer:_buffer];
     [UIView animateWithDuration:0.1 animations:^{
         _eventsView.view.alpha=0;
@@ -663,9 +696,7 @@
         _eventActivity.alpha=1;
         [_eventActivity startAnimating];
     } completion:^(BOOL finished){
-        [_usersView setBuffer:_buffer];
         [_eventsView setBuffer:_buffer];
-        [self _updateUserListVisibility];
         [UIView animateWithDuration:0.1 animations:^{
             _eventsView.view.alpha=1;
             _eventActivity.alpha=0;
@@ -673,6 +704,8 @@
             [_eventActivity stopAnimating];
         }];
     }];
+    [_usersView setBuffer:_buffer];
+    [self _updateUserListVisibility];
     [self _updateServerStatus];
     if(self.slidingViewController) {
         [self.slidingViewController resetTopView];
@@ -1020,6 +1053,19 @@
             _selectedUser.hostmask = _selectedEvent.hostmask;
         }
         [self _showUserPopupInRect:rect];
+    }
+}
+
+-(IBAction)titleAreaPressed:(id)sender {
+    if([_buffer.type isEqualToString:@"channel"]) {
+        ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
+        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            [self.navigationController pushViewController:c animated:YES];
+        } else {
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:nc animated:YES completion:nil];
+        }
     }
 }
 

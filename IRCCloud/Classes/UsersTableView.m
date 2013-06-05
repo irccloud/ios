@@ -171,6 +171,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.tableView.scrollsToTop = NO;
     
     if(self.slidingViewController) {
         delegate = (id<UsersTableViewDelegate>)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];

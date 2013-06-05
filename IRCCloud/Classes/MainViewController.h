@@ -25,6 +25,10 @@
     IBOutlet UILabel *_serverStatus;
     IBOutlet UIView *_serverStatusBar;
     IBOutlet UIActivityIndicatorView *_eventActivity;
+    IBOutlet UIView *_titleView;
+    IBOutlet UILabel *_titleLabel;
+    IBOutlet UILabel *_topicLabel;
+    IBOutlet UIImageView *_lock;
     UIBarButtonItem *_usersButtonItem;
     Buffer *_buffer;
     int _startHeight;
@@ -45,4 +49,5 @@
 -(void)usersButtonPressed:(id)sender;
 -(void)listButtonPressed:(id)sender;
 -(IBAction)serverStatusBarPressed:(id)sender;
+-(IBAction)titleAreaPressed:(id)sender;
 @end

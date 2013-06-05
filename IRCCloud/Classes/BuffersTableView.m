@@ -386,6 +386,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.tableView.scrollsToTop = NO;
 
     if(self.slidingViewController) {
         _delegate = (UIViewController<BuffersTableViewDelegate> *)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];

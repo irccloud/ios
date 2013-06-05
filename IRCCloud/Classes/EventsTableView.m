@@ -122,6 +122,7 @@ int __timestampWidth;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.tableView.scrollsToTop = NO;
     UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
