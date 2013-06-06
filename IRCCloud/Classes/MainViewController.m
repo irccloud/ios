@@ -39,8 +39,9 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.navigationItem.titleView = _titleView;
     
+    self.navigationItem.titleView = _titleView;
+    self.navigationController.navigationBar.tintColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
     _barButtonContainer = [[UIView alloc] initWithFrame:CGRectMake(0,0,_toolBar.frame.size.width, _toolBar.frame.size.height)];
     _barButtonContainer.autoresizesSubviews = YES;
     _barButtonContainer.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -100,7 +101,11 @@
         self.navigationController.view.layer.shadowRadius = 10.0f;
         self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
 
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"cloud"] style:UIBarButtonItemStyleBordered target:self action:@selector(listButtonPressed:)];
+        UIButton *cloud = [UIButton buttonWithType:UIButtonTypeCustom];
+        [cloud setImage:[UIImage imageNamed:@"world"] forState:UIControlStateNormal];
+        [cloud addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+        cloud.frame = CGRectMake(0,0,40,40);
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:cloud];
     }
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
@@ -114,7 +119,11 @@
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
     [_toolBar addSubview:_message];
-    _usersButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"users"] style:UIBarButtonItemStylePlain target:self action:@selector(usersButtonPressed:)];
+    UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
+    [users setImage:[UIImage imageNamed:@"users"] forState:UIControlStateNormal];
+    [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    users.frame = CGRectMake(0,0,40,40);
+    _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
     int bid = [BuffersDataSource sharedInstance].firstBid;
     if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
         if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
@@ -297,15 +306,10 @@
                 btv.event = o;
                 btv.bans = [o objectForKey:@"bans"];
                 btv.bid = _buffer.bid;
-                if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-                    btv.navigationItem.title = @"Ban List";
-                    [self.navigationController pushViewController:btv animated:YES];
-                } else {
-                    btv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
-                    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:btv];
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
-                    [self presentViewController:nc animated:YES completion:nil];
-                }
+                btv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:btv];
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                [self presentViewController:nc animated:YES completion:nil];
             }
             break;
         case kIRCEventLinkChannel:
@@ -1067,13 +1071,9 @@
 -(IBAction)titleAreaPressed:(id)sender {
     if([_buffer.type isEqualToString:@"channel"]) {
         ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
-        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-            [self.navigationController pushViewController:c animated:YES];
-        } else {
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            [self presentViewController:nc animated:YES completion:nil];
-        }
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        [self presentViewController:nc animated:YES completion:nil];
     }
 }
 
@@ -1222,26 +1222,18 @@
             itv.ignores = s.ignores;
             itv.cid = s.cid;
             itv.navigationItem.title = @"Ignore List";
-            if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-                [self.navigationController pushViewController:itv animated:YES];
-            } else {
-                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-                [self presentViewController:nc animated:YES completion:nil];
-            }
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Mention"]) {
             //TODO: Show the double-tap tip
             [self _mention];
         } else if([action isEqualToString:@"Edit Connection…"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [ecv setServer:_buffer.cid];
-            if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-                [self.navigationController pushViewController:ecv animated:YES];
-            } else {
-                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-                [self presentViewController:nc animated:YES completion:nil];
-            }
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:nc animated:YES completion:nil];
         }
     }
     _selectedUser = nil;

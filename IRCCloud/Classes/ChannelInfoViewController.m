@@ -26,13 +26,12 @@
     [super viewDidLoad];
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        self.navigationItem.title = @"Info";
         offset = 40;
     } else {
-        self.navigationItem.title = [NSString stringWithFormat:@"%@ Info", _channel.name];
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
         offset = 80;
     }
+    self.navigationItem.title = [NSString stringWithFormat:@"%@ Info", _channel.name];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
     _topicLabel = [[TTTAttributedLabel alloc] initWithFrame:CGRectZero];
     _topicLabel.numberOfLines = 0;
     _topicLabel.lineBreakMode = NSLineBreakByWordWrapping;

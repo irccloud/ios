@@ -254,7 +254,7 @@
 								<string key="NSFrame">{{0, 4}, {24, 24}}</string>
 								<reference key="NSSuperview" ref="43149447"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="377533780"/>
+								<reference key="NSNextKeyView" ref="710922623"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<object class="NSColor" key="IBUIBackgroundColor">
 									<int key="NSColorSpace">3</int>
@@ -292,7 +292,7 @@
 								</object>
 								<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
 							</object>
-							<object class="IBUIButton" id="377533780">
+							<object class="IBUIButton" id="710922623">
 								<reference key="NSNextResponder" ref="43149447"/>
 								<int key="NSvFlags">289</int>
 								<string key="NSFrame">{{552, 0}, {32, 32}}</string>
@@ -411,7 +411,7 @@
 								<bool key="IBUIUserInteractionEnabled">NO</bool>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 								<string key="IBUIText"/>
-								<object class="NSColor" key="IBUITextColor">
+								<object class="NSColor" key="IBUITextColor" id="745693178">
 									<int key="NSColorSpace">1</int>
 									<bytes key="NSRGB">MCAwIDAAA</bytes>
 									<string key="IBUIColorCocoaTouchKeyPath">darkTextColor</string>
@@ -496,15 +496,9 @@
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 						<string key="IBUIText">Loading</string>
-						<object class="NSColor" key="IBUITextColor" id="18648767">
-							<int key="NSColorSpace">3</int>
-							<bytes key="NSWhite">MC4zMzMzMzMzMzMzAA</bytes>
-						</object>
-						<object class="NSColor" key="IBUIHighlightedColor" id="669149215">
-							<int key="NSColorSpace">3</int>
-							<bytes key="NSWhite">MC42NjY2NjY2NjY3AA</bytes>
-						</object>
-						<reference key="IBUIShadowColor" ref="532066558"/>
+						<reference key="IBUITextColor" ref="745693178"/>
+						<nil key="IBUIHighlightedColor"/>
+						<string key="IBUIShadowOffset">{0, 0}</string>
 						<int key="IBUIBaselineAdjustment">0</int>
 						<int key="IBUITextAlignment">1</int>
 						<object class="IBUIFontDescription" key="IBUIFontDescription">
@@ -539,6 +533,7 @@
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIOpaque">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
+						<int key="IBUIStyle">2</int>
 					</object>
 				</array>
 				<string key="NSFrameSize">{584, 40}</string>
@@ -568,10 +563,9 @@
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 						<string key="IBUIText"/>
-						<reference key="IBUITextColor" ref="18648767"/>
-						<reference key="IBUIHighlightedColor" ref="669149215"/>
-						<reference key="IBUIShadowColor" ref="532066558"/>
-						<string key="IBUIShadowOffset">{0, 1}</string>
+						<reference key="IBUITextColor" ref="745693178"/>
+						<nil key="IBUIHighlightedColor"/>
+						<string key="IBUIShadowOffset">{0, 0}</string>
 						<int key="IBUIBaselineAdjustment">0</int>
 						<int key="IBUITextAlignment">1</int>
 						<object class="IBUIFontDescription" key="IBUIFontDescription">
@@ -598,10 +592,9 @@
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 						<string key="IBUIText"/>
-						<reference key="IBUITextColor" ref="18648767"/>
-						<reference key="IBUIHighlightedColor" ref="669149215"/>
-						<reference key="IBUIShadowColor" ref="532066558"/>
-						<string key="IBUIShadowOffset">{0, 1}</string>
+						<reference key="IBUITextColor" ref="745693178"/>
+						<nil key="IBUIHighlightedColor"/>
+						<string key="IBUIShadowOffset">{0, 0}</string>
 						<int key="IBUIBaselineAdjustment">0</int>
 						<float key="IBUIMinimumFontSize">12</float>
 						<int key="IBUITextAlignment">1</int>
@@ -989,7 +982,7 @@
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">dismissButtonPressed:</string>
-						<reference key="source" ref="377533780"/>
+						<reference key="source" ref="710922623"/>
 						<reference key="destination" ref="14589142"/>
 						<int key="IBEventType">7</int>
 					</object>
@@ -1103,7 +1096,7 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="866748247"/>
 							<reference ref="966728334"/>
-							<reference ref="377533780"/>
+							<reference ref="710922623"/>
 						</array>
 						<reference key="parent" ref="191373211"/>
 						<string key="objectName">Top Unread View</string>
@@ -1223,7 +1216,7 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">106</int>
-						<reference key="object" ref="377533780"/>
+						<reference key="object" ref="710922623"/>
 						<reference key="parent" ref="43149447"/>
 						<string key="objectName">Dismiss</string>
 					</object>

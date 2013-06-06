@@ -628,12 +628,10 @@
         EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
         if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
             [self.slidingViewController resetTopView];
-            [(UINavigationController *)(self.slidingViewController.topViewController) pushViewController:ecv animated:YES];
-        } else {
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            [self presentViewController:nc animated:YES completion:nil];
         }
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        [self presentViewController:nc animated:YES completion:nil];
     } else {
         _selectedRow = indexPath.row;
         if(_delegate)

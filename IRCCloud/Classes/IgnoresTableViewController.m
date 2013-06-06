@@ -21,12 +21,8 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        self.navigationItem.rightBarButtonItem = _addButton;
-    } else {
-        self.navigationItem.leftBarButtonItem = _addButton;
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
-    }
+    self.navigationItem.leftBarButtonItem = _addButton;
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
