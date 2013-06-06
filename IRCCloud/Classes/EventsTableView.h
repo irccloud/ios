@@ -58,5 +58,6 @@
 -(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadBarClicked:(id)sender;
 -(IBAction)bottomUnreadBarClicked:(id)sender;
+-(IBAction)dismissButtonPressed:(id)sender;
 -(void)scrollToBottom;
 @end

@@ -400,10 +400,10 @@ int __timestampWidth;
             size.width = size.height;
         _topHighlightsCountView.frame = CGRectMake(4,6,size.width,size.height);
         _topHighlightsCountView.hidden = NO;
-        _topUnreadlabel.frame = CGRectMake(8+size.width,6,rect.size.width - size.width - 8, rect.size.height-12);
+        _topUnreadlabel.frame = CGRectMake(8+size.width,6,rect.size.width - size.width - 8 - 32, rect.size.height-12);
     } else {
         _topHighlightsCountView.hidden = YES;
-        _topUnreadlabel.frame = CGRectMake(4,6,rect.size.width - 8, rect.size.height-12);
+        _topUnreadlabel.frame = CGRectMake(4,6,rect.size.width - 8 - 32, rect.size.height-12);
     }
     if(_lastSeenEidPos == 0) {
         int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
@@ -887,6 +887,16 @@ int __timestampWidth;
     return YES;
 }
 */
+
+-(IBAction)dismissButtonPressed:(id)sender {
+    if(_topUnreadView.alpha) {
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.1];
+        _topUnreadView.alpha = 0;
+        [UIView commitAnimations];
+        [self sendHeartbeat];
+    }
+}
 
 -(IBAction)topUnreadBarClicked:(id)sender {
     if(_topUnreadView.alpha) {

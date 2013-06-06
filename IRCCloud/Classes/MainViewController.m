@@ -99,11 +99,12 @@
         self.navigationController.view.layer.shadowOpacity = 0.75f;
         self.navigationController.view.layer.shadowRadius = 10.0f;
         self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
+
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"cloud"] style:UIBarButtonItemStyleBordered target:self action:@selector(listButtonPressed:)];
     }
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.height;
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemBookmarks target:self action:@selector(listButtonPressed:)];
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,212,35)];
         _message.maximumNumberOfLines = 8;
     } else {
