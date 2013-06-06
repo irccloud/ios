@@ -654,6 +654,7 @@
 }
 
 -(void)_updateTitleArea {
+    _lock.hidden = YES;
     if([_buffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s.name.length)
@@ -680,6 +681,12 @@
                 } else {
                     _topicLabel.hidden = YES;
                 }
+            }
+            if(lock) {
+                _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font].width)/2 - 16,4,16,16);
+                _lock.hidden = NO;
+            } else {
+                _lock.hidden = YES;
             }
         }
     }

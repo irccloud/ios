@@ -14,6 +14,7 @@
 			<string>IBProxyObject</string>
 			<string>IBUIActivityIndicatorView</string>
 			<string>IBUIButton</string>
+			<string>IBUIImageView</string>
 			<string>IBUILabel</string>
 			<string>IBUIProgressView</string>
 			<string>IBUITableView</string>
@@ -163,7 +164,7 @@
 								<string key="NSFrame">{{148, 4}, {24, 24}}</string>
 								<reference key="NSSuperview" ref="227863088"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="770346423"/>
+								<reference key="NSNextKeyView" ref="991612810"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<object class="NSColor" key="IBUIBackgroundColor">
 									<int key="NSColorSpace">3</int>
@@ -203,7 +204,7 @@
 									<int key="NSfFlags">16</int>
 								</object>
 							</object>
-							<object class="IBUIButton" id="770346423">
+							<object class="IBUIButton" id="991612810">
 								<reference key="NSNextResponder" ref="227863088"/>
 								<int key="NSvFlags">289</int>
 								<string key="NSFrame">{{288, 0}, {32, 32}}</string>
@@ -483,7 +484,7 @@
 						<string key="NSFrame">{{0, 20}, {200, 18}}</string>
 						<reference key="NSSuperview" ref="1047982300"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
+						<reference key="NSNextKeyView" ref="951027648"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
@@ -505,6 +506,21 @@
 							<string key="NSName">Helvetica</string>
 							<double key="NSSize">14</double>
 							<int key="NSfFlags">16</int>
+						</object>
+					</object>
+					<object class="IBUIImageView" id="951027648">
+						<reference key="NSNextResponder" ref="1047982300"/>
+						<int key="NSvFlags">-2147483356</int>
+						<string key="NSFrameSize">{16, 16}</string>
+						<reference key="NSSuperview" ref="1047982300"/>
+						<reference key="NSWindow"/>
+						<reference key="NSNextKeyView"/>
+						<string key="NSReuseIdentifierKey">_NS:9</string>
+						<bool key="IBUIUserInteractionEnabled">NO</bool>
+						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+						<object class="NSCustomResource" key="IBUIImage">
+							<string key="NSClassName">NSImage</string>
+							<string key="NSResourceName">lock.png</string>
 						</object>
 					</object>
 				</array>
@@ -623,6 +639,14 @@
 						<reference key="destination" ref="770866425"/>
 					</object>
 					<int key="connectionID">132</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">_lock</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="951027648"/>
+					</object>
+					<int key="connectionID">137</int>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
@@ -751,7 +775,7 @@
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">dismissButtonPressed:</string>
-						<reference key="source" ref="770346423"/>
+						<reference key="source" ref="991612810"/>
 						<reference key="destination" ref="201083123"/>
 						<int key="IBEventType">7</int>
 					</object>
@@ -827,7 +851,7 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="496733564"/>
 							<reference ref="914011120"/>
-							<reference ref="770346423"/>
+							<reference ref="991612810"/>
 						</array>
 						<reference key="parent" ref="191373211"/>
 						<string key="objectName">Top Unread View</string>
@@ -913,6 +937,7 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="282206292"/>
 							<reference ref="770866425"/>
+							<reference ref="951027648"/>
 						</array>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Title View</string>
@@ -929,9 +954,14 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">134</int>
-						<reference key="object" ref="770346423"/>
+						<reference key="object" ref="991612810"/>
 						<reference key="parent" ref="227863088"/>
 						<string key="objectName">Dismiss</string>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">136</int>
+						<reference key="object" ref="951027648"/>
+						<reference key="parent" ref="1047982300"/>
 					</object>
 				</array>
 			</object>
@@ -951,6 +981,7 @@
 				<string key="129.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="134.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<real value="0.0" key="134.IBUIButtonInspectorSelectedStateConfigurationMetadataKey"/>
+				<string key="136.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="26.CustomClassName">EventsTableView</string>
 				<string key="26.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="27.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -976,7 +1007,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">135</int>
+			<int key="maxID">137</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -1240,10 +1271,10 @@
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
-		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="NS.key.0">accept.png</string>
-			<string key="NS.object.0">{16, 16}</string>
-		</object>
+		<dictionary class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
+			<string key="accept.png">{16, 16}</string>
+			<string key="lock.png">{16, 16}</string>
+		</dictionary>
 		<string key="IBCocoaTouchPluginVersion">2083</string>
 	</data>
 </archive>
