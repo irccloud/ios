@@ -81,13 +81,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
     [self performSelector:@selector(refresh) withObject:nil afterDelay:0.15];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)handleEvent:(NSNotification *)notification {
@@ -178,6 +172,14 @@
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.view.backgroundColor = [UIColor backgroundBlueColor];
     }
+
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
+}
+
+- (void)viewDidUnload {
+    [super viewDidUnload];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)didReceiveMemoryWarning {
