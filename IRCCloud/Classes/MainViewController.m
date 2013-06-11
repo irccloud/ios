@@ -101,11 +101,11 @@
         self.navigationController.view.layer.shadowRadius = 10.0f;
         self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
 
-        UIButton *cloud = [UIButton buttonWithType:UIButtonTypeCustom];
-        [cloud setImage:[UIImage imageNamed:@"world"] forState:UIControlStateNormal];
-        [cloud addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-        cloud.frame = CGRectMake(0,0,40,40);
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:cloud];
+        _menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
+        [_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+        _menuBtn.frame = CGRectMake(0,0,32,32);
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
     }
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
@@ -176,12 +176,13 @@
             }
         }
     }
+    
     if(highlightCount)
-        self.navigationItem.leftBarButtonItem.tintColor = [UIColor redColor];
+        [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
     else if(unreadCount)
-        self.navigationItem.leftBarButtonItem.tintColor = [UIColor selectedBlueColor];
+        [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
     else
-        self.navigationItem.leftBarButtonItem.tintColor = nil;
+        [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
 }
 
 - (void)handleEvent:(NSNotification *)notification {

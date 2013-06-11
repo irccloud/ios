@@ -29,6 +29,7 @@
     IBOutlet UILabel *_titleLabel;
     IBOutlet UILabel *_topicLabel;
     IBOutlet UIImageView *_lock;
+    UIButton *_menuBtn;
     UIBarButtonItem *_usersButtonItem;
     Buffer *_buffer;
     int _startHeight;
