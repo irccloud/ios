@@ -37,11 +37,13 @@
         _label = [[UILabel alloc] init];
         _label.backgroundColor = [UIColor clearColor];
         _label.textColor = [UIColor blackColor];
+        _label.font = [UIFont systemFontOfSize:18];
         [self.contentView addSubview:_label];
 
         _count = [[UILabel alloc] init];
         _count.backgroundColor = [UIColor clearColor];
         _count.textColor = [UIColor blackColor];
+        _count.font = [UIFont systemFontOfSize:18];
         [self.contentView addSubview:_count];
     }
     return self;
@@ -152,12 +154,12 @@
             [members addObject:user];
     }
     
-    [self _addUsersFromList:owners heading:@"OWNERS" headingColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] data:data];
-    [self _addUsersFromList:admins heading:@"ADMINS" headingColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] data:data];
-    [self _addUsersFromList:ops heading:@"OPS" headingColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] data:data];
-    [self _addUsersFromList:halfops heading:@"HALF OPS" headingColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] data:data];
-    [self _addUsersFromList:voiced heading:@"VOICED" headingColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] data:data];
-    [self _addUsersFromList:members heading:@"MEMBERS" headingColor:[UIColor membersHeadingColor] groupColor:[UIColor backgroundBlueColor] data:data];
+    [self _addUsersFromList:owners heading:@"Owners" headingColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] data:data];
+    [self _addUsersFromList:admins heading:@"Admins" headingColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] data:data];
+    [self _addUsersFromList:ops heading:@"Ops" headingColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] data:data];
+    [self _addUsersFromList:halfops heading:@"Half Ops" headingColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] data:data];
+    [self _addUsersFromList:voiced heading:@"Voiced" headingColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] data:data];
+    [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor membersHeadingColor] groupColor:[UIColor backgroundBlueColor] data:data];
     
     _data = data;
     [self.tableView reloadData];
@@ -198,12 +200,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    /*if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_HEADING) {
-        return 40;
-    } else {
-        return 32;
-    }*/
-    return 32;
+    return 26;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
