@@ -667,10 +667,16 @@
         else
             _titleLabel.text = s.hostname;
         self.navigationItem.title = _titleLabel.text;
+        _topicLabel.hidden = NO;
+        _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
+        _titleLabel.font = [UIFont boldSystemFontOfSize:18];
+        _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
+        _topicLabel.text = [NSString stringWithFormat:@"%@:%i", s.hostname, s.port];
     } else {
         self.navigationItem.title = _buffer.name = _titleLabel.text = _buffer.name;
         _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
         _titleLabel.font = [UIFont boldSystemFontOfSize:20];
+        _topicLabel.hidden = YES;
         if([_buffer.type isEqualToString:@"channel"]) {
             BOOL lock = NO;
             Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid];
