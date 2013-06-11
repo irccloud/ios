@@ -98,8 +98,8 @@
         _activity.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 10, _activity.frame.size.width, _activity.frame.size.height);
     }
     if(!_joinBtn.hidden) {
-        frame.size.width -= 24 + 12;
-        _joinBtn.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y, 24, frame.size.height);
+        frame.size.width -= frame.size.height + 12;
+        _joinBtn.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y, frame.size.height, frame.size.height);
     }
     if(!_highlights.hidden) {
         CGSize size = [_highlights.count sizeWithFont:_highlights.font];
