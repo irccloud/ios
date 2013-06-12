@@ -1,3 +1,5 @@
+//From: https://github.com/mayoff/uiimage-from-animated-gif
+
 #import <UIKit/UIKit.h>
 
 /**

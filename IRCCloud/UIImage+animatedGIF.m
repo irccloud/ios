@@ -1,3 +1,5 @@
+//From: https://github.com/mayoff/uiimage-from-animated-gif
+
 #import "UIImage+animatedGIF.h"
 #import <ImageIO/ImageIO.h>
 
