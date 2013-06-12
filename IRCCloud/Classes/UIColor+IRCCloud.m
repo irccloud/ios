@@ -51,6 +51,36 @@ UIImage *__newMsgsBackgroundImage;
 +(UIColor *)membersHeadingColor {
     return [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
 }
++(UIColor *)ownersBorderColor {
+    return [UIColor colorWithRed:0.996 green:0.89 blue:0.455 alpha:1]; /*#fee374*/
+}
++(UIColor *)ownersLightColor {
+    return [UIColor colorWithRed:0.996 green:0.847 blue:0.361 alpha:1]; /*#fed85c*/
+}
++(UIColor *)adminsBorderColor {
+    return [UIColor colorWithRed:0.776 green:0.616 blue:1 alpha:1]; /*#c69dff*/
+}
++(UIColor *)adminsLightColor {
+    return [UIColor colorWithRed:0.71 green:0.502 blue:1 alpha:1]; /*#b580ff*/
+}
++(UIColor *)opsBorderColor {
+    return [UIColor colorWithRed:0.98 green:0.788 blue:0.796 alpha:1]; /*#fac9cb*/
+}
++(UIColor *)opsLightColor {
+    return [UIColor colorWithRed:0.988 green:0.678 blue:0.686 alpha:1]; /*#fcadaf*/
+}
++(UIColor *)halfopsBorderColor {
+    return [UIColor colorWithRed:0.969 green:0.843 blue:0.671 alpha:1]; /*#f7d7ab*/
+}
++(UIColor *)halfopsLightColor {
+    return [UIColor colorWithRed:0.992 green:0.8 blue:0.604 alpha:1]; /*#fdcc9a*/
+}
++(UIColor *)voicedBorderColor {
+    return [UIColor colorWithRed:0.557 green:0.992 blue:0.537 alpha:1]; /*#8efd89*/
+}
++(UIColor *)voicedLightColor {
+    return [UIColor colorWithRed:0.62 green:0.922 blue:0.29 alpha:1]; /*#9eeb4a*/
+}
 +(UIColor *)timestampColor {
     return [UIColor colorWithRed:0.667 green:0.667 blue:0.667 alpha:1];
 }

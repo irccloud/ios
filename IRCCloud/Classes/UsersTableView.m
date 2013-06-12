@@ -105,14 +105,15 @@
     }
 }
 
-- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading headingColor:(UIColor *)headingColor groupColor:(UIColor *)groupColor data:(NSMutableArray *)data {
+- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor data:(NSMutableArray *)data {
     if(users.count) {
         [data addObject:@{
          @"type":@TYPE_HEADING,
          @"text":heading,
          @"color":headingColor,
-         @"bgColor":groupColor,
-         @"count":@(users.count)
+         @"bgColor":headingBgColor,
+         @"count":@(users.count),
+         @"countColor":countColor
          }];
         for(User *user in users) {
             [data addObject:@{
@@ -154,12 +155,12 @@
             [members addObject:user];
     }
     
-    [self _addUsersFromList:owners heading:@"Owners" headingColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] data:data];
-    [self _addUsersFromList:admins heading:@"Admins" headingColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] data:data];
-    [self _addUsersFromList:ops heading:@"Ops" headingColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] data:data];
-    [self _addUsersFromList:halfops heading:@"Half Ops" headingColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] data:data];
-    [self _addUsersFromList:voiced heading:@"Voiced" headingColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] data:data];
-    [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor membersHeadingColor] groupColor:[UIColor backgroundBlueColor] data:data];
+    [self _addUsersFromList:owners heading:@"Owners" headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] data:data];
+    [self _addUsersFromList:admins heading:@"Admins" headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] data:data];
+    [self _addUsersFromList:ops heading:@"Ops" headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] data:data];
+    [self _addUsersFromList:halfops heading:@"Half Ops" headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] data:data];
+    [self _addUsersFromList:voiced heading:@"Voiced" headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] data:data];
+    [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] data:data];
     
     _data = data;
     [self.tableView reloadData];
@@ -214,6 +215,7 @@
     cell.label.text = [row objectForKey:@"text"];
     cell.label.textColor = [row objectForKey:@"color"];
     cell.count.text = [[row objectForKey:@"count"] description];
+    cell.count.textColor = [row objectForKey:@"countColor"];
     
     return cell;
 }

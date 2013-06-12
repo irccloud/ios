@@ -22,6 +22,16 @@
 +(UIColor *)halfopsHeadingColor;
 +(UIColor *)voicedHeadingColor;
 +(UIColor *)membersHeadingColor;
++(UIColor *)ownersBorderColor;
++(UIColor *)ownersLightColor;
++(UIColor *)adminsBorderColor;
++(UIColor *)adminsLightColor;
++(UIColor *)opsBorderColor;
++(UIColor *)opsLightColor;
++(UIColor *)halfopsBorderColor;
++(UIColor *)halfopsLightColor;
++(UIColor *)voicedBorderColor;
++(UIColor *)voicedLightColor;
 +(UIColor *)timestampColor;
 +(UIColor *)colorFromHexString:(NSString *)hexString;
 +(UIColor *)mIRCColor:(int)color;
