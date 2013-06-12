@@ -514,6 +514,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    self.navigationController.navigationBar.clipsToBounds = YES;
     [self _updateTitleArea];
     if(self.slidingViewController) {
         [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
