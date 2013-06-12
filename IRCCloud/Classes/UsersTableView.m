@@ -174,8 +174,11 @@
     [self _addUsersFromList:voiced heading:@"Voiced" headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data];
     [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor lightGrayColor] data:data];
     
-    _data = data;
-    [self.tableView reloadData];
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _data = data;
+        [self.tableView reloadData];
+    }];
 }
 
 - (void)viewDidLoad {
