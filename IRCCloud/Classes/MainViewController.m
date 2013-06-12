@@ -98,7 +98,7 @@
         self.slidingViewController.underRightWidthLayout = ECFixedRevealWidth;
 
         self.navigationController.view.layer.shadowOpacity = 0.75f;
-        self.navigationController.view.layer.shadowRadius = 10.0f;
+        self.navigationController.view.layer.shadowRadius = 2.0f;
         self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
 
         _menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
