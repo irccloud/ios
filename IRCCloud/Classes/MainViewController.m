@@ -1013,7 +1013,12 @@
 }
 
 -(void)_showUserPopupInRect:(CGRect)rect {
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:[NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,_selectedUser.hostmask] delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    NSString *title;
+    if([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length)
+        title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,_selectedUser.hostmask];
+    else
+        title = _selectedUser.nick;
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:title delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     if(_selectedEvent)
         [sheet addButtonWithTitle:@"Copy Message"];
     //[sheet addButtonWithTitle:@"Whois…"];
