@@ -18,6 +18,9 @@
 		2223C6AB1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
 		2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
 		2223C6AD1768D7150032544B /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
+		2223C6B01768F36F0032544B /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */; };
+		2223C6B11768F36F0032544B /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */; };
+		2223C6B61768F4500032544B /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
 		2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		2230F8E817162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
 		2230F8E917162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
@@ -217,6 +220,9 @@
 		2223C6A71768D7150032544B /* ImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageViewController.h; sourceTree = "<group>"; };
 		2223C6A81768D7150032544B /* ImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageViewController.m; sourceTree = "<group>"; };
 		2223C6A91768D7150032544B /* ImageViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ImageViewController.xib; path = Classes/ImageViewController.xib; sourceTree = "<group>"; };
+		2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+animatedGIF.m"; sourceTree = "<group>"; };
+		2223C6AF1768F36F0032544B /* UIImage+animatedGIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+animatedGIF.h"; sourceTree = "<group>"; };
+		2223C6B51768F4500032544B /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		2230F8E617162ACC007F7C98 /* Ignore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ignore.h; sourceTree = "<group>"; };
 		2230F8E717162ACC007F7C98 /* Ignore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ignore.m; sourceTree = "<group>"; };
@@ -378,6 +384,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2223C6B61768F4500032544B /* ImageIO.framework in Frameworks */,
 				2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */,
 				2248DF3916EE375D0086BB42 /* libz.dylib in Frameworks */,
 				228A05D716D3DFDA0029769C /* CoreText.framework in Frameworks */,
@@ -428,6 +435,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2223C6B51768F4500032544B /* ImageIO.framework */,
 				2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */,
 				2248DF3816EE375D0086BB42 /* libz.dylib */,
 				228A05D516D3DFD00029769C /* CoreText.framework */,
@@ -460,6 +468,8 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */,
+				2223C6AF1768F36F0032544B /* UIImage+animatedGIF.h */,
 				2274F49D1756723F0039B4CB /* OpenInChromeController.h */,
 				2274F49E1756723F0039B4CB /* OpenInChromeController.m */,
 				22B15CF617301BAE0075EBA7 /* ECSlidingViewController */,
@@ -903,6 +913,7 @@
 				2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */,
 				2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
 				2223C6AA1768D7150032544B /* ImageViewController.m in Sources */,
+				2223C6B01768F36F0032544B /* UIImage+animatedGIF.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -955,6 +966,7 @@
 				2274F4A01756723F0039B4CB /* OpenInChromeController.m in Sources */,
 				2212AF89175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
 				2223C6AB1768D7150032544B /* ImageViewController.m in Sources */,
+				2223C6B11768F36F0032544B /* UIImage+animatedGIF.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

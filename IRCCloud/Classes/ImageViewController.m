@@ -8,6 +8,7 @@
 
 #import "ImageViewController.h"
 #import "AppDelegate.h"
+#import "UIImage+animatedGIF.h"
 
 @implementation ImageViewController
 
@@ -30,7 +31,7 @@
     CGFloat yScale = self.view.bounds.size.height / img.size.height;
     CGFloat minScale = MIN(xScale, yScale);
     
-    CGFloat maxScale = 1.0 / [[UIScreen mainScreen] scale];
+    CGFloat maxScale = 4;
     
     if (minScale > maxScale) {
         minScale = maxScale;
@@ -40,6 +41,7 @@
     _scrollView.maximumZoomScale = maxScale;
     _scrollView.contentSize = img.size;
     _scrollView.zoomScale = minScale;
+    [self scrollViewDidZoom:_scrollView];
 
     [_activityView stopAnimating];
     [UIView beginAnimations:nil context:nil];
@@ -77,7 +79,11 @@
 -(void)_load {
     NSData *data = [NSData dataWithContentsOfURL:_url];
     if(data) {
-        UIImage *img = [UIImage imageWithData:data];
+        UIImage *img;
+        if([[[_url description] lowercaseString] hasSuffix:@"gif"])
+            img = [UIImage animatedImageWithAnimatedGIFData:data];
+        else
+            img = [UIImage imageWithData:data];
         [self performSelectorOnMainThread:@selector(_setImage:) withObject:img waitUntilDone:YES];
     }
     //TODO: Display a message saying the image failed to download, then return to the main view
