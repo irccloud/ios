@@ -171,8 +171,9 @@
     
     if(self.slidingViewController) {
         delegate = (id<UsersTableViewDelegate>)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
+        self.tableView.separatorColor = [UIColor lightGrayColor];
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-        self.view.backgroundColor = [UIColor lightGrayColor];
+        self.view.backgroundColor = [UIColor backgroundBlueColor];
     }
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
