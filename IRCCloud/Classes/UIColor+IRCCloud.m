@@ -18,6 +18,9 @@ UIImage *__newMsgsBackgroundImage;
 +(UIColor *)selectedBlueColor {
     return [UIColor colorWithRed:0.322 green:0.49 blue:1 alpha:1];
 }
++(UIColor *)blueBorderColor {
+    return [UIColor colorWithRed:0.753 green:0.824 blue:1 alpha:1]; /*#c0d2ff*/
+}
 +(UIColor *)ownersGroupColor {
     return [UIColor colorWithRed:1 green:1 blue:0.82 alpha:1];
 }

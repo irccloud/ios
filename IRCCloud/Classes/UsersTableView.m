@@ -144,43 +144,41 @@
 }
 
 - (void)refresh {
-    @synchronized(_data) {
-        NSMutableArray *data = [[NSMutableArray alloc] init];
-        NSMutableArray *owners = [[NSMutableArray alloc] init];
-        NSMutableArray *admins = [[NSMutableArray alloc] init];
-        NSMutableArray *ops = [[NSMutableArray alloc] init];
-        NSMutableArray *halfops = [[NSMutableArray alloc] init];
-        NSMutableArray *voiced = [[NSMutableArray alloc] init];
-        NSMutableArray *members = [[NSMutableArray alloc] init];
-        
-        for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
-            if([user.mode rangeOfString:@"q"].location != NSNotFound)
-                [owners addObject:user];
-            else if([user.mode rangeOfString:@"a"].location != NSNotFound)
-                [admins addObject:user];
-            else if([user.mode rangeOfString:@"o"].location != NSNotFound)
-                [ops addObject:user];
-            else if([user.mode rangeOfString:@"h"].location != NSNotFound)
-                [halfops addObject:user];
-            else if([user.mode rangeOfString:@"v"].location != NSNotFound)
-                [voiced addObject:user];
-            else
-                [members addObject:user];
-        }
-        
-        [self _addUsersFromList:owners heading:@"Owners" headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data];
-        [self _addUsersFromList:admins heading:@"Admins" headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data];
-        [self _addUsersFromList:ops heading:@"Ops" headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data];
-        [self _addUsersFromList:halfops heading:@"Half Ops" headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data];
-        [self _addUsersFromList:voiced heading:@"Voiced" headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data];
-        [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor lightGrayColor] data:data];
-        
-        
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            _data = data;
-            [self.tableView reloadData];
-        }];
+    NSMutableArray *data = [[NSMutableArray alloc] init];
+    NSMutableArray *owners = [[NSMutableArray alloc] init];
+    NSMutableArray *admins = [[NSMutableArray alloc] init];
+    NSMutableArray *ops = [[NSMutableArray alloc] init];
+    NSMutableArray *halfops = [[NSMutableArray alloc] init];
+    NSMutableArray *voiced = [[NSMutableArray alloc] init];
+    NSMutableArray *members = [[NSMutableArray alloc] init];
+    
+    for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
+        if([user.mode rangeOfString:@"q"].location != NSNotFound)
+            [owners addObject:user];
+        else if([user.mode rangeOfString:@"a"].location != NSNotFound)
+            [admins addObject:user];
+        else if([user.mode rangeOfString:@"o"].location != NSNotFound)
+            [ops addObject:user];
+        else if([user.mode rangeOfString:@"h"].location != NSNotFound)
+            [halfops addObject:user];
+        else if([user.mode rangeOfString:@"v"].location != NSNotFound)
+            [voiced addObject:user];
+        else
+            [members addObject:user];
     }
+    
+    [self _addUsersFromList:owners heading:@"Owners" headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data];
+    [self _addUsersFromList:admins heading:@"Admins" headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data];
+    [self _addUsersFromList:ops heading:@"Ops" headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data];
+    [self _addUsersFromList:halfops heading:@"Half Ops" headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data];
+    [self _addUsersFromList:voiced heading:@"Voiced" headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data];
+    [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor lightGrayColor] data:data];
+    
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _data = data;
+        [self.tableView reloadData];
+    }];
 }
 
 - (void)viewDidLoad {
