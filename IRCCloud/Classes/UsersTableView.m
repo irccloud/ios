@@ -58,6 +58,8 @@
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
+    _border.frame = CGRectMake(0,0,frame.size.width,1);
+
     frame.origin.x = 12;
     frame.size.width -= 24;
     
@@ -66,12 +68,9 @@
         _count.frame = CGRectMake(frame.origin.x + frame.size.width - countWidth, frame.origin.y, countWidth, frame.size.height);
         _count.hidden = NO;
         _label.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width - countWidth - 6, frame.size.height);
-        _border.hidden = YES;
     } else {
         _count.hidden = YES;
         _label.frame = frame;
-        _border.frame = CGRectMake(0,0,self.contentView.bounds.size.width,1);
-        _border.hidden = NO;
     }
 }
 
@@ -114,6 +113,7 @@
 }
 
 - (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data {
+    int first;
     if(users.count) {
         [data addObject:@{
          @"type":@TYPE_HEADING,
@@ -123,7 +123,7 @@
          @"count":@(users.count),
          @"countColor":countColor
          }];
-        int first = 1;
+        first = 1;
         for(User *user in users) {
             [data addObject:@{
              @"type":@TYPE_USER,
