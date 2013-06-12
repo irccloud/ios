@@ -18,10 +18,12 @@
 @interface UsersTableCell : UITableViewCell {
     UILabel *_label;
     UILabel *_count;
+    UIView *_border;
     int _type;
 }
 @property int type;
 @property (readonly) UILabel *label,*count;
+@property (readonly) UIView *border;
 @end
 
 @implementation UsersTableCell
@@ -45,6 +47,9 @@
         _count.textColor = [UIColor grayColor];
         _count.font = [UIFont systemFontOfSize:14];
         [self.contentView addSubview:_count];
+        
+        _border = [[UIView alloc] init];
+        [self.contentView addSubview:_border];
     }
     return self;
 }
@@ -61,9 +66,12 @@
         _count.frame = CGRectMake(frame.origin.x + frame.size.width - countWidth, frame.origin.y, countWidth, frame.size.height);
         _count.hidden = NO;
         _label.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width - countWidth - 6, frame.size.height);
+        _border.hidden = YES;
     } else {
         _count.hidden = YES;
         _label.frame = frame;
+        _border.frame = CGRectMake(0,0,self.contentView.bounds.size.width,1);
+        _border.hidden = NO;
     }
 }
 
@@ -105,7 +113,7 @@
     }
 }
 
-- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor data:(NSMutableArray *)data {
+- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data {
     if(users.count) {
         [data addObject:@{
          @"type":@TYPE_HEADING,
@@ -115,13 +123,17 @@
          @"count":@(users.count),
          @"countColor":countColor
          }];
+        int first = 1;
         for(User *user in users) {
             [data addObject:@{
              @"type":@TYPE_USER,
              @"text":user.nick,
              @"color":[UIColor blackColor],
-             @"bgColor":groupColor
+             @"bgColor":groupColor,
+             @"first":@(first),
+             @"borderColor":borderColor
              }];
+            first = 0;
         }
     }
 }
@@ -155,12 +167,12 @@
             [members addObject:user];
     }
     
-    [self _addUsersFromList:owners heading:@"Owners" headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] data:data];
-    [self _addUsersFromList:admins heading:@"Admins" headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] data:data];
-    [self _addUsersFromList:ops heading:@"Ops" headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] data:data];
-    [self _addUsersFromList:halfops heading:@"Half Ops" headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] data:data];
-    [self _addUsersFromList:voiced heading:@"Voiced" headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] data:data];
-    [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] data:data];
+    [self _addUsersFromList:owners heading:@"Owners" headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data];
+    [self _addUsersFromList:admins heading:@"Admins" headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data];
+    [self _addUsersFromList:ops heading:@"Ops" headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data];
+    [self _addUsersFromList:halfops heading:@"Half Ops" headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data];
+    [self _addUsersFromList:voiced heading:@"Voiced" headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data];
+    [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor lightGrayColor] data:data];
     
     _data = data;
     [self.tableView reloadData];
@@ -172,8 +184,7 @@
     
     if(self.slidingViewController) {
         delegate = (id<UsersTableViewDelegate>)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
-        self.tableView.separatorColor = [UIColor lightGrayColor];
-        self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
         self.view.backgroundColor = [UIColor backgroundBlueColor];
     }
 
@@ -216,7 +227,12 @@
     cell.label.textColor = [row objectForKey:@"color"];
     cell.count.text = [[row objectForKey:@"count"] description];
     cell.count.textColor = [row objectForKey:@"countColor"];
-    
+    if(cell.type == TYPE_HEADING || [[row objectForKey:@"first"] intValue]) {
+        cell.border.hidden = YES;
+    } else {
+        cell.border.hidden = NO;
+        cell.border.backgroundColor = [row objectForKey:@"borderColor"];
+    }
     return cell;
 }
 
