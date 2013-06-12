@@ -99,14 +99,6 @@
     [self performSelectorInBackground:@selector(_load) withObject:nil];
 }
 
--(void)viewWillAppear:(BOOL)animated {
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
-}
-
--(void)viewWillDisappear:(BOOL)animated {
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
-}
-
 -(IBAction)viewTapped:(id)sender {
     [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
 }
