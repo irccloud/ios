@@ -37,13 +37,13 @@
         _label = [[UILabel alloc] init];
         _label.backgroundColor = [UIColor clearColor];
         _label.textColor = [UIColor blackColor];
-        _label.font = [UIFont systemFontOfSize:18];
+        _label.font = [UIFont systemFontOfSize:16];
         [self.contentView addSubview:_label];
 
         _count = [[UILabel alloc] init];
         _count.backgroundColor = [UIColor clearColor];
-        _count.textColor = [UIColor blackColor];
-        _count.font = [UIFont systemFontOfSize:18];
+        _count.textColor = [UIColor grayColor];
+        _count.font = [UIFont systemFontOfSize:14];
         [self.contentView addSubview:_count];
     }
     return self;
@@ -171,8 +171,8 @@
     
     if(self.slidingViewController) {
         delegate = (id<UsersTableViewDelegate>)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
-        self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        self.view.backgroundColor = [UIColor backgroundBlueColor];
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+        self.view.backgroundColor = [UIColor lightGrayColor];
     }
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
@@ -200,7 +200,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 26;
+    return 32;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
