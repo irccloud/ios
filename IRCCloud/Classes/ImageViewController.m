@@ -94,7 +94,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:YES];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
