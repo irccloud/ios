@@ -9,6 +9,7 @@
 #import "ChannelInfoViewController.h"
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
+#import "AppDelegate.h"
 
 @implementation ChannelInfoViewController
 
@@ -52,8 +53,11 @@
 }
 
 - (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {
+    NSString *l = [[url description] lowercaseString];
     //TODO: check for irc:// URLs
-    if(![_openInChromeController openInChrome:url
+    if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"]) {
+        [((AppDelegate *)[UIApplication sharedApplication].delegate) showImage:url];
+    } else if(![_openInChromeController openInChrome:url
                               withCallbackURL:[NSURL URLWithString:@"irccloud://"]
                                  createNewTab:NO])
         [[UIApplication sharedApplication] openURL:url];

@@ -14,6 +14,10 @@
 		220EA4101760EF8800EFEA6A /* users.png in Resources */ = {isa = PBXBuildFile; fileRef = 220EA40F1760EF8800EFEA6A /* users.png */; };
 		2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
 		2212AF89175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
+		2223C6AA1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
+		2223C6AB1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
+		2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
+		2223C6AD1768D7150032544B /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
 		2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		2230F8E817162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
 		2230F8E917162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
@@ -210,6 +214,9 @@
 		220EA40F1760EF8800EFEA6A /* users.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = users.png; sourceTree = "<group>"; };
 		2212AF86175F82F900D08C7F /* ChannelInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelInfoViewController.h; sourceTree = "<group>"; };
 		2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelInfoViewController.m; sourceTree = "<group>"; };
+		2223C6A71768D7150032544B /* ImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageViewController.h; sourceTree = "<group>"; };
+		2223C6A81768D7150032544B /* ImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageViewController.m; sourceTree = "<group>"; };
+		2223C6A91768D7150032544B /* ImageViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ImageViewController.xib; path = Classes/ImageViewController.xib; sourceTree = "<group>"; };
 		2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		2230F8E617162ACC007F7C98 /* Ignore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ignore.h; sourceTree = "<group>"; };
 		2230F8E717162ACC007F7C98 /* Ignore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ignore.m; sourceTree = "<group>"; };
@@ -438,6 +445,7 @@
 		228A057516D3DABA0029769C /* IRCCloud */ = {
 			isa = PBXGroup;
 			children = (
+				2223C6A91768D7150032544B /* ImageViewController.xib */,
 				228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */,
 				224027EC1702028F008940B1 /* LoginSplashViewController_iPad.xib */,
 				2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */,
@@ -522,6 +530,8 @@
 				2230F8E717162ACC007F7C98 /* Ignore.m */,
 				22D4309E171C663A003C0684 /* IgnoresTableViewController.h */,
 				22D4309F171C663A003C0684 /* IgnoresTableViewController.m */,
+				2223C6A71768D7150032544B /* ImageViewController.h */,
+				2223C6A81768D7150032544B /* ImageViewController.m */,
 				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
 				228A05DB16D3E40E0029769C /* LoginSplashViewController.h */,
@@ -776,6 +786,7 @@
 				229C2A0217677ED200A07CED /* menu_highlight@2x.png in Resources */,
 				229C2A0417677ED200A07CED /* menu_unread@2x.png in Resources */,
 				229C2A0617677ED200A07CED /* menu@2x.png in Resources */,
+				2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -816,6 +827,7 @@
 				229C2A0317677ED200A07CED /* menu_highlight@2x.png in Resources */,
 				229C2A0517677ED200A07CED /* menu_unread@2x.png in Resources */,
 				229C2A0717677ED200A07CED /* menu@2x.png in Resources */,
+				2223C6AD1768D7150032544B /* ImageViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -890,6 +902,7 @@
 				22B15CFD17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
 				2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */,
 				2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
+				2223C6AA1768D7150032544B /* ImageViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -941,6 +954,7 @@
 				22B15CFE17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
 				2274F4A01756723F0039B4CB /* OpenInChromeController.m in Sources */,
 				2212AF89175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
+				2223C6AB1768D7150032544B /* ImageViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

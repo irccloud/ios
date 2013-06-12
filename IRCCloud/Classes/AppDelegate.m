@@ -8,7 +8,7 @@
 
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
-#import "ECSlidingViewController.h"
+#import "ImageViewController.h"
 
 @implementation AppDelegate
 
@@ -18,6 +18,8 @@
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPhone" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPhone" bundle:nil];
+        self.slideViewController = [[ECSlidingViewController alloc] init];
+        self.slideViewController.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
     } else {
         self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPad" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPad" bundle:nil];
@@ -57,14 +59,18 @@
     }];
 }
 
+-(void)showImage:(NSURL *)url {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        self.window.rootViewController = [[ImageViewController alloc] initWithURL:url];
+    }];
+}
+
 -(void)showMainView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if([[ServersDataSource sharedInstance] count]) {
             [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
             if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-                ECSlidingViewController *evc = [[ECSlidingViewController alloc] init];
-                evc.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
-                self.window.rootViewController = evc;
+                self.window.rootViewController = self.slideViewController;
             } else {
                 self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
             }

@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "LoginSplashViewController.h"
 #import "MainViewController.h"
+#import "ECSlidingViewController.h"
 
 @class ViewController;
 
@@ -20,7 +21,9 @@
 
 @property (strong, nonatomic) LoginSplashViewController *loginSplashViewController;
 @property (strong, nonatomic) MainViewController *mainViewController;
+@property (strong, nonatomic) ECSlidingViewController *slideViewController;
 
+-(void)showImage:(NSURL *)url;
 -(void)showLoginView;
 -(void)showMainView;
 

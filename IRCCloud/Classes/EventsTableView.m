@@ -10,6 +10,7 @@
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
 #import "ColorFormatter.h"
+#import "AppDelegate.h"
 
 int __timestampWidth;
 
@@ -135,7 +136,10 @@ int __timestampWidth;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogCompleted:)
                                                  name:kIRCCloudBacklogCompletedNotification object:nil];
-    [self refresh];
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self refresh];
+    }];
     if(!_scrolledUp)
         [self scrollToBottom];
 }
@@ -740,7 +744,7 @@ int __timestampWidth;
     }
     
     [self.tableView reloadData];
-    if(_requestingBacklog && backlogEid > 0) {
+    if(_requestingBacklog && backlogEid > 0 && _scrolledUp) {
         int markerPos = -1;
         for(Event *e in _data) {
             if(e.eid == backlogEid)
@@ -748,7 +752,7 @@ int __timestampWidth;
             markerPos++;
         }
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-    } else if(!_scrolledUp && _data.count && (_scrollTimer || !_firstScroll)) {
+    } else if(!_scrolledUp || (_data.count && (_scrollTimer || !_firstScroll))) {
         [self _scrollToBottom];
         [self scrollToBottom];
     }
@@ -842,8 +846,11 @@ int __timestampWidth;
 }
 
 - (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {
+    NSString *l = [[url description] lowercaseString];
     //TODO: check for irc:// URLs
-    if(![_openInChromeController openInChrome:url
+    if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"]) {
+        [((AppDelegate *)[UIApplication sharedApplication].delegate) showImage:url];
+    } else if(![_openInChromeController openInChrome:url
                           withCallbackURL:[NSURL URLWithString:@"irccloud://"]
                              createNewTab:NO])
         [[UIApplication sharedApplication] openURL:url];

@@ -41,7 +41,7 @@
     [super viewDidLoad];
     
     self.navigationItem.titleView = _titleView;
-    self.navigationController.navigationBar.tintColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+
     _barButtonContainer = [[UIView alloc] initWithFrame:CGRectMake(0,0,_toolBar.frame.size.width, _toolBar.frame.size.height)];
     _barButtonContainer.autoresizesSubviews = YES;
     _barButtonContainer.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -392,10 +392,12 @@
 }
 
 -(void)_showConnectingView {
+    self.navigationController.navigationBar.tintColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
     self.navigationItem.titleView = _connectingView;
 }
 
 -(void)_hideConnectingView {
+    self.navigationController.navigationBar.tintColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
     self.navigationItem.titleView = _titleView;
 }
 
@@ -659,6 +661,7 @@
 }
 
 -(void)_updateTitleArea {
+    self.navigationController.navigationBar.tintColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
     _lock.hidden = YES;
     if([_buffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
