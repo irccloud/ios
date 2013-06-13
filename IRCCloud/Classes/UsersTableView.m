@@ -105,7 +105,7 @@
         case kIRCEventMemberUpdates:
         case kIRCEventUserChannelMode:
         case kIRCEventKick:
-            //[self refresh];
+            [self refresh];
             break;
         default:
             break;
