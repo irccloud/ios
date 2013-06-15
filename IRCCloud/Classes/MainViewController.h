@@ -21,7 +21,7 @@
     IBOutlet UIProgressView *_connectingProgress;
     IBOutlet UILabel *_connectingStatus;
     IBOutlet UIActivityIndicatorView *_connectingActivity;
-    IBOutlet UIToolbar *_toolBar;
+    IBOutlet UIImageView *_bottomBar;
     IBOutlet UILabel *_serverStatus;
     IBOutlet UIView *_serverStatusBar;
     IBOutlet UIActivityIndicatorView *_eventActivity;
@@ -38,7 +38,6 @@
     CGRect _selectedRect;
     int _cidToOpen;
     NSString *_bufferToOpen;
-    UIView *_barButtonContainer;
     NSTimer *_doubleTapTimer;
     NSMutableArray *_pendingEvents;
     int _bidToOpen;

@@ -42,42 +42,25 @@
     
     self.navigationItem.titleView = _titleView;
 
-    _barButtonContainer = [[UIView alloc] initWithFrame:CGRectMake(0,0,_toolBar.frame.size.width, _toolBar.frame.size.height)];
-    _barButtonContainer.autoresizesSubviews = YES;
-    _barButtonContainer.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    
-    UIImage *buttonImage = [[UIImage imageNamed:@"UINavigationBarDefaultButton"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
-    UIImage *pressedButtonImage = [[UIImage imageNamed:@"UINavigationBarDefaultButtonPressed"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
-    UIImage *doneButtonImage = [[UIImage imageNamed:@"UINavigationBarDoneButton"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
-    UIImage *donePressedButtonImage = [[UIImage imageNamed:@"UINavigationBarDoneButtonPressed"] stretchableImageWithLeftCapWidth:5 topCapHeight:0];
+    _bottomBar.image = [[UIImage imageNamed:@"bottombar"] stretchableImageWithLeftCapWidth:0 topCapHeight:1];
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.titleLabel.font = [UIFont boldSystemFontOfSize:14.0f];
     button.contentMode = UIViewContentModeScaleToFill;
     button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-    
-    [button setBackgroundImage:buttonImage forState:UIControlStateNormal];
-    [button setBackgroundImage:pressedButtonImage forState:UIControlStateHighlighted];
     [button setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
     [button addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [button sizeToFit];
-    button.frame = CGRectMake(8,8,button.frame.size.width + 12, button.frame.size.height);
-    [_barButtonContainer addSubview:button];
+    button.frame = CGRectMake(8,6,button.frame.size.width, button.frame.size.height);
+    [_bottomBar addSubview:button];
 
     button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.titleLabel.font = [UIFont boldSystemFontOfSize:14.0f];
     button.contentMode = UIViewContentModeScaleToFill;
     button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
-    
-    [button setBackgroundImage:doneButtonImage forState:UIControlStateNormal];
-    [button setBackgroundImage:donePressedButtonImage forState:UIControlStateHighlighted];
-    [button setTitle:@"Send" forState:UIControlStateNormal];
+    [button setImage:[UIImage imageNamed:@"send"] forState:UIControlStateNormal];
     [button addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [button sizeToFit];
-    button.frame = CGRectMake(_toolBar.frame.size.width - button.frame.size.width - 20,8,button.frame.size.width + 12,button.frame.size.height);
-    [_barButtonContainer addSubview:button];
-    
-    [_toolBar addSubview:_barButtonContainer];
+    button.frame = CGRectMake(_bottomBar.frame.size.width - button.frame.size.width - 8,6,button.frame.size.width,button.frame.size.height);
+    [_bottomBar addSubview:button];
     
     if(_buffersView)
         [self addChildViewController:_buffersView];
@@ -110,15 +93,15 @@
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.height;
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,212,35)];
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,226,35)];
         _message.maximumNumberOfLines = 8;
     } else {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.width - self.navigationController.navigationBar.frame.size.height;
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,10,476,35)];
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,490,35)];
     }
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
-    [_toolBar addSubview:_message];
+    [_bottomBar addSubview:_message];
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[UIImage imageNamed:@"users"] forState:UIControlStateNormal];
     [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -652,8 +635,7 @@
     frame.origin.y = self.view.frame.size.height - height - 9 - frame.size.height;
     _serverStatusBar.frame = frame;
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-    _toolBar.frame = CGRectMake(_toolBar.frame.origin.x, self.view.frame.size.height - height - 9, _toolBar.frame.size.width, height + 9);
-    _barButtonContainer.frame = CGRectMake(0,0,_toolBar.frame.size.width, _toolBar.frame.size.height);
+    _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 9, _bottomBar.frame.size.width, height + 9);
 }
 
 -(void)setUnreadColor:(UIColor *)color {
@@ -836,9 +818,9 @@
             CGRect frame = _eventsView.view.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
             _eventsView.view.frame = frame;
-            frame = _toolBar.frame;
+            frame = _bottomBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
-            _toolBar.frame = frame;
+            _bottomBar.frame = frame;
             frame = _serverStatusBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
             _serverStatusBar.frame = frame;
@@ -847,9 +829,9 @@
             CGRect frame = _eventsView.view.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
             _eventsView.view.frame = frame;
-            frame = _toolBar.frame;
+            frame = _bottomBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
-            _toolBar.frame = frame;
+            _bottomBar.frame = frame;
             frame = _serverStatusBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
             _serverStatusBar.frame = frame;

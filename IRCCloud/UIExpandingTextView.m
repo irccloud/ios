@@ -30,7 +30,7 @@
 
 #import "UIExpandingTextView.h"
 
-#define kTextInsetX 4
+#define kTextInsetX 1
 #define kTextInsetBottom 0
 
 @implementation UIExpandingTextView
@@ -82,7 +82,7 @@
 		internalTextView = [[UIExpandingTextViewInternal alloc] initWithFrame:textViewFrame];
 		internalTextView.delegate        = self;
 		internalTextView.font            = [UIFont systemFontOfSize:15.0]; 
-		internalTextView.contentInset    = UIEdgeInsetsMake(-4,0,-4,0);	
+		internalTextView.contentInset    = UIEdgeInsetsMake(-1,0,-1,0);
         internalTextView.text            = @"-";
 		internalTextView.scrollEnabled   = NO;
         internalTextView.opaque          = NO;
