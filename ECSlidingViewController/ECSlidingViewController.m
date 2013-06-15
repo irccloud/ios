@@ -246,6 +246,8 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 
 - (void)updateTopViewHorizontalCenterWithRecognizer:(UIPanGestureRecognizer *)recognizer
 {
+    static BOOL underLeftWasShowing = NO;
+    static BOOL underRightWasShowing = NO;
   CGPoint currentTouchPoint     = [recognizer locationInView:self.view];
   CGFloat currentTouchPositionX = currentTouchPoint.x;
   
@@ -261,14 +263,26 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
       newCenterPosition = self.resettedCenter;
     }
     
+      if((newCenterPosition > self.resettedCenter && underRightWasShowing) || (newCenterPosition < self.resettedCenter && underLeftWasShowing)) {
+          newCenterPosition = self.resettedCenter;
+      }
+          
+      
     BOOL newCenterPositionIsOutsideAnchor = newCenterPosition < self.anchorLeftTopViewCenter || self.anchorRightTopViewCenter < newCenterPosition;
     
     if ((newCenterPositionIsOutsideAnchor && self.shouldAllowPanningPastAnchor) || !newCenterPositionIsOutsideAnchor) {
       [self topViewHorizontalCenterWillChange:newCenterPosition];
       [self updateTopViewHorizontalCenter:newCenterPosition];
       [self topViewHorizontalCenterDidChange:newCenterPosition];
+        if(self.underLeftShowing)
+            underLeftWasShowing = self.underLeftShowing;
+        
+        if(self.underRightShowing)
+            underRightWasShowing = self.underRightShowing;
     }
   } else if (recognizer.state == UIGestureRecognizerStateEnded || recognizer.state == UIGestureRecognizerStateCancelled) {
+      underLeftWasShowing = NO;
+      underRightWasShowing = NO;
     CGFloat panAmount            = currentTouchPositionX - self.initialTouchPositionX;
     CGPoint currentVelocityPoint = [recognizer velocityInView:self.view];
     CGFloat currentVelocityX     = currentVelocityPoint.x;
