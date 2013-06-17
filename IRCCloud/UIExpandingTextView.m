@@ -240,6 +240,7 @@
 			r.origin.x = 0;
             r.size.height -= 8;
             internalTextView.frame = CGRectInset(r, kTextInsetX, 0);
+            internalTextView.contentInset = UIEdgeInsetsMake(-1,0,-1,0);
             textViewBackgroundImage.frame = r;
             
 			if(animateHeightChange)

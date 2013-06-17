@@ -614,7 +614,7 @@
             e.reqId = [[NetworkConnection sharedInstance] say:_message.text to:_buffer.name cid:_buffer.cid];
             if(e.msg)
                 [_pendingEvents addObject:e];
-            _message.text = @"";
+            [_message clearText];
         }
     }
 }
