@@ -42,7 +42,7 @@
     
     self.navigationItem.titleView = _titleView;
 
-    _bottomBar.image = [[UIImage imageNamed:@"bottombar"] stretchableImageWithLeftCapWidth:0 topCapHeight:1];
+    //_bottomBar.image = [[UIImage imageNamed:@"bottombar"] stretchableImageWithLeftCapWidth:0 topCapHeight:1];
     
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     button.contentMode = UIViewContentModeScaleToFill;
