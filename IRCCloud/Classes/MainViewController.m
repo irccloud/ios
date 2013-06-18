@@ -120,52 +120,54 @@
 }
 
 - (void)_updateUnreadIndicator {
-    int unreadCount = 0;
-    int highlightCount = 0;
-    NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
-    
-    for(Server *server in [[ServersDataSource sharedInstance] getServers]) {
-        NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:server.cid];
-        for(Buffer *buffer in buffers) {
-            int type = -1;
-            int joined = 1;
-            if([buffer.type isEqualToString:@"channel"]) {
-                type = 1;
-                Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid];
-                if(!channel) {
-                    joined = 0;
+    @synchronized(_buffer) {
+        int unreadCount = 0;
+        int highlightCount = 0;
+        NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+        
+        for(Server *server in [[ServersDataSource sharedInstance] getServers]) {
+            NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:server.cid];
+            for(Buffer *buffer in buffers) {
+                int type = -1;
+                int joined = 1;
+                if([buffer.type isEqualToString:@"channel"]) {
+                    type = 1;
+                    Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid];
+                    if(!channel) {
+                        joined = 0;
+                    }
+                } else if([buffer.type isEqualToString:@"conversation"]) {
+                    type = 2;
                 }
-            } else if([buffer.type isEqualToString:@"conversation"]) {
-                type = 2;
-            }
-            if(joined > 0 && buffer.archived == 0) {
-                int unread = 0;
-                int highlights = 0;
-                unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
-                highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
-                if(type == 1) {
-                    if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
-                        unread = 0;
-                } else {
-                    if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
-                        unread = 0;
-                    if(type == 2 && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
-                        highlights = 0;
-                }
-                if(buffer.bid != _buffer.bid) {
-                    unreadCount += unread;
-                    highlightCount += highlights;
+                if(joined > 0 && buffer.archived == 0) {
+                    int unread = 0;
+                    int highlights = 0;
+                    unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    if(type == 1) {
+                        if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            unread = 0;
+                    } else {
+                        if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            unread = 0;
+                        if(type == 2 && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            highlights = 0;
+                    }
+                    if(buffer.bid != _buffer.bid) {
+                        unreadCount += unread;
+                        highlightCount += highlights;
+                    }
                 }
             }
         }
+        
+        if(highlightCount)
+            [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
+        else if(unreadCount)
+            [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
+        else
+            [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
     }
-    
-    if(highlightCount)
-        [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
-    else if(unreadCount)
-        [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
-    else
-        [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
 }
 
 - (void)handleEvent:(NSNotification *)notification {
@@ -371,7 +373,7 @@
             break;
     }
     if(self.slidingViewController)
-        [self _updateUnreadIndicator];
+        [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
 }
 
 -(void)_showConnectingView {
@@ -609,7 +611,7 @@
                 e.pending = YES;
                 [_eventsView scrollToBottom];
                 [[EventsDataSource sharedInstance] addEvent:e];
-                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
+                [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
             }
             e.reqId = [[NetworkConnection sharedInstance] say:_message.text to:_buffer.name cid:_buffer.cid];
             if(e.msg)

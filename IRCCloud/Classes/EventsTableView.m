@@ -157,10 +157,13 @@ int __timestampWidth;
 }
 
 - (void)_sendHeartbeat {
-    NSTimeInterval eid = [[[[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] lastObject] eid];
-    if(eid > _buffer.last_seen_eid) {
-        [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
-        _buffer.last_seen_eid = eid;
+    Event *last = [[[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] lastObject];
+    if(!last.pending) {
+        NSTimeInterval eid = last.eid;
+        if(eid > _buffer.last_seen_eid) {
+            [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
+            _buffer.last_seen_eid = eid;
+        }
     }
     _heartbeatTimer = nil;
 }
@@ -799,17 +802,19 @@ int __timestampWidth;
     Event *e = [_data objectAtIndex:indexPath.row];
     [_lock unlock];
     if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED) {
-        if(e.formatted == nil && e.formattedMsg.length > 0) {
+        if(e.formatted != nil && e.height > 0) {
+            return e.height;
+        } else if(e.formatted == nil && e.formattedMsg.length > 0) {
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify];
         } else if(e.formattedMsg.length == 0) {
-            TFLog(@"No formatted message: %@", e);
+            //TFLog(@"No formatted message: %@", e);
             return 26;
         }
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
          CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth,CGFLOAT_MAX), NULL);
-         float height = ceilf(suggestedSize.height);
+         e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
          CFRelease(framesetter);
-        return height + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+        return e.height;
     } else {
         return 26;
     }

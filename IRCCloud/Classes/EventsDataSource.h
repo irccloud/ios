@@ -48,6 +48,7 @@
     int _reqid;
     BOOL _pending;
     BOOL _monospace;
+    float _height;
 }
 @property int cid, bid, rowType, reqId;
 @property NSTimeInterval eid, groupEid;
@@ -56,6 +57,7 @@
 @property NSDictionary *ops;
 @property UIColor *color, *bgColor;
 @property NSAttributedString *formatted;
+@property float height;
 -(NSComparisonResult)compare:(Event *)aEvent;
 -(BOOL)isImportant:(NSString *)bufferType;
 @end
