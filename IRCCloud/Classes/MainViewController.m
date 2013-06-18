@@ -17,6 +17,7 @@
 #import "UIColor+IRCCloud.h"
 #import "ECSlidingViewController.h"
 #import "ChannelInfoViewController.h"
+#import "ChannelListTableViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -165,6 +166,7 @@
     Buffer *b = nil;
     IRCCloudJSONObject *o = nil;
     BansTableViewController *btv = nil;
+    ChannelListTableViewController *ctv = nil;
     Event *e = nil;
     Server *s = nil;
     UIAlertView *alert = nil;
@@ -284,6 +286,38 @@
                 btv.bid = _buffer.bid;
                 btv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:btv];
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventListResponseFetching:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                s = [[ServersDataSource sharedInstance] getServer:o.cid];
+                _alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Loading channel list for %@…", [o objectForKey:@"server"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [_alert show];
+            }
+            break;
+        case kIRCEventListResponseTooManyChannels:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                s = [[ServersDataSource sharedInstance] getServer:o.cid];
+                if(_alert)
+                    [_alert dismissWithClickedButtonIndex:0 animated:YES];
+                alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Too many channels to list for %@", [o objectForKey:@"server"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            }
+            break;
+        case kIRCEventListResponse:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                if(_alert)
+                    [_alert dismissWithClickedButtonIndex:0 animated:YES];
+                ctv = [[ChannelListTableViewController alloc] initWithStyle:UITableViewStylePlain];
+                ctv.event = o;
+                ctv.channels = [o objectForKey:@"channels"];
+                ctv.navigationItem.title = @"Channel List";
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ctv];
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 [self presentViewController:nc animated:YES completion:nil];
             }
@@ -1119,6 +1153,7 @@
             }
             break;
     }
+    _alert = nil;
 }
 
 -(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
