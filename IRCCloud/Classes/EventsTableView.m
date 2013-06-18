@@ -508,9 +508,10 @@ int __timestampWidth;
 
     e.timestamp = [_formatter stringFromDate:date];
     e.groupEid = _currentCollapsedEid;
-    e.formatted = nil;
-    if(e.groupMsg && !e.formattedMsg)
+    if(e.groupMsg && !e.formattedMsg) {
         e.formattedMsg = e.groupMsg;
+        e.formatted = nil;
+    }
     
     if(eid > _maxEid || _data.count == 0 || eid > ((Event *)[_data objectAtIndex:_data.count - 1]).eid) {
         //Message at bottom
@@ -986,7 +987,7 @@ int __timestampWidth;
     
     if(indexPath.row < _data.count) {
         NSTimeInterval group = ((Event *)[_data objectAtIndex:indexPath.row]).groupEid;
-        if(group) {
+        if(group > 0) {
             if([_expandedSectionEids objectForKey:@(group)])
                 [_expandedSectionEids removeObjectForKey:@(group)];
             else
