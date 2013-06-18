@@ -812,7 +812,7 @@
     if(self.slidingViewController) {
         if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
             self.navigationItem.rightBarButtonItem = _usersButtonItem;
-            if(self.slidingViewController.underLeftViewController == nil)
+            if(self.slidingViewController.underRightViewController == nil)
                 self.slidingViewController.underRightViewController = _usersView;
         } else {
             self.navigationItem.rightBarButtonItem = nil;
