@@ -163,7 +163,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[NSString stringWithFormat:@"email=%@&password=%@", [email stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [password stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] dataUsingEncoding:NSUTF8StringEncoding]];
+    [request setHTTPBody:[[[NSString stringWithFormat:@"email=%@&password=%@", [email stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding], [password stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] stringByReplacingOccurrencesOfString:@"+" withString:@"%2B"] dataUsingEncoding:NSUTF8StringEncoding]];
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
