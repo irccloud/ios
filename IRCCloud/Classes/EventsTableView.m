@@ -670,6 +670,9 @@ int __timestampWidth;
     [_collapsedEvents clear];
     [_unseenHighlightPositions removeAllObjects];
     
+    if(!_buffer)
+        return;
+    
     [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
 
     __timestampWidth = [@"88:88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
@@ -942,7 +945,7 @@ int __timestampWidth;
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(!_ready || !_firstScroll)
+    if(!_ready || !_firstScroll || !_buffer)
         return;
     
     if(self.tableView.tableHeaderView && _minEid > 0 && _buffer && _buffer.bid != -1/* TODO: && conn.ready */) {

@@ -107,16 +107,6 @@
     [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     users.frame = CGRectMake(0,0,40,40);
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
-    int bid = [BuffersDataSource sharedInstance].firstBid;
-    if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
-        if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
-            bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
-    }
-    if(_bidToOpen != -1) {
-        bid = _bidToOpen;
-        _bidToOpen = -1;
-    }
-    [self bufferSelected:bid];
 }
 
 - (void)_updateUnreadIndicator {
@@ -497,6 +487,18 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    if(!_buffer) {
+        int bid = [BuffersDataSource sharedInstance].firstBid;
+        if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
+            if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+                bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
+        }
+        if(_bidToOpen != -1) {
+            bid = _bidToOpen;
+            _bidToOpen = -1;
+        }
+        [self bufferSelected:bid];
+    }
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.clipsToBounds = YES;
     [self _updateTitleArea];
@@ -513,6 +515,7 @@
         self.view.frame = frame;
     }
     [_message resignFirstResponder];
+    self.navigationItem.titleView = _titleView;
     [self connectivityChanged:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     
@@ -1209,11 +1212,16 @@
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
             [[NSUserDefaults standardUserDefaults] synchronize];
             [[NetworkConnection sharedInstance] disconnect];
+            [[NetworkConnection sharedInstance] cancelIdleTimer];
             [[NetworkConnection sharedInstance] clearPrefs];
             [[ServersDataSource sharedInstance] clear];
             [[UsersDataSource sharedInstance] clear];
             [[ChannelsDataSource sharedInstance] clear];
             [[EventsDataSource sharedInstance] clear];
+            _buffer = nil;
+            [_eventsView setBuffer:nil];
+            [_buffersView setBuffer:nil];
+            [_usersView setBuffer:nil];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
         } else if([action isEqualToString:@"Ignore List…"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
