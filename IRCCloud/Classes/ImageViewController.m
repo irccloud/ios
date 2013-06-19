@@ -9,6 +9,7 @@
 #import "ImageViewController.h"
 #import "AppDelegate.h"
 #import "UIImage+animatedGIF.h"
+#import "OpenInChromeController.h"
 
 @implementation ImageViewController
 
@@ -77,16 +78,24 @@
 }
 
 -(void)_load {
+    UIImage *img = nil;
     NSData *data = [NSData dataWithContentsOfURL:_url];
     if(data) {
-        UIImage *img;
         if([[[_url description] lowercaseString] hasSuffix:@"gif"])
             img = [UIImage animatedImageWithAnimatedGIFData:data];
         else
             img = [UIImage imageWithData:data];
-        [self performSelectorOnMainThread:@selector(_setImage:) withObject:img waitUntilDone:YES];
+        if(img)
+            [self performSelectorOnMainThread:@selector(_setImage:) withObject:img waitUntilDone:YES];
     }
-    //TODO: Display a message saying the image failed to download, then return to the main view
+    if(!data || !img) {
+        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
+        OpenInChromeController *chrome = [[OpenInChromeController alloc] init];
+        if(![chrome openInChrome:_url
+                                  withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                                     createNewTab:NO])
+            [[UIApplication sharedApplication] openURL:_url];
+    }
 }
 
 - (void)viewDidLoad {
