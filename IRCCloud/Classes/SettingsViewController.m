@@ -31,11 +31,10 @@
     SBJsonWriter *writer = [[SBJsonWriter alloc] init];
     NSString *json = [writer stringWithObject:prefs];
     
-    //TODO: check the response
-    [[NetworkConnection sharedInstance] setEmail:_email.text realname:_name.text highlights:_highlights.text autoaway:_autoaway.isOn];
-    [[NetworkConnection sharedInstance] setPrefs:json];
-    
-    [self dismissViewControllerAnimated:YES completion:nil];
+    _userinfosaved = NO;
+    _prefssaved = NO;
+    _userinforeqid = [[NetworkConnection sharedInstance] setEmail:_email.text realname:_name.text highlights:_highlights.text autoaway:_autoaway.isOn];
+    _prefsreqid = [[NetworkConnection sharedInstance] setPrefs:json];
 }
 
 -(void)cancelButtonPressed:(id)sender {
@@ -52,10 +51,30 @@
 
 -(void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-
+    IRCCloudJSONObject *o;
+    int reqid;
+    
     switch(event) {
         case kIRCEventUserInfo:
             [self refresh];
+            break;
+        case kIRCEventFailureMsg:
+            o = notification.object;
+            reqid = [[o objectForKey:@"_reqid"] intValue];
+            if(reqid == _userinforeqid || reqid == _prefsreqid) {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            }
+            break;
+        case kIRCEventSuccess:
+            o = notification.object;
+            reqid = [[o objectForKey:@"_reqid"] intValue];
+            if(reqid == _userinforeqid)
+                _userinfosaved = YES;
+            if(reqid == _prefsreqid)
+                _prefssaved = YES;
+            if(_userinfosaved == YES && _prefssaved == YES)
+                [self dismissViewControllerAnimated:YES completion:nil];
             break;
         default:
             break;

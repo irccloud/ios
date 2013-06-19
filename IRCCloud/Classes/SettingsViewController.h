@@ -16,7 +16,10 @@
     UISwitch *_24hour;
     UISwitch *_seconds;
     UISwitch *_symbols;
-    int _reqid;
     NSString *_version;
+    int _userinforeqid;
+    int _prefsreqid;
+    BOOL _userinfosaved;
+    BOOL _prefssaved;
 }
 @end
