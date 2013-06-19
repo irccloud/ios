@@ -18,6 +18,7 @@
 #import "ECSlidingViewController.h"
 #import "ChannelInfoViewController.h"
 #import "ChannelListTableViewController.h"
+#import "SettingsViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -893,7 +894,6 @@
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     if([_buffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-        NSLog(@"Status: %@", s.status);
         if([s.status isEqualToString:@"disconnected"]) {
             [sheet addButtonWithTitle:@"Reconnect"];
             [sheet addButtonWithTitle:@"Delete"];
@@ -923,7 +923,7 @@
     }
     [sheet addButtonWithTitle:@"Ignore List…"];
     //[sheet addButtonWithTitle:@"Display Options…"];
-    //[sheet addButtonWithTitle:@"Settings…"];
+    [sheet addButtonWithTitle:@"Settings…"];
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
     if(self.slidingViewController)
@@ -1274,6 +1274,11 @@
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [ecv setServer:_buffer.cid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:nc animated:YES completion:nil];
+        } else if([action isEqualToString:@"Settings…"]) {
+            SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];
         }
