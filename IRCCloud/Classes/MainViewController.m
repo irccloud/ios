@@ -19,6 +19,7 @@
 #import "ChannelInfoViewController.h"
 #import "ChannelListTableViewController.h"
 #import "SettingsViewController.h"
+#import "CallerIDTableViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -168,6 +169,7 @@
     IRCCloudJSONObject *o = nil;
     BansTableViewController *btv = nil;
     ChannelListTableViewController *ctv = nil;
+    CallerIDTableViewController *citv = nil;
     Event *e = nil;
     Server *s = nil;
     UIAlertView *alert = nil;
@@ -319,6 +321,18 @@
                 ctv.channels = [o objectForKey:@"channels"];
                 ctv.navigationItem.title = @"Channel List";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ctv];
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventAcceptList:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                citv = [[CallerIDTableViewController alloc] initWithStyle:UITableViewStylePlain];
+                citv.event = o;
+                citv.nicks = [o objectForKey:@"nicks"];
+                citv.navigationItem.title = @"Accept List";
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:citv];
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 [self presentViewController:nc animated:YES completion:nil];
             }
