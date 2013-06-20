@@ -1001,11 +1001,15 @@ int __timestampWidth;
             else
                 [_expandedSectionEids setObject:@(YES) forKey:@(group)];
             [self refresh];
+        } else if(indexPath.row < _data.count) {
+            Event *e = [_data objectAtIndex:indexPath.row];
+            if([e.type isEqualToString:@"channel_invite"])
+                [_conn join:e.oldNick key:nil cid:e.cid];
+            else if([e.type isEqualToString:@"callerid"])
+                [_conn say:[NSString stringWithFormat:@"/accept %@", e.nick] to:nil cid:e.cid];
+            else
+                [_delegate rowSelected:e];
         }
-        if(indexPath.row < _data.count)
-            [_delegate rowSelected:[_data objectAtIndex:indexPath.row]];
-        else
-            [_delegate rowSelected:[_data objectAtIndex:_data.count - 1]];
     }
 }
 
