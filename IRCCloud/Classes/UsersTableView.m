@@ -141,6 +141,8 @@
 - (void)setBuffer:(Buffer *)buffer {
     _buffer = buffer;
     [self refresh];
+    if(_data.count)
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
 }
 
 - (void)refresh {
