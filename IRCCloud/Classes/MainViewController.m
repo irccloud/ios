@@ -408,6 +408,11 @@
                 }
             }
             break;
+        case kIRCEventDeleteBuffer:
+            o = notification.object;
+            if(o.bid == _buffer.bid)
+                [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+            break;
         default:
             break;
     }
