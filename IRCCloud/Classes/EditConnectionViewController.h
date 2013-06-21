@@ -24,6 +24,8 @@
     int _cid;
     int _reqid;
     NSString *_netname;
+    NSURL *_url;
 }
 -(void)setServer:(int)cid;
+-(void)setURL:(NSURL *)url;
 @end

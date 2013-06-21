@@ -53,14 +53,9 @@
 }
 
 - (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {
-    NSString *l = [[url description] lowercaseString];
-    //TODO: check for irc:// URLs
-    if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"]) {
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) showImage:url];
-    } else if(![_openInChromeController openInChrome:url
-                              withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                                 createNewTab:NO])
-        [[UIApplication sharedApplication] openURL:url];
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
+    if([url.scheme hasPrefix:@"irc"])
+        [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -102,11 +97,15 @@
     [_modeHints removeAllObjects];
     _topicChanged = NO;
     if([_channel.topic_text isKindOfClass:[NSString class]] && _channel.topic_text.length) {
-        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:YES];
+        NSArray *links;
+        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
         _topicLabel.text = _topic;
+        for(NSTextCheckingResult *result in links) {
+            [_topicLabel addLinkWithTextCheckingResult:result];
+        }
         _topicEdit.text = [_topic string];
     } else {
-        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor grayColor] mono:NO linkify:NO];
+        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor grayColor] mono:NO linkify:NO server:nil links:nil];
         _topicLabel.text = _topic;
         _topicEdit.text = @"";
     }

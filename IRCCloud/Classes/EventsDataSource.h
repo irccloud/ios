@@ -49,6 +49,7 @@
     BOOL _pending;
     BOOL _monospace;
     float _height;
+    NSArray *_links;
 }
 @property int cid, bid, rowType, reqId;
 @property NSTimeInterval eid, groupEid;
@@ -58,6 +59,7 @@
 @property UIColor *color, *bgColor;
 @property NSAttributedString *formatted;
 @property float height;
+@property NSArray *links;
 -(NSComparisonResult)compare:(Event *)aEvent;
 -(BOOL)isImportant:(NSString *)bufferType;
 @end

@@ -473,7 +473,7 @@
 
 -(void)backlogCompleted:(NSNotification *)notification {
     [self _hideConnectingView];
-    if(_buffer) {
+    if(_buffer && !_urlToOpen && _bidToOpen == -1) {
         [self _updateServerStatus];
         [self _updateUserListVisibility];
         if(self.slidingViewController) {
@@ -486,7 +486,14 @@
             if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                 bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
         }
+        if(_bidToOpen != -1) {
+            bid = _bidToOpen;
+            _bidToOpen = -1;
+        }
         [self bufferSelected:bid];
+        if(_urlToOpen)
+            [self launchURL:_urlToOpen];
+        _urlToOpen = nil;
     }
 }
 
@@ -547,6 +554,10 @@
             _bidToOpen = -1;
         }
         [self bufferSelected:bid];
+        if(_urlToOpen) {
+            [self launchURL:_urlToOpen];
+            _urlToOpen = nil;
+        }
     }
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.clipsToBounds = YES;
@@ -726,7 +737,7 @@
                     _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
                     _titleLabel.font = [UIFont boldSystemFontOfSize:18];
                     _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
-                    _topicLabel.text = [[ColorFormatter format:channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:NO] string];
+                    _topicLabel.text = [[ColorFormatter format:channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
                 } else {
                     _topicLabel.hidden = YES;
                 }
@@ -737,6 +748,42 @@
             } else {
                 _lock.hidden = YES;
             }
+        }
+    }
+}
+
+-(void)launchURL:(NSURL *)url {
+    int port = [url.port intValue];
+    int ssl = [url.scheme hasSuffix:@"s"]?1:0;
+    BOOL match = NO;
+    kIRCCloudState state = [NetworkConnection sharedInstance].state;
+    for(Server *s in [[ServersDataSource sharedInstance] getServers]) {
+        if([[s.hostname lowercaseString] isEqualToString:[url.host lowercaseString]])
+            match = YES;
+        if(port > 0 && port != 6667 && port != s.port)
+            match = NO;
+        if(ssl == 1 && !s.ssl)
+            match = NO;
+        if(match) {
+            NSString *channel = [url.path substringFromIndex:1];
+            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:channel server:s.cid];
+            if(b)
+                [self bufferSelected:b.bid];
+            else if(state == kIRCCloudStateConnected)
+                [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid];
+            else
+                match = NO;
+            break;
+        }
+    }
+
+    if(!match) {
+        if(state == kIRCCloudStateConnected) {
+            EditConnectionViewController *evc = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            [evc setURL:url];
+            [self.navigationController presentModalViewController:[[UINavigationController alloc] initWithRootViewController:evc] animated:YES];
+        } else {
+            _urlToOpen = url;
         }
     }
 }
@@ -1184,7 +1231,7 @@
         
         if([action isEqualToString:@"Copy Message"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            NSString *plaintext = [NSString stringWithFormat:@"<%@> %@",_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO] string]];
+            NSString *plaintext = [NSString stringWithFormat:@"<%@> %@",_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
             [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
         } else if([action isEqualToString:@"Send a message"]) {
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];

@@ -47,6 +47,30 @@
 				<string>irccloud</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLIconFile</key>
+			<string>Icon</string>
+			<key>CFBundleURLName</key>
+			<string>com.irccloud.irc</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>irc</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLIconFile</key>
+			<string>Icon</string>
+			<key>CFBundleURLName</key>
+			<string>com.irccloud.irc.secure</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>ircs</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>0.9.6</string>

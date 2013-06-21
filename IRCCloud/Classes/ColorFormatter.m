@@ -13,6 +13,27 @@
 #import "NetworkConnection.h"
 
 @implementation ColorFormatter
++(NSRegularExpression *)ircLinkRegex {
+    return [NSRegularExpression
+            regularExpressionWithPattern:@"(\\b)ircs?://[^<>\"()\\[\\],\\s]+(\\b)"
+            options:0
+            error:nil];
+}
+
++(NSRegularExpression *)ircChannelRegexForServer:(Server *)s {
+    NSString *pattern;
+    if(s && s.isupport && [[s.isupport objectForKey:@"CHANTYPES"] isKindOfClass:[NSString class]]) {
+        pattern = [NSString stringWithFormat:@"(\\B)[%@][^<>!?\"()\\[\\],\\s]+(\\b)", [s.isupport objectForKey:@"CHANTYPES"]];
+    } else {
+        pattern = [NSString stringWithFormat:@"(\\B)[#][^<>!?\"()\\[\\],\\s]+(\\b)"];
+    }
+    
+    return [NSRegularExpression
+            regularExpressionWithPattern:pattern
+            options:0
+            error:nil];
+}
+
 +(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode {
     NSString *output = [NSString stringWithFormat:@"%c%@%c", BOLD, nick, CLEAR];
     BOOL showSymbol = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue];
@@ -44,16 +65,16 @@
     }
     return output;
 }
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify {
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;
     static CTFontRef Courier, CourierBold, CourierOblique,CourierBoldOblique;
     static CTFontRef Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
     static CTFontRef arrowFont;
     static NSDataDetector *dataDetector;
-    static NSDictionary *linkAttributes;
     CTFontRef font, boldFont, italicFont, boldItalicFont;
     float lineSpacing = 6;
+    NSMutableArray *matches = [[NSMutableArray alloc] init];
     
     if(!Courier) {
         arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL);
@@ -66,18 +87,7 @@
         HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
         HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
         
-        dataDetector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-        CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
-        CTParagraphStyleSetting paragraphStyles[2] = {
-            {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
-            {.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
-        };
-        CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
-        NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-        [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-        [mutableLinkAttributes setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCTUnderlineStyleAttributeName];
-        [mutableLinkAttributes setObject:(__bridge id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
-        linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+        dataDetector = [NSDataDetector dataDetectorWithTypes:(NSTextCheckingTypes)NSTextCheckingTypeLink error:nil];
     }
     if(mono) {
         font = Courier;
@@ -337,11 +347,21 @@
     if(linkify) {
         NSArray *results = [dataDetector matchesInString:[output string] options:0 range:NSMakeRange(0, [output length])];
         if(results.count) {
-            for (NSTextCheckingResult *result in results) {
-                [output addAttributes:linkAttributes range:result.range];
+            [matches addObjectsFromArray:results];
+        }
+        results = [[self ircLinkRegex] matchesInString:[output string] options:0 range:NSMakeRange(0, [output length])];
+        if(results.count) {
+            [matches addObjectsFromArray:results];
+        }
+        if(server) {
+            results = [[self ircChannelRegexForServer:server] matchesInString:[output string] options:0 range:NSMakeRange(0, [output length])];
+            if(results.count) {
+                [matches addObjectsFromArray:results];
             }
         }
     }
+    if(links)
+        *links = [NSArray arrayWithArray:matches];
     return output;
 }
 @end

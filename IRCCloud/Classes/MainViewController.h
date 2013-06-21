@@ -38,6 +38,7 @@
     CGRect _selectedRect;
     int _cidToOpen;
     NSString *_bufferToOpen;
+    NSURL *_urlToOpen;
     NSTimer *_doubleTapTimer;
     NSMutableArray *_pendingEvents;
     int _bidToOpen;
@@ -51,4 +52,5 @@
 -(void)listButtonPressed:(id)sender;
 -(IBAction)serverStatusBarPressed:(id)sender;
 -(IBAction)titleAreaPressed:(id)sender;
+-(void)launchURL:(NSURL *)url;
 @end

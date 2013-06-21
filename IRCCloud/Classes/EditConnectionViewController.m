@@ -279,45 +279,68 @@
     [self.tableView reloadData];
 }
 
+-(void)setURL:(NSURL *)url {
+    _url = url;
+    _netname = url.scheme;
+    [self refresh];
+}
 
 -(void)refresh {
-    Server *server = [[ServersDataSource sharedInstance] getServer:_cid];
-    if(server) {
-        _netname = server.name;
-        
-        if([server.hostname isKindOfClass:[NSString class]] && server.hostname.length)
-            _server.text = server.hostname;
+    if(_url) {
+        int port = [_url.port intValue];
+        int ssl = [_url.scheme hasSuffix:@"s"]?1:0;
+        if(port == 0 && ssl == 1)
+            port = 6697;
         else
-            _server.text = @"";
+            port = 6667;
         
-        _port.text = [NSString stringWithFormat:@"%i", server.port];
+        _server.text = _url.host;
+        _port.text = [NSString stringWithFormat:@"%i", port];
+        if(ssl == 1)
+            _ssl.on = YES;
+        else
+            _ssl.on = NO;
         
-        _ssl.on = (server.ssl > 0);
+        //TODO: Add the channel to the auto join field
+    } else {
+        Server *server = [[ServersDataSource sharedInstance] getServer:_cid];
+        if(server) {
+            _netname = server.name;
+            
+            if([server.hostname isKindOfClass:[NSString class]] && server.hostname.length)
+                _server.text = server.hostname;
+            else
+                _server.text = @"";
+            
+            _port.text = [NSString stringWithFormat:@"%i", server.port];
+            
+            _ssl.on = (server.ssl > 0);
 
-        if([server.nick isKindOfClass:[NSString class]] && server.nick.length)
-            _nickname.text = server.nick;
-        else
-            _nickname.text = @"";
-        
-        if([server.realname isKindOfClass:[NSString class]] && server.realname.length)
-            _realname.text = server.realname;
-        else
-            _realname.text = @"";
-        
-        if([server.nickserv_pass isKindOfClass:[NSString class]] && server.nickserv_pass.length)
-            _nspass.text = server.nickserv_pass;
-        else
-            _nspass.text = @"";
-        
-        if([server.server_pass isKindOfClass:[NSString class]] && server.server_pass.length)
-            _serverpass.text = server.server_pass;
-        else
-            _serverpass.text = @"";
-        
-        if([server.join_commands isKindOfClass:[NSString class]] && server.join_commands.length)
-            _commands.text = server.join_commands;
-        else
-            _commands.text = @"";
+            if([server.nick isKindOfClass:[NSString class]] && server.nick.length)
+                _nickname.text = server.nick;
+            else
+                _nickname.text = @"";
+            
+            if([server.realname isKindOfClass:[NSString class]] && server.realname.length)
+                _realname.text = server.realname;
+            else
+                _realname.text = @"";
+            
+            if([server.nickserv_pass isKindOfClass:[NSString class]] && server.nickserv_pass.length)
+                _nspass.text = server.nickserv_pass;
+            else
+                _nspass.text = @"";
+            
+            if([server.server_pass isKindOfClass:[NSString class]] && server.server_pass.length)
+                _serverpass.text = server.server_pass;
+            else
+                _serverpass.text = @"";
+            
+            if([server.join_commands isKindOfClass:[NSString class]] && server.join_commands.length)
+                _commands.text = server.join_commands;
+            else
+                _commands.text = @"";
+        }
     }
 }
 
@@ -445,7 +468,7 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch(section) {
         case 0:
-            return (_cid==-1)?4:3;
+            return (_cid==-1 && !_url)?4:3;
         case 1:
             return 2;
         case 2:
@@ -480,7 +503,7 @@
     
     switch(indexPath.section) {
         case 0:
-            if(_cid!=-1)
+            if(_cid!=-1 || _url)
                 row++;
             switch(row) {
                 case 0:

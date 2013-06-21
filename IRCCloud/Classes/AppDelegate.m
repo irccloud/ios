@@ -34,6 +34,28 @@
     return YES;
 }
 
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+    if(![url.scheme isEqualToString:@"irccloud"])
+        [self launchURL:url];
+    return YES;
+}
+
+- (void)launchURL:(NSURL *)url {
+    if([url.scheme hasPrefix:@"irc"]) {
+        [self.mainViewController launchURL:url];
+    } else {
+        if(!_openInChromeController)
+            _openInChromeController = [[OpenInChromeController alloc] init];
+        NSString *l = [url.path lowercaseString];
+        if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"]) {
+            [self showImage:url];
+        } else if(![_openInChromeController openInChrome:url
+                                         withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                                            createNewTab:NO])
+            [[UIApplication sharedApplication] openURL:url];
+    }
+}
+
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
     [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{

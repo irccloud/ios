@@ -10,11 +10,13 @@
 #import "LoginSplashViewController.h"
 #import "MainViewController.h"
 #import "ECSlidingViewController.h"
+#import "OpenInChromeController.h"
 
 @class ViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate> {
     NSTimer *_disconnectTimer;
+    OpenInChromeController *_openInChromeController;
 }
 
 @property (strong, nonatomic) UIWindow *window;
@@ -26,5 +28,5 @@
 -(void)showImage:(NSURL *)url;
 -(void)showLoginView;
 -(void)showMainView;
-
+-(void)launchURL:(NSURL *)url;
 @end

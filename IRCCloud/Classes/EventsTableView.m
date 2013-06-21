@@ -128,7 +128,6 @@ int __timestampWidth;
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
-    _openInChromeController = [[OpenInChromeController alloc] init];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -630,6 +629,10 @@ int __timestampWidth;
     _requestingBacklog = NO;
     _firstScroll = NO;
     _buffer = buffer;
+    if(buffer)
+        _server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+    else
+        _server = nil;
     _earliestEid = 0;
     _scrolledUp = NO;
     [_expandedSectionEids removeAllObjects];
@@ -690,8 +693,7 @@ int __timestampWidth;
             self.tableView.tableHeaderView = nil;
         }
     } else if(events.count) {
-        Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-        [_ignore setIgnores:server.ignores];
+        [_ignore setIgnores:_server.ignores];
         _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
         if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0) {
             self.tableView.tableHeaderView = _headerView;
@@ -808,7 +810,9 @@ int __timestampWidth;
         if(e.formatted != nil && e.height > 0) {
             return e.height;
         } else if(e.formatted == nil && e.formattedMsg.length > 0) {
-            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify];
+            NSArray *links;
+            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links];
+            e.links = links;
         } else if(e.formattedMsg.length == 0) {
             //TFLog(@"No formatted message: %@", e);
             return 26;
@@ -833,11 +837,20 @@ int __timestampWidth;
     cell.type = e.rowType;
     cell.contentView.backgroundColor = e.bgColor;
     cell.message.delegate = self;
-    if(e.linkify)
-        cell.message.dataDetectorTypes = UIDataDetectorTypeLink;
-    else
-        cell.message.dataDetectorTypes = UIDataDetectorTypeNone;
+    cell.message.dataDetectorTypes = UIDataDetectorTypeNone;
     cell.message.text = e.formatted;
+    if(e.linkify) {
+        for(NSTextCheckingResult *result in e.links) {
+            if(result.resultType == NSTextCheckingTypeLink) {
+                [cell.message addLinkWithTextCheckingResult:result];
+            } else {
+                NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
+                if(![url hasPrefix:@"irc"])
+                    url = [NSString stringWithFormat:@"irc%@://%@:%i/%@", (_server.ssl==1)?@"s":@"", _server.hostname, _server.port, url];
+                [cell.message addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
+            }
+        }
+    }
     cell.timestamp.text = e.timestamp;
     if(e.rowType == ROW_TIMESTAMP) {
         cell.timestamp.textColor = [UIColor blackColor];
@@ -855,14 +868,7 @@ int __timestampWidth;
 }
 
 - (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {
-    NSString *l = [[url description] lowercaseString];
-    //TODO: check for irc:// URLs
-    if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"]) {
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) showImage:url];
-    } else if(![_openInChromeController openInChrome:url
-                          withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                             createNewTab:NO])
-        [[UIApplication sharedApplication] openURL:url];
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
 }
 
 /*
