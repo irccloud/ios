@@ -33,14 +33,12 @@
     if (self) {
         _type = 0;
         
-        self.selectionStyle = UITableViewCellSelectionStyleNone;
         self.backgroundColor = [UIColor backgroundBlueColor];
         
-        _label = [[UILabel alloc] init];
+        _label = self.textLabel;
         _label.backgroundColor = [UIColor clearColor];
         _label.textColor = [UIColor blackColor];
         _label.font = [UIFont systemFontOfSize:16];
-        [self.contentView addSubview:_label];
 
         _count = [[UILabel alloc] init];
         _count.backgroundColor = [UIColor clearColor];
@@ -73,11 +71,6 @@
         _label.frame = frame;
     }
 }
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
-}
-
 @end
 
 @implementation UsersTableView
@@ -232,6 +225,10 @@
     cell.label.textColor = [row objectForKey:@"color"];
     cell.count.text = [[row objectForKey:@"count"] description];
     cell.count.textColor = [row objectForKey:@"countColor"];
+    if(cell.type == TYPE_HEADING)
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    else
+        cell.selectionStyle = UITableViewCellSelectionStyleBlue;
     if(cell.type == TYPE_HEADING || [[row objectForKey:@"first"] intValue]) {
         cell.border.hidden = YES;
     } else {
