@@ -44,7 +44,6 @@
     _topicEdit.returnKeyType = UIReturnKeyDone;
     _topicEdit.delegate = self;
     _topicEdit.backgroundColor = [UIColor clearColor];
-    _openInChromeController = [[OpenInChromeController alloc] init];
     [self refresh];
 }
 
@@ -96,12 +95,20 @@
 -(void)refresh {
     [_modeHints removeAllObjects];
     _topicChanged = NO;
+    Server *server = [[ServersDataSource sharedInstance] getServer:_channel.cid];
     if([_channel.topic_text isKindOfClass:[NSString class]] && _channel.topic_text.length) {
         NSArray *links;
         _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
         _topicLabel.text = _topic;
         for(NSTextCheckingResult *result in links) {
-            [_topicLabel addLinkWithTextCheckingResult:result];
+            if(result.resultType == NSTextCheckingTypeLink) {
+                [_topicLabel addLinkWithTextCheckingResult:result];
+            } else {
+                NSString *url = [[_topic attributedSubstringFromRange:result.range] string];
+                if(![url hasPrefix:@"irc"])
+                    url = [NSString stringWithFormat:@"irc%@://%@:%i/%@", (server.ssl==1)?@"s":@"", server.hostname, server.port, url];
+                [_topicLabel addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
+            }
         }
         _topicEdit.text = [_topic string];
     } else {

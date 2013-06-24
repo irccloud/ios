@@ -20,6 +20,7 @@
 #import "ChannelListTableViewController.h"
 #import "SettingsViewController.h"
 #import "CallerIDTableViewController.h"
+#import "WhoisViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -176,6 +177,13 @@
     NSString *msg = nil;
     NSString *type = nil;
     switch(event) {
+        case kIRCEventWhois:
+        {
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[WhoisViewController alloc] initWithJSONObject:notification.object]];
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:nc animated:YES completion:nil];
+        }
+            break;
         case kIRCEventChannelInit:
         case kIRCEventChannelTopic:
             [self _updateTitleArea];
@@ -1107,7 +1115,7 @@
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:title delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     if(_selectedEvent)
         [sheet addButtonWithTitle:@"Copy Message"];
-    //[sheet addButtonWithTitle:@"Whois…"];
+    [sheet addButtonWithTitle:@"Whois…"];
     [sheet addButtonWithTitle:@"Send a message"];
     [sheet addButtonWithTitle:@"Mention"];
     [sheet addButtonWithTitle:@"Invite to channel…"];
@@ -1255,6 +1263,8 @@
                 [_eventsView setBuffer:b];
                 [self _updateUserListVisibility];
             }
+        } else if([action isEqualToString:@"Whois…"]) {
+            [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
         } else if([action isEqualToString:@"Op"]) {
             [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
         } else if([action isEqualToString:@"Deop"]) {

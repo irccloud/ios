@@ -109,6 +109,7 @@
 		229C2A0517677ED200A07CED /* menu_unread@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 229C29FA17677ED200A07CED /* menu_unread@2x.png */; };
 		229C2A0617677ED200A07CED /* menu@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 229C29FB17677ED200A07CED /* menu@2x.png */; };
 		229C2A0717677ED200A07CED /* menu@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 229C29FB17677ED200A07CED /* menu@2x.png */; };
+		22A1D0271778A86900F8A89C /* WhoisViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A1D0261778A86900F8A89C /* WhoisViewController.m */; };
 		22AD75ED1718567D00141257 /* BansTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* BansTableViewController.m */; };
 		22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
@@ -297,6 +298,8 @@
 		229C29F917677ED200A07CED /* menu_highlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu_highlight@2x.png"; sourceTree = "<group>"; };
 		229C29FA17677ED200A07CED /* menu_unread@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu_unread@2x.png"; sourceTree = "<group>"; };
 		229C29FB17677ED200A07CED /* menu@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu@2x.png"; sourceTree = "<group>"; };
+		22A1D0251778A86900F8A89C /* WhoisViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhoisViewController.h; sourceTree = "<group>"; };
+		22A1D0261778A86900F8A89C /* WhoisViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoisViewController.m; sourceTree = "<group>"; };
 		22AD75EB1718567D00141257 /* BansTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BansTableViewController.h; sourceTree = "<group>"; };
 		22AD75EC1718567D00141257 /* BansTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BansTableViewController.m; sourceTree = "<group>"; };
 		22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditConnectionViewController.h; sourceTree = "<group>"; };
@@ -559,6 +562,8 @@
 				2236F64516DD138B007BE535 /* UsersDataSource.m */,
 				2236F64816DD30E0007BE535 /* UsersTableView.h */,
 				2236F64916DD30E3007BE535 /* UsersTableView.m */,
+				22A1D0251778A86900F8A89C /* WhoisViewController.h */,
+				22A1D0261778A86900F8A89C /* WhoisViewController.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -904,6 +909,7 @@
 				2253BA251770CD7200CCA77F /* ChannelListTableViewController.m in Sources */,
 				227FF8231772063F00394114 /* SettingsViewController.m in Sources */,
 				221F0BC5177368B40008EE04 /* CallerIDTableViewController.m in Sources */,
+				22A1D0271778A86900F8A89C /* WhoisViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
