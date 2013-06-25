@@ -13,6 +13,7 @@
     NSArray *_ignores;
     UIBarButtonItem *_addButton;
     int _cid;
+    UITextView *_placeholder;
 }
 @property (strong, nonatomic) NSArray *ignores;
 @property int cid;

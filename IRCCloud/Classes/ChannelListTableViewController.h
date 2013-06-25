@@ -13,6 +13,8 @@
     NSArray *_channels;
     NSArray *_data;
     IRCCloudJSONObject *_event;
+    UITextView *_placeholder;
+    UIActivityIndicatorView *_activity;
 }
 @property (strong, nonatomic) NSArray *channels;
 @property (strong, nonatomic) IRCCloudJSONObject *event;

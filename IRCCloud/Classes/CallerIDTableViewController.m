@@ -15,6 +15,12 @@
     self = [super initWithStyle:style];
     if (self) {
         _addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
+        _placeholder = [[UITextView alloc] initWithFrame:CGRectZero];
+        _placeholder.text = @"No accepted nicks.\n\nYou can accept someone by tapping their message request or by using /accept.";
+        _placeholder.backgroundColor = [UIColor whiteColor];
+        _placeholder.font = [UIFont systemFontOfSize:18];
+        _placeholder.contentInset = UIEdgeInsetsMake(12, 12, 12, 12);
+        _placeholder.textAlignment = UITextAlignmentCenter;
     }
     return self;
 }
@@ -23,10 +29,15 @@
     [super viewDidLoad];
     self.navigationItem.leftBarButtonItem = _addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
+    _placeholder.frame = self.tableView.frame;
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    if(_nicks.count)
+        [_placeholder removeFromSuperview];
+    else
+        [self.tableView.superview addSubview:_placeholder];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -43,6 +54,10 @@
             if(o.cid == _event.cid) {
                 _event = o;
                 _nicks = [o objectForKey:@"nicks"];
+                if(_nicks.count)
+                    [_placeholder removeFromSuperview];
+                else
+                    [self.tableView.superview addSubview:_placeholder];
                 [self.tableView reloadData];
             }
             break;

@@ -14,6 +14,7 @@
     IRCCloudJSONObject *_event;
     UIBarButtonItem *_addButton;
     int _bid;
+    UITextView *_placeholder;
 }
 @property (strong, nonatomic) NSArray *bans;
 @property (strong, nonatomic) IRCCloudJSONObject *event;

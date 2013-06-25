@@ -66,6 +66,14 @@
     self = [super initWithStyle:style];
     if (self) {
         //_addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
+        _placeholder = [[UITextView alloc] initWithFrame:CGRectZero];
+        _placeholder.backgroundColor = [UIColor whiteColor];
+        _placeholder.font = [UIFont systemFontOfSize:18];
+        _placeholder.contentInset = UIEdgeInsetsMake(12, 12, 12, 12);
+        _placeholder.textAlignment = UITextAlignmentCenter;
+        _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        _activity.hidesWhenStopped = YES;
+        [_placeholder addSubview:_activity];
     }
     return self;
 }
@@ -78,7 +86,17 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    [self refresh];
+    if(_channels.count) {
+        [self refresh];
+        [_activity stopAnimating];
+        [_placeholder removeFromSuperview];
+    } else {
+        _placeholder.text = [NSString stringWithFormat:@"\nLoading channel list for %@", [_event objectForKey:@"server"]];
+        _placeholder.frame = self.tableView.frame;
+        _activity.frame = CGRectMake((_placeholder.frame.size.width - _activity.frame.size.width)/2,6,_activity.frame.size.width,_activity.frame.size.height);
+        [_activity startAnimating];
+        [self.tableView.superview addSubview:_placeholder];
+    }
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -114,6 +132,16 @@
                 _event = o;
                 _channels = [o objectForKey:@"channels"];
                 [self refresh];
+                [_activity stopAnimating];
+                [_placeholder removeFromSuperview];
+            }
+            break;
+        case kIRCEventListResponseTooManyChannels:
+            o = notification.object;
+            if(o.cid == _event.cid) {
+                _event = o;
+                _placeholder.text = [NSString stringWithFormat:@"Too many channels to list for %@", [o objectForKey:@"server"]];
+                [_activity stopAnimating];
             }
             break;
         default:

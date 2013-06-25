@@ -63,6 +63,12 @@
     self = [super initWithStyle:style];
     if (self) {
         _addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
+        _placeholder = [[UITextView alloc] initWithFrame:CGRectZero];
+        _placeholder.text = @"No bans in effect.\n\nYou can ban someone by tapping their nickname in the user list, long-pressing a message, or by using /ban.";
+        _placeholder.backgroundColor = [UIColor whiteColor];
+        _placeholder.font = [UIFont systemFontOfSize:18];
+        _placeholder.contentInset = UIEdgeInsetsMake(12, 12, 12, 12);
+        _placeholder.textAlignment = UITextAlignmentCenter;
     }
     return self;
 }
@@ -71,10 +77,15 @@
     [super viewDidLoad];
     self.navigationItem.leftBarButtonItem = _addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
+    _placeholder.frame = self.tableView.frame;
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    if(_bans.count)
+        [_placeholder removeFromSuperview];
+    else
+        [self.tableView.superview addSubview:_placeholder];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -92,6 +103,10 @@
             if(o.cid == _event.cid && [[o objectForKey:@"channel"] isEqualToString:[_event objectForKey:@"channel"]]) {
                 _event = o;
                 _bans = [o objectForKey:@"bans"];
+                if(_bans.count)
+                    [_placeholder removeFromSuperview];
+                else
+                    [self.tableView.superview addSubview:_placeholder];
                 [self.tableView reloadData];
             }
             break;

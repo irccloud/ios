@@ -43,7 +43,6 @@
     NSMutableArray *_pendingEvents;
     int _bidToOpen;
     IRCCloudJSONObject *_alertObject;
-    UIAlertView *_alert;
 }
 @property (nonatomic) int bidToOpen;
 -(void)bufferSelected:(int)bid;

@@ -13,6 +13,7 @@
     NSArray *_nicks;
     IRCCloudJSONObject *_event;
     UIBarButtonItem *_addButton;
+    UITextView *_placeholder;
 }
 @property (strong, nonatomic) NSArray *nicks;
 @property (strong, nonatomic) IRCCloudJSONObject *event;
