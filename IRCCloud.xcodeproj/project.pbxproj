@@ -97,6 +97,7 @@
 		228A05DF16D3E40F0029769C /* LoginSplashViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */; };
 		228A05E116D3E4B70029769C /* splashlogo@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 228A05E016D3E4B70029769C /* splashlogo@2x.png */; };
 		228A05E316D3E53F0029769C /* splashlogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 228A05E216D3E53F0029769C /* splashlogo.png */; };
+		228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */; };
 		229C29FC17677ED200A07CED /* menu_unread.png in Resources */ = {isa = PBXBuildFile; fileRef = 229C29F617677ED200A07CED /* menu_unread.png */; };
 		229C29FD17677ED200A07CED /* menu_unread.png in Resources */ = {isa = PBXBuildFile; fileRef = 229C29F617677ED200A07CED /* menu_unread.png */; };
 		229C29FE17677ED200A07CED /* menu_highlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 229C29F717677ED200A07CED /* menu_highlight.png */; };
@@ -292,6 +293,8 @@
 		228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LoginSplashViewController_iPhone.xib; path = Classes/LoginSplashViewController_iPhone.xib; sourceTree = "<group>"; };
 		228A05E016D3E4B70029769C /* splashlogo@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "splashlogo@2x.png"; sourceTree = "<group>"; };
 		228A05E216D3E53F0029769C /* splashlogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splashlogo.png; sourceTree = "<group>"; };
+		228EFBC6177B4F6000B83A4C /* DisplayOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayOptionsViewController.h; sourceTree = "<group>"; };
+		228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayOptionsViewController.m; sourceTree = "<group>"; };
 		229C29F617677ED200A07CED /* menu_unread.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_unread.png; sourceTree = "<group>"; };
 		229C29F717677ED200A07CED /* menu_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu_highlight.png; sourceTree = "<group>"; };
 		229C29F817677ED200A07CED /* menu.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = menu.png; sourceTree = "<group>"; };
@@ -530,6 +533,8 @@
 				22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */,
 				2237E13B16E1214A00CA188F /* ColorFormatter.h */,
 				2237E13C16E1214A00CA188F /* ColorFormatter.m */,
+				228EFBC6177B4F6000B83A4C /* DisplayOptionsViewController.h */,
+				228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */,
 				22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */,
 				22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */,
 				22F9EE1A16DE6F21004615C0 /* EventsDataSource.h */,
@@ -910,6 +915,7 @@
 				227FF8231772063F00394114 /* SettingsViewController.m in Sources */,
 				221F0BC5177368B40008EE04 /* CallerIDTableViewController.m in Sources */,
 				22A1D0271778A86900F8A89C /* WhoisViewController.m in Sources */,
+				228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

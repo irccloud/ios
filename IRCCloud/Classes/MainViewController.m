@@ -21,6 +21,7 @@
 #import "SettingsViewController.h"
 #import "CallerIDTableViewController.h"
 #import "WhoisViewController.h"
+#import "DisplayOptionsViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -975,7 +976,7 @@
         }
     }
     [sheet addButtonWithTitle:@"Ignore List…"];
-    //[sheet addButtonWithTitle:@"Display Options…"];
+    [sheet addButtonWithTitle:@"Display Options…"];
     [sheet addButtonWithTitle:@"Settings…"];
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
@@ -1333,6 +1334,13 @@
         } else if([action isEqualToString:@"Settings…"]) {
             SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:nc animated:YES completion:nil];
+        } else if([action isEqualToString:@"Display Options…"]) {
+            DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            dvc.buffer = _buffer;
+            dvc.navigationItem.title = _titleLabel.text;
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:dvc];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];
         }
