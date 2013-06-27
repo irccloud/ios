@@ -401,6 +401,11 @@
             if(o.bid == _buffer.bid)
                 [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
             break;
+        case kIRCEventConnectionDeleted:
+            o = notification.object;
+            if(o.cid == _buffer.cid)
+                [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+            break;
         default:
             break;
     }
