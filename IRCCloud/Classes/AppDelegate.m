@@ -42,7 +42,7 @@
 
 - (void)launchURL:(NSURL *)url {
     if([url.scheme hasPrefix:@"irc"]) {
-        [self.mainViewController launchURL:url];
+        [self.mainViewController launchURL:[NSURL URLWithString:[url.description stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
     } else {
         if(!_openInChromeController)
             _openInChromeController = [[OpenInChromeController alloc] init];

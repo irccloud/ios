@@ -21,6 +21,7 @@
     UITextField *_nspass;
     UITextField *_serverpass;
     UITextView *_commands;
+    UITextView *_channels;
     int _cid;
     int _reqid;
     NSString *_netname;

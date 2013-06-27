@@ -252,7 +252,7 @@
 
 -(void)saveButtonPressed:(id)sender {
     if(_cid == -1) {
-        _reqid = [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:@""];
+        _reqid = [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text];
         //TODO: check the response
         [self dismissViewControllerAnimated:YES completion:nil];
     } else {
@@ -281,7 +281,7 @@
 
 -(void)setURL:(NSURL *)url {
     _url = url;
-    _netname = url.scheme;
+    _netname = url.host;
     [self refresh];
 }
 
@@ -301,7 +301,7 @@
         else
             _ssl.on = NO;
         
-        //TODO: Add the channel to the auto join field
+        _channels.text = [_url.path substringFromIndex:1];
     } else {
         Server *server = [[ServersDataSource sharedInstance] getServer:_cid];
         if(server) {
@@ -439,6 +439,13 @@
     _commands.text = @"";
     _commands.backgroundColor = [UIColor clearColor];
     
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+        _channels = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - padding, 70)];
+    else
+        _channels = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - 280, 70)];
+    _channels.text = @"";
+    _channels.backgroundColor = [UIColor clearColor];
+    
     [self refresh];
 }
 
@@ -455,14 +462,14 @@
 #pragma mark - Table view data source
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.section == 3)
+    if(indexPath.section >= 3)
         return 80;
     else
         return 48;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 4;
+    return (_cid==-1)?5:4;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -474,6 +481,8 @@
         case 2:
             return 2;
         case 3:
+            return 1;
+        case 4:
             return 1;
     }
     return 0;
@@ -488,6 +497,8 @@
         case 2:
             return @"Passwords";
         case 3:
+            return (_cid==-1)?@"Channels To Join":@"Commands To Run On Connect";
+        case 4:
             return @"Commands To Run On Connect";
     }
     return nil;
@@ -553,6 +564,10 @@
             }
             break;
         case 3:
+            cell.textLabel.text = nil;
+            cell.accessoryView = (_cid==-1)?_channels:_commands;
+            break;
+        case 4:
             cell.textLabel.text = nil;
             cell.accessoryView = _commands;
             break;

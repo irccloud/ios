@@ -13,12 +13,6 @@
 #import "NetworkConnection.h"
 
 @implementation ColorFormatter
-+(NSRegularExpression *)ircLinkRegex {
-    return [NSRegularExpression
-            regularExpressionWithPattern:@"(\\b)ircs?://[^<>\"()\\[\\],\\s]+(\\b)"
-            options:0
-            error:nil];
-}
 
 +(NSRegularExpression *)ircChannelRegexForServer:(Server *)s {
     NSString *pattern;
@@ -346,10 +340,6 @@
     
     if(linkify) {
         NSArray *results = [dataDetector matchesInString:[output string] options:0 range:NSMakeRange(0, [output length])];
-        if(results.count) {
-            [matches addObjectsFromArray:results];
-        }
-        results = [[self ircLinkRegex] matchesInString:[output string] options:0 range:NSMakeRange(0, [output length])];
         if(results.count) {
             [matches addObjectsFromArray:results];
         }
