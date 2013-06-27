@@ -252,12 +252,11 @@
 
 -(void)saveButtonPressed:(id)sender {
     if(_cid == -1) {
+        if(!_netname)
+            _netname = _server.text;
         _reqid = [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text];
-        //TODO: check the response
-        [self dismissViewControllerAnimated:YES completion:nil];
     } else {
         _reqid = [[NetworkConnection sharedInstance] editServer:_cid hostname:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text];
-        [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
 
@@ -457,6 +456,50 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+}
+
+-(void)viewWillDisappear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+-(void)handleEvent:(NSNotification *)notification {
+    kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
+    IRCCloudJSONObject *o;
+    int reqid;
+    
+    switch(event) {
+        case kIRCEventUserInfo:
+            [self refresh];
+            break;
+        case kIRCEventFailureMsg:
+            o = notification.object;
+            reqid = [[o objectForKey:@"_reqid"] intValue];
+            if(reqid == _reqid) {
+                NSString *msg = [o objectForKey:@"message"];
+                if([msg isEqualToString:@"hostname"]) {
+                    msg = @"Invalid hostname";
+                } else if([msg isEqualToString:@"nickname"]) {
+                    msg = @"Invalid nickname";
+                } else if([msg isEqualToString:@"realname"]) {
+                    msg = @"Invalid real name";
+                }
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            }
+            break;
+        case kIRCEventSuccess:
+            o = notification.object;
+            reqid = [[o objectForKey:@"_reqid"] intValue];
+            if(reqid == _reqid)
+                [self dismissViewControllerAnimated:YES completion:nil];
+            break;
+        default:
+            break;
+    }
 }
 
 #pragma mark - Table view data source
