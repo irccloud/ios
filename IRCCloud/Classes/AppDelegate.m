@@ -102,6 +102,7 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
+    [NetworkConnection sharedInstance].background = YES;
     [_disconnectTimer invalidate];
     _disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:[NetworkConnection sharedInstance] selector:@selector(disconnect) userInfo:nil repeats:NO];
     if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
@@ -126,6 +127,7 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    [NetworkConnection sharedInstance].background = NO;
     application.applicationIconBadgeNumber = 1;
     application.applicationIconBadgeNumber = 0;
     [application cancelAllLocalNotifications];

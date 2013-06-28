@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <SystemConfiguration/SystemConfiguration.h>
 #import "WebSocket.h"
 #import "SBJson.h"
 #import "ServersDataSource.h"
@@ -97,6 +98,7 @@ typedef enum {
     int _lastReqId;
     int _currentCount;
     int _currentBid;
+    BOOL _background;
     NSTimeInterval _firstEID;
     
     kIRCCloudState _state;
@@ -105,11 +107,13 @@ typedef enum {
     NSTimeInterval _clockOffset;
     NSTimeInterval _reconnectTimestamp;
     NSOperationQueue *_queue;
+    SCNetworkReachabilityRef _reachability;
 }
 @property (readonly) kIRCCloudState state;
 @property (readonly) NSDictionary *userInfo;
 @property (readonly) NSTimeInterval clockOffset;
-@property (readonly) NSTimeInterval reconnectTimestamp;
+@property NSTimeInterval reconnectTimestamp;
+@property BOOL background;
 
 +(NetworkConnection*)sharedInstance;
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password;
@@ -147,4 +151,5 @@ typedef enum {
 -(int)reconnect:(int)cid;
 -(NSDictionary *)registerAPNs:(NSData *)token;
 -(NSDictionary *)unregisterAPNs:(NSData *)token;
+-(BOOL)reachable;
 @end

@@ -38,6 +38,7 @@
             activity.hidden = NO;
             [status setText:@"Connecting"];
             [_conn connect];
+            [self updateConnecting:nil];
         }
     } else {
         password.text = @"";
@@ -84,7 +85,10 @@
             progress.hidden = YES;
             [self performSelector:@selector(updateConnecting:) withObject:nil afterDelay:1];
         } else {
-            [status setText:@"Disconnected"];
+            if([_conn reachable])
+                [status setText:@"Disconnected"];
+            else
+                [status setText:@"Offline"];
             activity.hidden = YES;
             progress.progress = 0;
             progress.hidden = YES;

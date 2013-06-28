@@ -440,7 +440,10 @@
                 _connectingProgress.hidden = YES;
                 [self performSelector:@selector(connectivityChanged:) withObject:nil afterDelay:1];
             } else {
-                _connectingStatus.text = @"Disconnected";
+                if([[NetworkConnection sharedInstance] reachable])
+                    _connectingStatus.text = @"Disconnected";
+                else
+                    _connectingStatus.text = @"Offline";
                 _connectingActivity.hidden = YES;
                 _connectingProgress.progress = 0;
                 _connectingProgress.hidden = YES;

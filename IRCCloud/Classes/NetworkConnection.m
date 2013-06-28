@@ -142,8 +142,12 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _parser.delegate = _adapter;
     _lastReqId = 0;
     _idleInterval = 20;
-    _reconnectTimestamp = 0;
+    _reconnectTimestamp = -1;
+    _background = NO;
     _writer = [[SBJsonWriter alloc] init];
+    _reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
+    SCNetworkReachabilityScheduleWithRunLoop(_reachability, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+    SCNetworkReachabilitySetCallback(_reachability, ReachabilityCallback, NULL);
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogStarted:) name:kIRCCloudBacklogStartedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
@@ -151,6 +155,25 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _userAgent = [NSString stringWithFormat:@"IRCCloud/%@ (%@; %@; %@ %@)", version, [UIDevice currentDevice].model, [[[NSUserDefaults standardUserDefaults] objectForKey: @"AppleLanguages"] objectAtIndex:0], [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
     TFLog(@"%@", _userAgent);
     return self;
+}
+
+-(BOOL)reachable {
+    SCNetworkReachabilityFlags flags;
+    SCNetworkReachabilityGetFlags(_reachability, &flags);
+    return flags & kSCNetworkFlagsReachable;
+}
+
+static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) {
+    kIRCCloudState state = [NetworkConnection sharedInstance].state;
+    NSLog(@"IRCCloud state: %i Reconnect timestamp: %f Reachable: %@", state, [NetworkConnection sharedInstance].reconnectTimestamp, (flags & kSCNetworkFlagsReachable)?@"YES":@"NO");
+    if(flags & kSCNetworkFlagsReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0) {
+        TFLog(@"IRCCloud server became reachable, connecting");
+        [[NetworkConnection sharedInstance] connect];
+    } else if(state == kIRCCloudStateConnected) {
+        TFLog(@"IRCCloud server became unreachable, disconnecting");
+        [[NetworkConnection sharedInstance] disconnect];
+        [NetworkConnection sharedInstance].reconnectTimestamp = -1;
+    }
 }
 
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password {
@@ -385,6 +408,17 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     if(_socket)
         _socket.delegate = nil;
 
+    if(_background)
+        return;
+
+    if(![self reachable]) {
+        TFLog(@"IRCCloud is unreachable");
+        _reconnectTimestamp = -1;
+        _state = kIRCCloudStateDisconnected;
+        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+        return;
+    }
+    
     NSString *url = [NSString stringWithFormat:@"wss://%@",IRCCLOUD_HOST];
     if(_events.highestEid > 0)
         url = [url stringByAppendingFormat:@"?since_id=%.0lf", _events.highestEid];
@@ -443,6 +477,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         TFLog(@"Close Message: %@", aMessage);
         TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
+        if(![self reachable])
+            [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }
 }
@@ -451,7 +487,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     if(socket == _socket) {
         TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
-        [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
+        if([self reachable] && _reconnectTimestamp != 0)
+            [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }
 }
