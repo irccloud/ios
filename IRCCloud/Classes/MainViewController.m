@@ -452,10 +452,14 @@
             [self _showConnectingView];
         case kIRCCloudStateConnected:
             [_connectingActivity stopAnimating];
-            for(Event *e in _pendingEvents) {
-                [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+            for(Event *e in [_pendingEvents copy]) {
+                if(e.reqId == -1) {
+                    e.reqId = [[NetworkConnection sharedInstance] say:e.command to:e.to cid:e.cid];
+                } else {
+                    [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                    [_pendingEvents removeObject:e];
+                }
             }
-            [_pendingEvents removeAllObjects];
             break;
     }
 }
@@ -633,7 +637,7 @@
 }
 
 -(void)sendButtonPressed:(id)sender {
-    if([NetworkConnection sharedInstance].state == kIRCCloudStateConnected && _message.text && _message.text.length) {
+    if(_message.text && _message.text.length) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s) {
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
@@ -677,11 +681,28 @@
                 [[EventsDataSource sharedInstance] addEvent:e];
                 [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
             }
+            e.to = _buffer.name;
+            e.command = _message.text;
             e.reqId = [[NetworkConnection sharedInstance] say:_message.text to:_buffer.name cid:_buffer.cid];
             if(e.msg)
                 [_pendingEvents addObject:e];
             [_message clearText];
+            [NSTimer scheduledTimerWithTimeInterval:5*60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
         }
+    }
+}
+
+-(void)_sendRequestDidExpire:(NSTimer *)timer {
+    Event *e = timer.userInfo;
+    if([_pendingEvents containsObject:e]) {
+        [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+        [_pendingEvents removeObject:e];
+        e.msg = [e.msg stringByAppendingFormat:@" %c4(FAILED)%c", COLOR_MIRC, CLEAR];
+        e.formattedMsg = nil;
+        e.formatted = nil;
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
+        }];
     }
 }
 

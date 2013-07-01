@@ -252,11 +252,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args {
     @synchronized(_writer) {
-        NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:args];
-        [dict setObject:method forKey:@"_method"];
-        [dict setObject:@(++_lastReqId) forKey:@"_reqid"];
-        [_socket sendText:[_writer stringWithObject:dict]];
-        return _lastReqId;
+        if([self reachable] && _state == kIRCCloudStateConnected) {
+            NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:args];
+            [dict setObject:method forKey:@"_method"];
+            [dict setObject:@(++_lastReqId) forKey:@"_reqid"];
+            [_socket sendText:[_writer stringWithObject:dict]];
+            return _lastReqId;
+        } else {
+            return -1;
+        }
     }
 }
 
@@ -425,7 +429,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     TFLog(@"Connecting: %@", url);
     _state = kIRCCloudStateConnecting;
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-    _reconnectTimestamp = 0;
+    _reconnectTimestamp = -1;
     WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:nil protocols:nil
                                                                      tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: [NSNull null],
                                                                                   (NSString *)kCFStreamSSLAllowsAnyRoot: @YES,
@@ -477,7 +481,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         TFLog(@"Close Message: %@", aMessage);
         TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
-        if(![self reachable])
+        if([self reachable] && _reconnectTimestamp != 0)
+            [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
+        else
             [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }

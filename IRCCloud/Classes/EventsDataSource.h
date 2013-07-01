@@ -50,10 +50,12 @@
     BOOL _monospace;
     float _height;
     NSArray *_links;
+    NSString *_to;
+    NSString *_command;
 }
 @property int cid, bid, rowType, reqId;
 @property NSTimeInterval eid, groupEid;
-@property NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg;
+@property NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command;
 @property BOOL isHighlight, isSelf, toChan, linkify, pending, monospace;
 @property NSDictionary *ops;
 @property UIColor *color, *bgColor;
