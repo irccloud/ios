@@ -453,7 +453,7 @@
         case kIRCCloudStateConnected:
             [_connectingActivity stopAnimating];
             for(Event *e in [_pendingEvents copy]) {
-                if(e.reqId == -1) {
+                if(e.reqId == -1 && (([[NSDate date] timeIntervalSince1970] - (e.eid/1000000)) < (5 * 60))) {
                     e.reqId = [[NetworkConnection sharedInstance] say:e.command to:e.to cid:e.cid];
                 } else {
                     [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
