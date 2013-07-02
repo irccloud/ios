@@ -453,7 +453,7 @@
         case kIRCCloudStateConnected:
             [_connectingActivity stopAnimating];
             for(Event *e in [_pendingEvents copy]) {
-                if(e.reqId == -1 && (([[NSDate date] timeIntervalSince1970] - (e.eid/1000000)) < (5 * 60))) {
+                if(e.reqId == -1 && (([[NSDate date] timeIntervalSince1970] - (e.eid/1000000)) < 60)) {
                     e.reqId = [[NetworkConnection sharedInstance] say:e.command to:e.to cid:e.cid];
                 } else {
                     [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
@@ -687,7 +687,7 @@
             if(e.msg)
                 [_pendingEvents addObject:e];
             [_message clearText];
-            [NSTimer scheduledTimerWithTimeInterval:5*60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
+            [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
         }
     }
 }
