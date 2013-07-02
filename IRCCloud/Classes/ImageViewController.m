@@ -75,6 +75,38 @@
         anEdgeInset.bottom = -anEdgeInset.top;
     }
     pScrollView.contentInset = anEdgeInset;
+    
+    if(_toolbar.hidden)
+        [self _showToolbar];
+    [_hideTimer invalidate];
+    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+}
+
+-(void)_showToolbar {
+    [_hideTimer invalidate];
+    _hideTimer = nil;
+    [UIView animateWithDuration:0.5 animations:^{
+        _toolbar.hidden = NO;
+        _toolbar.alpha = 1;
+    } completion:nil];
+}
+
+-(void)_hideToolbar {
+    [_hideTimer invalidate];
+    _hideTimer = nil;
+    [UIView animateWithDuration:0.5 animations:^{
+        _toolbar.alpha = 0;
+    } completion:^(BOOL finished){
+        _toolbar.hidden = YES;
+    }];
+}
+
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    [self _showToolbar];
+}
+
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
 }
 
 -(void)_load {
@@ -89,12 +121,7 @@
             [self performSelectorOnMainThread:@selector(_setImage:) withObject:img waitUntilDone:YES];
     }
     if(!data || !img) {
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
-        OpenInChromeController *chrome = [[OpenInChromeController alloc] init];
-        if(![chrome openInChrome:_url
-                                  withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                                     createNewTab:NO])
-            [[UIApplication sharedApplication] openURL:_url];
+        [self openInBrowser:nil];
     }
 }
 
@@ -106,10 +133,25 @@
         self.view.frame = _scrollView.frame = CGRectMake(0,0,[UIScreen mainScreen].bounds.size.height,[UIScreen mainScreen].bounds.size.width);
     }
     [self performSelectorInBackground:@selector(_load) withObject:nil];
+    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
 }
 
 -(IBAction)viewTapped:(id)sender {
+    [self _showToolbar];
+    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+}
+
+-(IBAction)doneButtonPressed:(id)sender {
     [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
+}
+
+-(IBAction)openInBrowser:(id)sender {
+    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
+    OpenInChromeController *chrome = [[OpenInChromeController alloc] init];
+    if(![chrome openInChrome:_url
+             withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                createNewTab:NO])
+        [[UIApplication sharedApplication] openURL:_url];
 }
 
 - (void)didReceiveMemoryWarning {

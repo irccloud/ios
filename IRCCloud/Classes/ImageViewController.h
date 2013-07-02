@@ -8,12 +8,16 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ImageViewController : UIViewController {
+@interface ImageViewController : UIViewController<UIScrollViewDelegate> {
     IBOutlet UIImageView *_imageView;
     IBOutlet UIScrollView *_scrollView;
     IBOutlet UIActivityIndicatorView *_activityView;
+    IBOutlet UIToolbar *_toolbar;
     NSURL *_url;
+    NSTimer *_hideTimer;
 }
 -(id)initWithURL:(NSURL *)url;
 -(IBAction)viewTapped:(id)sender;
+-(IBAction)openInBrowser:(id)sender;
+-(IBAction)doneButtonPressed:(id)sender;
 @end
