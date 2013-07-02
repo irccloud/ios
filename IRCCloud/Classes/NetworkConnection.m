@@ -431,9 +431,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     _reconnectTimestamp = -1;
     WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:nil protocols:nil
-                                                                     tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: [NSNull null],
-                                                                                  (NSString *)kCFStreamSSLAllowsAnyRoot: @YES,
-                                                                                  (NSString *)kCFStreamSSLValidatesCertificateChain: @NO} mutableCopy]
+                                                                     tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST} mutableCopy]
                                                                          headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"],
                                                                                     [HandshakeHeader headerWithValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forKey:@"Cookie"]] mutableCopy]
                                                                verifySecurityKey:YES extensions:nil ];
