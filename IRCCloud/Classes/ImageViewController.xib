@@ -46,7 +46,7 @@
 						<string key="NSFrame">{{141, 266}, {37, 37}}</string>
 						<reference key="NSSuperview" ref="950164512"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView"/>
+						<reference key="NSNextKeyView" ref="1024983995"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIOpaque">NO</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
@@ -63,7 +63,7 @@
 								<string key="NSFrame">{{40, 220}, {240, 128}}</string>
 								<reference key="NSSuperview" ref="603888905"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="859096967"/>
+								<reference key="NSNextKeyView" ref="790201846"/>
 								<string key="NSReuseIdentifierKey">_NS:9</string>
 								<float key="IBUIAlpha">0.0</float>
 								<array key="IBUIGestureRecognizers" id="0"/>
@@ -101,34 +101,34 @@
 						<bool key="IBUIShowsVerticalScrollIndicator">NO</bool>
 						<float key="IBUIMinimumZoomScale">0.0</float>
 					</object>
-					<object class="IBUIToolbar" id="859096967">
+					<object class="IBUIToolbar" id="1024983995">
 						<reference key="NSNextResponder" ref="950164512"/>
 						<int key="NSvFlags">266</int>
 						<string key="NSFrame">{{0, 524}, {320, 44}}</string>
 						<reference key="NSSuperview" ref="950164512"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="790201846"/>
+						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClearsContextBeforeDrawing">NO</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 						<int key="IBUIBarStyle">2</int>
 						<array class="NSMutableArray" key="IBUIItems">
-							<object class="IBUIBarButtonItem" id="225443922">
-								<string key="IBUITitle">Open In Browser</string>
+							<object class="IBUIBarButtonItem" id="560486616">
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								<int key="IBUIStyle">1</int>
-								<reference key="IBUIToolbar" ref="859096967"/>
+								<reference key="IBUIToolbar" ref="1024983995"/>
+								<int key="IBUISystemItemIdentifier">9</int>
 							</object>
-							<object class="IBUIBarButtonItem" id="281087153">
+							<object class="IBUIBarButtonItem" id="403808012">
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-								<reference key="IBUIToolbar" ref="859096967"/>
+								<reference key="IBUIToolbar" ref="1024983995"/>
 								<int key="IBUISystemItemIdentifier">5</int>
 							</object>
-							<object class="IBUIBarButtonItem" id="234529511">
+							<object class="IBUIBarButtonItem" id="963988808">
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								<int key="IBUIStyle">2</int>
-								<reference key="IBUIToolbar" ref="859096967"/>
+								<reference key="IBUIToolbar" ref="1024983995"/>
 								<int key="IBUISystemItemIdentifier">0</int>
 							</object>
 						</array>
@@ -187,7 +187,7 @@
 					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">_toolbar</string>
 						<reference key="source" ref="372490531"/>
-						<reference key="destination" ref="859096967"/>
+						<reference key="destination" ref="1024983995"/>
 					</object>
 					<int key="connectionID">23</int>
 				</object>
@@ -219,19 +219,19 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
-						<string key="label">openInBrowser:</string>
-						<reference key="source" ref="225443922"/>
-						<reference key="destination" ref="372490531"/>
-					</object>
-					<int key="connectionID">22</int>
-				</object>
-				<object class="IBConnectionRecord">
-					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">doneButtonPressed:</string>
-						<reference key="source" ref="234529511"/>
+						<reference key="source" ref="963988808"/>
 						<reference key="destination" ref="372490531"/>
 					</object>
 					<int key="connectionID">26</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">shareButtonPressed:</string>
+						<reference key="source" ref="560486616"/>
+						<reference key="destination" ref="372490531"/>
+					</object>
+					<int key="connectionID">28</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -259,7 +259,7 @@
 						<array class="NSMutableArray" key="children">
 							<reference ref="603888905"/>
 							<reference ref="790201846"/>
-							<reference ref="859096967"/>
+							<reference ref="1024983995"/>
 						</array>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -284,33 +284,33 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">16</int>
-						<reference key="object" ref="859096967"/>
+						<reference key="object" ref="1024983995"/>
 						<array class="NSMutableArray" key="children">
-							<reference ref="225443922"/>
-							<reference ref="281087153"/>
-							<reference ref="234529511"/>
+							<reference ref="403808012"/>
+							<reference ref="963988808"/>
+							<reference ref="560486616"/>
 						</array>
 						<reference key="parent" ref="950164512"/>
 					</object>
 					<object class="IBObjectRecord">
-						<int key="objectID">17</int>
-						<reference key="object" ref="225443922"/>
-						<reference key="parent" ref="859096967"/>
-					</object>
-					<object class="IBObjectRecord">
 						<int key="objectID">19</int>
-						<reference key="object" ref="281087153"/>
-						<reference key="parent" ref="859096967"/>
+						<reference key="object" ref="403808012"/>
+						<reference key="parent" ref="1024983995"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">20</int>
-						<reference key="object" ref="234529511"/>
-						<reference key="parent" ref="859096967"/>
+						<reference key="object" ref="963988808"/>
+						<reference key="parent" ref="1024983995"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">13</int>
 						<reference key="object" ref="593762640"/>
 						<reference key="parent" ref="0"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">27</int>
+						<reference key="object" ref="560486616"/>
+						<reference key="parent" ref="1024983995"/>
 					</object>
 				</array>
 			</object>
@@ -322,9 +322,9 @@
 				<string key="11.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="13.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="16.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-				<string key="17.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="19.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="20.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
+				<string key="27.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="4.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="5.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="6.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -333,7 +333,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">26</int>
+			<int key="maxID">28</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -343,6 +343,7 @@
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="doneButtonPressed:">id</string>
 						<string key="openInBrowser:">id</string>
+						<string key="shareButtonPressed:">id</string>
 						<string key="viewTapped:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
@@ -352,6 +353,10 @@
 						</object>
 						<object class="IBActionInfo" key="openInBrowser:">
 							<string key="name">openInBrowser:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="shareButtonPressed:">
+							<string key="name">shareButtonPressed:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="viewTapped:">

@@ -6,10 +6,13 @@
 //  Copyright (c) 2013 IRCCloud, Ltd. All rights reserved.
 //
 
+#import <MobileCoreServices/UTCoreTypes.h>
+#import <Twitter/Twitter.h>
 #import "ImageViewController.h"
 #import "AppDelegate.h"
 #import "UIImage+animatedGIF.h"
-#import "OpenInChromeController.h"
+#import "ARChromeActivity.h"
+#import "TUSafariActivity.h"
 
 @implementation ImageViewController
 
@@ -17,6 +20,7 @@
     self = [super initWithNibName:@"ImageViewController" bundle:nil];
     if (self) {
         _url = url;
+        _chrome = [[OpenInChromeController alloc] init];
     }
     return self;
 }
@@ -121,7 +125,11 @@
             [self performSelectorOnMainThread:@selector(_setImage:) withObject:img waitUntilDone:YES];
     }
     if(!data || !img) {
-        [self openInBrowser:nil];
+        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
+        if(![_chrome openInChrome:_url
+                  withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                     createNewTab:NO])
+            [[UIApplication sharedApplication] openURL:_url];
     }
 }
 
@@ -137,21 +145,56 @@
 }
 
 -(IBAction)viewTapped:(id)sender {
-    [self _showToolbar];
-    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    if(_toolbar.hidden) {
+        [self _showToolbar];
+        _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    } else {
+        [self _hideToolbar];
+    }
+}
+
+-(IBAction)shareButtonPressed:(id)sender {
+    if(NSClassFromString(@"UIActivityViewController")) {
+        UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:_imageView.image?@[_url,_imageView.image]:@[_url] applicationActivities:@[[_chrome isChromeInstalled]?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:@"irccloud://"]]:[[TUSafariActivity alloc] init]]];
+        [self presentViewController:activityController animated:YES completion:nil];
+    } else {
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Copy To Clipboard", @"Share on Twitter", [_chrome isChromeInstalled]?@"Open In Chrome":@"Open In Safari",nil];
+        [sheet showFromToolbar:_toolbar];
+    }
+}
+
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    NSString *title = [actionSheet buttonTitleAtIndex:buttonIndex];
+    
+    if([title isEqualToString:@"Copy To Clipboard"]) {
+        UIPasteboard *pb = [UIPasteboard generalPasteboard];
+        if(_imageView.image) {
+            NSData* imageData = UIImageJPEGRepresentation(_imageView.image, 1);
+            pb.items = @[@{(NSString *)kUTTypeUTF8PlainText:_url.absoluteString,
+                           (NSString *)kUTTypeJPEG:imageData,
+                           (NSString *)kUTTypeURL:_url}];
+        } else {
+            pb.items = @[@{(NSString *)kUTTypeUTF8PlainText:_url.absoluteString,
+                           (NSString *)kUTTypeURL:_url}];
+        }
+    } else if([title isEqualToString:@"Share on Twitter"]) {
+        TWTweetComposeViewController *tweetViewController = [[TWTweetComposeViewController alloc] init];
+        [tweetViewController setInitialText:_url.absoluteString];
+        [tweetViewController setCompletionHandler:^(TWTweetComposeViewControllerResult result) {
+            [self dismissModalViewControllerAnimated:YES];
+        }];
+        [self presentModalViewController:tweetViewController animated:YES];
+    } else if([title hasPrefix:@"Open "]) {
+        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
+        if(![_chrome openInChrome:_url
+                  withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                     createNewTab:NO])
+            [[UIApplication sharedApplication] openURL:_url];
+    }
 }
 
 -(IBAction)doneButtonPressed:(id)sender {
     [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
-}
-
--(IBAction)openInBrowser:(id)sender {
-    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
-    OpenInChromeController *chrome = [[OpenInChromeController alloc] init];
-    if(![chrome openInChrome:_url
-             withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                createNewTab:NO])
-        [[UIApplication sharedApplication] openURL:_url];
 }
 
 - (void)didReceiveMemoryWarning {
