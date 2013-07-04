@@ -22,6 +22,10 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 #define BACKLOG_BUFFER_MAX 99
 
+#define TYPE_UNKNOWN 0
+#define TYPE_WIFI 1
+#define TYPE_WWAN 2
+
 @interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
     SBJsonStreamParser *_parser;
     SBJsonStreamParserAdapter *_adapter;
@@ -77,6 +81,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     }
 }
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    if(_cancelled)
+        return;
 	TFLog(@"Request failed: %@", error);
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
@@ -84,6 +90,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _running = NO;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    if(_cancelled)
+        return;
 	TFLog(@"Backlog download completed");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
@@ -91,6 +99,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _running = NO;
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
+    if(_cancelled)
+        return nil;
 	TFLog(@"Fetching: %@", [request URL]);
 	return request;
 }
@@ -160,15 +170,33 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 -(kIRCCloudReachability)reachable {
     SCNetworkReachabilityFlags flags;
     if(SCNetworkReachabilityGetFlags(_reachability, &flags)) {
-        return (flags & kSCNetworkFlagsReachable)?kIRCCloudReachable:kIRCCloudUnreachable;
+        return (flags & kSCNetworkReachabilityFlagsReachable)?kIRCCloudReachable:kIRCCloudUnreachable;
     }
     return kIRCCloudUnknown;
 }
 
 static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) {
+    static int lastType = TYPE_UNKNOWN;
+    int type = TYPE_UNKNOWN;
     kIRCCloudState state = [NetworkConnection sharedInstance].state;
-    NSLog(@"IRCCloud state: %i Reconnect timestamp: %f Reachable: %@", state, [NetworkConnection sharedInstance].reconnectTimestamp, (flags & kSCNetworkFlagsReachable)?@"YES":@"NO");
-    if(flags & kSCNetworkFlagsReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0) {
+    NSLog(@"IRCCloud state: %i Reconnect timestamp: %f Reachable: %@ lastType: %i", state, [NetworkConnection sharedInstance].reconnectTimestamp, (flags & kSCNetworkReachabilityFlagsReachable)?@"YES":@"NO", lastType);
+
+    if(flags & kSCNetworkReachabilityFlagsIsWWAN)
+        type = TYPE_WWAN;
+    else if (flags & kSCNetworkReachabilityFlagsReachable)
+        type = TYPE_WIFI;
+    else
+        type = TYPE_UNKNOWN;
+    
+    if(type != lastType && state != kIRCCloudStateDisconnected) {
+        [[NetworkConnection sharedInstance] disconnect];
+        [NetworkConnection sharedInstance].reconnectTimestamp = -1;
+        state = kIRCCloudStateDisconnected;
+    }
+    
+    lastType = type;
+    
+    if(flags & kSCNetworkReachabilityFlagsReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0) {
         TFLog(@"IRCCloud server became reachable, connecting");
         [[NetworkConnection sharedInstance] connect];
     } else if(state == kIRCCloudStateConnected) {
@@ -445,6 +473,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)disconnect {
+    for(OOBFetcher *fetcher in _oobQueue) {
+        [fetcher cancel];
+    }
     _reconnectTimestamp = 0;
     [self cancelIdleTimer];
     _state = kIRCCloudStateDisconnecting;
