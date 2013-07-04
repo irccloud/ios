@@ -147,7 +147,7 @@
     loginView.alpha = 0;
     loadingView.alpha = 1;
     [UIView commitAnimations];
-    [status setText:@"Authenticating"];
+    [status setText:@"Signing In"];
     progress.hidden = YES;
     progress.progress = 0;
     [activity startAnimating];
