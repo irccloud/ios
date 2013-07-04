@@ -157,10 +157,12 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     return self;
 }
 
--(BOOL)reachable {
+-(kIRCCloudReachability)reachable {
     SCNetworkReachabilityFlags flags;
-    SCNetworkReachabilityGetFlags(_reachability, &flags);
-    return flags & kSCNetworkFlagsReachable;
+    if(SCNetworkReachabilityGetFlags(_reachability, &flags)) {
+        return (flags & kSCNetworkFlagsReachable)?kIRCCloudReachable:kIRCCloudUnreachable;
+    }
+    return kIRCCloudUnknown;
 }
 
 static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) {
@@ -415,11 +417,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(_background)
         return;
 
-    if(![self reachable]) {
+    kIRCCloudReachability reachability = [self reachable];
+    if(reachability != kIRCCloudReachable) {
         TFLog(@"IRCCloud is unreachable");
         _reconnectTimestamp = -1;
         _state = kIRCCloudStateDisconnected;
-        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+        if(reachability == kIRCCloudUnreachable)
+            [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         return;
     }
     
@@ -479,7 +483,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         TFLog(@"Close Message: %@", aMessage);
         TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
-        if([self reachable] && _reconnectTimestamp != 0)
+        if([self reachable] == kIRCCloudReachable && _reconnectTimestamp != 0)
             [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
         else
             [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];

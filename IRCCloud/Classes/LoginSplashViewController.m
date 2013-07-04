@@ -70,7 +70,7 @@
 }
 
 -(void)updateConnecting:(NSNotification *)notification {
-    if(_conn.state == kIRCCloudStateConnecting) {
+    if(_conn.state == kIRCCloudStateConnecting || [_conn reachable] == kIRCCloudUnknown) {
         [status setText:@"Connecting"];
         activity.hidden = NO;
         [activity startAnimating];

@@ -432,6 +432,8 @@
             _connectingProgress.hidden = YES;
             break;
         case kIRCCloudStateDisconnected:
+        case kIRCCloudStateDisconnecting:
+            [self _showConnectingView];
             if([NetworkConnection sharedInstance].reconnectTimestamp > 0) {
                 [_connectingStatus setText:[NSString stringWithFormat:@"Reconnecting in %0.f seconds", [NetworkConnection sharedInstance].reconnectTimestamp - [[NSDate date] timeIntervalSince1970]]];
                 _connectingActivity.hidden = NO;
@@ -448,8 +450,7 @@
                 _connectingProgress.progress = 0;
                 _connectingProgress.hidden = YES;
             }
-        case kIRCCloudStateDisconnecting:
-            [self _showConnectingView];
+            break;
         case kIRCCloudStateConnected:
             [_connectingActivity stopAnimating];
             for(Event *e in [_pendingEvents copy]) {
@@ -608,7 +609,7 @@
                                              selector:@selector(keyboardWillBeHidden:)
                                                  name:UIKeyboardWillHideNotification object:nil];
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
-    if(([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected || [NetworkConnection sharedInstance].state == kIRCCloudStateDisconnecting) && session != nil && [session length] > 0)
+    if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable && session != nil && [session length] > 0)
         [[NetworkConnection sharedInstance] connect];
 }
 

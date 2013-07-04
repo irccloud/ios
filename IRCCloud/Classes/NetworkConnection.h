@@ -80,6 +80,12 @@ typedef enum {
     kIRCCloudStateDisconnecting
 } kIRCCloudState;
 
+typedef enum {
+    kIRCCloudUnreachable,
+    kIRCCloudReachable,
+    kIRCCloudUnknown
+} kIRCCloudReachability;
+
 @interface NetworkConnection : NSObject<WebSocketDelegate, SBJsonStreamParserAdapterDelegate> {
     WebSocket *_socket;
     SBJsonStreamParserAdapter *_adapter;
@@ -114,6 +120,7 @@ typedef enum {
 @property (readonly) NSTimeInterval clockOffset;
 @property NSTimeInterval reconnectTimestamp;
 @property BOOL background;
+@property (readonly) kIRCCloudReachability reachable;
 
 +(NetworkConnection*)sharedInstance;
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password;
@@ -151,5 +158,4 @@ typedef enum {
 -(int)reconnect:(int)cid;
 -(NSDictionary *)registerAPNs:(NSData *)token;
 -(NSDictionary *)unregisterAPNs:(NSData *)token;
--(BOOL)reachable;
 @end
