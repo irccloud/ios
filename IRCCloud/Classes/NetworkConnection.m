@@ -476,6 +476,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     for(OOBFetcher *fetcher in _oobQueue) {
         [fetcher cancel];
     }
+    [_oobQueue removeAllObjects];
     _reconnectTimestamp = 0;
     [self cancelIdleTimer];
     _state = kIRCCloudStateDisconnecting;

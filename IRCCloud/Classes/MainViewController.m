@@ -483,7 +483,6 @@
         [self _updateServerStatus];
         [self _updateUserListVisibility];
         if(self.slidingViewController) {
-            [self.slidingViewController resetTopView];
             [self _updateUnreadIndicator];
         }
     } else {
