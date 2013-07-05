@@ -103,8 +103,8 @@
     }
     if(!_highlights.hidden) {
         CGSize size = [_highlights.count sizeWithFont:_highlights.font];
-        size.width += 4;
-        size.height = frame.size.height - 12;
+        size.width += 0;
+        size.height = frame.size.height - 16;
         if(size.width < size.height)
             size.width = size.height;
         frame.size.width -= size.width + 12;
