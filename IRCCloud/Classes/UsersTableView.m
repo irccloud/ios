@@ -167,7 +167,7 @@
     [self _addUsersFromList:ops heading:@"Ops" headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data];
     [self _addUsersFromList:halfops heading:@"Half Ops" headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data];
     [self _addUsersFromList:voiced heading:@"Voiced" headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data];
-    [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor lightGrayColor] data:data];
+    [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor blueBorderColor] data:data];
     
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
