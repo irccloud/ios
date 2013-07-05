@@ -203,10 +203,6 @@
 		22E4D55A176A1D720072CBD0 /* navbar.png in Resources */ = {isa = PBXBuildFile; fileRef = 22E4D559176A1D720072CBD0 /* navbar.png */; };
 		22EBD35C176CC23500E84DA4 /* settings@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EBD35B176CC23500E84DA4 /* settings@2x.png */; };
 		22EBD35E176CC24400E84DA4 /* settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EBD35D176CC24400E84DA4 /* settings.png */; };
-		22EBD361176CC3BD00E84DA4 /* bottombar.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EBD35F176CC3BD00E84DA4 /* bottombar.png */; };
-		22EBD362176CC3BD00E84DA4 /* bottombar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EBD360176CC3BD00E84DA4 /* bottombar@2x.png */; };
-		22EBD364176CCE8600E84DA4 /* send@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EBD363176CCE8600E84DA4 /* send@2x.png */; };
-		22EBD366176CCE9800E84DA4 /* send.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EBD365176CCE9800E84DA4 /* send.png */; };
 		22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
 		22F9EE1D16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
 /* End PBXBuildFile section */
@@ -431,10 +427,6 @@
 		22E4D559176A1D720072CBD0 /* navbar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = navbar.png; sourceTree = "<group>"; };
 		22EBD35B176CC23500E84DA4 /* settings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "settings@2x.png"; sourceTree = "<group>"; };
 		22EBD35D176CC24400E84DA4 /* settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = settings.png; sourceTree = "<group>"; };
-		22EBD35F176CC3BD00E84DA4 /* bottombar.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = bottombar.png; sourceTree = "<group>"; };
-		22EBD360176CC3BD00E84DA4 /* bottombar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bottombar@2x.png"; sourceTree = "<group>"; };
-		22EBD363176CCE8600E84DA4 /* send@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "send@2x.png"; sourceTree = "<group>"; };
-		22EBD365176CCE9800E84DA4 /* send.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = send.png; sourceTree = "<group>"; };
 		22F9EE1A16DE6F21004615C0 /* EventsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsDataSource.h; sourceTree = "<group>"; };
 		22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsDataSource.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -683,12 +675,8 @@
 				220EA40B1760E48800EFEA6A /* accept@2x.png */,
 				224D00A8173C188100500D70 /* add.png */,
 				224D00A5173C185B00500D70 /* add@2x.png */,
-				22EBD35F176CC3BD00E84DA4 /* bottombar.png */,
-				22EBD360176CC3BD00E84DA4 /* bottombar@2x.png */,
 				220EA40F1760EF8800EFEA6A /* users.png */,
 				220EA40D1760EF6B00EFEA6A /* users@2x.png */,
-				22EBD365176CCE9800E84DA4 /* send.png */,
-				22EBD363176CCE8600E84DA4 /* send@2x.png */,
 				22EBD35D176CC24400E84DA4 /* settings.png */,
 				22EBD35B176CC23500E84DA4 /* settings@2x.png */,
 				22DB1D5116FEB25200C5FE6F /* Icon-72.png */,
@@ -917,10 +905,6 @@
 				22E4D55A176A1D720072CBD0 /* navbar.png in Resources */,
 				22EBD35C176CC23500E84DA4 /* settings@2x.png in Resources */,
 				22EBD35E176CC24400E84DA4 /* settings.png in Resources */,
-				22EBD361176CC3BD00E84DA4 /* bottombar.png in Resources */,
-				22EBD362176CC3BD00E84DA4 /* bottombar@2x.png in Resources */,
-				22EBD364176CCE8600E84DA4 /* send@2x.png in Resources */,
-				22EBD366176CCE9800E84DA4 /* send.png in Resources */,
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
 				225017661783434900066E71 /* ARChromeActivity@2x~ipad.png in Resources */,

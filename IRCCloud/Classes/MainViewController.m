@@ -47,25 +47,31 @@
     
     self.navigationItem.titleView = _titleView;
 
-    //_bottomBar.image = [[UIImage imageNamed:@"bottombar"] stretchableImageWithLeftCapWidth:0 topCapHeight:1];
-    
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     button.contentMode = UIViewContentModeScaleToFill;
     button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
     [button setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
     [button addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [button sizeToFit];
-    button.frame = CGRectMake(12,10,button.frame.size.width, button.frame.size.height);
+    button.frame = CGRectMake(12,12,button.frame.size.width, button.frame.size.height);
     [_bottomBar addSubview:button];
 
-    button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.contentMode = UIViewContentModeScaleToFill;
-    button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
-    [button setImage:[UIImage imageNamed:@"send"] forState:UIControlStateNormal];
-    [button addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [button sizeToFit];
-    button.frame = CGRectMake(_bottomBar.frame.size.width - button.frame.size.width - 8,6,button.frame.size.width,button.frame.size.height);
-    [_bottomBar addSubview:button];
+    _sendBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    _sendBtn.contentMode = UIViewContentModeScaleToFill;
+    _sendBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
+    [_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
+    [_sendBtn setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
+    [_sendBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+    [_sendBtn setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    _sendBtn.titleLabel.shadowOffset = CGSizeMake(0, 1);
+    [_sendBtn setBackgroundImage:[UIImage imageNamed:@"sendbg_active"] forState:UIControlStateNormal];
+    [_sendBtn setBackgroundImage:[UIImage imageNamed:@"sendbg"] forState:UIControlStateDisabled];
+    [_sendBtn addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [_sendBtn sizeToFit];
+    _sendBtn.enabled = NO;
+    _sendBtn.adjustsImageWhenHighlighted = NO;
+    _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,8,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
+    [_bottomBar addSubview:_sendBtn];
     
     if(_buffersView)
         [self addChildViewController:_buffersView];
@@ -98,11 +104,11 @@
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.height;
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,226,35)];
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,208,38)];
         _message.maximumNumberOfLines = 8;
     } else {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.width - self.navigationController.navigationBar.frame.size.height;
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,490,35)];
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,472,38)];
     }
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
@@ -704,6 +710,10 @@
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
         }];
     }
+}
+
+-(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
+    _sendBtn.enabled = expandingTextView.text.length > 0;
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
