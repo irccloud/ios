@@ -55,7 +55,7 @@
     [button setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
     [button addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [button sizeToFit];
-    button.frame = CGRectMake(10,10,button.frame.size.width, button.frame.size.height);
+    button.frame = CGRectMake(13,10,button.frame.size.width, button.frame.size.height);
     [_bottomBar addSubview:button];
 
     button = [UIButton buttonWithType:UIButtonTypeCustom];
