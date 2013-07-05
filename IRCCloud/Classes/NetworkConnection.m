@@ -196,7 +196,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     lastType = type;
     
-    if(flags & kSCNetworkReachabilityFlagsReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0) {
+    if(flags & kSCNetworkReachabilityFlagsReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0 && [[[NSUserDefaults standardUserDefaults] stringForKey:@"session"] length]) {
         TFLog(@"IRCCloud server became reachable, connecting");
         [[NetworkConnection sharedInstance] connect];
     } else if(state == kIRCCloudStateConnected) {
