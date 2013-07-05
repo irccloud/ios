@@ -71,6 +71,8 @@
 		224D00A7173C185B00500D70 /* add@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 224D00A5173C185B00500D70 /* add@2x.png */; };
 		224D00A9173C188100500D70 /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = 224D00A8173C188100500D70 /* add.png */; };
 		224D00AA173C188100500D70 /* add.png in Resources */ = {isa = PBXBuildFile; fileRef = 224D00A8173C188100500D70 /* add.png */; };
+		224FCF331787286000FC3879 /* licenses.txt in Resources */ = {isa = PBXBuildFile; fileRef = 224FCF321787286000FC3879 /* licenses.txt */; };
+		224FCF361787288400FC3879 /* LicenseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 224FCF351787288400FC3879 /* LicenseViewController.m */; };
 		22501740178340AB00066E71 /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
 		225017631783434900066E71 /* ARChromeActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 225017431783434800066E71 /* ARChromeActivity.m */; };
 		225017641783434900066E71 /* ARChromeActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017441783434800066E71 /* ARChromeActivity.png */; };
@@ -275,6 +277,9 @@
 		2248DF3816EE375D0086BB42 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		224D00A5173C185B00500D70 /* add@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "add@2x.png"; sourceTree = "<group>"; };
 		224D00A8173C188100500D70 /* add.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = add.png; sourceTree = "<group>"; };
+		224FCF321787286000FC3879 /* licenses.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = licenses.txt; sourceTree = "<group>"; };
+		224FCF341787288400FC3879 /* LicenseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LicenseViewController.h; sourceTree = "<group>"; };
+		224FCF351787288400FC3879 /* LicenseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LicenseViewController.m; sourceTree = "<group>"; };
 		2250173F178340AB00066E71 /* Twitter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Twitter.framework; path = System/Library/Frameworks/Twitter.framework; sourceTree = SDKROOT; };
 		225017421783434800066E71 /* ARChromeActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARChromeActivity.h; sourceTree = "<group>"; };
 		225017431783434800066E71 /* ARChromeActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ARChromeActivity.m; sourceTree = "<group>"; };
@@ -638,6 +643,8 @@
 				2223C6A81768D7150032544B /* ImageViewController.m */,
 				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
+				224FCF341787288400FC3879 /* LicenseViewController.h */,
+				224FCF351787288400FC3879 /* LicenseViewController.m */,
 				228A05DB16D3E40E0029769C /* LoginSplashViewController.h */,
 				228A05DC16D3E40E0029769C /* LoginSplashViewController.m */,
 				2236F60816DBCBC6007BE535 /* MainViewController.h */,
@@ -663,6 +670,7 @@
 		228A05B416D3DB930029769C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				224FCF321787286000FC3879 /* licenses.txt */,
 				22E4D559176A1D720072CBD0 /* navbar.png */,
 				22E4D557176A1C550072CBD0 /* navbar@2x.png */,
 				229C29F617677ED200A07CED /* menu_unread.png */,
@@ -926,6 +934,7 @@
 				1AF93B7D1787213E005C1FD4 /* sendbg_active@2x.png in Resources */,
 				1AF93B7E1787213E005C1FD4 /* sendbg.png in Resources */,
 				1AF93B7F1787213E005C1FD4 /* sendbg@2x.png in Resources */,
+				224FCF331787286000FC3879 /* licenses.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1040,6 +1049,7 @@
 				228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */,
 				225017631783434900066E71 /* ARChromeActivity.m in Sources */,
 				2250176D1783434900066E71 /* TUSafariActivity.m in Sources */,
+				224FCF361787288400FC3879 /* LicenseViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

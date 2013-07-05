@@ -8,6 +8,7 @@
 
 #import "SettingsViewController.h"
 #import "NetworkConnection.h"
+#import "LicenseViewController.h"
 
 @implementation SettingsViewController
 
@@ -214,7 +215,7 @@
         case 2:
             return 3;
         case 3:
-            return 1;
+            return 2;
     }
     return 0;
 }
@@ -283,6 +284,9 @@
         case 3:
             switch(row) {
                 case 0:
+                    cell.textLabel.text = @"Open-Source Licenses";
+                    break;
+                case 1:
                     cell.textLabel.text = @"Version";
                     cell.detailTextLabel.text = _version;
                     break;
@@ -336,6 +340,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
+    if(indexPath.section == 3 && indexPath.row == 0)
+        [self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];
 }
 
 @end
