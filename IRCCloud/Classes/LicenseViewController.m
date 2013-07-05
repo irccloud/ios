@@ -22,6 +22,7 @@
     [super viewDidLoad];
     UITextView *tv = [[UITextView alloc] initWithFrame:self.view.bounds];
     tv.text = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"licenses" ofType:@"txt"] encoding:NSUTF8StringEncoding error:nil];
+    tv.autoresizingMask = UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:tv];
 }
 
