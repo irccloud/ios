@@ -64,6 +64,7 @@
     [_sendBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
     [_sendBtn setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
     _sendBtn.titleLabel.shadowOffset = CGSizeMake(0, 1);
+    [_sendBtn.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
     [_sendBtn setBackgroundImage:[UIImage imageNamed:@"sendbg_active"] forState:UIControlStateNormal];
     [_sendBtn setBackgroundImage:[UIImage imageNamed:@"sendbg"] forState:UIControlStateDisabled];
     [_sendBtn addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
