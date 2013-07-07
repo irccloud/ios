@@ -808,6 +808,17 @@
             } else {
                 _lock.hidden = YES;
             }
+        } else if([_buffer.type isEqualToString:@"conversation"]) {
+            self.navigationItem.title = _titleLabel.text = _buffer.name;
+            _topicLabel.hidden = NO;
+            _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
+            _titleLabel.font = [UIFont boldSystemFontOfSize:18];
+            _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            if(s.name.length)
+                _topicLabel.text = s.name;
+            else
+                _topicLabel.text = s.hostname;
         }
     }
 }
