@@ -385,6 +385,31 @@
                         break;
                     }
                 }
+            } else {
+                if([[o objectForKey:@"message"] isEqualToString:@"auth"]) {
+                    [[NetworkConnection sharedInstance] unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]];
+                    //TODO: check the above result, and retry if it fails
+                    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
+                    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                    [[NetworkConnection sharedInstance] disconnect];
+                    [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
+                    [NetworkConnection sharedInstance].reconnectTimestamp = 0;
+                    [[NetworkConnection sharedInstance] clearPrefs];
+                    [[ServersDataSource sharedInstance] clear];
+                    [[UsersDataSource sharedInstance] clear];
+                    [[ChannelsDataSource sharedInstance] clear];
+                    [[EventsDataSource sharedInstance] clear];
+                    _buffer = nil;
+                    [_eventsView setBuffer:nil];
+                    [_buffersView setBuffer:nil];
+                    [_usersView setBuffer:nil];
+                    [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+                } else if([[o objectForKey:@"message"] isEqualToString:@"set_shard"]) {
+                    [[NSUserDefaults standardUserDefaults] setObject:[o objectForKey:@"cookie"] forKey:@"session"];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                    [[NetworkConnection sharedInstance] connect];
+                }
             }
             break;
         case kIRCEventBufferMsg:

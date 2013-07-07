@@ -189,7 +189,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         type = TYPE_UNKNOWN;
     
     if(type != lastType && state != kIRCCloudStateDisconnected) {
-        [[NetworkConnection sharedInstance] disconnect];
+        [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
         [NetworkConnection sharedInstance].reconnectTimestamp = -1;
         state = kIRCCloudStateDisconnected;
     }
@@ -198,10 +198,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     if(flags & kSCNetworkReachabilityFlagsReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0 && [[[NSUserDefaults standardUserDefaults] stringForKey:@"session"] length]) {
         TFLog(@"IRCCloud server became reachable, connecting");
-        [[NetworkConnection sharedInstance] connect];
+        [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:YES];
     } else if(state == kIRCCloudStateConnected) {
         TFLog(@"IRCCloud server became unreachable, disconnecting");
-        [[NetworkConnection sharedInstance] disconnect];
+        [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
         [NetworkConnection sharedInstance].reconnectTimestamp = -1;
     }
 }
@@ -436,6 +436,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)connect {
+    if([[[NSUserDefaults standardUserDefaults] stringForKey:@"session"] length] < 1)
+        return;
+    
     if(_state == kIRCCloudStateConnecting)
         return;
     
@@ -482,6 +485,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _state = kIRCCloudStateDisconnecting;
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     [_socket close];
+    _socket = nil;
 }
 
 -(void)clearPrefs {
@@ -520,6 +524,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         else
             [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+        if([aError.domain isEqualToString:@"kCFStreamErrorDomainSSL"]) {
+            IRCCloudJSONObject *o = [[IRCCloudJSONObject alloc] initWithDictionary:@{@"success":@0,@"message":@"Unable to establish a secure connection"}];
+            [self postObject:o forEvent:kIRCEventFailureMsg];
+        } else if([aError localizedDescription]) {
+            IRCCloudJSONObject *o = [[IRCCloudJSONObject alloc] initWithDictionary:@{@"success":@0,@"message":[aError localizedDescription]}];
+            [self postObject:o forEvent:kIRCEventFailureMsg];
+        }
     }
 }
 
@@ -923,19 +934,23 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         }
         TFLog(@"Repsonse: %@", object);
     }
-    if(_idleInterval > 0)
+    if(_reconnectTimestamp != 0)
         [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
 }
 
 -(void)cancelIdleTimer {
+    if(![NSThread currentThread].isMainThread)
+        TFLog(@"WARNING: cancel idle timer called outside of main thread");
     [_idleTimer invalidate];
     _idleTimer = nil;
 }
 
 -(void)scheduleIdleTimer {
+    if(![NSThread currentThread].isMainThread)
+        TFLog(@"WARNING: schedule idle timer called outside of main thread");
     [_idleTimer invalidate];
     _idleTimer = nil;
-    if(_idleInterval <= 0)
+    if(_reconnectTimestamp == 0)
         return;
     
     _idleTimer = [NSTimer scheduledTimerWithTimeInterval:_idleInterval+10 target:self selector:@selector(_idle) userInfo:nil repeats:NO];

@@ -53,6 +53,10 @@
                                                  name:kIRCCloudConnectivityNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(handleEvent:)
+                                                 name:kIRCCloudEventNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
                                                  name:UIKeyboardWillShowNotification object:nil];
     
@@ -69,6 +73,58 @@
                                                  name:kIRCCloudBacklogProgressNotification object:nil];
 }
 
+-(void)handleEvent:(NSNotification *)notification {
+    kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
+    IRCCloudJSONObject *o = nil;
+    
+    switch(event) {
+        case kIRCEventFailureMsg:
+            o = notification.object;
+            if([[o objectForKey:@"message"] isEqualToString:@"auth"]) {
+                [[NetworkConnection sharedInstance] unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]];
+                //TODO: check the above result, and retry if it fails
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                [_conn performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
+                [_conn performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
+                [_conn clearPrefs];
+                _conn.reconnectTimestamp = 0;
+                [[ServersDataSource sharedInstance] clear];
+                [[UsersDataSource sharedInstance] clear];
+                [[ChannelsDataSource sharedInstance] clear];
+                [[EventsDataSource sharedInstance] clear];
+                [activity stopAnimating];
+                loginView.alpha = 1;
+                loadingView.alpha = 0;
+            } else if([[o objectForKey:@"message"] isEqualToString:@"set_shard"]) {
+                [[NSUserDefaults standardUserDefaults] setObject:[o objectForKey:@"cookie"] forKey:@"session"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                progress.hidden = YES;
+                progress.progress = 0;
+                [activity startAnimating];
+                activity.hidden = NO;
+                [status setText:@"Connecting"];
+                [_conn connect];
+            } else if([[o objectForKey:@"message"] isEqualToString:@"temp_unavailable"]) {
+                error.text = @"Your account is temporarily unavailable";
+                error.hidden = NO;
+                CGRect frame = error.frame;
+                frame.size.height = [error.text sizeWithFont:error.font constrainedToSize:CGSizeMake(frame.size.width,INT_MAX) lineBreakMode:error.lineBreakMode].height;
+                error.frame = frame;
+            } else {
+                error.text = [o objectForKey:@"message"];
+                error.hidden = NO;
+                CGRect frame = error.frame;
+                frame.size.height = [error.text sizeWithFont:error.font constrainedToSize:CGSizeMake(frame.size.width,INT_MAX) lineBreakMode:error.lineBreakMode].height;
+                error.frame = frame;
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 -(void)updateConnecting:(NSNotification *)notification {
     if(_conn.state == kIRCCloudStateConnecting || [_conn reachable] == kIRCCloudUnknown) {
         [status setText:@"Connecting"];
@@ -76,6 +132,7 @@
         [activity startAnimating];
         progress.progress = 0;
         progress.hidden = YES;
+        error.text = nil;
     } else if(_conn.state == kIRCCloudStateDisconnected) {
         if(_conn.reconnectTimestamp > 0) {
             [status setText:[NSString stringWithFormat:@"Reconnecting in %0.f seconds", _conn.reconnectTimestamp - [[NSDate date] timeIntervalSince1970]]];
@@ -147,11 +204,13 @@
     loginView.alpha = 0;
     loadingView.alpha = 1;
     [UIView commitAnimations];
-    [status setText:@"Signing In"];
+    [status setText:@"Signing in"];
     progress.hidden = YES;
     progress.progress = 0;
     [activity startAnimating];
     activity.hidden = NO;
+    error.text = nil;
+    error.hidden = YES;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] login:[username text] password:[password text]];
         if([[result objectForKey:@"success"] intValue] == 1) {
