@@ -87,6 +87,7 @@
 @property (nonatomic) UIReturnKeyType returnKeyType;
 @property (nonatomic) UIImageView *textViewBackgroundImage;
 @property (nonatomic,copy) NSString *placeholder;
+@property (nonatomic) int minimumHeight;
 - (BOOL)hasText;
 - (void)scrollRangeToVisible:(NSRange)range;
 - (void)clearText;

@@ -105,12 +105,14 @@
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.height;
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,208,38)];
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,208,36)];
         _message.maximumNumberOfLines = 8;
     } else {
         _startHeight = [UIScreen mainScreen].applicationFrame.size.width - self.navigationController.navigationBar.frame.size.height;
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,472,38)];
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,472,36)];
     }
+    _message.minimumHeight = 36;
+    [_message sizeToFit];
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
     [_bottomBar addSubview:_message];
@@ -725,15 +727,15 @@
 -(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {
     NSArray *rows = [_eventsView.tableView indexPathsForVisibleRows];
     CGRect frame = _eventsView.tableView.frame;
-    frame.size.height = self.view.frame.size.height - height - 9;
+    frame.size.height = self.view.frame.size.height - height - 8;
     if(!_serverStatusBar.hidden)
         frame.size.height -= _serverStatusBar.frame.size.height;
     _eventsView.tableView.frame = frame;
     frame = _serverStatusBar.frame;
-    frame.origin.y = self.view.frame.size.height - height - 9 - frame.size.height;
+    frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
     _serverStatusBar.frame = frame;
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-    _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 9, _bottomBar.frame.size.width, height + 9);
+    _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
 }
 
 -(void)setUnreadColor:(UIColor *)color {

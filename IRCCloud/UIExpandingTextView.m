@@ -49,6 +49,7 @@
 @synthesize returnKeyType;
 @synthesize textViewBackgroundImage;
 @synthesize placeholder;
+@synthesize minimumHeight;
 
 - (void)setPlaceholder:(NSString *)placeholders
 {
