@@ -110,6 +110,10 @@
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,208,36)];
         _message.maximumNumberOfLines = 8;
     } else {
+        _borders.layer.shadowOpacity = 0.75f;
+        _borders.layer.shadowRadius = 2.0f;
+        _borders.layer.shadowColor = [UIColor blackColor].CGColor;
+
         _startHeight = [UIScreen mainScreen].applicationFrame.size.width - self.navigationController.navigationBar.frame.size.height;
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,472,36)];
     }
@@ -1022,7 +1026,10 @@
             frame = _serverStatusBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
             _serverStatusBar.frame = frame;
-            _usersViewBorder.hidden = _usersView.view.hidden = NO;
+            _usersView.view.hidden = NO;
+            frame = _borders.frame;
+            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width + 2;
+            _borders.frame = frame;
         } else {
             CGRect frame = _eventsView.view.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
@@ -1033,7 +1040,10 @@
             frame = _serverStatusBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
             _serverStatusBar.frame = frame;
-            _usersViewBorder.hidden = _usersView.view.hidden = YES;
+            _usersView.view.hidden = YES;
+            frame = _borders.frame;
+            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width + 2;
+            _borders.frame = frame;
         }
     }
     }];
