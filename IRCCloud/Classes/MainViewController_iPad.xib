@@ -567,7 +567,7 @@
 					<object class="IBUILabel" id="803825877">
 						<reference key="NSNextResponder" ref="356460238"/>
 						<int key="NSvFlags">290</int>
-						<string key="NSFrame">{{0, 2}, {1024, 18}}</string>
+						<string key="NSFrame">{{0, 2}, {1010, 18}}</string>
 						<reference key="NSSuperview" ref="356460238"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="763586643"/>
@@ -597,7 +597,7 @@
 					<object class="IBUILabel" id="763586643">
 						<reference key="NSNextResponder" ref="356460238"/>
 						<int key="NSvFlags">290</int>
-						<string key="NSFrame">{{0, 20}, {1024, 18}}</string>
+						<string key="NSFrame">{{0, 20}, {1010, 18}}</string>
 						<reference key="NSSuperview" ref="356460238"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView"/>
@@ -628,7 +628,7 @@
 						</object>
 					</object>
 				</array>
-				<string key="NSFrameSize">{1024, 40}</string>
+				<string key="NSFrameSize">{1010, 40}</string>
 				<reference key="NSSuperview"/>
 				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="677931145"/>
@@ -1446,11 +1446,16 @@
 					<string key="superclassName">UIViewController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="serverStatusBarPressed:">id</string>
+						<string key="settingsButtonPressed:">id</string>
 						<string key="titleAreaPressed:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="serverStatusBarPressed:">
 							<string key="name">serverStatusBarPressed:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="settingsButtonPressed:">
+							<string key="name">settingsButtonPressed:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="titleAreaPressed:">
