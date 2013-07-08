@@ -686,7 +686,7 @@ int __timestampWidth;
     
     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
     if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
-        if(_buffer.bid != -1) {
+        if(_buffer.bid != -1 && _buffer.min_eid > 0) {
             _requestingBacklog = YES;
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
         } else {
