@@ -28,7 +28,6 @@
 -(void)viewWillAppear:(BOOL)animated {
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if(session != nil && [session length] > 0) {
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
         if(_conn.state == kIRCCloudStateDisconnected) {
             loginView.alpha = 0;
             loadingView.alpha = 1;
@@ -158,6 +157,7 @@
 }
 
 -(void)backlogStarted:(NSNotification *)notification {
+    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
     [status setText:@"Loading"];
     activity.hidden = YES;
     progress.progress = 0;

@@ -179,7 +179,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     static int lastType = TYPE_UNKNOWN;
     int type = TYPE_UNKNOWN;
     kIRCCloudState state = [NetworkConnection sharedInstance].state;
-    NSLog(@"IRCCloud state: %i Reconnect timestamp: %f Reachable: %@ lastType: %i", state, [NetworkConnection sharedInstance].reconnectTimestamp, (flags & kSCNetworkReachabilityFlagsReachable)?@"YES":@"NO", lastType);
+    TFLog(@"IRCCloud state: %i Reconnect timestamp: %f Reachable: %@ lastType: %i", state, [NetworkConnection sharedInstance].reconnectTimestamp, (flags & kSCNetworkReachabilityFlagsReachable)?@"YES":@"NO", lastType);
 
     if(flags & kSCNetworkReachabilityFlagsIsWWAN)
         type = TYPE_WWAN;
@@ -252,6 +252,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-register", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    [request setValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
     
@@ -271,6 +272,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-unregister", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    [request setValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
     
