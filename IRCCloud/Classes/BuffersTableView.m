@@ -192,7 +192,8 @@
                  @"unread":@(unread),
                  @"highlights":@(highlights),
                  @"archived":@0,
-                 @"status":server.status
+                 @"status":server.status,
+                 @"ssl":@(server.ssl)
                  }];
                 
                 if(unread > 0 && _firstUnreadPosition == -1)
@@ -483,7 +484,10 @@
     }
     switch(cell.type) {
         case TYPE_SERVER:
-            cell.icon.image = [UIImage imageNamed:@"world"];
+            if([[row objectForKey:@"ssl"] intValue])
+                cell.icon.image = [UIImage imageNamed:@"world_shield"];
+            else
+                cell.icon.image = [UIImage imageNamed:@"world"];
             cell.icon.hidden = NO;
             if(selected) {
                 cell.label.textColor = [UIColor whiteColor];
