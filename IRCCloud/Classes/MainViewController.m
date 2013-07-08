@@ -22,6 +22,7 @@
 #import "CallerIDTableViewController.h"
 #import "WhoisViewController.h"
 #import "DisplayOptionsViewController.h"
+#import "WhoListTableViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -181,6 +182,7 @@
     BansTableViewController *btv = nil;
     ChannelListTableViewController *ctv = nil;
     CallerIDTableViewController *citv = nil;
+    WhoListTableViewController *wtv = nil;
     Event *e = nil;
     Server *s = nil;
     UIAlertView *alert = nil;
@@ -330,6 +332,17 @@
                 citv.nicks = [o objectForKey:@"nicks"];
                 citv.navigationItem.title = @"Accept List";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:citv];
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventWhoList:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                wtv = [[WhoListTableViewController alloc] initWithStyle:UITableViewStylePlain];
+                wtv.event = o;
+                wtv.navigationItem.title = [NSString stringWithFormat:@"WHO For %@", [o objectForKey:@"subject"]];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:wtv];
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 [self presentViewController:nc animated:YES completion:nil];
             }

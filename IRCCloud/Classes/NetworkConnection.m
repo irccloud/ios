@@ -691,6 +691,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         } else if([object.type isEqualToString:@"who_response"]) {
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventWhoList];
+        } else if([object.type isEqualToString:@"names_reply"]) {
+            if(!backlog)
+                [self postObject:object forEvent:kIRCEventNamesList];
         } else if([object.type isEqualToString:@"whois_response"]) {
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventWhois];

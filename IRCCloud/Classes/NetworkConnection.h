@@ -61,6 +61,7 @@ typedef enum {
     kIRCEventBanList,
     kIRCEventWhoList,
     kIRCEventWhois,
+    kIRCEventNamesList,
     kIRCEventLinkChannel,
     kIRCEventListResponseFetching,
     kIRCEventListResponse,
