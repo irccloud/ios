@@ -110,10 +110,6 @@
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,208,36)];
         _message.maximumNumberOfLines = 8;
     } else {
-        _borders.layer.shadowOpacity = 0.75f;
-        _borders.layer.shadowRadius = 2.0f;
-        _borders.layer.shadowColor = [UIColor blackColor].CGColor;
-
         _startHeight = [UIScreen mainScreen].applicationFrame.size.width - self.navigationController.navigationBar.frame.size.height;
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,472,36)];
     }
