@@ -1022,7 +1022,7 @@
             frame = _serverStatusBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
             _serverStatusBar.frame = frame;
-            _usersView.view.hidden = NO;
+            _usersViewBorder.hidden = _usersView.view.hidden = NO;
         } else {
             CGRect frame = _eventsView.view.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
@@ -1033,7 +1033,7 @@
             frame = _serverStatusBar.frame;
             frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
             _serverStatusBar.frame = frame;
-            _usersView.view.hidden = YES;
+            _usersViewBorder.hidden = _usersView.view.hidden = YES;
         }
     }
     }];
