@@ -131,6 +131,7 @@
 		229C2A0717677ED200A07CED /* menu@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 229C29FB17677ED200A07CED /* menu@2x.png */; };
 		22A1D0271778A86900F8A89C /* WhoisViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A1D0261778A86900F8A89C /* WhoisViewController.m */; };
 		22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F25178A317100529CDA /* WhoListTableViewController.m */; };
+		22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F28178A3F3500529CDA /* NamesListTableViewController.m */; };
 		22AD75ED1718567D00141257 /* BansTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* BansTableViewController.m */; };
 		22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
@@ -361,6 +362,8 @@
 		22A1D0261778A86900F8A89C /* WhoisViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoisViewController.m; sourceTree = "<group>"; };
 		22A35F24178A316300529CDA /* WhoListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhoListTableViewController.h; sourceTree = "<group>"; };
 		22A35F25178A317100529CDA /* WhoListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoListTableViewController.m; sourceTree = "<group>"; };
+		22A35F27178A3F2B00529CDA /* NamesListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NamesListTableViewController.h; sourceTree = "<group>"; };
+		22A35F28178A3F3500529CDA /* NamesListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NamesListTableViewController.m; sourceTree = "<group>"; };
 		22AD75EB1718567D00141257 /* BansTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BansTableViewController.h; sourceTree = "<group>"; };
 		22AD75EC1718567D00141257 /* BansTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BansTableViewController.m; sourceTree = "<group>"; };
 		22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditConnectionViewController.h; sourceTree = "<group>"; };
@@ -644,6 +647,8 @@
 				228A05DC16D3E40E0029769C /* LoginSplashViewController.m */,
 				2236F60816DBCBC6007BE535 /* MainViewController.h */,
 				2236F60916DBCBC6007BE535 /* MainViewController.m */,
+				22A35F27178A3F2B00529CDA /* NamesListTableViewController.h */,
+				22A35F28178A3F3500529CDA /* NamesListTableViewController.m */,
 				22B4284616D7E36300498507 /* NetworkConnection.h */,
 				22B4284716D7E36300498507 /* NetworkConnection.m */,
 				2236F5F816DA765C007BE535 /* ServersDataSource.h */,
@@ -1040,6 +1045,7 @@
 				2250176D1783434900066E71 /* TUSafariActivity.m in Sources */,
 				224FCF361787288400FC3879 /* LicenseViewController.m in Sources */,
 				22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */,
+				22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

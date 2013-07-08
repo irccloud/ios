@@ -23,6 +23,7 @@
 #import "WhoisViewController.h"
 #import "DisplayOptionsViewController.h"
 #import "WhoListTableViewController.h"
+#import "NamesListTableViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -183,6 +184,7 @@
     ChannelListTableViewController *ctv = nil;
     CallerIDTableViewController *citv = nil;
     WhoListTableViewController *wtv = nil;
+    NamesListTableViewController *ntv = nil;
     Event *e = nil;
     Server *s = nil;
     UIAlertView *alert = nil;
@@ -343,6 +345,17 @@
                 wtv.event = o;
                 wtv.navigationItem.title = [NSString stringWithFormat:@"WHO For %@", [o objectForKey:@"subject"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:wtv];
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventNamesList:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                ntv = [[NamesListTableViewController alloc] initWithStyle:UITableViewStylePlain];
+                ntv.event = o;
+                ntv.navigationItem.title = [NSString stringWithFormat:@"NAMES For %@", [o objectForKey:@"chan"]];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ntv];
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 [self presentViewController:nc animated:YES completion:nil];
             }
