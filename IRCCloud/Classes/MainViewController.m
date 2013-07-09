@@ -829,7 +829,7 @@
                 }
             }
             if(lock) {
-                _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font].width)/2 - 16,4,16,16);
+                _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font].width)/2 - 20,4,16,16);
                 _lock.hidden = NO;
             } else {
                 _lock.hidden = YES;
