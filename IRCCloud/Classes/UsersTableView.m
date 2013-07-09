@@ -225,7 +225,7 @@
     cell.label.text = [row objectForKey:@"text"];
     cell.label.textColor = [row objectForKey:@"color"];
     if([[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue])
-        cell.count.text = [NSString stringWithFormat:@"%@%@", [row objectForKey:@"symbol"], [row objectForKey:@"count"]];
+        cell.count.text = [NSString stringWithFormat:@"%@ %@", [row objectForKey:@"symbol"], [row objectForKey:@"count"]];
     else
         cell.count.text = [NSString stringWithFormat:@"%@", [row objectForKey:@"count"]];
     cell.count.textColor = [row objectForKey:@"countColor"];
