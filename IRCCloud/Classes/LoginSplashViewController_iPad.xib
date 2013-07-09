@@ -53,7 +53,7 @@
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 						<object class="NSCustomResource" key="IBUIImage">
 							<string key="NSClassName">NSImage</string>
-							<string key="NSResourceName">splashlogo.png</string>
+							<string key="NSResourceName">splashlogo_big.png</string>
 						</object>
 					</object>
 					<object class="IBUIView" id="348988465">
@@ -665,7 +665,7 @@
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
 		<object class="NSMutableDictionary" key="IBDocument.LastKnownImageSizes">
-			<string key="NS.key.0">splashlogo.png</string>
+			<string key="NS.key.0">splashlogo_big.png</string>
 			<string key="NS.object.0">{256, 256}</string>
 		</object>
 		<string key="IBCocoaTouchPluginVersion">2083</string>
