@@ -328,6 +328,7 @@ int __timestampWidth;
         }
         event.groupMsg = msg;
         event.formattedMsg = nil;
+        event.formatted = nil;
         event.linkify = NO;
     } else {
         _currentCollapsedEid = -1;
@@ -338,6 +339,7 @@ int __timestampWidth;
         } else {
             event.formattedMsg = event.msg;
         }
+        event.formatted = nil;
     }
     
     if(event.from.length && event.hostmask.length && ![type isEqualToString:@"user_channel_mode"] && [type rangeOfString:@"kicked"].location == NSNotFound) {
@@ -703,6 +705,7 @@ int __timestampWidth;
             self.tableView.tableHeaderView = nil;
         }
         for(Event *e in events) {
+            e.formatted = nil;
             [self insertEvent:e backlog:true nextIsGrouped:false];
         }
         
