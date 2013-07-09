@@ -128,6 +128,8 @@ int __timestampWidth;
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
+    _topUnreadView.backgroundColor = [UIColor selectedBlueColor];
+    _bottomUnreadView.backgroundColor = [UIColor selectedBlueColor];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
