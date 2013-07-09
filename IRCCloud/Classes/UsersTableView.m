@@ -105,7 +105,7 @@
     }
 }
 
-- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data {
+- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data {
     int first;
     if(users.count) {
         [data addObject:@{
@@ -114,7 +114,8 @@
          @"color":headingColor,
          @"bgColor":headingBgColor,
          @"count":@(users.count),
-         @"countColor":countColor
+         @"countColor":countColor,
+         @"symbol":symbol
          }];
         first = 1;
         for(User *user in users) {
@@ -162,12 +163,12 @@
             [members addObject:user];
     }
     
-    [self _addUsersFromList:owners heading:@"Owners" headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data];
-    [self _addUsersFromList:admins heading:@"Admins" headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data];
-    [self _addUsersFromList:ops heading:@"Ops" headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data];
-    [self _addUsersFromList:halfops heading:@"Half Ops" headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data];
-    [self _addUsersFromList:voiced heading:@"Voiced" headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data];
-    [self _addUsersFromList:members heading:@"Members" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor blueBorderColor] data:data];
+    [self _addUsersFromList:owners heading:@"Owners" symbol:@"~" headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data];
+    [self _addUsersFromList:admins heading:@"Admins" symbol:@"&" headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data];
+    [self _addUsersFromList:ops heading:@"Ops" symbol:@"@" headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data];
+    [self _addUsersFromList:halfops heading:@"Half Ops" symbol:@"%" headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data];
+    [self _addUsersFromList:voiced heading:@"Voiced" symbol:@"+" headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data];
+    [self _addUsersFromList:members heading:@"Members" symbol:@"" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor blueBorderColor] data:data];
     
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -223,7 +224,10 @@
     cell.contentView.backgroundColor = [row objectForKey:@"bgColor"];
     cell.label.text = [row objectForKey:@"text"];
     cell.label.textColor = [row objectForKey:@"color"];
-    cell.count.text = [[row objectForKey:@"count"] description];
+    if([[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue])
+        cell.count.text = [NSString stringWithFormat:@"%@%@", [row objectForKey:@"symbol"], [row objectForKey:@"count"]];
+    else
+        cell.count.text = [NSString stringWithFormat:@"%@", [row objectForKey:@"count"]];
     cell.count.textColor = [row objectForKey:@"countColor"];
     if(cell.type == TYPE_HEADING)
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
