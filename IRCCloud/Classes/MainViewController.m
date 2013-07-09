@@ -1065,12 +1065,12 @@
             //[sheet addButtonWithTitle:@"Identify Nickname…"];
             [sheet addButtonWithTitle:@"Disconnect"];
         }
-        [sheet addButtonWithTitle:@"Edit Connection…"];
+        [sheet addButtonWithTitle:@"Edit Connection"];
     } else if([_buffer.type isEqualToString:@"channel"]) {
         if([[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             [sheet addButtonWithTitle:@"Leave"];
             if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
-                [sheet addButtonWithTitle:@"Ban List…"];
+                [sheet addButtonWithTitle:@"Ban List"];
             }
         } else {
             [sheet addButtonWithTitle:@"Rejoin"];
@@ -1085,9 +1085,9 @@
             [sheet addButtonWithTitle:@"Archive"];
         }
     }
-    [sheet addButtonWithTitle:@"Ignore List…"];
-    [sheet addButtonWithTitle:@"Display Options…"];
-    [sheet addButtonWithTitle:@"Settings…"];
+    [sheet addButtonWithTitle:@"Ignore List"];
+    [sheet addButtonWithTitle:@"Display Options"];
+    [sheet addButtonWithTitle:@"Settings"];
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
     if(self.slidingViewController)
@@ -1205,11 +1205,11 @@
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:title delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     if(_selectedEvent)
         [sheet addButtonWithTitle:@"Copy Message"];
-    [sheet addButtonWithTitle:@"Whois…"];
+    [sheet addButtonWithTitle:@"Whois"];
     [sheet addButtonWithTitle:@"Send a message"];
     [sheet addButtonWithTitle:@"Mention"];
-    [sheet addButtonWithTitle:@"Invite to channel…"];
-    [sheet addButtonWithTitle:@"Ignore…"];
+    [sheet addButtonWithTitle:@"Invite to channel"];
+    [sheet addButtonWithTitle:@"Ignore"];
     if([_buffer.type isEqualToString:@"channel"]) {
         User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
         if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
@@ -1219,8 +1219,8 @@
                 [sheet addButtonWithTitle:@"Op"];
         }
         if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound || [me.mode rangeOfString:@"h"].location != NSNotFound) {
-            [sheet addButtonWithTitle:@"Kick…"];
-            [sheet addButtonWithTitle:@"Ban…"];
+            [sheet addButtonWithTitle:@"Kick"];
+            [sheet addButtonWithTitle:@"Ban"];
         }
     }
     
@@ -1352,33 +1352,33 @@
                 [_eventsView setBuffer:b];
                 [self _updateUserListVisibility];
             }
-        } else if([action isEqualToString:@"Whois…"]) {
+        } else if([action isEqualToString:@"Whois"]) {
             [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
         } else if([action isEqualToString:@"Op"]) {
             [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
         } else if([action isEqualToString:@"Deop"]) {
             [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
-        } else if([action isEqualToString:@"Ban…"]) {
+        } else if([action isEqualToString:@"Ban"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
             alert.tag = TAG_BAN;
             alert.alertViewStyle = UIAlertViewStylePlainTextInput;
             [alert textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
             [alert show];
-        } else if([action isEqualToString:@"Ignore…"]) {
+        } else if([action isEqualToString:@"Ignore"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
             alert.tag = TAG_IGNORE;
             alert.alertViewStyle = UIAlertViewStylePlainTextInput;
             [alert textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
             [alert show];
-        } else if([action isEqualToString:@"Kick…"]) {
+        } else if([action isEqualToString:@"Kick"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
             alert.tag = TAG_KICK;
             alert.alertViewStyle = UIAlertViewStylePlainTextInput;
             [alert show];
-        } else if([action isEqualToString:@"Invite to channel…"]) {
+        } else if([action isEqualToString:@"Invite to channel"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
             alert.tag = TAG_INVITE;
@@ -1399,7 +1399,7 @@
             [[NetworkConnection sharedInstance] part:_buffer.name msg:nil cid:_buffer.cid];
         } else if([action isEqualToString:@"Rejoin"]) {
             [[NetworkConnection sharedInstance] join:_buffer.name key:nil cid:_buffer.cid];
-        } else if([action isEqualToString:@"Ban List…"]) {
+        } else if([action isEqualToString:@"Ban List"]) {
             [[NetworkConnection sharedInstance] mode:@"b" chan:_buffer.name cid:_buffer.cid];
         } else if([action isEqualToString:@"Disconnect"]) {
             [[NetworkConnection sharedInstance] disconnect:_buffer.cid msg:nil];
@@ -1423,7 +1423,7 @@
             [_buffersView setBuffer:nil];
             [_usersView setBuffer:nil];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
-        } else if([action isEqualToString:@"Ignore List…"]) {
+        } else if([action isEqualToString:@"Ignore List"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
             itv.ignores = s.ignores;
@@ -1435,18 +1435,18 @@
         } else if([action isEqualToString:@"Mention"]) {
             //TODO: Show the double-tap tip
             [self _mention];
-        } else if([action isEqualToString:@"Edit Connection…"]) {
+        } else if([action isEqualToString:@"Edit Connection"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [ecv setServer:_buffer.cid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];
-        } else if([action isEqualToString:@"Settings…"]) {
+        } else if([action isEqualToString:@"Settings"]) {
             SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];
-        } else if([action isEqualToString:@"Display Options…"]) {
+        } else if([action isEqualToString:@"Display Options"]) {
             DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
             dvc.buffer = _buffer;
             dvc.navigationItem.title = _titleLabel.text;
