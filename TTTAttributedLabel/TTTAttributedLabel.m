@@ -21,7 +21,6 @@
 // THE SOFTWARE.
 
 #import "TTTAttributedLabel.h"
-#import "UIColor+IRCCloud.h"
 
 #define kTTTLineBreakWordWrapTextWidthScalingFactor (M_PI / M_E)
 
@@ -238,7 +237,7 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
     CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
     
     NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-    [mutableLinkAttributes setObject:(id)[[UIColor selectedBlueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+    [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
     [mutableLinkAttributes setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCTUnderlineStyleAttributeName];
 	[mutableLinkAttributes setObject:(__bridge id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
 	    
