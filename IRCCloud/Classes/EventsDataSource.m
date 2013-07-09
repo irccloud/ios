@@ -313,6 +313,10 @@
         event.linkify = NO;
         event.from = @"";
         event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"hidden_host"], BOLD, event.msg];
+    } else if([object.type hasPrefix:@"server_nomotd"]) {
+        event.linkify = NO;
+        event.from = @"";
+        event.color = [UIColor timestampColor];
     } else if([object.type hasPrefix:@"server_"]) {
         event.bgColor = [UIColor statusBackgroundColor];
         event.linkify = NO;
