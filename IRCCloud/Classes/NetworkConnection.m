@@ -243,6 +243,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)registerAPNs:(NSData *)token {
+#ifdef DEBUG
+    return nil;
+#else
 	NSData *data;
 	NSURLResponse *response = nil;
 	NSError *error = nil;
@@ -260,9 +263,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     
     return [[[SBJsonParser alloc] init] objectWithData:data];
+#endif
 }
 
 -(NSDictionary *)unregisterAPNs:(NSData *)token {
+#ifdef DEBUG
+    return nil;
+#else
 	NSData *data;
 	NSURLResponse *response = nil;
 	NSError *error = nil;
@@ -280,6 +287,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     
     return [[[SBJsonParser alloc] init] objectWithData:data];
+#endif
 }
 
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args {

@@ -157,7 +157,11 @@
 }
 
 -(void)backlogStarted:(NSNotification *)notification {
+#ifdef DEBUG
+    NSLog(@"This is a debug build, skipping APNs registration");
+#else
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+#endif
     [status setText:@"Loading"];
     activity.hidden = YES;
     progress.progress = 0;
@@ -216,7 +220,6 @@
         if([[result objectForKey:@"success"] intValue] == 1) {
             [[NSUserDefaults standardUserDefaults] setObject:[result objectForKey:@"session"] forKey:@"session"];
             [[NSUserDefaults standardUserDefaults] synchronize];
-            [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
             [status setText:@"Connecting"];
             [_conn connect];
         } else {
