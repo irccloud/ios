@@ -77,8 +77,7 @@ typedef enum {
 typedef enum {
     kIRCCloudStateDisconnected,
     kIRCCloudStateConnecting,
-    kIRCCloudStateConnected,
-    kIRCCloudStateDisconnecting
+    kIRCCloudStateConnected
 } kIRCCloudState;
 
 typedef enum {
@@ -105,6 +104,7 @@ typedef enum {
     int _lastReqId;
     int _currentCount;
     int _currentBid;
+    int _failCount;
     BOOL _background;
     NSTimeInterval _firstEID;
     
@@ -119,6 +119,7 @@ typedef enum {
 @property (readonly) kIRCCloudState state;
 @property (readonly) NSDictionary *userInfo;
 @property (readonly) NSTimeInterval clockOffset;
+@property NSTimeInterval idleInterval;
 @property NSTimeInterval reconnectTimestamp;
 @property BOOL background;
 @property (readonly) kIRCCloudReachability reachable;

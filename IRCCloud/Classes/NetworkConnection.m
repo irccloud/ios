@@ -153,6 +153,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _lastReqId = 0;
     _idleInterval = 20;
     _reconnectTimestamp = -1;
+    _failCount = 0;
     _background = NO;
     _writer = [[SBJsonWriter alloc] init];
     _reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
@@ -492,7 +493,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [_oobQueue removeAllObjects];
     _reconnectTimestamp = 0;
     [self cancelIdleTimer];
-    _state = kIRCCloudStateDisconnecting;
+    _state = kIRCCloudStateDisconnected;
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     [_socket close];
     _socket = nil;
@@ -529,10 +530,18 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         TFLog(@"Close Message: %@", aMessage);
         TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
-        if([self reachable] == kIRCCloudReachable && _reconnectTimestamp != 0)
+        if([self reachable] == kIRCCloudReachable && _reconnectTimestamp != 0) {
+            _failCount++;
+            if(_failCount < 4)
+                _idleInterval = _failCount;
+            else if(_failCount < 10)
+                _idleInterval = 10;
+            else
+                _idleInterval = 30;
             [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
-        else
+        } else {
             [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
+        }
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         if([aError.domain isEqualToString:@"kCFStreamErrorDomainSSL"]) {
             IRCCloudJSONObject *o = [[IRCCloudJSONObject alloc] initWithDictionary:@{@"success":@0,@"message":@"Unable to establish a secure connection"}];
@@ -548,8 +557,16 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(socket == _socket) {
         TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
-        if([self reachable] && _reconnectTimestamp != 0)
+        if([self reachable] && _reconnectTimestamp != 0) {
+            _failCount++;
+            if(_failCount < 4)
+                _idleInterval = _failCount;
+            else if(_failCount < 10)
+                _idleInterval = 10;
+            else
+                _idleInterval = 30;
             [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
+        }
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }
 }
@@ -603,6 +620,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if([object.type isEqualToString:@"header"]) {
             _idleInterval = [[object objectForKey:@"idle_interval"] doubleValue] / 1000.0;
             _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
+            _failCount = 0;
             TFLog(@"idle interval: %f clock offset: %f", _idleInterval, _clockOffset);
         } else if([object.type isEqualToString:@"oob_include"]) {
             [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
@@ -966,8 +984,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(_reconnectTimestamp == 0)
         return;
     
-    _idleTimer = [NSTimer scheduledTimerWithTimeInterval:_idleInterval+10 target:self selector:@selector(_idle) userInfo:nil repeats:NO];
-    _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval + 10;
+    _idleTimer = [NSTimer scheduledTimerWithTimeInterval:_idleInterval target:self selector:@selector(_idle) userInfo:nil repeats:NO];
+    _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
 }
 
 -(void)_idle {

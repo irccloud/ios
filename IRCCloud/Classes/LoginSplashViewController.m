@@ -37,7 +37,6 @@
             activity.hidden = NO;
             [status setText:@"Connecting"];
             [_conn connect];
-            [self updateConnecting:nil];
         }
     } else {
         password.text = @"";
@@ -111,6 +110,9 @@
                 CGRect frame = error.frame;
                 frame.size.height = [error.text sizeWithFont:error.font constrainedToSize:CGSizeMake(frame.size.width,INT_MAX) lineBreakMode:error.lineBreakMode].height;
                 error.frame = frame;
+                [_conn disconnect];
+                _conn.idleInterval = 30;
+                [_conn scheduleIdleTimer];
             } else {
                 error.text = [o objectForKey:@"message"];
                 error.hidden = NO;
@@ -134,7 +136,8 @@
         error.text = nil;
     } else if(_conn.state == kIRCCloudStateDisconnected) {
         if(_conn.reconnectTimestamp > 0) {
-            [status setText:[NSString stringWithFormat:@"Reconnecting in %0.f seconds", _conn.reconnectTimestamp - [[NSDate date] timeIntervalSince1970]]];
+            int seconds = (int)(_conn.reconnectTimestamp - [[NSDate date] timeIntervalSince1970]);
+            [status setText:[NSString stringWithFormat:@"Reconnecting in %i second%@", seconds, (seconds == 1)?@"":@"s"]];
             activity.hidden = NO;
             [activity startAnimating];
             progress.progress = 0;
