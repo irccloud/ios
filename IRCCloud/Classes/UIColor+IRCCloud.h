@@ -46,4 +46,6 @@
 +(UIColor *)noticeBackgroundColor;
 +(UIColor *)timestampBackgroundColor;
 +(UIColor *)newMsgsBackgroundColor;
++(UIColor *)collapsedRowBackgroundColor;
++(UIColor *)collapsedHeadingBackgroundColor;
 @end

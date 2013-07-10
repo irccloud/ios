@@ -304,9 +304,6 @@ int __timestampWidth;
             _lastCollpasedDay = [_formatter stringFromDate:date];
         }
         
-        if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)])
-            [_collapsedEvents clear];
-        
         if([type isEqualToString:@"user_channel_mode"]) {
             event.color = [UIColor blackColor];
             event.bgColor = [UIColor statusBackgroundColor];
@@ -319,7 +316,27 @@ int __timestampWidth;
             [_collapsedEvents clear];
         }
         
-        NSString *msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse];
+        NSString *msg;
+        if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
+            CollapsedEvents *c = [[CollapsedEvents alloc] init];
+            [c addEvent:event];
+            msg = [c collapse];
+            if(!nextIsGrouped) {
+                Event *heading = [[Event alloc] init];
+                heading.cid = event.cid;
+                heading.bid = event.bid;
+                heading.eid = _currentCollapsedEid - 1;
+                heading.groupMsg = [NSString stringWithFormat:@"   %@",[_collapsedEvents collapse]];
+                heading.color = [UIColor timestampColor];
+                heading.bgColor = [UIColor whiteColor];
+                heading.formattedMsg = nil;
+                heading.formatted = nil;
+                heading.linkify = NO;
+                [self _addItem:heading eid:_currentCollapsedEid - 1];
+            }
+        } else {
+            msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse];
+        }
         if(msg == nil && [type isEqualToString:@"nickchange"])
             msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [ColorFormatter formatNick:event.nick mode:event.fromMode], BOLD];
         if(msg == nil && [type isEqualToString:@"user_channel_mode"]) {
@@ -854,11 +871,13 @@ int __timestampWidth;
     cell.message.text = e.formatted;
     if(e.rowType == ROW_MESSAGE && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
         if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
-            if(e.groupEid == e.eid)
+            if(e.groupEid == e.eid + 1) {
                 cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_minus"];
-            else
+                cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
+            } else {
                 cell.accessory.image = [UIImage imageNamed:@"tiny_plus"];
-            cell.contentView.backgroundColor = [UIColor colorFromHexString:@"f5f5f5"];
+                cell.contentView.backgroundColor = [UIColor collapsedRowBackgroundColor];
+            }
         } else {
             cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_plus"];
         }
@@ -1030,11 +1049,18 @@ int __timestampWidth;
         NSTimeInterval group = ((Event *)[_data objectAtIndex:indexPath.row]).groupEid;
         //NSLog(@"Group: %f, EID: %f", group, ((Event *)[_data objectAtIndex:indexPath.row]).eid);
         if(group > 0) {
-            if([_expandedSectionEids objectForKey:@(group)])
-                [_expandedSectionEids removeObjectForKey:@(group)];
-            else
-                [_expandedSectionEids setObject:@(YES) forKey:@(group)];
-            [self refresh];
+            int count = 0;
+            for(Event *e in _data) {
+                if(e.groupEid == group)
+                    count++;
+            }
+            if(count > 1 || [((Event *)[_data objectAtIndex:indexPath.row]).groupMsg hasPrefix:@"   "]) {
+                if([_expandedSectionEids objectForKey:@(group)])
+                    [_expandedSectionEids removeObjectForKey:@(group)];
+                else
+                    [_expandedSectionEids setObject:@(YES) forKey:@(group)];
+                [self refresh];
+            }
         } else if(indexPath.row < _data.count) {
             Event *e = [_data objectAtIndex:indexPath.row];
             if([e.type isEqualToString:@"channel_invite"])

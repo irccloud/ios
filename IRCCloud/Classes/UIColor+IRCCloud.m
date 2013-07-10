@@ -214,4 +214,10 @@ UIImage *__newMsgsBackgroundImage;
     }
     return [UIColor colorWithPatternImage:__newMsgsBackgroundImage];
 }
++(UIColor *)collapsedRowBackgroundColor {
+    return [UIColor colorWithRed:0.961 green:0.961 blue:0.961 alpha:1];
+}
++(UIColor *)collapsedHeadingBackgroundColor {
+    return [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
+}
 @end
