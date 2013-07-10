@@ -87,6 +87,12 @@ UIImage *__newMsgsBackgroundImage;
 +(UIColor *)timestampColor {
     return [UIColor colorWithRed:0.667 green:0.667 blue:0.667 alpha:1];
 }
++(UIColor *)networkErrorBackgroundColor {
+    return [UIColor colorWithRed:0.973 green:0.875 blue:0.149 alpha:1];
+}
++(UIColor *)networkErrorColor {
+    return [UIColor colorWithRed:0.388 green:0.157 blue:0 alpha:1];
+}
 +(UIColor *) colorFromHexString:(NSString *)hexString {
     //From: http://stackoverflow.com/a/3805354
     

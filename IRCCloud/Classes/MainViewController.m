@@ -956,8 +956,8 @@
                 if([reason isEqualToString:@"nxdomain"])
                     reason = @"Invalid hostname";
                 _serverStatus.text = [NSString stringWithFormat:@"Disconnected: Failed to connect - %@", reason];
-                _serverStatusBar.backgroundColor = [UIColor colorWithRed:0.973 green:0.875 blue:0.149 alpha:1];
-                _serverStatus.textColor = [UIColor colorWithRed:0.388 green:0.157 blue:0 alpha:1];
+                _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
+                _serverStatus.textColor = [UIColor networkErrorColor];
             } else {
                 _serverStatus.text = @"Disconnected. Tap to reconnect.";
             }
@@ -971,8 +971,8 @@
             _serverStatus.text = @"Connected: Joining Channels";
         } else if([s.status isEqualToString:@"pool_unavailable"]) {
             _serverStatus.text = @"Connection temporarily unavailable";
-            _serverStatusBar.backgroundColor = [UIColor colorWithRed:0.973 green:0.875 blue:0.149 alpha:1];
-            _serverStatus.textColor = [UIColor colorWithRed:0.388 green:0.157 blue:0 alpha:1];
+            _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
+            _serverStatus.textColor = [UIColor networkErrorColor];
         } else if([s.status isEqualToString:@"waiting_to_retry"]) {
             double seconds = ([[s.fail_info objectForKey:@"timestamp"] doubleValue] + [[s.fail_info objectForKey:@"retry_timeout"] intValue]) - [[NSDate date] timeIntervalSince1970];
             if(seconds > 0) {
@@ -984,8 +984,8 @@
                     text = [text stringByAppendingString:@"; "];
                 text = [text stringByAppendingFormat:@"Reconnecting in %i seconds.", (int)seconds];
                 _serverStatus.text = text;
-                _serverStatusBar.backgroundColor = [UIColor colorWithRed:0.973 green:0.875 blue:0.149 alpha:1];
-                _serverStatus.textColor = [UIColor colorWithRed:0.388 green:0.157 blue:0 alpha:1];
+                _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
+                _serverStatus.textColor = [UIColor networkErrorColor];
             } else {
                 _serverStatus.text = @"Ready to connect.  Waiting our turn…";
             }
