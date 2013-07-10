@@ -1069,6 +1069,7 @@ int __timestampWidth;
                 [_conn say:[NSString stringWithFormat:@"/accept %@", e.nick] to:nil cid:e.cid];
             else
                 [_delegate rowSelected:e];
+            [self refresh];
         }
     }
 }
