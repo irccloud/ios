@@ -19,10 +19,12 @@ int __timestampWidth;
     TTTAttributedLabel *_message;
     int _type;
     UIView *_socketClosedBar;
+    UIImageView *_accessory;
 }
 @property int type;
 @property (readonly) UILabel *timestamp;
 @property (readonly) TTTAttributedLabel *message;
+@property (readonly) UIImageView *accessory;
 @end
 
 @implementation EventsTableCell
@@ -54,6 +56,10 @@ int __timestampWidth;
         _socketClosedBar.backgroundColor = [UIColor newMsgsBackgroundColor];
         _socketClosedBar.hidden = YES;
         [self.contentView addSubview:_socketClosedBar];
+        
+        _accessory = [[UIImageView alloc] initWithFrame:CGRectZero];
+        _accessory.hidden = YES;
+        [self.contentView addSubview:_accessory];
     }
     return self;
 }
@@ -79,6 +85,7 @@ int __timestampWidth;
         _timestamp.hidden = NO;
         _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
         _message.hidden = NO;
+        _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 2, 16, 16);
     } else {
         if(_type == ROW_BACKLOG) {
             frame.origin.y = frame.size.height / 2;
@@ -318,12 +325,11 @@ int __timestampWidth;
             msg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [ColorFormatter formatNick:event.from mode:event.fromMode], BOLD, BOLD, event.diff, [ColorFormatter formatNick:event.nick mode:event.fromMode], BOLD];
             _currentCollapsedEid = eid;
         }
-        if(![_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
-            if(eid != _currentCollapsedEid) {
-                msg = [NSString stringWithFormat:@"[+] %@", msg];
-                event.color = [UIColor timestampColor];
-                event.bgColor = [UIColor whiteColor];
-            }
+        if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
+            msg = [NSString stringWithFormat:@"   %@", msg];
+        } else {
+            if(eid != _currentCollapsedEid)
+                msg = [NSString stringWithFormat:@"   %@", msg];
             eid = _currentCollapsedEid;
         }
         event.groupMsg = msg;
@@ -519,7 +525,7 @@ int __timestampWidth;
         e.formatted = nil;
     }
     
-    if(eid > _maxEid || _data.count == 0 || [e compare:[_data objectAtIndex:_data.count - 1]] == NSOrderedDescending) {
+    if(eid > _maxEid || _data.count == 0 || (eid == e.eid && [e compare:[_data objectAtIndex:_data.count - 1]] == NSOrderedDescending)) {
         //Message at bottom
         if(_data.count) {
             [_formatter setDateFormat:@"DDD"];
@@ -844,6 +850,15 @@ int __timestampWidth;
     cell.message.delegate = self;
     cell.message.dataDetectorTypes = UIDataDetectorTypeNone;
     cell.message.text = e.formatted;
+    if(e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
+        if([_expandedSectionEids objectForKey:@(e.groupEid)])
+            cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_minus"];
+        else
+            cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_plus"];
+        cell.accessory.hidden = NO;
+    } else {
+        cell.accessory.hidden = YES;
+    }
     if(e.linkify) {
         for(NSTextCheckingResult *result in e.links) {
             if(result.resultType == NSTextCheckingTypeLink) {
@@ -1006,6 +1021,7 @@ int __timestampWidth;
     
     if(indexPath.row < _data.count) {
         NSTimeInterval group = ((Event *)[_data objectAtIndex:indexPath.row]).groupEid;
+        //NSLog(@"Group: %f, EID: %f", group, ((Event *)[_data objectAtIndex:indexPath.row]).eid);
         if(group > 0) {
             if([_expandedSectionEids objectForKey:@(group)])
                 [_expandedSectionEids removeObjectForKey:@(group)];
