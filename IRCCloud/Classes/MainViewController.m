@@ -807,11 +807,18 @@
         _titleLabel.font = [UIFont boldSystemFontOfSize:18];
         _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
         _topicLabel.text = [NSString stringWithFormat:@"%@:%i", s.hostname, s.port];
+        _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleView.bounds.size].width)/2 - 20,4,16,16);
+        _lock.hidden = NO;
+        if(s.ssl > 0)
+            _lock.image = [UIImage imageNamed:@"world_shield"];
+        else
+            _lock.image = [UIImage imageNamed:@"world"];
     } else {
         self.navigationItem.title = _buffer.name = _titleLabel.text = _buffer.name;
         _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
         _titleLabel.font = [UIFont boldSystemFontOfSize:20];
         _topicLabel.hidden = YES;
+        _lock.image = [UIImage imageNamed:@"lock"];
         if([_buffer.type isEqualToString:@"channel"]) {
             BOOL lock = NO;
             Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid];
@@ -829,7 +836,7 @@
                 }
             }
             if(lock) {
-                _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font].width)/2 - 20,4,16,16);
+                _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleView.bounds.size].width)/2 - 20,4,16,16);
                 _lock.hidden = NO;
             } else {
                 _lock.hidden = YES;
