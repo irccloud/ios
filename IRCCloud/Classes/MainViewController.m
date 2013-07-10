@@ -710,7 +710,7 @@
             if(msg) {
                 e.cid = s.cid;
                 e.bid = _buffer.bid;
-                e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset + 30) * 1000000;
+                e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset + 1) * 1000000;
                 e.isSelf = YES;
                 e.from = s.nick;
                 e.nick = s.nick;

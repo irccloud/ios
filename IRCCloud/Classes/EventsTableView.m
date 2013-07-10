@@ -519,7 +519,7 @@ int __timestampWidth;
         e.formatted = nil;
     }
     
-    if(eid > _maxEid || _data.count == 0 || eid > ((Event *)[_data objectAtIndex:_data.count - 1]).eid) {
+    if(eid > _maxEid || _data.count == 0 || [e compare:[_data objectAtIndex:_data.count - 1]] == NSOrderedDescending) {
         //Message at bottom
         if(_data.count) {
             [_formatter setDateFormat:@"DDD"];
@@ -549,7 +549,7 @@ int __timestampWidth;
     } else {
         int i = 0;
         for(Event *e1 in _data) {
-            if(e1.rowType != ROW_TIMESTAMP && e1.eid > eid && e.eid == eid) {
+            if(e1.rowType != ROW_TIMESTAMP && [e compare:e1] == NSOrderedAscending && e.eid == eid) {
                 //Insert the message
                 if(i > 0 && ((Event *)[_data objectAtIndex:i - 1]).rowType != ROW_TIMESTAMP) {
                     [_formatter setDateFormat:@"DDD"];

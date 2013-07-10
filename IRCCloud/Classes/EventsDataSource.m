@@ -15,6 +15,10 @@
 
 @implementation Event
 -(NSComparisonResult)compare:(Event *)aEvent {
+    if(aEvent.pending && !_pending)
+        return NSOrderedAscending;
+    if(!aEvent.pending && _pending)
+        return NSOrderedDescending;
     if(aEvent.eid > _eid)
         return NSOrderedAscending;
     else if(aEvent.eid < _eid)
