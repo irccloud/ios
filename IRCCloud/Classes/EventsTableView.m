@@ -69,7 +69,7 @@ int __timestampWidth;
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
-    if(_type == ROW_MESSAGE || _type == ROW_SOCKETCLOSED) {
+    if(_type == ROW_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED) {
         frame.origin.x = 6;
         frame.origin.y = 4;
         frame.size.height -= 6;
@@ -78,15 +78,18 @@ int __timestampWidth;
             frame.size.height -= 26;
             _socketClosedBar.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height, frame.size.width, 26);
             _socketClosedBar.hidden = NO;
+        } else if(_type == ROW_FAILED) {
+            frame.size.width -= 16;
+            _accessory.frame = CGRectMake(frame.origin.x + frame.size.width, frame.origin.y + 1, 16, 16);
         } else {
             _socketClosedBar.hidden = YES;
+            _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 1, 16, 16);
         }
         _timestamp.textAlignment = NSTextAlignmentRight;
         _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, __timestampWidth, 20);
         _timestamp.hidden = NO;
         _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
         _message.hidden = NO;
-        _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 1, 16, 16);
     } else {
         if(_type == ROW_BACKLOG) {
             frame.origin.y = frame.size.height / 2;
@@ -836,7 +839,7 @@ int __timestampWidth;
     [_lock lock];
     Event *e = [_data objectAtIndex:indexPath.row];
     [_lock unlock];
-    if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED) {
+    if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
         if(e.formatted != nil && e.height > 0) {
             return e.height;
         } else if(e.formatted == nil && e.formattedMsg.length > 0) {
@@ -848,7 +851,7 @@ int __timestampWidth;
             return 26;
         }
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-         CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth,CGFLOAT_MAX), NULL);
+        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?16:0),CGFLOAT_MAX), NULL);
          e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
          CFRelease(framesetter);
         return e.height;
@@ -882,6 +885,9 @@ int __timestampWidth;
             cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_plus"];
         }
         cell.accessory.hidden = NO;
+    } else if(e.rowType == ROW_FAILED) {
+        cell.accessory.hidden = NO;
+        cell.accessory.image = [UIImage imageNamed:@"send_fail"];
     } else {
         cell.accessory.hidden = YES;
     }
@@ -1069,7 +1075,8 @@ int __timestampWidth;
                 [_conn say:[NSString stringWithFormat:@"/accept %@", e.nick] to:nil cid:e.cid];
             else
                 [_delegate rowSelected:e];
-            [self refresh];
+            if(e.rowType != ROW_FAILED)
+                [self refresh];
         }
     }
 }

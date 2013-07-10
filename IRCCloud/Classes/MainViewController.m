@@ -758,15 +758,12 @@
 -(void)_sendRequestDidExpire:(NSTimer *)timer {
     Event *e = timer.userInfo;
     if([_pendingEvents containsObject:e]) {
-        [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
         [_pendingEvents removeObject:e];
-        e.msg = [e.msg stringByAppendingFormat:@" %c4(FAILED)%c", COLOR_MIRC, CLEAR];
-        e.formattedMsg = nil;
-        e.formatted = nil;
+        e.height = 0;
         e.pending = NO;
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
-        }];
+        e.rowType = ROW_FAILED;
+        e.bgColor = [UIColor errorBackgroundColor];
+        [_eventsView.tableView reloadData];
     }
 }
 
@@ -1115,9 +1112,21 @@
     [_message resignFirstResponder];
 }
 
--(void)_eventTapped {
+-(void)_eventTapped:(NSTimer *)timer {
     _doubleTapTimer = nil;
     [_message resignFirstResponder];
+    Event *e = timer.userInfo;
+    if(e.rowType == ROW_FAILED) {
+        e.height = 0;
+        e.rowType = ROW_MESSAGE;
+        e.bgColor = [UIColor selfBackgroundColor];
+        e.pending = YES;
+        e.reqId = [[NetworkConnection sharedInstance] say:e.command to:_buffer.name cid:_buffer.cid];
+        if(e.msg)
+            [_pendingEvents addObject:e];
+        [_eventsView.tableView reloadData];
+        [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
+    }
 }
 
 -(void)rowSelected:(Event *)event {
@@ -1131,7 +1140,7 @@
         }
         [self _mention];
     } else {
-        _doubleTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_eventTapped) userInfo:nil repeats:NO];
+        _doubleTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_eventTapped:) userInfo:event repeats:NO];
     }
 }
 

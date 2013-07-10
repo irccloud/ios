@@ -14,6 +14,7 @@
 #define ROW_BACKLOG 2
 #define ROW_LASTSEENEID 3
 #define ROW_SOCKETCLOSED 4
+#define ROW_FAILED 5
 #define TYPE_TIMESTMP @"__timestamp__"
 #define TYPE_BACKLOG @"__backlog__"
 #define TYPE_LASTSEENEID @"__lastseeneid"
