@@ -174,14 +174,16 @@ UIImage *__newMsgsBackgroundImage;
 }
 +(UIColor *)timestampBackgroundColor {
     if(!__timestampBackgroundImage) {
+        float scaleFactor = [[UIScreen mainScreen] scale];
         int width = [[UIScreen mainScreen] bounds].size.width;
         CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        CGContextRef context = CGBitmapContextCreate(NULL, width, 26, 8, 4 * width, colorSpace, kCGImageAlphaNoneSkipFirst);
+        CGContextRef context = CGBitmapContextCreate(NULL, width * scaleFactor, 26 * scaleFactor, 8, 4 * width * scaleFactor, colorSpace, kCGImageAlphaNoneSkipFirst);
+        CGContextScaleCTM(context, scaleFactor, scaleFactor);
         NSArray *colors = [NSArray arrayWithObjects:(id)[UIColor colorWithRed:0.961 green:0.961 blue:0.961 alpha:1].CGColor, (id)[UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1].CGColor, nil];
         CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)(colors), NULL);
         CGContextDrawLinearGradient(context, gradient, CGPointMake(0.0f, 26.0f), CGPointMake(0.0f, 0.0f), 0);
         CGImageRef cgImage = CGBitmapContextCreateImage(context);
-        __timestampBackgroundImage = [UIImage imageWithCGImage:cgImage];
+        __timestampBackgroundImage = [UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp];
         CGContextRelease(context);
         CGColorSpaceRelease(colorSpace);
     }
@@ -189,9 +191,11 @@ UIImage *__newMsgsBackgroundImage;
 }
 +(UIColor *)newMsgsBackgroundColor {
     if(!__newMsgsBackgroundImage) {
+        float scaleFactor = [[UIScreen mainScreen] scale];
         int width = [[UIScreen mainScreen] bounds].size.width;
         CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        CGContextRef context = CGBitmapContextCreate(NULL, width, 26, 8, 4 * width, colorSpace, kCGImageAlphaNoneSkipFirst);
+        CGContextRef context = CGBitmapContextCreate(NULL, width * scaleFactor, 26 * scaleFactor, 8, 4 * width * scaleFactor, colorSpace, kCGImageAlphaNoneSkipFirst);
+        CGContextScaleCTM(context, scaleFactor, scaleFactor);
         CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
         CGContextFillRect(context, CGRectMake(0,0,width,26));
         CGContextSetLineCap(context, kCGLineCapSquare);
@@ -204,7 +208,7 @@ UIImage *__newMsgsBackgroundImage;
         CGContextAddLineToPoint(context, width, 15.0);
         CGContextStrokePath(context);
         CGImageRef cgImage = CGBitmapContextCreateImage(context);
-        __newMsgsBackgroundImage = [UIImage imageWithCGImage:cgImage];
+        __newMsgsBackgroundImage = [UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp];
         CGContextRelease(context);
         CGColorSpaceRelease(colorSpace);
     }
