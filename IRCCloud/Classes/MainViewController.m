@@ -377,6 +377,8 @@
                 [self bufferSelected:b.bid];
                 _bufferToOpen = nil;
                 _cidToOpen = -1;
+            } else if([b.type isEqualToString:@"console"]) {
+                [self bufferSelected:b.bid];
             }
             break;
         case kIRCEventOpenBuffer:
