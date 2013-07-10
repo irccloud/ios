@@ -618,7 +618,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(object.type) {
         //NSLog(@"New event (%@)", object.type);
         if([object.type isEqualToString:@"header"]) {
-            _idleInterval = [[object objectForKey:@"idle_interval"] doubleValue] / 1000.0;
+            _idleInterval = ([[object objectForKey:@"idle_interval"] doubleValue] / 1000.0) + 10;
             _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
             _failCount = 0;
             TFLog(@"idle interval: %f clock offset: %f", _idleInterval, _clockOffset);
