@@ -468,6 +468,11 @@
             if(o.cid == _buffer.cid)
                 [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
             break;
+        case kIRCEventBufferArchived:
+            o = notification.object;
+            if(o.bid == _buffer.bid)
+                [_buffersView setBuffer:_buffer];
+            break;
         default:
             break;
     }
