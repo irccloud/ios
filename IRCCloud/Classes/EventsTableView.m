@@ -384,13 +384,14 @@ int __timestampWidth;
         [self.tableView reloadData];
         if(!_scrolledUp) {
             [self scrollToBottom];
+            [self _scrollToBottom];
         } else if(!event.isSelf) {
             _newMsgs++;
             if(event.isHighlight)
                 _newHighlights++;
             [self updateUnread];
+            [self scrollViewDidScroll:self.tableView];
         }
-        [self scrollViewDidScroll:self.tableView];
     }
 }
 
