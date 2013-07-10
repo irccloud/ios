@@ -87,6 +87,9 @@ UIImage *__newMsgsBackgroundImage;
 +(UIColor *)timestampColor {
     return [UIColor colorWithRed:0.667 green:0.667 blue:0.667 alpha:1];
 }
++(UIColor *)darkBlueColor {
+    return [UIColor colorWithRed:0.094 green:0.247 blue:0.553 alpha:1.0]; /*#183f8d*/
+}
 +(UIColor *)networkErrorBackgroundColor {
     return [UIColor colorWithRed:0.973 green:0.875 blue:0.149 alpha:1];
 }

@@ -34,6 +34,7 @@
 +(UIColor *)voicedBorderColor;
 +(UIColor *)voicedLightColor;
 +(UIColor *)timestampColor;
++(UIColor *)darkBlueColor;
 +(UIColor *)networkErrorBackgroundColor;
 +(UIColor *)networkErrorColor;
 +(UIColor *)colorFromHexString:(NSString *)hexString;

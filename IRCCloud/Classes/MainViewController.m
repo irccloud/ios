@@ -935,7 +935,11 @@
             _serverStatusBar.hidden = NO;
         }
         _serverStatusBar.backgroundColor = [UIColor backgroundBlueColor];
-        _serverStatus.textColor = [UIColor selectedBlueColor];
+        CGRect statusFrame = _serverStatus.frame;
+        statusFrame.origin.x = 8;
+        _serverStatus.frame = statusFrame;
+        _serverStatus.textColor = [UIColor darkBlueColor];
+        _serverStatus.font = [UIFont systemFontOfSize:FONT_SIZE];
         if([s.status isEqualToString:@"connected_ready"]) {
             if([s.away isKindOfClass:[NSString class]]) {
                 _serverStatusBar.backgroundColor = [UIColor lightGrayColor];
