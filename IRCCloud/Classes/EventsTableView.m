@@ -59,6 +59,7 @@ int __timestampWidth;
         
         _accessory = [[UIImageView alloc] initWithFrame:CGRectZero];
         _accessory.hidden = YES;
+        _accessory.contentMode = UIViewContentModeCenter;
         [self.contentView addSubview:_accessory];
     }
     return self;
@@ -85,7 +86,7 @@ int __timestampWidth;
         _timestamp.hidden = NO;
         _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
         _message.hidden = NO;
-        _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 2, 16, 16);
+        _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 1, 16, 16);
     } else {
         if(_type == ROW_BACKLOG) {
             frame.origin.y = frame.size.height / 2;
@@ -851,11 +852,16 @@ int __timestampWidth;
     cell.message.delegate = self;
     cell.message.dataDetectorTypes = UIDataDetectorTypeNone;
     cell.message.text = e.formatted;
-    if(e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
-        if([_expandedSectionEids objectForKey:@(e.groupEid)])
-            cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_minus"];
-        else
+    if(e.rowType == ROW_MESSAGE && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
+        if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
+            if(e.groupEid == e.eid)
+                cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_minus"];
+            else
+                cell.accessory.image = [UIImage imageNamed:@"tiny_plus"];
+            cell.contentView.backgroundColor = [UIColor colorFromHexString:@"f5f5f5"];
+        } else {
             cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_plus"];
+        }
         cell.accessory.hidden = NO;
     } else {
         cell.accessory.hidden = YES;
