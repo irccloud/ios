@@ -551,7 +551,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             IRCCloudJSONObject *o = [[IRCCloudJSONObject alloc] initWithDictionary:@{@"success":@0,@"message":@"Unable to establish a secure connection"}];
             [self postObject:o forEvent:kIRCEventFailureMsg];
         } else if([aError localizedDescription]) {
-            IRCCloudJSONObject *o = [[IRCCloudJSONObject alloc] initWithDictionary:@{@"success":@0,@"message":[aError localizedDescription]}];
+            IRCCloudJSONObject *o = [[IRCCloudJSONObject alloc] initWithDictionary:@{@"success":@0,@"message":@"Unable to connect to IRCCloud"}];
             [self postObject:o forEvent:kIRCEventFailureMsg];
         }
     }

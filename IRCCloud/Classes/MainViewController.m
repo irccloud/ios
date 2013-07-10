@@ -494,7 +494,7 @@
         case kIRCCloudStateDisconnected:
             [self _showConnectingView];
             if([NetworkConnection sharedInstance].reconnectTimestamp > 0) {
-                int seconds = (int)([NetworkConnection sharedInstance].reconnectTimestamp - [[NSDate date] timeIntervalSince1970]);
+                int seconds = (int)([NetworkConnection sharedInstance].reconnectTimestamp - [[NSDate date] timeIntervalSince1970]) + 1;
                 [_connectingStatus setText:[NSString stringWithFormat:@"Reconnecting in %i second%@", seconds, (seconds == 1)?@"":@"s"]];
                 _connectingActivity.hidden = NO;
                 [_connectingActivity startAnimating];

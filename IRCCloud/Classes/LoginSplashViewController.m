@@ -136,7 +136,7 @@
         error.text = nil;
     } else if(_conn.state == kIRCCloudStateDisconnected) {
         if(_conn.reconnectTimestamp > 0) {
-            int seconds = (int)(_conn.reconnectTimestamp - [[NSDate date] timeIntervalSince1970]);
+            int seconds = (int)(_conn.reconnectTimestamp - [[NSDate date] timeIntervalSince1970]) + 1;
             [status setText:[NSString stringWithFormat:@"Reconnecting in %i second%@", seconds, (seconds == 1)?@"":@"s"]];
             activity.hidden = NO;
             [activity startAnimating];
