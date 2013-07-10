@@ -9,13 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "NetworkConnection.h"
 
-@interface LoginSplashViewController : UIViewController {
+@interface LoginSplashViewController : UIViewController<UITextFieldDelegate> {
     IBOutlet UIImageView *logo;
     IBOutlet UILabel *version;
     
     IBOutlet UIView *loginView;
     IBOutlet UITextField *username;
     IBOutlet UITextField *password;
+    IBOutlet UIButton *login;
     
     IBOutlet UIView *loadingView;
     IBOutlet UILabel *status;
@@ -26,4 +27,5 @@
     NetworkConnection *_conn;
 }
 -(IBAction)loginButtonPressed:(id)sender;
+-(IBAction)textFieldChanged:(id)sender;
 @end

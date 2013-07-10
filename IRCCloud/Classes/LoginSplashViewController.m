@@ -6,7 +6,9 @@
 //  Copyright (c) 2013 IRCCloud, Ltd. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import "LoginSplashViewController.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation LoginSplashViewController
 
@@ -20,8 +22,27 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    // Do any additional setup after loading the view from its nib.
+    username.borderStyle = password.borderStyle = UITextBorderStyleNone;
+    username.background = password.background = [[UIImage imageNamed:@"textbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)];
+    username.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, username.frame.size.height)];
+    username.leftViewMode = UITextFieldViewModeAlways;
+    username.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, username.frame.size.height)];
+    username.rightViewMode = UITextFieldViewModeAlways;
+    password.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, password.frame.size.height)];
+    password.leftViewMode = UITextFieldViewModeAlways;
+    password.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, password.frame.size.height)];
+    password.rightViewMode = UITextFieldViewModeAlways;
+    [login setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
+    [login setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateDisabled];
+    [login setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
+    [login setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+    [login setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    login.titleLabel.shadowOffset = CGSizeMake(0, 1);
+    [login.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
+    login.adjustsImageWhenDisabled = YES;
+    login.adjustsImageWhenHighlighted = NO;
+    login.enabled = NO;
+    
     [version setText:[NSString stringWithFormat:@"Version %@",[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey]]];
 }
 
@@ -242,6 +263,10 @@
             });
         }
     });
+}
+
+-(IBAction)textFieldChanged:(id)sender {
+    login.enabled = (username.text.length > 0 && password.text.length > 0);
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
