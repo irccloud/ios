@@ -9,6 +9,7 @@
 #import "SettingsViewController.h"
 #import "NetworkConnection.h"
 #import "LicenseViewController.h"
+#import "AppDelegate.h"
 
 @implementation SettingsViewController
 
@@ -100,7 +101,7 @@
         _autoaway.on = [[userInfo objectForKey:@"autoaway"] boolValue];
     }
     
-    if([[userInfo objectForKey:@"highlights"] isKindOfClass:[NSArray class]] && [[userInfo objectForKey:@"highlights"] count])
+    if([[userInfo objectForKey:@"highlights"] isKindOfClass:[NSArray class]] && [(NSArray *)[userInfo objectForKey:@"highlights"] count])
         _highlights.text = [[userInfo objectForKey:@"highlights"] componentsJoinedByString:@", "];
     else if([[userInfo objectForKey:@"highlights"] isKindOfClass:[NSString class]] && [[userInfo objectForKey:@"highlights"] length])
         _highlights.text = [userInfo objectForKey:@"highlights"];
@@ -215,7 +216,7 @@
         case 2:
             return 3;
         case 3:
-            return 2;
+            return 4;
     }
     return 0;
 }
@@ -284,9 +285,15 @@
         case 3:
             switch(row) {
                 case 0:
-                    cell.textLabel.text = @"Open-Source Licenses";
+                    cell.textLabel.text = @"FAQ";
                     break;
                 case 1:
+                    cell.textLabel.text = @"Feedback Channel";
+                    break;
+                case 2:
+                    cell.textLabel.text = @"Open-Source Licenses";
+                    break;
+                case 3:
                     cell.textLabel.text = @"Version";
                     cell.detailTextLabel.text = _version;
                     break;
@@ -340,7 +347,15 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
-    if(indexPath.section == 3 && indexPath.row == 0)
+    if(indexPath.section == 3 && indexPath.row == 0) {
+        [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];
+    }
+    if(indexPath.section == 3 && indexPath.row == 1) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23ios"]];
+        }];
+    }
+    if(indexPath.section == 3 && indexPath.row == 2)
         [self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];
 }
 
