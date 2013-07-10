@@ -760,6 +760,7 @@
         e.msg = [e.msg stringByAppendingFormat:@" %c4(FAILED)%c", COLOR_MIRC, CLEAR];
         e.formattedMsg = nil;
         e.formatted = nil;
+        e.pending = NO;
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
         }];
