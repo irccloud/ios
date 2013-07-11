@@ -397,7 +397,6 @@
             NSString *url = [[output string] substringWithRange:result.range];
             if([url rangeOfString:@"://"].location == NSNotFound)
                 url = [NSString stringWithFormat:@"http://%@", url];
-            NSLog(@"URL: %@", url);
             [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
         }
         if(server) {

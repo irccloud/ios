@@ -163,6 +163,12 @@ int __timestampWidth;
 - (void)backlogCompleted:(NSNotification *)notification {
     if([notification.object bid] == -1 || (_buffer && [notification.object bid] == _buffer.bid)) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
+                if(event.rowType == ROW_LASTSEENEID) {
+                    [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
+                    break;
+                }
+            }
             [self refresh];
         }];
     }
@@ -660,6 +666,14 @@ int __timestampWidth;
     _bottomUnreadView.alpha = 0;
     _requestingBacklog = NO;
     _firstScroll = NO;
+    if(buffer.bid != _buffer.bid) {
+        for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid]) {
+            if(event.rowType == ROW_LASTSEENEID) {
+                [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
+                break;
+            }
+        }
+    }
     _buffer = buffer;
     if(buffer)
         _server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
@@ -757,7 +771,9 @@ int __timestampWidth;
         _lastSeenEidPos = 0;
     } else {
         Event *e = [[Event alloc] init];
-        e.eid = _buffer.last_seen_eid;
+        e.cid = _buffer.cid;
+        e.bid = _buffer.bid;
+        e.eid = _buffer.last_seen_eid + 1;
         e.type = TYPE_LASTSEENEID;
         e.rowType = ROW_LASTSEENEID;
         e.formattedMsg = nil;
@@ -775,8 +791,17 @@ int __timestampWidth;
         if(_lastSeenEidPos != _data.count - 1) {
             if(_lastSeenEidPos > 0 && [[_data objectAtIndex:_lastSeenEidPos - 1] rowType] == ROW_TIMESTAMP)
                 _lastSeenEidPos--;
-            if(_lastSeenEidPos > 0)
+            if(_lastSeenEidPos > 0) {
+                for(Event *event in events) {
+                    if(event.rowType == ROW_LASTSEENEID) {
+                        [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
+                        [_data removeObject:event];
+                        break;
+                    }
+                }
+                [[EventsDataSource sharedInstance] addEvent:e];
                 [_data insertObject:e atIndex:_lastSeenEidPos + 1];
+            }
         } else {
             _lastSeenEidPos = -1;
         }
@@ -907,7 +932,10 @@ int __timestampWidth;
             }
         }
     }
-    cell.timestamp.text = e.timestamp;
+    if(e.rowType == ROW_LASTSEENEID)
+        cell.timestamp.text = @"New Messages";
+    else
+        cell.timestamp.text = e.timestamp;
     if(e.rowType == ROW_TIMESTAMP) {
         cell.timestamp.textColor = [UIColor blackColor];
     } else {
