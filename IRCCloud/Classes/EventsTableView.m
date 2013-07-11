@@ -1066,7 +1066,7 @@ int __timestampWidth;
             }
 
             if(_lastSeenEidPos >= 0) {
-                if(_lastSeenEidPos > 0 && firstRow <= _lastSeenEidPos) {
+                if(_lastSeenEidPos > 0 && firstRow <= _lastSeenEidPos + 1) {
                     [UIView beginAnimations:nil context:nil];
                     [UIView setAnimationDuration:0.1];
                     _topUnreadView.alpha = 0;
