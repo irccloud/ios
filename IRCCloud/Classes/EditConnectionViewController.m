@@ -246,8 +246,6 @@
         _cid = -1;
         self.navigationItem.title = @"New Connection";
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
-        if(self.presentingViewController)
-            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
     }
     return self;
 }
@@ -347,6 +345,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if(self.presentingViewController)
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 
     NSDictionary *userInfo = [NetworkConnection sharedInstance].userInfo;
     NSString *name = [userInfo objectForKey:@"name"];
