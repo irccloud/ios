@@ -79,8 +79,8 @@ int __timestampWidth;
             _socketClosedBar.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height, frame.size.width, 26);
             _socketClosedBar.hidden = NO;
         } else if(_type == ROW_FAILED) {
-            frame.size.width -= 16;
-            _accessory.frame = CGRectMake(frame.origin.x + frame.size.width, frame.origin.y + 1, 16, 16);
+            frame.size.width -= 20;
+            _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, 16, 16);
         } else {
             _socketClosedBar.hidden = YES;
             _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 1, 16, 16);
@@ -853,7 +853,7 @@ int __timestampWidth;
             return 26;
         }
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?16:0),CGFLOAT_MAX), NULL);
+        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
          e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
          CFRelease(framesetter);
         return e.height;
