@@ -168,10 +168,38 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     return self;
 }
 
+//Adapted from http://stackoverflow.com/a/17057553/1406639
 -(kIRCCloudReachability)reachable {
     SCNetworkReachabilityFlags flags;
     if(SCNetworkReachabilityGetFlags(_reachability, &flags)) {
-        return (flags & kSCNetworkReachabilityFlagsReachable)?kIRCCloudReachable:kIRCCloudUnreachable;
+        if((flags & kSCNetworkReachabilityFlagsReachable) == 0) {
+            // if target host is not reachable
+            return kIRCCloudUnreachable;
+        }
+        
+        if((flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0) {
+            // if target host is reachable and no connection is required
+            return kIRCCloudReachable;
+        }
+        
+        
+        if ((((flags & kSCNetworkReachabilityFlagsConnectionOnDemand ) != 0) || (flags & kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0)) {
+            // ... and the connection is on-demand (or on-traffic) if the
+            //     calling application is using the CFSocketStream or higher APIs
+            
+            if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0) {
+                // ... and no [user] intervention is needed
+                return kIRCCloudReachable;
+            }
+        }
+        
+        if ((flags & kSCNetworkReachabilityFlagsIsWWAN) == kSCNetworkReachabilityFlagsIsWWAN) {
+            // ... but WWAN connections are OK if the calling application
+            //     is using the CFNetwork (CFSocketStream?) APIs.
+            return kIRCCloudReachable;
+        }
+        
+        return kIRCCloudUnreachable;
     }
     return kIRCCloudUnknown;
 }
@@ -179,8 +207,9 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) {
     static int lastType = TYPE_UNKNOWN;
     int type = TYPE_UNKNOWN;
+    kIRCCloudReachability reachable = [[NetworkConnection sharedInstance] reachable];
     kIRCCloudState state = [NetworkConnection sharedInstance].state;
-    TFLog(@"IRCCloud state: %i Reconnect timestamp: %f Reachable: %@ lastType: %i", state, [NetworkConnection sharedInstance].reconnectTimestamp, (flags & kSCNetworkReachabilityFlagsReachable)?@"YES":@"NO", lastType);
+    TFLog(@"IRCCloud state: %i Reconnect timestamp: %f Reachable: %i lastType: %i", state, [NetworkConnection sharedInstance].reconnectTimestamp, reachable, lastType);
 
     if(flags & kSCNetworkReachabilityFlagsIsWWAN)
         type = TYPE_WWAN;
@@ -197,14 +226,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     lastType = type;
     
-    if(flags & kSCNetworkReachabilityFlagsReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0 && [[[NSUserDefaults standardUserDefaults] stringForKey:@"session"] length]) {
+    if(reachable == kIRCCloudReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0 && [[[NSUserDefaults standardUserDefaults] stringForKey:@"session"] length]) {
         TFLog(@"IRCCloud server became reachable, connecting");
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:YES];
-    } else if(state == kIRCCloudStateConnected) {
+    } else if(reachable == kIRCCloudUnreachable && state == kIRCCloudStateConnected) {
         TFLog(@"IRCCloud server became unreachable, disconnecting");
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
         [NetworkConnection sharedInstance].reconnectTimestamp = -1;
     }
+    [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
 }
 
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password {
@@ -532,6 +562,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _idleInterval = 10;
     else
         _idleInterval = 30;
+    _reconnectTimestamp = -1;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
 }
 

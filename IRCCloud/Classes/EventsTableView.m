@@ -811,7 +811,8 @@ int __timestampWidth;
         _requestingBacklog = NO;
     }
     
-    [[NetworkConnection sharedInstance] scheduleIdleTimer];
+    if(_conn.state == kIRCCloudStateConnected)
+        [[NetworkConnection sharedInstance] scheduleIdleTimer];
     _ready = YES;
     [self scrollViewDidScroll:self.tableView];
     [_lock unlock];

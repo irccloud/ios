@@ -47,26 +47,6 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
-    NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
-    if(session != nil && [session length] > 0) {
-        if(_conn.state == kIRCCloudStateDisconnected) {
-            loginView.alpha = 0;
-            loadingView.alpha = 1;
-            progress.hidden = YES;
-            progress.progress = 0;
-            [activity startAnimating];
-            activity.hidden = NO;
-            [status setText:@"Connecting"];
-            [_conn connect];
-        }
-    } else {
-        password.text = @"";
-        loadingView.alpha = 0;
-        loginView.alpha = 1;
-    }
-}
-
--(void)viewDidAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateConnecting:)
                                                  name:kIRCCloudConnectivityNotification object:nil];
@@ -90,6 +70,24 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogProgress:)
                                                  name:kIRCCloudBacklogProgressNotification object:nil];
+
+    NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
+    if(session != nil && [session length] > 0) {
+        if(_conn.state == kIRCCloudStateDisconnected) {
+            loginView.alpha = 0;
+            loadingView.alpha = 1;
+            progress.hidden = YES;
+            progress.progress = 0;
+            [activity startAnimating];
+            activity.hidden = NO;
+            [status setText:@"Connecting"];
+            [_conn connect];
+        }
+    } else {
+        password.text = @"";
+        loadingView.alpha = 0;
+        loginView.alpha = 1;
+    }
 }
 
 -(void)handleEvent:(NSNotification *)notification {
@@ -148,6 +146,7 @@
 }
 
 -(void)updateConnecting:(NSNotification *)notification {
+    int state = _conn.state;
     if(_conn.state == kIRCCloudStateConnecting || [_conn reachable] == kIRCCloudUnknown) {
         [status setText:@"Connecting"];
         activity.hidden = NO;
