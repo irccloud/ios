@@ -567,6 +567,8 @@
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.accessoryView = nil;
+    cell.detailTextLabel.text = nil;
+    cell.accessoryType = UITableViewCellAccessoryNone;
     
     switch(indexPath.section) {
         case 0:
