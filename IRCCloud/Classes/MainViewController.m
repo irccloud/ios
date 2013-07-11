@@ -31,6 +31,7 @@
 #define TAG_INVITE 4
 #define TAG_BADCHANNELKEY 5
 #define TAG_INVALIDNICK 6
+#define TAG_FAILEDMSG 7
 
 @implementation MainViewController
 
@@ -1117,15 +1118,11 @@
     [_message resignFirstResponder];
     Event *e = timer.userInfo;
     if(e.rowType == ROW_FAILED) {
-        e.height = 0;
-        e.rowType = ROW_MESSAGE;
-        e.bgColor = [UIColor selfBackgroundColor];
-        e.pending = YES;
-        e.reqId = [[NetworkConnection sharedInstance] say:e.command to:_buffer.name cid:_buffer.cid];
-        if(e.msg)
-            [_pendingEvents addObject:e];
-        [_eventsView.tableView reloadData];
-        [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
+        _selectedEvent = e;
+        Server *s = [[ServersDataSource sharedInstance] getServer:e.cid];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"This message could not be sent" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Try Again", nil];
+        alert.tag = TAG_FAILEDMSG;
+        [alert show];
     }
 }
 
@@ -1340,6 +1337,18 @@
                     [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",[alertView textFieldAtIndex:0].text] to:nil cid:_alertObject.cid];
             }
             break;
+        case TAG_FAILEDMSG:
+            if([title isEqualToString:@"Try Again"]) {
+                _selectedEvent.height = 0;
+                _selectedEvent.rowType = ROW_MESSAGE;
+                _selectedEvent.bgColor = [UIColor selfBackgroundColor];
+                _selectedEvent.pending = YES;
+                _selectedEvent.reqId = [[NetworkConnection sharedInstance] say:_selectedEvent.command to:_buffer.name cid:_buffer.cid];
+                if(_selectedEvent.msg)
+                    [_pendingEvents addObject:_selectedEvent];
+                [_eventsView.tableView reloadData];
+                [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:_selectedEvent repeats:NO];
+            }
     }
 }
 
