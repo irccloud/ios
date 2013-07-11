@@ -392,12 +392,16 @@
     }
     
     if(linkify) {
-        NSArray *results = [[self webURL] matchesInString:[output string] options:0 range:NSMakeRange(0, [output length])];;
-        if(results.count) {
-            [matches addObjectsFromArray:results];
+        NSArray *results = [[self webURL] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];;
+        for(NSTextCheckingResult *result in results) {
+            NSString *url = [[output string] substringWithRange:result.range];
+            if([url rangeOfString:@"://"].location == NSNotFound)
+                url = [NSString stringWithFormat:@"http://%@", url];
+            NSLog(@"URL: %@", url);
+            [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
         }
         if(server) {
-            results = [[self ircChannelRegexForServer:server] matchesInString:[output string] options:0 range:NSMakeRange(0, [output length])];
+            results = [[self ircChannelRegexForServer:server] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
             if(results.count) {
                 [matches addObjectsFromArray:results];
             }
