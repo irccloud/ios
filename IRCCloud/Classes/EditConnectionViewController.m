@@ -566,6 +566,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"connectioncell"];
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.accessoryView = nil;
     
     switch(indexPath.section) {
         case 0:
