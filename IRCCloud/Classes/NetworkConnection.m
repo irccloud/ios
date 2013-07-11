@@ -156,6 +156,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _failCount = 0;
     _background = NO;
     _writer = [[SBJsonWriter alloc] init];
+    _reachabilityValid = NO;
     _reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
     SCNetworkReachabilityScheduleWithRunLoop(_reachability, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
     SCNetworkReachabilitySetCallback(_reachability, ReachabilityCallback, NULL);
@@ -171,7 +172,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 //Adapted from http://stackoverflow.com/a/17057553/1406639
 -(kIRCCloudReachability)reachable {
     SCNetworkReachabilityFlags flags;
-    if(SCNetworkReachabilityGetFlags(_reachability, &flags)) {
+    if(_reachabilityValid && SCNetworkReachabilityGetFlags(_reachability, &flags)) {
         if((flags & kSCNetworkReachabilityFlagsReachable) == 0) {
             // if target host is not reachable
             return kIRCCloudUnreachable;
@@ -198,7 +199,6 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
             //     is using the CFNetwork (CFSocketStream?) APIs.
             return kIRCCloudReachable;
         }
-        
         return kIRCCloudUnreachable;
     }
     return kIRCCloudUnknown;
@@ -207,6 +207,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) {
     static int lastType = TYPE_UNKNOWN;
     int type = TYPE_UNKNOWN;
+    [NetworkConnection sharedInstance].reachabilityValid = YES;
     kIRCCloudReachability reachable = [[NetworkConnection sharedInstance] reachable];
     kIRCCloudState state = [NetworkConnection sharedInstance].state;
     TFLog(@"IRCCloud state: %i Reconnect timestamp: %f Reachable: %i lastType: %i", state, [NetworkConnection sharedInstance].reconnectTimestamp, reachable, lastType);

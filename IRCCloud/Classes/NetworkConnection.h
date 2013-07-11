@@ -115,13 +115,14 @@ typedef enum {
     NSTimeInterval _reconnectTimestamp;
     NSOperationQueue *_queue;
     SCNetworkReachabilityRef _reachability;
+    BOOL _reachabilityValid;
 }
 @property (readonly) kIRCCloudState state;
 @property (readonly) NSDictionary *userInfo;
 @property (readonly) NSTimeInterval clockOffset;
 @property NSTimeInterval idleInterval;
 @property NSTimeInterval reconnectTimestamp;
-@property BOOL background;
+@property BOOL background, reachabilityValid;
 @property (readonly) kIRCCloudReachability reachable;
 
 +(NetworkConnection*)sharedInstance;
