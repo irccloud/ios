@@ -9,11 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "IRCCloudJSONObject.h"
 
-@interface IgnoresTableViewController : UITableViewController<UIAlertViewDelegate> {
+@interface IgnoresTableViewController : UITableViewController<UIAlertViewDelegate,UITextFieldDelegate> {
     NSArray *_ignores;
     UIBarButtonItem *_addButton;
     int _cid;
     UITextView *_placeholder;
+    UIAlertView *_alertView;
 }
 @property (strong, nonatomic) NSArray *ignores;
 @property int cid;

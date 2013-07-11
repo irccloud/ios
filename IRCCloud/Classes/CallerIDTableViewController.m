@@ -72,13 +72,20 @@
 
 -(void)addButtonPressed {
     Server *s = [[ServersDataSource sharedInstance] getServer:_event.cid];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Allow messages from this user" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Allow", nil];
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [alert show];
+    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Allow messages from this user" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Allow", nil];
+    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [_alertView textFieldAtIndex:0].delegate = self;
+    [_alertView show];
 }
 
 -(void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
+    [self alertView:_alertView clickedButtonAtIndex:1];
+    return NO;
 }
 
 #pragma mark - Table view data source
@@ -128,6 +135,8 @@
         [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/accept %@", [alertView textFieldAtIndex:0].text] to:nil cid:_event.cid];
         [[NetworkConnection sharedInstance] say:@"/accept *" to:nil cid:_event.cid];
     }
+    
+    _alertView = nil;
 }
 
 -(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {

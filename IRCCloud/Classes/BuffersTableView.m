@@ -352,11 +352,18 @@
 
 - (void)joinBtnPressed:(UIButton *)sender {
     Server *s = [[ServersDataSource sharedInstance] getServer:sender.tag];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    alert.tag = sender.tag;
-    [alert textFieldAtIndex:0].placeholder = @"#example";
-    [alert show];
+    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    _alertView.tag = sender.tag;
+    [_alertView textFieldAtIndex:0].placeholder = @"#example";
+    [_alertView textFieldAtIndex:0].delegate = self;
+    [_alertView show];
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
+    [self alertView:_alertView clickedButtonAtIndex:1];
+    return NO;
 }
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
@@ -374,6 +381,8 @@
            [[NetworkConnection sharedInstance] join:channel key:key cid:alertView.tag];
         }
     }
+    
+    _alertView = nil;
 }
 
 - (void)viewDidLoad {

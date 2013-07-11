@@ -69,13 +69,20 @@
 
 -(void)addButtonPressed {
     Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [alert show];
+    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
+    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [_alertView textFieldAtIndex:0].delegate = self;
+    [_alertView show];
 }
 
 -(void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
+    [self alertView:_alertView clickedButtonAtIndex:1];
+    return NO;
 }
 
 #pragma mark - Table view data source
@@ -130,6 +137,8 @@
     if([title isEqualToString:@"Ignore"]) {
         [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:_cid];
     }
+    
+    _alertView = nil;
 }
 
 -(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {

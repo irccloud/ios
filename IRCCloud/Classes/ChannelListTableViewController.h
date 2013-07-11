@@ -9,12 +9,13 @@
 #import <UIKit/UIKit.h>
 #import "IRCCloudJSONObject.h"
 
-@interface ChannelListTableViewController : UITableViewController<UIAlertViewDelegate> {
+@interface ChannelListTableViewController : UITableViewController<UIAlertViewDelegate,UITextFieldDelegate> {
     NSArray *_channels;
     NSArray *_data;
     IRCCloudJSONObject *_event;
     UITextView *_placeholder;
     UIActivityIndicatorView *_activity;
+    UIAlertView *_alertView;
 }
 @property (strong, nonatomic) NSArray *channels;
 @property (strong, nonatomic) IRCCloudJSONObject *event;

@@ -188,7 +188,6 @@
     NamesListTableViewController *ntv = nil;
     Event *e = nil;
     Server *s = nil;
-    UIAlertView *alert = nil;
     NSString *msg = nil;
     NSString *type = nil;
     switch(event) {
@@ -207,18 +206,20 @@
         case kIRCEventBadChannelKey:
             _alertObject = notification.object;
             s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
-            alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-            alert.tag = TAG_BADCHANNELKEY;
-            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [alert show];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+            _alertView.tag = TAG_BADCHANNELKEY;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
             break;
         case kIRCEventInvalidNick:
             _alertObject = notification.object;
             s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
-            alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Change", nil];
-            alert.tag = TAG_INVALIDNICK;
-            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [alert show];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Change", nil];
+            _alertView.tag = TAG_INVALIDNICK;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
             break;
         case kIRCEventAlert:
             o = notification.object;
@@ -294,8 +295,8 @@
                 msg = [o objectForKey:@"msg"];
 
             s = [[ServersDataSource sharedInstance] getServer:o.cid];
-            alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [alert show];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [_alertView show];
             break;
         case kIRCEventSelfBack:
         case kIRCEventAway:
@@ -1298,6 +1299,12 @@
     }
 }
 
+-(BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
+    [self alertView:_alertView clickedButtonAtIndex:1];
+    return NO;
+}
+
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
@@ -1350,6 +1357,7 @@
                 [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:_selectedEvent repeats:NO];
             }
     }
+    _alertView = nil;
 }
 
 -(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
@@ -1393,30 +1401,34 @@
             [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
         } else if([action isEqualToString:@"Ban"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
-            alert.tag = TAG_BAN;
-            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [alert textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
-            [alert show];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
+            _alertView.tag = TAG_BAN;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
         } else if([action isEqualToString:@"Ignore"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
-            alert.tag = TAG_IGNORE;
-            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [alert textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
-            [alert show];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
+            _alertView.tag = TAG_IGNORE;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
         } else if([action isEqualToString:@"Kick"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
-            alert.tag = TAG_KICK;
-            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [alert show];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
+            _alertView.tag = TAG_KICK;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
         } else if([action isEqualToString:@"Invite to channel"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
-            alert.tag = TAG_INVITE;
-            alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [alert show];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
+            _alertView.tag = TAG_INVITE;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
         } else if([action isEqualToString:@"Archive"]) {
             [[NetworkConnection sharedInstance] archiveBuffer:_buffer.bid cid:_buffer.cid];
         } else if([action isEqualToString:@"Unarchive"]) {

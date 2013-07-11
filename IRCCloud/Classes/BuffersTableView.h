@@ -15,7 +15,7 @@
 -(void)dismissKeyboard;
 @end
 
-@interface BuffersTableView : UITableViewController {
+@interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate> {
     NSArray *_data;
     int _selectedRow;
     IBOutlet UIViewController<BuffersTableViewDelegate> *_delegate;
@@ -31,6 +31,8 @@
 	int _lastUnreadPosition;
 	int _firstHighlightPosition;
 	int _lastHighlightPosition;
+    
+    UIAlertView *_alertView;
 }
 -(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadIndicatorClicked:(id)sender;

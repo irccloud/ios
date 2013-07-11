@@ -127,13 +127,20 @@
 
 -(void)addButtonPressed {
     Server *s = [[ServersDataSource sharedInstance] getServer:_event.cid];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ban this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [alert show];
+    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ban this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
+    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [_alertView textFieldAtIndex:0].delegate = self;
+    [_alertView show];
 }
 
 -(void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField {
+    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
+    [self alertView:_alertView clickedButtonAtIndex:1];
+    return NO;
 }
 
 -(NSString *)setByTextForRow:(NSDictionary *)row {
@@ -224,6 +231,8 @@
     if([title isEqualToString:@"Ban"]) {
         [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", [alertView textFieldAtIndex:0].text] chan:[_event objectForKey:@"channel"] cid:_event.cid];
     }
+    
+    _alertView = nil;
 }
 
 -(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {

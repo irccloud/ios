@@ -9,9 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "IRCCloudJSONObject.h"
 
-@interface WhoListTableViewController : UITableViewController<UIAlertViewDelegate> {
+@interface WhoListTableViewController : UITableViewController<UIAlertViewDelegate,UITextFieldDelegate> {
     IRCCloudJSONObject *_event;
     NSArray *_data;
+    UIAlertView *_alertView;
 }
 @property (strong, nonatomic) IRCCloudJSONObject *event;
 -(void)refresh;

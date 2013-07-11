@@ -12,7 +12,7 @@
 #import "EventsTableView.h"
 #import "UIExpandingTextView.h"
 
-@interface MainViewController : UIViewController<BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate> {
+@interface MainViewController : UIViewController<BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
@@ -44,6 +44,7 @@
     NSTimer *_doubleTapTimer;
     NSMutableArray *_pendingEvents;
     int _bidToOpen;
+    UIAlertView *_alertView;
     IRCCloudJSONObject *_alertObject;
 }
 @property (nonatomic) int bidToOpen;

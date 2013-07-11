@@ -9,12 +9,13 @@
 #import <UIKit/UIKit.h>
 #import "IRCCloudJSONObject.h"
 
-@interface BansTableViewController : UITableViewController<UIAlertViewDelegate> {
+@interface BansTableViewController : UITableViewController<UIAlertViewDelegate,UITextFieldDelegate> {
     NSArray *_bans;
     IRCCloudJSONObject *_event;
     UIBarButtonItem *_addButton;
     int _bid;
     UITextView *_placeholder;
+    UIAlertView *_alertView;
 }
 @property (strong, nonatomic) NSArray *bans;
 @property (strong, nonatomic) IRCCloudJSONObject *event;
