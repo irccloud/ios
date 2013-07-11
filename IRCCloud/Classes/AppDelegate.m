@@ -9,6 +9,7 @@
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
 #import "ImageViewController.h"
+#import "EditConnectionViewController.h"
 
 @implementation AppDelegate
 
@@ -97,7 +98,15 @@
             } else {
                 self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
             }
+        } else {
+            [self showConnectionView];
         }
+    }];
+}
+
+-(void)showConnectionView {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped]];
     }];
 }
 

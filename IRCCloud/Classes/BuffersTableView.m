@@ -654,6 +654,7 @@
 
 -(void)setBuffer:(Buffer *)buffer {
     _selectedBuffer = buffer;
+    _selectedRow = -1;
     if(_selectedBuffer.archived && ![_selectedBuffer.type isEqualToString:@"console"])
         [_expandedArchives setObject:@YES forKey:@(_selectedBuffer.cid)];
     [self refresh];

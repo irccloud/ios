@@ -705,8 +705,10 @@ int __timestampWidth;
     [_collapsedEvents clear];
     [_unseenHighlightPositions removeAllObjects];
     
-    if(!_buffer)
+    if(!_buffer) {
+        [self.tableView reloadData];
         return;
+    }
 
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while

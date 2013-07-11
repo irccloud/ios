@@ -28,5 +28,6 @@
 -(void)showImage:(NSURL *)url;
 -(void)showLoginView;
 -(void)showMainView;
+-(void)showConnectionView;
 -(void)launchURL:(NSURL *)url;
 @end

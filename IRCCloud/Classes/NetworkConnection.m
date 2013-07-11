@@ -1078,13 +1078,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(fetcher.bid > 0)
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     [_oobQueue removeObject:fetcher];
-    if([_servers count] < 1) {
-        NSLog(@"Initial backlog download failed");
-        [self disconnect];
-        _state = kIRCCloudStateDisconnected;
-        [self _fail];
-        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-    } else {
+    if([_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }
 }

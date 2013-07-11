@@ -472,8 +472,14 @@
             break;
         case kIRCEventConnectionDeleted:
             o = notification.object;
-            if(o.cid == _buffer.cid)
-                [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+            if(o.cid == _buffer.cid) {
+                if([[ServersDataSource sharedInstance] count]) {
+                    [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+                } else {
+                    [self bufferSelected:-1];
+                    [(AppDelegate *)[UIApplication sharedApplication].delegate showConnectionView];
+                }
+            }
             break;
         default:
             break;
@@ -1467,10 +1473,7 @@
             [[UsersDataSource sharedInstance] clear];
             [[ChannelsDataSource sharedInstance] clear];
             [[EventsDataSource sharedInstance] clear];
-            _buffer = nil;
-            [_eventsView setBuffer:nil];
-            [_buffersView setBuffer:nil];
-            [_usersView setBuffer:nil];
+            [self bufferSelected:-1];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
         } else if([action isEqualToString:@"Ignore List"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];

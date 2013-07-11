@@ -8,6 +8,7 @@
 
 #import "EditConnectionViewController.h"
 #import "NetworkConnection.h"
+#import "AppDelegate.h"
 
 @interface NetworkListViewController : UITableViewController {
     id<NetworkListDelegate> _delegate;
@@ -245,7 +246,8 @@
         _cid = -1;
         self.navigationItem.title = @"New Connection";
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+        if(self.presentingViewController)
+            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
     }
     return self;
 }
@@ -469,6 +471,7 @@
 -(void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     IRCCloudJSONObject *o;
+    Server *s;
     int reqid;
     
     switch(event) {
@@ -494,8 +497,17 @@
         case kIRCEventSuccess:
             o = notification.object;
             reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _reqid)
-                [self dismissViewControllerAnimated:YES completion:nil];
+            if(reqid == _reqid) {
+                if(self.presentingViewController)
+                    [self dismissViewControllerAnimated:YES completion:nil];
+                else
+                    _cid = [[o objectForKey:@"cid"] intValue];
+            }
+            break;
+        case kIRCEventMakeServer:
+            s = notification.object;
+            if(s.cid == _cid)
+                [(AppDelegate *)([UIApplication sharedApplication].delegate) showMainView];
             break;
         default:
             break;
