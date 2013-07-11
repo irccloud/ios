@@ -707,8 +707,9 @@ int __timestampWidth;
     
     if(!_buffer)
         return;
-    
-    [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
+
+    if(_conn.state == kIRCCloudStateConnected)
+        [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
 
     __timestampWidth = [@"88:88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
     if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])

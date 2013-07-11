@@ -47,6 +47,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateConnecting:)
                                                  name:kIRCCloudConnectivityNotification object:nil];
@@ -146,7 +147,6 @@
 }
 
 -(void)updateConnecting:(NSNotification *)notification {
-    int state = _conn.state;
     if(_conn.state == kIRCCloudStateConnecting || [_conn reachable] == kIRCCloudUnknown) {
         [status setText:@"Connecting"];
         activity.hidden = NO;
