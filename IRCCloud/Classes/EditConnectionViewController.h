@@ -26,6 +26,9 @@
     int _reqid;
     NSString *_netname;
     NSURL *_url;
+    BOOL keyboardShown;
+    CGFloat keyboardOverlap;
+    NSIndexPath *_activeCellIndexPath;
 }
 -(void)setServer:(int)cid;
 -(void)setURL:(NSURL *)url;

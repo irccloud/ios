@@ -250,6 +250,116 @@
     return self;
 }
 
+//From: http://stackoverflow.com/a/13867108/1406639
+- (void)keyboardWillShow:(NSNotification *)aNotification
+{
+    if(keyboardShown)
+        return;
+    
+    keyboardShown = YES;
+    
+    // Get the keyboard size
+    UIScrollView *tableView;
+    if([self.tableView.superview isKindOfClass:[UIScrollView class]])
+        tableView = (UIScrollView *)self.tableView.superview;
+    else
+        tableView = self.tableView;
+    NSDictionary *userInfo = [aNotification userInfo];
+    NSValue *aValue = [userInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
+    CGRect keyboardRect = [tableView.superview convertRect:[aValue CGRectValue] fromView:nil];
+    
+    // Get the keyboard's animation details
+    NSTimeInterval animationDuration;
+    [[userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
+    UIViewAnimationCurve animationCurve;
+    [[userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
+    
+    // Determine how much overlap exists between tableView and the keyboard
+    CGRect tableFrame = tableView.frame;
+    CGFloat tableLowerYCoord = tableFrame.origin.y + tableFrame.size.height;
+    keyboardOverlap = tableLowerYCoord - keyboardRect.origin.y;
+    if(self.inputAccessoryView && keyboardOverlap>0)
+    {
+        CGFloat accessoryHeight = self.inputAccessoryView.frame.size.height;
+        keyboardOverlap -= accessoryHeight;
+        
+        tableView.contentInset = UIEdgeInsetsMake(0, 0, accessoryHeight, 0);
+        tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, accessoryHeight, 0);
+    }
+    
+    if(keyboardOverlap < 0)
+        keyboardOverlap = 0;
+    
+    if(keyboardOverlap != 0)
+    {
+        tableFrame.size.height -= keyboardOverlap;
+        
+        NSTimeInterval delay = 0;
+        if(keyboardRect.size.height)
+        {
+            delay = (1 - keyboardOverlap/keyboardRect.size.height)*animationDuration;
+            animationDuration = animationDuration * keyboardOverlap/keyboardRect.size.height;
+        }
+        
+        [UIView animateWithDuration:animationDuration delay:delay
+                            options:UIViewAnimationOptionBeginFromCurrentState
+                         animations:^{ tableView.frame = tableFrame; }
+                         completion:^(BOOL finished){ [self tableAnimationEnded:nil finished:nil contextInfo:nil]; }];
+    }
+}
+
+//From: http://stackoverflow.com/a/13867108/1406639
+- (void)keyboardWillHide:(NSNotification *)aNotification {
+    if(!keyboardShown)
+        return;
+    
+    keyboardShown = NO;
+    
+    UIScrollView *tableView;
+    if([self.tableView.superview isKindOfClass:[UIScrollView class]])
+        tableView = (UIScrollView *)self.tableView.superview;
+    else
+        tableView = self.tableView;
+    if(self.inputAccessoryView)
+    {
+        tableView.contentInset = UIEdgeInsetsZero;
+        tableView.scrollIndicatorInsets = UIEdgeInsetsZero;
+    }
+    
+    if(keyboardOverlap == 0)
+        return;
+    
+    // Get the size & animation details of the keyboard
+    NSDictionary *userInfo = [aNotification userInfo];
+    NSValue *aValue = [userInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
+    CGRect keyboardRect = [tableView.superview convertRect:[aValue CGRectValue] fromView:nil];
+    
+    NSTimeInterval animationDuration;
+    [[userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] getValue:&animationDuration];
+    UIViewAnimationCurve animationCurve;
+    [[userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] getValue:&animationCurve];
+    
+    CGRect tableFrame = tableView.frame;
+    tableFrame.size.height += keyboardOverlap;
+    
+    if(keyboardRect.size.height)
+        animationDuration = animationDuration * keyboardOverlap/keyboardRect.size.height;
+    
+    [UIView animateWithDuration:animationDuration delay:0
+                        options:UIViewAnimationOptionBeginFromCurrentState
+                     animations:^{ tableView.frame = tableFrame; }
+                     completion:nil];
+}
+
+//From: http://stackoverflow.com/a/13867108/1406639
+- (void)tableAnimationEnded:(NSString*)animationID finished:(NSNumber *)finished contextInfo:(void *)context {
+    // Scroll to the active cell
+    if(_activeCellIndexPath) {
+        [self.tableView scrollToRowAtIndexPath:_activeCellIndexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
+//        [self.tableView selectRowAtIndexPath:_activeCellIndexPath animated:NO scrollPosition:UITableViewScrollPositionBottom];
+    }
+}
+
 -(void)saveButtonPressed:(id)sender {
     if(_cid == -1) {
         if(!_netname)
@@ -341,6 +451,21 @@
                 _commands.text = @"";
         }
     }
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+    if(textField == _server)
+        _activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:0];
+    else if(textField == _port)
+        _activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:0];
+    if(textField == _nickname)
+        _activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:1];
+    if(textField == _realname)
+        _activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:1];
+    if(textField == _nspass)
+        _activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:2];
+    if(textField == _serverpass)
+        _activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:2];
 }
 
 - (void)viewDidLoad {
@@ -461,6 +586,8 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
 }
 
@@ -676,12 +803,17 @@
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    _activeCellIndexPath = indexPath;
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
     if(_cid == -1 && indexPath.section == 0 && indexPath.row == 0) {
         NetworkListViewController *nvc = [[NetworkListViewController alloc] initWithDelegate:self];
         nvc.selection = _netname;
         [self.navigationController pushViewController:nvc animated:YES];
+    } else {
+        UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
+        if(cell.accessoryView)
+            [cell.accessoryView becomeFirstResponder];
     }
 }
 
