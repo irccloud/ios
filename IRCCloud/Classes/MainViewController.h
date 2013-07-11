@@ -30,6 +30,8 @@
     IBOutlet UILabel *_topicLabel;
     IBOutlet UIImageView *_lock;
     IBOutlet UIView *_borders;
+    IBOutlet UIView *_swipeTip;
+    IBOutlet UIView *_mentionTip;
     UIButton *_menuBtn;
     UIButton *_sendBtn;
     UIBarButtonItem *_usersButtonItem;

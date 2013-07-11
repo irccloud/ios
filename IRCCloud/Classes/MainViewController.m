@@ -104,6 +104,12 @@
         [_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
         _menuBtn.frame = CGRectMake(0,0,32,32);
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
+        
+        [_swipeTip removeFromSuperview];
+        [self.slidingViewController.view addSubview:_swipeTip];
+
+        [_mentionTip removeFromSuperview];
+        [self.slidingViewController.view addSubview:_mentionTip];
     }
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
@@ -448,6 +454,8 @@
             break;
         case kIRCEventBufferMsg:
             e = notification.object;
+            if(e.isHighlight && e.bid == _buffer.bid)
+                [self showMentionTip];
             if([[e.from lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
                 for(Event *e in _pendingEvents) {
                     [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
@@ -682,6 +690,15 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillBeHidden:)
                                                  name:UIKeyboardWillHideNotification object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didSwipe:)
+                                                 name:ECSlidingViewUnderLeftWillAppear object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didSwipe:)
+                                                 name:ECSlidingViewUnderRightWillAppear object:nil];
+    
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable && session != nil && [session length] > 0)
         [[NetworkConnection sharedInstance] connect];
@@ -1069,11 +1086,51 @@
     }];
 }
 
+-(void)showMentionTip {
+    if(![[NSUserDefaults standardUserDefaults] boolForKey:@"mentionTip"]) {
+        [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"mentionTip"];
+        [UIView animateWithDuration:0.5 animations:^{
+            _mentionTip.alpha = 1;
+        } completion:^(BOOL finished){
+            [self performSelector:@selector(hideMentionTip) withObject:nil afterDelay:2];
+        }];
+    }
+}
+
+-(void)hideMentionTip {
+    [UIView animateWithDuration:0.5 animations:^{
+        _mentionTip.alpha = 0;
+    } completion:nil];
+}
+
+-(void)didSwipe:(NSNotification *)n {
+    [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"swipeTip"];
+}
+
+-(void)showSwipeTip {
+    if(![[NSUserDefaults standardUserDefaults] boolForKey:@"swipeTip"]) {
+        [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"swipeTip"];
+        [UIView animateWithDuration:0.5 animations:^{
+            _swipeTip.alpha = 1;
+        } completion:^(BOOL finished){
+            [self performSelector:@selector(hideSwipeTip) withObject:nil afterDelay:2];
+        }];
+    }
+}
+
+-(void)hideSwipeTip {
+    [UIView animateWithDuration:0.5 animations:^{
+        _swipeTip.alpha = 0;
+    } completion:nil];
+}
+
 -(void)usersButtonPressed:(id)sender {
+    [self showSwipeTip];
     [self.slidingViewController anchorTopViewTo:ECLeft];
 }
 
 -(void)listButtonPressed:(id)sender {
+    [self showSwipeTip];
     [self.slidingViewController anchorTopViewTo:ECRight];
 }
 
@@ -1156,7 +1213,7 @@
     if(!_selectedUser)
         return;
 
-    //TODO: set the mention tip flag
+    [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"mentionTip"];
     
     if(self.slidingViewController) {
         [self.slidingViewController resetTopView];
@@ -1485,7 +1542,7 @@
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Mention"]) {
-            //TODO: Show the double-tap tip
+            [self showMentionTip];
             [self _mention];
         } else if([action isEqualToString:@"Edit Connection"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
