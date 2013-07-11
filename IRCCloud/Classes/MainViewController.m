@@ -365,9 +365,13 @@
         case kIRCEventLinkChannel:
             o = notification.object;
             if(_cidToOpen == o.cid && [[o objectForKey:@"invalid_chan"] isEqualToString:_bufferToOpen]) {
-                _bufferToOpen = [o objectForKey:@"valid_chan"];
-                b = [[BuffersDataSource sharedInstance] getBuffer:o.bid];
+                if([[o objectForKey:@"valid_chan"] isKindOfClass:[NSString class]] && [[o objectForKey:@"valid_chan"] length]) {
+                    _bufferToOpen = [o objectForKey:@"valid_chan"];
+                    b = [[BuffersDataSource sharedInstance] getBuffer:o.bid];
+                }
             }
+            if(!b)
+                break;
         case kIRCEventMakeBuffer:
             if(!b)
                 b = notification.object;
