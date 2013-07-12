@@ -10,6 +10,7 @@
 #import "TTTAttributedLabel.h"
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
+#import "UIColor+IRCCloud.h"
 
 @interface NamesTableCell : UITableViewCell {
     TTTAttributedLabel *_info;
@@ -62,6 +63,10 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7) {
+        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
+        self.navigationController.view.backgroundColor = [UIColor navBarColor];
+    }
     //self.navigationItem.leftBarButtonItem = _addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
     [self refresh];
