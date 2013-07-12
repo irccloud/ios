@@ -1107,16 +1107,19 @@ int __timestampWidth;
                 [_conn say:[NSString stringWithFormat:@"/accept %@", e.nick] to:nil cid:e.cid];
             else
                 [_delegate rowSelected:e];
-            if(e.rowType != ROW_FAILED) {
-                for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
-                    if(event.rowType == ROW_LASTSEENEID) {
-                        [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
-                        break;
-                    }
-                }
-                [self refresh];
+        }
+    }
+}
+
+-(void)clearLastSeenMarker {
+    if(_lastSeenEidPos > 0) {
+        for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
+            if(event.rowType == ROW_LASTSEENEID) {
+                [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
+                break;
             }
         }
+        [self refresh];
     }
 }
 

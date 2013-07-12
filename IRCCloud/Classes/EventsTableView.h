@@ -59,4 +59,5 @@
 -(IBAction)bottomUnreadBarClicked:(id)sender;
 -(IBAction)dismissButtonPressed:(id)sender;
 -(void)scrollToBottom;
+-(void)clearLastSeenMarker;
 @end

@@ -1191,6 +1191,8 @@
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"This message could not be sent" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Try Again", nil];
         alert.tag = TAG_FAILEDMSG;
         [alert show];
+    } else {
+        [_eventsView clearLastSeenMarker];
     }
 }
 
