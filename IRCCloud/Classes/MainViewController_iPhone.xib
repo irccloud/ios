@@ -368,7 +368,7 @@
 						<int key="IBUIContentMode">7</int>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-						<string key="IBUIText">Swipe left and right to quickly open and close the sidebars.</string>
+						<string key="IBUIText">Swipe left and right to quickly open and close the sidebars</string>
 						<reference key="IBUITextColor" ref="988859338"/>
 						<nil key="IBUIHighlightedColor"/>
 						<int key="IBUIBaselineAdjustment">0</int>
@@ -392,7 +392,7 @@
 						<int key="IBUIContentMode">7</int>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-						<string key="IBUIText">Double-tap to quickly reply to the sender.</string>
+						<string key="IBUIText">Double-tap to quickly reply to the sender</string>
 						<reference key="IBUITextColor" ref="988859338"/>
 						<nil key="IBUIHighlightedColor"/>
 						<int key="IBUIBaselineAdjustment">0</int>

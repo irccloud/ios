@@ -465,7 +465,7 @@
 						<int key="IBUIContentMode">7</int>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
-						<string key="IBUIText">Double-tap to quickly reply to the sender.</string>
+						<string key="IBUIText">Double-tap to quickly reply to the sender</string>
 						<reference key="IBUITextColor" ref="532066558"/>
 						<nil key="IBUIHighlightedColor"/>
 						<int key="IBUIBaselineAdjustment">0</int>
