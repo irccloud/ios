@@ -568,13 +568,14 @@
 
 -(void)backlogCompleted:(NSNotification *)notification {
     [self _hideConnectingView];
-    if(_buffer && !_urlToOpen && _bidToOpen == -1) {
+    if(_buffer && !_urlToOpen && _bidToOpen == -1 && _eidToOpen < 1) {
         [self _updateServerStatus];
         [self _updateUserListVisibility];
         if(self.slidingViewController) {
             [self _updateUnreadIndicator];
         }
     } else {
+        [[NSNotificationCenter defaultCenter] removeObserver:_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
         int bid = [BuffersDataSource sharedInstance].firstBid;
         if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
             if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
@@ -583,11 +584,16 @@
         if(_bidToOpen != -1) {
             bid = _bidToOpen;
             _bidToOpen = -1;
+        } else if(_eidToOpen > 0) {
+            bid = _buffer.bid;
         }
         [self bufferSelected:bid];
+        _eidToOpen = -1;
+        NSLog(@"** backlog complete: Set eidToOpen to -1");
         if(_urlToOpen)
             [self launchURL:_urlToOpen];
         _urlToOpen = nil;
+        [[NSNotificationCenter defaultCenter] addObserver:_eventsView selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
     }
 }
 
@@ -717,6 +723,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_doubleTapTimer invalidate];
     _doubleTapTimer = nil;
+    NSLog(@"** view will disappear: Set eidToOpen to -1");
+    _eidToOpen = -1;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -932,9 +940,14 @@
 
 -(void)bufferSelected:(int)bid {
     TFLog(@"BID selected: %i", bid);
+    if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
+        NSLog(@"** bid changed from %i to %i: Set eidToOpen to -1", _buffer.bid, bid);
+        _eidToOpen = -1;
+    }
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     [self _updateTitleArea];
     [_buffersView setBuffer:_buffer];
+    _eventsView.eidToOpen = _eidToOpen;
     [UIView animateWithDuration:0.1 animations:^{
         _eventsView.view.alpha=0;
         _eventsView.topUnreadView.alpha=0;

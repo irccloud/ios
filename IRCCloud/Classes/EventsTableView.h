@@ -40,10 +40,10 @@
     CollapsedEvents *_collapsedEvents;
     NetworkConnection *_conn;
     
-    NSTimeInterval _maxEid, _minEid, _currentCollapsedEid, _earliestEid;
+    NSTimeInterval _maxEid, _minEid, _currentCollapsedEid, _earliestEid, _eidToOpen;
     int _currentGroupPosition, _newMsgs, _newHighlights, _lastSeenEidPos;
     NSString *_lastCollpasedDay;
-    BOOL _requestingBacklog, _ready, _firstScroll, _scrolledUp;
+    BOOL _requestingBacklog, _ready, _scrolledUp;
     NSTimer *_heartbeatTimer;
     NSTimer *_scrollTimer;
     Ignore *_ignore;
@@ -53,6 +53,7 @@
 }
 @property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;
+@property (nonatomic) NSTimeInterval eidToOpen;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadBarClicked:(id)sender;

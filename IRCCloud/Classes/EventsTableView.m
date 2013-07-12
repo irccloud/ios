@@ -128,6 +128,7 @@ int __timestampWidth;
         _unseenHighlightPositions = [[NSMutableArray alloc] init];
         _buffer = nil;
         _ignore = [[Ignore alloc] init];
+        _eidToOpen = -1;
     }
     return self;
 }
@@ -665,7 +666,6 @@ int __timestampWidth;
     _topUnreadView.alpha = 0;
     _bottomUnreadView.alpha = 0;
     _requestingBacklog = NO;
-    _firstScroll = NO;
     if(buffer.bid != _buffer.bid) {
         for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid]) {
             if(event.rowType == ROW_LASTSEENEID) {
@@ -689,19 +689,21 @@ int __timestampWidth;
     [_lock lock];
     if(_data.count) {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
+        [self scrollViewDidScroll:self.tableView];
     }
     _scrollTimer = nil;
-    _firstScroll = YES;
+    _scrolledUp = NO;
     [_lock unlock];
 }
 
 - (void)scrollToBottom {
     [_scrollTimer invalidate];
     
-    _scrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(_scrollToBottom) userInfo:nil repeats:NO];
+    _scrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_scrollToBottom) userInfo:nil repeats:NO];
 }
 
 - (void)refresh {
+    NSLog(@"** refresh, eidToLaunch: %f", _eidToOpen);
     [_lock lock];
     [_scrollTimer invalidate];
     _ready = NO;
@@ -711,7 +713,7 @@ int __timestampWidth;
         backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
 
     [_data removeAllObjects];
-    _minEid = _maxEid = _earliestEid = 0;
+    _minEid = _maxEid = _earliestEid = _newMsgs = _newHighlights = 0;
     _lastSeenEidPos = -1;
     _currentCollapsedEid = 0;
     _currentGroupPosition = -1;
@@ -752,8 +754,12 @@ int __timestampWidth;
         for(Event *e in events) {
             e.formatted = nil;
             [self insertEvent:e backlog:true nextIsGrouped:false];
+            if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && !e.isSelf && e.rowType != ROW_LASTSEENEID) {
+                _newMsgs++;
+                if(e.isHighlight)
+                    _newHighlights++;
+            }
         }
-        
     }
     
     if(backlogEid > 0) {
@@ -800,7 +806,7 @@ int __timestampWidth;
                     }
                 }
                 [[EventsDataSource sharedInstance] addEvent:e];
-                [_data insertObject:e atIndex:_lastSeenEidPos + 1];
+                [self _addItem:e eid:e.eid];
             }
         } else {
             _lastSeenEidPos = -1;
@@ -822,7 +828,17 @@ int __timestampWidth;
             markerPos++;
         }
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-    } else if(!_scrolledUp || (_data.count && (_scrollTimer || !_firstScroll))) {
+    } else if(_eidToOpen > 0) {
+        int i = 0;
+        for(Event *e in _data) {
+            if(e.eid == _eidToOpen) {
+                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                break;
+            }
+            i++;
+        }
+        _eidToOpen = -1;
+    } else if(!_scrolledUp || (_data.count && _scrollTimer)) {
         [self _scrollToBottom];
         [self scrollToBottom];
     }
@@ -842,6 +858,7 @@ int __timestampWidth;
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
     _ready = YES;
+    [self updateUnread];
     [self scrollViewDidScroll:self.tableView];
     [_lock unlock];
 }
@@ -1012,6 +1029,7 @@ int __timestampWidth;
             _topUnreadView.alpha = 0;
             [UIView commitAnimations];
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_lastSeenEidPos+1 inSection:0] atScrollPosition: UITableViewScrollPositionTop animated: YES];
+            [self scrollViewDidScroll:self.tableView];
         } else {
             [self.tableView setContentOffset:CGPointMake(0,0) animated:YES];
         }
@@ -1035,7 +1053,7 @@ int __timestampWidth;
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(!_ready || !_firstScroll || !_buffer)
+    if(!_ready || !_buffer)
         return;
     
     if(self.tableView.tableHeaderView && _minEid > 0 && _buffer && _buffer.bid != -1/* TODO: && conn.ready */) {
@@ -1071,7 +1089,8 @@ int __timestampWidth;
                     [UIView setAnimationDuration:0.1];
                     _topUnreadView.alpha = 0;
                     [UIView commitAnimations];
-                    [self _sendHeartbeat];
+                    if(_bottomUnreadView.alpha == 0)
+                        [self _sendHeartbeat];
                 } else {
                     [self updateTopUnread:firstRow];
                 }

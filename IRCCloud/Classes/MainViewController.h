@@ -46,10 +46,12 @@
     NSTimer *_doubleTapTimer;
     NSMutableArray *_pendingEvents;
     int _bidToOpen;
+    NSTimeInterval _eidToOpen;
     UIAlertView *_alertView;
     IRCCloudJSONObject *_alertObject;
 }
 @property (nonatomic) int bidToOpen;
+@property (nonatomic) NSTimeInterval eidToOpen;
 -(void)bufferSelected:(int)bid;
 -(void)sendButtonPressed:(id)sender;
 -(void)usersButtonPressed:(id)sender;
