@@ -1112,15 +1112,13 @@ int __timestampWidth;
 }
 
 -(void)clearLastSeenMarker {
-    if(_lastSeenEidPos > 0) {
-        for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
-            if(event.rowType == ROW_LASTSEENEID) {
-                [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
-                break;
-            }
+    for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
+        if(event.rowType == ROW_LASTSEENEID) {
+            [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
+            break;
         }
-        [self refresh];
     }
+    [self refresh];
 }
 
 -(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {

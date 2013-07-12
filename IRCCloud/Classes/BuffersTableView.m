@@ -164,6 +164,7 @@
     _firstUnreadPosition = -1;
     _lastHighlightPosition = -1;
     _lastUnreadPosition = -1;
+    _selectedRow = -1;
     
     NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     
