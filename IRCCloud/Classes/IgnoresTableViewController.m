@@ -19,7 +19,6 @@
         _placeholder.text = @"You're not ignoring anyone at the moment.\n\nYou can ignore someone by tapping their nickname in the user list, long-pressing a message, or by using /ignore.";
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
-        _placeholder.contentInset = UIEdgeInsetsMake(12, 12, 12, 12);
         _placeholder.textAlignment = UITextAlignmentCenter;
     }
     return self;
@@ -29,11 +28,11 @@
     [super viewDidLoad];
     self.navigationItem.leftBarButtonItem = _addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
-    _placeholder.frame = self.tableView.frame;
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    _placeholder.frame = self.tableView.frame;
     if(_ignores.count)
         [_placeholder removeFromSuperview];
     else

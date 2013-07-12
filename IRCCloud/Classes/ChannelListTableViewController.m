@@ -69,7 +69,6 @@
         _placeholder = [[UITextView alloc] initWithFrame:CGRectZero];
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
-        _placeholder.contentInset = UIEdgeInsetsMake(12, 12, 12, 12);
         _placeholder.textAlignment = UITextAlignmentCenter;
         _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         _activity.hidesWhenStopped = YES;
@@ -86,13 +85,13 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    _placeholder.frame = self.tableView.frame;
     if(_channels.count) {
         [self refresh];
         [_activity stopAnimating];
         [_placeholder removeFromSuperview];
     } else {
         _placeholder.text = [NSString stringWithFormat:@"\nLoading channel list for %@", [_event objectForKey:@"server"]];
-        _placeholder.frame = self.tableView.frame;
         _activity.frame = CGRectMake((_placeholder.frame.size.width - _activity.frame.size.width)/2,6,_activity.frame.size.width,_activity.frame.size.height);
         [_activity startAnimating];
         [self.tableView.superview addSubview:_placeholder];
