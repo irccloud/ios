@@ -48,6 +48,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    if(_swipeTip)
+        _swipeTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
+    
+    if(_mentionTip)
+        _mentionTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
+    
     self.navigationItem.titleView = _titleView;
 
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
