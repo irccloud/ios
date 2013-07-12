@@ -1566,7 +1566,5 @@
             [self presentViewController:nc animated:YES completion:nil];
         }
     }
-    _selectedUser = nil;
-    _selectedEvent = nil;
 }
 @end
