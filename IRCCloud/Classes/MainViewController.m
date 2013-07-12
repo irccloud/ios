@@ -901,6 +901,8 @@
         if(match) {
             NSString *channel = [url.path substringFromIndex:1];
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:channel server:s.cid];
+            if([b.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:b.bid])
+                b = nil;
             if(b)
                 [self bufferSelected:b.bid];
             else if(state == kIRCCloudStateConnected)
