@@ -147,6 +147,7 @@
 		229C2A0517677ED200A07CED /* menu_unread@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 229C29FA17677ED200A07CED /* menu_unread@2x.png */; };
 		229C2A0617677ED200A07CED /* menu@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 229C29FB17677ED200A07CED /* menu@2x.png */; };
 		229C2A0717677ED200A07CED /* menu@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 229C29FB17677ED200A07CED /* menu@2x.png */; };
+		22A19C60178FCCAC00772C60 /* UINavigationController+iPadSux.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */; };
 		22A1D0271778A86900F8A89C /* WhoisViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A1D0261778A86900F8A89C /* WhoisViewController.m */; };
 		22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F25178A317100529CDA /* WhoListTableViewController.m */; };
 		22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F28178A3F3500529CDA /* NamesListTableViewController.m */; };
@@ -394,6 +395,8 @@
 		229C29F917677ED200A07CED /* menu_highlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu_highlight@2x.png"; sourceTree = "<group>"; };
 		229C29FA17677ED200A07CED /* menu_unread@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu_unread@2x.png"; sourceTree = "<group>"; };
 		229C29FB17677ED200A07CED /* menu@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "menu@2x.png"; sourceTree = "<group>"; };
+		22A19C5E178FCCAB00772C60 /* UINavigationController+iPadSux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+iPadSux.h"; sourceTree = "<group>"; };
+		22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+iPadSux.m"; sourceTree = "<group>"; };
 		22A1D0251778A86900F8A89C /* WhoisViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhoisViewController.h; sourceTree = "<group>"; };
 		22A1D0261778A86900F8A89C /* WhoisViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoisViewController.m; sourceTree = "<group>"; };
 		22A35F24178A316300529CDA /* WhoListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhoListTableViewController.h; sourceTree = "<group>"; };
@@ -693,6 +696,8 @@
 				227FF8221772063F00394114 /* SettingsViewController.m */,
 				2236F63A16DBF3CA007BE535 /* UIColor+IRCCloud.h */,
 				2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */,
+				22A19C5E178FCCAB00772C60 /* UINavigationController+iPadSux.h */,
+				22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */,
 				2236F64416DD138A007BE535 /* UsersDataSource.h */,
 				2236F64516DD138B007BE535 /* UsersDataSource.m */,
 				2236F64816DD30E0007BE535 /* UsersTableView.h */,
@@ -1118,6 +1123,7 @@
 				224FCF361787288400FC3879 /* LicenseViewController.m in Sources */,
 				22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */,
 				22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */,
+				22A19C60178FCCAC00772C60 /* UINavigationController+iPadSux.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
