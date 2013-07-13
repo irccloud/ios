@@ -422,32 +422,18 @@
                 int reqid = [[o objectForKey:@"_reqid"] intValue];
                 for(Event *e in _pendingEvents) {
                     if(e.reqId == reqid) {
-                        [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
                         [_pendingEvents removeObject:e];
-                        e.msg = [e.msg stringByAppendingFormat:@" %c4(FAILED)%c", COLOR_MIRC, CLEAR];
-                        e.formattedMsg = nil;
-                        e.formatted = nil;
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:e userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventBufferMsg]}];
-                        }];
+                        e.height = 0;
+                        e.pending = NO;
+                        e.rowType = ROW_FAILED;
+                        e.bgColor = [UIColor errorBackgroundColor];
+                        [_eventsView.tableView reloadData];
                         break;
                     }
                 }
             } else {
                 if([[o objectForKey:@"message"] isEqualToString:@"auth"]) {
-                    [[NetworkConnection sharedInstance] unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]];
-                    //TODO: check the above result, and retry if it fails
-                    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
-                    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
-                    [[NSUserDefaults standardUserDefaults] synchronize];
-                    [[NetworkConnection sharedInstance] disconnect];
-                    [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
-                    [NetworkConnection sharedInstance].reconnectTimestamp = 0;
-                    [[NetworkConnection sharedInstance] clearPrefs];
-                    [[ServersDataSource sharedInstance] clear];
-                    [[UsersDataSource sharedInstance] clear];
-                    [[ChannelsDataSource sharedInstance] clear];
-                    [[EventsDataSource sharedInstance] clear];
+                    [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(logout) withObject:nil waitUntilDone:YES];
                     _buffer = nil;
                     [_eventsView setBuffer:nil];
                     [_buffersView setBuffer:nil];
