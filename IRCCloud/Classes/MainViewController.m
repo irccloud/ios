@@ -378,7 +378,7 @@
             break;
         case kIRCEventLinkChannel:
             o = notification.object;
-            if(_cidToOpen == o.cid && [[o objectForKey:@"invalid_chan"] isEqualToString:_bufferToOpen]) {
+            if(_cidToOpen == o.cid && [[[o objectForKey:@"invalid_chan"] lowercaseString] isEqualToString:[_bufferToOpen lowercaseString]]) {
                 if([[o objectForKey:@"valid_chan"] isKindOfClass:[NSString class]] && [[o objectForKey:@"valid_chan"] length]) {
                     _bufferToOpen = [o objectForKey:@"valid_chan"];
                     b = [[BuffersDataSource sharedInstance] getBuffer:o.bid];
@@ -389,7 +389,7 @@
         case kIRCEventMakeBuffer:
             if(!b)
                 b = notification.object;
-            if(_cidToOpen == b.cid && [b.name isEqualToString:_bufferToOpen] && ![_buffer.name isEqualToString:_bufferToOpen]) {
+            if(_cidToOpen == b.cid && [[b.name lowercaseString] isEqualToString:[_bufferToOpen lowercaseString]] && ![[_buffer.name lowercaseString] isEqualToString:[_bufferToOpen lowercaseString]]) {
                 [self bufferSelected:b.bid];
                 _bufferToOpen = nil;
                 _cidToOpen = -1;
@@ -406,7 +406,7 @@
             _bufferToOpen = [o objectForKey:@"name"];
             _cidToOpen = o.cid;
             b = [[BuffersDataSource sharedInstance] getBufferWithName:_bufferToOpen server:_cidToOpen];
-            if(b != nil && ![b.name isEqualToString:_buffer.name]) {
+            if(b != nil && ![[b.name lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
                 [self bufferSelected:b.bid];
                 _bufferToOpen = nil;
                 _cidToOpen = -1;

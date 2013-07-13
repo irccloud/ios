@@ -93,7 +93,7 @@
 -(Buffer *)getBufferWithName:(NSString *)name server:(int)cid {
     @synchronized(_buffers) {
         for(Buffer *buffer in _buffers) {
-            if(buffer.cid == cid && [buffer.name isEqualToString:name])
+            if(buffer.cid == cid && [[buffer.name lowercaseString] isEqualToString:[name lowercaseString]])
                 return buffer;
         }
         return nil;
