@@ -769,7 +769,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventConnectionDeleted];
         } else if([object.type isEqualToString:@"delete_buffer"]) {
-            [_buffers removeBuffer:object.bid];
+            [_buffers removeAllDataForBuffer:object.bid];
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventDeleteBuffer];
         } else if([object.type isEqualToString:@"buffer_archived"]) {
@@ -1122,6 +1122,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _reconnectTimestamp = 0;
     [self clearPrefs];
     [[ServersDataSource sharedInstance] clear];
+    [[BuffersDataSource sharedInstance] clear];
     [[UsersDataSource sharedInstance] clear];
     [[ChannelsDataSource sharedInstance] clear];
     [[EventsDataSource sharedInstance] clear];
