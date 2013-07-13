@@ -660,6 +660,8 @@
             [self launchURL:_urlToOpen];
             _urlToOpen = nil;
         }
+    } else {
+        [self bufferSelected:_buffer.bid];
     }
     [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.clipsToBounds = YES;

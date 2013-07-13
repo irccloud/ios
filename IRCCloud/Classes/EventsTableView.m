@@ -150,11 +150,11 @@ int __timestampWidth;
                                              selector:@selector(backlogCompleted:)
                                                  name:kIRCCloudBacklogCompletedNotification object:nil];
     
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+/*    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [self refresh];
     }];
     if(!_scrolledUp)
-        [self scrollToBottom];
+        [self scrollToBottom];*/
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -829,15 +829,20 @@ int __timestampWidth;
         }
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
     } else if(_eidToOpen > 0) {
-        int i = 0;
-        for(Event *e in _data) {
-            if(e.eid == _eidToOpen) {
-                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-                break;
+        NSLog(@"EID to open: %f max: %f", _eidToOpen, _maxEid);
+        if(_eidToOpen <= _maxEid) {
+            int i = 0;
+            for(Event *e in _data) {
+                if(e.eid == _eidToOpen) {
+                    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                    break;
+                }
+                i++;
             }
-            i++;
+            _eidToOpen = -1;
+        } else {
+            NSLog(@"Requested EID is in the future, not scrolling");
         }
-        _eidToOpen = -1;
     } else if(!_scrolledUp || (_data.count && _scrollTimer)) {
         [self _scrollToBottom];
         [self scrollToBottom];
