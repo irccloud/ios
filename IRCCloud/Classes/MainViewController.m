@@ -434,10 +434,7 @@
             } else {
                 if([[o objectForKey:@"message"] isEqualToString:@"auth"]) {
                     [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(logout) withObject:nil waitUntilDone:YES];
-                    _buffer = nil;
-                    [_eventsView setBuffer:nil];
-                    [_buffersView setBuffer:nil];
-                    [_usersView setBuffer:nil];
+                    [self bufferSelected:-1];
                     [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
                 } else if([[o objectForKey:@"message"] isEqualToString:@"set_shard"]) {
                     [[NSUserDefaults standardUserDefaults] setObject:[o objectForKey:@"cookie"] forKey:@"session"];

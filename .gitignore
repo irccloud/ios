@@ -1,3 +1,4 @@
 IRCCloud.xcodeproj/project.xcworkspace
 IRCCloud.xcodeproj/xcuserdata
 build/
+IRCCloud/config.h

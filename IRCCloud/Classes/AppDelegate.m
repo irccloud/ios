@@ -11,11 +11,13 @@
 #import "ImageViewController.h"
 #import "EditConnectionViewController.h"
 #import "UIColor+IRCCloud.h"
+#import "config.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [TestFlight takeOff:@""];
+    if(TESTFLIGHT_KEY)
+        [TestFlight takeOff:TESTFLIGHT_KEY];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
