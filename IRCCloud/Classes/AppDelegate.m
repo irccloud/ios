@@ -10,6 +10,7 @@
 #import "NetworkConnection.h"
 #import "ImageViewController.h"
 #import "EditConnectionViewController.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation AppDelegate
 
@@ -21,7 +22,9 @@
         self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPhone" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPhone" bundle:nil];
         self.slideViewController = [[ECSlidingViewController alloc] init];
+        self.slideViewController.view.backgroundColor = [UIColor backgroundBlueColor];
         self.slideViewController.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+        self.slideViewController.topViewController.view.backgroundColor = [UIColor navBarColor];
     } else {
         self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPad" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPad" bundle:nil];

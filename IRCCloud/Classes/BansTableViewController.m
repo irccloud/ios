@@ -8,6 +8,7 @@
 
 #import "BansTableViewController.h"
 #import "NetworkConnection.h"
+#import "UIColor+IRCCloud.h"
 
 @interface BansTableCell : UITableViewCell {
     UILabel *_mask;
@@ -74,6 +75,10 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7) {
+        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
+        self.navigationController.view.backgroundColor = [UIColor navBarColor];
+    }
     self.navigationItem.leftBarButtonItem = _addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
 }

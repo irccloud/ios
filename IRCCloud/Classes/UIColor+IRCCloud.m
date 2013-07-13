@@ -220,4 +220,7 @@ UIImage *__newMsgsBackgroundImage;
 +(UIColor *)collapsedHeadingBackgroundColor {
     return [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
 }
++(UIColor *)navBarColor {
+    return [UIColor colorWithRed:242.0/255.0 green:247.0/255.0 blue:252.0/255.0 alpha:1];
+}
 @end

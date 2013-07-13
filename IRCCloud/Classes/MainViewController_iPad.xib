@@ -456,7 +456,7 @@
 					<object class="IBUILabel" id="211459074">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">269</int>
-						<string key="NSFrame">{{372, 568}, {280, 52}}</string>
+						<string key="NSFrame">{{367, 568}, {290, 55}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIOpaque">NO</bool>
@@ -465,7 +465,7 @@
 						<int key="IBUIContentMode">7</int>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBIPadFramework</string>
-						<string key="IBUIText">Double-tap to quickly reply to the sender.</string>
+						<string key="IBUIText">Double-tap to quickly reply to the sender</string>
 						<reference key="IBUITextColor" ref="532066558"/>
 						<nil key="IBUIHighlightedColor"/>
 						<int key="IBUIBaselineAdjustment">0</int>
@@ -474,7 +474,7 @@
 						<reference key="IBUIFontDescription" ref="959547288"/>
 						<reference key="IBUIFont" ref="153290715"/>
 						<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
-						<double key="preferredMaxLayoutWidth">280</double>
+						<double key="preferredMaxLayoutWidth">290</double>
 					</object>
 					<object class="IBUIImageView" id="984730425">
 						<reference key="NSNextResponder" ref="191373211"/>

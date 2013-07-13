@@ -8,6 +8,7 @@
 
 #import "DisplayOptionsViewController.h"
 #import "NetworkConnection.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation DisplayOptionsViewController
 
@@ -164,6 +165,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7) {
+        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
+        self.navigationController.view.backgroundColor = [UIColor navBarColor];
+    }
 
     int padding = 80;
     

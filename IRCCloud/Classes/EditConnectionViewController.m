@@ -9,6 +9,7 @@
 #import "EditConnectionViewController.h"
 #import "NetworkConnection.h"
 #import "AppDelegate.h"
+#import "UIColor+IRCCloud.h"
 
 @interface NetworkListViewController : UITableViewController {
     id<NetworkListDelegate> _delegate;
@@ -470,6 +471,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7) {
+        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
+        self.navigationController.view.backgroundColor = [UIColor navBarColor];
+    }
     if(self.presentingViewController)
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 

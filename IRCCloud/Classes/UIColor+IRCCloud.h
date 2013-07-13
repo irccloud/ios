@@ -48,4 +48,5 @@
 +(UIColor *)newMsgsBackgroundColor;
 +(UIColor *)collapsedRowBackgroundColor;
 +(UIColor *)collapsedHeadingBackgroundColor;
++(UIColor *)navBarColor;
 @end

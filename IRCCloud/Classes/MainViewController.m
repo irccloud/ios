@@ -126,6 +126,8 @@
         _startHeight = [UIScreen mainScreen].applicationFrame.size.width - self.navigationController.navigationBar.frame.size.height;
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,472,36)];
     }
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
+        _startHeight += [UIApplication sharedApplication].statusBarFrame.size.height;
     _message.minimumHeight = 36;
     [_message sizeToFit];
     _message.delegate = self;

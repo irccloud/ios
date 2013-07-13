@@ -10,6 +10,7 @@
 #import "NetworkConnection.h"
 #import "LicenseViewController.h"
 #import "AppDelegate.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation SettingsViewController
 
@@ -123,6 +124,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7) {
+        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
+        self.navigationController.view.backgroundColor = [UIColor navBarColor];
+    }
 
     int padding = 80;
     
