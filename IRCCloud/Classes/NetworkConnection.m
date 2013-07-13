@@ -1110,4 +1110,20 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         }];
     }
 }
+
+-(void)logout {
+    [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]];
+    //TODO: check the above result, and retry if it fails
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self disconnect];
+    [self cancelIdleTimer];
+    _reconnectTimestamp = 0;
+    [self clearPrefs];
+    [[ServersDataSource sharedInstance] clear];
+    [[UsersDataSource sharedInstance] clear];
+    [[ChannelsDataSource sharedInstance] clear];
+    [[EventsDataSource sharedInstance] clear];
+}
 @end

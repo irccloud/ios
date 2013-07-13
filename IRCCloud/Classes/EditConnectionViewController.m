@@ -375,6 +375,11 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+-(void)logoutButtonPressed:(id)sender {
+    [[NetworkConnection sharedInstance] logout];
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+}
+
 -(void)setServer:(int)cid {
     self.navigationItem.title = @"Edit Connection";
     _cid = cid;
@@ -475,9 +480,11 @@
         [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
         self.navigationController.view.backgroundColor = [UIColor navBarColor];
     }
-    if(self.presentingViewController)
+    if(self.presentingViewController) {
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-
+    } else {
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Logout" style:UIBarButtonItemStylePlain target:self action:@selector(logoutButtonPressed:)];
+    }
     NSDictionary *userInfo = [NetworkConnection sharedInstance].userInfo;
     NSString *name = [userInfo objectForKey:@"name"];
     int padding = 80;

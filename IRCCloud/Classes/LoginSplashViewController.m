@@ -98,19 +98,7 @@
         case kIRCEventFailureMsg:
             o = notification.object;
             if([[o objectForKey:@"message"] isEqualToString:@"auth"]) {
-                [[NetworkConnection sharedInstance] unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]];
-                //TODO: check the above result, and retry if it fails
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-                [_conn performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
-                [_conn performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
-                [_conn clearPrefs];
-                _conn.reconnectTimestamp = 0;
-                [[ServersDataSource sharedInstance] clear];
-                [[UsersDataSource sharedInstance] clear];
-                [[ChannelsDataSource sharedInstance] clear];
-                [[EventsDataSource sharedInstance] clear];
+                [_conn performSelectorOnMainThread:@selector(logout) withObject:nil waitUntilDone:YES];
                 [activity stopAnimating];
                 loginView.alpha = 1;
                 loadingView.alpha = 0;
