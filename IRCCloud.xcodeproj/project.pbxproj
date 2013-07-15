@@ -114,6 +114,7 @@
 		227FF2A116FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		227FF2A216FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		227FF8231772063F00394114 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF8221772063F00394114 /* SettingsViewController.m */; };
+		2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -362,6 +363,7 @@
 		227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HighlightsCountView.m; sourceTree = "<group>"; };
 		227FF8211772062E00394114 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		227FF8221772063F00394114 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
+		2283322F17944E2B00ED22EA /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A056F16D3DABA0029769C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -486,6 +488,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */,
 				22501740178340AB00066E71 /* Twitter.framework in Frameworks */,
 				22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */,
 				2223C6B61768F4500032544B /* ImageIO.framework in Frameworks */,
@@ -565,19 +568,20 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2250173F178340AB00066E71 /* Twitter.framework */,
-				22324FDF177DE51A008B6912 /* SystemConfiguration.framework */,
-				2223C6B51768F4500032544B /* ImageIO.framework */,
-				2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */,
-				2248DF3816EE375D0086BB42 /* libz.dylib */,
-				228A05D516D3DFD00029769C /* CoreText.framework */,
-				228A05CD16D3DD310029769C /* libicucore.dylib */,
-				228A05CB16D3DCE20029769C /* Security.framework */,
+				2283322F17944E2B00ED22EA /* AudioToolbox.framework */,
 				228A05C916D3DCB60029769C /* CFNetwork.framework */,
-				228A056F16D3DABA0029769C /* UIKit.framework */,
-				228A057116D3DABA0029769C /* Foundation.framework */,
 				228A057316D3DABA0029769C /* CoreGraphics.framework */,
+				228A05D516D3DFD00029769C /* CoreText.framework */,
+				228A057116D3DABA0029769C /* Foundation.framework */,
+				2223C6B51768F4500032544B /* ImageIO.framework */,
+				228A05CD16D3DD310029769C /* libicucore.dylib */,
+				2248DF3816EE375D0086BB42 /* libz.dylib */,
+				2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */,
+				228A05CB16D3DCE20029769C /* Security.framework */,
 				228A059616D3DABB0029769C /* SenTestingKit.framework */,
+				22324FDF177DE51A008B6912 /* SystemConfiguration.framework */,
+				2250173F178340AB00066E71 /* Twitter.framework */,
+				228A056F16D3DABA0029769C /* UIKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

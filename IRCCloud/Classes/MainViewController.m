@@ -48,6 +48,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &alertSound);
+    
     if(_swipeTip)
         _swipeTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
     
@@ -138,6 +140,11 @@
     [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     users.frame = CGRectMake(0,0,40,40);
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+}
+
+- (void)viewDidUnload {
+    [super viewDidUnload];
+    AudioServicesDisposeSystemSoundID(alertSound);
 }
 
 - (void)_updateUnreadIndicator {
@@ -446,21 +453,29 @@
             break;
         case kIRCEventBufferMsg:
             e = notification.object;
-            if(e.isHighlight && e.bid == _buffer.bid)
-                [self showMentionTip];
-            if([[e.from lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
-                for(Event *e in _pendingEvents) {
-                    [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
-                }
-                [_pendingEvents removeAllObjects];
-            } else {
-                int reqid = e.reqId;
-                for(Event *e in _pendingEvents) {
-                    if(e.reqId == reqid) {
+            if(e.bid == _buffer.bid) {
+                if(e.isHighlight)
+                    [self showMentionTip];
+                if([[e.from lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
+                    for(Event *e in _pendingEvents) {
                         [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
-                        [_pendingEvents removeObject:e];
-                        break;
                     }
+                    [_pendingEvents removeAllObjects];
+                } else {
+                    int reqid = e.reqId;
+                    for(Event *e in _pendingEvents) {
+                        if(e.reqId == reqid) {
+                            [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                            [_pendingEvents removeObject:e];
+                            break;
+                        }
+                    }
+                }
+            } else {
+                Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
+                if(b && e.isHighlight && [e isImportant:b.type]) {
+                    AudioServicesPlaySystemSound(alertSound);
+                    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
                 }
             }
             break;

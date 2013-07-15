@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AudioToolbox/AudioToolbox.h>
 #import "BuffersTableView.h"
 #import "UsersTableView.h"
 #import "EventsTableView.h"
@@ -49,6 +50,7 @@
     NSTimeInterval _eidToOpen;
     UIAlertView *_alertView;
     IRCCloudJSONObject *_alertObject;
+    SystemSoundID alertSound;
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;
