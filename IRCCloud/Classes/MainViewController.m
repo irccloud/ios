@@ -1170,10 +1170,10 @@
     } else {
         if(_buffer.archived) {
             [sheet addButtonWithTitle:@"Unarchive"];
-            [sheet addButtonWithTitle:@"Delete"];
         } else {
             [sheet addButtonWithTitle:@"Archive"];
         }
+        [sheet addButtonWithTitle:@"Delete"];
     }
     [sheet addButtonWithTitle:@"Ignore List"];
     [sheet addButtonWithTitle:@"Display Options"];
@@ -1517,6 +1517,8 @@
             //TODO: prompt for confirmation
             if([_buffer.type isEqualToString:@"console"]) {
                 [[NetworkConnection sharedInstance] deleteServer:_buffer.cid];
+            } else if(_buffer == nil || _buffer.bid == -1) {
+                [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
             } else {
                 [[NetworkConnection sharedInstance] deleteBuffer:_buffer.bid cid:_buffer.cid];
             }
