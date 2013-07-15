@@ -1465,11 +1465,13 @@
                 b.name = _selectedUser.nick;
                 b.type = @"conversation";
                 _buffer = b;
-                self.navigationItem.title = _selectedUser.nick;
                 [_buffersView setBuffer:b];
                 [_usersView setBuffer:b];
                 [_eventsView setBuffer:b];
                 [self _updateUserListVisibility];
+                [self _updateTitleArea];
+                if(self.slidingViewController)
+                    [self.slidingViewController resetTopView];
             }
         } else if([action isEqualToString:@"Whois"]) {
             [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
