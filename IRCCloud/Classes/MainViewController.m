@@ -414,6 +414,7 @@
             break;
         case kIRCEventUserInfo:
         case kIRCEventPart:
+        case kIRCEventKick:
             [self _updateUserListVisibility];
             break;
         case kIRCEventFailureMsg:
