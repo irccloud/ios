@@ -48,6 +48,7 @@
     NSTimer *_scrollTimer;
     Ignore *_ignore;
     NSRecursiveLock *_lock;
+    int _scrolledUpFrom;
     
     IBOutlet id<EventsTableViewDelegate> _delegate;
 }

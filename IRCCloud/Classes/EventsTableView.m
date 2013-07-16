@@ -129,6 +129,7 @@ int __timestampWidth;
         _buffer = nil;
         _ignore = [[Ignore alloc] init];
         _eidToOpen = -1;
+        _scrolledUpFrom = -1;
     }
     return self;
 }
@@ -674,6 +675,7 @@ int __timestampWidth;
             }
         }
         _scrolledUp = NO;
+        _scrolledUpFrom = -1;
     }
     _buffer = buffer;
     if(buffer)
@@ -754,11 +756,6 @@ int __timestampWidth;
         for(Event *e in events) {
             e.formatted = nil;
             [self insertEvent:e backlog:true nextIsGrouped:false];
-            if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && !e.isSelf && e.rowType != ROW_LASTSEENEID) {
-                _newMsgs++;
-                if(e.isHighlight)
-                    _newHighlights++;
-            }
         }
     }
     
@@ -835,6 +832,7 @@ int __timestampWidth;
             for(Event *e in _data) {
                 if(e.eid == _eidToOpen) {
                     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                    _scrolledUpFrom = [[[self.tableView indexPathsForVisibleRows] lastObject] row];
                     break;
                 }
                 i++;
@@ -842,6 +840,8 @@ int __timestampWidth;
             _eidToOpen = -1;
         } else {
             NSLog(@"Requested EID is in the future, not scrolling");
+            if(!_scrolledUp)
+                _scrolledUpFrom = -1;
         }
     } else if(!_scrolledUp || (_data.count && _scrollTimer)) {
         [self _scrollToBottom];
@@ -858,6 +858,16 @@ int __timestampWidth;
             [self updateTopUnread:firstRow];
         }
         _requestingBacklog = NO;
+        if(_scrolledUpFrom > 0) {
+            for(int i = _scrolledUpFrom; i < _data.count; i++) {
+                Event *e = [_data objectAtIndex:i];
+                if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && !e.isSelf && e.rowType != ROW_LASTSEENEID) {
+                    _newMsgs++;
+                    if(e.isHighlight)
+                        _newHighlights++;
+                }
+            }
+        }
     }
     
     if(_conn.state == kIRCCloudStateConnected)
@@ -1084,7 +1094,10 @@ int __timestampWidth;
                 if(_topUnreadView.alpha == 0)
                     [self _sendHeartbeat];
                 _scrolledUp = NO;
+                _scrolledUpFrom = -1;
             } else {
+                if(_scrolledUp)
+                    _scrolledUpFrom = lastRow;
                 _scrolledUp = YES;
             }
 
