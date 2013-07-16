@@ -673,6 +673,7 @@ int __timestampWidth;
                 break;
             }
         }
+        _scrolledUp = NO;
     }
     _buffer = buffer;
     if(buffer)
@@ -680,7 +681,6 @@ int __timestampWidth;
     else
         _server = nil;
     _earliestEid = 0;
-    _scrolledUp = NO;
     [_expandedSectionEids removeAllObjects];
     [self refresh];
 }
