@@ -357,7 +357,7 @@
     }
     if(indexPath.section == 3 && indexPath.row == 1) {
         [self dismissViewControllerAnimated:YES completion:^{
-            [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23ios"]];
+            [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
         }];
     }
     if(indexPath.section == 3 && indexPath.row == 2)
