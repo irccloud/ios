@@ -411,6 +411,12 @@
             url = [NSString stringWithFormat:@"mailto:%@", url];
             [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
         }
+        if(server) {
+            results = [[self ircChannelRegexForServer:server] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
+            if(results.count) {
+                [matches addObjectsFromArray:results];
+            }
+        }
         results = [[self webURL] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];;
         for(NSTextCheckingResult *result in results) {
             BOOL overlap = NO;
@@ -427,12 +433,6 @@
                 [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
             }
             overlap = NO;
-        }
-        if(server) {
-            results = [[self ircChannelRegexForServer:server] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
-            if(results.count) {
-                [matches addObjectsFromArray:results];
-            }
         }
     }
     if(links)
