@@ -405,18 +405,28 @@
     }
     
     if(linkify) {
-        NSArray *results = [[self webURL] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];;
-        for(NSTextCheckingResult *result in results) {
-            NSString *url = [[output string] substringWithRange:result.range];
-            if([url rangeOfString:@"://"].location == NSNotFound)
-                url = [NSString stringWithFormat:@"http://%@", url];
-            [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
-        }
-        results = [[self email] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];;
+        NSArray *results = [[self email] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];;
         for(NSTextCheckingResult *result in results) {
             NSString *url = [[output string] substringWithRange:result.range];
             url = [NSString stringWithFormat:@"mailto:%@", url];
             [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
+        }
+        results = [[self webURL] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];;
+        for(NSTextCheckingResult *result in results) {
+            BOOL overlap = NO;
+            for(NSTextCheckingResult *match in matches) {
+                if(result.range.location >= match.range.location && result.range.location <= match.range.location + match.range.length) {
+                    overlap = YES;
+                    break;
+                }
+            }
+            if(!overlap) {
+                NSString *url = [[output string] substringWithRange:result.range];
+                if([url rangeOfString:@"://"].location == NSNotFound)
+                    url = [NSString stringWithFormat:@"http://%@", url];
+                [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
+            }
+            overlap = NO;
         }
         if(server) {
             results = [[self ircChannelRegexForServer:server] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
