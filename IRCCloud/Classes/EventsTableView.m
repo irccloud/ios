@@ -832,7 +832,7 @@ int __timestampWidth;
             for(Event *e in _data) {
                 if(e.eid == _eidToOpen) {
                     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-                    _scrolledUpFrom = [[[self.tableView indexPathsForVisibleRows] lastObject] row];
+                    _scrolledUpFrom = [[_data objectAtIndex:[[[self.tableView indexPathsForVisibleRows] lastObject] row]] eid];
                     break;
                 }
                 i++;
@@ -859,9 +859,9 @@ int __timestampWidth;
         }
         _requestingBacklog = NO;
         if(_scrolledUpFrom > 0) {
-            for(int i = _scrolledUpFrom; i < _data.count; i++) {
-                Event *e = [_data objectAtIndex:i];
-                if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && !e.isSelf && e.rowType != ROW_LASTSEENEID) {
+            NSLog(@"Scrolled up from EID: %f", _scrolledUpFrom);
+            for(Event *e in _data) {
+                if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && e.eid > _scrolledUpFrom && !e.isSelf && e.rowType != ROW_LASTSEENEID) {
                     _newMsgs++;
                     if(e.isHighlight)
                         _newHighlights++;
@@ -1096,8 +1096,8 @@ int __timestampWidth;
                 _scrolledUp = NO;
                 _scrolledUpFrom = -1;
             } else {
-                if(_scrolledUp)
-                    _scrolledUpFrom = lastRow;
+                if(!_scrolledUp)
+                    _scrolledUpFrom = [[_data lastObject] eid];
                 _scrolledUp = YES;
             }
 
