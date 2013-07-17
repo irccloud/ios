@@ -942,6 +942,7 @@
 }
 
 -(void)bufferSelected:(int)bid {
+    BOOL changed = (_buffer.bid != bid);
     TFLog(@"BID selected: %i", bid);
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
         NSLog(@"** bid changed from %i to %i: Set eidToOpen to -1", _buffer.bid, bid);
@@ -951,21 +952,25 @@
     [self _updateTitleArea];
     [_buffersView setBuffer:_buffer];
     _eventsView.eidToOpen = _eidToOpen;
-    [UIView animateWithDuration:0.1 animations:^{
-        _eventsView.view.alpha=0;
-        _eventsView.topUnreadView.alpha=0;
-        _eventsView.bottomUnreadView.alpha=0;
-        _eventActivity.alpha=1;
-        [_eventActivity startAnimating];
-    } completion:^(BOOL finished){
-        [_eventsView setBuffer:_buffer];
+    if(changed) {
         [UIView animateWithDuration:0.1 animations:^{
-            _eventsView.view.alpha=1;
-            _eventActivity.alpha=0;
+            _eventsView.view.alpha=0;
+            _eventsView.topUnreadView.alpha=0;
+            _eventsView.bottomUnreadView.alpha=0;
+            _eventActivity.alpha=1;
+            [_eventActivity startAnimating];
         } completion:^(BOOL finished){
-            [_eventActivity stopAnimating];
+            [_eventsView setBuffer:_buffer];
+            [UIView animateWithDuration:0.1 animations:^{
+                _eventsView.view.alpha=1;
+                _eventActivity.alpha=0;
+            } completion:^(BOOL finished){
+                [_eventActivity stopAnimating];
+            }];
         }];
-    }];
+    } else {
+        [_eventsView setBuffer:_buffer];
+    }
     [_usersView setBuffer:_buffer];
     [self _updateUserListVisibility];
     [self _updateServerStatus];
