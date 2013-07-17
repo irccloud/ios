@@ -14,6 +14,19 @@
 
 @implementation ColorFormatter
 
++(NSRegularExpression *)email {
+    static NSRegularExpression *_pattern = nil;
+    if(!_pattern) {
+        //Ported from Android: https://github.com/android/platform_frameworks_base/blob/master/core/java/android/util/Patterns.java
+        NSString *pattern = @"[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}\\@[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+";
+        _pattern = [NSRegularExpression
+                    regularExpressionWithPattern:pattern
+                    options:0
+                    error:nil];
+    }
+    return _pattern;
+}
+
 +(NSRegularExpression *)webURL {
     static NSRegularExpression *_pattern = nil;
     if(!_pattern) {
@@ -397,6 +410,12 @@
             NSString *url = [[output string] substringWithRange:result.range];
             if([url rangeOfString:@"://"].location == NSNotFound)
                 url = [NSString stringWithFormat:@"http://%@", url];
+            [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
+        }
+        results = [[self email] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];;
+        for(NSTextCheckingResult *result in results) {
+            NSString *url = [[output string] substringWithRange:result.range];
+            url = [NSString stringWithFormat:@"mailto:%@", url];
             [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
         }
         if(server) {
