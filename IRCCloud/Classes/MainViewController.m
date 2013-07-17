@@ -942,7 +942,7 @@
 }
 
 -(void)bufferSelected:(int)bid {
-    BOOL changed = (_buffer.bid != bid);
+    BOOL changed = (_buffer && _buffer.bid != bid);
     TFLog(@"BID selected: %i", bid);
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
         NSLog(@"** bid changed from %i to %i: Set eidToOpen to -1", _buffer.bid, bid);
