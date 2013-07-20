@@ -185,10 +185,34 @@
         event.rowType = ROW_SOCKETCLOSED;
         event.color = [UIColor timestampColor];
         event.from = @"";
-        if([object objectForKey:@"reason"])
-            event.msg = [@"Failed to connect: " stringByAppendingString:[object objectForKey:@"reason"]];
-        else
+        NSString *reason = [object objectForKey:@"reason"];
+        if([reason isKindOfClass:[NSString class]] && [reason length]) {
+            if([reason isEqualToString:@"pool_lost"])
+                reason = @"Connection pool failed";
+            else if([reason isEqualToString:@"no_pool"])
+                reason = @"No available connection pools";
+            else if([reason isEqualToString:@"enetdown"])
+                reason = @"Network down";
+            else if([reason isEqualToString:@"etimedout"] || [reason isEqualToString:@"timeout"])
+                reason = @"Timed out";
+            else if([reason isEqualToString:@"ehostunreach"])
+                reason = @"Host unreachable";
+            else if([reason isEqualToString:@"econnrefused"])
+                reason = @"Connection refused";
+            else if([reason isEqualToString:@"nxdomain"])
+                reason = @"Invalid hostname";
+            else if([reason isEqualToString:@"server_ping_timeout"])
+                reason = @"PING timeout";
+            else if([reason isEqualToString:@"ssl_certificate_error"])
+                reason = @"SSL certificate error";
+            else if([reason isEqualToString:@"ssl_error"])
+                reason = @"SSL error";
+            else if([reason isEqualToString:@"crash"])
+                reason = @"Connection crashed";
+            event.msg = [@"Failed to connect: " stringByAppendingString:reason];
+        } else {
             event.msg = @"Failed to connect.";
+        }
     } else if([object.type isEqualToString:@"quit_server"]) {
         event.from = @"";
         event.msg = @"⇐ You disconnected";

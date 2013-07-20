@@ -993,18 +993,9 @@
     Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
     if(s && (![s.status isEqualToString:@"connected_ready"] || s.lag > 2*1000*1000 || ([s.away isKindOfClass:[NSString class]] && s.away.length))) {
         if(_serverStatusBar.hidden) {
-            CGRect frame = _eventsView.view.frame;
-            frame.size.height -= _serverStatusBar.frame.size.height;
-            _eventsView.view.frame = frame;
-            frame = _eventsView.bottomUnreadView.frame;
-            frame.origin.y -= _serverStatusBar.frame.size.height;
-            _eventsView.bottomUnreadView.frame = frame;
             _serverStatusBar.hidden = NO;
         }
         _serverStatusBar.backgroundColor = [UIColor backgroundBlueColor];
-        CGRect statusFrame = _serverStatus.frame;
-        statusFrame.origin.x = 8;
-        _serverStatus.frame = statusFrame;
         _serverStatus.textColor = [UIColor darkBlueColor];
         _serverStatus.font = [UIFont systemFontOfSize:FONT_SIZE];
         if([s.status isEqualToString:@"connected_ready"]) {
@@ -1024,9 +1015,29 @@
         } else if([s.status isEqualToString:@"disconnected"]) {
             NSString *reason = [s.fail_info objectForKey:@"reason"];
             if([reason isKindOfClass:[NSString class]] && [reason length]) {
-                if([reason isEqualToString:@"nxdomain"])
+                if([reason isEqualToString:@"pool_lost"])
+                    reason = @"Connection pool failed";
+                else if([reason isEqualToString:@"no_pool"])
+                    reason = @"No available connection pools";
+                else if([reason isEqualToString:@"enetdown"])
+                    reason = @"Network down";
+                else if([reason isEqualToString:@"etimedout"] || [reason isEqualToString:@"timeout"])
+                    reason = @"Timed out";
+                else if([reason isEqualToString:@"ehostunreach"])
+                    reason = @"Host unreachable";
+                else if([reason isEqualToString:@"econnrefused"])
+                    reason = @"Connection refused";
+                else if([reason isEqualToString:@"nxdomain"])
                     reason = @"Invalid hostname";
-                _serverStatus.text = [NSString stringWithFormat:@"Disconnected: Failed to connect - %@", reason];
+                else if([reason isEqualToString:@"server_ping_timeout"])
+                    reason = @"PING timeout";
+                else if([reason isEqualToString:@"ssl_certificate_error"])
+                    reason = @"SSL certificate error";
+                else if([reason isEqualToString:@"ssl_error"])
+                    reason = @"SSL error";
+                else if([reason isEqualToString:@"crash"])
+                    reason = @"Connection crashed";
+                _serverStatus.text = [NSString stringWithFormat:@"Disconnected: %@", reason];
                 _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
                 _serverStatus.textColor = [UIColor networkErrorColor];
             } else {
@@ -1048,6 +1059,30 @@
             double seconds = ([[s.fail_info objectForKey:@"timestamp"] doubleValue] + [[s.fail_info objectForKey:@"retry_timeout"] intValue]) - [[NSDate date] timeIntervalSince1970];
             if(seconds > 0) {
                 NSString *reason = [s.fail_info objectForKey:@"reason"];
+                if([reason isKindOfClass:[NSString class]] && [reason length]) {
+                    if([reason isEqualToString:@"pool_lost"])
+                        reason = @"Connection pool failed";
+                    else if([reason isEqualToString:@"no_pool"])
+                        reason = @"No available connection pools";
+                    else if([reason isEqualToString:@"enetdown"])
+                        reason = @"Network down";
+                    else if([reason isEqualToString:@"etimedout"] || [reason isEqualToString:@"timeout"])
+                        reason = @"Timed out";
+                    else if([reason isEqualToString:@"ehostunreach"])
+                        reason = @"Host unreachable";
+                    else if([reason isEqualToString:@"econnrefused"])
+                        reason = @"Connection refused";
+                    else if([reason isEqualToString:@"nxdomain"])
+                        reason = @"Invalid hostname";
+                    else if([reason isEqualToString:@"server_ping_timeout"])
+                        reason = @"PING timeout";
+                    else if([reason isEqualToString:@"ssl_certificate_error"])
+                        reason = @"SSL certificate error";
+                    else if([reason isEqualToString:@"ssl_error"])
+                        reason = @"SSL error";
+                    else if([reason isEqualToString:@"crash"])
+                        reason = @"Connection crashed";
+                }
                 NSString *text = @"Disconnected";
                 if([reason isKindOfClass:[NSString class]] && [reason length])
                     text = [text stringByAppendingFormat:@": %@, ", reason];
@@ -1066,6 +1101,22 @@
         } else {
             TFLog(@"Unhandled server status: %@", s.status);
         }
+        CGRect frame = _serverStatus.frame;
+        frame.origin.x = 8;
+        frame.origin.y = 4;
+        frame.size.width = _serverStatusBar.frame.size.width - 16;
+        frame.size.height = [_serverStatus.text sizeWithFont:_serverStatus.font constrainedToSize:CGSizeMake(frame.size.width, INT_MAX) lineBreakMode:_serverStatus.lineBreakMode].height;
+        _serverStatus.frame = frame;
+        frame = _serverStatusBar.frame;
+        frame.size.height = _serverStatus.frame.size.height + 8;
+        frame.origin.y = _bottomBar.frame.origin.y - frame.size.height;
+        _serverStatusBar.frame = frame;
+        frame = _eventsView.view.frame;
+        frame.size.height = _serverStatusBar.frame.origin.y;
+        _eventsView.view.frame = frame;
+        frame = _eventsView.bottomUnreadView.frame;
+        frame.origin.y -= _serverStatusBar.frame.size.height;
+        _eventsView.bottomUnreadView.frame = frame;
     } else {
         if(!_serverStatusBar.hidden) {
             CGRect frame = _eventsView.view.frame;

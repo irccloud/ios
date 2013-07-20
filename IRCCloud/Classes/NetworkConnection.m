@@ -986,6 +986,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(backlog) {
             if(_totalBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
                 if(object.bid != _currentBid) {
+                    NSLog(@"Count: %i", _currentCount);
                     if(_currentBid != -1 && _currentCount >= BACKLOG_BUFFER_MAX) {
                         [_events removeEventsBefore:_firstEID buffer:_currentBid];
                     }
