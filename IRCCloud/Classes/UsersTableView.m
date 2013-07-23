@@ -95,6 +95,10 @@
     [self performSelector:@selector(refresh) withObject:nil afterDelay:0.15];
 }
 
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    [self.tableView reloadData];
+}
+
 - (void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     switch(event) {
@@ -190,11 +194,11 @@
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
     
-    if(self.slidingViewController) {
+    if(!delegate)
         delegate = (id<UsersTableViewDelegate>)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
-        self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        self.view.backgroundColor = [UIColor backgroundBlueColor];
-    }
+
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.view.backgroundColor = [UIColor backgroundBlueColor];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];

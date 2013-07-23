@@ -187,6 +187,14 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   [self.topViewSnapshot addGestureRecognizer:self.resetTapGesture];
 }
 
+-(NSUInteger)supportedInterfaceOrientations {
+    return [self.topViewController supportedInterfaceOrientations];
+}
+
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    return [self.topViewController shouldAutorotateToInterfaceOrientation:orientation];
+}
+
 - (BOOL)gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)recognizer {
     CGPoint velocity = [recognizer velocityInView:self.view];
     return ABS(velocity.x) > ABS(velocity.y);

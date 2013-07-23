@@ -94,51 +94,44 @@
     _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,8,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
     [_bottomBar addSubview:_sendBtn];
     
-    if(_buffersView)
-        [self addChildViewController:_buffersView];
     [self addChildViewController:_eventsView];
     
-    if(_usersView)
-        [self addChildViewController:_usersView];
-    
-    if(self.slidingViewController) {
+    if(!_buffersView)
         _buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
+    
+    if(!_usersView)
         _usersView = [[UsersTableView alloc] initWithStyle:UITableViewStylePlain];
-        self.slidingViewController.shouldAllowPanningPastAnchor = NO;
-        self.slidingViewController.underLeftViewController = _buffersView;
-        self.slidingViewController.underRightViewController = _usersView;
-        self.slidingViewController.anchorLeftRevealAmount = 240;
-        self.slidingViewController.anchorRightRevealAmount = 240;
-        self.slidingViewController.underLeftWidthLayout = ECFixedRevealWidth;
-        self.slidingViewController.underRightWidthLayout = ECFixedRevealWidth;
+    self.slidingViewController.shouldAllowPanningPastAnchor = NO;
+    self.slidingViewController.underLeftViewController = _buffersView;
+    self.slidingViewController.underRightViewController = _usersView;
+    self.slidingViewController.anchorLeftRevealAmount = 240;
+    self.slidingViewController.anchorRightRevealAmount = 240;
+    self.slidingViewController.underLeftWidthLayout = ECFixedRevealWidth;
+    self.slidingViewController.underRightWidthLayout = ECFixedRevealWidth;
 
-        self.navigationController.view.layer.shadowOpacity = 0.75f;
-        self.navigationController.view.layer.shadowRadius = 2.0f;
-        self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
+    self.navigationController.view.layer.shadowOpacity = 0.75f;
+    self.navigationController.view.layer.shadowRadius = 2.0f;
+    self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
 
-        _menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
-        [_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-        _menuBtn.frame = CGRectMake(0,0,32,32);
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
-        
-        [_swipeTip removeFromSuperview];
-        [self.slidingViewController.view addSubview:_swipeTip];
+    _menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
+    [_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    _menuBtn.frame = CGRectMake(0,0,32,32);
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
+    
+    [_swipeTip removeFromSuperview];
+    [self.slidingViewController.view addSubview:_swipeTip];
 
-        [_mentionTip removeFromSuperview];
-        [self.slidingViewController.view addSubview:_mentionTip];
-    }
+    [_mentionTip removeFromSuperview];
+    [self.slidingViewController.view addSubview:_mentionTip];
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        _startHeight = [UIScreen mainScreen].applicationFrame.size.height;
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,208,36)];
         _message.maximumNumberOfLines = 8;
+        _landscapeView = [[UIView alloc] initWithFrame:CGRectZero];
     } else {
-        _startHeight = [UIScreen mainScreen].applicationFrame.size.width - self.navigationController.navigationBar.frame.size.height;
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,472,36)];
     }
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
-        _startHeight += [UIApplication sharedApplication].statusBarFrame.size.height;
     _message.minimumHeight = 36;
     [_message sizeToFit];
     _message.delegate = self;
@@ -508,8 +501,7 @@
         default:
             break;
     }
-    if(self.slidingViewController)
-        [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
+    [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
 }
 
 -(void)_showConnectingView {
@@ -581,9 +573,7 @@
     if(_buffer && !_urlToOpen && _bidToOpen == -1 && _eidToOpen < 1) {
         [self _updateServerStatus];
         [self _updateUserListVisibility];
-        if(self.slidingViewController) {
-            [self _updateUnreadIndicator];
-        }
+        [self _updateUnreadIndicator];
     } else {
         [[NSNotificationCenter defaultCenter] removeObserver:_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
         int bid = [BuffersDataSource sharedInstance].firstBid;
@@ -615,18 +605,30 @@
     [UIView setAnimationBeginsFromCurrentState:YES];
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
+
+    int height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height;
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
+        height += [UIApplication sharedApplication].statusBarFrame.size.height;
+#endif
     
-    if(self.slidingViewController) {
-        CGRect frame = self.slidingViewController.view.frame;
-        frame.size.height = _startHeight - keyboardSize.height;
-        self.slidingViewController.view.frame = frame;
-    } else {
-        CGRect frame = self.view.frame;
-        frame.size.height = _startHeight - keyboardSize.height;
-        self.view.frame = frame;
-    }
+    CGRect frame = self.slidingViewController.view.frame;
+    if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
+        frame.origin.y = keyboardSize.height;
+    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
+        frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height;
+    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
+        frame.origin.x = keyboardSize.height;
+    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
+        frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width;
+    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))
+        frame.size.width = height - keyboardSize.height;
+    else
+        frame.size.height = height - keyboardSize.height;
+    self.slidingViewController.view.frame = frame;
     
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+    [_buffersView scrollViewDidScroll:_buffersView.tableView];
     
     [UIView commitAnimations];
 }
@@ -638,17 +640,26 @@
     [UIView setAnimationBeginsFromCurrentState:YES];
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
+
+    int height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height;
     
-    if(self.slidingViewController) {
-        CGRect frame = self.slidingViewController.view.frame;
-        frame.size.height = _startHeight;
-        self.slidingViewController.view.frame = frame;
-    } else {
-        CGRect frame = self.view.frame;
-        frame.size.height = _startHeight;
-        self.view.frame = frame;
-    }
+    CGRect frame = self.slidingViewController.view.frame;
+    if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
+        frame.origin.y = 0;
+    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
+        frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height;
+    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
+        frame.origin.x = 0;
+    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
+        frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width;
+    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))
+        frame.size.width = height;
+    else
+        frame.size.height = height;
+    self.slidingViewController.view.frame = frame;
+
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+    [_buffersView scrollViewDidScroll:_buffersView.tableView];
     [UIView commitAnimations];
 }
 
@@ -671,21 +682,13 @@
     } else {
         [self bufferSelected:_buffer.bid];
     }
-    [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.clipsToBounds = YES;
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [self _updateTitleArea];
-    if(self.slidingViewController) {
-        [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
-        CGRect frame = self.slidingViewController.view.frame;
-        frame.size.height = _startHeight;
-        self.slidingViewController.view.frame = frame;
-        [self _updateUnreadIndicator];
-        [self.slidingViewController resetTopView];
-    } else {
-        CGRect frame = self.view.frame;
-        frame.size.height = _startHeight;
-        self.view.frame = frame;
-    }
+    [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
+    [self _updateUnreadIndicator];
+    [self.slidingViewController resetTopView];
     [_message resignFirstResponder];
     self.navigationItem.titleView = _titleView;
     [self connectivityChanged:nil];
@@ -729,9 +732,7 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    if(self.slidingViewController) {
-        [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
-    }
+    [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_doubleTapTimer invalidate];
     _doubleTapTimer = nil;
@@ -983,10 +984,8 @@
     [_usersView setBuffer:_buffer];
     [self _updateUserListVisibility];
     [self _updateServerStatus];
-    if(self.slidingViewController) {
-        [self.slidingViewController resetTopView];
-        [self _updateUnreadIndicator];
-    }
+    [self.slidingViewController resetTopView];
+    [self _updateUnreadIndicator];
 }
 
 -(void)_updateServerStatus {
@@ -1130,9 +1129,84 @@
     }
 }
 
+-(NSUInteger)supportedInterfaceOrientations {
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
+}
+
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    return YES;
+}
+
+-(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    [self.slidingViewController resetTopView];
+    int height = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - self.navigationController.navigationBar.frame.size.height;
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
+        _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
+        CGRect frame = _titleView.frame;
+        frame.size.width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?400:210;
+        frame.size.height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?24:40;
+        _titleView.frame = frame;
+        _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
+        _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
+        _topicLabel.alpha = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?0:1;
+        _message.maximumNumberOfLines = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?4:8;
+    } else {
+        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+            self.navigationItem.leftBarButtonItem = nil;
+            self.navigationItem.rightBarButtonItem = nil;
+            self.slidingViewController.underLeftViewController = nil;
+            self.slidingViewController.underRightViewController = nil;
+            [self addChildViewController:_buffersView];
+            [self addChildViewController:_usersView];
+            _buffersView.view.frame = CGRectMake(0,0,220,height);
+            _eventsView.view.frame = CGRectMake(220,0,(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width) - 440,height - _bottomBar.frame.size.height);
+            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,0,220,height);
+            _bottomBar.frame = CGRectMake(220,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
+            _borders.frame = CGRectMake(219,0,_eventsView.view.frame.size.width + 2,height);
+            [_buffersView viewWillAppear:NO];
+            [self.view insertSubview:_buffersView.view atIndex:1];
+            [_usersView viewWillAppear:NO];
+            [self.view insertSubview:_usersView.view atIndex:1];
+            _borders.hidden = NO;
+            CGRect frame = _titleView.frame;
+            frame.size.width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
+            _titleView.frame = frame;
+        } else {
+            [_buffersView.view removeFromSuperview];
+            [_usersView.view removeFromSuperview];
+            _borders.hidden = YES;
+            if(!self.slidingViewController.underLeftViewController)
+                self.slidingViewController.underLeftViewController = _buffersView;
+            if(!self.navigationItem.leftBarButtonItem)
+                self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
+            _buffersView.view.frame = CGRectMake(0,0,220,height);
+            _usersView.view.frame = CGRectMake(0,0,220,height);
+            _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
+            _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
+            CGRect frame = _titleView.frame;
+            frame.size.width = 666;
+            _titleView.frame = frame;
+        }
+    }
+    if(duration > 0) {
+        _eventsView.view.hidden = YES;
+        [_eventActivity startAnimating];
+    }
+}
+
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    _eventsView.view.hidden = NO;
+    [_eventActivity stopAnimating];
+    [self _updateUserListVisibility];
+}
+
 -(void)_updateUserListVisibility {
-    [[NSOperationQueue mainQueue]  addOperationWithBlock:^{
-    if(self.slidingViewController) {
+    if(![NSThread currentThread].isMainThread) {
+        [self performSelectorOnMainThread:@selector(_updateUserListVisibility) withObject:nil waitUntilDone:YES];
+        return;
+    }
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
             self.navigationItem.rightBarButtonItem = _usersButtonItem;
             if(self.slidingViewController.underRightViewController == nil)
@@ -1142,37 +1216,45 @@
             self.slidingViewController.underRightViewController = nil;
         }
     } else {
-        if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
-            CGRect frame = _eventsView.view.frame;
-            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
-            _eventsView.view.frame = frame;
-            frame = _bottomBar.frame;
-            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
-            _bottomBar.frame = frame;
-            frame = _serverStatusBar.frame;
-            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
-            _serverStatusBar.frame = frame;
-            _usersView.view.hidden = NO;
-            frame = _borders.frame;
-            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width + 2;
-            _borders.frame = frame;
+        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+            if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+                CGRect frame = _eventsView.view.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+                _eventsView.view.frame = frame;
+                frame = _bottomBar.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+                _bottomBar.frame = frame;
+                frame = _serverStatusBar.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+                _serverStatusBar.frame = frame;
+                _usersView.view.hidden = NO;
+                frame = _borders.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width + 2;
+                _borders.frame = frame;
+            } else {
+                CGRect frame = _eventsView.view.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+                _eventsView.view.frame = frame;
+                frame = _bottomBar.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+                _bottomBar.frame = frame;
+                frame = _serverStatusBar.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+                _serverStatusBar.frame = frame;
+                _usersView.view.hidden = YES;
+                frame = _borders.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width + 2;
+                _borders.frame = frame;
+            }
         } else {
-            CGRect frame = _eventsView.view.frame;
-            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
-            _eventsView.view.frame = frame;
-            frame = _bottomBar.frame;
-            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
-            _bottomBar.frame = frame;
-            frame = _serverStatusBar.frame;
-            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
-            _serverStatusBar.frame = frame;
-            _usersView.view.hidden = YES;
-            frame = _borders.frame;
-            frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width + 2;
-            _borders.frame = frame;
+            if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+                self.navigationItem.rightBarButtonItem = _usersButtonItem;
+                if(!self.slidingViewController.underRightViewController)
+                    self.slidingViewController.underRightViewController = _usersView;
+            } else {
+            }
         }
     }
-    }];
 }
 
 -(void)showMentionTip {
@@ -1260,10 +1342,12 @@
     [sheet addButtonWithTitle:@"Settings"];
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-    if(self.slidingViewController)
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        [self.view.window addSubview:_landscapeView];
+        [sheet showInView:_landscapeView];
+    } else {
         [sheet showInView:self.slidingViewController.view.superview];
-    else
-        [sheet showInView:self.view.superview];
+    }
 }
 
 -(void)dismissKeyboard {
@@ -1306,9 +1390,7 @@
 
     [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"mentionTip"];
     
-    if(self.slidingViewController) {
-        [self.slidingViewController resetTopView];
-    }
+    [self.slidingViewController resetTopView];
     
     if(_message.text.length == 0) {
         _message.text = [NSString stringWithFormat:@"%@: ",_selectedUser.nick];
@@ -1406,7 +1488,12 @@
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-        [sheet showInView:self.slidingViewController.view.superview];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+            [self.view.window addSubview:_landscapeView];
+            [sheet showInView:_landscapeView];
+        } else {
+            [sheet showInView:self.slidingViewController.view.superview];
+        }
     } else {
         if(_selectedEvent)
             [sheet showFromRect:rect inView:_eventsView.tableView animated:NO];
@@ -1526,6 +1613,7 @@
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    [_landscapeView removeFromSuperview];
     [_message resignFirstResponder];
     if(buttonIndex != -1) {
         NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
@@ -1550,8 +1638,7 @@
                 [_eventsView setBuffer:b];
                 [self _updateUserListVisibility];
                 [self _updateTitleArea];
-                if(self.slidingViewController)
-                    [self.slidingViewController resetTopView];
+                [self.slidingViewController resetTopView];
             }
         } else if([action isEqualToString:@"Whois"]) {
             [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];

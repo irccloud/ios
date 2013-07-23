@@ -38,6 +38,10 @@
     } else {
         self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPad" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPad" bundle:nil];
+        self.slideViewController = [[ECSlidingViewController alloc] init];
+        self.slideViewController.view.backgroundColor = [UIColor backgroundBlueColor];
+        self.slideViewController.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+        self.slideViewController.topViewController.view.backgroundColor = [UIColor navBarColor];
     }
     if(launchOptions && [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]) {
         self.mainViewController.bidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:1] intValue];
@@ -109,11 +113,7 @@
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if([[ServersDataSource sharedInstance] count]) {
             [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
-            if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-                self.window.rootViewController = self.slideViewController;
-            } else {
-                self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
-            }
+            self.window.rootViewController = self.slideViewController;
         } else {
             [self showConnectionView];
         }

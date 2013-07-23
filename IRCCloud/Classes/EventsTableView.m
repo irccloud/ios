@@ -171,6 +171,28 @@ int __timestampWidth;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+-(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    if(_data.count && _scrolledUp)
+        _bottomRow = [[[self.tableView indexPathsForVisibleRows] lastObject] row];
+    else
+        _bottomRow = -1;
+}
+
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    [_lock lock];
+    for(Event *e in _data) {
+        e.height = 0;
+    }
+    [_lock unlock];
+    [self.tableView reloadData];
+    if(_bottomRow >= 0) {
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+        _bottomRow = -1;
+    } else {
+        [self _scrollToBottom];
+    }
+}
+
 - (void)backlogCompleted:(NSNotification *)notification {
     if([notification.object bid] == -1 || (_buffer && [notification.object bid] == _buffer.bid)) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{

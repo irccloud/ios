@@ -46,7 +46,6 @@
     UIButton *_sendBtn;
     UIBarButtonItem *_usersButtonItem;
     Buffer *_buffer;
-    int _startHeight;
     User *_selectedUser;
     Event *_selectedEvent;
     CGRect _selectedRect;
@@ -60,6 +59,7 @@
     UIAlertView *_alertView;
     IRCCloudJSONObject *_alertObject;
     SystemSoundID alertSound;
+    UIView *_landscapeView;
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;
