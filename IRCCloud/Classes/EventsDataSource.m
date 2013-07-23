@@ -72,6 +72,7 @@
     self = [super init];
     _events = [[NSMutableDictionary alloc] init];
     _highestEid = 0;
+    _dirty = YES;
     return self;
 }
 
@@ -90,6 +91,7 @@
             [_events setObject:events forKey:@(event.bid)];
         }
         [events addObject:event];
+        _dirty = YES;
     }
 }
 
@@ -100,6 +102,7 @@
         event.bid = object.bid;
         [self addEvent: event];
     }
+    _dirty = YES;
     
     event.cid = object.cid;
     event.bid = object.bid;
@@ -422,6 +425,7 @@
                 break;
             }
         }
+        _dirty = YES;
     }
 }
 
@@ -433,7 +437,11 @@
 
 -(NSArray *)eventsForBuffer:(int)bid {
     @synchronized(_events) {
-        return [[_events objectForKey:@(bid)] sortedArrayUsingSelector:@selector(compare:)];
+        if(_dirty) {
+            [[_events objectForKey:@(bid)] sortedArrayUsingSelector:@selector(compare:)];
+            _dirty = NO;
+        }
+        return [_events objectForKey:@(bid)];
     }
 }
 

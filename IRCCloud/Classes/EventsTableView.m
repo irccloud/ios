@@ -290,7 +290,13 @@ int __timestampWidth;
             }
             break;
         case kIRCEventSetIgnores:
+            [self refresh];
+            break;
         case kIRCEventUserInfo:
+            for(Event *e in _data) {
+                e.formatted = nil;
+                e.timestamp = nil;
+            }
             [self refresh];
             break;
         default:
@@ -568,19 +574,21 @@ int __timestampWidth;
     int insertPos = -1;
     NSString *lastDay = nil;
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
-    if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]) {
-        if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-            [_formatter setDateFormat:@"H:mm:ss"];
-        else
-            [_formatter setDateFormat:@"H:mm"];
-    } else if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue]) {
-        [_formatter setDateFormat:@"h:mm:ss a"];
-    } else {
-        [_formatter setDateFormat:@"h:mm a"];
-    }
+    if(!e.timestamp) {
+        if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]) {
+            if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
+                [_formatter setDateFormat:@"H:mm:ss"];
+            else
+                [_formatter setDateFormat:@"H:mm"];
+        } else if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue]) {
+            [_formatter setDateFormat:@"h:mm:ss a"];
+        } else {
+            [_formatter setDateFormat:@"h:mm a"];
+        }
 
-    e.timestamp = [_formatter stringFromDate:date];
-    e.groupEid = _currentCollapsedEid;
+        e.timestamp = [_formatter stringFromDate:date];
+        e.groupEid = _currentCollapsedEid;
+    }
     if(e.groupMsg && !e.formattedMsg) {
         e.formattedMsg = e.groupMsg;
         e.formatted = nil;
@@ -704,6 +712,8 @@ int __timestampWidth;
                 [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
                 break;
             }
+            event.formatted = nil;
+            event.timestamp = nil;
         }
         _scrolledUp = NO;
         _scrolledUpFrom = -1;
@@ -785,7 +795,6 @@ int __timestampWidth;
             self.tableView.tableHeaderView = nil;
         }
         for(Event *e in events) {
-            e.formatted = nil;
             [self insertEvent:e backlog:true nextIsGrouped:false];
         }
     }
@@ -1165,6 +1174,10 @@ int __timestampWidth;
                     [_expandedSectionEids removeObjectForKey:@(group)];
                 else
                     [_expandedSectionEids setObject:@(YES) forKey:@(group)];
+                for(Event *e in _data) {
+                    e.timestamp = nil;
+                    e.formatted = nil;
+                }
                 [self refresh];
             }
         } else if(indexPath.row < _data.count) {
