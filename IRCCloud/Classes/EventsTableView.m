@@ -194,6 +194,10 @@ int __timestampWidth;
 }
 
 - (void)backlogCompleted:(NSNotification *)notification {
+    if(_buffer && [notification.object bid] == _buffer.bid) {
+        if([[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] == nil)
+            _buffer.min_eid = -1;
+    }
     if([notification.object bid] == -1 || (_buffer && [notification.object bid] == _buffer.bid)) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
