@@ -30,6 +30,14 @@
     return self;
 }
 
+-(NSUInteger)supportedInterfaceOrientations {
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
+}
+
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    return YES;
+}
+
 -(void)saveButtonPressed:(id)sender {
     NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[[NetworkConnection sharedInstance] prefs]];
     NSMutableDictionary *disableTrackUnread = [[NSMutableDictionary alloc] init];

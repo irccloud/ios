@@ -607,6 +607,7 @@
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
 
     int height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height;
+    int width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
         height += [UIApplication sharedApplication].statusBarFrame.size.height;
@@ -621,10 +622,13 @@
         frame.origin.x = keyboardSize.height;
     else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
         frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width;
-    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))
+    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
         frame.size.width = height - keyboardSize.height;
-    else
+        frame.size.height = width;
+    } else {
+        frame.size.width = width;
         frame.size.height = height - keyboardSize.height;
+    }
     self.slidingViewController.view.frame = frame;
     
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
@@ -642,6 +646,7 @@
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
 
     int height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height;
+    int width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
     
     CGRect frame = self.slidingViewController.view.frame;
     if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
@@ -652,11 +657,15 @@
         frame.origin.x = 0;
     else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
         frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width;
-    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))
+    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
         frame.size.width = height;
-    else
+        frame.size.height = width;
+    } else {
+        frame.size.width = width;
         frame.size.height = height;
+    }
     self.slidingViewController.view.frame = frame;
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
@@ -685,11 +694,9 @@
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.clipsToBounds = YES;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
-    [self _updateTitleArea];
     [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
     [self _updateUnreadIndicator];
     [self.slidingViewController resetTopView];
-    [_message resignFirstResponder];
     self.navigationItem.titleView = _titleView;
     [self connectivityChanged:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
@@ -864,7 +871,7 @@
         _titleLabel.font = [UIFont boldSystemFontOfSize:18];
         _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
         _topicLabel.text = [NSString stringWithFormat:@"%@:%i", s.hostname, s.port];
-        _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleView.bounds.size].width)/2 - 20,4,16,16);
+        _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,16);
         _lock.hidden = NO;
         if(s.ssl > 0)
             _lock.image = [UIImage imageNamed:@"world_shield"];
@@ -1193,6 +1200,7 @@
         _eventsView.view.hidden = YES;
         [_eventActivity startAnimating];
     }
+    [self _updateTitleArea];
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {

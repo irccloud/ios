@@ -56,7 +56,7 @@
     frame.origin.x = 6;
     frame.size.width -= 12;
     
-    float maskHeight = [_mask.text sizeWithFont:_mask.font forWidth:frame.size.width lineBreakMode:_mask.lineBreakMode].height;
+    float maskHeight = [_mask.text sizeWithFont:_mask.font constrainedToSize:CGSizeMake(frame.size.width,INT_MAX) lineBreakMode:_mask.lineBreakMode].height;
     _mask.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, maskHeight);
     _setBy.frame = CGRectMake(frame.origin.x, frame.origin.y + maskHeight, frame.size.width, frame.size.height - maskHeight);
 }
@@ -80,6 +80,14 @@
         _placeholder.textAlignment = UITextAlignmentCenter;
     }
     return self;
+}
+
+-(NSUInteger)supportedInterfaceOrientations {
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
+}
+
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    return YES;
 }
 
 -(void)viewDidLoad {

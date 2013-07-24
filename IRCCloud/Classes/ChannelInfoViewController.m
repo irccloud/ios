@@ -32,6 +32,14 @@
     return self;
 }
 
+-(NSUInteger)supportedInterfaceOrientations {
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
+}
+
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    return YES;
+}
+
 -(void)viewDidLoad {
     [super viewDidLoad];
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
@@ -57,6 +65,7 @@
 }
 
 -(void)cancelButtonPressed:(id)sender {
+    [self.tableView endEditing:YES];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
