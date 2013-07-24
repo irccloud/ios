@@ -20,6 +20,7 @@
 #import "LicenseViewController.h"
 #import "AppDelegate.h"
 #import "UIColor+IRCCloud.h"
+#import "OpenInChromeController.h"
 
 @implementation SettingsViewController
 
@@ -29,6 +30,8 @@
         self.navigationItem.title = @"Settings";
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+        OpenInChromeController *c = [[OpenInChromeController alloc] init];
+        _chromeInstalled = [c isChromeInstalled];
     }
     return self;
 }
@@ -47,6 +50,10 @@
     _prefssaved = NO;
     _userinforeqid = [[NetworkConnection sharedInstance] setEmail:_email.text realname:_name.text highlights:_highlights.text autoaway:_autoaway.isOn];
     _prefsreqid = [[NetworkConnection sharedInstance] setPrefs:json];
+    
+    [[NSUserDefaults standardUserDefaults] setBool:_screen.on forKey:@"keepScreenOn"];
+    [[NSUserDefaults standardUserDefaults] setBool:_chrome.on forKey:@"useChrome"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 -(void)cancelButtonPressed:(id)sender {
@@ -129,6 +136,9 @@
     if([[prefs objectForKey:@"mode-showsymbol"] isKindOfClass:[NSNumber class]]) {
         _symbols.on = [[prefs objectForKey:@"mode-showsymbol"] boolValue];
     }
+    
+    _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
+    _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
 }
 
 - (void)viewDidLoad {
@@ -171,6 +181,8 @@
     _24hour = [[UISwitch alloc] init];
     _seconds = [[UISwitch alloc] init];
     _symbols = [[UISwitch alloc] init];
+    _screen = [[UISwitch alloc] init];
+    _chrome = [[UISwitch alloc] init];
 
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
         _highlights = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - padding, 70)];
@@ -218,7 +230,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 4;
+    return 5;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -230,6 +242,8 @@
         case 2:
             return 3;
         case 3:
+            return (_chromeInstalled)?2:1;
+        case 4:
             return 4;
     }
     return 0;
@@ -244,6 +258,8 @@
         case 2:
             return @"Display";
         case 3:
+            return @"Device";
+        case 4:
             return @"About";
     }
     return nil;
@@ -297,6 +313,18 @@
             }
             break;
         case 3:
+            switch(row) {
+                case 0:
+                    cell.textLabel.text = @"Keep screen on";
+                    cell.accessoryView = _screen;
+                    break;
+                case 1:
+                    cell.textLabel.text = @"Open URLs in Chrome";
+                    cell.accessoryView = _chrome;
+                    break;
+            }
+            break;
+        case 4:
             switch(row) {
                 case 0:
                     cell.textLabel.text = @"FAQ";
@@ -361,15 +389,15 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
-    if(indexPath.section == 3 && indexPath.row == 0) {
+    if(indexPath.section == 4 && indexPath.row == 0) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];
     }
-    if(indexPath.section == 3 && indexPath.row == 1) {
+    if(indexPath.section == 4 && indexPath.row == 1) {
         [self dismissViewControllerAnimated:YES completion:^{
             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
         }];
     }
-    if(indexPath.section == 3 && indexPath.row == 2)
+    if(indexPath.section == 4 && indexPath.row == 2)
         [self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];
 }
 

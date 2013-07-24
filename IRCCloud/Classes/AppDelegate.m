@@ -68,9 +68,9 @@
         NSString *l = [url.path lowercaseString];
         if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"]) {
             [self showImage:url];
-        } else if(![_openInChromeController openInChrome:url
+        } else if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_openInChromeController openInChrome:url
                                          withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                                            createNewTab:NO])
+                                            createNewTab:NO]))
             [[UIApplication sharedApplication] openURL:url];
     }
 }

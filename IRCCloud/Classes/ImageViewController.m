@@ -143,9 +143,9 @@
     }
     if(!data || !img) {
         [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
-        if(![_chrome openInChrome:_url
+        if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
                   withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                     createNewTab:NO])
+                     createNewTab:NO]))
             [[UIApplication sharedApplication] openURL:_url];
     }
 }
@@ -172,10 +172,10 @@
 
 -(IBAction)shareButtonPressed:(id)sender {
     if(NSClassFromString(@"UIActivityViewController")) {
-        UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:_imageView.image?@[_url,_imageView.image]:@[_url] applicationActivities:@[[_chrome isChromeInstalled]?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:@"irccloud://"]]:[[TUSafariActivity alloc] init]]];
+        UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:_imageView.image?@[_url,_imageView.image]:@[_url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:@"irccloud://"]]:[[TUSafariActivity alloc] init]]];
         [self presentViewController:activityController animated:YES completion:nil];
     } else {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Copy To Clipboard", @"Share on Twitter", [_chrome isChromeInstalled]?@"Open In Chrome":@"Open In Safari",nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Copy To Clipboard", @"Share on Twitter", ([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?@"Open In Chrome":@"Open In Safari",nil];
         [sheet showFromToolbar:_toolbar];
     }
 }
@@ -203,9 +203,9 @@
         [self presentModalViewController:tweetViewController animated:YES];
     } else if([title hasPrefix:@"Open "]) {
         [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
-        if(![_chrome openInChrome:_url
+        if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
                   withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                     createNewTab:NO])
+                     createNewTab:NO]))
             [[UIApplication sharedApplication] openURL:_url];
     }
 }

@@ -25,10 +25,13 @@
     UISwitch *_24hour;
     UISwitch *_seconds;
     UISwitch *_symbols;
+    UISwitch *_screen;
+    UISwitch *_chrome;
     NSString *_version;
     int _userinforeqid;
     int _prefsreqid;
     BOOL _userinfosaved;
     BOOL _prefssaved;
+    BOOL _chromeInstalled;
 }
 @end

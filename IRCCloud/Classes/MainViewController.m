@@ -673,6 +673,8 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
     if(!_buffer) {
         int bid = [BuffersDataSource sharedInstance].firstBid;
         if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
@@ -739,6 +741,7 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    [UIApplication sharedApplication].idleTimerDisabled = NO;
     [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_doubleTapTimer invalidate];
