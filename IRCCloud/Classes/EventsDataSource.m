@@ -20,6 +20,8 @@
 #import "ColorFormatter.h"
 #import "BuffersDataSource.h"
 #import "ServersDataSource.h"
+#import "ChannelsDataSource.h"
+#import "UsersDataSource.h"
 #import "Ignore.h"
 
 @implementation Event
@@ -492,6 +494,20 @@
             }
         }
         return count;
+    }
+}
+
+-(void)purgeInvalidBIDs {
+    @synchronized(_events) {
+        for(NSNumber *bid in _events.allKeys) {
+            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[bid intValue]];
+            if(!b) {
+                NSLog(@"Dropping events for stale BID: %i", [bid intValue]);
+                [_events removeObjectForKey:bid];
+                [[ChannelsDataSource sharedInstance] removeChannelForBuffer:[bid intValue]];
+                [[UsersDataSource sharedInstance] removeUsersForBuffer:[bid intValue]];
+            }
+        }
     }
 }
 @end
