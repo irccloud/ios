@@ -903,7 +903,7 @@
                 }
             }
             if(lock) {
-                _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleView.bounds.size].width)/2 - 20,4,16,16);
+                _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,16);
                 _lock.hidden = NO;
             } else {
                 _lock.hidden = YES;
@@ -1154,7 +1154,7 @@
         _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
         CGRect frame = _titleView.frame;
-        frame.size.width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?400:210;
+        frame.size.width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?384:210;
         frame.size.height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?24:40;
         _titleView.frame = frame;
         _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
