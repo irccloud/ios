@@ -46,11 +46,28 @@
     return _imageView;
 }
 
+-(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        _scrollView.frame = CGRectMake(0,0,[UIScreen mainScreen].bounds.size.height,[UIScreen mainScreen].bounds.size.width);
+    } else {
+        _scrollView.frame = CGRectMake(0,0,[UIScreen mainScreen].bounds.size.width,[UIScreen mainScreen].bounds.size.height);
+    }
+    if(_imageView.image) {
+        [_imageView sizeToFit];
+        CGRect frame = _imageView.frame;
+        frame.origin.x = 0;
+        frame.origin.y = 0;
+        _imageView.frame = frame;
+        _scrollView.contentSize = _imageView.frame.size;
+    }
+    [self scrollViewDidZoom:_scrollView];
+}
+
 -(void)_setImage:(UIImage *)img {
     _imageView.image = img;
     _imageView.frame = CGRectMake(0,0,img.size.width,img.size.height);
-    CGFloat xScale = self.view.bounds.size.width / img.size.width;
-    CGFloat yScale = self.view.bounds.size.height / img.size.height;
+    CGFloat xScale = _scrollView.bounds.size.width / _imageView.frame.size.width;
+    CGFloat yScale = _scrollView.bounds.size.height / _imageView.frame.size.height;
     CGFloat minScale = MIN(xScale, yScale);
     
     CGFloat maxScale = 4;
@@ -61,7 +78,7 @@
 
     _scrollView.minimumZoomScale = minScale;
     _scrollView.maximumZoomScale = maxScale;
-    _scrollView.contentSize = img.size;
+    _scrollView.contentSize = _imageView.frame.size;
     _scrollView.zoomScale = minScale;
     [self scrollViewDidZoom:_scrollView];
 
@@ -152,10 +169,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        self.view.frame = _scrollView.frame = CGRectMake(0,0,[UIScreen mainScreen].bounds.size.width,[UIScreen mainScreen].bounds.size.height);
-    } else {
+    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
         self.view.frame = _scrollView.frame = CGRectMake(0,0,[UIScreen mainScreen].bounds.size.height,[UIScreen mainScreen].bounds.size.width);
+    } else {
+        self.view.frame = _scrollView.frame = CGRectMake(0,0,[UIScreen mainScreen].bounds.size.width,[UIScreen mainScreen].bounds.size.height);
     }
     [self performSelectorInBackground:@selector(_load) withObject:nil];
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
