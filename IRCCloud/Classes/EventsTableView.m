@@ -208,7 +208,13 @@ int __timestampWidth;
 }
 
 - (void)_sendHeartbeat {
-    Event *last = [[[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] lastObject];
+    NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
+    Event *last;
+    for(int i = events.count - 1; i >= 0; i--) {
+        last = [events objectAtIndex:i];
+        if(!last.pending && last.rowType != ROW_LASTSEENEID)
+            break;
+    }
     if(!last.pending) {
         NSTimeInterval eid = last.eid;
         if(eid > _buffer.last_seen_eid) {
@@ -826,7 +832,8 @@ int __timestampWidth;
         NSEnumerator *i = [_data reverseObjectEnumerator];
         Event *event = [i nextObject];
         while(event) {
-            if(event.eid <= _buffer.last_seen_eid)
+            NSLog(@"eid: %f last_eid: %f", event.eid, _buffer.last_seen_eid);
+            if(event.eid <= _buffer.last_seen_eid && event.rowType != ROW_LASTSEENEID)
                 break;
             event = [i nextObject];
             _lastSeenEidPos--;
