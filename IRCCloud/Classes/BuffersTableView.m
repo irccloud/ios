@@ -38,8 +38,11 @@
     HighlightsCountView *_highlights;
     UIActivityIndicatorView *_activity;
     UIButton *_joinBtn;
+    UIColor *_bgColor;
+    UIColor *_highlightColor;
 }
 @property int type;
+@property UIColor *bgColor, *highlightColor;
 @property (readonly) UILabel *label;
 @property (readonly) UIImageView *icon;
 @property (readonly) UIView *unreadIndicator, *bg;
@@ -122,8 +125,10 @@
     _label.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.height + 6, frame.origin.y, frame.size.width - 6 - _icon.frame.size.height - 8, frame.size.height);
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
+-(void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
+    [super setHighlighted:highlighted animated:animated];
+    if(!self.selected)
+        _bg.backgroundColor = highlighted?_highlightColor:_bgColor;
 }
 
 @end
@@ -496,11 +501,12 @@
     } else {
         cell.highlights.hidden = YES;
     }
+    cell.highlightColor = [UIColor colorWithRed:0.776 green:0.855 blue:1 alpha:1];
     if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
         if([[row objectForKey:@"archived"] intValue]) {
-            cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+            cell.highlightColor = cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
         } else {
-            cell.unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
+            cell.highlightColor = cell.unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
         }
         cell.unreadIndicator.hidden = NO;
         cell.label.font = [UIFont boldSystemFontOfSize:16.0f];
@@ -518,9 +524,9 @@
             if(selected) {
                 cell.label.textColor = [UIColor whiteColor];
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
-                    cell.unreadIndicator.backgroundColor = cell.bg.backgroundColor = [UIColor opsHeadingColor];
+                    cell.unreadIndicator.backgroundColor = cell.bgColor = [UIColor opsHeadingColor];
                 else
-                    cell.bg.backgroundColor = [UIColor selectedBlueColor];
+                    cell.bgColor = [UIColor selectedBlueColor];
             } else {
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
                     cell.label.textColor = [UIColor opsHeadingColor];
@@ -529,9 +535,9 @@
                 else
                     cell.label.textColor = [UIColor selectedBlueColor];
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
-                    cell.bg.backgroundColor = [UIColor opsGroupColor];
+                    cell.bgColor = [UIColor opsGroupColor];
                 else
-                    cell.bg.backgroundColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
+                    cell.bgColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
             }
             if(![status isEqualToString:@"connected_ready"] && ![status isEqualToString:@"quitting"] && ![status isEqualToString:@"disconnected"]) {
                 [cell.activity startAnimating];
@@ -556,21 +562,22 @@
             if(selected) {
                 if([[row objectForKey:@"archived"] intValue]) {
                     cell.label.textColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
-                    cell.bg.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+                    cell.bgColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
                 } else {
                     cell.label.textColor = [UIColor whiteColor];
-                    cell.bg.backgroundColor = [UIColor selectedBlueColor];
+                    cell.bgColor = [UIColor selectedBlueColor];
                 }
             } else {
                 if([[row objectForKey:@"archived"] intValue]) {
                     cell.label.textColor = [UIColor timestampColor];
-                    cell.bg.backgroundColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
+                    cell.bgColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
+                    cell.highlightColor = [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
                 } else {
                     if([[row objectForKey:@"joined"] intValue] == 0 || ![status isEqualToString:@"connected_ready"])
                         cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
                     else
                         cell.label.textColor = [UIColor selectedBlueColor];
-                    cell.bg.backgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+                    cell.bgColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
                 }
             }
             if([[row objectForKey:@"timeout"] intValue]) {
@@ -583,21 +590,22 @@
             }
             break;
         case TYPE_ARCHIVES_HEADER:
+            cell.highlightColor = [UIColor timestampColor];
             cell.icon.image = nil;
             cell.icon.hidden = YES;
             if([_expandedArchives objectForKey:[row objectForKey:@"cid"]]) {
                 cell.label.textColor = [UIColor blackColor];
-                cell.bg.backgroundColor = [UIColor timestampColor];
+                cell.bgColor = [UIColor timestampColor];
             } else {
                 cell.label.textColor = [UIColor colorWithRed:0.133 green:0.133 blue:0.133 alpha:1];
-                cell.bg.backgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+                cell.bgColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
             }
             break;
         case TYPE_ADD_NETWORK:
             cell.icon.image = [UIImage imageNamed:@"add"];
             cell.icon.hidden = NO;
             cell.label.textColor = [UIColor selectedBlueColor];
-            cell.bg.backgroundColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
+            cell.bgColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
             break;
     }
     return cell;
