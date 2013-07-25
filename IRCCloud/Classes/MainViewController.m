@@ -696,6 +696,7 @@
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.clipsToBounds = YES;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
     [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
     [self _updateUnreadIndicator];
     [self.slidingViewController resetTopView];

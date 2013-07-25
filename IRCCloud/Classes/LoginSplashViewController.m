@@ -55,6 +55,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateConnecting:)
@@ -191,26 +192,72 @@
     [progress setProgress:[notification.object floatValue] animated:YES];
 }
 
--(void)keyboardWillShow:(NSNotification*)notification {
-    [UIView beginAnimations:nil context:nil];
+-(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        logo.frame = CGRectMake(112, 16, 96, 96);
-        loginView.frame = CGRectMake(0, 112, 320, 160);
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+            logo.frame = CGRectMake(96, 36, 128, 128);
+            loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 160);
+        } else {
+            logo.frame = CGRectMake(36, 76, 128, 128);
+            loadingView.frame = CGRectMake(160, 100, 320, 160);
+            loginView.frame = CGRectMake(160, 70, 320, 160);
+        }
     } else {
-        logo.frame = CGRectMake(128, 246-180, 256, 256);
-        loginView.frame = CGRectMake(392, 302-180, 612, 144);
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+            logo.frame = CGRectMake(256, 118, 256, 256);
+            loadingView.frame = loginView.frame = CGRectMake(78, 392, 612, 160);
+            version.frame = CGRectMake(0, 984, 768, 20);
+        } else {
+            logo.frame = CGRectMake(128, 246, 256, 256);
+            loadingView.frame = CGRectMake(392, 344, 612, 160);
+            loginView.frame = CGRectMake(392, 302, 612, 160);
+            version.frame = CGRectMake(0, 728, 1024, 20);
+        }
+    }
+}
+
+-(void)keyboardWillShow:(NSNotification*)notification {
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
+    [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+            logo.frame = CGRectMake(112, 16, 96, 96);
+            loadingView.frame = loginView.frame = CGRectMake(0, 112, 320, 160);
+        } else {
+            logo.frame = CGRectMake(52, 24, 96, 96);
+            loadingView.frame = loginView.frame = CGRectMake(160, 0, 320, 160);
+        }
+    } else {
+        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+            logo.frame = CGRectMake(128, 246-180, 256, 256);
+            loadingView.frame = loginView.frame = CGRectMake(392, 302-180, 612, 144);
+        }
     }
     [UIView commitAnimations];
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
-    [UIView beginAnimations:nil context:nil];
+    [UIView beginAnimations:nil context:NULL];
+    [UIView setAnimationBeginsFromCurrentState:YES];
+    [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
+    [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        logo.frame = CGRectMake(96, 36, 128, 128);
-        loginView.frame = CGRectMake(0, 200, 320, 160);
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+            logo.frame = CGRectMake(96, 36, 128, 128);
+            loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 160);
+        } else {
+            logo.frame = CGRectMake(36, 76, 128, 128);
+            loadingView.frame = loginView.frame = CGRectMake(160, 70, 320, 160);
+        }
     } else {
-        logo.frame = CGRectMake(128, 246, 256, 256);
-        loginView.frame = CGRectMake(392, 302, 612, 144);
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+        } else {
+            logo.frame = CGRectMake(128, 246, 256, 256);
+            loadingView.frame = CGRectMake(392, 344, 612, 160);
+            loginView.frame = CGRectMake(392, 302, 612, 160);
+        }
     }
     [UIView commitAnimations];
 }
@@ -272,15 +319,12 @@
     return YES;
 }
 
-- (NSUInteger)supportedInterfaceOrientations {
-    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskPortrait:UIInterfaceOrientationMaskLandscape;
+-(NSUInteger)supportedInterfaceOrientations {
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
-    if(([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone && UIInterfaceOrientationIsPortrait(orientation)) || ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && UIInterfaceOrientationIsLandscape(orientation)))
-        return YES;
-    
-    return NO;
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    return YES;
 }
 
 @end

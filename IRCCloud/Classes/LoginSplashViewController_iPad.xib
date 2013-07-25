@@ -133,7 +133,7 @@
 								<double key="preferredMaxLayoutWidth">400</double>
 							</object>
 						</array>
-						<string key="NSFrame">{{392, 344}, {612, 159}}</string>
+						<string key="NSFrame">{{392, 344}, {612, 160}}</string>
 						<reference key="NSSuperview" ref="187623155"/>
 						<reference key="NSNextKeyView" ref="369905262"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
@@ -254,7 +254,7 @@
 								</object>
 							</object>
 						</array>
-						<string key="NSFrame">{{392, 302}, {612, 144}}</string>
+						<string key="NSFrame">{{392, 302}, {612, 160}}</string>
 						<reference key="NSSuperview" ref="187623155"/>
 						<reference key="NSNextKeyView" ref="30722041"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
@@ -265,8 +265,9 @@
 					<object class="IBUILabel" id="907596578">
 						<reference key="NSNextResponder" ref="187623155"/>
 						<int key="NSvFlags">266</int>
-						<string key="NSFrame">{{20, 727}, {984, 21}}</string>
+						<string key="NSFrame">{{0, 728}, {1024, 20}}</string>
 						<reference key="NSSuperview" ref="187623155"/>
+						<reference key="NSNextKeyView"/>
 						<string key="NSReuseIdentifierKey">_NS:9</string>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
