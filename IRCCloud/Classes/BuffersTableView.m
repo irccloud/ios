@@ -503,11 +503,8 @@
     }
     cell.highlightColor = [UIColor colorWithRed:0.776 green:0.855 blue:1 alpha:1];
     if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
-        if([[row objectForKey:@"archived"] intValue]) {
-            cell.highlightColor = cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
-        } else {
-            cell.highlightColor = cell.unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
-        }
+        if([[row objectForKey:@"archived"] intValue])
+            cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
         cell.unreadIndicator.hidden = NO;
         cell.label.font = [UIFont boldSystemFontOfSize:16.0f];
     } else {
