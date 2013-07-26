@@ -22,6 +22,90 @@
 #import "UIColor+IRCCloud.h"
 #import "OpenInChromeController.h"
 
+@interface BGTimeoutViewController : UITableViewController
+@end
+
+@implementation BGTimeoutViewController
+
+-(id)init {
+    self = [super initWithStyle:UITableViewStyleGrouped];
+    if (self) {
+        self.navigationItem.title = @"Background Timeout";
+    }
+    return self;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Table view data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 4;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"timeoutcell"];
+    if(!cell)
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"timeoutcell"];
+    
+    cell.accessoryType = UITableViewCellAccessoryNone;
+    
+    switch(indexPath.row) {
+        case 0:
+            cell.textLabel.text = @"30 seconds";
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] == 30)
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+        case 1:
+            cell.textLabel.text = @"1 minute";
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] == 60)
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+        case 2:
+            cell.textLabel.text = @"5 minutes";
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] == 300)
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+        case 3:
+            cell.textLabel.text = @"10 minutes";
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] == 600)
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+    }
+    
+    return cell;
+}
+
+#pragma mark - Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    switch(indexPath.row) {
+        case 0:
+            [[NSUserDefaults standardUserDefaults] setObject:@(30) forKey:@"bgTimeout"];
+            break;
+        case 1:
+            [[NSUserDefaults standardUserDefaults] setObject:@(60) forKey:@"bgTimeout"];
+            break;
+        case 2:
+            [[NSUserDefaults standardUserDefaults] setObject:@(300) forKey:@"bgTimeout"];
+            break;
+        case 3:
+            [[NSUserDefaults standardUserDefaults] setObject:@(600) forKey:@"bgTimeout"];
+            break;
+    }
+    [tableView reloadData];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+@end
+
 @implementation SettingsViewController
 
 - (id)initWithStyle:(UITableViewStyle)style {
@@ -62,6 +146,7 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    [self.tableView reloadData];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -242,7 +327,7 @@
         case 2:
             return 3;
         case 3:
-            return (_chromeInstalled)?2:1;
+            return (_chromeInstalled)?3:2;
         case 4:
             return 4;
     }
@@ -273,6 +358,7 @@
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.accessoryView = nil;
+    cell.accessoryType = UITableViewCellAccessoryNone;
     cell.detailTextLabel.text = nil;
     
     switch(indexPath.section) {
@@ -319,6 +405,15 @@
                     cell.accessoryView = _screen;
                     break;
                 case 1:
+                    cell.textLabel.text = @"Disconnect in background";
+                    int seconds = [[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue];
+                    if(seconds < 60)
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%is", seconds];
+                    else
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%im", seconds/60];
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    break;
+                case 2:
                     cell.textLabel.text = @"Open URLs in Chrome";
                     cell.accessoryView = _chrome;
                     break;
@@ -345,50 +440,14 @@
     return cell;
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
+    if(indexPath.section == 3 && indexPath.row == 1) {
+        [self.navigationController pushViewController:[[BGTimeoutViewController alloc] init] animated:YES];
+    }
     if(indexPath.section == 4 && indexPath.row == 0) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];
     }
@@ -397,8 +456,9 @@
             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
         }];
     }
-    if(indexPath.section == 4 && indexPath.row == 2)
+    if(indexPath.section == 4 && indexPath.row == 2) {
         [self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];
+    }
 }
 
 @end

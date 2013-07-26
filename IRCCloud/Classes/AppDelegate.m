@@ -24,7 +24,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"useChrome"];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30)}];
     if(TESTFLIGHT_KEY)
         [TestFlight takeOff:TESTFLIGHT_KEY];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
@@ -142,7 +142,7 @@
 - (void)applicationWillResignActive:(UIApplication *)application {
     [NetworkConnection sharedInstance].background = YES;
     [_disconnectTimer invalidate];
-    _disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:[NetworkConnection sharedInstance] selector:@selector(disconnect) userInfo:nil repeats:NO];
+    _disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:[[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] target:[NetworkConnection sharedInstance] selector:@selector(disconnect) userInfo:nil repeats:NO];
     if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
         ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
         [evc.topViewController viewWillDisappear:NO];
@@ -158,7 +158,7 @@
         background_task = UIBackgroundTaskInvalid;
     }];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [NSThread sleepForTimeInterval:35];
+        [NSThread sleepForTimeInterval:[[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] + 5];
         [application endBackgroundTask: background_task];
         background_task = UIBackgroundTaskInvalid;
     });
