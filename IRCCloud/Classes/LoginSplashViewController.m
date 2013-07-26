@@ -195,20 +195,20 @@
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            logo.frame = CGRectMake(96, 36, 128, 128);
+            logo.frame = CGRectMake(92, 36, 138, 138);
             loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 160);
         } else {
-            logo.frame = CGRectMake(36, 76, 128, 128);
+            logo.frame = CGRectMake(36, 76, 138, 138);
             loadingView.frame = CGRectMake(160, 100, 320, 160);
             loginView.frame = CGRectMake(160, 70, 320, 160);
         }
     } else {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            logo.frame = CGRectMake(256, 118, 256, 256);
+            logo.frame = CGRectMake(249, 118, 276, 276);
             loadingView.frame = loginView.frame = CGRectMake(78, 392, 612, 160);
             version.frame = CGRectMake(0, 984, 768, 20);
         } else {
-            logo.frame = CGRectMake(128, 246, 256, 256);
+            logo.frame = CGRectMake(128, 240, 276, 276);
             loadingView.frame = CGRectMake(392, 344, 612, 160);
             loginView.frame = CGRectMake(392, 302, 612, 160);
             version.frame = CGRectMake(0, 728, 1024, 20);
