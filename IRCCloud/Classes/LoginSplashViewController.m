@@ -198,7 +198,7 @@
             logo.frame = CGRectMake(92, 36, 138, 138);
             loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 160);
         } else {
-            logo.frame = CGRectMake(36, 76, 138, 138);
+            logo.frame = CGRectMake(26, 76, 138, 138);
             loadingView.frame = CGRectMake(160, 100, 320, 160);
             loginView.frame = CGRectMake(160, 70, 320, 160);
         }

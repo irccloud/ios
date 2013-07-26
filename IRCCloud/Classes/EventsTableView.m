@@ -159,12 +159,9 @@ int __timestampWidth;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogCompleted:)
                                                  name:kIRCCloudBacklogCompletedNotification object:nil];
-    
-/*    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [self refresh];
-    }];
-    if(!_scrolledUp)
-        [self scrollToBottom];*/
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogFailed:)
+                                                 name:kIRCCloudBacklogFailedNotification object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -179,26 +176,37 @@ int __timestampWidth;
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    [_lock lock];
-    for(Event *e in _data) {
-        e.height = 0;
+    if([_data count]) {
+        [_lock lock];
+        for(Event *e in _data) {
+            e.height = 0;
+        }
+        [_lock unlock];
+        [self.tableView reloadData];
+        if(_bottomRow >= 0) {
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+            _bottomRow = -1;
+        } else {
+            [self _scrollToBottom];
+        }
     }
-    [_lock unlock];
-    [self.tableView reloadData];
-    if(_bottomRow >= 0) {
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-        _bottomRow = -1;
-    } else {
-        [self _scrollToBottom];
+}
+
+- (void)backlogFailed:(NSNotification *)notification {
+    if(_buffer && [notification.object bid] == _buffer.bid) {
+        _requestingBacklog = NO;
+        self.tableView.tableHeaderView = nil;
     }
 }
 
 - (void)backlogCompleted:(NSNotification *)notification {
     if(_buffer && [notification.object bid] == _buffer.bid) {
-        if([[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] == nil)
-            _buffer.min_eid = -1;
+        if([[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] == nil) {
+            self.tableView.tableHeaderView = nil;
+            return;
+        }
     }
-    if([notification.object bid] == -1 || (_buffer && [notification.object bid] == _buffer.bid)) {
+    if([notification.object bid] == -1 || (_buffer && [notification.object bid] == _buffer.bid && _requestingBacklog)) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
                 if(event.rowType == ROW_LASTSEENEID) {
@@ -711,6 +719,7 @@ int __timestampWidth;
 }
 
 -(void)setBuffer:(Buffer *)buffer {
+    _ready = NO;
     [_scrollTimer invalidate];
     _scrollTimer = nil;
     _topUnreadView.alpha = 0;
@@ -756,7 +765,6 @@ int __timestampWidth;
 }
 
 - (void)refresh {
-    NSLog(@"** refresh, eidToLaunch: %f", _eidToOpen);
     [_lock lock];
     [_scrollTimer invalidate];
     _ready = NO;
@@ -836,7 +844,6 @@ int __timestampWidth;
         NSEnumerator *i = [_data reverseObjectEnumerator];
         Event *event = [i nextObject];
         while(event) {
-            NSLog(@"eid: %f last_eid: %f", event.eid, _buffer.last_seen_eid);
             if(event.eid <= _buffer.last_seen_eid && event.rowType != ROW_LASTSEENEID)
                 break;
             event = [i nextObject];
@@ -877,7 +884,6 @@ int __timestampWidth;
         }
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
     } else if(_eidToOpen > 0) {
-        NSLog(@"EID to open: %f max: %f", _eidToOpen, _maxEid);
         if(_eidToOpen <= _maxEid) {
             int i = 0;
             for(Event *e in _data) {
@@ -890,7 +896,6 @@ int __timestampWidth;
             }
             _eidToOpen = -1;
         } else {
-            NSLog(@"Requested EID is in the future, not scrolling");
             if(!_scrolledUp)
                 _scrolledUpFrom = -1;
         }
@@ -910,7 +915,6 @@ int __timestampWidth;
         }
         _requestingBacklog = NO;
         if(_scrolledUpFrom > 0) {
-            NSLog(@"Scrolled up from EID: %f", _scrolledUpFrom);
             for(Event *e in _data) {
                 if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && e.eid > _scrolledUpFrom && !e.isSelf && e.rowType != ROW_LASTSEENEID) {
                     _newMsgs++;
@@ -1121,19 +1125,23 @@ int __timestampWidth;
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if(!_ready || !_buffer)
         return;
+
+    int firstRow = -1;
+    int lastRow = -1;
+    NSArray *rows = [self.tableView indexPathsForVisibleRows];
+    if(rows.count) {
+        firstRow = [[rows objectAtIndex:0] row];
+        lastRow = [[rows lastObject] row];
+    }
     
-    if(self.tableView.tableHeaderView && _minEid > 0 && _buffer && _buffer.bid != -1/* TODO: && conn.ready */) {
+    if(self.tableView.tableHeaderView && _minEid > 0 && _buffer && _buffer.bid != -1 && (_scrolledUp || (_data.count && firstRow == 0 && lastRow == _data.count - 1))) {
         if(!_requestingBacklog && _conn.state == kIRCCloudStateConnected && scrollView.contentOffset.y < _headerView.frame.size.height) {
             _requestingBacklog = YES;
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
         }
     }
     
-    NSArray *rows = [self.tableView indexPathsForVisibleRows];
     if(rows.count) {
-        int firstRow = [[rows objectAtIndex:0] row];
-        int lastRow = [[rows lastObject] row];
-        
         if(_data.count) {
             if(lastRow == _data.count - 1) {
                 [UIView beginAnimations:nil context:nil];
@@ -1173,7 +1181,6 @@ int __timestampWidth;
     
     if(indexPath.row < _data.count) {
         NSTimeInterval group = ((Event *)[_data objectAtIndex:indexPath.row]).groupEid;
-        //NSLog(@"Group: %f, EID: %f", group, ((Event *)[_data objectAtIndex:indexPath.row]).eid);
         if(group > 0) {
             int count = 0;
             for(Event *e in _data) {

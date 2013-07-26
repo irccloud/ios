@@ -938,13 +938,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventAway];
         } else if([object.type isEqualToString:@"self_away"]) {
-            NSLog(@"self away: %@", object);
             [_users updateAway:1 msg:[object objectForKey:@"away_msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             [_servers updateAway:[object objectForKey:@"away_msg"] server:object.cid];
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventAway];
         } else if([object.type isEqualToString:@"self_back"]) {
-            NSLog(@"self back: %@", object);
             [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             [_servers updateAway:@"" server:object.cid];
             if(!backlog)
@@ -986,7 +984,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(backlog) {
             if(_totalBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
                 if(object.bid != _currentBid) {
-                    //NSLog(@"Count: %i", _currentCount);
                     if(_currentBid != -1 && _currentCount >= BACKLOG_BUFFER_MAX) {
                         [_events removeEventsBefore:_firstEID buffer:_currentBid];
                     }
@@ -1104,7 +1101,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)_backlogFailed:(NSNotification *)notification {
     [_oobQueue removeObject:notification.object];
     if([_servers count] < 1) {
-        NSLog(@"Initial backlog download failed");
+        TFLog(@"Initial backlog download failed");
         [self disconnect];
         _state = kIRCCloudStateDisconnected;
         [self _fail];

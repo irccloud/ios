@@ -505,6 +505,8 @@
     if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
         if([[row objectForKey:@"archived"] intValue])
             cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+        else
+            cell.unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
         cell.unreadIndicator.hidden = NO;
         cell.label.font = [UIFont boldSystemFontOfSize:16.0f];
     } else {

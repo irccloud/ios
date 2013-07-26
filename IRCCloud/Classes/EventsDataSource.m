@@ -502,7 +502,6 @@
         for(NSNumber *bid in _events.allKeys) {
             Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[bid intValue]];
             if(!b) {
-                NSLog(@"Dropping events for stale BID: %i", [bid intValue]);
                 [_events removeObjectForKey:bid];
                 [[ChannelsDataSource sharedInstance] removeChannelForBuffer:[bid intValue]];
                 [[UsersDataSource sharedInstance] removeUsersForBuffer:[bid intValue]];

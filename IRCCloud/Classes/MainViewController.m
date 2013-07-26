@@ -56,8 +56,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [self addChildViewController:_eventsView];
     
     AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &alertSound);
+    
+    if(!_buffersView)
+        _buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
+    
+    if(!_usersView)
+        _usersView = [[UsersTableView alloc] initWithStyle:UITableViewStylePlain];
     
     if(_swipeTip)
         _swipeTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
@@ -94,13 +101,6 @@
     _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,8,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
     [_bottomBar addSubview:_sendBtn];
     
-    [self addChildViewController:_eventsView];
-    
-    if(!_buffersView)
-        _buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
-    
-    if(!_usersView)
-        _usersView = [[UsersTableView alloc] initWithStyle:UITableViewStylePlain];
     self.slidingViewController.shouldAllowPanningPastAnchor = NO;
     self.slidingViewController.underLeftViewController = _buffersView;
     self.slidingViewController.underRightViewController = _usersView;
@@ -126,11 +126,11 @@
     [self.slidingViewController.view addSubview:_mentionTip];
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,208,36)];
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,0,36)];
         _message.maximumNumberOfLines = 8;
         _landscapeView = [[UIView alloc] initWithFrame:CGRectZero];
     } else {
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,472,36)];
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,0,36)];
     }
     _message.minimumHeight = 36;
     [_message sizeToFit];
@@ -142,6 +142,7 @@
     [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     users.frame = CGRectMake(0,0,40,40);
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
 - (void)viewDidUnload {
@@ -589,7 +590,6 @@
         }
         [self bufferSelected:bid];
         _eidToOpen = -1;
-        NSLog(@"** backlog complete: Set eidToOpen to -1");
         if(_urlToOpen)
             [self launchURL:_urlToOpen];
         _urlToOpen = nil;
@@ -695,8 +695,6 @@
     }
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.clipsToBounds = YES;
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
-    [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
     [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
     [self _updateUnreadIndicator];
     [self.slidingViewController resetTopView];
@@ -747,8 +745,12 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_doubleTapTimer invalidate];
     _doubleTapTimer = nil;
-    NSLog(@"** view will disappear: Set eidToOpen to -1");
     _eidToOpen = -1;
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -854,7 +856,7 @@
     frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
     _serverStatusBar.frame = frame;
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-    _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
+    //_bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
 }
 
 -(void)setUnreadColor:(UIColor *)color {
@@ -966,7 +968,6 @@
     BOOL changed = (_buffer && _buffer.bid != bid);
     TFLog(@"BID selected: %i", bid);
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
-        NSLog(@"** bid changed from %i to %i: Set eidToOpen to -1", _buffer.bid, bid);
         _eidToOpen = -1;
     }
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
@@ -1181,8 +1182,12 @@
             [self.view insertSubview:_usersView.view atIndex:1];
             _borders.hidden = NO;
             CGRect frame = _titleView.frame;
-            frame.size.width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
+            frame.size.width = 1000;
             _titleView.frame = frame;
+            frame = _serverStatusBar.frame;
+            frame.origin.x = _buffersView.view.frame.size.width;
+            frame.size.width = _eventsView.view.frame.size.width;
+            _serverStatusBar.frame = frame;
         } else {
             [_buffersView.view removeFromSuperview];
             [_usersView.view removeFromSuperview];
@@ -1198,19 +1203,27 @@
             CGRect frame = _titleView.frame;
             frame.size.width = 666;
             _titleView.frame = frame;
+            frame = _serverStatusBar.frame;
+            frame.origin.x = 0;
+            frame.size.width = _eventsView.view.frame.size.width;
+            _serverStatusBar.frame = frame;
         }
     }
     if(duration > 0) {
         _eventsView.view.hidden = YES;
         [_eventActivity startAnimating];
     }
+    CGRect frame = _message.frame;
+    frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
+    _message.frame = frame;
     [self _updateTitleArea];
+    [self _updateServerStatus];
+    [self _updateUserListVisibility];
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
     _eventsView.view.hidden = NO;
     [_eventActivity stopAnimating];
-    [self _updateUserListVisibility];
 }
 
 -(void)_updateUserListVisibility {
@@ -1264,6 +1277,8 @@
                 if(!self.slidingViewController.underRightViewController)
                     self.slidingViewController.underRightViewController = _usersView;
             } else {
+                self.navigationItem.rightBarButtonItem = nil;
+                self.slidingViewController.underRightViewController = nil;
             }
         }
     }
