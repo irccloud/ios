@@ -22,9 +22,10 @@
 
 @class ViewController;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate> {
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate> {
     NSTimer *_disconnectTimer;
     OpenInChromeController *_openInChromeController;
+    NSURL *_pendingURL;
 }
 
 @property (strong, nonatomic) UIWindow *window;

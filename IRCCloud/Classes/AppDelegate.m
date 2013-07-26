@@ -24,6 +24,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"useChrome"];
     if(TESTFLIGHT_KEY)
         [TestFlight takeOff:TESTFLIGHT_KEY];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
@@ -60,19 +61,32 @@
 }
 
 - (void)launchURL:(NSURL *)url {
+    NSString *l = [url.path lowercaseString];
     if([url.scheme hasPrefix:@"irc"]) {
         [self.mainViewController launchURL:[NSURL URLWithString:[url.description stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
+    } else if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"]) {
+        [self showImage:url];
     } else {
         if(!_openInChromeController)
             _openInChromeController = [[OpenInChromeController alloc] init];
-        NSString *l = [url.path lowercaseString];
-        if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"]) {
-            [self showImage:url];
-        } else if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_openInChromeController openInChrome:url
-                                         withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                                            createNewTab:NO]))
-            [[UIApplication sharedApplication] openURL:url];
+        if([[NSUserDefaults standardUserDefaults] objectForKey:@"useChrome"] || ![_openInChromeController isChromeInstalled]) {
+            if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_openInChromeController openInChrome:url
+                                             withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                                                createNewTab:NO]))
+                [[UIApplication sharedApplication] openURL:url];
+        } else {
+            _pendingURL = url;
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Choose A Browser" message:@"Would you prefer to open links in Safari or Chrome?" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Chrome", @"Safari", nil];
+            [alert show];
+        }
     }
+}
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    [[NSUserDefaults standardUserDefaults] setObject:@(buttonIndex == 0) forKey:@"useChrome"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self launchURL:_pendingURL];
+    _pendingURL = nil;
 }
 
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
