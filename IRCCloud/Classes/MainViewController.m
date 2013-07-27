@@ -460,10 +460,12 @@
                 if(e.isHighlight)
                     [self showMentionTip];
                 if([[e.from lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
-                    for(Event *e in _pendingEvents) {
-                        [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                    for(Event *e in [_pendingEvents copy]) {
+                        if(e.bid == _buffer.bid) {
+                            [_pendingEvents removeObject:e];
+                            [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                        }
                     }
-                    [_pendingEvents removeAllObjects];
                 } else {
                     int reqid = e.reqId;
                     for(Event *e in _pendingEvents) {
@@ -546,11 +548,14 @@
         case kIRCCloudStateConnected:
             [_connectingActivity stopAnimating];
             for(Event *e in [_pendingEvents copy]) {
-                if(e.reqId == -1 && (([[NSDate date] timeIntervalSince1970] - (e.eid/1000000)) < 60)) {
+                if(e.reqId == -1 && (([[NSDate date] timeIntervalSince1970] - (e.eid/1000000) - [NetworkConnection sharedInstance].clockOffset) < 60)) {
                     e.reqId = [[NetworkConnection sharedInstance] say:e.command to:e.to cid:e.cid];
                 } else {
-                    [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
                     [_pendingEvents removeObject:e];
+                    e.height = 0;
+                    e.pending = NO;
+                    e.rowType = ROW_FAILED;
+                    e.bgColor = [UIColor errorBackgroundColor];
                 }
             }
             break;
@@ -782,7 +787,7 @@
             if(msg) {
                 e.cid = s.cid;
                 e.bid = _buffer.bid;
-                e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset + -100) * 1000000;
+                e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset) * 1000000;
                 e.isSelf = YES;
                 e.from = s.nick;
                 e.nick = s.nick;
