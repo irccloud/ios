@@ -861,7 +861,7 @@
     frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
     _serverStatusBar.frame = frame;
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-    //_bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
+    _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
 }
 
 -(void)setUnreadColor:(UIColor *)color {
