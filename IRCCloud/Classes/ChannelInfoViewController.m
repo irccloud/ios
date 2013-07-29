@@ -91,6 +91,7 @@
         case kIRCEventChannelInit:
         case kIRCEventChannelTopic:
         case kIRCEventChannelMode:
+        case kIRCEventUserChannelMode:
             o = notification.object;
             if(o.bid == _channel.bid && !self.tableView.editing)
                 [self refresh];
@@ -111,6 +112,7 @@
 }
 
 -(void)refresh {
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
     [_modeHints removeAllObjects];
     _topicChanged = NO;
     Server *server = [[ServersDataSource sharedInstance] getServer:_channel.cid];
@@ -166,6 +168,9 @@
                     break;
                 case 't':
                     [_modeHints addObject:@{@"mode":@"Topic Control (+t)", @"hint":@"Only ops can set the topic."}];
+                    User *u = [[UsersDataSource sharedInstance] getUser:server.nick cid:_channel.cid bid:_channel.bid];
+                    if(u && [u.mode rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"qao"]].location == NSNotFound)
+                        self.navigationItem.rightBarButtonItem = nil;
                     break;
             }
         }
