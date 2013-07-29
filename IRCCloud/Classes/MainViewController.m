@@ -127,7 +127,7 @@
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,0,36)];
-        _message.maximumNumberOfLines = 8;
+        _message.maximumNumberOfLines = 6;
         _landscapeView = [[UIView alloc] initWithFrame:CGRectZero];
     } else {
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,0,36)];
@@ -860,6 +860,9 @@
     frame = _serverStatusBar.frame;
     frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
     _serverStatusBar.frame = frame;
+    frame = _eventsView.bottomUnreadView.frame;
+    frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
+    _eventsView.bottomUnreadView.frame = frame;
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
 }
@@ -1167,7 +1170,7 @@
         _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
         _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
         _topicLabel.alpha = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?0:1;
-        _message.maximumNumberOfLines = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?4:8;
+        _message.maximumNumberOfLines = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?4:6;
     } else {
         if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
             self.navigationItem.leftBarButtonItem = nil;
@@ -1221,6 +1224,11 @@
     CGRect frame = _message.frame;
     frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
     _message.frame = frame;
+    frame = _eventsView.view.frame;
+    frame.size.height = 32;
+    _eventsView.topUnreadView.frame = frame;
+    frame.origin.y += _eventsView.view.frame.size.height - 32;
+    _eventsView.bottomUnreadView.frame = frame;
     [self _updateTitleArea];
     [self _updateServerStatus];
     [self _updateUserListVisibility];
@@ -1261,6 +1269,12 @@
                 frame = _borders.frame;
                 frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width + 2;
                 _borders.frame = frame;
+                frame = _eventsView.topUnreadView.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+                _eventsView.topUnreadView.frame = frame;
+                frame = _eventsView.bottomUnreadView.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+                _eventsView.bottomUnreadView.frame = frame;
             } else {
                 CGRect frame = _eventsView.view.frame;
                 frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
@@ -1275,6 +1289,12 @@
                 frame = _borders.frame;
                 frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width + 2;
                 _borders.frame = frame;
+                frame = _eventsView.topUnreadView.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+                _eventsView.topUnreadView.frame = frame;
+                frame = _eventsView.bottomUnreadView.frame;
+                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+                _eventsView.bottomUnreadView.frame = frame;
             }
         } else {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
@@ -1535,8 +1555,8 @@
 }
 
 -(void)_userTapped {
-    _doubleTapTimer = nil;
     [self _showUserPopupInRect:_selectedRect];
+    _doubleTapTimer = nil;
 }
 
 -(void)userSelected:(NSString *)nick rect:(CGRect)rect {
