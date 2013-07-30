@@ -152,6 +152,13 @@ int __timestampWidth;
     [self.tableView addGestureRecognizer:lp];
     _topUnreadView.backgroundColor = [UIColor selectedBlueColor];
     _bottomUnreadView.backgroundColor = [UIColor selectedBlueColor];
+    [_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
+    [_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateHighlighted];
+    [_backlogFailedButton setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
+    [_backlogFailedButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
+    [_backlogFailedButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    _backlogFailedButton.titleLabel.shadowOffset = CGSizeMake(0, 1);
+    [_backlogFailedButton.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -198,10 +205,16 @@ int __timestampWidth;
     }
 }
 
+- (IBAction)loadMoreBacklogButtonPressed:(id)sender {
+    _requestingBacklog = YES;
+    [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
+    self.tableView.tableHeaderView = _headerView;
+}
+
 - (void)backlogFailed:(NSNotification *)notification {
     if(_buffer && [notification.object bid] == _buffer.bid) {
         _requestingBacklog = NO;
-        self.tableView.tableHeaderView = nil;
+        self.tableView.tableHeaderView = _backlogFailedView;
     }
 }
 
@@ -515,7 +528,7 @@ int __timestampWidth;
     if(_lastSeenEidPos == 0) {
         int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
         if(seconds < 0) {
-            _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 48);
+            _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
             _topUnreadView.alpha = 0;
         } else {
             int minutes = seconds / 60;
@@ -549,7 +562,7 @@ int __timestampWidth;
         } else if(firstRow - _lastSeenEidPos > 0) {
             _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i unread messages", firstRow - _lastSeenEidPos];
         } else {
-            _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 48);
+            _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
             _topUnreadView.alpha = 0;
         }
     }
@@ -875,9 +888,9 @@ int __timestampWidth;
     }
     
     if(_lastSeenEidPos == 0) {
-        _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 80);
+        _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 80);
     } else {
-        _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 48);
+        _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
     }
     
     [self.tableView reloadData];
@@ -1140,7 +1153,7 @@ int __timestampWidth;
         lastRow = [[rows lastObject] row];
     }
     
-    if(self.tableView.tableHeaderView && _minEid > 0 && _buffer && _buffer.bid != -1 && (_scrolledUp || (_data.count && firstRow == 0 && lastRow == _data.count - 1))) {
+    if(self.tableView.tableHeaderView == _headerView && _minEid > 0 && _buffer && _buffer.bid != -1 && (_scrolledUp || (_data.count && firstRow == 0 && lastRow == _data.count - 1))) {
         if(!_requestingBacklog && _conn.state == kIRCCloudStateConnected && scrollView.contentOffset.y < _headerView.frame.size.height) {
             _requestingBacklog = YES;
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
@@ -1178,6 +1191,9 @@ int __timestampWidth;
                     [self updateTopUnread:firstRow];
                 }
             }
+            
+            if(self.tableView.tableHeaderView != _headerView && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && firstRow > 0 && lastRow < _data.count)
+                self.tableView.tableHeaderView = _headerView;
         }
     }
 }

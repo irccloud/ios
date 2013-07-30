@@ -31,7 +31,8 @@
 
 @interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate,UIGestureRecognizerDelegate> {
     IBOutlet UIView *_headerView;
-    
+    IBOutlet UIView *_backlogFailedView;
+    IBOutlet UIButton *_backlogFailedButton;
     IBOutlet UIView *_topUnreadView;
     IBOutlet UILabel *_topUnreadlabel;
     IBOutlet HighlightsCountView *_topHighlightsCountView;
@@ -68,6 +69,7 @@
 -(IBAction)topUnreadBarClicked:(id)sender;
 -(IBAction)bottomUnreadBarClicked:(id)sender;
 -(IBAction)dismissButtonPressed:(id)sender;
+-(IBAction)loadMoreBacklogButtonPressed:(id)sender;
 -(void)scrollToBottom;
 -(void)clearLastSeenMarker;
 @end
