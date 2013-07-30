@@ -207,7 +207,7 @@ int __timestampWidth;
 
 - (IBAction)loadMoreBacklogButtonPressed:(id)sender {
     _requestingBacklog = YES;
-    [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
+    [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
     self.tableView.tableHeaderView = _headerView;
 }
 

@@ -97,6 +97,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
     }];
     _running = NO;
+    _cancelled = YES;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if(_cancelled)
@@ -120,6 +121,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
         }];
+        _cancelled = YES;
 	}
 }
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
