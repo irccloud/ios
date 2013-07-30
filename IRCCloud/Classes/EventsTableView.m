@@ -221,7 +221,7 @@ int __timestampWidth;
 - (void)backlogCompleted:(NSNotification *)notification {
     if(_buffer && [notification.object bid] == _buffer.bid) {
         if([[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] == nil) {
-            self.tableView.tableHeaderView = nil;
+            self.tableView.tableHeaderView = _backlogFailedView;
             return;
         }
     }
@@ -818,6 +818,7 @@ int __timestampWidth;
     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
     if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
         if(_buffer.bid != -1 && _buffer.min_eid > 0) {
+            self.tableView.tableHeaderView = _headerView;
             _requestingBacklog = YES;
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
         } else {
