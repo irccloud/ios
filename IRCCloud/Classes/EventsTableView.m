@@ -166,6 +166,10 @@ int __timestampWidth;
 
 - (void)viewWillDisappear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    if(_data.count && _scrolledUp)
+        _bottomRow = [[[self.tableView indexPathsForVisibleRows] lastObject] row];
+    else
+        _bottomRow = -1;
 }
 
 -(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
