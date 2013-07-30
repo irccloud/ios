@@ -180,18 +180,20 @@ int __timestampWidth;
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    if([_data count]) {
-        [_lock lock];
-        for(Event *e in _data) {
-            e.height = 0;
-        }
-        [_lock unlock];
-        [self.tableView reloadData];
-        if(_bottomRow >= 0) {
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-            _bottomRow = -1;
-        } else {
-            [self _scrollToBottom];
+    if(_ready) {
+        if([_data count]) {
+            [_lock lock];
+            for(Event *e in _data) {
+                e.height = 0;
+            }
+            [_lock unlock];
+            [self.tableView reloadData];
+            if(_bottomRow >= 0) {
+                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+                _bottomRow = -1;
+            } else {
+                [self _scrollToBottom];
+            }
         }
     }
 }

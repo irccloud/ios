@@ -155,7 +155,6 @@
      
 -(void)setMaximumNumberOfLines:(int)n
 {
-    BOOL didChange            = NO;
     NSString *saveText        = internalTextView.text;
     NSString *newText         = @"-";
     internalTextView.hidden   = YES;
@@ -165,16 +164,13 @@
         newText = [newText stringByAppendingString:@"\n|W|"];
     }
     internalTextView.text     = newText;
-    didChange = (maximumHeight != internalTextView.contentSize.height);
     maximumHeight             = internalTextView.contentSize.height;
     maximumNumberOfLines      = n;
     internalTextView.text     = saveText;
     internalTextView.hidden   = NO;
     internalTextView.delegate = self;
-    if (didChange) {
-        forceSizeUpdate = YES;
-        [self textViewDidChange:self.internalTextView];
-    }
+    forceSizeUpdate = YES;
+    [self textViewDidChange:self.internalTextView];
 }
 
 -(void)setMinimumNumberOfLines:(int)m
@@ -218,41 +214,39 @@
         {
             newHeight = maximumHeight;
         }
-		if (newHeight <= maximumHeight)
-		{
-			if(animateHeightChange)
-            {
-				[UIView beginAnimations:@"" context:nil];
-				[UIView setAnimationDelegate:self];
-				[UIView setAnimationDidStopSelector:@selector(growDidStop)];
-				[UIView setAnimationBeginsFromCurrentState:YES];
-			}
-			
-			if ([delegate respondsToSelector:@selector(expandingTextView:willChangeHeight:)]) 
-            {
-				[delegate expandingTextView:self willChangeHeight:(newHeight+ kTextInsetBottom)];
-			}
-			
-			/* Resize the frame */
-			CGRect r = self.frame;
-			r.size.height = newHeight + kTextInsetBottom;
-			self.frame = r;
-			r.origin.y = 0;
-			r.origin.x = 0;
-            r.size.height -= 8;
-            internalTextView.frame = CGRectInset(r, kTextInsetX, 0);
-            internalTextView.contentInset = UIEdgeInsetsMake(-1,0,-1,0);
-            textViewBackgroundImage.frame = r;
-            
-			if(animateHeightChange)
-            {
-				[UIView commitAnimations];
-			}
-            else if ([delegate respondsToSelector:@selector(expandingTextView:didChangeHeight:)]) 
-            {
-                [delegate expandingTextView:self didChangeHeight:(newHeight+ kTextInsetBottom)];
-            }
-		}
+
+        if(animateHeightChange)
+        {
+            [UIView beginAnimations:@"" context:nil];
+            [UIView setAnimationDelegate:self];
+            [UIView setAnimationDidStopSelector:@selector(growDidStop)];
+            [UIView setAnimationBeginsFromCurrentState:YES];
+        }
+        
+        if ([delegate respondsToSelector:@selector(expandingTextView:willChangeHeight:)]) 
+        {
+            [delegate expandingTextView:self willChangeHeight:(newHeight+ kTextInsetBottom)];
+        }
+        
+        /* Resize the frame */
+        CGRect r = self.frame;
+        r.size.height = (newHeight<maximumHeight)?newHeight:maximumHeight + kTextInsetBottom;
+        self.frame = r;
+        r.origin.y = 0;
+        r.origin.x = 0;
+        r.size.height -= 8;
+        internalTextView.frame = CGRectInset(r, kTextInsetX, 0);
+        internalTextView.contentInset = UIEdgeInsetsMake(-1,0,-1,0);
+        textViewBackgroundImage.frame = r;
+        
+        if(animateHeightChange)
+        {
+            [UIView commitAnimations];
+        }
+        else if ([delegate respondsToSelector:@selector(expandingTextView:didChangeHeight:)]) 
+        {
+            [delegate expandingTextView:self didChangeHeight:(newHeight+ kTextInsetBottom)];
+        }
 		
 		if (newHeight >= maximumHeight)
 		{

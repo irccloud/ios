@@ -127,13 +127,11 @@
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,0,36)];
-        _message.maximumNumberOfLines = 6;
         _landscapeView = [[UIView alloc] initWithFrame:CGRectZero];
     } else {
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,0,36)];
     }
     _message.minimumHeight = 36;
-    [_message sizeToFit];
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
     [_bottomBar addSubview:_message];
@@ -142,6 +140,7 @@
     [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     users.frame = CGRectMake(0,0,40,40);
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+    self.slidingViewController.view.frame = [UIScreen mainScreen].applicationFrame;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
@@ -973,7 +972,7 @@
 }
 
 -(void)bufferSelected:(int)bid {
-    BOOL changed = (_buffer && _buffer.bid != bid);
+    BOOL changed = (_buffer && _buffer.bid != bid) || !_buffer;
     TFLog(@"BID selected: %i", bid);
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
         _eidToOpen = -1;
@@ -1159,20 +1158,19 @@
 
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     [self.slidingViewController resetTopView];
-    int height = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - self.navigationController.navigationBar.frame.size.height;
+    int height = (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - self.navigationController.navigationBar.frame.size.height;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
+        _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
         CGRect frame = _titleView.frame;
-        frame.size.width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?384:210;
-        frame.size.height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?24:40;
+        frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?384:210;
+        frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
         _titleView.frame = frame;
         _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
         _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
-        _topicLabel.alpha = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?0:1;
-        _message.maximumNumberOfLines = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?4:6;
+        _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
     } else {
-        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
             self.navigationItem.leftBarButtonItem = nil;
             self.navigationItem.rightBarButtonItem = nil;
             self.slidingViewController.underLeftViewController = nil;
@@ -1180,7 +1178,7 @@
             [self addChildViewController:_buffersView];
             [self addChildViewController:_usersView];
             _buffersView.view.frame = CGRectMake(0,0,220,height);
-            _eventsView.view.frame = CGRectMake(220,0,(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width) - 440,height - _bottomBar.frame.size.height);
+            _eventsView.view.frame = CGRectMake(220,0,(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width) - 440,height - _bottomBar.frame.size.height);
             _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,0,220,height);
             _bottomBar.frame = CGRectMake(220,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             _borders.frame = CGRectMake(219,0,_eventsView.view.frame.size.width + 2,height);
@@ -1206,7 +1204,7 @@
                 self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
             _buffersView.view.frame = CGRectMake(0,0,220,height);
             _usersView.view.frame = CGRectMake(0,0,220,height);
-            _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
+            _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
             _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             CGRect frame = _titleView.frame;
             frame.size.width = 666;
@@ -1224,6 +1222,8 @@
     CGRect frame = _message.frame;
     frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
     _message.frame = frame;
+    _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;
+    _message.text = _message.text;
     frame = _eventsView.view.frame;
     frame.size.height = 32;
     _eventsView.topUnreadView.frame = frame;
