@@ -58,6 +58,7 @@
     Ignore *_ignore;
     NSRecursiveLock *_lock;
     NSTimeInterval _scrolledUpFrom;
+    UIInterfaceOrientation _lastOrientation;
     
     IBOutlet id<EventsTableViewDelegate> _delegate;
 }

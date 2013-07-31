@@ -187,7 +187,8 @@ int __timestampWidth;
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    if(_ready) {
+    if(_ready && [UIApplication sharedApplication].statusBarOrientation != _lastOrientation) {
+        NSLog(@"Did rotate, clearing cached heights");
         if([_data count]) {
             [_lock lock];
             for(Event *e in _data) {
@@ -203,6 +204,7 @@ int __timestampWidth;
             }
         }
     }
+    _lastOrientation = [UIApplication sharedApplication].statusBarOrientation;
 }
 
 - (IBAction)loadMoreBacklogButtonPressed:(id)sender {
@@ -448,7 +450,6 @@ int __timestampWidth;
         } else {
             event.formattedMsg = event.msg;
         }
-        event.formatted = nil;
     }
     
     if(event.from.length && event.hostmask.length && ![type isEqualToString:@"user_channel_mode"] && [type rangeOfString:@"kicked"].location == NSNotFound) {
@@ -748,6 +749,7 @@ int __timestampWidth;
     _bottomUnreadView.alpha = 0;
     _requestingBacklog = NO;
     if(buffer.bid != _buffer.bid) {
+        NSLog(@"Changing from bid %i to %i", _buffer.bid, buffer.bid);
         for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid]) {
             if(event.rowType == ROW_LASTSEENEID) {
                 [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
