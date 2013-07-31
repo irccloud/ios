@@ -631,6 +631,8 @@ int __timestampWidth;
         }
 
         e.timestamp = [_formatter stringFromDate:date];
+    }
+    if(!e.day) {
         [_formatter setDateFormat:@"DDD"];
         e.day = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:eid/1000000]];
     }
