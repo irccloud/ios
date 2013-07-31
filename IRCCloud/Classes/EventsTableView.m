@@ -889,7 +889,7 @@ int __timestampWidth;
     }
     
     if(_lastSeenEidPos == 0) {
-        _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 80);
+        _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 92);
     } else {
         _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
     }
