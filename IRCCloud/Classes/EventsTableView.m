@@ -632,13 +632,13 @@ int __timestampWidth;
 
         e.timestamp = [_formatter stringFromDate:date];
         [_formatter setDateFormat:@"DDD"];
-        e.day = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:e.eid/1000000]];
-        e.groupEid = _currentCollapsedEid;
+        e.day = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:eid/1000000]];
     }
     if(e.groupMsg && !e.formattedMsg) {
         e.formattedMsg = e.groupMsg;
         e.formatted = nil;
     }
+    e.groupEid = _currentCollapsedEid;
     
     if(eid > _maxEid || _data.count == 0 || (eid == e.eid && [e compare:[_data objectAtIndex:_data.count - 1]] == NSOrderedDescending)) {
         //Message at bottom
