@@ -62,10 +62,11 @@
     NSArray *_links;
     NSString *_to;
     NSString *_command;
+    NSString *_day;
 }
 @property int cid, bid, rowType, reqId;
 @property NSTimeInterval eid, groupEid;
-@property NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command;
+@property NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day;
 @property BOOL isHighlight, isSelf, toChan, linkify, pending, monospace;
 @property NSDictionary *ops;
 @property UIColor *color, *bgColor;

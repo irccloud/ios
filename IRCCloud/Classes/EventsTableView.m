@@ -445,10 +445,12 @@ int __timestampWidth;
         _currentCollapsedEid = -1;
         [_collapsedEvents clear];
 
-        if([event.from length]) {
-            event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [ColorFormatter formatNick:event.from mode:event.fromMode], event.msg];
-        } else {
-            event.formattedMsg = event.msg;
+        if(!event.formatted) {
+            if([event.from length]) {
+                event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [ColorFormatter formatNick:event.from mode:event.fromMode], event.msg];
+            } else {
+                event.formattedMsg = event.msg;
+            }
         }
     }
     
@@ -460,28 +462,30 @@ int __timestampWidth;
         }
     }
     
-    if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
-        event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [ColorFormatter formatNick:event.nick mode:event.fromMode]];
-    } else if([type isEqualToString:@"buffer_me_msg"]) {
-        event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [ColorFormatter formatNick:event.nick mode:event.fromMode], event.msg];
-    } else if([type isEqualToString:@"kicked_channel"]) {
-        event.formattedMsg = @"← ";
-        if([event.type hasPrefix:@"you_"])
-            event.formattedMsg = [event.formattedMsg stringByAppendingString:@"You"];
-        else
-            event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c", BOLD, event.oldNick, CLEAR];
-        if([event.type hasPrefix:@"you_"])
-            event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
-        else
-            event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
-        event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@ (%@)", [ColorFormatter formatNick:event.nick mode:event.fromMode], event.hostmask];
-        if(event.msg.length > 0)
-            event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
-    } else if([type isEqualToString:@"channel_mode_list_change"]) {
-        if(event.from.length == 0)
-            event.formattedMsg = [NSString stringWithFormat:@"%@%@", event.msg, [ColorFormatter formatNick:event.nick mode:event.fromMode]];
+    if(!event.formatted) {
+        if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
+            event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [ColorFormatter formatNick:event.nick mode:event.fromMode]];
+        } else if([type isEqualToString:@"buffer_me_msg"]) {
+            event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [ColorFormatter formatNick:event.nick mode:event.fromMode], event.msg];
+        } else if([type isEqualToString:@"kicked_channel"]) {
+            event.formattedMsg = @"← ";
+            if([event.type hasPrefix:@"you_"])
+                event.formattedMsg = [event.formattedMsg stringByAppendingString:@"You"];
+            else
+                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c", BOLD, event.oldNick, CLEAR];
+            if([event.type hasPrefix:@"you_"])
+                event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
+            else
+                event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
+            event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@ (%@)", [ColorFormatter formatNick:event.nick mode:event.fromMode], event.hostmask];
+            if(event.msg.length > 0)
+                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
+        } else if([type isEqualToString:@"channel_mode_list_change"]) {
+            if(event.from.length == 0)
+                event.formattedMsg = [NSString stringWithFormat:@"%@%@", event.msg, [ColorFormatter formatNick:event.nick mode:event.fromMode]];
+        }
     }
-
+    
     [self _addItem:event eid:eid];
     
     if(!backlog) {
@@ -627,6 +631,8 @@ int __timestampWidth;
         }
 
         e.timestamp = [_formatter stringFromDate:date];
+        [_formatter setDateFormat:@"DDD"];
+        e.day = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:e.eid/1000000]];
         e.groupEid = _currentCollapsedEid;
     }
     if(e.groupMsg && !e.formattedMsg) {
@@ -637,8 +643,7 @@ int __timestampWidth;
     if(eid > _maxEid || _data.count == 0 || (eid == e.eid && [e compare:[_data objectAtIndex:_data.count - 1]] == NSOrderedDescending)) {
         //Message at bottom
         if(_data.count) {
-            [_formatter setDateFormat:@"DDD"];
-            lastDay = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:((Event *)[_data objectAtIndex:_data.count - 1]).eid/1000000]];
+            lastDay = ((Event *)[_data objectAtIndex:_data.count - 1]).day;
         }
         _maxEid = eid;
         [_data addObject:e];
@@ -646,9 +651,8 @@ int __timestampWidth;
     } else if(_minEid > eid) {
         //Message on top
         if(_data.count > 1) {
-            [_formatter setDateFormat:@"DDD"];
-            lastDay = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:((Event *)[_data objectAtIndex:1]).eid/1000000]];
-            if(![lastDay isEqualToString:[_formatter stringFromDate:date]]) {
+            lastDay = ((Event *)[_data objectAtIndex:1]).day;
+            if(![lastDay isEqualToString:e.day]) {
                 //Insert above the dateline
                 [_data insertObject:e atIndex:0];
                 insertPos = 0;
@@ -667,18 +671,16 @@ int __timestampWidth;
             if(e1.rowType != ROW_TIMESTAMP && [e compare:e1] == NSOrderedAscending && e.eid == eid) {
                 //Insert the message
                 if(i > 0 && ((Event *)[_data objectAtIndex:i - 1]).rowType != ROW_TIMESTAMP) {
-                    [_formatter setDateFormat:@"DDD"];
-                    lastDay = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:((Event *)[_data objectAtIndex:i - 1]).eid/1000000]];
+                    lastDay = ((Event *)[_data objectAtIndex:i - 1]).day;
                     [_data insertObject:e atIndex:i];
                     insertPos = i;
                     break;
                 } else {
                     //There was a dateline above our insertion point
-                    [_formatter setDateFormat:@"DDD"];
-                    lastDay = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:e1.eid/1000000]];
-                    if(![lastDay isEqualToString:[_formatter stringFromDate:date]]) {
+                    lastDay = e1.day;
+                    if(![lastDay isEqualToString:e.day]) {
                         if(i > 1) {
-                            lastDay = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:((Event *)[_data objectAtIndex:i - 2]).eid/1000000]];
+                            lastDay = ((Event *)[_data objectAtIndex:i - 2]).day;
                         } else {
                             //We're above the first dateline, so we'll need to put a new one on top
                             lastDay = nil;
@@ -694,8 +696,7 @@ int __timestampWidth;
                 }
             } else if(e1.rowType != ROW_TIMESTAMP && (e1.eid == eid || e1.groupEid == eid)) {
                 //Replace the message
-                [_formatter setDateFormat:@"DDD"];
-                lastDay = [_formatter stringFromDate:date];
+                lastDay = e.day;
                 [_data removeObjectAtIndex:i];
                 [_data insertObject:e atIndex:i];
                 insertPos = i;
@@ -724,8 +725,7 @@ int __timestampWidth;
     else
         _currentGroupPosition = -1;
     
-    [_formatter setDateFormat:@"DDD"];
-    if(![lastDay isEqualToString:[_formatter stringFromDate:date]]) {
+    if(![lastDay isEqualToString:e.day]) {
         [_formatter setDateFormat:@"EEEE, MMMM dd, yyyy"];
         Event *d = [[Event alloc] init];
         d.type = TYPE_TIMESTMP;

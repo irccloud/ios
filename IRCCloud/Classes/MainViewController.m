@@ -1217,6 +1217,7 @@
     }
     if(duration > 0) {
         _eventsView.view.hidden = YES;
+        _eventActivity.alpha = 1;
         [_eventActivity startAnimating];
     }
     CGRect frame = _message.frame;
@@ -1236,6 +1237,7 @@
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
     _eventsView.view.hidden = NO;
+    _eventActivity.alpha = 0;
     [_eventActivity stopAnimating];
 }
 
