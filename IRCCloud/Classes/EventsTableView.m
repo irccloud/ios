@@ -1140,7 +1140,8 @@ int __timestampWidth;
         [UIView setAnimationDuration:0.1];
         _bottomUnreadView.alpha = 0;
         [UIView commitAnimations];
-        [self scrollToBottom];
+        if(_data.count)
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
     }
 }
 
