@@ -204,6 +204,10 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
 }
 
+- (void)didMoveToParentViewController:(UIViewController *)parent {
+    [self refresh];
+}
+
 - (void)viewDidUnload {
     [super viewDidUnload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];

@@ -102,8 +102,10 @@
     [_bottomBar addSubview:_sendBtn];
     
     self.slidingViewController.shouldAllowPanningPastAnchor = NO;
-    self.slidingViewController.underLeftViewController = _buffersView;
-    self.slidingViewController.underRightViewController = _usersView;
+    if(self.slidingViewController.underLeftViewController == nil)
+        self.slidingViewController.underLeftViewController = _buffersView;
+    if(self.slidingViewController.underRightViewController == nil)
+        self.slidingViewController.underRightViewController = _usersView;
     self.slidingViewController.anchorLeftRevealAmount = 240;
     self.slidingViewController.anchorRightRevealAmount = 240;
     self.slidingViewController.underLeftWidthLayout = ECFixedRevealWidth;
@@ -1301,7 +1303,7 @@
         } else {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
                 self.navigationItem.rightBarButtonItem = _usersButtonItem;
-                if(!self.slidingViewController.underRightViewController)
+                if(self.slidingViewController.underRightViewController == nil)
                     self.slidingViewController.underRightViewController = _usersView;
             } else {
                 self.navigationItem.rightBarButtonItem = nil;

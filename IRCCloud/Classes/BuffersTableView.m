@@ -174,6 +174,10 @@
     [self performSelector:@selector(refresh) withObject:nil afterDelay:0.15];
 }
 
+- (void)didMoveToParentViewController:(UIViewController *)parent {
+    [self refresh];
+}
+
 - (void)refresh {
     NSMutableArray *data = [[NSMutableArray alloc] init];
     int archiveCount = 0;
