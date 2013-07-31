@@ -53,7 +53,7 @@
             ||[_type isEqualToString:@"wallops"]);
 }
 -(NSString *)description {
-    return [NSString stringWithFormat:@"{cid: %i, bid: %i, eid: %f, type: %@, msg: %@}", _cid, _bid, _eid, _type, _msg];
+    return [NSString stringWithFormat:@"{cid: %i, bid: %i, eid: %f, group: %f, type: %@, msg: %@}", _cid, _bid, _eid, _groupEid, _type, _msg];
 }
 @end
 
@@ -440,7 +440,7 @@
 -(NSArray *)eventsForBuffer:(int)bid {
     @synchronized(_events) {
         if(_dirty) {
-            [[_events objectForKey:@(bid)] sortedArrayUsingSelector:@selector(compare:)];
+            [[_events objectForKey:@(bid)] sortUsingSelector:@selector(compare:)];
             _dirty = NO;
         }
         return [_events objectForKey:@(bid)];

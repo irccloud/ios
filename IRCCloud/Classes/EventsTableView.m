@@ -528,7 +528,8 @@ int __timestampWidth;
     if(_lastSeenEidPos == 0) {
         int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
         if(seconds < 0) {
-            _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
+            _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
+            self.tableView.tableHeaderView = self.tableView.tableHeaderView;
             _topUnreadView.alpha = 0;
         } else {
             int minutes = seconds / 60;
@@ -562,7 +563,8 @@ int __timestampWidth;
         } else if(firstRow - _lastSeenEidPos > 0) {
             _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i unread messages", firstRow - _lastSeenEidPos];
         } else {
-            _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
+            _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
+            self.tableView.tableHeaderView = self.tableView.tableHeaderView;
             _topUnreadView.alpha = 0;
         }
     }
@@ -728,6 +730,7 @@ int __timestampWidth;
         d.type = TYPE_TIMESTMP;
         d.rowType = ROW_TIMESTAMP;
         d.eid = eid;
+        d.groupEid = -1;
         d.timestamp = [_formatter stringFromDate:date];
         d.bgColor = [UIColor timestampBackgroundColor];
         [_data insertObject:d atIndex:insertPos];
@@ -893,7 +896,8 @@ int __timestampWidth;
     } else {
         _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
     }
-    
+    self.tableView.tableHeaderView = self.tableView.tableHeaderView;
+   
     [self.tableView reloadData];
     if(_requestingBacklog && backlogEid > 0 && _scrolledUp) {
         int markerPos = -1;
