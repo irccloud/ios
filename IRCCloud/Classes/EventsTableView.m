@@ -1127,6 +1127,8 @@ int __timestampWidth;
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_lastSeenEidPos+1 inSection:0] atScrollPosition: UITableViewScrollPositionTop animated: YES];
             [self scrollViewDidScroll:self.tableView];
         } else {
+            if(self.tableView.tableHeaderView == _backlogFailedView)
+                [self loadMoreBacklogButtonPressed:nil];
             [self.tableView setContentOffset:CGPointMake(0,0) animated:YES];
         }
     }
