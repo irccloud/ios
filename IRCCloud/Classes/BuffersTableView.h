@@ -42,6 +42,7 @@
 	int _lastHighlightPosition;
     
     UIAlertView *_alertView;
+    NSRecursiveLock *_lock;
 }
 -(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadIndicatorClicked:(id)sender;

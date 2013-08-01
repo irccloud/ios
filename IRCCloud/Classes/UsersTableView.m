@@ -92,7 +92,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [self performSelector:@selector(refresh) withObject:nil afterDelay:0.15];
+    [self performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {

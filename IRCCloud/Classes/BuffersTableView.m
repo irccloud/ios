@@ -145,6 +145,7 @@
         _firstUnreadPosition = -1;
         _lastHighlightPosition = -1;
         _lastUnreadPosition = -1;
+        _lock = [[NSRecursiveLock alloc] init];
     }
     return self;
 }
@@ -159,6 +160,7 @@
         _firstUnreadPosition = -1;
         _lastHighlightPosition = -1;
         _lastUnreadPosition = -1;
+        _lock = [[NSRecursiveLock alloc] init];
     }
     return self;
 }
@@ -171,7 +173,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y,self.view.frame.size.width, 40);
     bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
-    [self performSelector:@selector(refresh) withObject:nil afterDelay:0.15];
+    [self performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
@@ -325,9 +327,11 @@
      @"archived":@0,
      }];
 
+    [_lock lock];
     _data = data;
     [self.tableView reloadData];
     [self _updateUnreadIndicators];
+    [_lock unlock];
 }
 
 -(void)_updateUnreadIndicators {
