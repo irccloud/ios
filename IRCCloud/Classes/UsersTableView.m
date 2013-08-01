@@ -111,7 +111,7 @@
         case kIRCEventMemberUpdates:
         case kIRCEventUserChannelMode:
         case kIRCEventKick:
-            [self refresh];
+            [self performSelectorInBackground:@selector(refresh) withObject:nil];
             break;
         default:
             break;

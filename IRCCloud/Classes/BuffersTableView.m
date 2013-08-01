@@ -329,7 +329,7 @@
 
     [_lock lock];
     _data = data;
-    [self.tableView reloadData];
+    [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
     [self _updateUnreadIndicators];
     [_lock unlock];
 }
@@ -456,8 +456,12 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.view.backgroundColor = [UIColor backgroundBlueColor];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudEventNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshInBackground) name:kIRCCloudEventNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshInBackground) name:kIRCCloudBacklogCompletedNotification object:nil];
+}
+
+- (void)refreshInBackground {
+    [self performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
 - (void)viewDidUnload {
