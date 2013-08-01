@@ -409,11 +409,17 @@ int __timestampWidth;
             [c addEvent:event];
             msg = [c collapse];
             if(!nextIsGrouped) {
+                NSString *groupMsg = [_collapsedEvents collapse];
+                if(groupMsg == nil && [type isEqualToString:@"nickchange"])
+                    groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [ColorFormatter formatNick:event.nick mode:event.fromMode], BOLD];
+                if(groupMsg == nil && [type isEqualToString:@"user_channel_mode"]) {
+                    groupMsg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [ColorFormatter formatNick:event.from mode:event.fromMode], BOLD, BOLD, event.diff, [ColorFormatter formatNick:event.nick mode:event.fromMode], BOLD];
+                }
                 Event *heading = [[Event alloc] init];
                 heading.cid = event.cid;
                 heading.bid = event.bid;
                 heading.eid = _currentCollapsedEid - 1;
-                heading.groupMsg = [NSString stringWithFormat:@"   %@",[_collapsedEvents collapse]];
+                heading.groupMsg = [NSString stringWithFormat:@"   %@",groupMsg];
                 heading.color = [UIColor timestampColor];
                 heading.bgColor = [UIColor whiteColor];
                 heading.formattedMsg = nil;
@@ -991,7 +997,7 @@ int __timestampWidth;
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links];
             e.links = links;
         } else if(e.formattedMsg.length == 0) {
-            //TFLog(@"No formatted message: %@", e);
+            TFLog(@"No formatted message: %@", e);
             return 26;
         }
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
