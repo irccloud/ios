@@ -170,14 +170,8 @@
     [self _updateUnreadIndicators];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y,self.view.frame.size.width, 40);
-    bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
-    [self performSelectorInBackground:@selector(refresh) withObject:nil];
-}
-
 - (void)didMoveToParentViewController:(UIViewController *)parent {
-    [self refresh];
+    [self performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
 - (void)refresh {
@@ -335,6 +329,8 @@
 }
 
 -(void)_updateUnreadIndicators {
+    topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y,self.view.frame.size.width, 40);
+    bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
     NSArray *rows = [self.tableView indexPathsForVisibleRows];
     if(rows.count) {
         int first = [[rows objectAtIndex:0] row];
@@ -674,7 +670,6 @@
             [_expandedArchives removeObjectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
         else
             [_expandedArchives setObject:@YES forKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
-        [self refresh];
     } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
         EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
         if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
@@ -688,7 +683,7 @@
         if(_delegate)
             [_delegate bufferSelected:[[[_data objectAtIndex:_selectedRow] objectForKey:@"bid"] intValue]];
     }
-    [tableView reloadData];
+    [self performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
 -(void)setBuffer:(Buffer *)buffer {
@@ -696,7 +691,7 @@
     _selectedRow = -1;
     if(_selectedBuffer.archived && ![_selectedBuffer.type isEqualToString:@"console"])
         [_expandedArchives setObject:@YES forKey:@(_selectedBuffer.cid)];
-    [self refresh];
+    [self performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {

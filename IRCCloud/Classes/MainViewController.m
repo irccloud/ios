@@ -101,6 +101,7 @@
     _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,8,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
     [_bottomBar addSubview:_sendBtn];
     
+    self.slidingViewController.view.frame = [UIScreen mainScreen].applicationFrame;
     self.slidingViewController.shouldAllowPanningPastAnchor = NO;
     if(self.slidingViewController.underLeftViewController == nil)
         self.slidingViewController.underLeftViewController = _buffersView;
@@ -142,7 +143,6 @@
     [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     users.frame = CGRectMake(0,0,40,40);
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
-    self.slidingViewController.view.frame = [UIScreen mainScreen].applicationFrame;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
@@ -1184,9 +1184,13 @@
             _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,0,220,height);
             _bottomBar.frame = CGRectMake(220,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             _borders.frame = CGRectMake(219,0,_eventsView.view.frame.size.width + 2,height);
+            [_buffersView willMoveToParentViewController:self];
             [_buffersView viewWillAppear:NO];
+            _buffersView.view.hidden = NO;
             [self.view insertSubview:_buffersView.view atIndex:1];
+            [_usersView willMoveToParentViewController:self];
             [_usersView viewWillAppear:NO];
+            _usersView.view.hidden = NO;
             [self.view insertSubview:_usersView.view atIndex:1];
             _borders.hidden = NO;
             CGRect frame = _titleView.frame;
@@ -1197,8 +1201,6 @@
             frame.size.width = _eventsView.view.frame.size.width;
             _serverStatusBar.frame = frame;
         } else {
-            [_buffersView.view removeFromSuperview];
-            [_usersView.view removeFromSuperview];
             _borders.hidden = YES;
             if(!self.slidingViewController.underLeftViewController)
                 self.slidingViewController.underLeftViewController = _buffersView;

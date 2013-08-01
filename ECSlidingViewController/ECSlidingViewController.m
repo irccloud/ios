@@ -128,6 +128,8 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     [self addChildViewController:self.underLeftViewController];
     [self.underLeftViewController didMoveToParentViewController:self];
     
+    _underLeftViewController.view.hidden = YES;
+    [self.view insertSubview:_underLeftViewController.view belowSubview:self.topView];
     [self updateUnderLeftLayout];
   }
 }
@@ -144,6 +146,8 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     [self addChildViewController:self.underRightViewController];
     [self.underRightViewController didMoveToParentViewController:self];
     
+    _underRightViewController.view.hidden = YES;
+    [self.view insertSubview:_underRightViewController.view belowSubview:self.topView];
     [self updateUnderRightLayout];
   }
 }
@@ -352,6 +356,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     dispatch_async(dispatch_get_main_queue(), ^{
       NSString *key = (side == ECLeft) ? ECSlidingViewTopDidAnchorLeft : ECSlidingViewTopDidAnchorRight;
       [[NSNotificationCenter defaultCenter] postNotificationName:key object:self userInfo:nil];
+      (side == ECRight) ? [_underLeftViewController viewDidAppear:NO] : [_underRightViewController viewDidAppear:NO];
     });
   }];
 }
@@ -532,9 +537,9 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ECSlidingViewUnderLeftWillAppear object:self userInfo:nil];
   });
-  [self.underRightView removeFromSuperview];
   [self updateUnderLeftLayout];
-  [self.view insertSubview:self.underLeftView belowSubview:self.topView];
+  self.underRightView.hidden = YES;
+  self.underLeftView.hidden = NO;
   _underLeftShowing  = YES;
   _underRightShowing = NO;
 }
@@ -544,9 +549,9 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ECSlidingViewUnderRightWillAppear object:self userInfo:nil];
   });
-  [self.underLeftView removeFromSuperview];
   [self updateUnderRightLayout];
-  [self.view insertSubview:self.underRightView belowSubview:self.topView];
+  self.underRightView.hidden = NO;
+  self.underLeftView.hidden = YES;
   _underLeftShowing  = NO;
   _underRightShowing = YES;
 }
@@ -559,8 +564,8 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   [self.topView removeGestureRecognizer:self.resetTapGesture];
   [self removeTopViewSnapshot];
   self.panGesture.enabled = YES;
-  [self.underRightView removeFromSuperview];
-  [self.underLeftView removeFromSuperview];
+  self.underRightView.hidden = YES;
+  self.underLeftView.hidden = YES;
   _underLeftShowing   = NO;
   _underRightShowing  = NO;
   _topViewIsOffScreen = NO;

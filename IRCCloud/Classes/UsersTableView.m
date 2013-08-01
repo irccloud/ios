@@ -91,10 +91,6 @@
     return self;
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-    [self performSelectorInBackground:@selector(refresh) withObject:nil];
-}
-
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
     [self.tableView reloadData];
 }

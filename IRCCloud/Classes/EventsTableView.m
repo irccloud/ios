@@ -757,7 +757,6 @@ int __timestampWidth;
     _bottomUnreadView.alpha = 0;
     _requestingBacklog = NO;
     if(buffer.bid != _buffer.bid) {
-        NSLog(@"Changing from bid %i to %i", _buffer.bid, buffer.bid);
         for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid]) {
             if(event.rowType == ROW_LASTSEENEID) {
                 [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
@@ -997,7 +996,7 @@ int __timestampWidth;
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links];
             e.links = links;
         } else if(e.formattedMsg.length == 0) {
-            TFLog(@"No formatted message: %@", e);
+            //TFLog(@"No formatted message: %@", e);
             return 26;
         }
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
