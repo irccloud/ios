@@ -460,8 +460,12 @@ int __timestampWidth;
         }
     }
     
-    if(event.from.length && event.hostmask.length && ![type isEqualToString:@"user_channel_mode"] && [type rangeOfString:@"kicked"].location == NSNotFound) {
-        if([_ignore match:[NSString stringWithFormat:@"%@!%@", event.from, event.hostmask]]) {
+    NSString *from = event.from;
+    if(!from.length)
+        from = event.nick;
+    
+    if(from.length && event.hostmask.length && ![type isEqualToString:@"user_channel_mode"] && [type rangeOfString:@"kicked"].location == NSNotFound) {
+        if([_ignore match:[NSString stringWithFormat:@"%@!%@", from, event.hostmask]]) {
             if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0)
                 [self sendHeartbeat];
             return;
