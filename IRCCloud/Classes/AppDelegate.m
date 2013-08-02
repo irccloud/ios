@@ -24,6 +24,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    _conn = [NetworkConnection sharedInstance];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30)}];
     if(TESTFLIGHT_KEY)
         [TestFlight takeOff:TESTFLIGHT_KEY];
@@ -92,7 +93,7 @@
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
     [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSDictionary *result = [[NetworkConnection sharedInstance] registerAPNs:devToken];
+        NSDictionary *result = [_conn registerAPNs:devToken];
         NSLog(@"Registration result: %@", result);
     });
 }
@@ -140,9 +141,9 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    [NetworkConnection sharedInstance].background = YES;
+    _conn.background = YES;
     [_disconnectTimer invalidate];
-    _disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:[[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] target:[NetworkConnection sharedInstance] selector:@selector(disconnect) userInfo:nil repeats:NO];
+    _disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:[[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] target:_conn selector:@selector(disconnect) userInfo:nil repeats:NO];
     if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
         ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
         [evc.topViewController viewWillDisappear:NO];
@@ -152,7 +153,7 @@
     __block UIBackgroundTaskIdentifier background_task;
     background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
         [_disconnectTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
-        [[NetworkConnection sharedInstance] disconnect];
+        [_conn disconnect];
         [NSThread sleepForTimeInterval:5];
         [application endBackgroundTask: background_task];
         background_task = UIBackgroundTaskInvalid;
@@ -165,7 +166,7 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [NetworkConnection sharedInstance].background = NO;
+    _conn.background = NO;
     application.applicationIconBadgeNumber = 1;
     application.applicationIconBadgeNumber = 0;
     [application cancelAllLocalNotifications];
@@ -180,7 +181,7 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    [[NetworkConnection sharedInstance] disconnect];
+    [_conn disconnect];
 }
 
 @end

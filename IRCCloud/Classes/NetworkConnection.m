@@ -1080,8 +1080,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)_backlogStarted:(NSNotification *)notification {
     OOBFetcher *fetcher = notification.object;
     if(fetcher.bid == -1) {
-        [[ServersDataSource sharedInstance] clear];
-        [[BuffersDataSource sharedInstance] clear];
+        [_servers clear];
+        [_buffers clear];
     }
     _currentBid = -1;
     _currentCount = 0;
@@ -1093,7 +1093,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(fetcher.bid > 0)
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     else
-        [[EventsDataSource sharedInstance] purgeInvalidBIDs];
+        [_events purgeInvalidBIDs];
     [_oobQueue removeObject:fetcher];
     if([_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
@@ -1137,10 +1137,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self cancelIdleTimer];
     _reconnectTimestamp = 0;
     [self clearPrefs];
-    [[ServersDataSource sharedInstance] clear];
-    [[BuffersDataSource sharedInstance] clear];
-    [[UsersDataSource sharedInstance] clear];
-    [[ChannelsDataSource sharedInstance] clear];
-    [[EventsDataSource sharedInstance] clear];
+    [_servers clear];
+    [_buffers clear];
+    [_users clear];
+    [_channels clear];
+    [_events clear];
 }
 @end

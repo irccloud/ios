@@ -19,6 +19,7 @@
 #import "MainViewController.h"
 #import "ECSlidingViewController.h"
 #import "OpenInChromeController.h"
+#import "NetworkConnection.h"
 
 @class ViewController;
 
@@ -26,6 +27,7 @@
     NSTimer *_disconnectTimer;
     OpenInChromeController *_openInChromeController;
     NSURL *_pendingURL;
+    NetworkConnection *_conn;
 }
 
 @property (strong, nonatomic) UIWindow *window;
