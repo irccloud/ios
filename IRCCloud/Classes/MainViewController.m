@@ -1431,12 +1431,17 @@
     if(_doubleTapTimer) {
         [_doubleTapTimer invalidate];
         _doubleTapTimer = nil;
-        _selectedUser = [[UsersDataSource sharedInstance] getUser:event.from cid:event.cid bid:event.bid];
-        if(!_selectedUser) {
-            _selectedUser = [[User alloc] init];
-            _selectedUser.nick = event.from;
+        NSString *from = event.from;
+        if(!from.length)
+            from = event.nick;
+        if(from.length) {
+            _selectedUser = [[UsersDataSource sharedInstance] getUser:from cid:event.cid bid:event.bid];
+            if(!_selectedUser) {
+                _selectedUser = [[User alloc] init];
+                _selectedUser.nick = from;
+            }
+            [self _mention];
         }
-        [self _mention];
     } else {
         _doubleTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_eventTapped:) userInfo:event repeats:NO];
     }
