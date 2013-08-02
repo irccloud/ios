@@ -145,7 +145,6 @@
         _firstUnreadPosition = -1;
         _lastHighlightPosition = -1;
         _lastUnreadPosition = -1;
-        _lock = [[NSRecursiveLock alloc] init];
     }
     return self;
 }
@@ -160,7 +159,6 @@
         _firstUnreadPosition = -1;
         _lastHighlightPosition = -1;
         _lastUnreadPosition = -1;
-        _lock = [[NSRecursiveLock alloc] init];
     }
     return self;
 }
@@ -321,16 +319,14 @@
      @"archived":@0,
      }];
 
-    [_lock lock];
-    _data = data;
-    [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
-    [self _updateUnreadIndicators];
-    [_lock unlock];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _data = data;
+        [self.tableView reloadData];
+        [self _updateUnreadIndicators];
+    }];
 }
 
 -(void)_updateUnreadIndicators {
-    topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y,self.view.frame.size.width, 40);
-    bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
     NSArray *rows = [self.tableView indexPathsForVisibleRows];
     if(rows.count) {
         int first = [[rows objectAtIndex:0] row];
