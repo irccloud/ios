@@ -470,7 +470,10 @@
         [ignore setIgnores:s.ignores];
         for(Event *event in [_events objectForKey:@(bid)]) {
             if(event.eid > lastSeenEid && [event isImportant:type]) {
-                if(event.from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", event.from, event.hostmask]])
+                NSString *from = event.from;
+                if(!from.length)
+                    from = event.nick;
+                if(from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", from, event.hostmask]])
                     continue;
                 count++;
             }
@@ -488,7 +491,10 @@
         [ignore setIgnores:s.ignores];
         for(Event *event in [_events objectForKey:@(bid)]) {
             if(event.eid > lastSeenEid && [event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"])) {
-                if(event.from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", event.from, event.hostmask]])
+                NSString *from = event.from;
+                if(!from.length)
+                    from = event.nick;
+                if(from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", from, event.hostmask]])
                     continue;
                 count++;
             }
