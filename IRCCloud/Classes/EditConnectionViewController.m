@@ -23,6 +23,7 @@
 @interface NetworkListViewController : UITableViewController {
     id<NetworkListDelegate> _delegate;
     NSString *_selection;
+    NSArray *_networks;
 }
 @property (nonatomic) NSString *selection;
 -(id)initWithDelegate:(id)delegate;
@@ -35,6 +36,32 @@
     if (self) {
         _delegate = delegate;
         self.navigationItem.title = @"Networks";
+        _networks = @[
+                      @{@"network":@"IRCCloud", @"host":@"irc.irccloud.com", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"Freenode", @"host":@"irc.freenode.net", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"QuakeNet", @"host":@"blacklotus.ca.us.quakenet.org", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"IRCNet", @"host":@"ircnet.blacklotus.net", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"Undernet", @"host":@"losangeles.ca.us.undernet.org", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"DALNet", @"host":@"irc.dal.net", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"OFTC", @"host":@"irc.oftc.net", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"GameSurge", @"host":@"irc.gamesurge.net", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"Efnet", @"host":@"efnet.xs4all.nl", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"Mozilla", @"host":@"irc.mozilla.org", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"Rizon", @"host":@"irc6.rizon.net", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"Espernet", @"host":@"irc.esper.net", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"ReplayIRC", @"host":@"irc.replayirc.com", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"synIRC", @"host":@"naamia.fl.eu.synirc.net", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"fossnet", @"host":@"irc.fossnet.info", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"P2P-NET", @"host":@"irc.p2p-network.net", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"euIRCnet", @"host":@"irc.euirc.net", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"SlashNET", @"host":@"irc.slashnet.org", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"Atrum", @"host":@"irc.atrum.org", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"Indymedia", @"host":@"irc.indymedia.org", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"TWiT", @"host":@"irc.twit.tv", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"Snoonet", @"host":@"irc.snoonet.org", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"BrasIRC", @"host":@"irc.brasirc.org", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"darkscience", @"host":@"irc.darkscience.net", @"port":@(6697), @"SSL":@(YES)}
+                      ];
     }
     return self;
 }
@@ -51,80 +78,36 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 21;
+    return [_networks count];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 54;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"networkcell"];
     if(!cell)
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"networkcell"];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"networkcell"];
     
-
-    switch(indexPath.row) {
-        case 0:
-            cell.textLabel.text = @"IRCCloud";
-            break;
-        case 1:
-            cell.textLabel.text = @"Freenode";
-            break;
-        case 2:
-            cell.textLabel.text = @"QuakeNet";
-            break;
-        case 3:
-            cell.textLabel.text = @"IRCNet";
-            break;
-        case 4:
-            cell.textLabel.text = @"Undernet";
-            break;
-        case 5:
-            cell.textLabel.text = @"DALNet";
-            break;
-        case 6:
-            cell.textLabel.text = @"OFTC";
-            break;
-        case 7:
-            cell.textLabel.text = @"GameSurge";
-            break;
-        case 8:
-            cell.textLabel.text = @"Efnet";
-            break;
-        case 9:
-            cell.textLabel.text = @"Mozilla";
-            break;
-        case 10:
-            cell.textLabel.text = @"Rizon";
-            break;
-        case 11:
-            cell.textLabel.text = @"Espernet";
-            break;
-        case 12:
-            cell.textLabel.text = @"ReplayIRC";
-            break;
-        case 13:
-            cell.textLabel.text = @"synIRC";
-            break;
-        case 14:
-            cell.textLabel.text = @"fossnet";
-            break;
-        case 15:
-            cell.textLabel.text = @"P2P-NET";
-            break;
-        case 16:
-            cell.textLabel.text = @"euIRCnet";
-            break;
-        case 17:
-            cell.textLabel.text = @"SlashNET";
-            break;
-        case 18:
-            cell.textLabel.text = @"Atrum";
-            break;
-        case 19:
-            cell.textLabel.text = @"Indymedia";
-            break;
-        case 20:
-            cell.textLabel.text = @"TWiT";
-            break;
-    }
+    NSDictionary *row = [_networks objectAtIndex:indexPath.row];
+    [[cell.textLabel subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    cell.textLabel.clipsToBounds = NO;
+    UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(-2,3,16,16)];
+    if([[row objectForKey:@"SSL"] boolValue])
+        icon.image = [UIImage imageNamed:@"world_shield"];
+    else
+        icon.image = [UIImage imageNamed:@"world"];
+/* icon on the right instead
+     if([[row objectForKey:@"SSL"] boolValue]) {
+     UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake([cell.textLabel.text sizeWithFont:[UIFont boldSystemFontOfSize:18]].width + 2,2,16,16)];
+     icon.image = [UIImage imageNamed:@"world_shield"];
+     [cell.textLabel addSubview:icon];
+     }
+*/
+    [cell.textLabel addSubview:icon];
+    cell.textLabel.text = [NSString stringWithFormat:@"   %@",[row objectForKey:@"network"]];
+    cell.detailTextLabel.text = [row objectForKey:@"host"];
     
     if([_selection isEqualToString:cell.textLabel.text])
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
@@ -178,71 +161,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     _selection = [self tableView:tableView cellForRowAtIndexPath:indexPath].textLabel.text;
     [tableView reloadData];
-    switch(indexPath.row) {
-        case 0:
-            [_delegate setNetwork:@"IRCCloud" host:@"irc.irccloud.com" port:6667 SSL:NO];
-            break;
-        case 1:
-            [_delegate setNetwork:@"Freenode" host:@"irc.freenode.net" port:6697 SSL:YES];
-            break;
-        case 2:
-            [_delegate setNetwork:@"QuakeNet" host:@"irc.quakenet.org" port:6667 SSL:NO];
-            break;
-        case 3:
-            [_delegate setNetwork:@"IRCNet" host:@"irc.otw-inter.net" port:6667 SSL:NO];
-            break;
-        case 4:
-            [_delegate setNetwork:@"Undernet" host:@"irc.undernet.org" port:6667 SSL:NO];
-            break;
-        case 5:
-            [_delegate setNetwork:@"DALNet" host:@"irc.dal.net" port:6667 SSL:NO];
-            break;
-        case 6:
-            [_delegate setNetwork:@"OFTC" host:@"irc.oftc.net" port:6667 SSL:NO];
-            break;
-        case 7:
-            [_delegate setNetwork:@"GameSurge" host:@"irc.gamesurge.net" port:6667 SSL:NO];
-            break;
-        case 8:
-            [_delegate setNetwork:@"Efnet" host:@"efnet.xs4all.nl" port:6667 SSL:NO];
-            break;
-        case 9:
-            [_delegate setNetwork:@"Mozilla" host:@"irc.mozilla.org" port:6697 SSL:YES];
-            break;
-        case 10:
-            [_delegate setNetwork:@"Rizon" host:@"irc6.rizon.net" port:6697 SSL:YES];
-            break;
-        case 11:
-            [_delegate setNetwork:@"Espernet" host:@"irc.esper.net" port:6667 SSL:NO];
-            break;
-        case 12:
-            [_delegate setNetwork:@"ReplayIRC" host:@"irc.replayirc.com" port:6667 SSL:NO];
-            break;
-        case 13:
-            [_delegate setNetwork:@"synIRC" host:@"naamia.fl.eu.synirc.net" port:6697 SSL:YES];
-            break;
-        case 14:
-            [_delegate setNetwork:@"fossnet" host:@"irc.fossnet.info" port:6697 SSL:YES];
-            break;
-        case 15:
-            [_delegate setNetwork:@"P2P-NET" host:@"irc.p2p-network.net" port:6697 SSL:YES];
-            break;
-        case 16:
-            [_delegate setNetwork:@"euIRCnet" host:@"irc.euirc.net" port:6697 SSL:YES];
-            break;
-        case 17:
-            [_delegate setNetwork:@"SlashNET" host:@"irc.slashnet.org" port:6697 SSL:YES];
-            break;
-        case 18:
-            [_delegate setNetwork:@"Atrum" host:@"irc.atrum.org" port:6697 SSL:YES];
-            break;
-        case 19:
-            [_delegate setNetwork:@"Indymedia" host:@"irc.indymedia.org" port:6697 SSL:YES];
-            break;
-        case 20:
-            [_delegate setNetwork:@"TWiT" host:@"irc.twit.tv" port:6697 SSL:YES];
-            break;
-    }
+    NSDictionary *row = [_networks objectAtIndex:indexPath.row];
+    [_delegate setNetwork:[row objectForKey:@"network"] host:[row objectForKey:@"host"] port:[[row objectForKey:@"port"] intValue] SSL:[[row objectForKey:@"SSL"] boolValue]];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
