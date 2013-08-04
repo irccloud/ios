@@ -242,18 +242,21 @@ int __timestampWidth;
 
 - (void)_sendHeartbeat {
     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
-    Event *last;
-    for(int i = events.count - 1; i >= 0; i--) {
-        last = [events objectAtIndex:i];
-        if(!last.pending && last.rowType != ROW_LASTSEENEID)
-            break;
-    }
-    if(!last.pending) {
-        NSTimeInterval eid = last.eid;
-        if(eid > _buffer.last_seen_eid) {
-            [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
-            _buffer.last_seen_eid = eid;
+    NSTimeInterval eid = _scrolledUpFrom;
+    if(eid <= 0) {
+        Event *last;
+        for(int i = events.count - 1; i >= 0; i--) {
+            last = [events objectAtIndex:i];
+            if(!last.pending && last.rowType != ROW_LASTSEENEID)
+                break;
         }
+        if(!last.pending) {
+            eid = last.eid;
+        }
+    }
+    if(eid >= 0 && eid > _buffer.last_seen_eid) {
+        [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
+        _buffer.last_seen_eid = eid;
     }
     _heartbeatTimer = nil;
 }
@@ -757,8 +760,6 @@ int __timestampWidth;
     _ready = NO;
     [_scrollTimer invalidate];
     _scrollTimer = nil;
-    _topUnreadView.alpha = 0;
-    _bottomUnreadView.alpha = 0;
     _requestingBacklog = NO;
     if(buffer.bid != _buffer.bid) {
         for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid]) {
@@ -771,6 +772,8 @@ int __timestampWidth;
         }
         _scrolledUp = NO;
         _scrolledUpFrom = -1;
+        _topUnreadView.alpha = 0;
+        _bottomUnreadView.alpha = 0;
     }
     _buffer = buffer;
     if(buffer)
@@ -944,10 +947,12 @@ int __timestampWidth;
     if(_data.count) {
         int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
         if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
-            [UIView beginAnimations:nil context:nil];
-            [UIView setAnimationDuration:0.1];
-            _topUnreadView.alpha = 1;
-            [UIView commitAnimations];
+            if(!_scrolledUp) {
+                [UIView beginAnimations:nil context:nil];
+                [UIView setAnimationDuration:0.1];
+                _topUnreadView.alpha = 1;
+                [UIView commitAnimations];
+            }
             [self updateTopUnread:firstRow];
         }
         _requestingBacklog = NO;
@@ -1206,8 +1211,7 @@ int __timestampWidth;
                     [UIView setAnimationDuration:0.1];
                     _topUnreadView.alpha = 0;
                     [UIView commitAnimations];
-                    if(_bottomUnreadView.alpha == 0)
-                        [self _sendHeartbeat];
+                    [self _sendHeartbeat];
                 } else {
                     [self updateTopUnread:firstRow];
                 }
