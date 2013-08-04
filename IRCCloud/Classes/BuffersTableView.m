@@ -469,6 +469,7 @@
 - (void)viewDidUnload {
     [super viewDidUnload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    NSLog(@"Buffers table view was unloaded");
 }
 
 - (void)didReceiveMemoryWarning {

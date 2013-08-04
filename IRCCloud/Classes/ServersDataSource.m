@@ -190,4 +190,8 @@
             server.ignores = ignores;
     }
 }
+
+-(void)finalize {
+    NSLog(@"ServersDataSource: HALP! I'm being garbage collected!");
+}
 @end

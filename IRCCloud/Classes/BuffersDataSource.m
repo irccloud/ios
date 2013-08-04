@@ -186,4 +186,8 @@
         }
     }
 }
+
+-(void)finalize {
+    NSLog(@"BuffersDataSource: HALP! I'm being garbage collected!");
+}
 @end
