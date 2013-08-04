@@ -145,6 +145,8 @@
         _firstUnreadPosition = -1;
         _lastHighlightPosition = -1;
         _lastUnreadPosition = -1;
+        _servers = [ServersDataSource sharedInstance];
+        _buffers = [BuffersDataSource sharedInstance];
     }
     return self;
 }
@@ -159,6 +161,8 @@
         _firstUnreadPosition = -1;
         _lastHighlightPosition = -1;
         _lastUnreadPosition = -1;
+        _servers = [ServersDataSource sharedInstance];
+        _buffers = [BuffersDataSource sharedInstance];
     }
     return self;
 }
@@ -181,11 +185,13 @@
     _lastUnreadPosition = -1;
     _selectedRow = -1;
     
+    NSLog(@"Refreshing the buffers table with %i servers and %i buffers", [_servers count], [_buffers count]);
+
     NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     
-    for(Server *server in [[ServersDataSource sharedInstance] getServers]) {
+    for(Server *server in [_servers getServers]) {
         archiveCount = 0;
-        NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:server.cid];
+        NSArray *buffers = [_buffers getBuffersForServer:server.cid];
         for(Buffer *buffer in buffers) {
             if([buffer.type isEqualToString:@"console"]) {
                 int unread = 0;
@@ -320,6 +326,10 @@
      }];
 
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if(data.count <= 1) {
+            NSLog(@"The buffer list doesn't have any buffers: %@", data);
+            NSLog(@"I should have %i servers with %i buffers", [_servers count], [_buffers count]);
+        }
         _data = data;
         [self.tableView reloadData];
         [self _updateUnreadIndicators];
@@ -367,7 +377,7 @@
 }
 
 - (void)joinBtnPressed:(UIButton *)sender {
-    Server *s = [[ServersDataSource sharedInstance] getServer:sender.tag];
+    Server *s = [_servers getServer:sender.tag];
     _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     _alertView.tag = sender.tag;

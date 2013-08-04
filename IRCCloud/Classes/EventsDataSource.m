@@ -505,9 +505,11 @@
 
 -(void)purgeInvalidBIDs {
     @synchronized(_events) {
+        NSLog(@"Cleaning up invalid BIDs");
         for(NSNumber *bid in _events.allKeys) {
             Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[bid intValue]];
             if(!b) {
+                NSLog(@"Removing stale events for bid %@", bid);
                 [_events removeObjectForKey:bid];
                 [[ChannelsDataSource sharedInstance] removeChannelForBuffer:[bid intValue]];
                 [[UsersDataSource sharedInstance] removeUsersForBuffer:[bid intValue]];

@@ -65,6 +65,7 @@
 -(void)clear {
     @synchronized(_buffers) {
         [_buffers removeAllObjects];
+        NSLog(@"Buffers list cleared: %@",[NSThread callStackSymbols]);
     }
 }
 

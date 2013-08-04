@@ -670,8 +670,16 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             _prefs = nil;
             [self postObject:object forEvent:kIRCEventUserInfo];
         } else if([object.type isEqualToString:@"backlog_starts"]) {
-            _numBuffers = [[object objectForKey:@"numbuffers"] intValue];
-            _totalBuffers = 0;
+            if([object objectForKey:@"numbuffers"]) {
+                NSLog(@"I currently have %i servers with %i buffers", [_servers count], [_buffers count]);
+                _numBuffers = [[object objectForKey:@"numbuffers"] intValue];
+                _totalBuffers = 0;
+                NSLog(@"OOB includes has %i buffers", _numBuffers);
+                if(_servers.count)
+                    [_servers clear];
+                if(_buffers.count)
+                    [_buffers clear];
+            }
         } else if([object.type isEqualToString:@"makeserver"] || [object.type isEqualToString:@"server_details_changed"]) {
             Server *server = [_servers getServer:object.cid];
             if(!server) {
@@ -1078,11 +1086,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogStarted:(NSNotification *)notification {
-    OOBFetcher *fetcher = notification.object;
-    if(fetcher.bid == -1) {
-        [_servers clear];
-        [_buffers clear];
-    }
     _currentBid = -1;
     _currentCount = 0;
     _firstEID = 0;
@@ -1090,10 +1093,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)_backlogCompleted:(NSNotification *)notification {
     OOBFetcher *fetcher = notification.object;
-    if(fetcher.bid > 0)
+    if(fetcher.bid > 0) {
         [_buffers updateTimeout:0 buffer:fetcher.bid];
-    else
+    } else {
+        NSLog(@"I now have %i servers with %i buffers", [_servers count], [_buffers count]);
         [_events purgeInvalidBIDs];
+    }
     [_oobQueue removeObject:fetcher];
     if([_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
@@ -1109,6 +1114,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [self _fail];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     } else {
+        TFLog(@"Backlog download failed, rescheduling timed out buffers");
         [self _scheduleTimedoutBuffers];
     }
 }

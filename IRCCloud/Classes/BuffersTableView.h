@@ -16,6 +16,7 @@
 
 
 #import <UIKit/UIKit.h>
+#import "ServersDataSource.h"
 #import "BuffersDataSource.h"
 
 @protocol BuffersTableViewDelegate<NSObject>
@@ -42,6 +43,8 @@
 	int _lastHighlightPosition;
     
     UIAlertView *_alertView;
+    ServersDataSource *_servers;
+    BuffersDataSource *_buffers;
 }
 -(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadIndicatorClicked:(id)sender;
