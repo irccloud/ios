@@ -186,8 +186,6 @@
     _lastUnreadPosition = -1;
     _selectedRow = -1;
     
-    NSLog(@"Refreshing the buffers table with %i servers and %i buffers", [_servers count], [_buffers count]);
-
     NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     
     for(Server *server in [_servers getServers]) {
@@ -482,7 +480,6 @@
 - (void)viewDidUnload {
     [super viewDidUnload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    NSLog(@"Buffers table view was unloaded");
 }
 
 - (void)didReceiveMemoryWarning {

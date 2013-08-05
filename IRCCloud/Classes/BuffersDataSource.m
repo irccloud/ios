@@ -19,6 +19,7 @@
 #import "ChannelsDataSource.h"
 #import "EventsDataSource.h"
 #import "UsersDataSource.h"
+#import "ServersDataSource.h"
 
 @implementation Buffer
 -(NSComparisonResult)compare:(Buffer *)aBuffer {
@@ -65,7 +66,6 @@
 -(void)clear {
     @synchronized(_buffers) {
         [_buffers removeAllObjects];
-        NSLog(@"Buffers list cleared: %@",[NSThread callStackSymbols]);
     }
 }
 
@@ -175,6 +175,29 @@
             [[ChannelsDataSource sharedInstance] removeChannelForBuffer:bid];
             [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
             [[UsersDataSource sharedInstance] removeUsersForBuffer:bid];
+        }
+    }
+}
+
+-(void)invalidate {
+    for(Buffer *buffer in _buffers.copy) {
+        buffer.valid = NO;
+    }
+}
+
+-(void)purgeInvalidBIDs {
+    NSLog(@"Cleaning up invalid BIDs");
+    for(Buffer *buffer in _buffers.copy) {
+        if(!buffer.valid) {
+            NSLog(@"Removing buffer: %@", buffer);
+            [[ChannelsDataSource sharedInstance] removeChannelForBuffer:buffer.bid];
+            [[EventsDataSource sharedInstance] removeEventsForBuffer:buffer.bid];
+            [[UsersDataSource sharedInstance] removeUsersForBuffer:buffer.bid];
+            if([buffer.type isEqualToString:@"console"]) {
+                NSLog(@"Removing CID: %i", buffer.cid);
+                [[ServersDataSource sharedInstance] removeServer:buffer.cid];
+            }
+            [_buffers removeObject:buffer];
         }
     }
 }

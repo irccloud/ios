@@ -28,10 +28,12 @@
     int _deferred;
     int _timeout;
     NSString *_away_msg;
+    BOOL _valid;
 }
 @property int bid, cid, archived, deferred, timeout;
 @property NSTimeInterval min_eid, last_seen_eid;
 @property NSString *name, *type, *away_msg;
+@property BOOL valid;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;
 @end
 
@@ -40,6 +42,7 @@
 }
 +(BuffersDataSource *)sharedInstance;
 -(void)clear;
+-(void)invalidate;
 -(int)count;
 -(int)firstBid;
 -(void)addBuffer:(Buffer *)buffer;
@@ -54,4 +57,5 @@
 -(void)updateAway:(NSString *)away buffer:(int)bid;
 -(void)removeBuffer:(int)bid;
 -(void)removeAllDataForBuffer:(int)bid;
+-(void)purgeInvalidBIDs;
 @end

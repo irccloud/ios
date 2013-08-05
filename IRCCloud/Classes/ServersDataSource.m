@@ -53,7 +53,6 @@
 -(void)clear {
     @synchronized(_servers) {
         [_servers removeAllObjects];
-        NSLog(@"Servers list cleared: %@",[NSThread callStackSymbols]);
     }
 }
 

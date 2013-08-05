@@ -94,5 +94,4 @@
 -(void)removeEventsBefore:(NSTimeInterval)min_eid buffer:(int)bid;
 -(int)unreadCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type;
 -(int)highlightCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type;
--(void)purgeInvalidBIDs;
 @end

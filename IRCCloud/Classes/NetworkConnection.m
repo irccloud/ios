@@ -675,10 +675,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 _numBuffers = [[object objectForKey:@"numbuffers"] intValue];
                 _totalBuffers = 0;
                 NSLog(@"OOB includes has %i buffers", _numBuffers);
-                if(_servers.count)
-                    [_servers clear];
                 if(_buffers.count)
-                    [_buffers clear];
+                    [_buffers invalidate];
             }
         } else if([object.type isEqualToString:@"makeserver"] || [object.type isEqualToString:@"server_details_changed"]) {
             Server *server = [_servers getServer:object.cid];
@@ -718,6 +716,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             buffer.archived = [[object objectForKey:@"archived"] intValue];
             buffer.deferred = [[object objectForKey:@"deferred"] intValue];
             buffer.timeout = [[object objectForKey:@"timeout"] intValue];
+            buffer.valid = YES;
             if(!backlog)
                 [self postObject:buffer forEvent:kIRCEventMakeBuffer];
             if(_numBuffers > 0) {
@@ -1097,7 +1096,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     } else {
         NSLog(@"I now have %i servers with %i buffers", [_servers count], [_buffers count]);
-        [_events purgeInvalidBIDs];
+        [_buffers purgeInvalidBIDs];
     }
     [_oobQueue removeObject:fetcher];
     if([_servers count]) {
