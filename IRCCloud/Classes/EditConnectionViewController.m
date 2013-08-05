@@ -60,7 +60,8 @@
                       @{@"network":@"TWiT", @"host":@"irc.twit.tv", @"port":@(6697), @"SSL":@(YES)},
                       @{@"network":@"Snoonet", @"host":@"irc.snoonet.org", @"port":@(6697), @"SSL":@(YES)},
                       @{@"network":@"BrasIRC", @"host":@"irc.brasirc.org", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"darkscience", @"host":@"irc.darkscience.net", @"port":@(6697), @"SSL":@(YES)}
+                      @{@"network":@"darkscience", @"host":@"irc.darkscience.net", @"port":@(6697), @"SSL":@(YES)},
+                      @{@"network":@"Techman's World", @"host":@"irc.techmansworld.com", @"port":@(6697), @"SSL":@(YES)}
                       ];
     }
     return self;
