@@ -180,11 +180,11 @@
 - (void)refresh {
     NSMutableArray *data = [[NSMutableArray alloc] init];
     int archiveCount = 0;
-    _firstHighlightPosition = -1;
-    _firstUnreadPosition = -1;
-    _lastHighlightPosition = -1;
-    _lastUnreadPosition = -1;
-    _selectedRow = -1;
+    int firstHighlightPosition = -1;
+    int firstUnreadPosition = -1;
+    int lastHighlightPosition = -1;
+    int lastUnreadPosition = -1;
+    int selectedRow = -1;
     
     NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     
@@ -215,17 +215,17 @@
                  @"count":@(buffers.count)
                  }];
                 
-                if(unread > 0 && _firstUnreadPosition == -1)
-                    _firstUnreadPosition = data.count - 1;
-                if(unread > 0 && (_lastUnreadPosition == -1 || _lastUnreadPosition < data.count - 1))
-                    _lastUnreadPosition = data.count - 1;
-                if(highlights > 0 && _firstHighlightPosition == -1)
-                    _firstHighlightPosition = data.count - 1;
-                if(highlights > 0 && (_lastHighlightPosition == -1 || _lastHighlightPosition < data.count - 1))
-                    _lastHighlightPosition = data.count - 1;
+                if(unread > 0 && firstUnreadPosition == -1)
+                    firstUnreadPosition = data.count - 1;
+                if(unread > 0 && (lastUnreadPosition == -1 || lastUnreadPosition < data.count - 1))
+                    lastUnreadPosition = data.count - 1;
+                if(highlights > 0 && firstHighlightPosition == -1)
+                    firstHighlightPosition = data.count - 1;
+                if(highlights > 0 && (lastHighlightPosition == -1 || lastHighlightPosition < data.count - 1))
+                    lastHighlightPosition = data.count - 1;
 
                 if(buffer.bid == _selectedBuffer.bid)
-                    _selectedRow = data.count - 1;
+                    selectedRow = data.count - 1;
                 break;
             }
         }
@@ -272,17 +272,17 @@
                  @"timeout":@(buffer.timeout),
                  @"status":server.status
                  }];
-                if(unread > 0 && _firstUnreadPosition == -1)
-                    _firstUnreadPosition = data.count - 1;
-                if(unread > 0 && (_lastUnreadPosition == -1 || _lastUnreadPosition < data.count - 1))
-                    _lastUnreadPosition = data.count - 1;
-                if(highlights > 0 && _firstHighlightPosition == -1)
-                    _firstHighlightPosition = data.count - 1;
-                if(highlights > 0 && (_lastHighlightPosition == -1 || _lastHighlightPosition < data.count - 1))
-                    _lastHighlightPosition = data.count - 1;
+                if(unread > 0 && firstUnreadPosition == -1)
+                    firstUnreadPosition = data.count - 1;
+                if(unread > 0 && (lastUnreadPosition == -1 || lastUnreadPosition < data.count - 1))
+                    lastUnreadPosition = data.count - 1;
+                if(highlights > 0 && firstHighlightPosition == -1)
+                    firstHighlightPosition = data.count - 1;
+                if(highlights > 0 && (lastHighlightPosition == -1 || lastHighlightPosition < data.count - 1))
+                    lastHighlightPosition = data.count - 1;
 
                 if(buffer.bid == _selectedBuffer.bid)
-                    _selectedRow = data.count - 1;
+                    selectedRow = data.count - 1;
             }
             if(type > 0 && buffer.archived > 0)
                 archiveCount++;
@@ -309,7 +309,7 @@
                          @"key":@0,
                          }];
                         if(buffer.bid == _selectedBuffer.bid)
-                            _selectedRow = data.count - 1;
+                            selectedRow = data.count - 1;
                     }
                 }
             }
@@ -342,6 +342,11 @@
             NSLog(@"I should have %i servers with %i buffers", [_servers count], [_buffers count]);
         }
         _data = data;
+        _selectedRow = selectedRow;
+        _firstUnreadPosition = firstUnreadPosition;
+        _firstHighlightPosition = firstHighlightPosition;
+        _lastUnreadPosition = lastUnreadPosition;
+        _lastHighlightPosition = lastHighlightPosition;
         [self.tableView reloadData];
         [self _updateUnreadIndicators];
     }];
