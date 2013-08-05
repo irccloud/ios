@@ -91,40 +91,32 @@
 }
 
 -(Buffer *)getBuffer:(int)bid {
-    @synchronized(_buffers) {
-        for(Buffer *buffer in _buffers) {
-            if(buffer.bid == bid)
-                return buffer;
-        }
+    for(Buffer *buffer in _buffers.copy) {
+        if(buffer.bid == bid)
+            return buffer;
     }
     return nil;
 }
 
 -(Buffer *)getBufferWithName:(NSString *)name server:(int)cid {
-    @synchronized(_buffers) {
-        for(Buffer *buffer in _buffers) {
-            if(buffer.cid == cid && [[buffer.name lowercaseString] isEqualToString:[name lowercaseString]])
-                return buffer;
-        }
-        return nil;
+    for(Buffer *buffer in _buffers.copy) {
+        if(buffer.cid == cid && [[buffer.name lowercaseString] isEqualToString:[name lowercaseString]])
+            return buffer;
     }
+    return nil;
 }
 
 -(NSArray *)getBuffersForServer:(int)cid {
-    @synchronized(_buffers) {
-        NSMutableArray *buffers = [[NSMutableArray alloc] init];
-        for(Buffer *buffer in _buffers) {
-            if(buffer.cid == cid)
-                [buffers addObject:buffer];
-        }
-        return [buffers sortedArrayUsingSelector:@selector(compare:)];
+    NSMutableArray *buffers = [[NSMutableArray alloc] init];
+    for(Buffer *buffer in _buffers.copy) {
+        if(buffer.cid == cid)
+            [buffers addObject:buffer];
     }
+    return [buffers sortedArrayUsingSelector:@selector(compare:)];
 }
 
 -(NSArray *)getBuffers {
-    @synchronized(_buffers) {
-        return [_buffers sortedArrayUsingSelector:@selector(compare:)];
-    }
+    return [_buffers sortedArrayUsingSelector:@selector(compare:)];
 }
 
 -(void)updateLastSeenEID:(NSTimeInterval)eid buffer:(int)bid {

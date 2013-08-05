@@ -28,6 +28,7 @@
 #define TYPE_CONVERSATION 2
 #define TYPE_ARCHIVES_HEADER 3
 #define TYPE_ADD_NETWORK 4
+#define TYPE_JOIN_CHANNEL 5
 
 @interface BuffersTableCell : UITableViewCell {
     UILabel *_label;
@@ -212,7 +213,8 @@
                  @"highlights":@(highlights),
                  @"archived":@0,
                  @"status":server.status,
-                 @"ssl":@(server.ssl)
+                 @"ssl":@(server.ssl),
+                 @"count":@(buffers.count)
                  }];
                 
                 if(unread > 0 && _firstUnreadPosition == -1)
@@ -313,6 +315,17 @@
                     }
                 }
             }
+        }
+        if(buffers.count == 1) {
+            [data addObject:@{
+             @"type":@TYPE_JOIN_CHANNEL,
+             @"cid":@(server.cid),
+             @"bid":@-1,
+             @"name":@"Join a channel…",
+             @"unread":@0,
+             @"highlights":@0,
+             @"archived":@0,
+             }];
         }
     }
     [data addObject:@{
@@ -561,7 +574,7 @@
                 [cell.activity stopAnimating];
                 cell.activity.hidden = YES;
             }
-            cell.joinBtn.hidden = ![status isEqualToString:@"connected_ready"];
+            cell.joinBtn.hidden = ![status isEqualToString:@"connected_ready"] || [[row objectForKey:@"count"] intValue] < 2;
             cell.joinBtn.tag = [[row objectForKey:@"cid"] intValue];
             break;
         case TYPE_CHANNEL:
@@ -621,6 +634,13 @@
             cell.label.textColor = [UIColor selectedBlueColor];
             cell.bgColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
             break;
+        case TYPE_JOIN_CHANNEL:
+            cell.icon.image = [UIImage imageNamed:@"add"];
+            cell.icon.hidden = NO;
+            cell.label.textColor = [UIColor colorWithRed:0.275 green:0.537 blue:0 alpha:1];
+            cell.highlightColor = [UIColor colorWithRed:0.855 green:0.961 blue:0.667 alpha:1];
+            cell.bgColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+            break;
     }
     return cell;
 }
@@ -677,6 +697,10 @@
             [_expandedArchives removeObjectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
         else
             [_expandedArchives setObject:@YES forKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
+    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
+        UIButton *b = [[UIButton alloc] init];
+        b.tag = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
+        [self joinBtnPressed:b];
     } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
         EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
         if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
