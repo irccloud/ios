@@ -706,6 +706,8 @@
         [self presentViewController:nc animated:YES completion:nil];
     } else {
         _selectedRow = indexPath.row;
+        [self.tableView reloadData];
+        [self _updateUnreadIndicators];
         if(_delegate)
             [_delegate bufferSelected:[[[_data objectAtIndex:_selectedRow] objectForKey:@"bid"] intValue]];
     }
