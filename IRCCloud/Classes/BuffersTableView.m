@@ -700,9 +700,7 @@
         [self joinBtnPressed:b];
     } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
         EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-            [self.slidingViewController resetTopView];
-        }
+        [self.slidingViewController resetTopView];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
         [self presentViewController:nc animated:YES completion:nil];
