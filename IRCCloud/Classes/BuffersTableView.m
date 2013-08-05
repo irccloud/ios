@@ -629,7 +629,7 @@
             }
             break;
         case TYPE_ADD_NETWORK:
-            cell.icon.image = [UIImage imageNamed:@"add"];
+            cell.icon.image = [UIImage imageNamed:@"world_add"];
             cell.icon.hidden = NO;
             cell.label.textColor = [UIColor selectedBlueColor];
             cell.bgColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
