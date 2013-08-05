@@ -30,7 +30,7 @@
 
 #import "UIExpandingTextView.h"
 
-#define kTextInsetX 1
+#define kTextInsetX 0
 #define kTextInsetBottom 0
 
 @implementation UIExpandingTextView
@@ -140,9 +140,11 @@
     backgroundFrame.origin.y = 0;
     backgroundFrame.origin.x = 0;
     backgroundFrame.size.height  -= 8;
+    textViewBackgroundImage.frame = backgroundFrame;
+    backgroundFrame.origin.x -= 4;
+    backgroundFrame.size.width += 4;
     CGRect textViewFrame = CGRectInset(backgroundFrame, kTextInsetX, 0);
 	internalTextView.frame   = textViewFrame;
-    textViewBackgroundImage.frame = backgroundFrame;
     forceSizeUpdate = YES;
 	[super setFrame:aframe];
 }
@@ -235,9 +237,11 @@
         r.origin.y = 0;
         r.origin.x = 0;
         r.size.height -= 8;
+        textViewBackgroundImage.frame = r;
+        r.origin.x -= 4;
+        r.size.width += 4;
         internalTextView.frame = CGRectInset(r, kTextInsetX, 0);
         internalTextView.contentInset = UIEdgeInsetsMake(-1,0,-1,0);
-        textViewBackgroundImage.frame = r;
         
         if(animateHeightChange)
         {
