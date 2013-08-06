@@ -263,7 +263,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[[NSString stringWithFormat:@"email=%@&password=%@", email_escaped, password_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
-    NSLog(@"%@", [NSString stringWithFormat:@"email=%@&password=%@", email_escaped, password_escaped]);
+
     CFRelease(email_escaped);
     CFRelease(password_escaped);
     
