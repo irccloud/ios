@@ -254,12 +254,18 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	NSURLResponse *response = nil;
 	NSError *error = nil;
 
+    CFStringRef email_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)email, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    CFStringRef password_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)password, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/login", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[[NSString stringWithFormat:@"email=%@&password=%@", [[email stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByReplacingOccurrencesOfString:@"&" withString:@"%26"], [[password stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByReplacingOccurrencesOfString:@"&" withString:@"%26"]] stringByReplacingOccurrencesOfString:@"+" withString:@"%2B"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [request setHTTPBody:[[NSString stringWithFormat:@"email=%@&password=%@", email_escaped, password_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
+    NSLog(@"%@", [NSString stringWithFormat:@"email=%@&password=%@", email_escaped, password_escaped]);
+    CFRelease(email_escaped);
+    CFRelease(password_escaped);
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
