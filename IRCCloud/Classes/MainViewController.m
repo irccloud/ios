@@ -137,6 +137,7 @@
     _message.minimumHeight = 36;
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
+    _message.autoresizesSubviews = NO;
     [_bottomBar addSubview:_message];
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[UIImage imageNamed:@"users"] forState:UIControlStateNormal];
@@ -1303,6 +1304,9 @@
                 frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
                 _eventsView.bottomUnreadView.frame = frame;
             }
+            CGRect frame = _message.frame;
+            frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
+            _message.frame = frame;
         } else {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
                 self.navigationItem.rightBarButtonItem = _usersButtonItem;

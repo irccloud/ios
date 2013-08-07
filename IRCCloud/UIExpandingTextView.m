@@ -72,7 +72,7 @@
     if ((self = [super initWithFrame:frame])) 
     {
         forceSizeUpdate = NO;
-        self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        //self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 		CGRect backgroundFrame = frame;
         backgroundFrame.origin.y = 0;
 		backgroundFrame.origin.x = 0;
@@ -90,7 +90,7 @@
         internalTextView.backgroundColor = [UIColor clearColor];
         internalTextView.showsHorizontalScrollIndicator = NO;
         [internalTextView sizeToFit];
-        internalTextView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        //internalTextView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         
         /* set placeholder */
         placeholderLabel = [[UILabel alloc]initWithFrame:CGRectMake(8,3,self.bounds.size.width - 16,self.bounds.size.height)];
