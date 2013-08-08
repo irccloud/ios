@@ -658,6 +658,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)parse:(NSDictionary *)dict backlog:(BOOL)backlog {
+    if(backlog)
+        _totalCount++;
     if([NSThread currentThread].isMainThread)
         NSLog(@"WARNING: Parsing on main thread");
     [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
@@ -1094,6 +1096,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _currentBid = -1;
     _currentCount = 0;
     _firstEID = 0;
+    _totalCount = 0;
 }
 
 -(void)_backlogCompleted:(NSNotification *)notification {
@@ -1104,6 +1107,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         NSLog(@"I now have %i servers with %i buffers", [_servers count], [_buffers count]);
         [_buffers purgeInvalidBIDs];
     }
+    NSLog(@"I downloaded %i events", _totalCount);
     [_oobQueue removeObject:fetcher];
     if([_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];

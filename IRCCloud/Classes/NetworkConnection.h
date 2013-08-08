@@ -112,6 +112,7 @@ typedef enum {
     int _numBuffers;
     int _lastReqId;
     int _currentCount;
+    int _totalCount;
     int _currentBid;
     int _failCount;
     BOOL _background;
