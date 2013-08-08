@@ -69,33 +69,39 @@
 }
 
 -(Server *)getServer:(int)cid {
+    NSArray *copy;
     @synchronized(_servers) {
-        for(Server *server in _servers) {
-            if(server.cid == cid)
-                return server;
-        }
+        copy = _servers.copy;
+    }
+    for(Server *server in copy) {
+        if(server.cid == cid)
+            return server;
     }
     return nil;
 }
 
 -(Server *)getServer:(NSString *)hostname port:(int)port {
+    NSArray *copy;
     @synchronized(_servers) {
-        for(Server *server in _servers) {
-            if([server.hostname isEqualToString:hostname] && (port == -1 || server.port == port))
-                return server;
-        }
-        return nil;
+        copy = _servers.copy;
     }
+    for(Server *server in copy) {
+        if([server.hostname isEqualToString:hostname] && (port == -1 || server.port == port))
+            return server;
+    }
+    return nil;
 }
 
 -(Server *)getServer:(NSString *)hostname SSL:(BOOL)ssl {
+    NSArray *copy;
     @synchronized(_servers) {
-        for(Server *server in _servers) {
-            if([server.hostname isEqualToString:hostname] && ((ssl == YES && server.ssl > 0) || (ssl == NO && server.ssl == 0)))
-                return server;
-        }
-        return nil;
+        copy = _servers.copy;
     }
+    for(Server *server in copy) {
+        if([server.hostname isEqualToString:hostname] && ((ssl == YES && server.ssl > 0) || (ssl == NO && server.ssl == 0)))
+            return server;
+    }
+    return nil;
 }
 
 -(void)removeServer:(int)cid {
@@ -107,12 +113,12 @@
 }
 
 -(void)removeAllDataForServer:(int)cid {
-    @synchronized(_servers) {
-        Server *server = [self getServer:cid];
-        if(server) {
-            for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:cid]) {
-                [[BuffersDataSource sharedInstance] removeAllDataForBuffer:b.bid];
-            }
+    Server *server = [self getServer:cid];
+    if(server) {
+        for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:cid]) {
+            [[BuffersDataSource sharedInstance] removeAllDataForBuffer:b.bid];
+        }
+        @synchronized(_servers) {
             [_servers removeObject:server];
         }
     }
@@ -125,69 +131,53 @@
 }
 
 -(void)updateLag:(long)lag server:(int)cid {
-    @synchronized(_servers) {
-        Server *server = [self getServer:cid];
-        if(server)
-            server.lag = lag;
-    }
+    Server *server = [self getServer:cid];
+    if(server)
+        server.lag = lag;
 }
 
 -(void)updateNick:(NSString *)nick server:(int)cid {
-    @synchronized(_servers) {
-        Server *server = [self getServer:cid];
-        if(server)
-            server.nick = nick;
-    }
+    Server *server = [self getServer:cid];
+    if(server)
+        server.nick = nick;
 }
 
 -(void)updateStatus:(NSString *)status failInfo:(NSDictionary *)failInfo server:(int)cid {
-    @synchronized(_servers) {
-        Server *server = [self getServer:cid];
-        if(server) {
-            server.status = status;
-            server.fail_info = failInfo;
-        }
+    Server *server = [self getServer:cid];
+    if(server) {
+        server.status = status;
+        server.fail_info = failInfo;
     }
 }
 
 -(void)updateAway:(NSString *)away server:(int)cid {
-    @synchronized(_servers) {
-        Server *server = [self getServer:cid];
-        if(server)
-            server.away = away;
-    }
+    Server *server = [self getServer:cid];
+    if(server)
+        server.away = away;
 }
 
 -(void)updateUsermask:(NSString *)usermask server:(int)cid {
-    @synchronized(_servers) {
-        Server *server = [self getServer:cid];
-        if(server)
-            server.usermask = usermask;
-    }
+    Server *server = [self getServer:cid];
+    if(server)
+        server.usermask = usermask;
 }
 
 -(void)updateMode:(NSString *)mode server:(int)cid {
-    @synchronized(_servers) {
-        Server *server = [self getServer:cid];
-        if(server)
-            server.mode = mode;
-    }
+    Server *server = [self getServer:cid];
+    if(server)
+        server.mode = mode;
 }
 
 -(void)updateIsupport:(NSDictionary *)isupport server:(int)cid {
-    @synchronized(_servers) {
-        Server *server = [self getServer:cid];
-        if(server)
-            server.isupport = isupport;
-    }
+    Server *server = [self getServer:cid];
+    if(server)
+        server.isupport = isupport;
 }
 
 -(void)updateIgnores:(NSArray *)ignores server:(int)cid {
-    @synchronized(_servers) {
-        Server *server = [self getServer:cid];
-        if(server)
-            server.ignores = ignores;
-    }
+    Server *server = [self getServer:cid];
+    if(server)
+        server.ignores = ignores;
 }
 
 -(void)finalize {

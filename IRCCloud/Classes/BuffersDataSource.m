@@ -91,7 +91,11 @@
 }
 
 -(Buffer *)getBuffer:(int)bid {
-    for(Buffer *buffer in _buffers.copy) {
+    NSArray *copy;
+    @synchronized(_buffers) {
+        copy = _buffers.copy;
+    }
+    for(Buffer *buffer in copy) {
         if(buffer.bid == bid)
             return buffer;
     }
@@ -99,7 +103,11 @@
 }
 
 -(Buffer *)getBufferWithName:(NSString *)name server:(int)cid {
-    for(Buffer *buffer in _buffers.copy) {
+    NSArray *copy;
+    @synchronized(_buffers) {
+        copy = _buffers.copy;
+    }
+    for(Buffer *buffer in copy) {
         if(buffer.cid == cid && [[buffer.name lowercaseString] isEqualToString:[name lowercaseString]])
             return buffer;
     }
@@ -108,7 +116,11 @@
 
 -(NSArray *)getBuffersForServer:(int)cid {
     NSMutableArray *buffers = [[NSMutableArray alloc] init];
-    for(Buffer *buffer in _buffers.copy) {
+    NSArray *copy;
+    @synchronized(_buffers) {
+        copy = _buffers.copy;
+    }
+    for(Buffer *buffer in copy) {
         if(buffer.cid == cid)
             [buffers addObject:buffer];
     }
@@ -116,47 +128,39 @@
 }
 
 -(NSArray *)getBuffers {
-    return [_buffers sortedArrayUsingSelector:@selector(compare:)];
+    @synchronized(_buffers) {
+        return [_buffers sortedArrayUsingSelector:@selector(compare:)];
+    }
 }
 
 -(void)updateLastSeenEID:(NSTimeInterval)eid buffer:(int)bid {
-    @synchronized(_buffers) {
-        Buffer *buffer = [self getBuffer:bid];
-        if(buffer)
-            buffer.last_seen_eid = eid;
-    }
+    Buffer *buffer = [self getBuffer:bid];
+    if(buffer)
+        buffer.last_seen_eid = eid;
 }
 
 -(void)updateArchived:(int)archived buffer:(int)bid {
-    @synchronized(_buffers) {
-        Buffer *buffer = [self getBuffer:bid];
-        if(buffer)
-            buffer.archived = archived;
-    }
+    Buffer *buffer = [self getBuffer:bid];
+    if(buffer)
+        buffer.archived = archived;
 }
 
 -(void)updateTimeout:(int)timeout buffer:(int)bid {
-    @synchronized(_buffers) {
-        Buffer *buffer = [self getBuffer:bid];
-        if(buffer)
-            buffer.timeout = timeout;
-    }
+    Buffer *buffer = [self getBuffer:bid];
+    if(buffer)
+        buffer.timeout = timeout;
 }
 
 -(void)updateName:(NSString *)name buffer:(int)bid {
-    @synchronized(_buffers) {
-        Buffer *buffer = [self getBuffer:bid];
-        if(buffer)
-            buffer.name = name;
-    }
+    Buffer *buffer = [self getBuffer:bid];
+    if(buffer)
+        buffer.name = name;
 }
 
 -(void)updateAway:(NSString *)away buffer:(int)bid {
-    @synchronized(_buffers) {
-        Buffer *buffer = [self getBuffer:bid];
-        if(buffer)
-            buffer.away_msg = away;
-    }
+    Buffer *buffer = [self getBuffer:bid];
+    if(buffer)
+        buffer.away_msg = away;
 }
 
 -(void)removeBuffer:(int)bid {
@@ -168,26 +172,34 @@
 }
 
 -(void)removeAllDataForBuffer:(int)bid {
-    @synchronized(_buffers) {
-        Buffer *buffer = [self getBuffer:bid];
-        if(buffer) {
+    Buffer *buffer = [self getBuffer:bid];
+    if(buffer) {
+        @synchronized(_buffers) {
             [_buffers removeObject:buffer];
-            [[ChannelsDataSource sharedInstance] removeChannelForBuffer:bid];
-            [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
-            [[UsersDataSource sharedInstance] removeUsersForBuffer:bid];
         }
+        [[ChannelsDataSource sharedInstance] removeChannelForBuffer:bid];
+        [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
+        [[UsersDataSource sharedInstance] removeUsersForBuffer:bid];
     }
 }
 
 -(void)invalidate {
-    for(Buffer *buffer in _buffers.copy) {
+    NSArray *copy;
+    @synchronized(_buffers) {
+        copy = _buffers.copy;
+    }
+    for(Buffer *buffer in copy) {
         buffer.valid = NO;
     }
 }
 
 -(void)purgeInvalidBIDs {
     NSLog(@"Cleaning up invalid BIDs");
-    for(Buffer *buffer in _buffers.copy) {
+    NSArray *copy;
+    @synchronized(_buffers) {
+        copy = _buffers.copy;
+    }
+    for(Buffer *buffer in copy) {
         if(!buffer.valid) {
             NSLog(@"Removing buffer: %@", buffer);
             [[ChannelsDataSource sharedInstance] removeChannelForBuffer:buffer.bid];

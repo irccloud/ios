@@ -178,178 +178,180 @@
 }
 
 - (void)refresh {
-    NSMutableArray *data = [[NSMutableArray alloc] init];
-    int archiveCount = 0;
-    int firstHighlightPosition = -1;
-    int firstUnreadPosition = -1;
-    int lastHighlightPosition = -1;
-    int lastUnreadPosition = -1;
-    int selectedRow = -1;
-    
-    NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
-    
-    for(Server *server in [_servers getServers]) {
-        archiveCount = 0;
-        NSArray *buffers = [_buffers getBuffersForServer:server.cid];
-        for(Buffer *buffer in buffers) {
-            if([buffer.type isEqualToString:@"console"]) {
-                int unread = 0;
-                int highlights = 0;
-                NSString *name = server.name;
-                if(!name || name.length == 0)
-                    name = server.hostname;
-                unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
-                highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
-                if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
-                    unread = 0;
-                [data addObject:@{
-                 @"type":@TYPE_SERVER,
-                 @"cid":@(buffer.cid),
-                 @"bid":@(buffer.bid),
-                 @"name":name,
-                 @"unread":@(unread),
-                 @"highlights":@(highlights),
-                 @"archived":@0,
-                 @"status":server.status,
-                 @"ssl":@(server.ssl),
-                 @"count":@(buffers.count)
-                 }];
-                
-                if(unread > 0 && firstUnreadPosition == -1)
-                    firstUnreadPosition = data.count - 1;
-                if(unread > 0 && (lastUnreadPosition == -1 || lastUnreadPosition < data.count - 1))
-                    lastUnreadPosition = data.count - 1;
-                if(highlights > 0 && firstHighlightPosition == -1)
-                    firstHighlightPosition = data.count - 1;
-                if(highlights > 0 && (lastHighlightPosition == -1 || lastHighlightPosition < data.count - 1))
-                    lastHighlightPosition = data.count - 1;
-
-                if(buffer.bid == _selectedBuffer.bid)
-                    selectedRow = data.count - 1;
-                break;
-            }
-        }
-        for(Buffer *buffer in buffers) {
-            int type = -1;
-            int key = 0;
-            int joined = 1;
-            if([buffer.type isEqualToString:@"channel"]) {
-                type = TYPE_CHANNEL;
-                Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid];
-                if(channel) {
-                    if([channel.mode rangeOfString:@"k"].location != NSNotFound)
-                        key = 1;
-                } else {
-                    joined = 0;
-                }
-            } else if([buffer.type isEqualToString:@"conversation"]) {
-                type = TYPE_CONVERSATION;
-            }
-            if(type > 0 && buffer.archived == 0) {
-                int unread = 0;
-                int highlights = 0;
-                unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
-                highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
-                if(type == TYPE_CHANNEL) {
-                    if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
-                        unread = 0;
-                } else {
+    @synchronized(self) {
+        NSMutableArray *data = [[NSMutableArray alloc] init];
+        int archiveCount = 0;
+        int firstHighlightPosition = -1;
+        int firstUnreadPosition = -1;
+        int lastHighlightPosition = -1;
+        int lastUnreadPosition = -1;
+        int selectedRow = -1;
+        
+        NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+        
+        for(Server *server in [_servers getServers]) {
+            archiveCount = 0;
+            NSArray *buffers = [_buffers getBuffersForServer:server.cid];
+            for(Buffer *buffer in buffers) {
+                if([buffer.type isEqualToString:@"console"]) {
+                    int unread = 0;
+                    int highlights = 0;
+                    NSString *name = server.name;
+                    if(!name || name.length == 0)
+                        name = server.hostname;
+                    unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
                         unread = 0;
-                    if(type == TYPE_CONVERSATION && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
-                        highlights = 0;
-                }
-                [data addObject:@{
-                 @"type":@(type),
-                 @"cid":@(buffer.cid),
-                 @"bid":@(buffer.bid),
-                 @"name":buffer.name,
-                 @"unread":@(unread),
-                 @"highlights":@(highlights),
-                 @"archived":@0,
-                 @"joined":@(joined),
-                 @"key":@(key),
-                 @"timeout":@(buffer.timeout),
-                 @"status":server.status
-                 }];
-                if(unread > 0 && firstUnreadPosition == -1)
-                    firstUnreadPosition = data.count - 1;
-                if(unread > 0 && (lastUnreadPosition == -1 || lastUnreadPosition < data.count - 1))
-                    lastUnreadPosition = data.count - 1;
-                if(highlights > 0 && firstHighlightPosition == -1)
-                    firstHighlightPosition = data.count - 1;
-                if(highlights > 0 && (lastHighlightPosition == -1 || lastHighlightPosition < data.count - 1))
-                    lastHighlightPosition = data.count - 1;
+                    [data addObject:@{
+                     @"type":@TYPE_SERVER,
+                     @"cid":@(buffer.cid),
+                     @"bid":@(buffer.bid),
+                     @"name":name,
+                     @"unread":@(unread),
+                     @"highlights":@(highlights),
+                     @"archived":@0,
+                     @"status":server.status,
+                     @"ssl":@(server.ssl),
+                     @"count":@(buffers.count)
+                     }];
+                    
+                    if(unread > 0 && firstUnreadPosition == -1)
+                        firstUnreadPosition = data.count - 1;
+                    if(unread > 0 && (lastUnreadPosition == -1 || lastUnreadPosition < data.count - 1))
+                        lastUnreadPosition = data.count - 1;
+                    if(highlights > 0 && firstHighlightPosition == -1)
+                        firstHighlightPosition = data.count - 1;
+                    if(highlights > 0 && (lastHighlightPosition == -1 || lastHighlightPosition < data.count - 1))
+                        lastHighlightPosition = data.count - 1;
 
-                if(buffer.bid == _selectedBuffer.bid)
-                    selectedRow = data.count - 1;
+                    if(buffer.bid == _selectedBuffer.bid)
+                        selectedRow = data.count - 1;
+                    break;
+                }
             }
-            if(type > 0 && buffer.archived > 0)
-                archiveCount++;
-        }
-        if(archiveCount > 0) {
-            [data addObject:@{@"type":@(TYPE_ARCHIVES_HEADER), @"name":@"Archives", @"cid":@(server.cid)}];
-            if([_expandedArchives objectForKey:@(server.cid)]) {
-                for(Buffer *buffer in buffers) {
-                    int type = -1;
-                    if(buffer.archived && ![buffer.type isEqualToString:@"console"]) {
-                        if([buffer.type isEqualToString:@"channel"]) {
-                            type = TYPE_CHANNEL;
-                        } else if([buffer.type isEqualToString:@"conversation"]) {
-                            type = TYPE_CONVERSATION;
+            for(Buffer *buffer in buffers) {
+                int type = -1;
+                int key = 0;
+                int joined = 1;
+                if([buffer.type isEqualToString:@"channel"]) {
+                    type = TYPE_CHANNEL;
+                    Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid];
+                    if(channel) {
+                        if([channel.mode rangeOfString:@"k"].location != NSNotFound)
+                            key = 1;
+                    } else {
+                        joined = 0;
+                    }
+                } else if([buffer.type isEqualToString:@"conversation"]) {
+                    type = TYPE_CONVERSATION;
+                }
+                if(type > 0 && buffer.archived == 0) {
+                    int unread = 0;
+                    int highlights = 0;
+                    unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    if(type == TYPE_CHANNEL) {
+                        if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            unread = 0;
+                    } else {
+                        if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            unread = 0;
+                        if(type == TYPE_CONVERSATION && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            highlights = 0;
+                    }
+                    [data addObject:@{
+                     @"type":@(type),
+                     @"cid":@(buffer.cid),
+                     @"bid":@(buffer.bid),
+                     @"name":buffer.name,
+                     @"unread":@(unread),
+                     @"highlights":@(highlights),
+                     @"archived":@0,
+                     @"joined":@(joined),
+                     @"key":@(key),
+                     @"timeout":@(buffer.timeout),
+                     @"status":server.status
+                     }];
+                    if(unread > 0 && firstUnreadPosition == -1)
+                        firstUnreadPosition = data.count - 1;
+                    if(unread > 0 && (lastUnreadPosition == -1 || lastUnreadPosition < data.count - 1))
+                        lastUnreadPosition = data.count - 1;
+                    if(highlights > 0 && firstHighlightPosition == -1)
+                        firstHighlightPosition = data.count - 1;
+                    if(highlights > 0 && (lastHighlightPosition == -1 || lastHighlightPosition < data.count - 1))
+                        lastHighlightPosition = data.count - 1;
+
+                    if(buffer.bid == _selectedBuffer.bid)
+                        selectedRow = data.count - 1;
+                }
+                if(type > 0 && buffer.archived > 0)
+                    archiveCount++;
+            }
+            if(archiveCount > 0) {
+                [data addObject:@{@"type":@(TYPE_ARCHIVES_HEADER), @"name":@"Archives", @"cid":@(server.cid)}];
+                if([_expandedArchives objectForKey:@(server.cid)]) {
+                    for(Buffer *buffer in buffers) {
+                        int type = -1;
+                        if(buffer.archived && ![buffer.type isEqualToString:@"console"]) {
+                            if([buffer.type isEqualToString:@"channel"]) {
+                                type = TYPE_CHANNEL;
+                            } else if([buffer.type isEqualToString:@"conversation"]) {
+                                type = TYPE_CONVERSATION;
+                            }
+                            [data addObject:@{
+                             @"type":@(type),
+                             @"cid":@(buffer.cid),
+                             @"bid":@(buffer.bid),
+                             @"name":buffer.name,
+                             @"unread":@0,
+                             @"highlights":@0,
+                             @"archived":@1,
+                             @"key":@0,
+                             }];
+                            if(buffer.bid == _selectedBuffer.bid)
+                                selectedRow = data.count - 1;
                         }
-                        [data addObject:@{
-                         @"type":@(type),
-                         @"cid":@(buffer.cid),
-                         @"bid":@(buffer.bid),
-                         @"name":buffer.name,
-                         @"unread":@0,
-                         @"highlights":@0,
-                         @"archived":@1,
-                         @"key":@0,
-                         }];
-                        if(buffer.bid == _selectedBuffer.bid)
-                            selectedRow = data.count - 1;
                     }
                 }
             }
+            if(buffers.count == 1) {
+                [data addObject:@{
+                 @"type":@TYPE_JOIN_CHANNEL,
+                 @"cid":@(server.cid),
+                 @"bid":@-1,
+                 @"name":@"Join a channel…",
+                 @"unread":@0,
+                 @"highlights":@0,
+                 @"archived":@0,
+                 }];
+            }
         }
-        if(buffers.count == 1) {
-            [data addObject:@{
-             @"type":@TYPE_JOIN_CHANNEL,
-             @"cid":@(server.cid),
-             @"bid":@-1,
-             @"name":@"Join a channel…",
-             @"unread":@0,
-             @"highlights":@0,
-             @"archived":@0,
-             }];
-        }
-    }
-    [data addObject:@{
-     @"type":@TYPE_ADD_NETWORK,
-     @"cid":@-1,
-     @"bid":@-1,
-     @"name":@"Add a Network…",
-     @"unread":@0,
-     @"highlights":@0,
-     @"archived":@0,
-     }];
+        [data addObject:@{
+         @"type":@TYPE_ADD_NETWORK,
+         @"cid":@-1,
+         @"bid":@-1,
+         @"name":@"Add a Network…",
+         @"unread":@0,
+         @"highlights":@0,
+         @"archived":@0,
+         }];
 
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if(data.count <= 1) {
-            NSLog(@"The buffer list doesn't have any buffers: %@", data);
-            NSLog(@"I should have %i servers with %i buffers", [_servers count], [_buffers count]);
-        }
-        _data = data;
-        _selectedRow = selectedRow;
-        _firstUnreadPosition = firstUnreadPosition;
-        _firstHighlightPosition = firstHighlightPosition;
-        _lastUnreadPosition = lastUnreadPosition;
-        _lastHighlightPosition = lastHighlightPosition;
-        [self.tableView reloadData];
-        [self _updateUnreadIndicators];
-    }];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if(data.count <= 1) {
+                NSLog(@"The buffer list doesn't have any buffers: %@", data);
+                NSLog(@"I should have %i servers with %i buffers", [_servers count], [_buffers count]);
+            }
+            _data = data;
+            _selectedRow = selectedRow;
+            _firstUnreadPosition = firstUnreadPosition;
+            _firstHighlightPosition = firstHighlightPosition;
+            _lastUnreadPosition = lastUnreadPosition;
+            _lastHighlightPosition = lastHighlightPosition;
+            [self.tableView reloadData];
+            [self _updateUnreadIndicators];
+        }];
+    }
 }
 
 -(void)_updateUnreadIndicators {

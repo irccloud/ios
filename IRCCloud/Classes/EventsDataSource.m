@@ -443,7 +443,7 @@
             [[_events objectForKey:@(bid)] sortUsingSelector:@selector(compare:)];
             _dirty = NO;
         }
-        return [_events objectForKey:@(bid)];
+        return [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
     }
 }
 
@@ -462,45 +462,49 @@
 }
 
 -(int)unreadCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
+    int count = 0;
+    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
+    Ignore *ignore = [[Ignore alloc] init];
+    [ignore setIgnores:s.ignores];
+    NSArray *copy;
     @synchronized(_events) {
-        int count = 0;
-        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
-        Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
-        Ignore *ignore = [[Ignore alloc] init];
-        [ignore setIgnores:s.ignores];
-        for(Event *event in [_events objectForKey:@(bid)]) {
-            if(event.eid > lastSeenEid && [event isImportant:type]) {
-                NSString *from = event.from;
-                if(!from.length)
-                    from = event.nick;
-                if(from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", from, event.hostmask]])
-                    continue;
-                count++;
-            }
-        }
-        return count;
+        copy = [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
     }
+    for(Event *event in copy) {
+        if(event.eid > lastSeenEid && [event isImportant:type]) {
+            NSString *from = event.from;
+            if(!from.length)
+                from = event.nick;
+            if(from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", from, event.hostmask]])
+                continue;
+            count++;
+        }
+    }
+    return count;
 }
 
 -(int)highlightCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
+    int count = 0;
+    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
+    Ignore *ignore = [[Ignore alloc] init];
+    [ignore setIgnores:s.ignores];
+    NSArray *copy;
     @synchronized(_events) {
-        int count = 0;
-        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
-        Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
-        Ignore *ignore = [[Ignore alloc] init];
-        [ignore setIgnores:s.ignores];
-        for(Event *event in [_events objectForKey:@(bid)]) {
-            if(event.eid > lastSeenEid && [event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"])) {
-                NSString *from = event.from;
-                if(!from.length)
-                    from = event.nick;
-                if(from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", from, event.hostmask]])
-                    continue;
-                count++;
-            }
-        }
-        return count;
+        copy = [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
     }
+    for(Event *event in copy) {
+        if(event.eid > lastSeenEid && [event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"])) {
+            NSString *from = event.from;
+            if(!from.length)
+                from = event.nick;
+            if(from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", from, event.hostmask]])
+                continue;
+            count++;
+        }
+    }
+    return count;
 }
 
 @end
