@@ -31,7 +31,7 @@
     for(NSString *ignore in ignores) {
         NSString *mask = [ignore lowercaseString];
         mask = [mask stringByReplacingOccurrencesOfString:@"(" withString:@"\\("];
-        mask = [mask stringByReplacingOccurrencesOfString:@"(" withString:@"\\}"];
+        mask = [mask stringByReplacingOccurrencesOfString:@")" withString:@"\\)"];
         mask = [mask stringByReplacingOccurrencesOfString:@"[" withString:@"\\["];
         mask = [mask stringByReplacingOccurrencesOfString:@"]" withString:@"\\]"];
         mask = [mask stringByReplacingOccurrencesOfString:@"{" withString:@"\\{"];
