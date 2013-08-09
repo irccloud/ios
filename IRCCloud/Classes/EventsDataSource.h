@@ -63,6 +63,7 @@
     NSString *_to;
     NSString *_command;
     NSString *_day;
+    NSString *_ignoreMask;
 }
 @property int cid, bid, rowType, reqId;
 @property NSTimeInterval eid, groupEid;
@@ -75,6 +76,7 @@
 @property NSArray *links;
 -(NSComparisonResult)compare:(Event *)aEvent;
 -(BOOL)isImportant:(NSString *)bufferType;
+-(NSString *)ignoreMask;
 @end
 
 @interface EventsDataSource : NSObject {

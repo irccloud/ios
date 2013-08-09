@@ -55,6 +55,18 @@
 -(NSString *)description {
     return [NSString stringWithFormat:@"{cid: %i, bid: %i, eid: %f, group: %f, type: %@, msg: %@}", _cid, _bid, _eid, _groupEid, _type, _msg];
 }
+-(NSString *)ignoreMask {
+    if(!_ignoreMask) {
+        NSString *from = _from;
+        if(!from.length)
+            from = _nick;
+        
+        if(from) {
+            _ignoreMask = [NSString stringWithFormat:@"%@!%@", from, _hostmask];
+        }
+    }
+    return _ignoreMask;
+}
 @end
 
 @implementation EventsDataSource
@@ -473,10 +485,7 @@
     }
     for(Event *event in copy) {
         if(event.eid > lastSeenEid && [event isImportant:type]) {
-            NSString *from = event.from;
-            if(!from.length)
-                from = event.nick;
-            if(from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", from, event.hostmask]])
+            if(event.ignoreMask && [ignore match:event.ignoreMask])
                 continue;
             count++;
         }
@@ -496,10 +505,7 @@
     }
     for(Event *event in copy) {
         if(event.eid > lastSeenEid && [event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"])) {
-            NSString *from = event.from;
-            if(!from.length)
-                from = event.nick;
-            if(from && event.hostmask && [ignore match:[NSString stringWithFormat:@"%@!%@", from, event.hostmask]])
+            if(event.ignoreMask && [ignore match:event.ignoreMask])
                 continue;
             count++;
         }

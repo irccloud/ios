@@ -355,7 +355,6 @@ int __timestampWidth;
     if(_minEid == 0)
         _minEid = event.eid;
     if(event.eid == _buffer.min_eid) {
-        NSLog(@"This event's EID matches the buffer's min_eid, hiding the loading header");
         self.tableView.tableHeaderView = nil;
     }
     if(event.eid < _earliestEid || _earliestEid == 0)
@@ -469,12 +468,8 @@ int __timestampWidth;
         }
     }
     
-    NSString *from = event.from;
-    if(!from.length)
-        from = event.nick;
-    
-    if(from.length && event.hostmask.length && ![type isEqualToString:@"user_channel_mode"] && [type rangeOfString:@"kicked"].location == NSNotFound) {
-        if([_ignore match:[NSString stringWithFormat:@"%@!%@", from, event.hostmask]]) {
+    if(event.ignoreMask.length && ![type isEqualToString:@"user_channel_mode"] && [type rangeOfString:@"kicked"].location == NSNotFound) {
+        if([_ignore match:event.ignoreMask]) {
             if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0)
                 [self sendHeartbeat];
             return;
@@ -508,7 +503,6 @@ int __timestampWidth;
     [self _addItem:event eid:eid];
     
     if(!backlog) {
-        NSLog(@"Inserted a real-time message, updating the tableView");
         [self.tableView reloadData];
         if(!_scrolledUp) {
             [self scrollToBottom];
@@ -520,7 +514,6 @@ int __timestampWidth;
             [self updateUnread];
             [self scrollViewDidScroll:self.tableView];
         }
-        NSLog(@"done");
     }
 }
 
@@ -811,7 +804,6 @@ int __timestampWidth;
 }
 
 - (void)refresh {
-    NSLog(@"Locking message table");
     [_lock lock];
     [_scrollTimer invalidate];
     _ready = NO;
@@ -830,7 +822,6 @@ int __timestampWidth;
     [_unseenHighlightPositions removeAllObjects];
     
     if(!_buffer) {
-        NSLog(@"I don't have a buffer object, just reloading the existing data");
         [self.tableView reloadData];
         return;
     }
@@ -846,18 +837,14 @@ int __timestampWidth;
     
     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
     if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
-        NSLog(@"I don't have any events to display! min_eid: %f", _buffer.min_eid);
         if(_buffer.bid != -1 && _buffer.min_eid > 0) {
-            NSLog(@"Requesting more events");
             self.tableView.tableHeaderView = _headerView;
             _requestingBacklog = YES;
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
         } else {
-            NSLog(@"There are no more events to request, hiding the header view");
             self.tableView.tableHeaderView = nil;
         }
     } else if(events.count) {
-        NSLog(@"Building the events table with %i events", events.count);
         [_ignore setIgnores:_server.ignores];
         _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
         if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0) {
@@ -871,7 +858,6 @@ int __timestampWidth;
     }
     
     if(backlogEid > 0) {
-        NSLog(@"Inserting the backlog marker");
         Event *e = [[Event alloc] init];
         e.eid = backlogEid;
         e.type = TYPE_BACKLOG;
@@ -883,10 +869,8 @@ int __timestampWidth;
     }
     
     if(_minEid > 0 && _buffer.last_seen_eid > 0 && _minEid >= _buffer.last_seen_eid) {
-        NSLog(@"We don't need a last seen EID marker");
         _lastSeenEidPos = 0;
     } else {
-        NSLog(@"Inserting the last seen EID marker");
         Event *e = [[Event alloc] init];
         e.cid = _buffer.cid;
         e.bid = _buffer.bid;
@@ -931,10 +915,8 @@ int __timestampWidth;
     }
     self.tableView.tableHeaderView = self.tableView.tableHeaderView;
     
-    NSLog(@"Sending the new data to the tableView with %i rows", _data.count);
     [self.tableView reloadData];
     if(_requestingBacklog && backlogEid > 0 && _scrolledUp) {
-        NSLog(@"Scrolling to the backlog marker");
         int markerPos = -1;
         for(Event *e in _data) {
             if(e.eid == backlogEid)
@@ -943,7 +925,6 @@ int __timestampWidth;
         }
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
     } else if(_eidToOpen > 0) {
-        NSLog(@"Attempting to scroll to the requested EID: %f", _eidToOpen);
         if(_eidToOpen <= _maxEid) {
             int i = 0;
             for(Event *e in _data) {
@@ -960,7 +941,6 @@ int __timestampWidth;
                 _scrolledUpFrom = -1;
         }
     } else if(!_scrolledUp || (_data.count && _scrollTimer)) {
-        NSLog(@"Scrolling to the bottom");
         [self _scrollToBottom];
         [self scrollToBottom];
     }
@@ -968,7 +948,6 @@ int __timestampWidth;
     if(_data.count) {
         int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
         if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
-            NSLog(@"Updating the top chatter bar");
             if(!_scrolledUp) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
@@ -979,7 +958,6 @@ int __timestampWidth;
         }
         _requestingBacklog = NO;
         if(_scrolledUpFrom > 0) {
-            NSLog(@"This table was scrolled up, re-calculating the bottom chatter bar");
             for(Event *e in _data) {
                 if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && e.eid > _scrolledUpFrom && !e.isSelf && e.rowType != ROW_LASTSEENEID) {
                     _newMsgs++;
@@ -987,20 +965,15 @@ int __timestampWidth;
                         _newHighlights++;
                 }
             }
-            NSLog(@"Bottom chatter bar has %i messages and %i highlights", _newMsgs - _newHighlights, _newHighlights);
         }
     }
     
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
     _ready = YES;
-    NSLog(@"Upading the unread indicator");
     [self updateUnread];
-    NSLog(@"Updating the scroll indicators");
     [self scrollViewDidScroll:self.tableView];
-    NSLog(@"Releasing lock");
     [_lock unlock];
-    NSLog(@"Messages table refresh complete");
 }
 
 - (void)didReceiveMemoryWarning {
