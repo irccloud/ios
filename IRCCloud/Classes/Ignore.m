@@ -39,6 +39,7 @@
         mask = [mask stringByReplacingOccurrencesOfString:@"-" withString:@"\\-"];
         mask = [mask stringByReplacingOccurrencesOfString:@"^" withString:@"\\^"];
         mask = [mask stringByReplacingOccurrencesOfString:@"$" withString:@"\\$"];
+        mask = [mask stringByReplacingOccurrencesOfString:@"|" withString:@"\\|"];
         mask = [mask stringByReplacingOccurrencesOfString:@"*" withString:@".*"];
         mask = [mask stringByReplacingOccurrencesOfString:@"!~" withString:@"!"];
         if([mask rangeOfString:@"!"].location == NSNotFound) {
