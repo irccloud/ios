@@ -102,12 +102,12 @@
 		225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017451783434800066E71 /* ARChromeActivity@2x.png */; };
 		225017661783434900066E71 /* ARChromeActivity@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017461783434800066E71 /* ARChromeActivity@2x~ipad.png */; };
 		225017671783434900066E71 /* ARChromeActivity~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017471783434800066E71 /* ARChromeActivity~ipad.png */; };
-		225017681783434900066E71 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 225017491783434800066E71 /* TUSafariActivity.strings */; };
 		225017691783434900066E71 /* Safari.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017591783434900066E71 /* Safari.png */; };
 		2250176A1783434900066E71 /* Safari@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2250175A1783434900066E71 /* Safari@2x.png */; };
 		2250176B1783434900066E71 /* Safari@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 2250175B1783434900066E71 /* Safari@2x~ipad.png */; };
 		2250176C1783434900066E71 /* Safari~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 2250175C1783434900066E71 /* Safari~ipad.png */; };
 		2250176D1783434900066E71 /* TUSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 225017601783434900066E71 /* TUSafariActivity.m */; };
+		2251693317B5A8040093ADC5 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
 		2253BA251770CD7200CCA77F /* ChannelListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */; };
 		225DB31417AF2D0A004C1571 /* world_add@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 225DB31317AF2D0A004C1571 /* world_add@2x.png */; };
 		225DB31617AF2D26004C1571 /* world_add.png in Resources */ = {isa = PBXBuildFile; fileRef = 225DB31517AF2D26004C1571 /* world_add.png */; };
@@ -334,15 +334,13 @@
 		225017451783434800066E71 /* ARChromeActivity@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ARChromeActivity@2x.png"; sourceTree = "<group>"; };
 		225017461783434800066E71 /* ARChromeActivity@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ARChromeActivity@2x~ipad.png"; sourceTree = "<group>"; };
 		225017471783434800066E71 /* ARChromeActivity~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ARChromeActivity~ipad.png"; sourceTree = "<group>"; };
-		2250174C1783434800066E71 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/TUSafariActivity.strings; sourceTree = "<group>"; };
-		225017551783434900066E71 /* no */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = no; path = no.lproj/TUSafariActivity.strings; sourceTree = "<group>"; };
 		225017591783434900066E71 /* Safari.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Safari.png; sourceTree = "<group>"; };
 		2250175A1783434900066E71 /* Safari@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Safari@2x.png"; sourceTree = "<group>"; };
 		2250175B1783434900066E71 /* Safari@2x~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Safari@2x~ipad.png"; sourceTree = "<group>"; };
 		2250175C1783434900066E71 /* Safari~ipad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Safari~ipad.png"; sourceTree = "<group>"; };
 		2250175F1783434900066E71 /* TUSafariActivity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TUSafariActivity.h; sourceTree = "<group>"; };
 		225017601783434900066E71 /* TUSafariActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUSafariActivity.m; sourceTree = "<group>"; };
-		225017621783434900066E71 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh_CN; path = zh_CN.lproj/TUSafariActivity.strings; sourceTree = "<group>"; };
+		2251693217B5A8040093ADC5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/TUSafariActivity.strings; sourceTree = "<group>"; };
 		2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelListTableViewController.m; sourceTree = "<group>"; };
 		2253BA261770CDC500CCA77F /* ChannelListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelListTableViewController.h; sourceTree = "<group>"; };
 		225DB31317AF2D0A004C1571 /* world_add@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "world_add@2x.png"; sourceTree = "<group>"; };
@@ -527,7 +525,7 @@
 		225017481783434800066E71 /* TUSafariActivity */ = {
 			isa = PBXGroup;
 			children = (
-				225017491783434800066E71 /* TUSafariActivity.strings */,
+				2251693117B5A8040093ADC5 /* TUSafariActivity.strings */,
 				225017591783434900066E71 /* Safari.png */,
 				2250175A1783434900066E71 /* Safari@2x.png */,
 				2250175B1783434900066E71 /* Safari@2x~ipad.png */,
@@ -983,7 +981,6 @@
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
 				225017661783434900066E71 /* ARChromeActivity@2x~ipad.png in Resources */,
 				225017671783434900066E71 /* ARChromeActivity~ipad.png in Resources */,
-				225017681783434900066E71 /* TUSafariActivity.strings in Resources */,
 				225017691783434900066E71 /* Safari.png in Resources */,
 				2250176A1783434900066E71 /* Safari@2x.png in Resources */,
 				2250176B1783434900066E71 /* Safari@2x~ipad.png in Resources */,
@@ -1020,6 +1017,7 @@
 				1AC5249F17A2865A00FD21FD /* Default-Portrait@2x.png in Resources */,
 				225DB31417AF2D0A004C1571 /* world_add@2x.png in Resources */,
 				225DB31617AF2D26004C1571 /* world_add.png in Resources */,
+				2251693317B5A8040093ADC5 /* TUSafariActivity.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1205,12 +1203,10 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		225017491783434800066E71 /* TUSafariActivity.strings */ = {
+		2251693117B5A8040093ADC5 /* TUSafariActivity.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				2250174C1783434800066E71 /* en */,
-				225017551783434900066E71 /* no */,
-				225017621783434900066E71 /* zh_CN */,
+				2251693217B5A8040093ADC5 /* en */,
 			);
 			name = TUSafariActivity.strings;
 			sourceTree = "<group>";
