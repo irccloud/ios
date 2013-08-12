@@ -72,7 +72,7 @@
     if(_ignores.count) {
         for(NSString *ignore in _ignores) {
             usermask = [[usermask stringByReplacingOccurrencesOfString:@"!~" withString:@"!"] lowercaseString];
-            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:ignore options:0 error:NULL];
+            NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^%@$",ignore] options:0 error:NULL];
             if([regex rangeOfFirstMatchInString:usermask options:0 range:NSMakeRange(0, [usermask length])].location != NSNotFound)
                 return YES;
         }
