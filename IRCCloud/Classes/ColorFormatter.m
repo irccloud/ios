@@ -92,9 +92,9 @@
 +(NSRegularExpression *)ircChannelRegexForServer:(Server *)s {
     NSString *pattern;
     if(s && s.isupport && [[s.isupport objectForKey:@"CHANTYPES"] isKindOfClass:[NSString class]]) {
-        pattern = [NSString stringWithFormat:@"(\\B)[%@][^<>!?\"()\\[\\],\\s]+(\\b)", [s.isupport objectForKey:@"CHANTYPES"]];
+        pattern = [NSString stringWithFormat:@"(\\B)[%@][^<>!?\"()\\[\\],\\s]+", [s.isupport objectForKey:@"CHANTYPES"]];
     } else {
-        pattern = [NSString stringWithFormat:@"(\\B)[#][^<>!?\"()\\[\\],\\s]+(\\b)"];
+        pattern = [NSString stringWithFormat:@"(\\B)[#][^<>!?\"()\\[\\],\\s]+"];
     }
     
     return [NSRegularExpression
@@ -414,7 +414,7 @@
     }
     
     if(linkify) {
-        NSArray *results = [[self email] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];;
+        NSArray *results = [[self email] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
         for(NSTextCheckingResult *result in results) {
             NSString *url = [[output string] substringWithRange:result.range];
             url = [NSString stringWithFormat:@"mailto:%@", url];
@@ -426,7 +426,7 @@
                 [matches addObjectsFromArray:results];
             }
         }
-        results = [[self webURL] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];;
+        results = [[self webURL] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
         for(NSTextCheckingResult *result in results) {
             BOOL overlap = NO;
             for(NSTextCheckingResult *match in matches) {
