@@ -737,7 +737,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         } else if([object.type isEqualToString:@"bad_channel_key"]) {
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventBadChannelKey];
-        } else if([object.type isEqualToString:@"too_many_channels"] || [object.type isEqualToString:@"no_such_channel"] ||
+        } else if([object.type isEqualToString:@"too_many_channels"] || [object.type isEqualToString:@"no_such_channel"] || [object.type isEqualToString:@"bad_channel_name"] ||
                   [object.type isEqualToString:@"no_such_nick"] || [object.type isEqualToString:@"invalid_nick_change"] ||
                   [object.type isEqualToString:@"chan_privs_needed"] || [object.type isEqualToString:@"accept_exists"] ||
                   [object.type isEqualToString:@"banned_from_channel"] || [object.type isEqualToString:@"oper_only"] ||

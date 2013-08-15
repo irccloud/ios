@@ -259,6 +259,8 @@
                 msg = [NSString stringWithFormat:@"You've been banned from %@", [o objectForKey:@"chan"]];
             else if([type isEqualToString:@"invalid_nickchange"])
                 msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"ban_channel"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"bad_channel_name"])
+                msg = [NSString stringWithFormat:@"Bad channel name: %@", [o objectForKey:@"chan"]];
             else if([type isEqualToString:@"no_messages_from_non_registered"]) {
                 if([[o objectForKey:@"nick"] length])
                     msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
