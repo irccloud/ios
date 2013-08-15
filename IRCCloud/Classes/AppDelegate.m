@@ -166,6 +166,8 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    if(_conn.reconnectTimestamp == 0)
+        _conn.reconnectTimestamp = -1;
     _conn.background = NO;
     application.applicationIconBadgeNumber = 1;
     application.applicationIconBadgeNumber = 0;
