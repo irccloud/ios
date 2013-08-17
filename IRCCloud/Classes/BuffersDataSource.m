@@ -37,7 +37,7 @@
     else if(joinedLeft < joinedRight)
         return NSOrderedDescending;
     else
-        return [[_name lowercaseString] compare:aBuffer.name];
+        return [[_name lowercaseString] compare:[aBuffer.name lowercaseString]];
 }
 -(NSString *)description {
     return [NSString stringWithFormat:@"{cid: %i, bid: %i, name: %@, type: %@}", _cid, _bid, _name, _type];
