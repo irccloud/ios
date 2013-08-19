@@ -16,6 +16,7 @@
 
 
 #import "ChannelsDataSource.h"
+#import "UsersDataSource.h"
 
 @implementation Channel
 
@@ -43,6 +44,14 @@
 -(void)clear {
     @synchronized(_channels) {
         [_channels removeAllObjects];
+    }
+}
+
+-(void)invalidate {
+    @synchronized(_channels) {
+        for(Channel *channel in _channels) {
+            channel.valid = NO;
+        }
     }
 }
 
@@ -102,6 +111,21 @@
                 return channel;
         }
         return nil;
+    }
+}
+
+-(void)purgeInvalidChannels {
+    NSLog(@"Cleaning up invalid channels");
+    NSArray *copy;
+    @synchronized(_channels) {
+        copy = _channels.copy;
+    }
+    for(Channel *channel in copy) {
+        if(!channel.valid) {
+            NSLog(@"Removing invalid channel: %@", channel.name);
+            [_channels removeObject:channel];
+            [[UsersDataSource sharedInstance] removeUsersForBuffer:channel.bid];
+        }
     }
 }
 @end

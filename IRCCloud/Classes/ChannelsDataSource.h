@@ -28,8 +28,10 @@
     NSString *_mode;
     NSTimeInterval _timestamp;
     NSString *_url;
+    BOOL _valid;
 }
 @property int cid, bid;
+@property BOOL valid;
 @property NSString *name, *topic_text, *topic_author, *type, *mode, *url;
 @property NSTimeInterval topic_time, timestamp;
 @end
@@ -39,6 +41,7 @@
 }
 +(ChannelsDataSource *)sharedInstance;
 -(void)clear;
+-(void)invalidate;
 -(void)addChannel:(Channel *)channel;
 -(void)removeChannelForBuffer:(int)bid;
 -(void)updateTopic:(NSString *)text time:(NSTimeInterval)time author:(NSString *)author buffer:(int)bid;
@@ -46,4 +49,5 @@
 -(void)updateURL:(NSString *)url buffer:(int)bid;
 -(void)updateTimestamp:(NSTimeInterval)timestamp buffer:(int)bid;
 -(Channel *)channelForBuffer:(int)bid;
+-(void)purgeInvalidChannels;
 @end

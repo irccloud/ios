@@ -683,8 +683,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 _numBuffers = [[object objectForKey:@"numbuffers"] intValue];
                 _totalBuffers = 0;
                 NSLog(@"OOB includes has %i buffers", _numBuffers);
-                if(_buffers.count)
+                if(_buffers.count) {
                     [_buffers invalidate];
+                    [_channels invalidate];
+                }
             }
         } else if([object.type isEqualToString:@"makeserver"] || [object.type isEqualToString:@"server_details_changed"]) {
             Server *server = [_servers getServer:object.cid];
@@ -842,6 +844,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             channel.topic_text = [[object objectForKey:@"topic"] objectForKey:@"text"];
             channel.topic_author = [[object objectForKey:@"topic"] objectForKey:@"nick"];
             channel.topic_time = [[[object objectForKey:@"topic"] objectForKey:@"time"] doubleValue];
+            channel.valid = YES;
             [_users removeUsersForBuffer:object.bid];
             for(NSDictionary *member in [object objectForKey:@"members"]) {
                 User *user = [[User alloc] init];
@@ -1106,6 +1109,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     } else {
         NSLog(@"I now have %i servers with %i buffers", [_servers count], [_buffers count]);
         [_buffers purgeInvalidBIDs];
+        [_channels purgeInvalidChannels];
     }
     NSLog(@"I downloaded %i events", _totalCount);
     [_oobQueue removeObject:fetcher];
