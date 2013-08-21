@@ -775,8 +775,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventAcceptList];
         } else if([object.type isEqualToString:@"who_response"]) {
-            if(!backlog)
+            if(!backlog) {
+                for(NSDictionary *user in [object objectForKey:@"users"]) {
+                    [_users updateHostmask:[user objectForKey:@"usermask"] nick:[user objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                    [_users updateAway:[[user objectForKey:@"away"] intValue] nick:[user objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                }
                 [self postObject:object forEvent:kIRCEventWhoList];
+            }
         } else if([object.type isEqualToString:@"names_reply"]) {
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventNamesList];

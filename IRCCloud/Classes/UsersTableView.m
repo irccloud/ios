@@ -107,6 +107,7 @@
         case kIRCEventMemberUpdates:
         case kIRCEventUserChannelMode:
         case kIRCEventKick:
+        case kIRCEventWhoList:
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
             break;
         default:
@@ -131,7 +132,7 @@
             [data addObject:@{
              @"type":@TYPE_USER,
              @"text":user.nick,
-             @"color":[UIColor blackColor],
+             @"color":user.away?[UIColor timestampColor]:[UIColor blackColor],
              @"bgColor":groupColor,
              @"first":@(first),
              @"borderColor":borderColor
