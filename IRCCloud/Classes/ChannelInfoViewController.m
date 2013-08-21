@@ -137,22 +137,14 @@
         _topicEdit.text = @"";
     }
     if(_channel.mode.length) {
-        NSString *mode = _channel.mode;
-        NSString *key = nil;
-        NSUInteger keypos = [mode rangeOfString:@" "].location;
-        if(keypos != NSNotFound) {
-            key = [_channel.mode substringFromIndex:keypos + 1];
-            mode = [_channel.mode substringToIndex:keypos];
-        }
-        
-        for(int i = 0; i < mode.length; i++) {
-            unichar m = [mode characterAtIndex:i];
+        for(NSDictionary *mode in _channel.modes) {
+            unichar m = [[mode objectForKey:@"mode"] characterAtIndex:0];
             switch(m) {
                 case 'i':
                     [_modeHints addObject:@{@"mode":@"Invite Only (+i)", @"hint":@"Members must be invited to join this channel."}];
                     break;
                 case 'k':
-                    [_modeHints addObject:@{@"mode":@"Password (+k)", @"hint":key}];
+                    [_modeHints addObject:@{@"mode":@"Password (+k)", @"hint":[mode objectForKey:@"param"]}];
                     break;
                 case 'm':
                     [_modeHints addObject:@{@"mode":@"Moderated (+m)", @"hint":@"Only ops and voiced members may talk."}];

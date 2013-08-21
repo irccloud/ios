@@ -19,7 +19,32 @@
 #import "UsersDataSource.h"
 
 @implementation Channel
+-(void)addMode:(NSString *)mode param:(NSString *)param {
+    [self removeMode:mode];
+    @synchronized(_modes) {
+        [_modes addObject:@{@"mode":mode,@"param":param}];
+    }
+}
 
+-(void)removeMode:(NSString *)mode {
+    @synchronized(_modes) {
+        for(NSDictionary *m in _modes) {
+            if([[[m objectForKey:@"mode"] lowercaseString] isEqualToString:mode]) {
+                [_modes removeObject:m];
+                return;
+            }
+        }
+    }
+}
+-(BOOL)hasMode:(NSString *)mode {
+    @synchronized(_modes) {
+        for(NSDictionary *m in _modes) {
+            if([[[m objectForKey:@"mode"] lowercaseString] isEqualToString:mode])
+                return YES;
+        }
+    }
+    return NO;
+}
 @end
 
 @implementation ChannelsDataSource
@@ -80,11 +105,20 @@
     }
 }
 
--(void)updateMode:(NSString *)mode buffer:(int)bid {
+-(void)updateMode:(NSString *)mode buffer:(int)bid ops:(NSDictionary *)ops {
     @synchronized(_channels) {
         Channel *channel = [self channelForBuffer:bid];
-        if(channel)
+        if(channel) {
+            NSArray *add = [ops objectForKey:@"add"];
+            for(NSDictionary *m in add) {
+                [channel addMode:[m objectForKey:@"mode"] param:[m objectForKey:@"param"]];
+            }
+            NSArray *remove = [ops objectForKey:@"remove"];
+            for(NSDictionary *m in remove) {
+                [channel removeMode:[m objectForKey:@"mode"]];
+            }
             channel.mode = mode;
+        }
     }
 }
 

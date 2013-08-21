@@ -917,7 +917,7 @@
             BOOL lock = NO;
             Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid];
             if(channel) {
-                if([channel.mode rangeOfString:@"k"].location != NSNotFound)
+                if([channel hasMode:@"k"])
                     lock = YES;
                 if([channel.topic_text isKindOfClass:[NSString class]] && channel.topic_text.length) {
                     _topicLabel.hidden = NO;

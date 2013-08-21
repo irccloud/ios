@@ -25,6 +25,7 @@
     NSTimeInterval _topic_time;
     NSString *_topic_author;
     NSString *_type;
+    NSMutableArray *_modes;
     NSString *_mode;
     NSTimeInterval _timestamp;
     NSString *_url;
@@ -34,6 +35,10 @@
 @property BOOL valid;
 @property NSString *name, *topic_text, *topic_author, *type, *mode, *url;
 @property NSTimeInterval topic_time, timestamp;
+@property NSArray *modes;
+-(void)addMode:(NSString *)mode param:(NSString *)param;
+-(void)removeMode:(NSString *)mode;
+-(BOOL)hasMode:(NSString *)mode;
 @end
 
 @interface ChannelsDataSource : NSObject {
@@ -45,7 +50,7 @@
 -(void)addChannel:(Channel *)channel;
 -(void)removeChannelForBuffer:(int)bid;
 -(void)updateTopic:(NSString *)text time:(NSTimeInterval)time author:(NSString *)author buffer:(int)bid;
--(void)updateMode:(NSString *)mode buffer:(int)bid;
+-(void)updateMode:(NSString *)mode buffer:(int)bid ops:(NSDictionary *)ops;
 -(void)updateURL:(NSString *)url buffer:(int)bid;
 -(void)updateTimestamp:(NSTimeInterval)timestamp buffer:(int)bid;
 -(Channel *)channelForBuffer:(int)bid;

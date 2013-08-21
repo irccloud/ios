@@ -839,12 +839,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             channel.bid = object.bid;
             channel.name = [object objectForKey:@"chan"];
             channel.type = [object objectForKey:@"channel_type"];
-            channel.mode = [object objectForKey:@"mode"];
             channel.timestamp = [[object objectForKey:@"timestamp"] doubleValue];
             channel.topic_text = [[object objectForKey:@"topic"] objectForKey:@"text"];
             channel.topic_author = [[object objectForKey:@"topic"] objectForKey:@"nick"];
             channel.topic_time = [[[object objectForKey:@"topic"] objectForKey:@"time"] doubleValue];
+            channel.mode = @"";
+            channel.modes = [[NSMutableArray alloc] init];
             channel.valid = YES;
+            [_channels updateMode:[object objectForKey:@"mode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
             [_users removeUsersForBuffer:object.bid];
             for(NSDictionary *member in [object objectForKey:@"members"]) {
                 User *user = [[User alloc] init];
@@ -870,7 +872,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         } else if([object.type isEqualToString:@"channel_mode"] || [object.type isEqualToString:@"channel_mode_is"]) {
             [_events addJSONObject:object];
             if(!backlog) {
-                [_channels updateMode:[object objectForKey:@"newmode"] buffer:object.bid];
+                [_channels updateMode:[object objectForKey:@"newmode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
                 [self postObject:object forEvent:kIRCEventChannelMode];
             }
         } else if([object.type isEqualToString:@"channel_timestamp"]) {
