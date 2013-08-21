@@ -476,12 +476,53 @@
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.view.backgroundColor = [UIColor backgroundBlueColor];
 
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshInBackground) name:kIRCCloudEventNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refreshInBackground) name:kIRCCloudBacklogCompletedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
 }
 
-- (void)refreshInBackground {
-    [self performSelectorInBackground:@selector(refresh) withObject:nil];
+- (void)handleEvent:(NSNotification *)notification {
+    kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
+    IRCCloudJSONObject *o = notification.object;
+    switch(event) {
+        case kIRCEventUserInfo:
+        case kIRCEventChannelTopic:
+        case kIRCEventNickChange:
+        case kIRCEventMemberUpdates:
+        case kIRCEventUserChannelMode:
+        case kIRCEventAway:
+        case kIRCEventSelfBack:
+        case kIRCEventChannelTimestamp:
+        case kIRCEventSelfDetails:
+        case kIRCEventUserMode:
+        case kIRCEventSetIgnores:
+        case kIRCEventBadChannelKey:
+        case kIRCEventOpenBuffer:
+        case kIRCEventInvalidNick:
+        case kIRCEventBanList:
+        case kIRCEventWhoList:
+        case kIRCEventWhois:
+        case kIRCEventNamesList:
+        case kIRCEventLinkChannel:
+        case kIRCEventListResponseFetching:
+        case kIRCEventListResponse:
+        case kIRCEventListResponseTooManyChannels:
+        case kIRCEventConnectionLag:
+        case kIRCEventGlobalMsg:
+        case kIRCEventAcceptList:
+        case kIRCEventFailureMsg:
+        case kIRCEventSuccess:
+        case kIRCEventAlert:
+            break;
+        case kIRCEventJoin:
+        case kIRCEventPart:
+        case kIRCEventKick:
+        case kIRCEventQuit:
+            if(![o.type hasPrefix:@"you_"])
+                break;
+        default:
+            [self performSelectorInBackground:@selector(refresh) withObject:nil];
+            break;
+    }
 }
 
 - (void)viewDidUnload {
