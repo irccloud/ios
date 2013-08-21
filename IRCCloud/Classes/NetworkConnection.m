@@ -851,6 +851,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             channel.mode = @"";
             channel.modes = [[NSMutableArray alloc] init];
             channel.valid = YES;
+            channel.key = NO;
             [_channels updateMode:[object objectForKey:@"mode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
             [_users removeUsersForBuffer:object.bid];
             for(NSDictionary *member in [object objectForKey:@"members"]) {

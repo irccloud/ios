@@ -30,9 +30,10 @@
     NSTimeInterval _timestamp;
     NSString *_url;
     BOOL _valid;
+    BOOL _key;
 }
 @property int cid, bid;
-@property BOOL valid;
+@property BOOL valid, key;
 @property NSString *name, *topic_text, *topic_author, *type, *mode, *url;
 @property NSTimeInterval topic_time, timestamp;
 @property NSArray *modes;

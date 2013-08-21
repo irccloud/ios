@@ -917,7 +917,7 @@
             BOOL lock = NO;
             Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid];
             if(channel) {
-                if([channel hasMode:@"k"])
+                if(channel.key)
                     lock = YES;
                 if([channel.topic_text isKindOfClass:[NSString class]] && channel.topic_text.length) {
                     _topicLabel.hidden = NO;
@@ -925,12 +925,13 @@
                     _titleLabel.font = [UIFont boldSystemFontOfSize:18];
                     _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
                     _topicLabel.text = [[ColorFormatter format:channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+                    _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,_titleLabel.bounds.size.height-4);
                 } else {
+                    _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,0,16,_titleLabel.bounds.size.height);
                     _topicLabel.hidden = YES;
                 }
             }
             if(lock) {
-                _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,16);
                 _lock.hidden = NO;
             } else {
                 _lock.hidden = YES;

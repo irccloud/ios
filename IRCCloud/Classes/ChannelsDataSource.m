@@ -21,6 +21,8 @@
 @implementation Channel
 -(void)addMode:(NSString *)mode param:(NSString *)param {
     [self removeMode:mode];
+    if([[mode lowercaseString] isEqualToString:@"k"])
+        _key = YES;
     @synchronized(_modes) {
         [_modes addObject:@{@"mode":mode,@"param":param}];
     }
@@ -28,6 +30,8 @@
 
 -(void)removeMode:(NSString *)mode {
     @synchronized(_modes) {
+        if([[mode lowercaseString] isEqualToString:@"k"])
+            _key = NO;
         for(NSDictionary *m in _modes) {
             if([[[m objectForKey:@"mode"] lowercaseString] isEqualToString:mode]) {
                 [_modes removeObject:m];
