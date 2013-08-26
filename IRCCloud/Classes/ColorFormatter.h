@@ -21,7 +21,7 @@
 #define COLOR_MIRC 3
 #define COLOR_RGB 4
 #define CLEAR 15
-#define ITALICS 16
+#define ITALICS 22
 #define UNDERLINE 31
 
 #define FONT_SIZE 14
