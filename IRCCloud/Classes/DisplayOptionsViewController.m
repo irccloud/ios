@@ -42,6 +42,7 @@
     NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[[NetworkConnection sharedInstance] prefs]];
     NSMutableDictionary *disableTrackUnread = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hideJoinPart = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *expandJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
     
     if([_buffer.type isEqualToString:@"channel"]) {
@@ -67,6 +68,17 @@
         else
             [prefs removeObjectForKey:@"channel-hideJoinPart"];
 
+        if([[prefs objectForKey:@"channel-expandJoinPart"] isKindOfClass:[NSDictionary class]])
+            [expandJoinPart addEntriesFromDictionary:[prefs objectForKey:@"channel-expandJoinPart"]];
+        if(_collapseJoinPart.on)
+            [expandJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [expandJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(expandJoinPart.count)
+            [prefs setObject:expandJoinPart forKey:@"channel-expandJoinPart"];
+        else
+            [prefs removeObjectForKey:@"channel-expandJoinPart"];
+        
         if([[prefs objectForKey:@"channel-hiddenMembers"] isKindOfClass:[NSDictionary class]])
             [hiddenMembers addEntriesFromDictionary:[prefs objectForKey:@"channel-hiddenMembers"]];
         if(_showMembers.on)
@@ -100,7 +112,18 @@
                 [prefs setObject:hideJoinPart forKey:@"buffer-hideJoinPart"];
             else
                 [prefs removeObjectForKey:@"buffer-hideJoinPart"];
-        }
+
+            if([[prefs objectForKey:@"buffer-expandJoinPart"] isKindOfClass:[NSDictionary class]])
+                [expandJoinPart addEntriesFromDictionary:[prefs objectForKey:@"buffer-expandJoinPart"]];
+            if(_collapseJoinPart.on)
+                [expandJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [expandJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(expandJoinPart.count)
+                [prefs setObject:expandJoinPart forKey:@"buffer-expandJoinPart"];
+            else
+                [prefs removeObjectForKey:@"buffer-expandJoinPart"];
+}
     }
     
     SBJsonWriter *writer = [[SBJsonWriter alloc] init];
@@ -163,6 +186,11 @@
         else
             _showJoinPart.on = YES;
 
+        if([[[prefs objectForKey:@"channel-expandJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+            _collapseJoinPart.on = NO;
+        else
+            _collapseJoinPart.on = YES;
+        
         if([[[prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
             _showMembers.on = NO;
         else
@@ -177,6 +205,12 @@
             _showJoinPart.on = NO;
         else
             _showJoinPart.on = YES;
+
+        if([[[prefs objectForKey:@"channel-expandJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+            _collapseJoinPart.on = NO;
+        else
+            _collapseJoinPart.on = YES;
+        
     }
 }
 
@@ -196,6 +230,7 @@
     _showMembers = [[UISwitch alloc] init];
     _trackUnread = [[UISwitch alloc] init];
     _showJoinPart = [[UISwitch alloc] init];
+    _collapseJoinPart = [[UISwitch alloc] init];
 
     [self refresh];
 }
@@ -220,11 +255,11 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if([_buffer.type isEqualToString:@"channel"])
-        return 3;
+        return 4;
     else if([_buffer.type isEqualToString:@"console"])
         return 1;
     else
-        return 2;
+        return 3;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -242,12 +277,16 @@
             cell.accessoryView = _trackUnread;
             break;
         case 1:
-            cell.textLabel.text = @"Joins and parts";
-            cell.accessoryView = _showJoinPart;
-            break;
-        case 2:
             cell.textLabel.text = @"Member list";
             cell.accessoryView = _showMembers;
+            break;
+        case 2:
+            cell.textLabel.text = @"Show joins/parts";
+            cell.accessoryView = _showJoinPart;
+            break;
+        case 3:
+            cell.textLabel.text = @"Collapse joins/parts";
+            cell.accessoryView = _collapseJoinPart;
             break;
     }
     return cell;

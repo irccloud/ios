@@ -352,6 +352,8 @@ int __timestampWidth;
 }
 
 - (void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped {
+    BOOL shouldExpand = NO;
+
     if(_minEid == 0)
         _minEid = event.eid;
     if(event.eid == _buffer.min_eid) {
@@ -388,12 +390,26 @@ int __timestampWidth;
                     [self.tableView reloadData];
                 return;
             }
+
+            NSDictionary *expandMap;
+            
+            if([_buffer.type isEqualToString:@"channel"]) {
+                expandMap = [prefs objectForKey:@"channel-expandJoinPart"];
+            } else {
+                expandMap = [prefs objectForKey:@"buffer-expandJoinPart"];
+            }
+            
+            if(expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                shouldExpand = YES;
         }
         
         [_formatter setDateFormat:@"DDD"];
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
         
-        if(_currentCollapsedEid == -1 || ![[_formatter stringFromDate:date] isEqualToString:_lastCollpasedDay]) {
+        if(shouldExpand)
+            [_expandedSectionEids removeAllObjects];
+        
+        if(_currentCollapsedEid == -1 || ![[_formatter stringFromDate:date] isEqualToString:_lastCollpasedDay] || shouldExpand) {
             [_collapsedEvents clear];
             _currentCollapsedEid = eid;
             _lastCollpasedDay = [_formatter stringFromDate:date];

@@ -23,6 +23,7 @@
     UISwitch *_showMembers;
     UISwitch *_trackUnread;
     UISwitch *_showJoinPart;
+    UISwitch *_collapseJoinPart;
     int _reqid;
 }
 @property (strong, nonatomic) Buffer *buffer;
