@@ -42,7 +42,10 @@
 		float bottomContentOffset = (self.contentSize.height - self.frame.size.height + self.contentInset.bottom);
 		if(s.y < bottomContentOffset && self.scrollEnabled) 
         {
-			self.contentInset = UIEdgeInsetsMake(kTopContentInset, 0, lBottonContentInset, 0);
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+                self.contentInset = UIEdgeInsetsMake(kTopContentInset, 0, lBottonContentInset, 0);
+            else
+                self.contentInset = UIEdgeInsetsMake(kTopContentInset, 0, 4, 0);
 		}
 	}
 	[super setContentOffset:s];

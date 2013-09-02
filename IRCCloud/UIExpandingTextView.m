@@ -72,7 +72,6 @@
     if ((self = [super initWithFrame:frame])) 
     {
         forceSizeUpdate = NO;
-        //self.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 		CGRect backgroundFrame = frame;
         backgroundFrame.origin.y = 0;
 		backgroundFrame.origin.x = 0;
@@ -90,7 +89,6 @@
         internalTextView.backgroundColor = [UIColor clearColor];
         internalTextView.showsHorizontalScrollIndicator = NO;
         [internalTextView sizeToFit];
-        //internalTextView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         
         /* set placeholder */
         placeholderLabel = [[UILabel alloc]initWithFrame:CGRectMake(8,3,self.bounds.size.width - 16,self.bounds.size.height)];
@@ -109,13 +107,11 @@
         [self addSubview:textViewBackgroundImage];
         [self addSubview:internalTextView];
 
-        /* Calculate the text view height */
-		UIView *internal = (UIView*)[[internalTextView subviews] objectAtIndex:0];
-		minimumHeight = internal.frame.size.height;
 		[self setMinimumNumberOfLines:1];
 		animateHeightChange = YES;
 		internalTextView.text = @"";
 		[self setMaximumNumberOfLines:13];
+        internalTextView.scrollEnabled = YES;
         
         [self sizeToFit];
     }
@@ -159,15 +155,21 @@
 {
     NSString *saveText        = internalTextView.text;
     NSString *newText         = @"-";
+    BOOL oldScrollEnabled     = internalTextView.scrollEnabled;
     internalTextView.hidden   = YES;
     internalTextView.delegate = nil;
+    internalTextView.scrollEnabled = NO;
     for (int i = 2; i < n; ++i)
     {
         newText = [newText stringByAppendingString:@"\n|W|"];
     }
     internalTextView.text     = newText;
-    maximumHeight             = internalTextView.contentSize.height;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+        maximumHeight             = internalTextView.contentSize.height;
+    else
+        maximumHeight             = internalTextView.intrinsicContentSize.height;
     maximumNumberOfLines      = n;
+    internalTextView.scrollEnabled = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?oldScrollEnabled:YES;
     internalTextView.text     = saveText;
     internalTextView.hidden   = NO;
     internalTextView.delegate = self;
@@ -179,14 +181,20 @@
 {
     NSString *saveText        = internalTextView.text;
     NSString *newText         = @"-";
+    BOOL oldScrollEnabled     = internalTextView.scrollEnabled;
     internalTextView.hidden   = YES;
     internalTextView.delegate = nil;
+    internalTextView.scrollEnabled = NO;
     for (int i = 2; i < m; ++i)
     {
         newText = [newText stringByAppendingString:@"\n|W|"];
     }
     internalTextView.text     = newText;
-    minimumHeight             = internalTextView.contentSize.height;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+        minimumHeight             = internalTextView.contentSize.height;
+    else
+        minimumHeight             = internalTextView.intrinsicContentSize.height;
+    internalTextView.scrollEnabled = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?oldScrollEnabled:YES;
     internalTextView.text     = saveText;
     internalTextView.hidden   = NO;
     internalTextView.delegate = self;
@@ -202,7 +210,7 @@
     else
         placeholderLabel.alpha = 0;
     
-	NSInteger newHeight = internalTextView.contentSize.height;
+    NSInteger newHeight = internalTextView.contentSize.height;
     
 	if(newHeight < minimumHeight || !internalTextView.hasText)
     {
@@ -252,20 +260,22 @@
             [delegate expandingTextView:self didChangeHeight:(newHeight+ kTextInsetBottom)];
         }
 		
-		if (newHeight >= maximumHeight)
-		{
-            /* Enable vertical scrolling */
-			if(!internalTextView.scrollEnabled)
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
+            if (newHeight >= maximumHeight)
             {
-				internalTextView.scrollEnabled = YES;
-				[internalTextView flashScrollIndicators];
-			}
-		} 
-        else 
-        {
-            /* Disable vertical scrolling */
-			internalTextView.scrollEnabled = NO;
-		}
+                if(!internalTextView.scrollEnabled)
+                {
+                    internalTextView.scrollEnabled = YES;
+                    [internalTextView flashScrollIndicators];
+                }
+            } 
+            else 
+            {
+                internalTextView.scrollEnabled = NO;
+            }
+        } else {
+            internalTextView.scrollEnabled = YES;
+        }
 	}
 	
 	if ([delegate respondsToSelector:@selector(expandingTextViewDidChange:)]) 

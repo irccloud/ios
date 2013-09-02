@@ -1030,7 +1030,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         }
         TFLog(@"Repsonse: %@", object);
     }
-    if(_reconnectTimestamp != 0)
+    if(!backlog && _reconnectTimestamp != 0)
         [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
 }
 

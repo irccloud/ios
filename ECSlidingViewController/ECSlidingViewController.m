@@ -595,7 +595,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     [NSException raise:@"Invalid Width Layout" format:@"underLeftWidthLayout must be a valid ECViewWidthLayout"];
   }
 #ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7) {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         CGRect frame = self.underLeftView.frame;
         frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
         frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.height;
@@ -640,7 +640,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     [NSException raise:@"Invalid Width Layout" format:@"underRightWidthLayout must be a valid ECViewWidthLayout"];
   }
 #ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7) {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         CGRect frame = self.underRightView.frame;
         frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
         frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.height;
