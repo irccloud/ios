@@ -35,6 +35,7 @@
     
     NetworkConnection *_conn;
 }
+-(void)flyaway;
 -(IBAction)loginButtonPressed:(id)sender;
 -(IBAction)textFieldChanged:(id)sender;
 @end

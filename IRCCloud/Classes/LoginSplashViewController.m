@@ -55,6 +55,15 @@
     [version setText:[NSString stringWithFormat:@"Version %@",[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey]]];
 }
 
+-(void)flyaway {
+    CGRect frame = logo.frame;
+    if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
+        frame.origin.y = -frame.size.height;
+    else
+        frame.origin.x = -frame.size.width;
+    logo.frame = frame;
+}
+
 -(void)viewWillAppear:(BOOL)animated {
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [[NSNotificationCenter defaultCenter] removeObserver:self];

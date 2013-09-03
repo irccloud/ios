@@ -113,6 +113,7 @@
 -(void)showLoginView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
+        self.loginSplashViewController.view.alpha = 1;
         self.window.rootViewController = self.loginSplashViewController;
     }];
 }
@@ -128,6 +129,11 @@
         if([[ServersDataSource sharedInstance] count]) {
             [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
             self.window.rootViewController = self.slideViewController;
+            [self.window insertSubview:self.loginSplashViewController.view aboveSubview:self.slideViewController.view];
+            [UIView animateWithDuration:0.5f animations:^{
+                self.loginSplashViewController.view.alpha = 0;
+                [self.loginSplashViewController flyaway];
+            }];
         } else {
             [self showConnectionView];
         }
