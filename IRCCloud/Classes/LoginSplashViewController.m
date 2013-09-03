@@ -193,6 +193,7 @@
 }
 
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    self.view.frame = [UIScreen mainScreen].applicationFrame;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
             logo.frame = CGRectMake(92, 36, 138, 138);

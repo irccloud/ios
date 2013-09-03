@@ -34,16 +34,16 @@
         self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPhone" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPhone" bundle:nil];
         self.slideViewController = [[ECSlidingViewController alloc] init];
-        self.slideViewController.view.backgroundColor = [UIColor backgroundBlueColor];
+        self.slideViewController.view.backgroundColor = [UIColor blackColor];
         self.slideViewController.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
-        self.slideViewController.topViewController.view.backgroundColor = [UIColor navBarColor];
+        self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
     } else {
         self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPad" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPad" bundle:nil];
         self.slideViewController = [[ECSlidingViewController alloc] init];
-        self.slideViewController.view.backgroundColor = [UIColor backgroundBlueColor];
+        self.slideViewController.view.backgroundColor = [UIColor blackColor];
         self.slideViewController.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
-        self.slideViewController.topViewController.view.backgroundColor = [UIColor navBarColor];
+        self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
     }
     if(launchOptions && [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]) {
         self.mainViewController.bidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:1] intValue];

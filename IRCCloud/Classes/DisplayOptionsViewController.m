@@ -219,7 +219,6 @@
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.view.backgroundColor = [UIColor navBarColor];
     }
 #endif
     int padding = 80;
