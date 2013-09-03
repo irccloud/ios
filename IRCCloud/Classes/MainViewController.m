@@ -579,8 +579,12 @@
 }
 
 -(void)backlogCompleted:(NSNotification *)notification {
+    if([ServersDataSource sharedInstance].count < 1) {
+        [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
+        return;
+    }
     [self _hideConnectingView];
-    if(_buffer && !_urlToOpen && _bidToOpen == -1 && _eidToOpen < 1) {
+    if(_buffer && !_urlToOpen && _bidToOpen == -1 && _eidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
         [self _updateServerStatus];
         [self _updateUserListVisibility];
         [self _updateUnreadIndicator];
@@ -706,9 +710,13 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    if([ServersDataSource sharedInstance].count < 1) {
+        [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
+        return;
+    }
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
-    if(!_buffer) {
+    if(!_buffer || ![[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
         int bid = [BuffersDataSource sharedInstance].firstBid;
         if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
             if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
