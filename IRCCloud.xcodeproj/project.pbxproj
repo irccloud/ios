@@ -7,6 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A23DFA617D5DD630060303D /* iOS7-iPad.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFA217D5DD630060303D /* iOS7-iPad.png */; };
+		1A23DFA717D5DD630060303D /* iOS7-iPad@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFA317D5DD630060303D /* iOS7-iPad@2x.png */; };
+		1A23DFA817D5DD630060303D /* iOS7-iPhone.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFA417D5DD630060303D /* iOS7-iPhone.png */; };
+		1A23DFA917D5DD630060303D /* iOS7-iPhone@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFA517D5DD630060303D /* iOS7-iPhone@2x.png */; };
+		1A23DFAE17D5DF020060303D /* iOS7-Settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFAA17D5DF020060303D /* iOS7-Settings.png */; };
+		1A23DFAF17D5DF020060303D /* iOS7-Settings@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFAB17D5DF020060303D /* iOS7-Settings@2x.png */; };
+		1A23DFB017D5DF020060303D /* iOS7-Spotlight.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFAC17D5DF020060303D /* iOS7-Spotlight.png */; };
+		1A23DFB117D5DF020060303D /* iOS7-Spotlight@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFAD17D5DF020060303D /* iOS7-Spotlight@2x.png */; };
+		1A23DFB917D5E8B40060303D /* iOS7-Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFB217D5E8B40060303D /* iOS7-Default-568h@2x.png */; };
+		1A23DFBA17D5E8B40060303D /* iOS7-Default-Landscape.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFB317D5E8B40060303D /* iOS7-Default-Landscape.png */; };
+		1A23DFBB17D5E8B40060303D /* iOS7-Default-Landscape@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFB417D5E8B40060303D /* iOS7-Default-Landscape@2x.png */; };
+		1A23DFBC17D5E8B40060303D /* iOS7-Default-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFB517D5E8B40060303D /* iOS7-Default-Portrait.png */; };
+		1A23DFBD17D5E8B40060303D /* iOS7-Default-Portrait@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFB617D5E8B40060303D /* iOS7-Default-Portrait@2x.png */; };
+		1A23DFBE17D5E8B40060303D /* iOS7-Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFB717D5E8B40060303D /* iOS7-Default.png */; };
+		1A23DFBF17D5E8B40060303D /* iOS7-Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1A23DFB817D5E8B40060303D /* iOS7-Default@2x.png */; };
 		1AC5249E17A2865A00FD21FD /* Default-Portrait.png in Resources */ = {isa = PBXBuildFile; fileRef = 1AC5249C17A2865A00FD21FD /* Default-Portrait.png */; };
 		1AC5249F17A2865A00FD21FD /* Default-Portrait@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1AC5249D17A2865A00FD21FD /* Default-Portrait@2x.png */; };
 		1AF107C4179059B300E5465A /* tip_bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 1AF107C2179059B300E5465A /* tip_bg.png */; };
@@ -246,6 +261,21 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1A23DFA217D5DD630060303D /* iOS7-iPad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-iPad.png"; sourceTree = "<group>"; };
+		1A23DFA317D5DD630060303D /* iOS7-iPad@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-iPad@2x.png"; sourceTree = "<group>"; };
+		1A23DFA417D5DD630060303D /* iOS7-iPhone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-iPhone.png"; sourceTree = "<group>"; };
+		1A23DFA517D5DD630060303D /* iOS7-iPhone@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-iPhone@2x.png"; sourceTree = "<group>"; };
+		1A23DFAA17D5DF020060303D /* iOS7-Settings.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Settings.png"; sourceTree = "<group>"; };
+		1A23DFAB17D5DF020060303D /* iOS7-Settings@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Settings@2x.png"; sourceTree = "<group>"; };
+		1A23DFAC17D5DF020060303D /* iOS7-Spotlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Spotlight.png"; sourceTree = "<group>"; };
+		1A23DFAD17D5DF020060303D /* iOS7-Spotlight@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Spotlight@2x.png"; sourceTree = "<group>"; };
+		1A23DFB217D5E8B40060303D /* iOS7-Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Default-568h@2x.png"; sourceTree = "<group>"; };
+		1A23DFB317D5E8B40060303D /* iOS7-Default-Landscape.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Default-Landscape.png"; sourceTree = "<group>"; };
+		1A23DFB417D5E8B40060303D /* iOS7-Default-Landscape@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Default-Landscape@2x.png"; sourceTree = "<group>"; };
+		1A23DFB517D5E8B40060303D /* iOS7-Default-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Default-Portrait.png"; sourceTree = "<group>"; };
+		1A23DFB617D5E8B40060303D /* iOS7-Default-Portrait@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Default-Portrait@2x.png"; sourceTree = "<group>"; };
+		1A23DFB717D5E8B40060303D /* iOS7-Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Default.png"; sourceTree = "<group>"; };
+		1A23DFB817D5E8B40060303D /* iOS7-Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "iOS7-Default@2x.png"; sourceTree = "<group>"; };
 		1AC5249C17A2865A00FD21FD /* Default-Portrait.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait.png"; sourceTree = "<group>"; };
 		1AC5249D17A2865A00FD21FD /* Default-Portrait@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-Portrait@2x.png"; sourceTree = "<group>"; };
 		1AF107C2179059B300E5465A /* tip_bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = tip_bg.png; sourceTree = "<group>"; };
@@ -721,6 +751,13 @@
 				1AF93B81178B30BA005C1FD4 /* bullet_toggle_minus@2x.png */,
 				1AF93B82178B30BA005C1FD4 /* bullet_toggle_plus.png */,
 				1AF93B83178B30BA005C1FD4 /* bullet_toggle_plus@2x.png */,
+				1A23DFB217D5E8B40060303D /* iOS7-Default-568h@2x.png */,
+				1A23DFB317D5E8B40060303D /* iOS7-Default-Landscape.png */,
+				1A23DFB417D5E8B40060303D /* iOS7-Default-Landscape@2x.png */,
+				1A23DFB517D5E8B40060303D /* iOS7-Default-Portrait.png */,
+				1A23DFB617D5E8B40060303D /* iOS7-Default-Portrait@2x.png */,
+				1A23DFB717D5E8B40060303D /* iOS7-Default.png */,
+				1A23DFB817D5E8B40060303D /* iOS7-Default@2x.png */,
 				228A05B516D3DB930029769C /* Default-568h@2x.png */,
 				1AFDA340178C61EF0067E153 /* Default-Landscape.png */,
 				1AFDA342178C61F50067E153 /* Default-Landscape@2x.png */,
@@ -728,6 +765,14 @@
 				228A05B716D3DB930029769C /* Default@2x.png */,
 				1AC5249C17A2865A00FD21FD /* Default-Portrait.png */,
 				1AC5249D17A2865A00FD21FD /* Default-Portrait@2x.png */,
+				1A23DFA217D5DD630060303D /* iOS7-iPad.png */,
+				1A23DFA317D5DD630060303D /* iOS7-iPad@2x.png */,
+				1A23DFA417D5DD630060303D /* iOS7-iPhone.png */,
+				1A23DFA517D5DD630060303D /* iOS7-iPhone@2x.png */,
+				1A23DFAA17D5DF020060303D /* iOS7-Settings.png */,
+				1A23DFAB17D5DF020060303D /* iOS7-Settings@2x.png */,
+				1A23DFAC17D5DF020060303D /* iOS7-Spotlight.png */,
+				1A23DFAD17D5DF020060303D /* iOS7-Spotlight@2x.png */,
 				22DB1D5116FEB25200C5FE6F /* Icon-72.png */,
 				22DB1D5216FEB25200C5FE6F /* Icon-72@2x.png */,
 				1AFDA330178C2E470067E153 /* Icon-Small-50.png */,
@@ -947,7 +992,9 @@
 				228A05BA16D3DB930029769C /* Default@2x.png in Resources */,
 				228A05DF16D3E40F0029769C /* LoginSplashViewController_iPhone.xib in Resources */,
 				2236F61016DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */,
+				1A23DFBB17D5E8B40060303D /* iOS7-Default-Landscape@2x.png in Resources */,
 				2236F63016DBE881007BE535 /* lock@2x.png in Resources */,
+				1A23DFBC17D5E8B40060303D /* iOS7-Default-Portrait.png in Resources */,
 				2236F63216DBE881007BE535 /* world@2x.png in Resources */,
 				2236F63616DBE89E007BE535 /* lock.png in Resources */,
 				2236F63816DBE89E007BE535 /* world.png in Resources */,
@@ -960,8 +1007,11 @@
 				22D430AC1725ADC5003C0684 /* textbg.png in Resources */,
 				22D430AE1725ADC5003C0684 /* textbg@2x.png in Resources */,
 				224D00A6173C185B00500D70 /* add@2x.png in Resources */,
+				1A23DFA617D5DD630060303D /* iOS7-iPad.png in Resources */,
 				224D00A9173C188100500D70 /* add.png in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
+				1A23DFB017D5DF020060303D /* iOS7-Spotlight.png in Resources */,
+				1A23DFBD17D5E8B40060303D /* iOS7-Default-Portrait@2x.png in Resources */,
 				220EA4061760E2EA00EFEA6A /* accept.png in Resources */,
 				220EA40C1760E48800EFEA6A /* accept@2x.png in Resources */,
 				220EA40E1760EF6B00EFEA6A /* users@2x.png in Resources */,
@@ -969,6 +1019,7 @@
 				229C29FC17677ED200A07CED /* menu_unread.png in Resources */,
 				229C29FE17677ED200A07CED /* menu_highlight.png in Resources */,
 				229C2A0017677ED200A07CED /* menu.png in Resources */,
+				1A23DFBA17D5E8B40060303D /* iOS7-Default-Landscape.png in Resources */,
 				229C2A0217677ED200A07CED /* menu_highlight@2x.png in Resources */,
 				229C2A0417677ED200A07CED /* menu_unread@2x.png in Resources */,
 				229C2A0617677ED200A07CED /* menu@2x.png in Resources */,
@@ -976,12 +1027,16 @@
 				22E4D558176A1C550072CBD0 /* navbar@2x.png in Resources */,
 				22E4D55A176A1D720072CBD0 /* navbar.png in Resources */,
 				22EBD35C176CC23500E84DA4 /* settings@2x.png in Resources */,
+				1A23DFA817D5DD630060303D /* iOS7-iPhone.png in Resources */,
 				22EBD35E176CC24400E84DA4 /* settings.png in Resources */,
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,
+				1A23DFBF17D5E8B40060303D /* iOS7-Default@2x.png in Resources */,
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
+				1A23DFB117D5DF020060303D /* iOS7-Spotlight@2x.png in Resources */,
 				225017661783434900066E71 /* ARChromeActivity@2x~ipad.png in Resources */,
 				225017671783434900066E71 /* ARChromeActivity~ipad.png in Resources */,
 				225017691783434900066E71 /* Safari.png in Resources */,
+				1A23DFA717D5DD630060303D /* iOS7-iPad@2x.png in Resources */,
 				2250176A1783434900066E71 /* Safari@2x.png in Resources */,
 				2250176B1783434900066E71 /* Safari@2x~ipad.png in Resources */,
 				2250176C1783434900066E71 /* Safari~ipad.png in Resources */,
@@ -991,6 +1046,7 @@
 				1AF93B7F1787213E005C1FD4 /* sendbg@2x.png in Resources */,
 				224FCF331787286000FC3879 /* licenses.txt in Resources */,
 				1AF93B84178B30BA005C1FD4 /* bullet_toggle_minus.png in Resources */,
+				1A23DFBE17D5E8B40060303D /* iOS7-Default.png in Resources */,
 				1AF93B85178B30BA005C1FD4 /* bullet_toggle_minus@2x.png in Resources */,
 				1AF93B86178B30BA005C1FD4 /* bullet_toggle_plus.png in Resources */,
 				1AF93B87178B30BA005C1FD4 /* bullet_toggle_plus@2x.png in Resources */,
@@ -1005,17 +1061,21 @@
 				1AFDA33E178C5D8D0067E153 /* splashlogo.png in Resources */,
 				1AFDA33F178C5D8D0067E153 /* splashlogo@2x.png in Resources */,
 				1AFDA341178C61F00067E153 /* Default-Landscape.png in Resources */,
+				1A23DFB917D5E8B40060303D /* iOS7-Default-568h@2x.png in Resources */,
 				1AFDA343178C61F60067E153 /* Default-Landscape@2x.png in Resources */,
 				1AFDA346178D59430067E153 /* send_fail.png in Resources */,
 				1AFDA347178D59430067E153 /* send_fail@2x.png in Resources */,
+				1A23DFAE17D5DF020060303D /* iOS7-Settings.png in Resources */,
 				1AFDA34A178D5F220067E153 /* tiny_plus.png in Resources */,
 				1AFDA34B178D5F220067E153 /* tiny_plus@2x.png in Resources */,
 				1AF107C4179059B300E5465A /* tip_bg.png in Resources */,
 				1AF107C5179059B300E5465A /* tip_bg@2x.png in Resources */,
 				22F5C4BD1791F205005E09A9 /* a.caf in Resources */,
+				1A23DFA917D5DD630060303D /* iOS7-iPhone@2x.png in Resources */,
 				1AC5249E17A2865A00FD21FD /* Default-Portrait.png in Resources */,
 				1AC5249F17A2865A00FD21FD /* Default-Portrait@2x.png in Resources */,
 				225DB31417AF2D0A004C1571 /* world_add@2x.png in Resources */,
+				1A23DFAF17D5DF020060303D /* iOS7-Settings@2x.png in Resources */,
 				225DB31617AF2D26004C1571 /* world_add.png in Resources */,
 				2251693317B5A8040093ADC5 /* TUSafariActivity.strings in Resources */,
 			);
