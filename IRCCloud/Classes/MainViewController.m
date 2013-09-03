@@ -1442,6 +1442,7 @@
         [sheet addButtonWithTitle:@"Delete"];
     }
     [sheet addButtonWithTitle:@"Ignore List"];
+    [sheet addButtonWithTitle:@"Add Network"];
     [sheet addButtonWithTitle:@"Display Options"];
     [sheet addButtonWithTitle:@"Settings"];
     [sheet addButtonWithTitle:@"Logout"];
@@ -1840,6 +1841,11 @@
             dvc.buffer = _buffer;
             dvc.navigationItem.title = _titleLabel.text;
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:dvc];
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:nc animated:YES completion:nil];
+        } else if([action isEqualToString:@"Add Network"]) {
+            EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];
         }

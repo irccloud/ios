@@ -133,6 +133,8 @@
             [UIView animateWithDuration:0.5f animations:^{
                 self.loginSplashViewController.view.alpha = 0;
                 [self.loginSplashViewController flyaway];
+            } completion:^(BOOL finished){
+                [self.loginSplashViewController.view removeFromSuperview];
             }];
         } else {
             [self showConnectionView];
