@@ -1208,7 +1208,7 @@
         _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
         CGRect frame = _titleView.frame;
-        frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?384:210;
+        frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:204;
         frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
         _titleView.frame = frame;
         _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
@@ -1254,7 +1254,7 @@
             _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
             _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             CGRect frame = _titleView.frame;
-            frame.size.width = 666;
+            frame.size.width = 652;
             _titleView.frame = frame;
             frame = _serverStatusBar.frame;
             frame.origin.x = 0;
