@@ -160,7 +160,8 @@
     
     switch(event) {
         case kIRCEventUserInfo:
-            [self refresh];
+            if(_userinforeqid == 0 && _prefsreqid == 0)
+                [self refresh];
             break;
         case kIRCEventFailureMsg:
             o = notification.object;
