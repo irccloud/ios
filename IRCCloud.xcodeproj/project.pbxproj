@@ -241,6 +241,8 @@
 		227FF8211772062E00394114 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		227FF8221772063F00394114 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		2283322F17944E2B00ED22EA /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		2283BD3917D689F300E077D0 /* TestFlight+AsyncLogging.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TestFlight+AsyncLogging.h"; sourceTree = "<group>"; };
+		2283BD3A17D689F300E077D0 /* TestFlight+ManualSessions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TestFlight+ManualSessions.h"; sourceTree = "<group>"; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A056F16D3DABA0029769C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -475,6 +477,8 @@
 				2274F49E1756723F0039B4CB /* OpenInChromeController.m */,
 				22B4280416D7E21100498507 /* SBJson */,
 				2248DF3516EE35FC0086BB42 /* TestFlight.h */,
+				2283BD3917D689F300E077D0 /* TestFlight+AsyncLogging.h */,
+				2283BD3A17D689F300E077D0 /* TestFlight+ManualSessions.h */,
 				228A05D116D3DFB70029769C /* TTTAttributedLabel */,
 				225017481783434800066E71 /* TUSafariActivity */,
 				22D430A21725AAE9003C0684 /* UIExpandingTextView.h */,
