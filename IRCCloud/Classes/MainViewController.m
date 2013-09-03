@@ -1202,10 +1202,6 @@
     if(duration > 0)
         [self.slidingViewController resetTopView];
     int height = (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - self.navigationController.navigationBar.frame.size.height;
-#ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-        height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
-#endif
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
