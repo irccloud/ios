@@ -597,8 +597,13 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         CGRect frame = self.underLeftView.frame;
-        frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
-        frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.height;
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+            frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
+            frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.height;
+        } else {
+            frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.width;
+            frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.width;
+        }
         self.underLeftView.frame = frame;
     }
 #endif
@@ -642,8 +647,13 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         CGRect frame = self.underRightView.frame;
-        frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
-        frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.height;
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+            frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
+            frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.height;
+        } else {
+            frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.width;
+            frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.width;
+        }
         self.underRightView.frame = frame;
     }
 #endif
