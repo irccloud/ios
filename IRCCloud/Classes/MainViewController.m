@@ -891,20 +891,22 @@
 }
 
 -(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {
-    NSArray *rows = [_eventsView.tableView indexPathsForVisibleRows];
-    CGRect frame = _eventsView.tableView.frame;
-    frame.size.height = self.view.frame.size.height - height - 8;
-    if(!_serverStatusBar.hidden)
-        frame.size.height -= _serverStatusBar.frame.size.height;
-    _eventsView.tableView.frame = frame;
-    frame = _serverStatusBar.frame;
-    frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
-    _serverStatusBar.frame = frame;
-    frame = _eventsView.bottomUnreadView.frame;
-    frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
-    _eventsView.bottomUnreadView.frame = frame;
-    [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-    _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
+    if(expandingTextView.frame.size.height != height) {
+        NSArray *rows = [_eventsView.tableView indexPathsForVisibleRows];
+        CGRect frame = _eventsView.tableView.frame;
+        frame.size.height = self.view.frame.size.height - height - 8;
+        if(!_serverStatusBar.hidden)
+            frame.size.height -= _serverStatusBar.frame.size.height;
+        _eventsView.tableView.frame = frame;
+        frame = _serverStatusBar.frame;
+        frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
+        _serverStatusBar.frame = frame;
+        frame = _eventsView.bottomUnreadView.frame;
+        frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
+        _eventsView.bottomUnreadView.frame = frame;
+        [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+        _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
+    }
 }
 
 -(void)setUnreadColor:(UIColor *)color {
