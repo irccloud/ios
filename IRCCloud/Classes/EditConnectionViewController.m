@@ -72,6 +72,14 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(NSUInteger)supportedInterfaceOrientations {
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
+}
+
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    return YES;
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -302,6 +310,7 @@
 }
 
 -(void)cancelButtonPressed:(id)sender {
+    [self.tableView endEditing:YES];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -404,6 +413,46 @@
         _activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:2];
 }
 
+-(NSUInteger)supportedInterfaceOrientations {
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
+}
+
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    return YES;
+}
+
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    int padding = 80;
+    
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+        padding = 26;
+    
+    int width = self.tableView.frame.size.width - padding;
+    
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        if(self.presentingViewController) {
+            if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
+                width = [UIScreen mainScreen].applicationFrame.size.width - 300;
+            else
+                width = [UIScreen mainScreen].applicationFrame.size.height - 560;
+        } else if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+            width = [UIScreen mainScreen].applicationFrame.size.width - 100;
+        } else {
+            width = [UIScreen mainScreen].applicationFrame.size.height - 140;
+        }
+    } else {
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+            width = [UIScreen mainScreen].applicationFrame.size.width - padding;
+        } else {
+            width = [UIScreen mainScreen].applicationFrame.size.height - padding;
+        }
+    }
+    
+    _commands.frame = CGRectMake(0, 0, width, 70);
+    _channels.frame = CGRectMake(0, 0, width, 70);
+    [self refresh];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 #ifdef __IPHONE_7_0
@@ -501,17 +550,32 @@
     _serverpass.delegate = self;
     _serverpass.secureTextEntry = YES;
 
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        _commands = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - padding, 70)];
-    else
-        _commands = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - 280, 70)];
+    int width = self.tableView.frame.size.width - padding;
+    
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        if(self.presentingViewController) {
+            if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
+                width = [UIScreen mainScreen].applicationFrame.size.width - 300;
+            else
+                width = [UIScreen mainScreen].applicationFrame.size.height - 560;
+        } else if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+            width = self.tableView.frame.size.width - 100;
+        } else {
+            width = [UIScreen mainScreen].applicationFrame.size.height - 140;
+        }
+    } else {
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+            width = [UIScreen mainScreen].applicationFrame.size.width - padding;
+        } else {
+            width = [UIScreen mainScreen].applicationFrame.size.height - padding;
+        }
+    }
+    
+    _commands = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
     _commands.text = @"";
     _commands.backgroundColor = [UIColor clearColor];
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        _channels = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - padding, 70)];
-    else
-        _channels = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - 280, 70)];
+    _channels = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
     _channels.text = @"";
     _channels.backgroundColor = [UIColor clearColor];
     
@@ -568,10 +632,12 @@
             o = notification.object;
             reqid = [[o objectForKey:@"_reqid"] intValue];
             if(reqid == _reqid) {
-                if(self.presentingViewController)
+                if(self.presentingViewController) {
+                    [self.tableView endEditing:YES];
                     [self dismissViewControllerAnimated:YES completion:nil];
-                else
+                } else {
                     _cid = [[o objectForKey:@"cid"] intValue];
+                }
             }
             break;
         case kIRCEventMakeServer:

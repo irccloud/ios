@@ -141,6 +141,7 @@
 }
 
 -(void)cancelButtonPressed:(id)sender {
+    [self.tableView endEditing:YES];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -151,6 +152,38 @@
 
 -(void)viewWillDisappear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+-(NSUInteger)supportedInterfaceOrientations {
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
+}
+
+-(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
+    return YES;
+}
+
+-(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+    int padding = 80;
+    
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+        padding = 26;
+    
+    int width = self.tableView.frame.size.width - padding;
+    
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
+            width = [UIScreen mainScreen].applicationFrame.size.width - 300;
+        else
+            width = [UIScreen mainScreen].applicationFrame.size.height - 560;
+    } else {
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
+            width = [UIScreen mainScreen].applicationFrame.size.width - padding;
+        else
+            width = [UIScreen mainScreen].applicationFrame.size.height - padding;
+    }
+    
+    _highlights.frame = CGRectMake(0, 0, width, 70);
+    [self refresh];
 }
 
 -(void)handleEvent:(NSNotification *)notification {
@@ -178,8 +211,10 @@
                 _userinfosaved = YES;
             if(reqid == _prefsreqid)
                 _prefssaved = YES;
-            if(_userinfosaved == YES && _prefssaved == YES)
+            if(_userinfosaved == YES && _prefssaved == YES) {
+                [self.tableView endEditing:YES];
                 [self dismissViewControllerAnimated:YES completion:nil];
+            }
             break;
         default:
             break;
@@ -270,10 +305,20 @@
     _screen = [[UISwitch alloc] init];
     _chrome = [[UISwitch alloc] init];
 
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        _highlights = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - padding, 70)];
-    else
-        _highlights = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - 280, 70)];
+    int width = self.tableView.frame.size.width - padding;
+    
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
+            width = [UIScreen mainScreen].applicationFrame.size.width - 300;
+        else
+            width = [UIScreen mainScreen].applicationFrame.size.height - 560;
+    } else {
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
+            width = [UIScreen mainScreen].applicationFrame.size.width - padding;
+        else
+            width = [UIScreen mainScreen].applicationFrame.size.height - padding;
+    }
+    _highlights = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
     _highlights.text = @"";
     _highlights.backgroundColor = [UIColor clearColor];
     _highlights.returnKeyType = UIReturnKeyDone;
@@ -453,6 +498,7 @@
         [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];
     }
     if(indexPath.section == 4 && indexPath.row == 1) {
+        [self.tableView endEditing:YES];
         [self dismissViewControllerAnimated:YES completion:^{
             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
         }];
