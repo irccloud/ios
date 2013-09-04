@@ -309,6 +309,13 @@ int __timestampWidth;
                     for(int i = 0; i < _data.count; i++) {
                         e = [_data objectAtIndex:i];
                         if(e.pending) {
+                            if(i > 0) {
+                                Event *p = [_data objectAtIndex:i-1];
+                                if(p.rowType == ROW_TIMESTAMP) {
+                                    [_data removeObject:p];
+                                    i--;
+                                }
+                            }
                             [_data removeObject:e];
                             i--;
                         }
@@ -320,7 +327,7 @@ int __timestampWidth;
                     for(int i = 0; i < _data.count; i++) {
                         e = [_data objectAtIndex:i];
                         if(e.reqId == reqid && e.pending) {
-                            if(i>1) {
+                            if(i>0) {
                                 Event *p = [_data objectAtIndex:i-1];
                                 if(p.rowType == ROW_TIMESTAMP) {
                                     [_data removeObject:p];
@@ -770,6 +777,7 @@ int __timestampWidth;
         if(_currentGroupPosition > -1)
             _currentGroupPosition++;
     }
+    
     [_lock unlock];
 }
 
@@ -838,6 +846,7 @@ int __timestampWidth;
     [_unseenHighlightPositions removeAllObjects];
     
     if(!_buffer) {
+        self.tableView.tableHeaderView = nil;
         [self.tableView reloadData];
         return;
     }
@@ -871,6 +880,8 @@ int __timestampWidth;
         for(Event *e in events) {
             [self insertEvent:e backlog:true nextIsGrouped:false];
         }
+    } else {
+        self.tableView.tableHeaderView = nil;
     }
     
     if(backlogEid > 0) {
