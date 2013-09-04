@@ -60,7 +60,7 @@
 	NSString *text;
 	UIFont *font;
 	UIColor *textColor;
-	UITextAlignment textAlignment; 
+	NSTextAlignment textAlignment;
 	NSRange selectedRange;
 	BOOL editable;
 	UIDataDetectorTypes dataDetectorTypes;
@@ -80,7 +80,7 @@
 @property (nonatomic) NSString *text;
 @property (nonatomic) UIFont *font;
 @property (nonatomic) UIColor *textColor;
-@property (nonatomic) UITextAlignment textAlignment;
+@property (nonatomic) NSTextAlignment textAlignment;
 @property (nonatomic) NSRange selectedRange;
 @property (nonatomic,getter=isEditable) BOOL editable;
 @property (nonatomic) UIDataDetectorTypes dataDetectorTypes __OSX_AVAILABLE_STARTING(__MAC_NA, __IPHONE_3_0);

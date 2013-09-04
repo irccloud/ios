@@ -77,7 +77,7 @@
         _placeholder.text = @"No bans in effect.\n\nYou can ban someone by tapping their nickname in the user list, long-pressing a message, or by using /ban.";
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
-        _placeholder.textAlignment = UITextAlignmentCenter;
+        _placeholder.textAlignment = NSTextAlignmentCenter;
     }
     return self;
 }

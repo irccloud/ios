@@ -29,7 +29,7 @@
         _placeholder.text = @"You're not ignoring anyone at the moment.\n\nYou can ignore someone by tapping their nickname in the user list, long-pressing a message, or by using /ignore.";
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
-        _placeholder.textAlignment = UITextAlignmentCenter;
+        _placeholder.textAlignment = NSTextAlignmentCenter;
     }
     return self;
 }
@@ -131,7 +131,7 @@
         cell.textLabel.text = [_ignores objectAtIndex:[indexPath row]];
         cell.textLabel.font = [UIFont boldSystemFontOfSize:18];
         cell.textLabel.numberOfLines = 0;
-        cell.textLabel.lineBreakMode = UILineBreakModeCharacterWrap;
+        cell.textLabel.lineBreakMode = NSLineBreakByCharWrapping;
         return cell;
     }
 }

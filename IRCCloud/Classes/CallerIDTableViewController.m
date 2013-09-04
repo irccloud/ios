@@ -29,7 +29,7 @@
         _placeholder.text = @"No accepted nicks.\n\nYou can accept someone by tapping their message request or by using /accept.";
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
-        _placeholder.textAlignment = UITextAlignmentCenter;
+        _placeholder.textAlignment = NSTextAlignmentCenter;
     }
     return self;
 }
