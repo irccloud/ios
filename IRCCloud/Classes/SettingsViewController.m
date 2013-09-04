@@ -163,12 +163,7 @@
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    int padding = 80;
-    
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        padding = 26;
-    
-    int width = self.tableView.frame.size.width - padding;
+    int width = self.tableView.frame.size.width;
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
@@ -177,10 +172,15 @@
             width = [UIScreen mainScreen].applicationFrame.size.height - 560;
     } else {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            width = [UIScreen mainScreen].applicationFrame.size.width - padding;
+            width = [UIScreen mainScreen].applicationFrame.size.width - 26;
         else
-            width = [UIScreen mainScreen].applicationFrame.size.height - padding;
+            width = [UIScreen mainScreen].applicationFrame.size.height - 26;
     }
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        width += 50;
+    }
+#endif
     
     _highlights.frame = CGRectMake(0, 0, width, 70);
     [self refresh];
@@ -264,16 +264,18 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-#ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
-    }
-#endif
     int padding = 80;
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
         padding = 26;
         
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
+        padding = 0;
+    }
+#endif
+
     _email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
     _email.placeholder = @"john@example.com";
     _email.text = @"";
@@ -314,10 +316,16 @@
             width = [UIScreen mainScreen].applicationFrame.size.height - 560;
     } else {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            width = [UIScreen mainScreen].applicationFrame.size.width - padding;
+            width = [UIScreen mainScreen].applicationFrame.size.width - 26;
         else
-            width = [UIScreen mainScreen].applicationFrame.size.height - padding;
+            width = [UIScreen mainScreen].applicationFrame.size.height - 26;
     }
+
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        width += 50;
+    }
+#endif
     _highlights = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
     _highlights.text = @"";
     _highlights.backgroundColor = [UIColor clearColor];

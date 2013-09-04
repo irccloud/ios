@@ -442,11 +442,16 @@
         }
     } else {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            width = [UIScreen mainScreen].applicationFrame.size.width - padding;
+            width = [UIScreen mainScreen].applicationFrame.size.width - 26;
         } else {
-            width = [UIScreen mainScreen].applicationFrame.size.height - padding;
+            width = [UIScreen mainScreen].applicationFrame.size.height - 26;
         }
     }
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        width += 50;
+    }
+#endif
     
     _commands.frame = CGRectMake(0, 0, width, 70);
     _channels.frame = CGRectMake(0, 0, width, 70);
@@ -455,11 +460,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-#ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
-    }
-#endif
     if(self.presentingViewController) {
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
     } else {
@@ -472,6 +472,13 @@
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
         padding = 26;
         
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        [self.navigationController.navigationBar setBackgroundImage:[UIImage imageNamed:@"navbar"] forBarMetrics:UIBarMetricsDefault];
+        padding = 0;
+    }
+#endif
+
     _server = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
     _server.placeholder = @"irc.example.net";
     _server.text = @"";
@@ -565,12 +572,17 @@
         }
     } else {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            width = [UIScreen mainScreen].applicationFrame.size.width - padding;
+            width = [UIScreen mainScreen].applicationFrame.size.width - 26;
         } else {
-            width = [UIScreen mainScreen].applicationFrame.size.height - padding;
+            width = [UIScreen mainScreen].applicationFrame.size.height - 26;
         }
     }
-    
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+        width += 50;
+    }
+#endif
+
     _commands = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
     _commands.text = @"";
     _commands.backgroundColor = [UIColor clearColor];
