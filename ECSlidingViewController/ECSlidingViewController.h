@@ -216,6 +216,8 @@ typedef enum {
 /** Returns true if the top view is completely off the screen */
 - (BOOL)topViewIsOffScreen;
 
+-(void)updateUnderLeftLayout;
+-(void)updateUnderRightLayout;
 @end
 
 /** UIViewController extension */

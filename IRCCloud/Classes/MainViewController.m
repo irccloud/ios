@@ -702,6 +702,8 @@
 #endif
 
     self.slidingViewController.view.frame = frame;
+    [self.slidingViewController updateUnderLeftLayout];
+    [self.slidingViewController updateUnderRightLayout];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
