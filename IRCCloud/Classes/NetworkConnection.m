@@ -35,6 +35,8 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 #define TYPE_WIFI 1
 #define TYPE_WWAN 2
 
+NSLock *__parserLock = nil;
+
 @interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
     SBJsonStreamParser *_parser;
     SBJsonStreamParserAdapter *_adapter;
@@ -90,6 +92,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     }
 }
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    [__parserLock unlock];
     if(_cancelled)
         return;
 	TFLog(@"Request failed: %@", error);
@@ -100,6 +103,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
     _cancelled = YES;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    [__parserLock unlock];
     if(_cancelled)
         return;
 	TFLog(@"Backlog download completed");
@@ -115,6 +119,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 	return request;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
+    [__parserLock lock];
 	if([response statusCode] != 200) {
         TFLog(@"HTTP status code: %i", [response statusCode]);
 		TFLog(@"HTTP headers: %@", [response allHeaderFields]);
@@ -148,6 +153,7 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
 -(id)init {
     self = [super init];
+    __parserLock = [[NSLock alloc] init];
     _queue = [[NSOperationQueue alloc] init];
     _servers = [ServersDataSource sharedInstance];
     _buffers = [BuffersDataSource sharedInstance];
@@ -621,7 +627,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)webSocket:(WebSocket *)socket didReceiveTextMessage:(NSString*)aMessage {
     if(socket == _socket) {
         if(aMessage) {
+            [__parserLock lock];
             [_parser parse:[aMessage dataUsingEncoding:NSUTF8StringEncoding]];
+            [__parserLock unlock];
         }
     }
 }
@@ -629,7 +637,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 - (void)webSocket:(WebSocket *)socket didReceiveBinaryMessage: (NSData*) aMessage {
     if(socket == _socket) {
         if(aMessage) {
+            [__parserLock lock];
             [_parser parse:aMessage];
+            [__parserLock unlock];
         }
     }
 }

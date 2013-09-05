@@ -806,8 +806,11 @@
     if(s) {
         if([s.status isEqualToString:@"disconnected"])
             [[NetworkConnection sharedInstance] reconnect:_buffer.cid];
-        else if([s.away isKindOfClass:[NSString class]] && s.away.length)
+        else if([s.away isKindOfClass:[NSString class]] && s.away.length) {
             [[NetworkConnection sharedInstance] back:_buffer.cid];
+            s.away = @"";
+            [self _updateServerStatus];
+        }
     }
 }
 
