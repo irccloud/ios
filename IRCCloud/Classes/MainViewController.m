@@ -1274,6 +1274,8 @@
                 self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
             _buffersView.view.frame = CGRectMake(0,0,220,height);
             _usersView.view.frame = CGRectMake(0,0,220,height);
+            [self.slidingViewController updateUnderLeftLayout];
+            [self.slidingViewController updateUnderRightLayout];
             _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
             _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             CGRect frame = _titleView.frame;
