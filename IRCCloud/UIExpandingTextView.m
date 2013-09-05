@@ -205,10 +205,12 @@
 
 - (void)textViewDidChange:(UITextView *)textView
 {
-    if(textView.text.length == 0)
+    if(textView.text.length == 0) {
+        internalTextView.contentOffset = CGPointMake(0,0);
         placeholderLabel.alpha = 1;
-    else
+    } else {
         placeholderLabel.alpha = 0;
+    }
     
     NSInteger newHeight = internalTextView.contentSize.height;
     
