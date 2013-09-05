@@ -134,7 +134,6 @@
     } else {
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,0,36)];
     }
-    //_message.minimumHeight = 36;
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
@@ -144,6 +143,14 @@
     [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     users.frame = CGRectMake(0,0,40,40);
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        [self.navigationController.navigationBar addSubview:_connectingProgress];
+        [_connectingProgress sizeToFit];
+        [_connectingActivity removeFromSuperview];
+        _connectingStatus.font = [UIFont boldSystemFontOfSize:20];
+    }
+#endif
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
@@ -517,6 +524,7 @@
 
 -(void)_hideConnectingView {
     self.navigationItem.titleView = _titleView;
+    _connectingProgress.hidden = YES;
 }
 
 -(void)connectivityChanged:(NSNotification *)notification {
@@ -567,11 +575,13 @@
 }
 
 -(void)backlogStarted:(NSNotification *)notification {
-    [_connectingStatus setText:@"Loading"];
-    _connectingActivity.hidden = YES;
-    [_connectingActivity stopAnimating];
-    _connectingProgress.progress = 0;
-    _connectingProgress.hidden = NO;
+    if(!_connectingView.hidden) {
+        [_connectingStatus setText:@"Loading"];
+        _connectingActivity.hidden = YES;
+        [_connectingActivity stopAnimating];
+        _connectingProgress.progress = 0;
+        _connectingProgress.hidden = NO;
+    }
 }
 
 -(void)backlogProgress:(NSNotification *)notification {
@@ -1290,6 +1300,19 @@
     _eventsView.topUnreadView.frame = frame;
     frame.origin.y += _eventsView.view.frame.size.height - 32;
     _eventsView.bottomUnreadView.frame = frame;
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        frame = _connectingProgress.frame;
+        frame.origin.x = 0;
+        frame.origin.y = self.navigationController.navigationBar.frame.size.height - frame.size.height;
+        frame.size.width = self.navigationController.navigationBar.frame.size.width;
+        _connectingProgress.frame = frame;
+        frame = _connectingStatus.frame;
+        frame.origin.y = 0;
+        frame.size.height = _connectingView.frame.size.height;
+        _connectingStatus.frame = frame;
+    }
+#endif
     [self _updateTitleArea];
     [self _updateServerStatus];
     [self _updateUserListVisibility];
