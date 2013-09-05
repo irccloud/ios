@@ -121,6 +121,12 @@
 -(void)showImage:(NSURL *)url {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         self.window.rootViewController = [[ImageViewController alloc] initWithURL:url];
+        [self.window insertSubview:self.slideViewController.view aboveSubview:self.window.rootViewController.view];
+        [UIView animateWithDuration:0.5f animations:^{
+            self.slideViewController.view.alpha = 0;
+        } completion:^(BOOL finished){
+            [self.slideViewController.view removeFromSuperview];
+        }];
     }];
 }
 
@@ -128,17 +134,29 @@
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if([[ServersDataSource sharedInstance] count]) {
             [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
-            self.window.rootViewController = self.slideViewController;
-            [self.window insertSubview:self.loginSplashViewController.view aboveSubview:self.slideViewController.view];
-            CGAffineTransform transform = self.slideViewController.view.transform;
-            self.slideViewController.view.transform = CGAffineTransformScale(transform, 0.01, 0.01);
-            [UIView animateWithDuration:0.5f animations:^{
-                self.loginSplashViewController.view.alpha = 0;
-                [self.loginSplashViewController flyaway];
-                self.slideViewController.view.transform = transform;
-            } completion:^(BOOL finished){
-                [self.loginSplashViewController.view removeFromSuperview];
-            }];
+            self.slideViewController.view.alpha = 1;
+            if(self.window.rootViewController == self.loginSplashViewController) {
+                self.window.rootViewController = self.slideViewController;
+                [self.window insertSubview:self.loginSplashViewController.view aboveSubview:self.slideViewController.view];
+                CGAffineTransform transform = self.slideViewController.view.transform;
+                self.slideViewController.view.transform = CGAffineTransformScale(transform, 0.01, 0.01);
+                [UIView animateWithDuration:0.5f animations:^{
+                    self.loginSplashViewController.view.alpha = 0;
+                    [self.loginSplashViewController flyaway];
+                    self.slideViewController.view.transform = transform;
+                } completion:^(BOOL finished){
+                    [self.loginSplashViewController.view removeFromSuperview];
+                }];
+            } else {
+                UIView *v = self.window.rootViewController.view;
+                self.window.rootViewController = self.slideViewController;
+                [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
+                [UIView animateWithDuration:0.5f animations:^{
+                    v.alpha = 0;
+                } completion:^(BOOL finished){
+                    [v removeFromSuperview];
+                }];
+            }
         } else {
             [self showConnectionView];
         }
