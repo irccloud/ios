@@ -56,17 +56,20 @@
 }
 
 -(void)flyaway {
-    CGRect frame = logo.frame;
-    if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-        frame.origin.y = -frame.size.height;
-    else
-        frame.origin.x = -frame.size.width;
-    logo.frame = frame;
+    if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+        logo.transform = CGAffineTransformMakeTranslation(0, -(logo.frame.origin.y + logo.frame.size.height));
+        loadingView.transform = CGAffineTransformMakeTranslation(0, self.view.frame.size.height - loadingView.frame.origin.y);
+    } else {
+        logo.transform = CGAffineTransformMakeTranslation(-(logo.frame.origin.x + logo.frame.size.width), 0);
+        loadingView.transform = CGAffineTransformMakeTranslation(self.view.frame.size.width - loadingView.frame.origin.x, 0);
+    }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     activity.hidden = YES;
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    logo.transform = CGAffineTransformIdentity;
+    loadingView.transform = CGAffineTransformIdentity;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self
