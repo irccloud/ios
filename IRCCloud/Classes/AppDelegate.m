@@ -130,9 +130,11 @@
             [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
             self.window.rootViewController = self.slideViewController;
             [self.window insertSubview:self.loginSplashViewController.view aboveSubview:self.slideViewController.view];
+            self.slideViewController.view.transform = CGAffineTransformMakeScale(0.01, 0.01);
             [UIView animateWithDuration:0.5f animations:^{
                 self.loginSplashViewController.view.alpha = 0;
                 [self.loginSplashViewController flyaway];
+                self.slideViewController.view.transform = CGAffineTransformIdentity;
             } completion:^(BOOL finished){
                 [self.loginSplashViewController.view removeFromSuperview];
             }];
