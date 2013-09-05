@@ -30,7 +30,7 @@
 
 #import "UIExpandingTextView.h"
 
-#define kTextInsetX 0
+#define kTextInsetX ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?2:4
 #define kTextInsetBottom 0
 
 @implementation UIExpandingTextView
