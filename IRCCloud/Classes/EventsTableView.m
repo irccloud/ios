@@ -278,6 +278,15 @@ int __timestampWidth;
     Buffer *b;
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     switch(event) {
+        case kIRCEventHeartbeatEcho:
+            [self updateUnread];
+            if(_maxEid <= _buffer.last_seen_eid) {
+                [UIView beginAnimations:nil context:nil];
+                [UIView setAnimationDuration:0.1];
+                _topUnreadView.alpha = 0;
+                [UIView commitAnimations];
+            }
+            break;
         case kIRCEventMakeBuffer:
             b = notification.object;
             if(_buffer.bid == -1 && b.cid == _buffer.cid && [[b.name lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
