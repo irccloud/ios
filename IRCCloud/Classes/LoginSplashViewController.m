@@ -62,6 +62,8 @@
     else
         frame.origin.x = -frame.size.width;
     logo.frame = frame;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    activity.hidden = YES;
 }
 
 -(void)viewWillAppear:(BOOL)animated {
