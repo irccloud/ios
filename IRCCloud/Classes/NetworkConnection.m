@@ -1168,7 +1168,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)logout {
-    [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]];
+    NSLog(@"Unregister result: %@", [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]]);
     //TODO: check the above result, and retry if it fails
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];

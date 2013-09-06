@@ -94,6 +94,7 @@
 -(void)clear {
     @synchronized(_events) {
         [_events removeAllObjects];
+        [_events_sorted removeAllObjects];
         _highestEid = 0;
     }
 }
