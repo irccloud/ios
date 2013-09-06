@@ -207,7 +207,7 @@
         else
             _showJoinPart.on = YES;
 
-        if([[[prefs objectForKey:@"channel-expandJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+        if([[[prefs objectForKey:@"buffer-expandJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
             _collapseJoinPart.on = NO;
         else
             _collapseJoinPart.on = YES;
@@ -267,6 +267,9 @@
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.accessoryView = nil;
+    
+    if(![_buffer.type isEqualToString:@"channel"] && row > 0)
+        row++;
     
     switch(row) {
         case 0:
