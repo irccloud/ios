@@ -1234,7 +1234,10 @@
         frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:204;
         frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
         _titleView.frame = frame;
-        _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
+        if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
+            _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
+        else
+            _landscapeView.transform = CGAffineTransformIdentity;
         _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
         _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
     } else {
@@ -1485,7 +1488,7 @@
     [sheet addButtonWithTitle:@"Settings"];
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
         [self.view.window addSubview:_landscapeView];
         [sheet showInView:_landscapeView];
     } else {
@@ -1636,12 +1639,8 @@
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-            [self.view.window addSubview:_landscapeView];
-            [sheet showInView:_landscapeView];
-        } else {
-            [sheet showInView:self.slidingViewController.view.superview];
-        }
+        [self.view.window addSubview:_landscapeView];
+        [sheet showInView:_landscapeView];
     } else {
         if(_selectedEvent)
             [sheet showFromRect:rect inView:_eventsView.tableView animated:NO];
