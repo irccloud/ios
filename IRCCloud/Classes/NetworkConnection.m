@@ -725,6 +725,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             Buffer *buffer = [_buffers getBuffer:object.bid];
             if(!buffer) {
                 buffer = [[Buffer alloc] init];
+                buffer.bid = object.bid;
                 [_buffers addBuffer:buffer];
             }
             buffer.bid = object.bid;
@@ -1020,7 +1021,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             TFLog(@"Unhandled type: %@", object);
         }
         if(backlog) {
-            if(_totalBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
+            if(_numBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
                 if(object.bid != _currentBid) {
                     if(_currentBid != -1 && _currentCount >= BACKLOG_BUFFER_MAX) {
                         [_events removeEventsBefore:_firstEID buffer:_currentBid];
@@ -1029,6 +1030,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                     _currentCount = 0;
                     _firstEID = object.eid;
                 }
+                [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalBuffers + (float)_currentCount/100.0f)/ (float)_numBuffers) waitUntilDone:YES];
                 _currentCount++;
             }
         }
@@ -1128,6 +1130,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         NSLog(@"I now have %i servers with %i buffers", [_servers count], [_buffers count]);
         [_buffers purgeInvalidBIDs];
         [_channels purgeInvalidChannels];
+        _numBuffers = 0;
     }
     NSLog(@"I downloaded %i events", _totalCount);
     [_oobQueue removeObject:fetcher];

@@ -59,7 +59,7 @@
 
 -(id)init {
     self = [super init];
-    _buffers = [[NSMutableArray alloc] init];
+    _buffers = [[NSMutableDictionary alloc] init];
     return self;
 }
 
@@ -78,7 +78,7 @@
 -(int)firstBid {
     @synchronized(_buffers) {
         if(_buffers.count)
-            return ((Buffer *)[_buffers objectAtIndex:0]).bid;
+            return ((Buffer *)[_buffers.allValues objectAtIndex:0]).bid;
         else
             return -1;
     }
@@ -86,26 +86,18 @@
 
 -(void)addBuffer:(Buffer *)buffer {
     @synchronized(_buffers) {
-        [_buffers addObject:buffer];
+        [_buffers setObject:buffer forKey:@(buffer.bid)];
     }
 }
 
 -(Buffer *)getBuffer:(int)bid {
-    NSArray *copy;
-    @synchronized(_buffers) {
-        copy = _buffers.copy;
-    }
-    for(Buffer *buffer in copy) {
-        if(buffer.bid == bid)
-            return buffer;
-    }
-    return nil;
+    return [_buffers objectForKey:@(bid)];
 }
 
 -(Buffer *)getBufferWithName:(NSString *)name server:(int)cid {
     NSArray *copy;
     @synchronized(_buffers) {
-        copy = _buffers.copy;
+        copy = _buffers.allValues;
     }
     for(Buffer *buffer in copy) {
         if(buffer.cid == cid && [[buffer.name lowercaseString] isEqualToString:[name lowercaseString]])
@@ -118,7 +110,7 @@
     NSMutableArray *buffers = [[NSMutableArray alloc] init];
     NSArray *copy;
     @synchronized(_buffers) {
-        copy = _buffers.copy;
+        copy = _buffers.allValues;
     }
     for(Buffer *buffer in copy) {
         if(buffer.cid == cid)
@@ -129,7 +121,7 @@
 
 -(NSArray *)getBuffers {
     @synchronized(_buffers) {
-        return [_buffers sortedArrayUsingSelector:@selector(compare:)];
+        return _buffers.allValues;
     }
 }
 
@@ -165,9 +157,7 @@
 
 -(void)removeBuffer:(int)bid {
     @synchronized(_buffers) {
-        Buffer *buffer = [self getBuffer:bid];
-        if(buffer)
-            [_buffers removeObject:buffer];
+        [_buffers removeObjectForKey:@(bid)];
     }
 }
 
@@ -175,7 +165,7 @@
     Buffer *buffer = [self getBuffer:bid];
     if(buffer) {
         @synchronized(_buffers) {
-            [_buffers removeObject:buffer];
+            [_buffers removeObjectForKey:@(bid)];
         }
         [[ChannelsDataSource sharedInstance] removeChannelForBuffer:bid];
         [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
@@ -186,7 +176,7 @@
 -(void)invalidate {
     NSArray *copy;
     @synchronized(_buffers) {
-        copy = _buffers.copy;
+        copy = _buffers.allValues;
     }
     for(Buffer *buffer in copy) {
         buffer.valid = NO;
@@ -197,7 +187,7 @@
     NSLog(@"Cleaning up invalid BIDs");
     NSArray *copy;
     @synchronized(_buffers) {
-        copy = _buffers.copy;
+        copy = _buffers.allValues;
     }
     for(Buffer *buffer in copy) {
         if(!buffer.valid) {
@@ -209,7 +199,7 @@
                 NSLog(@"Removing CID: %i", buffer.cid);
                 [[ServersDataSource sharedInstance] removeServer:buffer.cid];
             }
-            [_buffers removeObject:buffer];
+            [_buffers removeObjectForKey:@(buffer.bid)];
         }
     }
 }

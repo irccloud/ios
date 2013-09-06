@@ -38,7 +38,7 @@
 @end
 
 @interface BuffersDataSource : NSObject {
-    NSMutableArray *_buffers;
+    NSMutableDictionary *_buffers;
 }
 +(BuffersDataSource *)sharedInstance;
 -(void)clear;
