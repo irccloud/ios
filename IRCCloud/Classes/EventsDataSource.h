@@ -81,6 +81,7 @@
 
 @interface EventsDataSource : NSObject {
     NSMutableDictionary *_events;
+    NSMutableDictionary *_events_sorted;
     NSTimeInterval _highestEid;
     BOOL _dirty;
 }

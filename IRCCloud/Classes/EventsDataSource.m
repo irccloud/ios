@@ -85,6 +85,7 @@
 -(id)init {
     self = [super init];
     _events = [[NSMutableDictionary alloc] init];
+    _events_sorted = [[NSMutableDictionary alloc] init];
     _highestEid = 0;
     _dirty = YES;
     return self;
@@ -105,6 +106,12 @@
             [_events setObject:events forKey:@(event.bid)];
         }
         [events addObject:event];
+        NSMutableDictionary *events_sorted = [_events_sorted objectForKey:@(event.bid)];
+        if(!events_sorted) {
+            events_sorted = [[NSMutableDictionary alloc] init];
+            [_events_sorted setObject:events_sorted forKey:@(event.bid)];
+        }
+        [events_sorted setObject:event forKey:@(event.eid)];
         _dirty = YES;
     }
 }
@@ -114,6 +121,7 @@
     if(!event) {
         event = [[Event alloc] init];
         event.bid = object.bid;
+        event.eid = object.eid;
         [self addEvent: event];
     }
     _dirty = YES;
@@ -423,11 +431,7 @@
 
 -(Event *)event:(NSTimeInterval)eid buffer:(int)bid {
     @synchronized(_events) {
-        for(Event *event in [_events objectForKey:@(bid)]) {
-            if(event.eid == eid)
-                return event;
-        }
-        return nil;
+        return [[_events_sorted objectForKey:@(bid)] objectForKey:@(eid)];
     }
 }
 
@@ -436,6 +440,7 @@
         for(Event *event in [_events objectForKey:@(bid)]) {
             if(event.eid == eid) {
                 [[_events objectForKey:@(bid)] removeObject:event];
+                [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(eid)];
                 break;
             }
         }
@@ -446,6 +451,7 @@
 -(void)removeEventsForBuffer:(int)bid {
     @synchronized(_events) {
         [_events removeObjectForKey:@(bid)];
+        [_events_sorted removeObjectForKey:@(bid)];
     }
 }
 
@@ -469,6 +475,7 @@
         }
         for(Event *event in eventsToRemove) {
             [[_events objectForKey:@(bid)] removeObject:event];
+            [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(event.eid)];
         }
     }
 }

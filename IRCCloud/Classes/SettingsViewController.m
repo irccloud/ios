@@ -163,7 +163,7 @@
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    int width = self.tableView.frame.size.width;
+    int width;
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
@@ -308,7 +308,7 @@
     _screen = [[UISwitch alloc] init];
     _chrome = [[UISwitch alloc] init];
 
-    int width = self.tableView.frame.size.width - padding;
+    int width;
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))

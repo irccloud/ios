@@ -441,7 +441,6 @@
                     url = [NSString stringWithFormat:@"http://%@", url];
                 [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
             }
-            overlap = NO;
         }
     }
     if(links)

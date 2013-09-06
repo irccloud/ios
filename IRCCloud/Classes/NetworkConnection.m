@@ -1030,7 +1030,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                     _currentCount = 0;
                     _firstEID = object.eid;
                 }
-                [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalBuffers + (float)_currentCount/100.0f)/ (float)_numBuffers) waitUntilDone:YES];
+                [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalBuffers + (float)_currentCount/100.0f)/ (float)_numBuffers) waitUntilDone:NO];
                 _currentCount++;
             }
         }

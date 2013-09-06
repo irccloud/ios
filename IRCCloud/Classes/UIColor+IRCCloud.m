@@ -193,6 +193,8 @@ UIImage *__newMsgsBackgroundImage;
         CGContextDrawLinearGradient(context, gradient, CGPointMake(0.0f, 26.0f), CGPointMake(0.0f, 0.0f), 0);
         CGImageRef cgImage = CGBitmapContextCreateImage(context);
         __timestampBackgroundImage = [UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp];
+        CFRelease(cgImage);
+        CFRelease(gradient);
         CGContextRelease(context);
         CGColorSpaceRelease(colorSpace);
     }
@@ -218,6 +220,7 @@ UIImage *__newMsgsBackgroundImage;
         CGContextStrokePath(context);
         CGImageRef cgImage = CGBitmapContextCreateImage(context);
         __newMsgsBackgroundImage = [UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp];
+        CFRelease(cgImage);
         CGContextRelease(context);
         CGColorSpaceRelease(colorSpace);
     }

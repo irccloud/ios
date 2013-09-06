@@ -223,10 +223,6 @@
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
 #endif
-    int padding = 80;
-    
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        padding = 26;
         
     _showMembers = [[UISwitch alloc] init];
     _trackUnread = [[UISwitch alloc] init];

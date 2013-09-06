@@ -427,7 +427,7 @@
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
         padding = 26;
     
-    int width = self.tableView.frame.size.width - padding;
+    int width;
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         if(self.presentingViewController) {
@@ -558,7 +558,7 @@
     _serverpass.delegate = self;
     _serverpass.secureTextEntry = YES;
 
-    int width = self.tableView.frame.size.width - padding;
+    int width;
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         if(self.presentingViewController) {
