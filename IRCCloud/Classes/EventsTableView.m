@@ -385,6 +385,7 @@ int __timestampWidth;
     }
 
     if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]) {
+        BOOL showChan = ![_buffer.type isEqualToString:@"channel"];
         NSDictionary *prefs = _conn.prefs;
         if(prefs) {
             NSDictionary *hiddenMap;
@@ -447,9 +448,9 @@ int __timestampWidth;
         if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
             CollapsedEvents *c = [[CollapsedEvents alloc] init];
             [c addEvent:event];
-            msg = [c collapse];
+            msg = [c collapse:showChan];
             if(!nextIsGrouped) {
-                NSString *groupMsg = [_collapsedEvents collapse];
+                NSString *groupMsg = [_collapsedEvents collapse:showChan];
                 if(groupMsg == nil && [type isEqualToString:@"nickchange"])
                     groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [ColorFormatter formatNick:event.nick mode:event.fromMode], BOLD];
                 if(groupMsg == nil && [type isEqualToString:@"user_channel_mode"]) {
@@ -468,7 +469,7 @@ int __timestampWidth;
                 [self _addItem:heading eid:_currentCollapsedEid - 1];
             }
         } else {
-            msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse];
+            msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse:showChan];
         }
         if(msg == nil && [type isEqualToString:@"nickchange"])
             msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [ColorFormatter formatNick:event.nick mode:event.fromMode], BOLD];
@@ -1086,7 +1087,7 @@ int __timestampWidth;
     } else {
         cell.accessory.hidden = YES;
     }
-    if(e.linkify) {
+    if(e.links.count) {
         for(NSTextCheckingResult *result in e.links) {
             if(result.resultType == NSTextCheckingTypeLink) {
                 [cell.message addLinkWithTextCheckingResult:result];

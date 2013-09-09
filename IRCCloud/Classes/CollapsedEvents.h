@@ -50,10 +50,11 @@ typedef enum {
     NSString *_msg;
     NSString *_fromMode;
     NSString *_targetMode;
+    NSString *_chan;
 }
 @property kCollapsedEvent type;
 @property kCollapsedMode mode;
-@property NSString *nick, *oldNick, *hostname, *msg, *fromMode, *targetMode;
+@property NSString *nick, *oldNick, *hostname, *msg, *fromMode, *targetMode, *chan;
 -(NSComparisonResult)compare:(CollapsedEvent *)aEvent;
 @end
 
@@ -62,5 +63,5 @@ typedef enum {
 }
 -(void)clear;
 -(BOOL)addEvent:(Event *)event;
--(NSString *)collapse;
+-(NSString *)collapse:(BOOL)showChan;
 @end

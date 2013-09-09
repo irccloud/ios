@@ -146,6 +146,7 @@
     event.isSelf = [[object objectForKey:@"self"] boolValue];
     event.toChan = [[object objectForKey:@"to_chan"] boolValue];
     event.ops = [object objectForKey:@"ops"];
+    event.chan = [object objectForKey:@"chan"];
     if([object objectForKey:@"reqid"])
         event.reqId = [[object objectForKey:@"reqid"] intValue];
     else
@@ -177,6 +178,7 @@
             event.msg = @"";
     } else if([object.type isEqualToString:@"user_channel_mode"]) {
         event.targetMode = [object objectForKey:@"newmode"];
+        event.chan = [object objectForKey:@"channel"];
     } else if([object.type isEqualToString:@"buffer_me_msg"]) {
         event.nick = event.from;
         event.from = @"";

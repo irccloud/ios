@@ -442,6 +442,13 @@
                 [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
             }
         }
+    } else {
+        if(server) {
+            NSArray *results = [[self ircChannelRegexForServer:server] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
+            if(results.count) {
+                [matches addObjectsFromArray:results];
+            }
+        }
     }
     if(links)
         *links = [NSArray arrayWithArray:matches];
