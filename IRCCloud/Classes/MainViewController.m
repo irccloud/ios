@@ -728,6 +728,12 @@
     }
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
+    for(Event *e in [_pendingEvents copy]) {
+        if(e.reqId != -1) {
+            [_pendingEvents removeObject:e];
+            [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+        }
+    }
     if(!_buffer || ![[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
         int bid = [BuffersDataSource sharedInstance].firstBid;
         if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {

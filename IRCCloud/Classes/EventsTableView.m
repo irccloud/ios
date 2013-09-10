@@ -335,7 +335,7 @@ int __timestampWidth;
                     [_lock lock];
                     for(int i = 0; i < _data.count; i++) {
                         e = [_data objectAtIndex:i];
-                        if(e.reqId == reqid && e.pending) {
+                        if(e.reqId == reqid && (e.pending || e.rowType == ROW_FAILED)) {
                             if(i>0) {
                                 Event *p = [_data objectAtIndex:i-1];
                                 if(p.rowType == ROW_TIMESTAMP) {
