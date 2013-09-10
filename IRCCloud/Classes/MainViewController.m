@@ -449,6 +449,8 @@
                         e.pending = NO;
                         e.rowType = ROW_FAILED;
                         e.bgColor = [UIColor errorBackgroundColor];
+                        [e.expirationTimer invalidate];
+                        e.expirationTimer = nil;
                         [_eventsView.tableView reloadData];
                         break;
                     }
@@ -475,6 +477,8 @@
                         if(e.bid == _buffer.bid) {
                             [_pendingEvents removeObject:e];
                             [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                            [e.expirationTimer invalidate];
+                            e.expirationTimer = nil;
                         }
                     }
                 } else {
@@ -483,6 +487,8 @@
                         if(e.reqId == reqid) {
                             [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
                             [_pendingEvents removeObject:e];
+                            [e.expirationTimer invalidate];
+                            e.expirationTimer = nil;
                             break;
                         }
                     }
@@ -561,13 +567,19 @@
             [_connectingActivity stopAnimating];
             for(Event *e in [_pendingEvents copy]) {
                 if(e.reqId == -1 && (([[NSDate date] timeIntervalSince1970] - (e.eid/1000000) - [NetworkConnection sharedInstance].clockOffset) < 60)) {
+                    [e.expirationTimer invalidate];
+                    e.expirationTimer = nil;
                     e.reqId = [[NetworkConnection sharedInstance] say:e.command to:e.to cid:e.cid];
+                    if(e.reqId < 0)
+                        e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
                 } else {
                     [_pendingEvents removeObject:e];
                     e.height = 0;
                     e.pending = NO;
                     e.rowType = ROW_FAILED;
                     e.bgColor = [UIColor errorBackgroundColor];
+                    [e.expirationTimer invalidate];
+                    e.expirationTimer = nil;
                 }
             }
             break;
@@ -893,13 +905,15 @@
             if(e.msg)
                 [_pendingEvents addObject:e];
             [_message clearText];
-            [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
+            if(e.reqId < 0)
+                e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
         }
     }
 }
 
 -(void)_sendRequestDidExpire:(NSTimer *)timer {
     Event *e = timer.userInfo;
+    e.expirationTimer = nil;
     if([_pendingEvents containsObject:e]) {
         [_pendingEvents removeObject:e];
         e.height = 0;
@@ -1752,7 +1766,8 @@
                 if(_selectedEvent.msg)
                     [_pendingEvents addObject:_selectedEvent];
                 [_eventsView.tableView reloadData];
-                [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:_selectedEvent repeats:NO];
+                if(_selectedEvent.reqId < 0)
+                    _selectedEvent.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:_selectedEvent repeats:NO];
             }
     }
     _alertView = nil;

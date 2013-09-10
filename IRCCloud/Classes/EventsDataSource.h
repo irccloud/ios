@@ -65,6 +65,7 @@
     NSString *_day;
     NSString *_ignoreMask;
     NSString *_chan;
+    NSTimer *_expirationTimer;
 }
 @property int cid, bid, rowType, reqId;
 @property NSTimeInterval eid, groupEid;
@@ -75,6 +76,7 @@
 @property NSAttributedString *formatted;
 @property float height;
 @property NSArray *links;
+@property NSTimer *expirationTimer;
 -(NSComparisonResult)compare:(Event *)aEvent;
 -(BOOL)isImportant:(NSString *)bufferType;
 -(NSString *)ignoreMask;
