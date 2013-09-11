@@ -494,6 +494,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
       }
       [topViewSnapshot addGestureRecognizer:_topViewSnapshotPanGesture];
     }
+    self.topViewSnapshot.frame = self.topView.bounds;
     [self.topView addSubview:self.topViewSnapshot];
   }
 }

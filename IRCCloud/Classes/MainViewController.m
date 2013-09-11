@@ -1338,6 +1338,7 @@
         _connectingStatus.frame = frame;
     }
 #endif
+    self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];
     [self _updateServerStatus];
     [self _updateUserListVisibility];
