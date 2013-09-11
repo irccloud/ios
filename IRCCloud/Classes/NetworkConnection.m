@@ -569,7 +569,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)parser:(SBJsonStreamParser *)parser foundObjectInArray:(NSDictionary *)dict {
     [self parse:dict backlog:YES];
-    [NSThread sleepForTimeInterval:0.001];
 }
 
 -(void)webSocketDidOpen:(WebSocket *)socket {
