@@ -684,6 +684,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             TFLog(@"idle interval: %f clock offset: %f", _idleInterval, _clockOffset);
         } else if([object.type isEqualToString:@"oob_include"]) {
             _awayOverride = [[NSMutableDictionary alloc] init];
+            _reconnectTimestamp = 0;
             [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
         } else if([object.type isEqualToString:@"stat_user"]) {
             _userInfo = object.dictionary;
@@ -1129,6 +1130,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)_backlogCompleted:(NSNotification *)notification {
     _awayOverride = nil;
+    _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
+    [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
     OOBFetcher *fetcher = notification.object;
     if(fetcher.bid > 0) {
         [_buffers updateTimeout:0 buffer:fetcher.bid];
@@ -1147,6 +1150,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)_backlogFailed:(NSNotification *)notification {
     _awayOverride = nil;
+    _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
+    [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
     [_oobQueue removeObject:notification.object];
     if([_servers count] < 1) {
         TFLog(@"Initial backlog download failed");
