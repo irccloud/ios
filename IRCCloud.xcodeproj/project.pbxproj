@@ -147,7 +147,6 @@
 		22B4287F16D831A800498507 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
 		22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
-		22C8D79117E0D45E00DAB2A0 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8D79017E0D45E00DAB2A0 /* QuartzCore.framework */; };
 		22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A1171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A31725AAEA003C0684 /* UIExpandingTextView.m */; };
@@ -331,7 +330,6 @@
 		22B4286516D831A800498507 /* WebSocketMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebSocketMessage.m; sourceTree = "<group>"; };
 		22B4288416D846BF00498507 /* IRCCloudJSONObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudJSONObject.h; sourceTree = "<group>"; };
 		22B4288516D846BF00498507 /* IRCCloudJSONObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudJSONObject.m; sourceTree = "<group>"; };
-		22C8D79017E0D45E00DAB2A0 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		22D4309E171C663A003C0684 /* IgnoresTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IgnoresTableViewController.h; sourceTree = "<group>"; };
 		22D4309F171C663A003C0684 /* IgnoresTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IgnoresTableViewController.m; sourceTree = "<group>"; };
 		22D430A21725AAE9003C0684 /* UIExpandingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIExpandingTextView.h; sourceTree = "<group>"; };
@@ -350,7 +348,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22C8D79117E0D45E00DAB2A0 /* QuartzCore.framework in Frameworks */,
 				2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */,
 				22501740178340AB00066E71 /* Twitter.framework in Frameworks */,
 				22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */,
@@ -431,7 +428,6 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				22C8D79017E0D45E00DAB2A0 /* QuartzCore.framework */,
 				2283322F17944E2B00ED22EA /* AudioToolbox.framework */,
 				228A05C916D3DCB60029769C /* CFNetwork.framework */,
 				228A057316D3DABA0029769C /* CoreGraphics.framework */,
@@ -718,6 +714,11 @@
 			attributes = {
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "IRCCloud, Ltd.";
+				TargetAttributes = {
+					228A056B16D3DABA0029769C = {
+						DevelopmentTeam = GED45EQAGA;
+					};
+				};
 			};
 			buildConfigurationList = 228A056716D3DABA0029769C /* Build configuration list for PBXProject "IRCCloud" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -1048,6 +1049,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				INFOPLIST_FILE = "IRCCloud/IRCCloud-Info.plist";
@@ -1066,6 +1068,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				INFOPLIST_FILE = "IRCCloud/IRCCloud-Info.plist";

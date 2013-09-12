@@ -106,6 +106,7 @@ typedef enum {
     UsersDataSource *_users;
     EventsDataSource *_events;
     NSMutableArray *_oobQueue;
+    NSMutableDictionary *_awayOverride;
     NSTimer *_idleTimer;
     NSTimeInterval _idleInterval;
     int _totalBuffers;

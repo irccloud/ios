@@ -82,6 +82,7 @@ NSLock *__parserLock = nil;
     
     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     if(_connection) {
+        [__parserLock lock];
         _running = YES;
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
         NSRunLoop *loop = [NSRunLoop currentRunLoop];
@@ -119,7 +120,6 @@ NSLock *__parserLock = nil;
 	return request;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
-    [__parserLock lock];
 	if([response statusCode] != 200) {
         TFLog(@"HTTP status code: %i", [response statusCode]);
 		TFLog(@"HTTP headers: %@", [response allHeaderFields]);
@@ -162,6 +162,7 @@ NSLock *__parserLock = nil;
     _events = [EventsDataSource sharedInstance];
     _state = kIRCCloudStateDisconnected;
     _oobQueue = [[NSMutableArray alloc] init];
+    _awayOverride = nil;
     _adapter = [[SBJsonStreamParserAdapter alloc] init];
     _adapter.delegate = self;
     _parser = [[SBJsonStreamParser alloc] init];
@@ -682,6 +683,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             _failCount = 0;
             TFLog(@"idle interval: %f clock offset: %f", _idleInterval, _clockOffset);
         } else if([object.type isEqualToString:@"oob_include"]) {
+            _awayOverride = [[NSMutableDictionary alloc] init];
             [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
         } else if([object.type isEqualToString:@"stat_user"]) {
             _userInfo = object.dictionary;
@@ -717,7 +719,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             server.nickserv_pass = [object objectForKey:@"nickserv_pass"];
             server.join_commands = [object objectForKey:@"join_commands"];
             server.fail_info = [object objectForKey:@"fail_info"];
-            server.away = [object objectForKey:@"away"];
+            server.away = (backlog && [_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
             server.ignores = [object objectForKey:@"ignores"];
             if(!backlog)
                 [self postObject:server forEvent:kIRCEventMakeServer];
@@ -982,6 +984,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             if(!backlog)
                 [self postObject:object forEvent:kIRCEventAway];
         } else if([object.type isEqualToString:@"self_back"]) {
+            [_awayOverride setObject:@YES forKey:@(object.cid)];
             [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             [_servers updateAway:@"" server:object.cid];
             if(!backlog)
@@ -1116,6 +1119,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogStarted:(NSNotification *)notification {
+    if(_awayOverride.count)
+        NSLog(@"Caught %i self_back events", _awayOverride.count);
     _currentBid = -1;
     _currentCount = 0;
     _firstEID = 0;
@@ -1123,6 +1128,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogCompleted:(NSNotification *)notification {
+    _awayOverride = nil;
     OOBFetcher *fetcher = notification.object;
     if(fetcher.bid > 0) {
         [_buffers updateTimeout:0 buffer:fetcher.bid];
@@ -1140,6 +1146,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogFailed:(NSNotification *)notification {
+    _awayOverride = nil;
     [_oobQueue removeObject:notification.object];
     if([_servers count] < 1) {
         TFLog(@"Initial backlog download failed");
