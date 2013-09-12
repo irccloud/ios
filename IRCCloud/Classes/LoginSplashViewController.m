@@ -115,6 +115,10 @@
     }
 }
 
+-(void)viewDidAppear:(BOOL)animated {
+    self.view.frame = [UIScreen mainScreen].applicationFrame;
+}
+
 -(void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     IRCCloudJSONObject *o = nil;
