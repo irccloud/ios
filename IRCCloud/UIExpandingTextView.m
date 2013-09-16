@@ -202,7 +202,6 @@
     minimumNumberOfLines = m;
 }
 
-
 - (void)textViewDidChange:(UITextView *)textView
 {
     if(textView.text.length == 0) {
@@ -212,7 +211,7 @@
         placeholderLabel.alpha = 0;
     }
     
-    NSInteger newHeight = internalTextView.contentSize.height;
+    NSInteger newHeight = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?internalTextView.contentSize.height:[textView.text sizeWithFont:textView.font constrainedToSize:CGSizeMake(internalTextView.bounds.size.width - 12, maximumHeight) lineBreakMode:NSLineBreakByWordWrapping].height + 17;
     
 	if(newHeight < minimumHeight || !internalTextView.hasText)
     {
