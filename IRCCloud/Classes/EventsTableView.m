@@ -872,7 +872,7 @@ int __timestampWidth;
     
     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
     if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
-        if(_buffer.bid != -1 && _buffer.min_eid > 0) {
+        if(_buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
             self.tableView.tableHeaderView = _headerView;
             _requestingBacklog = YES;
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
@@ -882,7 +882,7 @@ int __timestampWidth;
     } else if(events.count) {
         [_ignore setIgnores:_server.ignores];
         _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
-        if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0) {
+        if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
             self.tableView.tableHeaderView = _headerView;
         } else {
             self.tableView.tableHeaderView = nil;
@@ -1256,7 +1256,7 @@ int __timestampWidth;
                 }
             }
             
-            if(self.tableView.tableHeaderView != _headerView && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && firstRow > 0 && lastRow < _data.count)
+            if(self.tableView.tableHeaderView != _headerView && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && firstRow > 0 && lastRow < _data.count && _conn.state == kIRCCloudStateConnected)
                 self.tableView.tableHeaderView = _headerView;
         }
     }
