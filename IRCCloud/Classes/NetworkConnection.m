@@ -87,13 +87,13 @@ NSLock *__parserLock = nil;
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
         NSRunLoop *loop = [NSRunLoop currentRunLoop];
         while(!_cancelled && _running && [loop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+        [__parserLock unlock];
     } else {
         TFLog(@"Failed to create NSURLConnection");
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
     }
 }
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    [__parserLock unlock];
     if(_cancelled)
         return;
 	TFLog(@"Request failed: %@", error);
@@ -104,7 +104,6 @@ NSLock *__parserLock = nil;
     _cancelled = YES;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    [__parserLock unlock];
     if(_cancelled)
         return;
 	TFLog(@"Backlog download completed");
