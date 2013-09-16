@@ -526,6 +526,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         return;
     }
+
+    if(_oobQueue.count) {
+        NSLog(@"Cancelling pending OOB requests");
+        for(OOBFetcher *fetcher in _oobQueue) {
+            [fetcher cancel];
+        }
+        [_oobQueue removeAllObjects];
+    }
     
     NSString *url = [NSString stringWithFormat:@"wss://%@",IRCCLOUD_HOST];
     if(_events.highestEid > 0)
