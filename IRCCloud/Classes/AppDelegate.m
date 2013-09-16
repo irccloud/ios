@@ -112,6 +112,7 @@
 
 -(void)showLoginView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        self.window.backgroundColor = [UIColor blackColor];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
         self.loginSplashViewController.view.alpha = 1;
         self.window.rootViewController = self.loginSplashViewController;
@@ -120,6 +121,7 @@
 
 -(void)showImage:(NSURL *)url {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        self.window.backgroundColor = [UIColor blackColor];
         self.window.rootViewController = [[ImageViewController alloc] initWithURL:url];
         [self.window insertSubview:self.slideViewController.view aboveSubview:self.window.rootViewController.view];
         [UIView animateWithDuration:0.5f animations:^{
@@ -146,6 +148,10 @@
                     self.slideViewController.view.transform = transform;
                 } completion:^(BOOL finished){
                     [self.loginSplashViewController.view removeFromSuperview];
+#ifdef __IPHONE_7_0
+                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                        self.window.backgroundColor = [UIColor whiteColor];
+#endif
                 }];
             } else {
                 UIView *v = self.window.rootViewController.view;
@@ -155,6 +161,10 @@
                     v.alpha = 0;
                 } completion:^(BOOL finished){
                     [v removeFromSuperview];
+#ifdef __IPHONE_7_0
+                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                        self.window.backgroundColor = [UIColor whiteColor];
+#endif
                 }];
             }
         } else {

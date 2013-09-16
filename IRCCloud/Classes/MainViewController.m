@@ -677,10 +677,9 @@
 #endif
     
     self.slidingViewController.view.frame = frame;
-    
+    self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
-    
     [UIView commitAnimations];
 }
 
@@ -726,6 +725,7 @@
 #endif
 
     self.slidingViewController.view.frame = frame;
+    self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self.slidingViewController updateUnderLeftLayout];
     [self.slidingViewController updateUnderRightLayout];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
