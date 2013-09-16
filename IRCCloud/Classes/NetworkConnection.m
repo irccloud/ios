@@ -508,8 +508,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(_state == kIRCCloudStateConnecting)
         return;
     
-    if(_socket)
-        _socket.delegate = nil;
+    if(_socket) {
+        WebSocket *s = _socket;
+        _socket = nil;
+        s.delegate = nil;
+        [s close];
+    }
 
     if(_background)
         return;
@@ -529,8 +533,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         url = [url stringByAppendingFormat:@"?since_id=%.0lf", _events.highestEid];
     TFLog(@"Connecting: %@", url);
     _state = kIRCCloudStateConnecting;
-    [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+    _idleInterval = 20;
     _reconnectTimestamp = -1;
+    [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:nil protocols:nil
                                                                      tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
                                                                                   (NSString *)kCFStreamSSLLevel: (NSString *)kCFStreamSocketSecurityLevelSSLv3} mutableCopy]
@@ -575,6 +580,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)webSocketDidOpen:(WebSocket *)socket {
     if(socket == _socket) {
         TFLog(@"Socket connected");
+        _idleInterval = 20;
+        _reconnectTimestamp = 0;
         _state = kIRCCloudStateConnected;
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }
