@@ -119,7 +119,14 @@
     _menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
     [_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+        _menuBtn.frame = CGRectMake(0,0,32,32);
+    else
+        _menuBtn.frame = CGRectMake(0,0,20,18);
+#else
     _menuBtn.frame = CGRectMake(0,0,32,32);
+#endif
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
     
     [_swipeTip removeFromSuperview];
@@ -141,7 +148,14 @@
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[UIImage imageNamed:@"users"] forState:UIControlStateNormal];
     [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+        users.frame = CGRectMake(0,0,40,40);
+    else
+        users.frame = CGRectMake(0,0,24,22);
+#else
     users.frame = CGRectMake(0,0,40,40);
+#endif
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
