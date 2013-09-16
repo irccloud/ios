@@ -750,6 +750,10 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+        ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor whiteColor];
+#endif
     if([ServersDataSource sharedInstance].count < 1) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
         return;
@@ -827,6 +831,10 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+        self.view.window.backgroundColor = [UIColor blackColor];
+#endif
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
