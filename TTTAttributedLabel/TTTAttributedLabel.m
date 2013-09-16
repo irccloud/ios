@@ -377,7 +377,6 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
             return result;
         }
     }
-    
     return nil;
 }
 
@@ -430,8 +429,8 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
         // Get bounding information of line
         CGFloat ascent = 0.0f, descent = 0.0f, leading = 0.0f;
         CGFloat width = CTLineGetTypographicBounds(line, &ascent, &descent, &leading);
-        CGFloat yMin = floor(lineOrigin.y - descent);
-        CGFloat yMax = ceil(lineOrigin.y + ascent);
+        CGFloat yMin = floor(lineOrigin.y - descent - 6);
+        CGFloat yMax = ceil(lineOrigin.y + ascent + 6);
         
         // Check if we've already passed the line
         if (p.y > yMax) {
@@ -440,9 +439,9 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
         // Check if the point is within this line vertically
         if (p.y >= yMin) {
             // Check if the point is within this line horizontally
-            if (p.x >= lineOrigin.x && p.x <= lineOrigin.x + width) {
+            if (p.x >= (lineOrigin.x - 6) && p.x <= lineOrigin.x + width + 6) {
                 // Convert CT coordinates to line-relative coordinates
-                CGPoint relativePoint = CGPointMake(p.x - lineOrigin.x, p.y - lineOrigin.y);
+                CGPoint relativePoint = CGPointMake(p.x - lineOrigin.x, lineOrigin.y);
                 idx = CTLineGetStringIndexForPosition(line, relativePoint);
                 break;
             }
