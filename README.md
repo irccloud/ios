@@ -15,9 +15,9 @@ IRCCloud for iOS is available in the [App Store](https://itunes.apple.com/us/app
 
 Screenshots
 ------
-![iPhone](https://blog.irccloud.com/static/ios-announce/iphone-chat-case.png)
-
-![iPad](https://blog.irccloud.com/static/ios-announce/ipad-case.png)
+<img src="https://blog.irccloud.com/static/ios-announce/iphone-sidebar-case.png" height="640">
+&nbsp;
+<img src="https://blog.irccloud.com/static/ios-announce/iphone-chat-case.png" height="640">
 
 Requirements
 ------
