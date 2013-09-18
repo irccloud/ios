@@ -11,6 +11,8 @@ Chat on IRC from anywhere, and never miss a message.
 Join our #feedback channel on irc.irccloud.com for feedback and suggestions so we can improve the app.
 You can also email us on team@irccloud.com or find us on Twitter @irccloud
 
+IRCCloud for iOS is available in the [App Store](https://itunes.apple.com/us/app/irccloud/id672699103).
+
 Screenshots
 ------
 ![iPhone](https://blog.irccloud.com/static/ios-announce/iphone-chat-case.png)
