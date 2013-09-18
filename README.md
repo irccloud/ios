@@ -19,8 +19,8 @@ Screenshots
 
 Requirements
 ------
-* XCode 4
-* iOS 6 SDK
+* XCode 4 or 5
+* iOS 6 or 7 SDK
 * An iPhone, iPad, or iPod Touch running iOS 5.0 or newer
 
 _A code signing key from Apple is required to deploy apps to a device.
