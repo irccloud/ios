@@ -468,6 +468,7 @@ int __timestampWidth;
                 heading.linkify = NO;
                 [self _addItem:heading eid:_currentCollapsedEid - 1];
             }
+            event.timestamp = nil;
         } else {
             msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse:showChan];
         }
