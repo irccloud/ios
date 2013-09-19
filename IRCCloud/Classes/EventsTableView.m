@@ -1062,6 +1062,14 @@ int __timestampWidth;
     if(!cell)
         cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"eventscell"];
     [_lock lock];
+    if([indexPath row] >= _data.count) {
+        cell.type = ROW_MESSAGE;
+        cell.message.text = @"";
+        cell.timestamp.text = @"";
+        cell.accessory.hidden = YES;
+        [_lock unlock];
+        return cell;
+    }
     Event *e = [_data objectAtIndex:[indexPath row]];
     [_lock unlock];
     cell.type = e.rowType;

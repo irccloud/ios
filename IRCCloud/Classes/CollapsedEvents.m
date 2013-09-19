@@ -438,7 +438,7 @@
                                 break;
                         }
                     }
-                    if(e.type != kCollapsedEventQuit)
+                    if(e.type != kCollapsedEventQuit && e.chan)
                         [message appendString:e.chan];
                 }
                 
