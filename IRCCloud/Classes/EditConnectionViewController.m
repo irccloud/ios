@@ -45,7 +45,7 @@
                       @{@"network":@"DALNet", @"host":@"irc.dal.net", @"port":@(6667), @"SSL":@(NO)},
                       @{@"network":@"OFTC", @"host":@"irc.oftc.net", @"port":@(6667), @"SSL":@(NO)},
                       @{@"network":@"GameSurge", @"host":@"irc.gamesurge.net", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"Efnet", @"host":@"efnet.xs4all.nl", @"port":@(6667), @"SSL":@(NO)},
+                      @{@"network":@"Efnet", @"host":@"efnet.port80.se", @"port":@(6667), @"SSL":@(NO)},
                       @{@"network":@"Mozilla", @"host":@"irc.mozilla.org", @"port":@(6697), @"SSL":@(YES)},
                       @{@"network":@"Rizon", @"host":@"irc6.rizon.net", @"port":@(6697), @"SSL":@(YES)},
                       @{@"network":@"Espernet", @"host":@"irc.esper.net", @"port":@(6667), @"SSL":@(NO)},
