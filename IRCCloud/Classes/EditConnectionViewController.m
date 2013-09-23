@@ -656,7 +656,7 @@
         case kIRCEventMakeServer:
             s = notification.object;
             if(s.cid == _cid)
-                [(AppDelegate *)([UIApplication sharedApplication].delegate) showMainView];
+                [(AppDelegate *)([UIApplication sharedApplication].delegate) showMainView:YES];
             break;
         default:
             break;

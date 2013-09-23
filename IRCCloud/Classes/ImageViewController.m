@@ -154,16 +154,13 @@
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
 }
 
--(void)_load {
+-(void)load {
 #ifdef DEBUG
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
 #endif
     
     NSURLRequest *request = [NSURLRequest requestWithURL:_url];
     NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-    
-    // Ensure the delegate is called on a valid thread, since -_load is called in the background
-    [connection scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     
     [connection start];
 }
@@ -203,11 +200,11 @@
         }
     }
     if(!data || !img) {
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
-        if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
-                                                                                      withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                                                                                         createNewTab:NO]))
-            [[UIApplication sharedApplication] openURL:_url];
+            [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
+            if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
+                                                                                          withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                                                                                             createNewTab:NO]))
+                [[UIApplication sharedApplication] openURL:_url];
     }
 }
 
@@ -218,8 +215,8 @@
     } else {
         self.view.frame = _scrollView.frame = CGRectMake(0,0,[UIScreen mainScreen].bounds.size.width,[UIScreen mainScreen].bounds.size.height);
     }
-    _progressView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth; // IB didn't want to cooperate.
-    [self performSelectorInBackground:@selector(_load) withObject:nil];
+    
+    [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -272,16 +269,18 @@
         }];
         [self presentModalViewController:tweetViewController animated:YES];
     } else if([title hasPrefix:@"Open "]) {
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
-        if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
-                  withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                     createNewTab:NO]))
-            [[UIApplication sharedApplication] openURL:_url];
+        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
+                      withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                         createNewTab:NO]))
+                [[UIApplication sharedApplication] openURL:_url];
+        }];
     }
 }
 
 -(IBAction)doneButtonPressed:(id)sender {
-    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
+    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
 }
 
 - (void)didReceiveMemoryWarning {
