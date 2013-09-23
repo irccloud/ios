@@ -38,7 +38,7 @@
 
 -(void)showImage:(NSURL *)url;
 -(void)showLoginView;
--(void)showMainView;
+-(void)showMainView:(BOOL)animated;
 -(void)showConnectionView;
 -(void)launchURL:(NSURL *)url;
 @end

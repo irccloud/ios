@@ -24,6 +24,11 @@
 #import "TUSafariActivity.h"
 
 @implementation ImageViewController
+{
+    NSMutableData *_imageData;
+    long long _bytesExpected;
+    long long _totalBytesReceived;
+}
 
 - (id)initWithURL:(NSURL *)url {
     self = [super initWithNibName:@"ImageViewController" bundle:nil];
@@ -61,6 +66,8 @@
         _scrollView.contentSize = _imageView.frame.size;
     }
     [self scrollViewDidZoom:_scrollView];
+    
+    _progressView.center = CGPointMake(self.view.bounds.size.width / 2.0,self.view.bounds.size.height/2.0);
 }
 
 -(void)_setImage:(UIImage *)img {
@@ -82,7 +89,7 @@
     _scrollView.zoomScale = minScale;
     [self scrollViewDidZoom:_scrollView];
 
-    [_activityView stopAnimating];
+    [_progressView removeFromSuperview];
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:0.25];
     _imageView.alpha = 1;
@@ -147,23 +154,57 @@
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
 }
 
--(void)_load {
+-(void)load {
+#ifdef DEBUG
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
+#endif
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:_url];
+    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+    
+    [connection start];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    _bytesExpected = [response expectedContentLength];
+    _imageData = [[NSMutableData alloc] initWithCapacity:_bytesExpected + 32]; // Just in case? Unsure if the extra 32 bytes are necessary
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    NSInteger receivedDataLength = [data length];
+    _totalBytesReceived += receivedDataLength;
+    
+    [_imageData appendData:data];
+    
+    if(_bytesExpected != NSURLResponseUnknownLength) {
+        float progress = ((_totalBytesReceived/(float)_bytesExpected) * 100.f) / 100.f;
+        _progressView.progress = progress;
+    }
+}
+
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    NSLog(@"Couldn't download image. Error code %i: %@", error.code, error.localizedDescription);
+}
+
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     UIImage *img = nil;
-    NSData *data = [NSData dataWithContentsOfURL:_url];
+    NSData *data = _imageData;
     if(data) {
         if([[[_url description] lowercaseString] hasSuffix:@"gif"])
             img = [UIImage animatedImageWithAnimatedGIFData:data];
         else
             img = [UIImage imageWithData:data];
-        if(img)
+        if(img) {
+            _progressView.progress = 1.f;
             [self performSelectorOnMainThread:@selector(_setImage:) withObject:img waitUntilDone:YES];
+        }
     }
     if(!data || !img) {
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
-        if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
-                  withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                     createNewTab:NO]))
-            [[UIApplication sharedApplication] openURL:_url];
+            [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
+            if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
+                                                                                          withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                                                                                             createNewTab:NO]))
+                [[UIApplication sharedApplication] openURL:_url];
     }
 }
 
@@ -174,7 +215,8 @@
     } else {
         self.view.frame = _scrollView.frame = CGRectMake(0,0,[UIScreen mainScreen].bounds.size.width,[UIScreen mainScreen].bounds.size.height);
     }
-    [self performSelectorInBackground:@selector(_load) withObject:nil];
+    
+    [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -227,16 +269,18 @@
         }];
         [self presentModalViewController:tweetViewController animated:YES];
     } else if([title hasPrefix:@"Open "]) {
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
-        if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
-                  withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                     createNewTab:NO]))
-            [[UIApplication sharedApplication] openURL:_url];
+        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
+                      withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                         createNewTab:NO]))
+                [[UIApplication sharedApplication] openURL:_url];
+        }];
     }
 }
 
 -(IBAction)doneButtonPressed:(id)sender {
-    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView];
+    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
 }
 
 - (void)didReceiveMemoryWarning {

@@ -18,10 +18,10 @@
 #import <UIKit/UIKit.h>
 #import "OpenInChromeController.h"
 
-@interface ImageViewController : UIViewController<UIScrollViewDelegate,UIActionSheetDelegate> {
+@interface ImageViewController : UIViewController<UIScrollViewDelegate,UIActionSheetDelegate,NSURLConnectionDataDelegate> {
     IBOutlet UIImageView *_imageView;
     IBOutlet UIScrollView *_scrollView;
-    IBOutlet UIActivityIndicatorView *_activityView;
+    __weak IBOutlet UIProgressView *_progressView;
     IBOutlet UIToolbar *_toolbar;
     NSURL *_url;
     NSTimer *_hideTimer;
