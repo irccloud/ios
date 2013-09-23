@@ -71,6 +71,17 @@
 		22695F5616E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
 		2274F4A01756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
+		227EA7BE17F0BE9A001E5E53 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
+		227EA7BF17F0BE9A001E5E53 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
+		227EA7C017F0BE9A001E5E53 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
+		227EA7C117F0BE9A001E5E53 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
+		227EA7C217F0BE9A001E5E53 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
+		227EA7C317F0BE9A001E5E53 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CD16D3DD310029769C /* libicucore.dylib */; };
+		227EA7C417F0BE9A001E5E53 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
+		227EA7C517F0BE9A001E5E53 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
+		227EA7C617F0BE9A001E5E53 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CB16D3DCE20029769C /* Security.framework */; };
+		227EA7C717F0BE9A001E5E53 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
+		227EA7C817F0BE9A001E5E53 /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
 		227FF2A116FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		227FF2A216FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		227FF8231772063F00394114 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF8221772063F00394114 /* SettingsViewController.m */; };
@@ -369,6 +380,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				227EA7BE17F0BE9A001E5E53 /* AudioToolbox.framework in Frameworks */,
+				227EA7BF17F0BE9A001E5E53 /* CFNetwork.framework in Frameworks */,
+				227EA7C017F0BE9A001E5E53 /* CoreGraphics.framework in Frameworks */,
+				227EA7C117F0BE9A001E5E53 /* CoreText.framework in Frameworks */,
+				227EA7C217F0BE9A001E5E53 /* ImageIO.framework in Frameworks */,
+				227EA7C317F0BE9A001E5E53 /* libicucore.dylib in Frameworks */,
+				227EA7C417F0BE9A001E5E53 /* libz.dylib in Frameworks */,
+				227EA7C517F0BE9A001E5E53 /* MobileCoreServices.framework in Frameworks */,
+				227EA7C617F0BE9A001E5E53 /* Security.framework in Frameworks */,
+				227EA7C717F0BE9A001E5E53 /* SystemConfiguration.framework in Frameworks */,
+				227EA7C817F0BE9A001E5E53 /* Twitter.framework in Frameworks */,
 				228A059716D3DABB0029769C /* SenTestingKit.framework in Frameworks */,
 				228A059816D3DABB0029769C /* UIKit.framework in Frameworks */,
 				228A059916D3DABB0029769C /* Foundation.framework in Frameworks */,
