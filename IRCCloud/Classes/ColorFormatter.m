@@ -423,7 +423,14 @@
         if(server) {
             results = [[self ircChannelRegexForServer:server] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
             if(results.count) {
-                [matches addObjectsFromArray:results];
+                for(NSTextCheckingResult *match in results) {
+                    if([[[output string] substringWithRange:match.range] hasSuffix:@"."]) {
+                        NSRange ranges[1] = {NSMakeRange(match.range.location, match.range.length - 1)};
+                        [matches addObject:[NSTextCheckingResult regularExpressionCheckingResultWithRanges:ranges count:1 regularExpression:match.regularExpression]];
+                    } else {
+                        [matches addObject:match];
+                    }
+                }
             }
         }
         results = [[self webURL] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
@@ -446,7 +453,14 @@
         if(server) {
             NSArray *results = [[self ircChannelRegexForServer:server] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
             if(results.count) {
-                [matches addObjectsFromArray:results];
+                for(NSTextCheckingResult *match in results) {
+                    if([[[output string] substringWithRange:match.range] hasSuffix:@"."]) {
+                        NSRange ranges[1] = {NSMakeRange(match.range.location, match.range.length - 1)};
+                        [matches addObject:[NSTextCheckingResult regularExpressionCheckingResultWithRanges:ranges count:1 regularExpression:match.regularExpression]];
+                    } else {
+                        [matches addObject:match];
+                    }
+                }
             }
         }
     }
