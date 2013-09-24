@@ -1088,22 +1088,34 @@
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
         _eidToOpen = -1;
     }
+    
+    Buffer *previousBuffer = _buffer;
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    previousBuffer.draft = _message.text;
+    
     [self _updateTitleArea];
     [_buffersView setBuffer:_buffer];
     _eventsView.eidToOpen = _eidToOpen;
     if(changed) {
         [UIView animateWithDuration:0.1 animations:^{
-            _eventsView.view.alpha=0;
-            _eventsView.topUnreadView.alpha=0;
-            _eventsView.bottomUnreadView.alpha=0;
-            _eventActivity.alpha=1;
+            _eventsView.view.alpha = 0;
+            _eventsView.topUnreadView.alpha = 0;
+            _eventsView.bottomUnreadView.alpha = 0;
+            _eventActivity.alpha = 1;
             [_eventActivity startAnimating];
+            if (changed) {
+                _message.alpha = 0.f;
+            }
+            
         } completion:^(BOOL finished){
             [_eventsView setBuffer:_buffer];
             [UIView animateWithDuration:0.1 animations:^{
-                _eventsView.view.alpha=1;
-                _eventActivity.alpha=0;
+                _eventsView.view.alpha = 1;
+                _eventActivity.alpha = 0;
+                if (changed) {
+                    _message.alpha = 1.f;
+                    _message.text = _buffer.draft;
+                }
             } completion:^(BOOL finished){
                 [_eventActivity stopAnimating];
             }];
