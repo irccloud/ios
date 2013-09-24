@@ -929,6 +929,7 @@
             if(e.msg)
                 [_pendingEvents addObject:e];
             [_message clearText];
+            _buffer.draft = nil;
             if(e.reqId < 0)
                 e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
         }
@@ -1088,10 +1089,10 @@
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
         _eidToOpen = -1;
     }
-    
-    Buffer *previousBuffer = _buffer;
+
+    if(_buffer)
+        _buffer.draft = _message.text;
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
-    previousBuffer.draft = _message.text;
     
     [self _updateTitleArea];
     [_buffersView setBuffer:_buffer];
@@ -1103,25 +1104,20 @@
             _eventsView.bottomUnreadView.alpha = 0;
             _eventActivity.alpha = 1;
             [_eventActivity startAnimating];
-            if (changed) {
-                _message.alpha = 0.f;
-            }
-            
+            [_message clearText];
         } completion:^(BOOL finished){
             [_eventsView setBuffer:_buffer];
             [UIView animateWithDuration:0.1 animations:^{
                 _eventsView.view.alpha = 1;
                 _eventActivity.alpha = 0;
-                if (changed) {
-                    _message.alpha = 1.f;
-                    _message.text = _buffer.draft;
-                }
+                _message.text = _buffer.draft;
             } completion:^(BOOL finished){
                 [_eventActivity stopAnimating];
             }];
         }];
     } else {
         [_eventsView setBuffer:_buffer];
+        _message.text = _buffer.draft;
     }
     [_usersView setBuffer:_buffer];
     [self _updateUserListVisibility];
