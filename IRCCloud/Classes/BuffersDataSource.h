@@ -29,11 +29,13 @@
     int _timeout;
     NSString *_away_msg;
     BOOL _valid;
+    NSString *_draft;
 }
 @property int bid, cid, archived, deferred, timeout;
 @property NSTimeInterval min_eid, last_seen_eid;
 @property NSString *name, *type, *away_msg;
 @property BOOL valid;
+@property (copy) NSString *draft;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;
 @end
 
