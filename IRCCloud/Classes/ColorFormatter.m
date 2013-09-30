@@ -20,6 +20,7 @@
 #import "TTTAttributedLabel.h"
 #import "UIColor+IRCCloud.h"
 #import "NetworkConnection.h"
+#import "NSURL+IDN.h"
 
 @implementation ColorFormatter
 
@@ -443,7 +444,7 @@
                 }
             }
             if(!overlap) {
-                NSString *url = [[output string] substringWithRange:result.range];
+                NSString *url = [NSURL IDNEncodedURL:[[output string] substringWithRange:result.range]];
                 if([url rangeOfString:@"://"].location == NSNotFound)
                     url = [NSString stringWithFormat:@"http://%@", url];
                 [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
