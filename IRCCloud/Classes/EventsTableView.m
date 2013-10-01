@@ -440,6 +440,9 @@ int __timestampWidth;
             event.bgColor = [UIColor whiteColor];
         }
         
+        if(!showChan)
+            event.chan = _buffer.name;
+        
         if(![_collapsedEvents addEvent:event]) {
             [_collapsedEvents clear];
         }
