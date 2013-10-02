@@ -199,12 +199,12 @@
                     unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     if(type == 1) {
-                        if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        if([[prefs objectForKey:@"channel-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
                             unread = 0;
                     } else {
-                        if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        if([[prefs objectForKey:@"buffer-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
                             unread = 0;
-                        if(type == 2 && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        if(type == 2 && [[prefs objectForKey:@"buffer-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
                             highlights = 0;
                     }
                     if(buffer.bid != _buffer.bid) {
@@ -929,6 +929,7 @@
             if(e.msg)
                 [_pendingEvents addObject:e];
             [_message clearText];
+            _buffer.draft = nil;
             if(e.reqId < 0)
                 e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
         }
@@ -1088,28 +1089,35 @@
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
         _eidToOpen = -1;
     }
+
+    if(_buffer)
+        _buffer.draft = _message.text;
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    
     [self _updateTitleArea];
     [_buffersView setBuffer:_buffer];
     _eventsView.eidToOpen = _eidToOpen;
     if(changed) {
         [UIView animateWithDuration:0.1 animations:^{
-            _eventsView.view.alpha=0;
-            _eventsView.topUnreadView.alpha=0;
-            _eventsView.bottomUnreadView.alpha=0;
-            _eventActivity.alpha=1;
+            _eventsView.view.alpha = 0;
+            _eventsView.topUnreadView.alpha = 0;
+            _eventsView.bottomUnreadView.alpha = 0;
+            _eventActivity.alpha = 1;
             [_eventActivity startAnimating];
+            [_message clearText];
         } completion:^(BOOL finished){
             [_eventsView setBuffer:_buffer];
             [UIView animateWithDuration:0.1 animations:^{
-                _eventsView.view.alpha=1;
-                _eventActivity.alpha=0;
+                _eventsView.view.alpha = 1;
+                _eventActivity.alpha = 0;
+                _message.text = _buffer.draft;
             } completion:^(BOOL finished){
                 [_eventActivity stopAnimating];
             }];
         }];
     } else {
         [_eventsView setBuffer:_buffer];
+        _message.text = _buffer.draft;
     }
     [_usersView setBuffer:_buffer];
     [self _updateUserListVisibility];

@@ -440,6 +440,9 @@ int __timestampWidth;
             event.bgColor = [UIColor whiteColor];
         }
         
+        if(!showChan)
+            event.chan = _buffer.name;
+        
         if(![_collapsedEvents addEvent:event]) {
             [_collapsedEvents clear];
         }
@@ -842,7 +845,7 @@ int __timestampWidth;
     [_lock lock];
     [_scrollTimer invalidate];
     _ready = NO;
-    int oldPosition = (_requestingBacklog && _data.count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
+    int oldPosition = (_requestingBacklog && _data.count && [self.tableView indexPathsForVisibleRows].count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
     NSTimeInterval backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
     if(backlogEid < 1)
         backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
