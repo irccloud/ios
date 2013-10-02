@@ -390,9 +390,9 @@
         event.msg = [NSString stringWithFormat:@"You invited %@ to join %@", [object objectForKey:@"recipient"], [object objectForKey:@"channel"]];
         event.bgColor = [UIColor noticeBackgroundColor];
     } else if([object.type isEqualToString:@"channel_invite"]) {
-        event.msg = [NSString stringWithFormat:@"invited you to %@.  Tap to join.", [object objectForKey:@"channel"]];
+        event.msg = [NSString stringWithFormat:@"Invite to join %@", [object objectForKey:@"channel"]];
         event.oldNick = [object objectForKey:@"channel"];
-        event.isHighlight = YES;
+        event.bgColor = [UIColor noticeBackgroundColor];
         event.monospace = YES;
     } else if([object.type isEqualToString:@"callerid"]) {
         event.msg = [event.msg stringByAppendingFormat:@" Tap to add %c%@%c to the whitelist.", BOLD, event.nick, CLEAR];

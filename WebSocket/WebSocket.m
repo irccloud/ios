@@ -675,7 +675,7 @@ WebSocketWaitingState waitingState;
 
 - (NSString *)buildStringFromHeaders:(NSMutableArray *)aHeaders resource:(NSString *)aResource {
     //init
-    NSMutableString *result = [NSMutableString stringWithFormat:@"GET %@ HTTP/1.1\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\n", aResource];
+    NSMutableString *result = [NSMutableString stringWithFormat:@"GET %@ HTTP/1.1\r\nUpgrade: websocket\r\nConnection: Upgrade\r\n", aResource];
 
     //add headers
     if (aHeaders) {
