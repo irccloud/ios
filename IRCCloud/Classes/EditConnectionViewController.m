@@ -19,15 +19,27 @@
 #import "NetworkConnection.h"
 #import "AppDelegate.h"
 #import "UIColor+IRCCloud.h"
+#import "SBJson.h"
 
 @interface NetworkListViewController : UITableViewController {
     id<NetworkListDelegate> _delegate;
     NSString *_selection;
     NSArray *_networks;
+    
+    UIActivityIndicatorView *_activityIndicator;
 }
 @property (nonatomic) NSString *selection;
 -(id)initWithDelegate:(id)delegate;
+- (void)fetchServerList;
 @end
+
+static NSString * const NetworksListLink = @"http://irccloud.com/static/networks.json";
+static NSString * const FetchedDataNetworksKey = @"networks";
+static NSString * const NetworkNameKey = @"name";
+static NSString * const NetworkServersKey = @"servers";
+static NSString * const ServerHostNameKey = @"hostname";
+static NSString * const ServerPortKey = @"port";
+static NSString * const ServerHasSSLKey = @"ssl";
 
 @implementation NetworkListViewController
 
@@ -36,35 +48,77 @@
     if (self) {
         _delegate = delegate;
         self.navigationItem.title = @"Networks";
-        _networks = @[
-                      @{@"network":@"IRCCloud", @"host":@"irc.irccloud.com", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"Freenode", @"host":@"irc.freenode.net", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"QuakeNet", @"host":@"blacklotus.ca.us.quakenet.org", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"IRCNet", @"host":@"ircnet.blacklotus.net", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"Undernet", @"host":@"losangeles.ca.us.undernet.org", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"DALNet", @"host":@"irc.dal.net", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"OFTC", @"host":@"irc.oftc.net", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"GameSurge", @"host":@"irc.gamesurge.net", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"Efnet", @"host":@"efnet.port80.se", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"Mozilla", @"host":@"irc.mozilla.org", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"Rizon", @"host":@"irc6.rizon.net", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"Espernet", @"host":@"irc.esper.net", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"ReplayIRC", @"host":@"irc.replayirc.com", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"synIRC", @"host":@"naamia.fl.eu.synirc.net", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"fossnet", @"host":@"irc.fossnet.info", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"P2P-NET", @"host":@"irc.p2p-network.net", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"euIRCnet", @"host":@"irc.euirc.net", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"SlashNET", @"host":@"irc.slashnet.org", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"Atrum", @"host":@"irc.atrum.org", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"Indymedia", @"host":@"irc.indymedia.org", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"TWiT", @"host":@"irc.twit.tv", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"Snoonet", @"host":@"irc.snoonet.org", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"BrasIRC", @"host":@"irc.brasirc.org", @"port":@(6667), @"SSL":@(NO)},
-                      @{@"network":@"darkscience", @"host":@"irc.darkscience.net", @"port":@(6697), @"SSL":@(YES)},
-                      @{@"network":@"Techman's World", @"host":@"irc.techmansworld.com", @"port":@(6697), @"SSL":@(YES)}
-                      ];
+        [self fetchServerList];
     }
     return self;
+}
+         
+- (void)fetchServerList
+{
+    _activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    _activityIndicator.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin);
+    _activityIndicator.center = (CGPoint){(self.view.bounds.size.width * 0.5), (self.view.bounds.size.height * 0.5)};
+    [_activityIndicator startAnimating];
+    [self.view addSubview:_activityIndicator];
+
+#ifdef DEBUG
+    [[NSURLCache sharedURLCache] removeAllCachedResponses];
+#endif
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:NetworksListLink]];
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error fetching remote networks list, falling back to default. Error %i : %@", error.code, error.userInfo);
+            
+            _networks = @[
+                          @{@"network":@"IRCCloud", @"host":@"irc.irccloud.com", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"Freenode", @"host":@"irc.freenode.net", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"QuakeNet", @"host":@"blacklotus.ca.us.quakenet.org", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"IRCNet", @"host":@"ircnet.blacklotus.net", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"Undernet", @"host":@"losangeles.ca.us.undernet.org", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"DALNet", @"host":@"irc.dal.net", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"OFTC", @"host":@"irc.oftc.net", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"GameSurge", @"host":@"irc.gamesurge.net", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"Efnet", @"host":@"efnet.port80.se", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"Mozilla", @"host":@"irc.mozilla.org", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"Rizon", @"host":@"irc6.rizon.net", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"Espernet", @"host":@"irc.esper.net", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"ReplayIRC", @"host":@"irc.replayirc.com", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"synIRC", @"host":@"naamia.fl.eu.synirc.net", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"fossnet", @"host":@"irc.fossnet.info", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"P2P-NET", @"host":@"irc.p2p-network.net", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"euIRCnet", @"host":@"irc.euirc.net", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"SlashNET", @"host":@"irc.slashnet.org", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"Atrum", @"host":@"irc.atrum.org", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"Indymedia", @"host":@"irc.indymedia.org", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"TWiT", @"host":@"irc.twit.tv", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"Snoonet", @"host":@"irc.snoonet.org", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"BrasIRC", @"host":@"irc.brasirc.org", @"port":@(6667), @"SSL":@(NO)},
+                          @{@"network":@"darkscience", @"host":@"irc.darkscience.net", @"port":@(6697), @"SSL":@(YES)},
+                          @{@"network":@"Techman's World", @"host":@"irc.techmansworld.com", @"port":@(6697), @"SSL":@(YES)}
+                          ];
+        }
+        else {
+            SBJsonParser *parser = [[SBJsonParser alloc] init];
+            NSDictionary *dict = [parser objectWithData:data];
+            NSMutableArray *networks = [[NSMutableArray alloc] initWithCapacity:[(NSArray *)dict[FetchedDataNetworksKey] count]];
+            for (NSDictionary *network in dict[FetchedDataNetworksKey]) {
+                NSDictionary *server = [(NSArray *)network[NetworkServersKey] objectAtIndex:0];
+                [networks addObject:@{
+                                      @"network": network[NetworkNameKey],
+                                      @"host": server[ServerHostNameKey],
+                                      @"port": server[ServerPortKey],
+                                      @"SSL": server[ServerHasSSLKey]
+                                      }];
+            }
+            _networks = networks;
+        }
+        
+        [_activityIndicator stopAnimating];
+        [_activityIndicator removeFromSuperview];
+        
+        [self.tableView reloadData];
+    }];
 }
 
 - (void)didReceiveMemoryWarning {
