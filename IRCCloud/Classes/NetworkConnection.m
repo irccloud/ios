@@ -539,7 +539,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(_events.highestEid > 0) {
         url = [url stringByAppendingFormat:@"/?since_id=%.0lf", _events.highestEid];
         if(_streamId)
-            url = [url stringByAppendingFormat:@"/?stream_id=%@", _streamId];
+            url = [url stringByAppendingFormat:@"&stream_id=%@", _streamId];
     }
     TFLog(@"Connecting: %@", url);
     _state = kIRCCloudStateConnecting;
