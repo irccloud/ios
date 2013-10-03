@@ -133,7 +133,7 @@ NSString* const WebSocketConnectConfigErrorDomain = @"WebSocketConnectConfigErro
 
 - (NSString*) buildOrigin
 {
-    return [NSString stringWithFormat:@"%@://%@%@", isSecure ? @"https" : @"http", [self buildHost], self.url.path ? self.url.path : @""];
+    return [NSString stringWithFormat:@"%@://%@%@", isSecure ? @"https" : @"http", [self buildHost], (self.url.path && ![self.url.path isEqualToString:@"/"]) ? self.url.path : @""];
 }
 
 - (NSString*) buildHost
