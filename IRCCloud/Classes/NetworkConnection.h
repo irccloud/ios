@@ -118,6 +118,7 @@ typedef enum {
     int _failCount;
     BOOL _background;
     NSTimeInterval _firstEID;
+    NSString *_streamId;
     
     kIRCCloudState _state;
     NSDictionary *_userInfo;

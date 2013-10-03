@@ -536,8 +536,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
     
     NSString *url = [NSString stringWithFormat:@"wss://%@",IRCCLOUD_HOST];
-    if(_events.highestEid > 0)
-        url = [url stringByAppendingFormat:@"?since_id=%.0lf", _events.highestEid];
+    if(_events.highestEid > 0) {
+        url = [url stringByAppendingFormat:@"/?since_id=%.0lf", _events.highestEid];
+        if(_streamId)
+            url = [url stringByAppendingFormat:@"/?stream_id=%@", _streamId];
+    }
     TFLog(@"Connecting: %@", url);
     _state = kIRCCloudStateConnecting;
     _idleInterval = 20;
@@ -690,12 +693,18 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
     IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
     if(object.type) {
-        //NSLog(@"New event (%@)", object.type);
+        //NSLog(@"New event (%@) %@", object.type, object);
         if([object.type isEqualToString:@"header"]) {
             _idleInterval = ([[object objectForKey:@"idle_interval"] doubleValue] / 1000.0) + 10;
             _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
             _failCount = 0;
-            TFLog(@"idle interval: %f clock offset: %f", _idleInterval, _clockOffset);
+            /*if(_streamId && [[object objectForKey:@"streamid"] isEqualToString:_streamId]) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
+                }];
+            }*/
+            _streamId = [object objectForKey:@"streamid"];
+            TFLog(@"idle interval: %f clock offset: %f stream id: %@", _idleInterval, _clockOffset, _streamId);
         } else if([object.type isEqualToString:@"oob_include"]) {
             _awayOverride = [[NSMutableDictionary alloc] init];
             _reconnectTimestamp = 0;
@@ -1202,6 +1211,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self disconnect];
     [self cancelIdleTimer];
     _reconnectTimestamp = 0;
+    _streamId = nil;
     [self clearPrefs];
     [_servers clear];
     [_buffers clear];
