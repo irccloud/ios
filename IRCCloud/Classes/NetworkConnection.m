@@ -544,6 +544,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     TFLog(@"Connecting: %@", url);
     _state = kIRCCloudStateConnecting;
     _idleInterval = 20;
+    _accrued = 0;
+    _currentCount = 0;
+    _totalCount = 0;
     _reconnectTimestamp = -1;
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:nil protocols:nil
@@ -663,9 +666,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)postObject:(id)object forEvent:(kIRCEvent)event {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:object userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:event]}];
-    }];
+    if(_accrued == 0) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:object userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:event]}];
+        }];
+    }
 }
 
 -(void)_postLoadingProgress:(NSNumber *)progress {
@@ -691,6 +696,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if([NSThread currentThread].isMainThread)
         NSLog(@"WARNING: Parsing on main thread");
     [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
+    if(_accrued > 0) {
+        [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_currentCount++ / (float)_accrued)) waitUntilDone:NO];
+    }
     IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
     if(object.type) {
         //NSLog(@"New event (%@) %@", object.type, object);
@@ -700,10 +708,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             _failCount = 0;
             if(_streamId && [[object objectForKey:@"streamid"] isEqualToString:_streamId]) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
                 }];
             }
             _streamId = [object objectForKey:@"streamid"];
+            _accrued = [[object objectForKey:@"accrued"] intValue];
+            _currentCount = 0;
             TFLog(@"idle interval: %f clock offset: %f stream id: %@", _idleInterval, _clockOffset, _streamId);
         } else if([object.type isEqualToString:@"oob_include"]) {
             _awayOverride = [[NSMutableDictionary alloc] init];
@@ -771,7 +781,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@((float)_totalBuffers / (float)_numBuffers) waitUntilDone:YES];
             }
         } else if([object.type isEqualToString:@"global_system_message"]) {
-        } else if([object.type isEqualToString:@"idle"] || [object.type isEqualToString:@"end_of_backlog"] || [object.type isEqualToString:@"backlog_complete"]) {
+        } else if([object.type isEqualToString:@"idle"] || [object.type isEqualToString:@"end_of_backlog"]) {
+        } else if([object.type isEqualToString:@"backlog_complete"]) {
+            _accrued = 0;
+            if([[object objectForKey:@"resumed"] boolValue]) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
+                }];
+            }
         } else if([object.type isEqualToString:@"num_invites"]) {
         } else if([object.type isEqualToString:@"bad_channel_key"]) {
             if(!backlog)
