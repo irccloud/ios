@@ -1295,7 +1295,7 @@ int __timestampWidth;
             if(count > 1 || [((Event *)[_data objectAtIndex:indexPath.row]).groupMsg hasPrefix:@"   "]) {
                 if([_expandedSectionEids objectForKey:@(group)])
                     [_expandedSectionEids removeObjectForKey:@(group)];
-                else
+                else if(((Event *)[_data objectAtIndex:indexPath.row]).eid != group)
                     [_expandedSectionEids setObject:@(YES) forKey:@(group)];
                 for(Event *e in _data) {
                     e.timestamp = nil;
