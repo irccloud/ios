@@ -333,7 +333,7 @@
                 if([[[op objectForKey:@"mode"] lowercaseString] isEqualToString:@"b"]) {
                     event.nick = event.from;
                     event.from = @"";
-                    event.msg = [NSString stringWithFormat:@"Channel ban set for %c%@%c (+b) by ", BOLD, [op objectForKey:@"param"], BOLD];
+                    event.msg = [NSString stringWithFormat:@"Channel ban set for %c%@%c (+b)", BOLD, [op objectForKey:@"param"], BOLD];
                     unknown = NO;
                 }
             }
@@ -343,7 +343,7 @@
                 if([[[op objectForKey:@"mode"] lowercaseString] isEqualToString:@"b"]) {
                     event.nick = event.from;
                     event.from = @"";
-                    event.msg = [NSString stringWithFormat:@"Channel ban removed for %c%@%c (-b) by ", BOLD, [op objectForKey:@"param"], BOLD];
+                    event.msg = [NSString stringWithFormat:@"Channel ban removed for %c%@%c (-b)", BOLD, [op objectForKey:@"param"], BOLD];
                     unknown = NO;
                 }
             }
@@ -351,7 +351,7 @@
         if(unknown) {
             event.nick = event.from;
             event.from = @"";
-            event.msg = [NSString stringWithFormat:@"Channel mode set to %c%@%c by ", BOLD, [object objectForKey:@"diff"], BOLD];
+            event.msg = [NSString stringWithFormat:@"Channel mode set to %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
         }
         event.bgColor = [UIColor statusBackgroundColor];
         event.linkify = NO;

@@ -135,9 +135,14 @@
                     c = [[CollapsedEvent alloc] init];
                     c.type = kCollapsedEventMode;
                     c.nick = [op objectForKey:@"param"];
-                    c.oldNick = event.from;
+                    if(event.from.length) {
+                        c.oldNick = event.from;
+                        c.fromMode = event.fromMode;
+                    } else if(event.server.length) {
+                        c.oldNick = event.server;
+                        c.fromMode = @"__the_server__";
+                    }
                     c.hostname = event.hostmask;
-                    c.fromMode = event.fromMode;
                     c.targetMode = event.targetMode;
                     c.chan = event.chan;
                     NSString *mode = [op objectForKey:@"mode"];
@@ -159,9 +164,14 @@
                     c = [[CollapsedEvent alloc] init];
                     c.type = kCollapsedEventMode;
                     c.nick = [op objectForKey:@"param"];
-                    c.oldNick = event.from;
+                    if(event.from.length) {
+                        c.oldNick = event.from;
+                        c.fromMode = event.fromMode;
+                    } else if(event.server.length) {
+                        c.oldNick = event.server;
+                        c.fromMode = @"__the_server__";
+                    }
                     c.hostname = event.hostmask;
-                    c.fromMode = event.fromMode;
                     c.targetMode = event.targetMode;
                     c.chan = event.chan;
                     NSString *mode = [op objectForKey:@"mode"];
@@ -296,8 +306,12 @@
                             output = [output stringByAppendingFormat:@"devoiced (%c25B100-v%c)", COLOR_RGB, CLEAR];
                             break;
                     }
-                    if(e.oldNick)
-                        output = [output stringByAppendingFormat:@" by %@", [ColorFormatter formatNick:e.oldNick mode:e.fromMode]];
+                    if(e.oldNick) {
+                        if([e.fromMode isEqualToString:@"__the_server__"])
+                            output = [output stringByAppendingFormat:@" by the server %c%@%c", BOLD, e.oldNick, CLEAR];
+                        else
+                            output = [output stringByAppendingFormat:@" by %@", [ColorFormatter formatNick:e.oldNick mode:e.fromMode]];
+                    }
                     break;
                 case kCollapsedEventJoin:
                     if(showChan)
