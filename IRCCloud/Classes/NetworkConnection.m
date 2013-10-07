@@ -706,15 +706,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             _idleInterval = ([[object objectForKey:@"idle_interval"] doubleValue] / 1000.0) + 10;
             _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
             _failCount = 0;
-            if(_streamId && [[object objectForKey:@"streamid"] isEqualToString:_streamId]) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
-                }];
-            }
             _streamId = [object objectForKey:@"streamid"];
             _accrued = [[object objectForKey:@"accrued"] intValue];
             _currentCount = 0;
             TFLog(@"idle interval: %f clock offset: %f stream id: %@", _idleInterval, _clockOffset, _streamId);
+            if(_accrued > 0) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
+                }];
+            }
         } else if([object.type isEqualToString:@"oob_include"]) {
             _awayOverride = [[NSMutableDictionary alloc] init];
             _reconnectTimestamp = 0;
