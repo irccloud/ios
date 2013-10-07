@@ -117,6 +117,7 @@ typedef enum {
     int _currentBid;
     int _failCount;
     BOOL _background;
+    BOOL backlog;
     NSTimeInterval _firstEID;
     NSString *_streamId;
     int _accrued;

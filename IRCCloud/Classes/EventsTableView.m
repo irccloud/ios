@@ -228,7 +228,7 @@ int __timestampWidth;
             return;
         }
     }
-    if([notification.object bid] == -1 || (_buffer && [notification.object bid] == _buffer.bid && _requestingBacklog)) {
+    if(notification.object == nil || [notification.object bid] == -1 || (_buffer && [notification.object bid] == _buffer.bid && _requestingBacklog)) {
         NSLog(@"Backlog loaded in current buffer, will find and remove the last seen EID marker");
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {

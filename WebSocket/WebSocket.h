@@ -27,7 +27,7 @@
 #import "NSData+Base64.h"
 #import "MutableQueue.h"
 #import "WebSocketConnectConfig.h"
-
+#include "zlib.h"
 
 enum 
 {
@@ -134,6 +134,8 @@ typedef NSUInteger WebSocketReadyState;
     WebSocketConnectConfig* config;
     dispatch_queue_t delegateQueue;
     NSTimer* pingTimer;
+    BOOL deflate;
+    z_stream zstrm;
 }
 
 

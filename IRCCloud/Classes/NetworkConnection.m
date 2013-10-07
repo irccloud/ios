@@ -554,7 +554,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                                                                                   (NSString *)kCFStreamSSLLevel: (NSString *)kCFStreamSocketSecurityLevelSSLv3} mutableCopy]
                                                                          headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"],
                                                                                     [HandshakeHeader headerWithValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forKey:@"Cookie"]] mutableCopy]
-                                                               verifySecurityKey:YES extensions:nil ];
+                                                               verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
     _socket = [WebSocket webSocketWithConfig:config delegate:self];
     
     [_socket open];
@@ -583,11 +583,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)parser:(SBJsonStreamParser *)parser foundObject:(NSDictionary *)dict {
-    [self parse:dict backlog:NO];
+    [self parse:dict];
 }
 
 -(void)parser:(SBJsonStreamParser *)parser foundObjectInArray:(NSDictionary *)dict {
-    [self parse:dict backlog:YES];
+    [self parse:dict];
 }
 
 -(void)webSocketDidOpen:(WebSocket *)socket {
@@ -690,7 +690,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return _prefs;
 }
 
--(void)parse:(NSDictionary *)dict backlog:(BOOL)backlog {
+-(void)parse:(NSDictionary *)dict {
     if(backlog)
         _totalCount++;
     if([NSThread currentThread].isMainThread)
@@ -701,7 +701,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
     IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
     if(object.type) {
-        //NSLog(@"New event (%@) %@", object.type, object);
+        //NSLog(@"New event (backlog: %i) (%@) %@", backlog, object.type, object);
         if([object.type isEqualToString:@"header"]) {
             _idleInterval = ([[object objectForKey:@"idle_interval"] doubleValue] / 1000.0) + 10;
             _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
@@ -714,6 +714,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
                 }];
+            }
+            if(![[object objectForKey:@"resumed"] boolValue]) {
+                TFLog(@"Socket was not resumed, invalidating BIDs");
+                [_buffers invalidate];
+                [_channels invalidate];
             }
         } else if([object.type isEqualToString:@"oob_include"]) {
             _awayOverride = [[NSMutableDictionary alloc] init];
@@ -729,11 +734,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 _numBuffers = [[object objectForKey:@"numbuffers"] intValue];
                 _totalBuffers = 0;
                 NSLog(@"OOB includes has %i buffers", _numBuffers);
-                if(_buffers.count) {
-                    [_buffers invalidate];
-                    [_channels invalidate];
-                }
             }
+            backlog = YES;
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
+            }];
         } else if([object.type isEqualToString:@"makeserver"] || [object.type isEqualToString:@"server_details_changed"]) {
             Server *server = [_servers getServer:object.cid];
             if(!server) {
@@ -784,7 +789,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         } else if([object.type isEqualToString:@"idle"] || [object.type isEqualToString:@"end_of_backlog"]) {
         } else if([object.type isEqualToString:@"backlog_complete"]) {
             _accrued = 0;
-            if([[object objectForKey:@"resumed"] boolValue]) {
+            backlog = NO;
+            if(_oobQueue.count == 0) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
                 }];
@@ -1166,6 +1172,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _currentCount = 0;
     _firstEID = 0;
     _totalCount = 0;
+    backlog = YES;
 }
 
 -(void)_backlogCompleted:(NSNotification *)notification {
