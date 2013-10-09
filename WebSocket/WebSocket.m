@@ -1134,15 +1134,6 @@ WebSocketWaitingState waitingState;
             _deflate = NO;
             NSMutableArray *extensions = [self getServerExtensions:self.config.serverHeaders];
             if (extensions) {
-                //validate the extensions, if rfc6455 or later
-                if (self.config.version >= WebSocketVersionRFC6455 && self.config.extensions.count) {
-                    if (![self isValidServerExtension:extensions]) {
-                        NSString *extensionFragment = [self getExtensionsAsString:self.config.extensions];
-                        [self close:WebSocketCloseStatusMissingExtensions message:extensionFragment];
-                        return;
-                    }
-                }
-
                 self.config.serverExtensions = extensions;
                 for(NSString *extension in extensions) {
                     if([extension hasPrefix:@"x-webkit-deflate-frame"]) {
