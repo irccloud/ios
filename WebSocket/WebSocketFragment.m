@@ -272,6 +272,15 @@
         byte = 0x80;
     }
     
+    if(self.isRSV1)
+        byte = byte | 0x40;
+    
+    if(self.isRSV2)
+        byte = byte | 0x20;
+    
+    if(self.isRSV3)
+        byte = byte | 0x10;
+    
     //build opmask
     byte = byte | (self.opCode & 0xF);
     

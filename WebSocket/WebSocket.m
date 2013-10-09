@@ -224,10 +224,15 @@ WebSocketWaitingState waitingState;
 
 - (void)sendMessage:(NSData *)aMessage messageWithOpCode:(MessageOpCode)aOpCode {
     if (!isClosing) {
+        if(_deflate)
+            aMessage = [self deflate:aMessage];
         NSUInteger messageLength = [aMessage length];
         if (messageLength <= self.config.maxPayloadSize) {
             //create and send fragment
             WebSocketFragment *fragment = [WebSocketFragment fragmentWithOpCode:aOpCode isFinal:YES payload:aMessage];
+            if(_deflate)
+                fragment.isRSV1 = YES;
+            [fragment buildFragment];
             [self sendMessage:fragment];
         }
         else {
@@ -254,6 +259,8 @@ WebSocketWaitingState waitingState;
                 else {
                     fragment = [WebSocketFragment fragmentWithOpCode:MessageOpCodeContinuation isFinal:NO payload:[aMessage subdataWithRange:NSMakeRange(i * self.config.maxPayloadSize, fragmentLength)]];
                 }
+                if(_deflate)
+                    fragment.isRSV1 = YES;
                 [fragments addObject:fragment];
             }
 
@@ -356,6 +363,7 @@ WebSocketWaitingState waitingState;
     if([d length] == 0)
         return d;
 
+    //Append 0x00 0x00 0xFF 0xFF
     unsigned char tail[4] = {0,0,255,255};
     NSMutableData *data = [d mutableCopy];
     [data appendBytes:tail length:4];
@@ -367,20 +375,20 @@ WebSocketWaitingState waitingState;
     BOOL done = NO;
     int status;
     
-    zstrm.next_in = (Bytef *)[data bytes];
-    zstrm.avail_in = [data length];
-    zstrm.total_out = 0;
+    zstrm_in.next_in = (Bytef *)[data bytes];
+    zstrm_in.avail_in = [data length];
+    zstrm_in.total_out = 0;
     
     while (!done) {
         // Make sure we have enough room and reset the lengths.
-        if (zstrm.total_out >= [decompressed length])
+        if (zstrm_in.total_out >= [decompressed length])
             [decompressed increaseLengthBy: half_length];
-        zstrm.next_out = [decompressed mutableBytes] + zstrm.total_out;
-        zstrm.avail_out = [decompressed length] - zstrm.total_out;
+        zstrm_in.next_out = [decompressed mutableBytes] + zstrm_in.total_out;
+        zstrm_in.avail_out = [decompressed length] - zstrm_in.total_out;
         
         // Inflate another chunk.
-        status = inflate(&zstrm, Z_FULL_FLUSH);
-        if(zstrm.avail_in == 0)
+        status = inflate(&zstrm_in, Z_FULL_FLUSH);
+        if(zstrm_in.avail_in == 0)
             done = YES;
         else if (status != Z_OK && status != Z_BUF_ERROR)
             break;
@@ -388,10 +396,36 @@ WebSocketWaitingState waitingState;
     
     // Set real length.
     if (done) {
-        [decompressed setLength: zstrm.total_out];
+        [decompressed setLength: zstrm_in.total_out];
         return [NSData dataWithData: decompressed];
     } else
         return nil;
+}
+
+- (NSData *)deflate:(NSData*)data
+{
+    if ([data length] == 0) return data;
+    
+    zstrm_out.next_in=(Bytef *)[data bytes];
+    zstrm_out.avail_in = [data length];
+    zstrm_out.total_out = 0;
+    
+    NSMutableData *compressed = [NSMutableData dataWithLength:16384];  // 16K chunks for expansion
+    
+    do {
+        if (zstrm_out.total_out >= [compressed length])
+            [compressed increaseLengthBy: 16384];
+        
+        zstrm_out.next_out = [compressed mutableBytes] + zstrm_out.total_out;
+        zstrm_out.avail_out = [compressed length] - zstrm_out.total_out;
+        
+        deflate(&zstrm_out, Z_FULL_FLUSH);
+        
+    } while (zstrm_out.avail_out == 0);
+    
+    //Chop off the 0x00 0x00 0xFF 0xFF from the tail
+    [compressed setLength: zstrm_out.total_out - 4];
+    return [NSData dataWithData:compressed];
 }
 
 - (void)handleCompleteFragments {
@@ -1034,8 +1068,10 @@ WebSocketWaitingState waitingState;
         }
     }
     //End the zlib session
-    inflateEnd(&zstrm);
-    zstrm.total_out = 0;
+    inflateEnd(&zstrm_in);
+    deflateEnd(&zstrm_out);
+    zstrm_in.total_out = 0;
+    zstrm_out.total_out = 0;
     
     [self dispatchClosed:closeStatusCode message:closeMessage error:closingError];
 }
@@ -1095,7 +1131,7 @@ WebSocketWaitingState waitingState;
             }
 
             //grab extensions from the server
-            deflate = NO;
+            _deflate = NO;
             NSMutableArray *extensions = [self getServerExtensions:self.config.serverHeaders];
             if (extensions) {
                 //validate the extensions, if rfc6455 or later
@@ -1110,13 +1146,19 @@ WebSocketWaitingState waitingState;
                 self.config.serverExtensions = extensions;
                 for(NSString *extension in extensions) {
                     if([extension hasPrefix:@"x-webkit-deflate-frame"]) {
-                        if(zstrm.total_out > 0)
-                            inflateEnd(&zstrm);
-                        memset(&zstrm, 0, sizeof(zstrm));
-                        zstrm.zalloc = Z_NULL;
-                        zstrm.zfree = Z_NULL;
-                        inflateInit2(&zstrm,-15);
-                        deflate = YES;
+                        if(zstrm_in.total_out > 0)
+                            inflateEnd(&zstrm_in);
+                        memset(&zstrm_in, 0, sizeof(zstrm_in));
+                        zstrm_in.zalloc = Z_NULL;
+                        zstrm_in.zfree = Z_NULL;
+                        inflateInit2(&zstrm_in,-15);
+                        if(zstrm_out.total_out > 0)
+                            deflateEnd(&zstrm_out);
+                        memset(&zstrm_out, 0, sizeof(zstrm_out));
+                        zstrm_out.zalloc = Z_NULL;
+                        zstrm_out.zfree = Z_NULL;
+                        deflateInit2(&zstrm_out, Z_DEFAULT_COMPRESSION, Z_DEFLATED, -15, 8, Z_DEFAULT_STRATEGY);
+                        _deflate = YES;
                     }
                 }
             }
