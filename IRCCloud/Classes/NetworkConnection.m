@@ -788,8 +788,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         } else if([object.type isEqualToString:@"global_system_message"]) {
         } else if([object.type isEqualToString:@"idle"] || [object.type isEqualToString:@"end_of_backlog"]) {
         } else if([object.type isEqualToString:@"backlog_complete"]) {
-            _accrued = 0;
-            backlog = NO;
             if(_oobQueue.count == 0) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
@@ -1182,6 +1180,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogCompleted:(NSNotification *)notification {
+    _accrued = 0;
+    backlog = NO;
     _awayOverride = nil;
     _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
@@ -1202,6 +1202,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogFailed:(NSNotification *)notification {
+    _accrued = 0;
+    backlog = NO;
     _awayOverride = nil;
     _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
