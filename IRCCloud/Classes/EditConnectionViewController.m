@@ -104,12 +104,14 @@ static NSString * const ServerHasSSLKey = @"ssl";
             NSMutableArray *networks = [[NSMutableArray alloc] initWithCapacity:[(NSArray *)dict[FetchedDataNetworksKey] count]];
             for (NSDictionary *network in dict[FetchedDataNetworksKey]) {
                 NSDictionary *server = [(NSArray *)network[NetworkServersKey] objectAtIndex:0];
-                [networks addObject:@{
-                                      @"network": network[NetworkNameKey],
-                                      @"host": server[ServerHostNameKey],
-                                      @"port": server[ServerPortKey],
-                                      @"SSL": server[ServerHasSSLKey]
-                                      }];
+                if(server) {
+                    [networks addObject:@{
+                                          @"network": network[NetworkNameKey],
+                                          @"host": server[ServerHostNameKey],
+                                          @"port": server[ServerPortKey],
+                                          @"SSL": server[ServerHasSSLKey]
+                                          }];
+                }
             }
             _networks = networks;
         }
