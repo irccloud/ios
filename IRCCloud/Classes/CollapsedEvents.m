@@ -147,9 +147,9 @@
                     c.chan = event.chan;
                     NSString *mode = [op objectForKey:@"mode"];
                     if([mode rangeOfString:@"q"].location != NSNotFound)
-                        c.mode = kCollapsedModeAdmin;
-                    else if([mode rangeOfString:@"a"].location != NSNotFound)
                         c.mode = kCollapsedModeOwner;
+                    else if([mode rangeOfString:@"a"].location != NSNotFound)
+                        c.mode = kCollapsedModeAdmin;
                     else if([mode rangeOfString:@"o"].location != NSNotFound)
                         c.mode = kCollapsedModeOp;
                     else if([mode rangeOfString:@"h"].location != NSNotFound)
@@ -176,9 +176,9 @@
                     c.chan = event.chan;
                     NSString *mode = [op objectForKey:@"mode"];
                     if([mode rangeOfString:@"q"].location != NSNotFound)
-                        c.mode = kCollapsedModeDeAdmin;
-                    else if([mode rangeOfString:@"a"].location != NSNotFound)
                         c.mode = kCollapsedModeDeOwner;
+                    else if([mode rangeOfString:@"a"].location != NSNotFound)
+                        c.mode = kCollapsedModeDeAdmin;
                     else if([mode rangeOfString:@"o"].location != NSNotFound)
                         c.mode = kCollapsedModeDeOp;
                     else if([mode rangeOfString:@"h"].location != NSNotFound)
