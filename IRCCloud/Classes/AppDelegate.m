@@ -62,6 +62,8 @@
 }
 
 - (void)launchURL:(NSURL *)url {
+    if(self.window.rootViewController.presentedViewController)
+       [self.window.rootViewController dismissModalViewControllerAnimated:NO];
     NSString *l = [url.path lowercaseString];
     if([url.scheme hasPrefix:@"irc"]) {
         [self.mainViewController launchURL:[NSURL URLWithString:[url.description stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
