@@ -382,7 +382,7 @@
         event.linkify = NO;
         event.from = @"";
         event.color = [UIColor timestampColor];
-    } else if([object.type hasPrefix:@"server_"] || [object.type isEqualToString:@"btn_metadata_set"] || [object.type isEqualToString:@"logged_in_as"]) {
+    } else if([object.type hasPrefix:@"server_"] || [object.type isEqualToString:@"btn_metadata_set"] || [object.type isEqualToString:@"logged_in_as"] || [object.type isEqualToString:@"sasl_success"]) {
         event.bgColor = [UIColor statusBackgroundColor];
         event.linkify = NO;
     } else if([object.type isEqualToString:@"inviting_to_channel"]) {
