@@ -93,9 +93,9 @@
 +(NSRegularExpression *)ircChannelRegexForServer:(Server *)s {
     NSString *pattern;
     if(s && s.isupport && [[s.isupport objectForKey:@"CHANTYPES"] isKindOfClass:[NSString class]]) {
-        pattern = [NSString stringWithFormat:@"(\\B)[%@][^<>!?\"()\\[\\],\\s]+", [s.isupport objectForKey:@"CHANTYPES"]];
+        pattern = [NSString stringWithFormat:@"(\\B)[%@][^<>!?\"()\\[\\],\\s\\u0001]+", [s.isupport objectForKey:@"CHANTYPES"]];
     } else {
-        pattern = [NSString stringWithFormat:@"(\\B)[#][^<>!?\"()\\[\\],\\s]+"];
+        pattern = [NSString stringWithFormat:@"(\\B)[#][^<>!?\"()\\[\\],\\s\\u0001]+"];
     }
     
     return [NSRegularExpression

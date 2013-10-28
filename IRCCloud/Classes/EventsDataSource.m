@@ -372,6 +372,7 @@
         event.monospace = YES;
     } else if([object.type isEqualToString:@"notice"]) {
         event.bgColor = [UIColor noticeBackgroundColor];
+        event.chan = [object objectForKey:@"target"];
         event.monospace = YES;
     } else if([object.type hasPrefix:@"hidden_host_set"]) {
         event.bgColor = [UIColor statusBackgroundColor];
