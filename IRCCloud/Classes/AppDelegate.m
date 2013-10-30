@@ -21,6 +21,47 @@
 #import "UIColor+IRCCloud.h"
 #import "config.h"
 
+//From: http://stackoverflow.com/a/19313559
+@interface NavBarHax : UINavigationBar
+
+@property (nonatomic, assign) BOOL changingUserInteraction;
+@property (nonatomic, assign) BOOL userInteractionChangedBySystem;
+
+@end
+
+@implementation NavBarHax
+
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
+    if (self.userInteractionChangedBySystem && self.userInteractionEnabled == NO) {
+        return [super hitTest:point withEvent:event];
+    }
+    
+    if ([self pointInside:point withEvent:event]) {
+        self.changingUserInteraction = YES;
+        self.userInteractionEnabled = YES;
+        self.changingUserInteraction = NO;
+    } else {
+        self.changingUserInteraction = YES;
+        self.userInteractionEnabled = NO;
+        self.changingUserInteraction = NO;
+    }
+    
+    return [super hitTest:point withEvent:event];
+}
+
+- (void)setUserInteractionEnabled:(BOOL)userInteractionEnabled
+{
+    if (!self.changingUserInteraction) {
+        self.userInteractionChangedBySystem = YES;
+    } else {
+        self.userInteractionChangedBySystem = NO;
+    }
+    
+    [super setUserInteractionEnabled:userInteractionEnabled];
+}
+
+@end
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -35,14 +76,16 @@
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPhone" bundle:nil];
         self.slideViewController = [[ECSlidingViewController alloc] init];
         self.slideViewController.view.backgroundColor = [UIColor blackColor];
-        self.slideViewController.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+        self.slideViewController.topViewController = [[UINavigationController alloc] initWithNavigationBarClass:[NavBarHax class] toolbarClass:nil];
+        [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
         self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
     } else {
         self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPad" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPad" bundle:nil];
         self.slideViewController = [[ECSlidingViewController alloc] init];
         self.slideViewController.view.backgroundColor = [UIColor blackColor];
-        self.slideViewController.topViewController = [[UINavigationController alloc] initWithRootViewController:self.mainViewController];
+        self.slideViewController.topViewController = [[UINavigationController alloc] initWithNavigationBarClass:[NavBarHax class] toolbarClass:nil];
+        [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
         self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
     }
     if(launchOptions && [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]) {
