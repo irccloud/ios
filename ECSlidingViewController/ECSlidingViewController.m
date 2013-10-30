@@ -597,13 +597,19 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   }
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
+        int sbwidth = [UIApplication sharedApplication].statusBarFrame.size.width;
+        if(sbheight > 20)
+            sbheight -= 20;
+        if(sbwidth > 2)
+            sbwidth -= 20;
         CGRect frame = self.underLeftView.frame;
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
-            frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.height;
+            frame.origin.y += sbheight;
+            frame.size.height -= sbheight;
         } else {
-            frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.width;
-            frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.width;
+            frame.origin.y += sbwidth;
+            frame.size.height -= sbwidth;
         }
         self.underLeftView.frame = frame;
     }
@@ -647,13 +653,19 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   }
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
+        int sbwidth = [UIApplication sharedApplication].statusBarFrame.size.width;
+        if(sbheight > 20)
+            sbheight -= 20;
+        if(sbwidth > 2)
+            sbwidth -= 20;
         CGRect frame = self.underRightView.frame;
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
-            frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.height;
+            frame.origin.y += sbheight;
+            frame.size.height -= sbheight;
         } else {
-            frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.width;
-            frame.size.height -= [UIApplication sharedApplication].statusBarFrame.size.width;
+            frame.origin.y += sbwidth;
+            frame.size.height -= sbwidth;
         }
         self.underRightView.frame = frame;
     }

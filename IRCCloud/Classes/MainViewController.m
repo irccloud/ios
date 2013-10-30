@@ -650,48 +650,15 @@
 
 -(void)keyboardWillShow:(NSNotification*)notification {
     NSArray *rows = [_eventsView.tableView indexPathsForVisibleRows];
-    CGSize keyboardSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue] toView:nil].size;
+    _kbSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue] toView:nil].size;
 
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationBeginsFromCurrentState:YES];
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
 
-    int height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height;
-    int width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
-#ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-        height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
-#endif
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     
-    CGRect frame = self.slidingViewController.view.frame;
-    if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
-        frame.origin.y = keyboardSize.height;
-    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
-        frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height;
-    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
-        frame.origin.x = keyboardSize.height;
-    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
-        frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width;
-    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-        frame.size.width = height - keyboardSize.height;
-        frame.size.height = width;
-    } else {
-        frame.size.width = width;
-        frame.size.height = height - keyboardSize.height;
-    }
-
-#ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        if(frame.origin.x == [UIApplication sharedApplication].statusBarFrame.size.width)
-            frame.origin.x = 0;
-        if(frame.origin.y == [UIApplication sharedApplication].statusBarFrame.size.height)
-            frame.origin.y = 0;
-    }
-#endif
-    
-    self.slidingViewController.view.frame = frame;
-    self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
     [UIView commitAnimations];
@@ -699,47 +666,13 @@
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
     NSArray *rows = [_eventsView.tableView indexPathsForVisibleRows];
+    _kbSize = CGSizeMake(0,0);
     
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationBeginsFromCurrentState:YES];
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
 
-    int height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height;
-    int width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
-#ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-        height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
-#endif
-    
-    CGRect frame = self.slidingViewController.view.frame;
-    if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
-        frame.origin.y = 0;
-    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
-        frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height;
-    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
-        frame.origin.x = 0;
-    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
-        frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width;
-    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-        frame.size.width = height;
-        frame.size.height = width;
-    } else {
-        frame.size.width = width;
-        frame.size.height = height;
-    }
-
-#ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        if(frame.origin.x == [UIApplication sharedApplication].statusBarFrame.size.width)
-            frame.origin.x = 0;
-        if(frame.origin.y == [UIApplication sharedApplication].statusBarFrame.size.height)
-            frame.origin.y = 0;
-    }
-#endif
-
-    self.slidingViewController.view.frame = frame;
-    self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self.slidingViewController updateUnderLeftLayout];
     [self.slidingViewController updateUnderRightLayout];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
@@ -1275,12 +1208,47 @@
     return YES;
 }
 
+-(void)viewWillLayoutSubviews {
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+}
+
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     if(duration > 0)
         [self.slidingViewController resetTopView];
-    int height = (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - self.navigationController.navigationBar.frame.size.height;
+
+    int height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height - _kbSize.height;
+    int width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+        height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
+#endif
+    
+    CGRect frame = self.slidingViewController.view.frame;
+    if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
+        frame.origin.y = _kbSize.height;
+    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
+        frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
+    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
+        frame.origin.x = _kbSize.height;
+    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
+        frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - 20;
+    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        frame.size.width = height;
+        frame.size.height = width;
+    } else {
+        frame.size.width = width;
+        frame.size.height = height;
+    }
+    self.slidingViewController.view.frame = frame;
+    
+    height -= self.navigationController.navigationBar.frame.size.height;
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+        height -= UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
+#endif
+
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
+        _eventsView.view.frame = CGRectMake(0,0, width, height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
         CGRect frame = _titleView.frame;
         frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:204;
@@ -1347,7 +1315,7 @@
         _eventActivity.alpha = 1;
         [_eventActivity startAnimating];
     }
-    CGRect frame = _message.frame;
+    frame = _message.frame;
     frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
     _message.frame = frame;
     _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;

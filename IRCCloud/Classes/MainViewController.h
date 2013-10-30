@@ -60,6 +60,7 @@
     IRCCloudJSONObject *_alertObject;
     SystemSoundID alertSound;
     UIView *_landscapeView;
+    CGSize _kbSize;
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;
