@@ -1227,11 +1227,11 @@
     if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
         frame.origin.y = _kbSize.height;
     else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
-        frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
+        frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
     else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
         frame.origin.x = _kbSize.height;
     else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
-        frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - 20;
+        frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
     if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
         frame.size.width = height;
         frame.size.height = width;
