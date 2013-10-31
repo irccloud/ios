@@ -522,10 +522,14 @@ int __timestampWidth;
         } else if([type isEqualToString:@"buffer_me_msg"]) {
             event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [ColorFormatter formatNick:event.nick mode:event.fromMode], event.msg];
         } else if([type isEqualToString:@"notice"]) {
+            if(event.from.length)
+                event.formattedMsg = [NSString stringWithFormat:@"%@ ", [ColorFormatter formatNick:event.from mode:event.fromMode]];
+            else
+                event.formattedMsg = @"";
             if([_buffer.type isEqualToString:@"console"] && event.toChan && event.chan.length) {
-                event.formattedMsg = [NSString stringWithFormat:@"%@ %@%c: %@", [ColorFormatter formatNick:event.from mode:event.fromMode], event.chan, 1, event.msg];
+                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%@%c: %@", event.chan, 1, event.msg];
             } else {
-                event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [ColorFormatter formatNick:event.from mode:event.fromMode], event.msg];
+                event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
             }
         } else if([type isEqualToString:@"kicked_channel"]) {
             event.formattedMsg = @"← ";
