@@ -42,9 +42,17 @@
         return NO;
     if(!_type)
         return NO;
-    if([_type isEqualToString:@"notice"] && [bufferType isEqualToString:@"console"])
-        if(_server || _toChan)
+    if([_type isEqualToString:@"notice"] || [_type isEqualToString:@"channel_invite"]) {
+        // Notices sent from the server (with no nick sender) aren't important
+        // e.g. *** Looking up your hostname...
+        if(_from.length == 0)
             return NO;
+        
+        // Notices and invites sent to a buffer shouldn't notify in the server buffer
+        if([bufferType isEqualToString:@"console"] && (_toChan || _toBuffer))
+            return NO;
+    }
+
     return ([_type isEqualToString:@"buffer_msg"]
             ||[_type isEqualToString:@"buffer_me_msg"]
             ||[_type isEqualToString:@"notice"]
@@ -145,6 +153,7 @@
     event.isHighlight = [[object objectForKey:@"highlight"] boolValue];
     event.isSelf = [[object objectForKey:@"self"] boolValue];
     event.toChan = [[object objectForKey:@"to_chan"] boolValue];
+    event.toBuffer = [[object objectForKey:@"to_buffer"] boolValue];
     event.ops = [object objectForKey:@"ops"];
     event.chan = [object objectForKey:@"chan"];
     if([object objectForKey:@"reqid"])
