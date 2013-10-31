@@ -395,6 +395,17 @@
     } else if([object.type hasPrefix:@"server_"] || [object.type isEqualToString:@"btn_metadata_set"] || [object.type isEqualToString:@"logged_in_as"] || [object.type isEqualToString:@"sasl_success"]) {
         event.bgColor = [UIColor statusBackgroundColor];
         event.linkify = NO;
+    } else if([object.type hasPrefix:@"cap_"]) {
+        event.bgColor = [UIColor statusBackgroundColor];
+        event.linkify = NO;
+        event.from = @"CAP";
+        if([event.type isEqualToString:@"cap_ls"])
+            event.msg = @"Server supports: ";
+        else if([event.type isEqualToString:@"cap_req"])
+            event.msg = @"Requesting: ";
+        else if([event.type isEqualToString:@"cap_ack"])
+            event.msg = @"Ackknowledged: ";
+        event.msg = [event.msg stringByAppendingString:[[object objectForKey:@"caps"] componentsJoinedByString:@" | "]];
     } else if([object.type isEqualToString:@"inviting_to_channel"]) {
         event.from = @"";
         event.msg = [NSString stringWithFormat:@"You invited %@ to join %@", [object objectForKey:@"recipient"], [object objectForKey:@"channel"]];
@@ -426,7 +437,7 @@
         event.monospace = YES;
     }
                   
-    if([object objectForKey:@"value"]) {
+    if([object objectForKey:@"value"] && ![event.type hasPrefix:@"cap_"]) {
         event.msg = [NSString stringWithFormat:@"%@ %@", [object objectForKey:@"value"], event.msg];
     }
 
