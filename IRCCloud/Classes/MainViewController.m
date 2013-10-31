@@ -1789,7 +1789,7 @@
         
         if([action isEqualToString:@"Copy Message"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            NSString *plaintext = [NSString stringWithFormat:@"<%@> %@",_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
+            NSString *plaintext = [NSString stringWithFormat:@"%@ <%@> %@", _selectedEvent.timestamp,_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
             [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
         } else if([action isEqualToString:@"Send a message"]) {
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];
