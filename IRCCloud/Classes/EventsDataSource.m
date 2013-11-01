@@ -392,7 +392,7 @@
         event.linkify = NO;
         event.from = @"";
         event.color = [UIColor timestampColor];
-    } else if([object.type hasPrefix:@"server_"] || [object.type isEqualToString:@"btn_metadata_set"] || [object.type isEqualToString:@"logged_in_as"] || [object.type isEqualToString:@"sasl_success"]) {
+    } else if([object.type hasPrefix:@"server_"] || [object.type isEqualToString:@"btn_metadata_set"] || [object.type isEqualToString:@"logged_in_as"] || [object.type isEqualToString:@"sasl_success"] || [object.type isEqualToString:@"you_are_operator"]) {
         event.bgColor = [UIColor statusBackgroundColor];
         event.linkify = NO;
     } else if([object.type hasPrefix:@"cap_"]) {
@@ -404,7 +404,7 @@
         else if([event.type isEqualToString:@"cap_req"])
             event.msg = @"Requesting: ";
         else if([event.type isEqualToString:@"cap_ack"])
-            event.msg = @"Ackknowledged: ";
+            event.msg = @"Acknowledged: ";
         event.msg = [event.msg stringByAppendingString:[[object objectForKey:@"caps"] componentsJoinedByString:@" | "]];
     } else if([object.type isEqualToString:@"inviting_to_channel"]) {
         event.from = @"";
