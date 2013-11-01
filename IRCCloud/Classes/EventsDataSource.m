@@ -191,7 +191,7 @@
     } else if([object.type isEqualToString:@"buffer_me_msg"]) {
         event.nick = event.from;
         event.from = @"";
-    } else if([object.type isEqualToString:@"too_fast"]) {
+    } else if([object.type isEqualToString:@"too_fast"] || [object.type isEqualToString:@"sasl_fail"] || [object.type isEqualToString:@"sasl_too_long"] || [object.type isEqualToString:@"sasl_aborted"] || [object.type isEqualToString:@"sasl_already"]) {
         event.from = @"";
         event.bgColor = [UIColor errorBackgroundColor];
     } else if([object.type isEqualToString:@"no_bots"]) {
