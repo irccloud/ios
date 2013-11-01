@@ -1094,7 +1094,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         } else if([object objectForKey:@"success"]) {
             [self postObject:object forEvent:kIRCEventSuccess];
         }
-        TFLog(@"Repsonse: %@", object);
+        TFLog(@"Response: %@", object);
     }
     if(!backlog && _reconnectTimestamp != 0)
         [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
