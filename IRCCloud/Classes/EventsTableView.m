@@ -561,7 +561,7 @@ int __timestampWidth;
         if(!_scrolledUp) {
             [self scrollToBottom];
             [self _scrollToBottom];
-        } else if(!event.isSelf) {
+        } else if(!event.isSelf && [event isImportant:_buffer.type]) {
             _newMsgs++;
             if(event.isHighlight)
                 _newHighlights++;
@@ -1017,7 +1017,7 @@ int __timestampWidth;
         _requestingBacklog = NO;
         if(_scrolledUpFrom > 0) {
             for(Event *e in _data) {
-                if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && e.eid > _scrolledUpFrom && !e.isSelf && e.rowType != ROW_LASTSEENEID) {
+                if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && e.eid > _scrolledUpFrom && !e.isSelf && e.rowType != ROW_LASTSEENEID && [e isImportant:_buffer.type]) {
                     _newMsgs++;
                     if(e.isHighlight)
                         _newHighlights++;
