@@ -153,6 +153,7 @@
      
 -(void)setMaximumNumberOfLines:(int)n
 {
+    NSRange saveSelection     = internalTextView.selectedRange;
     NSString *saveText        = internalTextView.text;
     NSString *newText         = @"-";
     BOOL oldScrollEnabled     = internalTextView.scrollEnabled;
@@ -172,6 +173,7 @@
     internalTextView.scrollEnabled = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?oldScrollEnabled:YES;
     internalTextView.text     = saveText;
     internalTextView.hidden   = NO;
+    internalTextView.selectedRange = saveSelection;
     internalTextView.delegate = self;
     forceSizeUpdate = YES;
     [self textViewDidChange:self.internalTextView];
@@ -179,6 +181,7 @@
 
 -(void)setMinimumNumberOfLines:(int)m
 {
+    NSRange saveSelection     = internalTextView.selectedRange;
     NSString *saveText        = internalTextView.text;
     NSString *newText         = @"-";
     BOOL oldScrollEnabled     = internalTextView.scrollEnabled;
@@ -197,6 +200,7 @@
     internalTextView.scrollEnabled = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?oldScrollEnabled:YES;
     internalTextView.text     = saveText;
     internalTextView.hidden   = NO;
+    internalTextView.selectedRange = saveSelection;
     internalTextView.delegate = self;
     [self sizeToFit];
     minimumNumberOfLines = m;
@@ -283,8 +287,6 @@
     {
 		[delegate expandingTextViewDidChange:self];
 	}
-
-	
 }
 
 -(void)growDidStop

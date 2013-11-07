@@ -1319,7 +1319,8 @@
     frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
     _message.frame = frame;
     _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;
-    _message.text = _message.text;
+    if(duration > 0)
+        _message.text = _message.text;
     frame = _eventsView.view.frame;
     frame.size.height = 32;
     _eventsView.topUnreadView.frame = frame;
