@@ -1216,7 +1216,7 @@
     if(duration > 0)
         [self.slidingViewController resetTopView];
 
-    int height = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height - _kbSize.height;
+    int height = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - _kbSize.height;
     int width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
@@ -1269,7 +1269,7 @@
             [self addChildViewController:_buffersView];
             [self addChildViewController:_usersView];
             _buffersView.view.frame = CGRectMake(0,0,220,height);
-            _eventsView.view.frame = CGRectMake(220,0,(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width) - 440,height - _bottomBar.frame.size.height);
+            _eventsView.view.frame = CGRectMake(220,0,width - 440,height - _bottomBar.frame.size.height);
             _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,0,220,height);
             _bottomBar.frame = CGRectMake(220,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             _borders.frame = CGRectMake(219,0,_eventsView.view.frame.size.width + 2,height);
