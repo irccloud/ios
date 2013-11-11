@@ -127,6 +127,7 @@
         case kIRCEventFailureMsg:
             o = notification.object;
             if([[o objectForKey:@"message"] isEqualToString:@"auth"]) {
+                [_conn disconnect];
                 [_conn performSelectorOnMainThread:@selector(logout) withObject:nil waitUntilDone:YES];
                 [activity stopAnimating];
                 loginView.alpha = 1;
@@ -148,13 +149,18 @@
                 error.frame = frame;
                 [_conn disconnect];
                 _conn.idleInterval = 30;
-                [_conn scheduleIdleTimer];
+                [self updateConnecting:nil];
+                [_conn performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
             } else {
                 error.text = [o objectForKey:@"message"];
                 error.hidden = NO;
                 CGRect frame = error.frame;
                 frame.size.height = [error.text sizeWithFont:error.font constrainedToSize:CGSizeMake(frame.size.width,INT_MAX) lineBreakMode:error.lineBreakMode].height;
                 error.frame = frame;
+                [_conn disconnect];
+                [_conn fail];
+                [self updateConnecting:nil];
+                [_conn performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
             }
             break;
         default:

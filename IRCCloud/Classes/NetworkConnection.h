@@ -176,4 +176,5 @@ typedef enum {
 -(NSDictionary *)registerAPNs:(NSData *)token;
 -(NSDictionary *)unregisterAPNs:(NSData *)token;
 -(void)logout;
+-(void)fail;
 @end

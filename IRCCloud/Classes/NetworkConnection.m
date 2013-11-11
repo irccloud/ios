@@ -600,7 +600,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
--(void)_fail {
+-(void)fail {
     _failCount++;
     if(_failCount < 4)
         _idleInterval = _failCount;
@@ -619,7 +619,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
         if([self reachable] == kIRCCloudReachable && _reconnectTimestamp != 0) {
-            [self _fail];
+            [self fail];
         } else {
             [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
         }
@@ -639,7 +639,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
         if([self reachable] && _reconnectTimestamp != 0) {
-            [self _fail];
+            [self fail];
         }
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }
@@ -705,7 +705,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if([object.type isEqualToString:@"header"]) {
             _idleInterval = ([[object objectForKey:@"idle_interval"] doubleValue] / 1000.0) + 10;
             _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
-            _failCount = 0;
             _streamId = [object objectForKey:@"streamid"];
             _accrued = [[object objectForKey:@"accrued"] intValue];
             _currentCount = 0;
@@ -1180,6 +1179,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogCompleted:(NSNotification *)notification {
+    _failCount = 0;
     _accrued = 0;
     backlog = NO;
     _awayOverride = nil;
@@ -1212,7 +1212,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         TFLog(@"Initial backlog download failed");
         [self disconnect];
         _state = kIRCCloudStateDisconnected;
-        [self _fail];
+        [self fail];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     } else {
         TFLog(@"Backlog download failed, rescheduling timed out buffers");
