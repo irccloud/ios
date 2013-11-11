@@ -454,7 +454,7 @@
             break;
         case kIRCEventFailureMsg:
             o = notification.object;
-            if([o objectForKey:@"_reqid"]) {
+            if([o objectForKey:@"_reqid"] && [[o objectForKey:@"_reqid"] intValue] > 0) {
                 int reqid = [[o objectForKey:@"_reqid"] intValue];
                 for(Event *e in _pendingEvents) {
                     if(e.reqId == reqid) {
@@ -478,6 +478,11 @@
                     [[NSUserDefaults standardUserDefaults] setObject:[o objectForKey:@"cookie"] forKey:@"session"];
                     [[NSUserDefaults standardUserDefaults] synchronize];
                     [[NetworkConnection sharedInstance] connect];
+                } else {
+                    [[NetworkConnection sharedInstance] disconnect];
+                    [[NetworkConnection sharedInstance] fail];
+                    [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
+                    [self connectivityChanged:nil];
                 }
             }
             break;
