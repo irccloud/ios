@@ -9,6 +9,7 @@
 "NA_MSG"  = "Reply";
 "N_MSGCH" = "‹%@› %@ (%@)";
 "N_MSG"   = "‹%@› %@ (%@)";
+"N_SMSG"  = "%@ (%@)";
 "N_MECH"  = "— %@ %@ (%@)";
 "N_ME"    = "— %@ %@ (%@)";
 "N_CHI"   = "%@ invited you to join %@";
