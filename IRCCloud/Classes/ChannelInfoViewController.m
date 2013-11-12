@@ -182,6 +182,21 @@
 
 #pragma mark - Table view data source
 
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
+        label.text = [self tableView:tableView titleForHeaderInSection:section];
+        label.font = [UIFont systemFontOfSize:14];
+        label.textColor = [UIColor grayColor];
+        label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+        [header addSubview:label];
+        return header;
+    } else {
+        return nil;
+    }
+}
+
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if([_channel.mode isKindOfClass:[NSString class]] && _channel.mode.length)
         return 2;
@@ -231,14 +246,26 @@
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    switch(section) {
-        case 0:
-            return @"Topic";
-        case 1:
-            if(_modeHints.count)
-                return [NSString stringWithFormat:@"Mode: +%@", _channel.mode];
-            else
-                return @"Mode";
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        switch(section) {
+            case 0:
+                return @"TOPIC";
+            case 1:
+                if(_modeHints.count)
+                    return [NSString stringWithFormat:@"MODE: +%@", _channel.mode];
+                else
+                    return @"MODE";
+        }
+    } else {
+        switch(section) {
+            case 0:
+                return @"Topic";
+            case 1:
+                if(_modeHints.count)
+                    return [NSString stringWithFormat:@"Mode: +%@", _channel.mode];
+                else
+                    return @"Mode";
+        }
     }
     return nil;
 }
