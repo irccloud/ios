@@ -655,9 +655,8 @@
 
 -(void)keyboardWillShow:(NSNotification*)notification {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillChangeFrameNotification object:nil];
     NSArray *rows = [_eventsView.tableView indexPathsForVisibleRows];
-    CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue] toView:nil].size;
+    CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     if(size.height != _kbSize.height) {
         _kbSize = size;
 
@@ -672,12 +671,13 @@
         [_buffersView scrollViewDidScroll:_buffersView.tableView];
         [UIView commitAnimations];
     }
+    [self performSelector:@selector(_observeKeyboard) withObject:nil afterDelay:0.01];
+}
+
+-(void)_observeKeyboard {
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
                                                  name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillShow:)
-                                                 name:UIKeyboardWillChangeFrameNotification object:nil];
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
@@ -761,10 +761,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
                                                  name:UIKeyboardWillShowNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillShow:)
-                                                 name:UIKeyboardWillChangeFrameNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillBeHidden:)
