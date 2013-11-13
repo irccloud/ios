@@ -190,7 +190,9 @@
     UIImage *img = nil;
     NSData *data = _imageData;
     if(data) {
-        if([[[_url description] lowercaseString] hasSuffix:@"gif"])
+        char GIF[3];
+        [data getBytes:&GIF length:3];
+        if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F')
             img = [UIImage animatedImageWithAnimatedGIFData:data];
         else
             img = [UIImage imageWithData:data];
