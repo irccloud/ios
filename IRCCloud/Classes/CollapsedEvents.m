@@ -59,6 +59,8 @@
     } else {
         return NO;
     }
+    if([self modeCount] == 0)
+        return [self addMode:mode];
     return YES;
 }
 -(BOOL)removeMode:(NSString *)mode {
@@ -90,6 +92,8 @@
     } else {
         return NO;
     }
+    if([self modeCount] == 0)
+        return [self removeMode:mode];
     return YES;
 }
 -(void)_copyModes:(BOOL *)to {
@@ -111,7 +115,7 @@
         @"demoted from admin",
         @"de-opped",
         @"de-halfopped",
-        @"devoiced"
+        @"de-voiced"
     };
     static NSString *mode_modes[] = {
         @"+q",
