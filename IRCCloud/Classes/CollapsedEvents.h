@@ -29,33 +29,39 @@ typedef enum {
 } kCollapsedEvent;
 
 typedef enum {
-    kCollapsedModeOwner = 1,
-    kCollapsedModeDeOwner,
+    kCollapsedModeOwner,
     kCollapsedModeAdmin,
-    kCollapsedModeDeAdmin,
     kCollapsedModeOp,
-    kCollapsedModeDeOp,
     kCollapsedModeHalfOp,
-    kCollapsedModeDeHalfOp,
     kCollapsedModeVoice,
+    
+    kCollapsedModeDeOwner,
+    kCollapsedModeDeAdmin,
+    kCollapsedModeDeOp,
+    kCollapsedModeDeHalfOp,
     kCollapsedModeDeVoice,
 } kCollapsedMode;
 
 @interface CollapsedEvent : NSObject {
     kCollapsedEvent _type;
-    kCollapsedMode _mode;
+    BOOL _modes[10];
     NSString *_nick;
     NSString *_oldNick;
     NSString *_hostname;
     NSString *_msg;
     NSString *_fromMode;
+    NSString *_fromNick;
     NSString *_targetMode;
     NSString *_chan;
 }
 @property kCollapsedEvent type;
-@property kCollapsedMode mode;
-@property NSString *nick, *oldNick, *hostname, *msg, *fromMode, *targetMode, *chan;
+@property NSString *nick, *oldNick, *hostname, *msg, *fromMode, *fromNick, *targetMode, *chan;
 -(NSComparisonResult)compare:(CollapsedEvent *)aEvent;
+-(BOOL)addMode:(NSString *)mode;
+-(BOOL)removeMode:(NSString *)mode;
+-(NSString *)modes:(BOOL)showSymbol;
+-(void)copyModes:(CollapsedEvent *)from;
+-(int)modeCount;
 @end
 
 @interface CollapsedEvents : NSObject {

@@ -28,7 +28,135 @@
         return NSOrderedDescending;
 }
 -(NSString *)description {
-    return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, mode: %i, msg: %@}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, _mode, _msg];
+    return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, modes: %@, msg: %@}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, [self modes:YES], _msg];
+}
+-(BOOL)addMode:(NSString *)mode {
+    if([mode rangeOfString:@"q"].location != NSNotFound) {
+        if(_modes[kCollapsedModeDeOwner])
+            _modes[kCollapsedModeDeOwner] = false;
+        else
+            _modes[kCollapsedModeOwner] = true;
+    } else if([mode rangeOfString:@"a"].location != NSNotFound) {
+        if(_modes[kCollapsedModeDeAdmin])
+            _modes[kCollapsedModeDeAdmin] = false;
+        else
+            _modes[kCollapsedModeAdmin] = true;
+    } else if([mode rangeOfString:@"o"].location != NSNotFound) {
+        if(_modes[kCollapsedModeDeOp])
+            _modes[kCollapsedModeDeOp] = false;
+        else
+            _modes[kCollapsedModeOp] = true;
+    } else if([mode rangeOfString:@"h"].location != NSNotFound) {
+        if(_modes[kCollapsedModeDeHalfOp])
+            _modes[kCollapsedModeDeHalfOp] = false;
+        else
+            _modes[kCollapsedModeHalfOp] = true;
+    } else if([mode rangeOfString:@"v"].location != NSNotFound) {
+        if(_modes[kCollapsedModeDeVoice])
+            _modes[kCollapsedModeDeVoice] = false;
+        else
+            _modes[kCollapsedModeVoice] = true;
+    } else {
+        return NO;
+    }
+    return YES;
+}
+-(BOOL)removeMode:(NSString *)mode {
+    if([mode rangeOfString:@"q"].location != NSNotFound) {
+        if(_modes[kCollapsedModeOwner])
+            _modes[kCollapsedModeOwner] = false;
+        else
+            _modes[kCollapsedModeDeOwner] = true;
+    } else if([mode rangeOfString:@"a"].location != NSNotFound) {
+        if(_modes[kCollapsedModeAdmin])
+            _modes[kCollapsedModeAdmin] = false;
+        else
+            _modes[kCollapsedModeDeAdmin] = true;
+    } else if([mode rangeOfString:@"o"].location != NSNotFound) {
+        if(_modes[kCollapsedModeOp])
+            _modes[kCollapsedModeOp] = false;
+        else
+            _modes[kCollapsedModeDeOp] = true;
+    } else if([mode rangeOfString:@"h"].location != NSNotFound) {
+        if(_modes[kCollapsedModeHalfOp])
+            _modes[kCollapsedModeHalfOp] = false;
+        else
+            _modes[kCollapsedModeDeHalfOp] = true;
+    } else if([mode rangeOfString:@"v"].location != NSNotFound) {
+        if(_modes[kCollapsedModeVoice])
+            _modes[kCollapsedModeVoice] = false;
+        else
+            _modes[kCollapsedModeDeVoice] = true;
+    } else {
+        return NO;
+    }
+    return YES;
+}
+-(void)_copyModes:(BOOL *)to {
+    for(int i = 0; i < sizeof(_modes); i++) {
+        to[i] = _modes[i];
+    }
+}
+-(void)copyModes:(CollapsedEvent *)from {
+    [from _copyModes:_modes];
+}
+-(NSString *)modes:(BOOL)showSymbol {
+    static NSString *mode_msgs[] = {
+        @"promoted to owner",
+        @"promoted to admin",
+        @"opped",
+        @"halfopped",
+        @"voiced",
+        @"demoted from owner",
+        @"demoted from admin",
+        @"de-opped",
+        @"de-halfopped",
+        @"devoiced"
+    };
+    static NSString *mode_modes[] = {
+        @"+q",
+        @"+a",
+        @"+o",
+        @"+h",
+        @"+v",
+        @"-q",
+        @"-a",
+        @"-o",
+        @"-h",
+        @"-v"
+    };
+    static NSString *mode_colors[] = {
+        @"E7AA00",
+        @"6500A5",
+        @"BA1719",
+        @"B55900",
+        @"25B100"
+    };
+    NSString *output = nil;
+    
+    if([self modeCount]) {
+        output = @"";
+        for(int i = 0; i < sizeof(_modes); i++) {
+            if(_modes[i]) {
+                if(output.length)
+                    output = [output stringByAppendingString:@", "];
+                output = [output stringByAppendingString:mode_msgs[i]];
+                if(showSymbol) {
+                    output = [output stringByAppendingFormat:@" (%c%@%@%c)", COLOR_RGB, mode_colors[i%5], mode_modes[i], CLEAR];
+                }
+            }
+        }
+    }
+    
+    return output;
+}
+-(int)modeCount {
+    int count = 0;
+    for(int i = 0; i < sizeof(_modes); i++) {
+        if(_modes[i])
+            count++;
+    }
+    return count;
 }
 @end
 
@@ -87,8 +215,7 @@
                 } else {
                     e.type = kCollapsedEventPopIn;
                 }
-                if(event.mode > 0)
-                    e.mode = event.mode;
+                [event copyModes:e];
             } else {
                 [_data addObject:event];
             }
@@ -130,62 +257,41 @@
     @synchronized(_data) {
         CollapsedEvent *c;
         if([event.type hasSuffix:@"user_channel_mode"]) {
+            c = [self findEvent:event.nick chan:event.chan];
+            if(!c) {
+                c = [[CollapsedEvent alloc] init];
+                c.type = kCollapsedEventMode;
+            }
             if(event.ops) {
                 for(NSDictionary *op in [event.ops objectForKey:@"add"]) {
-                    c = [[CollapsedEvent alloc] init];
-                    c.type = kCollapsedEventMode;
                     c.nick = [op objectForKey:@"param"];
                     if(event.from.length) {
-                        c.oldNick = event.from;
+                        c.fromNick = event.from;
                         c.fromMode = event.fromMode;
                     } else if(event.server.length) {
-                        c.oldNick = event.server;
+                        c.fromNick = event.server;
                         c.fromMode = @"__the_server__";
                     }
                     c.hostname = event.hostmask;
                     c.targetMode = event.targetMode;
                     c.chan = event.chan;
-                    NSString *mode = [op objectForKey:@"mode"];
-                    if([mode rangeOfString:@"q"].location != NSNotFound)
-                        c.mode = kCollapsedModeOwner;
-                    else if([mode rangeOfString:@"a"].location != NSNotFound)
-                        c.mode = kCollapsedModeAdmin;
-                    else if([mode rangeOfString:@"o"].location != NSNotFound)
-                        c.mode = kCollapsedModeOp;
-                    else if([mode rangeOfString:@"h"].location != NSNotFound)
-                        c.mode = kCollapsedModeHalfOp;
-                    else if([mode rangeOfString:@"v"].location != NSNotFound)
-                        c.mode = kCollapsedModeVoice;
-                    else
+                    if(![c addMode:[op objectForKey:@"mode"]])
                         return NO;
                     [self addCollapsedEvent:c];
                 }
                 for(NSDictionary *op in [event.ops objectForKey:@"remove"]) {
-                    c = [[CollapsedEvent alloc] init];
-                    c.type = kCollapsedEventMode;
                     c.nick = [op objectForKey:@"param"];
                     if(event.from.length) {
-                        c.oldNick = event.from;
+                        c.fromNick = event.from;
                         c.fromMode = event.fromMode;
                     } else if(event.server.length) {
-                        c.oldNick = event.server;
+                        c.fromNick = event.server;
                         c.fromMode = @"__the_server__";
                     }
                     c.hostname = event.hostmask;
                     c.targetMode = event.targetMode;
                     c.chan = event.chan;
-                    NSString *mode = [op objectForKey:@"mode"];
-                    if([mode rangeOfString:@"q"].location != NSNotFound)
-                        c.mode = kCollapsedModeDeOwner;
-                    else if([mode rangeOfString:@"a"].location != NSNotFound)
-                        c.mode = kCollapsedModeDeAdmin;
-                    else if([mode rangeOfString:@"o"].location != NSNotFound)
-                        c.mode = kCollapsedModeDeOp;
-                    else if([mode rangeOfString:@"h"].location != NSNotFound)
-                        c.mode = kCollapsedModeDeHalfOp;
-                    else if([mode rangeOfString:@"v"].location != NSNotFound)
-                        c.mode = kCollapsedModeDeVoice;
-                    else
+                    if(![c removeMode:[op objectForKey:@"mode"]])
                         return NO;
                     [self addCollapsedEvent:c];
                 }
@@ -217,44 +323,14 @@
 }
 -(NSString *)was:(CollapsedEvent *)e {
     NSString *output = @"";
+    NSString *modes = [e modes:NO];
     
     if(e.oldNick && e.type != kCollapsedEventMode)
         output = [NSString stringWithFormat:@"was %@", e.oldNick];
-    if(e.mode > 0) {
+    if(modes.length) {
         if(output.length > 0)
             output = [output stringByAppendingString:@"; "];
-        switch(e.mode) {
-            case kCollapsedModeOwner:
-                output = [output stringByAppendingString:@"promoted to owner"];
-                break;
-            case kCollapsedModeDeOwner:
-                output = [output stringByAppendingString:@"demoted from owner"];
-                break;
-            case kCollapsedModeAdmin:
-                output = [output stringByAppendingString:@"promoted to admin"];
-                break;
-            case kCollapsedModeDeAdmin:
-                output = [output stringByAppendingString:@"demoted from admin"];
-                break;
-            case kCollapsedModeOp:
-                output = [output stringByAppendingString:@"opped"];
-                break;
-            case kCollapsedModeDeOp:
-                output = [output stringByAppendingString:@"de-opped"];
-                break;
-            case kCollapsedModeHalfOp:
-                output = [output stringByAppendingString:@"halfopped"];
-                break;
-            case kCollapsedModeDeHalfOp:
-                output = [output stringByAppendingString:@"de-halfopped"];
-                break;
-            case kCollapsedModeVoice:
-                output = [output stringByAppendingString:@"voiced"];
-                break;
-            case kCollapsedModeDeVoice:
-                output = [output stringByAppendingString:@"devoiced"];
-                break;
-        }
+        output = [output stringByAppendingString:modes];
     }
     
     if(output.length)
@@ -269,48 +345,16 @@
         if(_data.count == 0)
             return nil;
         
-        if(_data.count == 1) {
+        if(_data.count == 1 && [[_data objectAtIndex:0] modeCount] < 2) {
             CollapsedEvent *e = [_data objectAtIndex:0];
             switch(e.type) {
                 case kCollapsedEventMode:
-                    output = [NSString stringWithFormat:@"%@ was ", [ColorFormatter formatNick:e.nick mode:e.targetMode]];
-                    switch(e.mode) {
-                        case kCollapsedModeOwner:
-                            output = [output stringByAppendingFormat:@"promoted to owner (%cE7AA00+q%c)", COLOR_RGB, CLEAR];
-                            break;
-                        case kCollapsedModeDeOwner:
-                            output = [output stringByAppendingFormat:@"demoted from owner (%cE7AA00-q%c)", COLOR_RGB, CLEAR];
-                            break;
-                        case kCollapsedModeAdmin:
-                            output = [output stringByAppendingFormat:@"promoted to admin (%c6500A5+a%c)", COLOR_RGB, CLEAR];
-                            break;
-                        case kCollapsedModeDeAdmin:
-                            output = [output stringByAppendingFormat:@"demoted from admin (%c6500A5-a%c)", COLOR_RGB, CLEAR];
-                            break;
-                        case kCollapsedModeOp:
-                            output = [output stringByAppendingFormat:@"opped (%cBA1719+o%c)", COLOR_RGB, CLEAR];
-                            break;
-                        case kCollapsedModeDeOp:
-                            output = [output stringByAppendingFormat:@"de-opped (%cBA1719-o%c)", COLOR_RGB, CLEAR];
-                            break;
-                        case kCollapsedModeHalfOp:
-                            output = [output stringByAppendingFormat:@"halfopped (%cB55900+h%c)", COLOR_RGB, CLEAR];
-                            break;
-                        case kCollapsedModeDeHalfOp:
-                            output = [output stringByAppendingFormat:@"de-halfopped (%cB55900-h%c)", COLOR_RGB, CLEAR];
-                            break;
-                        case kCollapsedModeVoice:
-                            output = [output stringByAppendingFormat:@"voiced (%c25B100+v%c)", COLOR_RGB, CLEAR];
-                            break;
-                        case kCollapsedModeDeVoice:
-                            output = [output stringByAppendingFormat:@"devoiced (%c25B100-v%c)", COLOR_RGB, CLEAR];
-                            break;
-                    }
-                    if(e.oldNick) {
+                    output = [NSString stringWithFormat:@"%@ was %@", [ColorFormatter formatNick:e.nick mode:e.targetMode], [e modes:YES]];
+                    if(e.fromNick) {
                         if([e.fromMode isEqualToString:@"__the_server__"])
-                            output = [output stringByAppendingFormat:@" by the server %c%@%c", BOLD, e.oldNick, CLEAR];
+                            output = [output stringByAppendingFormat:@" by the server %c%@%c", BOLD, e.fromNick, CLEAR];
                         else
-                            output = [output stringByAppendingFormat:@" by %@", [ColorFormatter formatNick:e.oldNick mode:e.fromMode]];
+                            output = [output stringByAppendingFormat:@" by %@", [ColorFormatter formatNick:e.fromNick mode:e.fromMode]];
                     }
                     break;
                 case kCollapsedEventJoin:
