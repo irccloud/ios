@@ -20,12 +20,16 @@
 
 @implementation CollapsedEvent
 -(NSComparisonResult)compare:(CollapsedEvent *)aEvent {
-    if(_type == aEvent.type)
-        return [_nick compare:aEvent.nick];
-    else if(_type < aEvent.type)
+    if(_type == aEvent.type) {
+        if(_type == kCollapsedEventNetSplit)
+            return [_msg compare:aEvent.msg];
+        else
+            return [_nick compare:aEvent.nick];
+    } else if(_type < aEvent.type) {
         return NSOrderedAscending;
-    else
+    } else {
         return NSOrderedDescending;
+    }
 }
 -(NSString *)description {
     return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, modes: %@, msg: %@, netsplit: %i}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, [self modes:YES], _msg, _netsplit];
