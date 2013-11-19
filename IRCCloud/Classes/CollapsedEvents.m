@@ -28,7 +28,7 @@
         return NSOrderedDescending;
 }
 -(NSString *)description {
-    return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, modes: %@, msg: %@}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, [self modes:YES], _msg];
+    return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, modes: %@, msg: %@, netsplit: %i}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, [self modes:YES], _msg, _netsplit];
 }
 -(BOOL)addMode:(NSString *)mode {
     if([mode rangeOfString:@"q"].location != NSNotFound) {
@@ -175,6 +175,7 @@
 -(void)clear {
     @synchronized(_data) {
         [_data removeAllObjects];
+        _netsplit = NO;
     }
 }
 -(CollapsedEvent *)findEvent:(NSString *)nick chan:(NSString *)chan {
@@ -314,6 +315,10 @@
             } else if([event.type hasSuffix:@"quit"]) {
                 c.type = kCollapsedEventQuit;
                 c.msg = event.msg;
+                if([event.msg isEqualToString:@"*.net *.split"]) {
+                    c.netsplit = YES;
+                    _netsplit = YES;
+                }
             } else if([event.type hasSuffix:@"nickchange"]) {
                 c.type = kCollapsedEventNickChange;
                 c.oldNick = event.oldNick;
@@ -405,10 +410,15 @@
             int groupcount = 0;
             NSMutableString *message = [[NSMutableString alloc] init];
             
+            if(_netsplit)
+                [message appendString:@"*.net ↮ *.split "];
+            
             while(next) {
                 e = next;
                 
-                next = [i nextObject];
+                do {
+                    next = [i nextObject];
+                } while(next.netsplit);
                 
                 if(message.length > 0 && e.type < kCollapsedEventNickChange && ((next == nil || next.type != e.type) && last != nil && last.type == e.type)) {
 					if(groupcount == 1) {

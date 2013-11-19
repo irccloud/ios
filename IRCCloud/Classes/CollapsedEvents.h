@@ -45,6 +45,7 @@ typedef enum {
 @interface CollapsedEvent : NSObject {
     kCollapsedEvent _type;
     BOOL _modes[10];
+    BOOL _netsplit;
     NSString *_nick;
     NSString *_oldNick;
     NSString *_hostname;
@@ -56,6 +57,7 @@ typedef enum {
 }
 @property kCollapsedEvent type;
 @property NSString *nick, *oldNick, *hostname, *msg, *fromMode, *fromNick, *targetMode, *chan;
+@property BOOL netsplit;
 -(NSComparisonResult)compare:(CollapsedEvent *)aEvent;
 -(BOOL)addMode:(NSString *)mode;
 -(BOOL)removeMode:(NSString *)mode;
@@ -66,6 +68,7 @@ typedef enum {
 
 @interface CollapsedEvents : NSObject {
     NSMutableArray *_data;
+    BOOL _netsplit;
 }
 -(void)clear;
 -(BOOL)addEvent:(Event *)event;
