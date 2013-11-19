@@ -175,7 +175,6 @@
 -(void)clear {
     @synchronized(_data) {
         [_data removeAllObjects];
-        _netsplit = NO;
     }
 }
 -(CollapsedEvent *)findEvent:(NSString *)nick chan:(NSString *)chan {
@@ -315,9 +314,22 @@
             } else if([event.type hasSuffix:@"quit"]) {
                 c.type = kCollapsedEventQuit;
                 c.msg = event.msg;
-                if([event.msg isEqualToString:@"*.net *.split"]) {
-                    c.netsplit = YES;
-                    _netsplit = YES;
+                if([[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^(?:[^\\s:\\/.]+\\.)+[a-z]{2,} (?:[^\\s:\\/.]+\\.)+[a-z]{2,}$"] evaluateWithObject:event.msg]) {
+                    NSArray *parts = [event.msg componentsSeparatedByString:@" "];
+                    if(parts.count > 1 && ![[parts objectAtIndex:0] isEqualToString:[parts objectAtIndex:1]]) {
+                        c.netsplit = YES;
+                        BOOL match = NO;
+                        for(CollapsedEvent *event in _data) {
+                            if(event.type == kCollapsedEventNetSplit && [event.msg isEqualToString:event.msg])
+                                match = YES;
+                        }
+                        if(!match) {
+                            CollapsedEvent *e = [[CollapsedEvent alloc] init];
+                            e.type = kCollapsedEventNetSplit;
+                            e.msg = event.msg;
+                            [_data addObject:e];
+                        }
+                    }
                 }
             } else if([event.type hasSuffix:@"nickchange"]) {
                 c.type = kCollapsedEventNickChange;
@@ -357,6 +369,9 @@
         if(_data.count == 1 && [[_data objectAtIndex:0] modeCount] < 2) {
             CollapsedEvent *e = [_data objectAtIndex:0];
             switch(e.type) {
+                case kCollapsedEventNetSplit:
+                    output = [e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "];
+                    break;
                 case kCollapsedEventMode:
                     output = [NSString stringWithFormat:@"%@ was %@", [ColorFormatter formatNick:e.nick mode:e.targetMode], [e modes:YES]];
                     if(e.fromNick) {
@@ -410,9 +425,6 @@
             int groupcount = 0;
             NSMutableString *message = [[NSMutableString alloc] init];
             
-            if(_netsplit)
-                [message appendString:@"*.net ↮ *.split "];
-            
             while(next) {
                 e = next;
                 
@@ -430,6 +442,8 @@
                 
                 if(last == nil || last.type != e.type) {
                     switch(e.type) {
+                        case kCollapsedEventNetSplit:
+                            break;
                         case kCollapsedEventMode:
                             if(message.length)
                                 [message appendString:@"• "];
@@ -461,6 +475,8 @@
                     e.oldNick = nil;
                     [message appendString:[self was:e]];
                     e.oldNick = oldNick;
+                } else if(e.type == kCollapsedEventNetSplit) {
+                    [message appendString:[e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "]];
                 } else if(!showChan) {
                     [message appendString:[ColorFormatter formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode]];
                     [message appendString:[self was:e]];
@@ -486,7 +502,7 @@
                         default:
                             break;
                     }
-                } else if(showChan) {
+                } else if(showChan && e.type != kCollapsedEventNetSplit) {
                     if(groupcount == 0) {
                         [message appendString:[ColorFormatter formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode]];
                         [message appendString:[self was:e]];

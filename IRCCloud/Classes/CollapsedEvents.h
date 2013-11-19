@@ -19,13 +19,14 @@
 #import "EventsDataSource.h"
 
 typedef enum {
+    kCollapsedEventNetSplit,
     kCollapsedEventJoin,
     kCollapsedEventPart,
     kCollapsedEventQuit,
     kCollapsedEventMode,
     kCollapsedEventPopIn,
     kCollapsedEventPopOut,
-    kCollapsedEventNickChange,
+    kCollapsedEventNickChange
 } kCollapsedEvent;
 
 typedef enum {
@@ -68,7 +69,6 @@ typedef enum {
 
 @interface CollapsedEvents : NSObject {
     NSMutableArray *_data;
-    BOOL _netsplit;
 }
 -(void)clear;
 -(BOOL)addEvent:(Event *)event;
