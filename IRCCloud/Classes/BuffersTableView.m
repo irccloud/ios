@@ -483,6 +483,7 @@
 - (void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     IRCCloudJSONObject *o = notification.object;
+    Event *e = notification.object;
     switch(event) {
         case kIRCEventUserInfo:
         case kIRCEventChannelTopic:
@@ -517,9 +518,124 @@
         case kIRCEventPart:
         case kIRCEventKick:
         case kIRCEventQuit:
-            if(![o.type hasPrefix:@"you_"])
-                break;
+            if([o.type hasPrefix:@"you_"])
+                [self performSelectorInBackground:@selector(refresh) withObject:nil];
+            break;
+        case kIRCEventHeartbeatEcho:
+            @synchronized(_data) {
+                NSDictionary *seenEids = [o objectForKey:@"seenEids"];
+                for(NSNumber *cid in seenEids.allKeys) {
+                    NSDictionary *eids = [seenEids objectForKey:cid];
+                    for(NSNumber *bid in eids.allKeys) {
+                        Buffer *b = [_buffers getBuffer:[bid intValue]];
+                        for(int i = 0; i < _data.count; i++) {
+                            NSDictionary *d = [_data objectAtIndex:i];
+                            if(b.bid == [[d objectForKey:@"bid"] intValue]) {
+                                NSMutableDictionary *m = [d mutableCopy];
+                                int unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                                int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                                [m setObject:@(unread) forKey:@"unread"];
+                                [m setObject:@(highlights) forKey:@"highlights"];
+                                [_data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
+                                if(unread) {
+                                    if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
+                                        _firstUnreadPosition = i;
+                                    if(_lastUnreadPosition == -1 || _lastUnreadPosition < i)
+                                        _lastUnreadPosition = i;
+                                } else {
+                                    if(_firstUnreadPosition == i) {
+                                        _firstUnreadPosition = -1;
+                                        for(int j = i; j < _data.count; j++) {
+                                            if([[[_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
+                                                _firstUnreadPosition = j;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if(_lastUnreadPosition == i) {
+                                        _lastUnreadPosition = -1;
+                                        for(int j = i; j >= 0; j--) {
+                                            if([[[_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
+                                                _lastUnreadPosition = j;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                if(highlights) {
+                                    if(_firstHighlightPosition == -1 || _firstHighlightPosition > i)
+                                        _firstHighlightPosition = i;
+                                    if(_lastHighlightPosition == -1 || _lastHighlightPosition < i)
+                                        _lastHighlightPosition = i;
+                                } else {
+                                    if(_firstHighlightPosition == i) {
+                                        _firstHighlightPosition = -1;
+                                        for(int j = i; j < _data.count; j++) {
+                                            if([[[_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
+                                                _firstHighlightPosition = j;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if(_lastHighlightPosition == i) {
+                                        _lastHighlightPosition = -1;
+                                        for(int j = i; j >= 0; j--) {
+                                            if([[[_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
+                                                _lastHighlightPosition = j;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                    [self.tableView reloadData];
+                                    [self _updateUnreadIndicators];
+                                }];
+                            }
+                        }
+                    }
+                }
+            }
+            break;
+        case kIRCEventBufferMsg:
+            if(e) {
+                @synchronized(_data) {
+                    for(int i = 0; i < _data.count; i++) {
+                        NSDictionary *d = [_data objectAtIndex:i];
+                        if(e.bid == [[d objectForKey:@"bid"] intValue]) {
+                            Buffer *b = [_buffers getBuffer:e.bid];
+                            if([e isImportant:b.type]) {
+                                NSMutableDictionary *m = [d mutableCopy];
+                                int unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                                int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                                [m setObject:@(unread) forKey:@"unread"];
+                                [m setObject:@(highlights) forKey:@"highlights"];
+                                [_data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
+                                if(unread) {
+                                    if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
+                                        _firstUnreadPosition = i;
+                                    if(_lastUnreadPosition == -1 || _lastUnreadPosition < i)
+                                        _lastUnreadPosition = i;
+                                }
+                                if(highlights) {
+                                    if(_firstHighlightPosition == -1 || _firstHighlightPosition > i)
+                                        _firstHighlightPosition = i;
+                                    if(_lastHighlightPosition == -1 || _lastHighlightPosition < i)
+                                        _lastHighlightPosition = i;
+                                }
+                                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                    [self.tableView reloadData];
+                                    [self _updateUnreadIndicators];
+                                }];
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+            break;
         default:
+            NSLog(@"Slow event: %i", event);
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
             break;
     }
