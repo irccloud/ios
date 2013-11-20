@@ -481,6 +481,7 @@
 }
 
 - (void)handleEvent:(NSNotification *)notification {
+    NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     IRCCloudJSONObject *o = notification.object;
     Event *e = notification.object;
@@ -536,6 +537,15 @@
                                 int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
                                 [m setObject:@(unread) forKey:@"unread"];
                                 [m setObject:@(highlights) forKey:@"highlights"];
+                                if([b.type isEqualToString:@"channel"]) {
+                                    if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                        unread = 0;
+                                } else {
+                                    if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                        unread = 0;
+                                    if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                        highlights = 0;
+                                }
                                 [_data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
                                 if(unread) {
                                     if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
@@ -608,6 +618,15 @@
                                 NSMutableDictionary *m = [d mutableCopy];
                                 int unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
                                 int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                                if([b.type isEqualToString:@"channel"]) {
+                                    if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                        unread = 0;
+                                } else {
+                                    if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                        unread = 0;
+                                    if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                        highlights = 0;
+                                }
                                 [m setObject:@(unread) forKey:@"unread"];
                                 [m setObject:@(highlights) forKey:@"highlights"];
                                 [_data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
