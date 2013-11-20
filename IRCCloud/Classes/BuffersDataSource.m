@@ -36,8 +36,20 @@
         return NSOrderedAscending;
     else if(joinedLeft < joinedRight)
         return NSOrderedDescending;
-    else
-        return [[_name lowercaseString] compare:[aBuffer.name lowercaseString]];
+    else {
+        if(_chantypes == nil) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
+            if(s) {
+                _chantypes = [s.isupport objectForKey:@"CHANTYPES"];
+                if(_chantypes == nil || _chantypes.length == 0)
+                    _chantypes = @"#";
+            }
+        }
+        NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
+        NSString *nameLeft = [r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""];
+        NSString *nameRight = [r stringByReplacingMatchesInString:[aBuffer.name lowercaseString] options:0 range:NSMakeRange(0, aBuffer.name.length) withTemplate:@""];
+        return [nameLeft compare:nameRight];
+    }
 }
 -(NSString *)description {
     return [NSString stringWithFormat:@"{cid: %i, bid: %i, name: %@, type: %@}", _cid, _bid, _name, _type];
