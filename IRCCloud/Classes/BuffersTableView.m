@@ -498,8 +498,6 @@
                 NSMutableDictionary *m = [d mutableCopy];
                 int unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
                 int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
-                [m setObject:@(unread) forKey:@"unread"];
-                [m setObject:@(highlights) forKey:@"highlights"];
                 if([b.type isEqualToString:@"channel"]) {
                     if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
                         unread = 0;
@@ -509,6 +507,8 @@
                     if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
                         highlights = 0;
                 }
+                [m setObject:@(unread) forKey:@"unread"];
+                [m setObject:@(highlights) forKey:@"highlights"];
                 [_data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
                 if(unread) {
                     if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
