@@ -315,7 +315,11 @@
     } else if([object.type isEqualToString:@"channel_mode"]) {
         event.nick = event.from;
         event.from = @"";
-        event.msg = [NSString stringWithFormat:@"Channel mode set to: %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
+        if(event.server.length)
+            event.msg = [NSString stringWithFormat:@"Channel mode set to: %c%@%c by the server %c%@%c", BOLD, [object objectForKey:@"diff"], CLEAR, BOLD, event.server, CLEAR];
+        else
+            event.msg = [NSString stringWithFormat:@"Channel mode set to: %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
+        event.linkify = NO;
         event.bgColor = [UIColor statusBackgroundColor];
     } else if([object.type isEqualToString:@"channel_mode_is"]) {
         event.from = @"";
