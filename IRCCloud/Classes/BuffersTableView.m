@@ -178,6 +178,7 @@
 }
 
 - (void)refresh {
+    NSLog(@"*** Rebuild buffers table");
     @synchronized(self) {
         NSMutableArray *data = [[NSMutableArray alloc] init];
         int archiveCount = 0;
@@ -477,11 +478,98 @@
     self.view.backgroundColor = [UIColor backgroundBlueColor];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
+}
+
+- (void)backlogCompleted:(NSNotification *)notification {
+    if(notification.object == nil || [notification.object bid] < 1) {
+        [self performSelectorInBackground:@selector(refresh) withObject:nil];
+    } else {
+        [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[_buffers getBuffer:[notification.object bid]]];
+    }
+}
+
+- (void)refreshBuffer:(Buffer *)b {
+    @synchronized(_data) {
+        NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+        for(int i = 0; i < _data.count; i++) {
+            NSDictionary *d = [_data objectAtIndex:i];
+            if(b.bid == [[d objectForKey:@"bid"] intValue]) {
+                NSMutableDictionary *m = [d mutableCopy];
+                int unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                [m setObject:@(unread) forKey:@"unread"];
+                [m setObject:@(highlights) forKey:@"highlights"];
+                if([b.type isEqualToString:@"channel"]) {
+                    if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                        unread = 0;
+                } else {
+                    if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                        unread = 0;
+                    if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                        highlights = 0;
+                }
+                [_data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
+                if(unread) {
+                    if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
+                        _firstUnreadPosition = i;
+                    if(_lastUnreadPosition == -1 || _lastUnreadPosition < i)
+                        _lastUnreadPosition = i;
+                } else {
+                    if(_firstUnreadPosition == i) {
+                        _firstUnreadPosition = -1;
+                        for(int j = i; j < _data.count; j++) {
+                            if([[[_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
+                                _firstUnreadPosition = j;
+                                break;
+                            }
+                        }
+                    }
+                    if(_lastUnreadPosition == i) {
+                        _lastUnreadPosition = -1;
+                        for(int j = i; j >= 0; j--) {
+                            if([[[_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
+                                _lastUnreadPosition = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if(highlights) {
+                    if(_firstHighlightPosition == -1 || _firstHighlightPosition > i)
+                        _firstHighlightPosition = i;
+                    if(_lastHighlightPosition == -1 || _lastHighlightPosition < i)
+                        _lastHighlightPosition = i;
+                } else {
+                    if(_firstHighlightPosition == i) {
+                        _firstHighlightPosition = -1;
+                        for(int j = i; j < _data.count; j++) {
+                            if([[[_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
+                                _firstHighlightPosition = j;
+                                break;
+                            }
+                        }
+                    }
+                    if(_lastHighlightPosition == i) {
+                        _lastHighlightPosition = -1;
+                        for(int j = i; j >= 0; j--) {
+                            if([[[_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
+                                _lastHighlightPosition = j;
+                                break;
+                            }
+                        }
+                    }
+                }
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.tableView reloadData];
+                    [self _updateUnreadIndicators];
+                }];
+            }
+        }
+    }
 }
 
 - (void)handleEvent:(NSNotification *)notification {
-    NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     IRCCloudJSONObject *o = notification.object;
     Event *e = notification.object;
@@ -528,128 +616,16 @@
                 for(NSNumber *cid in seenEids.allKeys) {
                     NSDictionary *eids = [seenEids objectForKey:cid];
                     for(NSNumber *bid in eids.allKeys) {
-                        Buffer *b = [_buffers getBuffer:[bid intValue]];
-                        for(int i = 0; i < _data.count; i++) {
-                            NSDictionary *d = [_data objectAtIndex:i];
-                            if(b.bid == [[d objectForKey:@"bid"] intValue]) {
-                                NSMutableDictionary *m = [d mutableCopy];
-                                int unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
-                                int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
-                                [m setObject:@(unread) forKey:@"unread"];
-                                [m setObject:@(highlights) forKey:@"highlights"];
-                                if([b.type isEqualToString:@"channel"]) {
-                                    if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
-                                        unread = 0;
-                                } else {
-                                    if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
-                                        unread = 0;
-                                    if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
-                                        highlights = 0;
-                                }
-                                [_data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
-                                if(unread) {
-                                    if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
-                                        _firstUnreadPosition = i;
-                                    if(_lastUnreadPosition == -1 || _lastUnreadPosition < i)
-                                        _lastUnreadPosition = i;
-                                } else {
-                                    if(_firstUnreadPosition == i) {
-                                        _firstUnreadPosition = -1;
-                                        for(int j = i; j < _data.count; j++) {
-                                            if([[[_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
-                                                _firstUnreadPosition = j;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if(_lastUnreadPosition == i) {
-                                        _lastUnreadPosition = -1;
-                                        for(int j = i; j >= 0; j--) {
-                                            if([[[_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
-                                                _lastUnreadPosition = j;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                if(highlights) {
-                                    if(_firstHighlightPosition == -1 || _firstHighlightPosition > i)
-                                        _firstHighlightPosition = i;
-                                    if(_lastHighlightPosition == -1 || _lastHighlightPosition < i)
-                                        _lastHighlightPosition = i;
-                                } else {
-                                    if(_firstHighlightPosition == i) {
-                                        _firstHighlightPosition = -1;
-                                        for(int j = i; j < _data.count; j++) {
-                                            if([[[_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
-                                                _firstHighlightPosition = j;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if(_lastHighlightPosition == i) {
-                                        _lastHighlightPosition = -1;
-                                        for(int j = i; j >= 0; j--) {
-                                            if([[[_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
-                                                _lastHighlightPosition = j;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
-                                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                    [self.tableView reloadData];
-                                    [self _updateUnreadIndicators];
-                                }];
-                            }
-                        }
+                        [self refreshBuffer:[_buffers getBuffer:[bid intValue]]];
                     }
                 }
             }
             break;
         case kIRCEventBufferMsg:
             if(e) {
-                @synchronized(_data) {
-                    for(int i = 0; i < _data.count; i++) {
-                        NSDictionary *d = [_data objectAtIndex:i];
-                        if(e.bid == [[d objectForKey:@"bid"] intValue]) {
-                            Buffer *b = [_buffers getBuffer:e.bid];
-                            if([e isImportant:b.type]) {
-                                NSMutableDictionary *m = [d mutableCopy];
-                                int unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
-                                int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
-                                if([b.type isEqualToString:@"channel"]) {
-                                    if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
-                                        unread = 0;
-                                } else {
-                                    if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
-                                        unread = 0;
-                                    if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
-                                        highlights = 0;
-                                }
-                                [m setObject:@(unread) forKey:@"unread"];
-                                [m setObject:@(highlights) forKey:@"highlights"];
-                                [_data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
-                                if(unread) {
-                                    if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
-                                        _firstUnreadPosition = i;
-                                    if(_lastUnreadPosition == -1 || _lastUnreadPosition < i)
-                                        _lastUnreadPosition = i;
-                                }
-                                if(highlights) {
-                                    if(_firstHighlightPosition == -1 || _firstHighlightPosition > i)
-                                        _firstHighlightPosition = i;
-                                    if(_lastHighlightPosition == -1 || _lastHighlightPosition < i)
-                                        _lastHighlightPosition = i;
-                                }
-                                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                    [self.tableView reloadData];
-                                    [self _updateUnreadIndicators];
-                                }];
-                            }
-                            break;
-                        }
-                    }
+                Buffer *b = [_buffers getBuffer:e.bid];
+                if([e isImportant:b.type]) {
+                    [self refreshBuffer:b];
                 }
             }
             break;
@@ -877,6 +853,7 @@
             [_expandedArchives removeObjectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
         else
             [_expandedArchives setObject:@YES forKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
+        [self performSelectorInBackground:@selector(refresh) withObject:nil];
     } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
         UIButton *b = [[UIButton alloc] init];
         b.tag = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
@@ -894,16 +871,35 @@
         if(_delegate)
             [_delegate bufferSelected:[[[_data objectAtIndex:_selectedRow] objectForKey:@"bid"] intValue]];
     }
-    [self performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
 -(void)setBuffer:(Buffer *)buffer {
     if(_selectedBuffer.bid != buffer.bid)
         _selectedRow = -1;
     _selectedBuffer = buffer;
-    if(_selectedBuffer.archived && ![_selectedBuffer.type isEqualToString:@"console"])
-        [_expandedArchives setObject:@YES forKey:@(_selectedBuffer.cid)];
-    [self performSelectorInBackground:@selector(refresh) withObject:nil];
+    if(_selectedBuffer.archived && ![_selectedBuffer.type isEqualToString:@"console"]) {
+        if(![_expandedArchives objectForKey:@(_selectedBuffer.cid)]) {
+            [_expandedArchives setObject:@YES forKey:@(_selectedBuffer.cid)];
+            [self performSelectorInBackground:@selector(refresh) withObject:nil];
+            return;
+        }
+    }
+    @synchronized(_data) {
+        if(_data.count) {
+            for(int i = 0; i < _data.count; i++) {
+                if([[[_data objectAtIndex:i] objectForKey:@"bid"] intValue] == _selectedBuffer.bid) {
+                    _selectedRow = i;
+                    break;
+                }
+            }
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self.tableView reloadData];
+                [self _updateUnreadIndicators];
+            }];
+        } else {
+            [self performSelectorInBackground:@selector(refresh) withObject:nil];
+        }
+    }
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
