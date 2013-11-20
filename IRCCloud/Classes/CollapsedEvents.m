@@ -21,10 +21,10 @@
 @implementation CollapsedEvent
 -(NSComparisonResult)compare:(CollapsedEvent *)aEvent {
     if(_type == aEvent.type) {
-        if(_type == kCollapsedEventNetSplit)
-            return [_msg compare:aEvent.msg];
+        if(_eid < aEvent.eid)
+            return NSOrderedAscending;
         else
-            return [_nick compare:aEvent.nick];
+            return NSOrderedDescending;
     } else if(_type < aEvent.type) {
         return NSOrderedAscending;
     } else {
@@ -223,6 +223,7 @@
                 } else {
                     e.type = kCollapsedEventPopIn;
                 }
+                e.eid = event.eid;
                 [event copyModes:e];
             } else {
                 [_data addObject:event];
@@ -234,16 +235,19 @@
                         if([[e1.oldNick lowercaseString] isEqualToString:[event.nick lowercaseString]]) {
                             [_data removeObject:e1];
                         } else {
+                            e1.eid = event.eid;
                             e1.nick = event.nick;
                         }
                         return;
                     }
                     if((e1.type == kCollapsedEventJoin || e1.type == kCollapsedEventPopOut) && [[e1.nick lowercaseString] isEqualToString:[event.oldNick lowercaseString]]) {
+                        e1.eid = event.eid;
                         e1.oldNick = event.oldNick;
                         e1.nick = event.nick;
                         return;
                     }
                     if((e1.type == kCollapsedEventQuit || e1.type == kCollapsedEventPart) && [[e1.nick lowercaseString] isEqualToString:[event.oldNick lowercaseString]]) {
+                        e1.eid = event.eid;
                         e1.type = kCollapsedEventPopOut;
                         for(CollapsedEvent *e2 in _data) {
                             if(e2.type == kCollapsedEventJoin && [[e2.nick lowercaseString] isEqualToString:[event.oldNick lowercaseString]]) {
@@ -269,6 +273,7 @@
             if(!c) {
                 c = [[CollapsedEvent alloc] init];
                 c.type = kCollapsedEventMode;
+                c.eid = event.eid;
             }
             if(event.ops) {
                 for(NSDictionary *op in [event.ops objectForKey:@"add"]) {
@@ -306,6 +311,7 @@
             }
         } else {
             c = [[CollapsedEvent alloc] init];
+            c.eid = event.eid;
             c.nick = event.nick;
             c.hostname = event.hostmask;
             c.fromMode = event.fromMode;
