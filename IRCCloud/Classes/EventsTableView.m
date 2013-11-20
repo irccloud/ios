@@ -877,6 +877,7 @@ int __timestampWidth;
     [_unseenHighlightPositions removeAllObjects];
     
     if(!_buffer) {
+        [_lock unlock];
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             self.tableView.tableHeaderView = nil;
             [self.tableView reloadData];
@@ -967,7 +968,10 @@ int __timestampWidth;
             _lastSeenEidPos = -1;
         }
     }
-    
+
+    _ready = YES;
+    [_lock unlock];
+
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if(_lastSeenEidPos == 0) {
             _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 92);
@@ -1035,8 +1039,6 @@ int __timestampWidth;
     
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
-    _ready = YES;
-    [_lock unlock];
 }
 
 - (void)didReceiveMemoryWarning {
