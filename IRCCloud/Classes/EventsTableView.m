@@ -240,7 +240,7 @@ int __timestampWidth;
                 }
             }
             NSLog(@"Rebuilding the message table");
-            [self performSelectorInBackground:@selector(refresh) withObject:nil];
+            [self refresh];
         }];
     }
 }
@@ -886,7 +886,7 @@ int __timestampWidth;
     }
 
     if(_conn.state == kIRCCloudStateConnected)
-        [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES]; //This may take a while
+        [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
 
     __timestampWidth = [@"88:88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
     if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
@@ -1038,7 +1038,7 @@ int __timestampWidth;
     }];
     
     if(_conn.state == kIRCCloudStateConnected)
-        [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
+        [[NetworkConnection sharedInstance] scheduleIdleTimer];
 }
 
 - (void)didReceiveMemoryWarning {
