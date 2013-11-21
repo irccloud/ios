@@ -878,10 +878,8 @@ int __timestampWidth;
     
     if(!_buffer) {
         [_lock unlock];
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            self.tableView.tableHeaderView = nil;
-            [self.tableView reloadData];
-        }];
+        self.tableView.tableHeaderView = nil;
+        [self.tableView reloadData];
         return;
     }
 
@@ -969,73 +967,71 @@ int __timestampWidth;
         }
     }
 
+    if(_lastSeenEidPos == 0) {
+        _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 92);
+    } else {
+        _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
+    }
+    self.tableView.tableHeaderView = self.tableView.tableHeaderView;
+    
+    [self.tableView reloadData];
+    if(_requestingBacklog && backlogEid > 0 && _scrolledUp) {
+        int markerPos = -1;
+        for(Event *e in _data) {
+            if(e.eid == backlogEid)
+                break;
+            markerPos++;
+        }
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    } else if(_eidToOpen > 0) {
+        if(_eidToOpen <= _maxEid) {
+            int i = 0;
+            for(Event *e in _data) {
+                if(e.eid == _eidToOpen) {
+                    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                    _scrolledUpFrom = [[_data objectAtIndex:[[[self.tableView indexPathsForVisibleRows] lastObject] row]] eid];
+                    break;
+                }
+                i++;
+            }
+            _eidToOpen = -1;
+        } else {
+            if(!_scrolledUp)
+                _scrolledUpFrom = -1;
+        }
+    } else if(!_scrolledUp || (_data.count && _scrollTimer)) {
+        [self _scrollToBottom];
+        [self scrollToBottom];
+    }
+    
+    if(_data.count) {
+        int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
+        if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
+            if(!_scrolledUp) {
+                [UIView beginAnimations:nil context:nil];
+                [UIView setAnimationDuration:0.1];
+                _topUnreadView.alpha = 1;
+                [UIView commitAnimations];
+            }
+            [self updateTopUnread:firstRow];
+        }
+        _requestingBacklog = NO;
+        if(_scrolledUpFrom > 0) {
+            for(Event *e in _data) {
+                if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && e.eid > _scrolledUpFrom && !e.isSelf && e.rowType != ROW_LASTSEENEID && [e isImportant:_buffer.type]) {
+                    _newMsgs++;
+                    if(e.isHighlight)
+                        _newHighlights++;
+                }
+            }
+        }
+    }
+    
+    [self updateUnread];
+    [self scrollViewDidScroll:self.tableView];
+    
     _ready = YES;
     [_lock unlock];
-
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if(_lastSeenEidPos == 0) {
-            _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 92);
-        } else {
-            _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
-        }
-        self.tableView.tableHeaderView = self.tableView.tableHeaderView;
-        
-        [self.tableView reloadData];
-        if(_requestingBacklog && backlogEid > 0 && _scrolledUp) {
-            int markerPos = -1;
-            for(Event *e in _data) {
-                if(e.eid == backlogEid)
-                    break;
-                markerPos++;
-            }
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-        } else if(_eidToOpen > 0) {
-            if(_eidToOpen <= _maxEid) {
-                int i = 0;
-                for(Event *e in _data) {
-                    if(e.eid == _eidToOpen) {
-                        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-                        _scrolledUpFrom = [[_data objectAtIndex:[[[self.tableView indexPathsForVisibleRows] lastObject] row]] eid];
-                        break;
-                    }
-                    i++;
-                }
-                _eidToOpen = -1;
-            } else {
-                if(!_scrolledUp)
-                    _scrolledUpFrom = -1;
-            }
-        } else if(!_scrolledUp || (_data.count && _scrollTimer)) {
-            [self _scrollToBottom];
-            [self scrollToBottom];
-        }
-        
-        if(_data.count) {
-            int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
-            if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
-                if(!_scrolledUp) {
-                    [UIView beginAnimations:nil context:nil];
-                    [UIView setAnimationDuration:0.1];
-                    _topUnreadView.alpha = 1;
-                    [UIView commitAnimations];
-                }
-                [self updateTopUnread:firstRow];
-            }
-            _requestingBacklog = NO;
-            if(_scrolledUpFrom > 0) {
-                for(Event *e in _data) {
-                    if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && e.eid > _scrolledUpFrom && !e.isSelf && e.rowType != ROW_LASTSEENEID && [e isImportant:_buffer.type]) {
-                        _newMsgs++;
-                        if(e.isHighlight)
-                            _newHighlights++;
-                    }
-                }
-            }
-        }
-        
-        [self updateUnread];
-        [self scrollViewDidScroll:self.tableView];
-    }];
     
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
