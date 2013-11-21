@@ -75,4 +75,5 @@ typedef enum {
 -(void)clear;
 -(BOOL)addEvent:(Event *)event;
 -(NSString *)collapse:(BOOL)showChan;
+-(int)count;
 @end

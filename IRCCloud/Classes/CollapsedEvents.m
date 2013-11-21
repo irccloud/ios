@@ -369,7 +369,7 @@
     if(modes.length) {
         if(output.length > 0)
             output = [output stringByAppendingString:@"; "];
-        output = [output stringByAppendingString:modes];
+        output = [output stringByAppendingFormat:@"%c1%@%c", COLOR_MIRC, modes, CLEAR];
     }
     
     if(output.length)
@@ -465,7 +465,7 @@
                         case kCollapsedEventMode:
                             if(message.length)
                                 [message appendString:@"• "];
-                            [message appendString:@"mode: "];
+                            [message appendFormat:@"%c1mode:%c ", COLOR_MIRC, CLEAR];
                             break;
                         case kCollapsedEventJoin:
                             [message appendString:@"→ "];
@@ -563,5 +563,8 @@
         
         return output;
     }
+}
+-(int)count {
+    return _data.count;
 }
 @end

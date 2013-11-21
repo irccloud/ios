@@ -432,19 +432,19 @@ int __timestampWidth;
             _lastCollpasedDay = [_formatter stringFromDate:date];
         }
         
-        if([type isEqualToString:@"user_channel_mode"]) {
-            event.color = [UIColor blackColor];
-            event.bgColor = [UIColor statusBackgroundColor];
-        } else {
-            event.color = [UIColor timestampColor];
-            event.bgColor = [UIColor whiteColor];
-        }
-        
         if(!showChan)
             event.chan = _buffer.name;
         
         if(![_collapsedEvents addEvent:event]) {
             [_collapsedEvents clear];
+        }
+
+        if((_currentCollapsedEid == event.eid || [_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) && [event.type isEqualToString:@"user_channel_mode"]) {
+            event.color = [UIColor blackColor];
+            event.bgColor = [UIColor whiteColor];
+        } else {
+            event.color = [UIColor timestampColor];
+            event.bgColor = [UIColor whiteColor];
         }
         
         NSString *msg;
