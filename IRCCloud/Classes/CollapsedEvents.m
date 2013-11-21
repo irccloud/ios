@@ -277,36 +277,44 @@
             }
             if(event.ops) {
                 for(NSDictionary *op in [event.ops objectForKey:@"add"]) {
-                    c.nick = [op objectForKey:@"param"];
-                    if(event.from.length) {
-                        c.fromNick = event.from;
-                        c.fromMode = event.fromMode;
-                    } else if(event.server.length) {
-                        c.fromNick = event.server;
-                        c.fromMode = @"__the_server__";
-                    }
-                    c.hostname = event.hostmask;
-                    c.targetMode = event.targetMode;
-                    c.chan = event.chan;
                     if(![c addMode:[op objectForKey:@"mode"]])
                         return NO;
-                    [self addCollapsedEvent:c];
+                    if(c.type == kCollapsedEventMode) {
+                        c.nick = [op objectForKey:@"param"];
+                        if(event.from.length) {
+                            c.fromNick = event.from;
+                            c.fromMode = event.fromMode;
+                        } else if(event.server.length) {
+                            c.fromNick = event.server;
+                            c.fromMode = @"__the_server__";
+                        }
+                        c.hostname = event.hostmask;
+                        c.targetMode = event.targetMode;
+                        c.chan = event.chan;
+                        [self addCollapsedEvent:c];
+                    } else {
+                        c.fromMode = event.targetMode;
+                    }
                 }
                 for(NSDictionary *op in [event.ops objectForKey:@"remove"]) {
-                    c.nick = [op objectForKey:@"param"];
-                    if(event.from.length) {
-                        c.fromNick = event.from;
-                        c.fromMode = event.fromMode;
-                    } else if(event.server.length) {
-                        c.fromNick = event.server;
-                        c.fromMode = @"__the_server__";
-                    }
-                    c.hostname = event.hostmask;
-                    c.targetMode = event.targetMode;
-                    c.chan = event.chan;
                     if(![c removeMode:[op objectForKey:@"mode"]])
                         return NO;
-                    [self addCollapsedEvent:c];
+                    if(c.type == kCollapsedEventMode) {
+                        c.nick = [op objectForKey:@"param"];
+                        if(event.from.length) {
+                            c.fromNick = event.from;
+                            c.fromMode = event.fromMode;
+                        } else if(event.server.length) {
+                            c.fromNick = event.server;
+                            c.fromMode = @"__the_server__";
+                        }
+                        c.hostname = event.hostmask;
+                        c.targetMode = event.targetMode;
+                        c.chan = event.chan;
+                        [self addCollapsedEvent:c];
+                    } else {
+                        c.fromMode = event.targetMode;
+                    }
                 }
             }
         } else {
