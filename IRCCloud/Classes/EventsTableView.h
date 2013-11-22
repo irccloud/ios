@@ -61,6 +61,9 @@
     UIInterfaceOrientation _lastOrientation;
     
     IBOutlet id<EventsTableViewDelegate> _delegate;
+    
+    NSDictionary *_linkAttributes;
+    NSDictionary *_lightLinkAttributes;
 }
 @property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;

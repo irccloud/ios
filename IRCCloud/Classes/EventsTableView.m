@@ -145,6 +145,24 @@ int __timestampWidth;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    float lineSpacing = 6;
+    CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
+    CTParagraphStyleSetting paragraphStyles[2] = {
+        {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
+		{.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
+	};
+    CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
+    
+    NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
+    [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+    [mutableLinkAttributes setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCTUnderlineStyleAttributeName];
+	[mutableLinkAttributes setObject:(__bridge id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
+    _linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+    
+    [mutableLinkAttributes setObject:(id)[[UIColor lightLinkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+    _lightLinkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+    
     self.tableView.scrollsToTop = NO;
     UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
@@ -1120,15 +1138,24 @@ int __timestampWidth;
         cell.accessory.hidden = YES;
     }
     if(e.links.count) {
-        for(NSTextCheckingResult *result in e.links) {
-            if(result.resultType == NSTextCheckingTypeLink) {
-                [cell.message addLinkWithTextCheckingResult:result];
-            } else {
-                NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
-                if(![url hasPrefix:@"irc"])
-                    url = [NSString stringWithFormat:@"irc%@://%@:%i/%@", (_server.ssl==1)?@"s":@"", _server.hostname, _server.port, url];
-                [cell.message addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
+        if(e.pending || [e.color isEqual:[UIColor timestampColor]])
+            cell.message.linkAttributes = _lightLinkAttributes;
+        else
+            cell.message.linkAttributes = _linkAttributes;
+        @try {
+            for(NSTextCheckingResult *result in e.links) {
+                if(result.resultType == NSTextCheckingTypeLink) {
+                    [cell.message addLinkWithTextCheckingResult:result];
+                } else {
+                    NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
+                    if(![url hasPrefix:@"irc"])
+                        url = [NSString stringWithFormat:@"irc%@://%@:%i/%@", (_server.ssl==1)?@"s":@"", _server.hostname, _server.port, url];
+                    [cell.message addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
+                }
             }
+        }
+        @catch (NSException *exception) {
+            NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
         }
     }
     if(e.rowType == ROW_LASTSEENEID)

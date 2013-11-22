@@ -58,4 +58,5 @@
 +(UIColor *)collapsedRowBackgroundColor;
 +(UIColor *)collapsedHeadingBackgroundColor;
 +(UIColor *)navBarColor;
++(UIColor *)lightLinkColor;
 @end

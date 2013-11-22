@@ -235,4 +235,7 @@ UIImage *__newMsgsBackgroundImage;
 +(UIColor *)navBarColor {
     return [UIColor colorWithRed:242.0/255.0 green:247.0/255.0 blue:252.0/255.0 alpha:1];
 }
++(UIColor *)lightLinkColor {
+    return [UIColor colorWithRed:0.612 green:0.78 blue:1 alpha:1];
+}
 @end
