@@ -224,6 +224,7 @@
                     e.type = kCollapsedEventPopIn;
                 }
                 e.eid = event.eid;
+                e.netsplit = event.netsplit;
                 [event copyModes:e];
             } else {
                 [_data addObject:event];
@@ -341,7 +342,7 @@
                             if(event.type == kCollapsedEventNetSplit && [event.msg isEqualToString:event.msg])
                                 match = YES;
                         }
-                        if(!match) {
+                        if(!match && _data.count > 0) {
                             CollapsedEvent *e = [[CollapsedEvent alloc] init];
                             e.type = kCollapsedEventNetSplit;
                             e.msg = event.msg;
@@ -435,6 +436,7 @@
                     break;
             }
         } else {
+            BOOL isNetsplit = NO;
             [_data sortUsingSelector:@selector(compare:)];
             NSEnumerator *i = [_data objectEnumerator];
             CollapsedEvent *last = nil;
@@ -448,7 +450,7 @@
                 
                 do {
                     next = [i nextObject];
-                } while(next.netsplit);
+                } while(isNetsplit && next.netsplit);
                 
                 if(message.length > 0 && e.type < kCollapsedEventNickChange && ((next == nil || next.type != e.type) && last != nil && last.type == e.type)) {
 					if(groupcount == 1) {
@@ -461,6 +463,8 @@
                 if(last == nil || last.type != e.type) {
                     switch(e.type) {
                         case kCollapsedEventNetSplit:
+                            isNetsplit = YES;
+                            NSLog(@"Netsplit");
                             break;
                         case kCollapsedEventMode:
                             if(message.length)
