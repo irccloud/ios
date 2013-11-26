@@ -212,6 +212,11 @@
                         e.fromMode = event.fromMode;
                     if(event.targetMode)
                         e.targetMode = event.targetMode;
+                } else if(e.type == kCollapsedEventNickChange) {
+                    e.type = event.type;
+                    e.msg = event.msg;
+                    e.fromMode = event.fromMode;
+                    e.fromNick = event.fromNick;
                 } else if(event.type == kCollapsedEventMode) {
                     e.fromMode = event.targetMode;
                 } else if(event.type == e.type) {
