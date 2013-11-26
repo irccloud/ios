@@ -396,6 +396,10 @@
         event.linkify = NO;
         event.from = @"";
         event.color = [UIColor timestampColor];
+    } else if([object.type hasPrefix:@"helptlr"]) {
+        event.from = @"";
+        event.bgColor = [UIColor statusBackgroundColor];
+        event.monospace = YES;
     } else if([object.type hasPrefix:@"server_"] || [object.type isEqualToString:@"btn_metadata_set"] || [object.type isEqualToString:@"logged_in_as"] || [object.type isEqualToString:@"sasl_success"] || [object.type isEqualToString:@"you_are_operator"]) {
         event.bgColor = [UIColor statusBackgroundColor];
         event.linkify = NO;
