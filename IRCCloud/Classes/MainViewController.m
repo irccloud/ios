@@ -81,6 +81,7 @@
     [button addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [button sizeToFit];
     button.frame = CGRectMake(12,12,button.frame.size.width, button.frame.size.height);
+    button.accessibilityLabel = @"Menu";
     [_bottomBar addSubview:button];
 
     _sendBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -127,6 +128,7 @@
 #else
     _menuBtn.frame = CGRectMake(0,0,32,32);
 #endif
+    _menuBtn.accessibilityLabel = @"Channels list";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
     
     [_swipeTip removeFromSuperview];
@@ -156,6 +158,7 @@
 #else
     users.frame = CGRectMake(0,0,40,40);
 #endif
+    users.accessibilityLabel = @"Channel members list";
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
@@ -213,12 +216,18 @@
             }
         }
         
-        if(highlightCount)
+        if(highlightCount) {
             [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
-        else if(unreadCount)
+            _menuBtn.accessibilityValue = [NSString stringWithFormat:@"%i highlight%@", highlightCount, (highlightCount==1)?@"":@"s"];
+        } else if(unreadCount) {
+            if(![_menuBtn.imageView.image isEqual:[UIImage imageNamed:@"menu_unread"]])
+                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
             [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
-        else
+            _menuBtn.accessibilityValue = [NSString stringWithFormat:@"%i unread message%@", unreadCount, (highlightCount==1)?@"":@"s"];
+        } else {
             [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
+            _menuBtn.accessibilityValue = nil;
+        }
     }
 }
 
@@ -510,11 +519,17 @@
                         }
                     }
                 }
+                if(e.from.length) {
+                    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"Message recieved from %@: %@", e.from, e.msg]);
+                }
             } else {
                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
                 if(b && e.isHighlight && [e isImportant:b.type]) {
                     AudioServicesPlaySystemSound(alertSound);
                     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+                    if(e.from.length) {
+                        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"New highlight from %@: %@", e.from, e.msg]);
+                    }
                 }
             }
             break;
@@ -560,6 +575,7 @@
             _connectingProgress.progress = 0;
             _connectingProgress.hidden = YES;
             _eventsView.tableView.tableHeaderView = nil;
+            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
             break;
         case kIRCCloudStateDisconnected:
             [self _showConnectingView];
@@ -572,6 +588,7 @@
                 _connectingProgress.hidden = YES;
                 [self performSelector:@selector(connectivityChanged:) withObject:nil afterDelay:1];
             } else {
+                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Disconnected");
                 if([[NetworkConnection sharedInstance] reachable])
                     _connectingStatus.text = @"Disconnected";
                 else
@@ -612,6 +629,7 @@
         [_connectingActivity stopAnimating];
         _connectingProgress.progress = 0;
         _connectingProgress.hidden = NO;
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Loading");
     }
 }
 
@@ -772,6 +790,14 @@
                                              selector:@selector(didSwipe:)
                                                  name:ECSlidingViewUnderRightWillAppear object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didSwipe:)
+                                                 name:ECSlidingViewUnderLeftWillDisappear object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didSwipe:)
+                                                 name:ECSlidingViewUnderRightWillDisappear object:nil];
+    
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable && session != nil && [session length] > 0)
         [[NetworkConnection sharedInstance] connect];
@@ -793,6 +819,7 @@
 - (void)viewDidAppear:(BOOL)animated {
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
+    UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
 }
 
 - (void)didReceiveMemoryWarning {
@@ -936,6 +963,8 @@
             _titleLabel.text = s.name;
         else
             _titleLabel.text = s.hostname;
+        _titleLabel.accessibilityLabel = @"Server";
+        _titleLabel.accessibilityValue = _titleLabel.text;
         self.navigationItem.title = _titleLabel.text;
         _topicLabel.hidden = NO;
         _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
@@ -952,9 +981,11 @@
         self.navigationItem.title = _buffer.name = _titleLabel.text = _buffer.name;
         _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
         _titleLabel.font = [UIFont boldSystemFontOfSize:20];
+        _titleLabel.accessibilityValue = _buffer.accessibilityValue;
         _topicLabel.hidden = YES;
         _lock.image = [UIImage imageNamed:@"lock"];
         if([_buffer.type isEqualToString:@"channel"]) {
+            _titleLabel.accessibilityLabel = @"Channel";
             BOOL lock = NO;
             Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid];
             if(channel) {
@@ -966,6 +997,8 @@
                     _titleLabel.font = [UIFont boldSystemFontOfSize:18];
                     _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
                     _topicLabel.text = [[ColorFormatter format:channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+                    _topicLabel.accessibilityLabel = @"Topic";
+                    _topicLabel.accessibilityValue = _topicLabel.text;
                     _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,_titleLabel.bounds.size.height-4);
                 } else {
                     _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,0,16,_titleLabel.bounds.size.height);
@@ -978,6 +1011,7 @@
                 _lock.hidden = YES;
             }
         } else if([_buffer.type isEqualToString:@"conversation"]) {
+            _titleLabel.accessibilityLabel = @"Conversation with";
             self.navigationItem.title = _titleLabel.text = _buffer.name;
             _topicLabel.hidden = NO;
             _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
@@ -1457,6 +1491,12 @@
 
 -(void)didSwipe:(NSNotification *)n {
     [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"swipeTip"];
+    if([n.name isEqualToString:ECSlidingViewUnderLeftWillAppear])
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, [_buffersView.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]);
+    else if([n.name isEqualToString:ECSlidingViewUnderRightWillAppear])
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, [_usersView.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]);
+    else
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
 }
 
 -(void)showSwipeTip {

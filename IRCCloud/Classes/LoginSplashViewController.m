@@ -170,6 +170,8 @@
 
 -(void)updateConnecting:(NSNotification *)notification {
     if(_conn.state == kIRCCloudStateConnecting || [_conn reachable] == kIRCCloudUnknown) {
+        if(loadingView.alpha > 0)
+            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
         [status setText:@"Connecting"];
         activity.hidden = NO;
         [activity startAnimating];
@@ -186,6 +188,8 @@
             progress.hidden = YES;
             [self performSelector:@selector(updateConnecting:) withObject:nil afterDelay:1];
         } else {
+            if(loadingView.alpha > 0)
+                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Disconnected");
             if([_conn reachable])
                 [status setText:@"Disconnected"];
             else
@@ -213,6 +217,7 @@
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
 #endif
     [status setText:@"Loading"];
+    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Loading");
     activity.hidden = YES;
     progress.progress = 0;
     progress.hidden = NO;
@@ -306,6 +311,7 @@
     loadingView.alpha = 1;
     [UIView commitAnimations];
     [status setText:@"Signing in"];
+    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Signing in");
     progress.hidden = YES;
     progress.progress = 0;
     [activity startAnimating];
@@ -318,6 +324,7 @@
             [[NSUserDefaults standardUserDefaults] setObject:[result objectForKey:@"session"] forKey:@"session"];
             [[NSUserDefaults standardUserDefaults] synchronize];
             [status setText:@"Connecting"];
+            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
             [_conn connect];
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{

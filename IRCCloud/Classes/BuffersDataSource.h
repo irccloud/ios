@@ -38,6 +38,7 @@
 @property BOOL valid;
 @property (copy) NSString *draft;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;
+-(NSString *)accessibilityValue;
 @end
 
 @interface BuffersDataSource : NSObject {

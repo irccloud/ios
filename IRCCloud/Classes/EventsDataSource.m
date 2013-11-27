@@ -395,7 +395,7 @@
     } else if([object.type hasPrefix:@"server_nomotd"]) {
         event.linkify = NO;
         event.from = @"";
-        event.color = [UIColor timestampColor];
+        event.bgColor = [UIColor statusBackgroundColor];
     } else if([object.type hasPrefix:@"helptlr"]) {
         event.from = @"";
         event.bgColor = [UIColor statusBackgroundColor];

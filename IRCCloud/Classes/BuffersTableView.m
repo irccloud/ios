@@ -209,6 +209,7 @@
                      @"cid":@(buffer.cid),
                      @"bid":@(buffer.bid),
                      @"name":name,
+                     @"hint":name,
                      @"unread":@(unread),
                      @"highlights":@(highlights),
                      @"archived":@0,
@@ -272,6 +273,7 @@
                      @"joined":@(joined),
                      @"key":@(key),
                      @"timeout":@(buffer.timeout),
+                     @"hint":buffer.accessibilityValue,
                      @"status":server.status
                      }];
                     if(unread > 0 && firstUnreadPosition == -1)
@@ -308,6 +310,7 @@
                              @"unread":@0,
                              @"highlights":@0,
                              @"archived":@1,
+                             @"hint":buffer.accessibilityValue,
                              @"key":@0,
                              }];
                             if(buffer.bid == _selectedBuffer.bid)
@@ -679,12 +682,7 @@
     cell.label.text = [row objectForKey:@"name"];
     cell.activity.hidden = YES;
     cell.joinBtn.hidden = YES;
-    if([[row objectForKey:@"highlights"] intValue]) {
-        cell.highlights.hidden = NO;
-        cell.highlights.count = [NSString stringWithFormat:@"%@",[row objectForKey:@"highlights"]];
-    } else {
-        cell.highlights.hidden = YES;
-    }
+    cell.accessibilityValue = [row objectForKey:@"hint"];
     cell.highlightColor = [UIColor colorWithRed:0.776 green:0.855 blue:1 alpha:1];
     if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
         if([[row objectForKey:@"archived"] intValue])
@@ -693,12 +691,21 @@
             cell.unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
         cell.unreadIndicator.hidden = NO;
         cell.label.font = [UIFont boldSystemFontOfSize:16.0f];
+        cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", unread"];
     } else {
         cell.unreadIndicator.hidden = YES;
         cell.label.font = [UIFont systemFontOfSize:16.0f];
     }
+    if([[row objectForKey:@"highlights"] intValue]) {
+        cell.highlights.hidden = NO;
+        cell.highlights.count = [NSString stringWithFormat:@"%@",[row objectForKey:@"highlights"]];
+        cell.accessibilityValue = [cell.accessibilityValue stringByAppendingFormat:@", %@ highlights", [row objectForKey:@"highlights"]];
+    } else {
+        cell.highlights.hidden = YES;
+    }
     switch(cell.type) {
         case TYPE_SERVER:
+            cell.accessibilityLabel = @"Network";
             if([[row objectForKey:@"ssl"] intValue])
                 cell.icon.image = [UIImage imageNamed:@"world_shield"];
             else
@@ -735,6 +742,10 @@
             break;
         case TYPE_CHANNEL:
         case TYPE_CONVERSATION:
+            if(cell.type == TYPE_CONVERSATION)
+                cell.accessibilityLabel = @"Conversation with";
+            else
+                cell.accessibilityLabel = @"Channel";
             if([[row objectForKey:@"key"] intValue]) {
                 cell.icon.image = [UIImage imageNamed:@"lock"];
                 cell.icon.hidden = NO;
@@ -746,6 +757,7 @@
                 if([[row objectForKey:@"archived"] intValue]) {
                     cell.label.textColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
                     cell.bgColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+                    cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", archived"];
                 } else {
                     cell.label.textColor = [UIColor whiteColor];
                     cell.bgColor = [UIColor selectedBlueColor];
@@ -755,6 +767,7 @@
                     cell.label.textColor = [UIColor timestampColor];
                     cell.bgColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
                     cell.highlightColor = [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
+                    cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", archived"];
                 } else {
                     if([[row objectForKey:@"joined"] intValue] == 0 || ![status isEqualToString:@"connected_ready"])
                         cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
@@ -779,9 +792,11 @@
             if([_expandedArchives objectForKey:[row objectForKey:@"cid"]]) {
                 cell.label.textColor = [UIColor blackColor];
                 cell.bgColor = [UIColor timestampColor];
+                cell.accessibilityHint = @"Hides archive list";
             } else {
                 cell.label.textColor = [UIColor colorWithRed:0.133 green:0.133 blue:0.133 alpha:1];
                 cell.bgColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+                cell.accessibilityHint = @"Shows archive list";
             }
             break;
         case TYPE_ADD_NETWORK:

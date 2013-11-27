@@ -54,6 +54,18 @@
 -(NSString *)description {
     return [NSString stringWithFormat:@"{cid: %i, bid: %i, name: %@, type: %@}", _cid, _bid, _name, _type];
 }
+-(NSString *)accessibilityValue {
+    if(_chantypes == nil) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
+        if(s) {
+            _chantypes = [s.isupport objectForKey:@"CHANTYPES"];
+            if(_chantypes == nil || _chantypes.length == 0)
+                _chantypes = @"#";
+        }
+    }
+    NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
+    return [r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""];
+}
 @end
 
 @implementation BuffersDataSource
