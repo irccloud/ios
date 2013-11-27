@@ -519,7 +519,7 @@
                         }
                     }
                 }
-                if(e.from.length && !_eventsView.scrolledUp) {
+                if(!e.isSelf && e.from.length && !_eventsView.scrolledUp) {
                     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"Message recieved from %@: %@", e.from, e.msg]);
                 }
             } else {
