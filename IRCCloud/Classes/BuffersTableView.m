@@ -690,11 +690,27 @@
         else
             cell.unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
         cell.unreadIndicator.hidden = NO;
+#ifdef __IPHONE_7_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+            cell.label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        } else {
+#endif
         cell.label.font = [UIFont boldSystemFontOfSize:16.0f];
+#ifdef __IPHONE_7_0
+        }
+#endif
         cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", unread"];
     } else {
         cell.unreadIndicator.hidden = YES;
+#ifdef __IPHONE_7_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+            cell.label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+        } else {
+#endif
         cell.label.font = [UIFont systemFontOfSize:16.0f];
+#ifdef __IPHONE_7_0
+        }
+#endif
     }
     if([[row objectForKey:@"highlights"] intValue]) {
         cell.highlights.hidden = NO;
