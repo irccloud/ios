@@ -103,13 +103,13 @@ int __timestampWidth;
             _socketClosedBar.hidden = NO;
         } else if(_type == ROW_FAILED) {
             frame.size.width -= 20;
-            _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, 16, 16);
+            _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         } else {
             _socketClosedBar.hidden = YES;
-            _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 1, 16, 16);
+            _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         }
         _timestamp.textAlignment = NSTextAlignmentRight;
-        _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, __timestampWidth, 20);
+        _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, __timestampWidth, _timestamp.font.pointSize + 4);
         _timestamp.hidden = NO;
         _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
         _message.hidden = NO;
