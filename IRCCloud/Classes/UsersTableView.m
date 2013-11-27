@@ -243,10 +243,21 @@
     else
         cell.count.text = [NSString stringWithFormat:@"%@", [row objectForKey:@"count"]];
     cell.count.textColor = [row objectForKey:@"countColor"];
-    if(cell.type == TYPE_HEADING)
+    if(cell.type == TYPE_HEADING) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    else
+#ifdef __IPHONE_7_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+            cell.label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+            cell.count.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+        }
+#endif
+    } else {
         cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+#ifdef __IPHONE_7_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+            cell.label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+#endif
+    }
     if(cell.type == TYPE_HEADING || [[row objectForKey:@"first"] intValue]) {
         cell.border.hidden = YES;
     } else {
