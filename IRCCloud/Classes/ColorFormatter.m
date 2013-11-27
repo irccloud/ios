@@ -165,15 +165,15 @@
             UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
             UIFontDescriptor *italicBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
             UIFontDescriptor *boldItalicBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold|UIFontDescriptorTraitItalic];
-            arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", bodyFontDesciptor.pointSize, NULL);
-            Courier = CTFontCreateWithName((CFStringRef)@"Courier", bodyFontDesciptor.pointSize, NULL);
-            CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", bodyFontDesciptor.pointSize, NULL);
-            CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", bodyFontDesciptor.pointSize, NULL);
-            CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", bodyFontDesciptor.pointSize, NULL);
-            Helvetica = CTFontCreateWithName((CFStringRef)[bodyFontDesciptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], bodyFontDesciptor.pointSize, NULL);
-            HelveticaBold = CTFontCreateWithName((CFStringRef)[boldBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldBodyFontDescriptor.pointSize, NULL);
-            HelveticaOblique = CTFontCreateWithName((CFStringRef)[italicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], italicBodyFontDescriptor.pointSize, NULL);
-            HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)[boldItalicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldItalicBodyFontDescriptor.pointSize, NULL);
+            arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", bodyFontDesciptor.pointSize * 0.8, NULL);
+            Courier = CTFontCreateWithName((CFStringRef)@"Courier", bodyFontDesciptor.pointSize * 0.8, NULL);
+            CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", bodyFontDesciptor.pointSize * 0.8, NULL);
+            CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", bodyFontDesciptor.pointSize * 0.8, NULL);
+            CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", bodyFontDesciptor.pointSize * 0.8, NULL);
+            Helvetica = CTFontCreateWithName((CFStringRef)[bodyFontDesciptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], bodyFontDesciptor.pointSize * 0.8, NULL);
+            HelveticaBold = CTFontCreateWithName((CFStringRef)[boldBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldBodyFontDescriptor.pointSize * 0.8, NULL);
+            HelveticaOblique = CTFontCreateWithName((CFStringRef)[italicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], italicBodyFontDescriptor.pointSize * 0.8, NULL);
+            HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)[boldItalicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldItalicBodyFontDescriptor.pointSize * 0.8, NULL);
         }
 #endif
         dataDetector = [NSDataDetector dataDetectorWithTypes:(NSTextCheckingTypes)NSTextCheckingTypeLink error:nil];

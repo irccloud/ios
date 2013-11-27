@@ -52,8 +52,10 @@ int __timestampWidth;
 #endif
         _timestamp.font = [UIFont systemFontOfSize:FONT_SIZE];
 #ifdef __IPHONE_7_0
-        else
+        else {
             _timestamp.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+            _timestamp.font = [UIFont fontWithName:_message.font.fontName size:_timestamp.font.pointSize * 0.8];
+        }
 #endif
         _timestamp.backgroundColor = [UIColor clearColor];
         _timestamp.textColor = [UIColor timestampColor];
@@ -66,8 +68,10 @@ int __timestampWidth;
 #endif
             _message.font = [UIFont systemFontOfSize:FONT_SIZE];
 #ifdef __IPHONE_7_0
-        else
+        else {
             _message.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+            _message.font = [UIFont fontWithName:_message.font.fontName size:_message.font.pointSize * 0.8];
+        }
 #endif
         _message.numberOfLines = 0;
         _message.lineBreakMode = NSLineBreakByWordWrapping;
@@ -927,11 +931,13 @@ int __timestampWidth;
         __timestampWidth += [@" AM" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
 #ifdef __IPHONE_7_0
     } else {
-        __timestampWidth = [@"88:88" sizeWithFont:[UIFont preferredFontForTextStyle:UIFontTextStyleBody]].width;
+        UIFont *f = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        f = [UIFont fontWithName:f.fontName size:f.pointSize * 0.8];
+        __timestampWidth = [@"88:88" sizeWithFont:f].width;
         if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-            __timestampWidth += [@":88" sizeWithFont:[UIFont preferredFontForTextStyle:UIFontTextStyleBody]].width;
+            __timestampWidth += [@":88" sizeWithFont:f].width;
         if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
-            __timestampWidth += [@" AM" sizeWithFont:[UIFont preferredFontForTextStyle:UIFontTextStyleBody]].width;
+            __timestampWidth += [@" AM" sizeWithFont:f].width;
     }
 #endif
     
