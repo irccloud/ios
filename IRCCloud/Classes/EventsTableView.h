@@ -68,6 +68,7 @@
 @property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;
 @property (nonatomic) NSTimeInterval eidToOpen;
+@property (readonly) BOOL scrolledUp;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadBarClicked:(id)sender;

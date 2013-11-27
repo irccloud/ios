@@ -217,7 +217,6 @@
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
 #endif
     [status setText:@"Loading"];
-    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Loading");
     activity.hidden = YES;
     progress.progress = 0;
     progress.hidden = NO;

@@ -519,7 +519,7 @@
                         }
                     }
                 }
-                if(e.from.length) {
+                if(e.from.length && !_eventsView.scrolledUp) {
                     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"Message recieved from %@: %@", e.from, e.msg]);
                 }
             } else {
@@ -527,9 +527,6 @@
                 if(b && e.isHighlight && [e isImportant:b.type]) {
                     AudioServicesPlaySystemSound(alertSound);
                     AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-                    if(e.from.length) {
-                        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"New highlight from %@: %@", e.from, e.msg]);
-                    }
                 }
             }
             break;
@@ -629,7 +626,6 @@
         [_connectingActivity stopAnimating];
         _connectingProgress.progress = 0;
         _connectingProgress.hidden = NO;
-        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Loading");
     }
 }
 
