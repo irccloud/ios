@@ -47,14 +47,28 @@ int __timestampWidth;
         self.backgroundColor = [UIColor whiteColor];
         
         _timestamp = [[UILabel alloc] init];
+#ifdef __IPHONE_7_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+#endif
         _timestamp.font = [UIFont systemFontOfSize:FONT_SIZE];
+#ifdef __IPHONE_7_0
+        else
+            _timestamp.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+#endif
         _timestamp.backgroundColor = [UIColor clearColor];
         _timestamp.textColor = [UIColor timestampColor];
         [self.contentView addSubview:_timestamp];
 
         _message = [[TTTAttributedLabel alloc] init];
         _message.verticalAlignment = TTTAttributedLabelVerticalAlignmentTop;
-        _message.font = [UIFont systemFontOfSize:FONT_SIZE];
+#ifdef __IPHONE_7_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+#endif
+            _message.font = [UIFont systemFontOfSize:FONT_SIZE];
+#ifdef __IPHONE_7_0
+        else
+            _message.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+#endif
         _message.numberOfLines = 0;
         _message.lineBreakMode = NSLineBreakByWordWrapping;
         _message.backgroundColor = [UIColor clearColor];
@@ -903,12 +917,23 @@ int __timestampWidth;
 
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
-
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
+#endif
     __timestampWidth = [@"88:88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
     if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
         __timestampWidth += [@":88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
     if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
         __timestampWidth += [@" AM" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
+#ifdef __IPHONE_7_0
+    } else {
+        __timestampWidth = [@"88:88" sizeWithFont:[UIFont preferredFontForTextStyle:UIFontTextStyleBody]].width;
+        if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
+            __timestampWidth += [@":88" sizeWithFont:[UIFont preferredFontForTextStyle:UIFontTextStyleBody]].width;
+        if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
+            __timestampWidth += [@" AM" sizeWithFont:[UIFont preferredFontForTextStyle:UIFontTextStyleBody]].width;
+    }
+#endif
     
     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
     if(!events || (events.count == 0 && _buffer.min_eid > 0)) {

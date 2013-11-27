@@ -105,32 +105,32 @@
 }
 
 +(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode {
-    NSString *output = [NSString stringWithFormat:@"%c%@%c", BOLD, nick, CLEAR];
+    NSString *output = [NSString stringWithFormat:@"%c%@%c", BOLD, nick, BOLD];
     BOOL showSymbol = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue];
 
     if(mode) {
         if(showSymbol) {
             if([mode rangeOfString:@"q"].location != NSNotFound)
-                output = [NSString stringWithFormat:@"%cE7AA00%c~%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+                output = [NSString stringWithFormat:@"%cE7AA00%c~%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
             else if([mode rangeOfString:@"a"].location != NSNotFound)
-                output = [NSString stringWithFormat:@"%c6500A5%c&%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+                output = [NSString stringWithFormat:@"%c6500A5%c&%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
             else if([mode rangeOfString:@"o"].location != NSNotFound)
-                output = [NSString stringWithFormat:@"%cBA1719%c@%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+                output = [NSString stringWithFormat:@"%cBA1719%c@%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
             else if([mode rangeOfString:@"h"].location != NSNotFound)
-                output = [NSString stringWithFormat:@"%cB55900%c%%%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+                output = [NSString stringWithFormat:@"%cB55900%c%%%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
             else if([mode rangeOfString:@"v"].location != NSNotFound)
-                output = [NSString stringWithFormat:@"%c25B100%c+%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+                output = [NSString stringWithFormat:@"%c25B100%c+%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
         } else {
             if([mode rangeOfString:@"q"].location != NSNotFound)
-                output = [NSString stringWithFormat:@"%cE7AA00%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+                output = [NSString stringWithFormat:@"%cE7AA00%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
             else if([mode rangeOfString:@"a"].location != NSNotFound)
-                output = [NSString stringWithFormat:@"%c6500A5%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+                output = [NSString stringWithFormat:@"%c6500A5%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
             else if([mode rangeOfString:@"o"].location != NSNotFound)
-                output = [NSString stringWithFormat:@"%cBA1719%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+                output = [NSString stringWithFormat:@"%cBA1719%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
             else if([mode rangeOfString:@"h"].location != NSNotFound)
-                output = [NSString stringWithFormat:@"%cB55900%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+                output = [NSString stringWithFormat:@"%cB55900%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
             else if([mode rangeOfString:@"v"].location != NSNotFound)
-                output = [NSString stringWithFormat:@"%c25B100%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, CLEAR];
+                output = [NSString stringWithFormat:@"%c25B100%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
         }
     }
     return output;
@@ -147,16 +147,35 @@
     NSMutableArray *matches = [[NSMutableArray alloc] init];
     
     if(!Courier) {
-        arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL);
-        Courier = CTFontCreateWithName((CFStringRef)@"Courier", FONT_SIZE, NULL);
-        CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL);
-        CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", FONT_SIZE, NULL);
-        CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", FONT_SIZE, NULL);
-        Helvetica = CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL);
-        HelveticaBold = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
-        HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
-        HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
-        
+#ifdef __IPHONE_7_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
+#endif
+            arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL);
+            Courier = CTFontCreateWithName((CFStringRef)@"Courier", FONT_SIZE, NULL);
+            CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL);
+            CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", FONT_SIZE, NULL);
+            CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", FONT_SIZE, NULL);
+            Helvetica = CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL);
+            HelveticaBold = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
+            HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
+            HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
+#ifdef __IPHONE_7_0
+        } else {
+            UIFontDescriptor *bodyFontDesciptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
+            UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+            UIFontDescriptor *italicBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
+            UIFontDescriptor *boldItalicBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold|UIFontDescriptorTraitItalic];
+            arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", bodyFontDesciptor.pointSize, NULL);
+            Courier = CTFontCreateWithName((CFStringRef)@"Courier", bodyFontDesciptor.pointSize, NULL);
+            CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", bodyFontDesciptor.pointSize, NULL);
+            CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", bodyFontDesciptor.pointSize, NULL);
+            CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", bodyFontDesciptor.pointSize, NULL);
+            Helvetica = CTFontCreateWithName((CFStringRef)[bodyFontDesciptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], bodyFontDesciptor.pointSize, NULL);
+            HelveticaBold = CTFontCreateWithName((CFStringRef)[boldBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldBodyFontDescriptor.pointSize, NULL);
+            HelveticaOblique = CTFontCreateWithName((CFStringRef)[italicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], italicBodyFontDescriptor.pointSize, NULL);
+            HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)[boldItalicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldItalicBodyFontDescriptor.pointSize, NULL);
+        }
+#endif
         dataDetector = [NSDataDetector dataDetectorWithTypes:(NSTextCheckingTypes)NSTextCheckingTypeLink error:nil];
     }
     if(mono) {
