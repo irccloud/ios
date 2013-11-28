@@ -1185,7 +1185,7 @@ int __timestampWidth;
         cell.timestamp.text = @"New Messages";
     else
         cell.timestamp.text = e.timestamp;
-    if(e.rowType == ROW_TIMESTAMP) {
+    if(e.rowType == ROW_TIMESTAMP || e.isHighlight) {
         cell.timestamp.textColor = [UIColor blackColor];
     } else {
         cell.timestamp.textColor = [UIColor timestampColor];
