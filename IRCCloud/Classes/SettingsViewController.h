@@ -25,6 +25,7 @@
     UISwitch *_24hour;
     UISwitch *_seconds;
     UISwitch *_symbols;
+    UISwitch *_colors;
     UISwitch *_screen;
     UISwitch *_chrome;
     NSString *_version;

@@ -397,45 +397,45 @@
                     output = [e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "];
                     break;
                 case kCollapsedEventMode:
-                    output = [NSString stringWithFormat:@"%@ was %@", [ColorFormatter formatNick:e.nick mode:e.targetMode], [e modes:YES]];
+                    output = [NSString stringWithFormat:@"%@ was %@", [ColorFormatter formatNick:e.nick mode:e.targetMode colorize:NO], [e modes:YES]];
                     if(e.fromNick) {
                         if([e.fromMode isEqualToString:@"__the_server__"])
                             output = [output stringByAppendingFormat:@" by the server %c%@%c", BOLD, e.fromNick, CLEAR];
                         else
-                            output = [output stringByAppendingFormat:@" by %@", [ColorFormatter formatNick:e.fromNick mode:e.fromMode]];
+                            output = [output stringByAppendingFormat:@" by %@", [ColorFormatter formatNick:e.fromNick mode:e.fromMode colorize:NO]];
                     }
                     break;
                 case kCollapsedEventJoin:
                     if(showChan)
-                        output = [NSString stringWithFormat:@"→ %@%@ joined %@ (%@)", [ColorFormatter formatNick:e.nick mode:e.fromMode], [self was:e], e.chan, e.hostname];
+                        output = [NSString stringWithFormat:@"→ %@%@ joined %@ (%@)", [ColorFormatter formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.chan, e.hostname];
                     else
-                        output = [NSString stringWithFormat:@"→ %@%@ joined (%@)", [ColorFormatter formatNick:e.nick mode:e.fromMode], [self was:e], e.hostname];
+                        output = [NSString stringWithFormat:@"→ %@%@ joined (%@)", [ColorFormatter formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.hostname];
                     break;
                 case kCollapsedEventPart:
                     if(showChan)
-                        output = [NSString stringWithFormat:@"← %@%@ left %@ (%@)", [ColorFormatter formatNick:e.nick mode:e.fromMode], [self was:e], e.chan, e.hostname];
+                        output = [NSString stringWithFormat:@"← %@%@ left %@ (%@)", [ColorFormatter formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.chan, e.hostname];
                     else
-                        output = [NSString stringWithFormat:@"← %@%@ left (%@)", [ColorFormatter formatNick:e.nick mode:e.fromMode], [self was:e], e.hostname];
+                        output = [NSString stringWithFormat:@"← %@%@ left (%@)", [ColorFormatter formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.hostname];
                     if(e.msg.length > 0)
                         output = [output stringByAppendingFormat:@": %@", e.msg];
                     break;
                 case kCollapsedEventQuit:
-                    output = [NSString stringWithFormat:@"⇐ %@%@ quit", [ColorFormatter formatNick:e.nick mode:e.fromMode], [self was:e]];
+                    output = [NSString stringWithFormat:@"⇐ %@%@ quit", [ColorFormatter formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
                     if(e.hostname.length > 0)
                         output = [output stringByAppendingFormat:@" (%@)", e.hostname];
                     if(e.msg.length > 0)
                         output = [output stringByAppendingFormat:@": %@", e.msg];
                     break;
                 case kCollapsedEventNickChange:
-                    output = [NSString stringWithFormat:@"%@ → %@", e.oldNick, [ColorFormatter formatNick:e.nick mode:e.fromMode]];
+                    output = [NSString stringWithFormat:@"%@ → %@", e.oldNick, [ColorFormatter formatNick:e.nick mode:e.fromMode colorize:NO]];
                     break;
                 case kCollapsedEventPopIn:
-                    output = [NSString stringWithFormat:@"↔ %@%@ popped in", [ColorFormatter formatNick:e.nick mode:e.fromMode], [self was:e]];
+                    output = [NSString stringWithFormat:@"↔ %@%@ popped in", [ColorFormatter formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
                     if(showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
                 case kCollapsedEventPopOut:
-                    output = [NSString stringWithFormat:@"↔ %@%@ nipped out", [ColorFormatter formatNick:e.nick mode:e.fromMode], [self was:e]];
+                    output = [NSString stringWithFormat:@"↔ %@%@ nipped out", [ColorFormatter formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
                     if(showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
@@ -497,7 +497,7 @@
                 }
                 
                 if(e.type == kCollapsedEventNickChange) {
-                    [message appendFormat:@"%@ → %@", e.oldNick, [ColorFormatter formatNick:e.nick mode:e.fromMode]];
+                    [message appendFormat:@"%@ → %@", e.oldNick, [ColorFormatter formatNick:e.nick mode:e.fromMode colorize:NO]];
                     NSString *oldNick = e.oldNick;
                     e.oldNick = nil;
                     [message appendString:[self was:e]];
@@ -505,7 +505,7 @@
                 } else if(e.type == kCollapsedEventNetSplit) {
                     [message appendString:[e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "]];
                 } else if(!showChan) {
-                    [message appendString:[ColorFormatter formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode]];
+                    [message appendString:[ColorFormatter formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO]];
                     [message appendString:[self was:e]];
                 }
                 
@@ -531,7 +531,7 @@
                     }
                 } else if(showChan && e.type != kCollapsedEventNetSplit) {
                     if(groupcount == 0) {
-                        [message appendString:[ColorFormatter formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode]];
+                        [message appendString:[ColorFormatter formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO]];
                         [message appendString:[self was:e]];
                         switch(e.type) {
                             case kCollapsedEventJoin:

@@ -126,6 +126,7 @@
     [prefs setObject:@(_24hour.isOn) forKey:@"time-24hr"];
     [prefs setObject:@(_seconds.isOn) forKey:@"time-seconds"];
     [prefs setObject:@(_symbols.isOn) forKey:@"mode-showsymbol"];
+    [prefs setObject:@(_colors.isOn) forKey:@"nick-colors"];
     
     SBJsonWriter *writer = [[SBJsonWriter alloc] init];
     NSString *json = [writer stringWithObject:prefs];
@@ -248,14 +249,26 @@
     
     if([[prefs objectForKey:@"time-24hr"] isKindOfClass:[NSNumber class]]) {
         _24hour.on = [[prefs objectForKey:@"time-24hr"] boolValue];
+    } else {
+        _24hour.on = NO;
     }
     
     if([[prefs objectForKey:@"time-seconds"] isKindOfClass:[NSNumber class]]) {
         _seconds.on = [[prefs objectForKey:@"time-seconds"] boolValue];
+    } else {
+        _seconds.on = NO;
     }
     
     if([[prefs objectForKey:@"mode-showsymbol"] isKindOfClass:[NSNumber class]]) {
         _symbols.on = [[prefs objectForKey:@"mode-showsymbol"] boolValue];
+    } else {
+        _symbols.on = NO;
+    }
+    
+    if([[prefs objectForKey:@"nick-colors"] isKindOfClass:[NSNumber class]]) {
+        _colors.on = [[prefs objectForKey:@"nick-colors"] boolValue];
+    } else {
+        _colors.on = NO;
     }
     
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
@@ -305,6 +318,7 @@
     _24hour = [[UISwitch alloc] init];
     _seconds = [[UISwitch alloc] init];
     _symbols = [[UISwitch alloc] init];
+    _colors = [[UISwitch alloc] init];
     _screen = [[UISwitch alloc] init];
     _chrome = [[UISwitch alloc] init];
 
@@ -380,7 +394,7 @@
         case 1:
             return 1;
         case 2:
-            return 3;
+            return 4;
         case 3:
             return (_chromeInstalled)?3:2;
         case 4:
@@ -450,6 +464,10 @@
                 case 2:
                     cell.textLabel.text = @"Usermode Symbols";
                     cell.accessoryView = _symbols;
+                    break;
+                case 3:
+                    cell.textLabel.text = @"Colorize Nicknames";
+                    cell.accessoryView = _colors;
                     break;
             }
             break;
