@@ -181,6 +181,9 @@ UIImage *__newMsgsBackgroundImage;
 +(UIColor *)noticeBackgroundColor {
     return [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
 }
++(UIColor *)highlightTimestampColor {
+    return [UIColor colorWithRed:0.376 green:0 blue:0 alpha:1];
+}
 +(UIColor *)timestampBackgroundColor {
     if(!__timestampBackgroundImage) {
         float scaleFactor = [[UIScreen mainScreen] scale];

@@ -52,6 +52,7 @@
 +(UIColor *)statusBackgroundColor;
 +(UIColor *)selfBackgroundColor;
 +(UIColor *)highlightBackgroundColor;
++(UIColor *)highlightTimestampColor;
 +(UIColor *)noticeBackgroundColor;
 +(UIColor *)timestampBackgroundColor;
 +(UIColor *)newMsgsBackgroundColor;
