@@ -1133,7 +1133,10 @@ int __timestampWidth;
     cell.message.text = e.formatted;
     if(e.from.length) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];
-        cell.accessibilityValue = e.msg;
+        cell.accessibilityValue = [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+    } else if([e.type isEqualToString:@"buffer_me_msg"]) {
+        cell.accessibilityLabel = [NSString stringWithFormat:@"Action from %@ at %@", e.nick, e.timestamp];
+        cell.accessibilityValue = [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
     }
     if(e.rowType == ROW_MESSAGE && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
         if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
