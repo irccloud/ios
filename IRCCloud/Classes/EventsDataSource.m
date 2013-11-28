@@ -552,4 +552,14 @@
     return count;
 }
 
+-(void)clearFormattingCache {
+    @synchronized(_events) {
+        for(NSNumber *bid in _events) {
+            NSArray *events = [_events objectForKey:bid];
+            for(Event *e in events)
+                e.formatted = nil;
+        }
+    }
+}
+
 @end

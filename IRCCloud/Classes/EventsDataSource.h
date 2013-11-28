@@ -92,6 +92,7 @@
 @property NSTimeInterval highestEid;
 +(EventsDataSource *)sharedInstance;
 -(void)clear;
+-(void)clearFormattingCache;
 -(void)addEvent:(Event *)event;
 -(Event *)addJSONObject:(IRCCloudJSONObject *)object;
 -(Event *)event:(NSTimeInterval)eid buffer:(int)bid;

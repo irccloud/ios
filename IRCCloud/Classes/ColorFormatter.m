@@ -22,7 +22,33 @@
 #import "NetworkConnection.h"
 #import "NSURL+IDN.h"
 
+CTFontRef Courier, CourierBold, CourierOblique,CourierBoldOblique;
+CTFontRef Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
+CTFontRef arrowFont;
+UIFont *timestampFont;
+
 @implementation ColorFormatter
+
++(void)clearFontCache {
+    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = nil;
+    timestampFont = nil;
+}
+
++(UIFont *)timestampFont {
+    if(!timestampFont) {
+#ifdef __IPHONE_7_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+#endif
+            timestampFont = [UIFont systemFontOfSize:FONT_SIZE];
+#ifdef __IPHONE_7_0
+        else {
+            timestampFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+            timestampFont = [UIFont fontWithName:timestampFont.fontName size:timestampFont.pointSize * 0.8];
+        }
+#endif
+    }
+    return timestampFont;
+}
 
 +(NSRegularExpression *)email {
     static NSRegularExpression *_pattern = nil;
@@ -138,9 +164,6 @@
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;
-    static CTFontRef Courier, CourierBold, CourierOblique,CourierBoldOblique;
-    static CTFontRef Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
-    static CTFontRef arrowFont;
     static NSDataDetector *dataDetector;
     CTFontRef font, boldFont, italicFont, boldItalicFont;
     float lineSpacing = 6;

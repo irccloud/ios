@@ -19,6 +19,7 @@
 #import "ImageViewController.h"
 #import "EditConnectionViewController.h"
 #import "UIColor+IRCCloud.h"
+#import "ColorFormatter.h"
 #import "config.h"
 
 //From: http://stackoverflow.com/a/19313559
@@ -259,6 +260,8 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    [ColorFormatter clearFontCache];
+    [[EventsDataSource sharedInstance] clearFormattingCache];
     if(_conn.reconnectTimestamp == 0)
         _conn.reconnectTimestamp = -1;
     _conn.background = NO;

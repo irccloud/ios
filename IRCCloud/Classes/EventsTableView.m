@@ -47,32 +47,12 @@ int __timestampWidth;
         self.backgroundColor = [UIColor whiteColor];
         
         _timestamp = [[UILabel alloc] init];
-#ifdef __IPHONE_7_0
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-#endif
-        _timestamp.font = [UIFont systemFontOfSize:FONT_SIZE];
-#ifdef __IPHONE_7_0
-        else {
-            _timestamp.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-            _timestamp.font = [UIFont fontWithName:_message.font.fontName size:_timestamp.font.pointSize * 0.8];
-        }
-#endif
         _timestamp.backgroundColor = [UIColor clearColor];
         _timestamp.textColor = [UIColor timestampColor];
         [self.contentView addSubview:_timestamp];
 
         _message = [[TTTAttributedLabel alloc] init];
         _message.verticalAlignment = TTTAttributedLabelVerticalAlignmentTop;
-#ifdef __IPHONE_7_0
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-#endif
-            _message.font = [UIFont systemFontOfSize:FONT_SIZE];
-#ifdef __IPHONE_7_0
-        else {
-            _message.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-            _message.font = [UIFont fontWithName:_message.font.fontName size:_message.font.pointSize * 0.8];
-        }
-#endif
         _message.numberOfLines = 0;
         _message.lineBreakMode = NSLineBreakByWordWrapping;
         _message.backgroundColor = [UIColor clearColor];
@@ -1146,6 +1126,8 @@ int __timestampWidth;
     [_lock unlock];
     cell.type = e.rowType;
     cell.contentView.backgroundColor = e.bgColor;
+    cell.timestamp.font = [ColorFormatter timestampFont];
+    cell.message.font = [ColorFormatter timestampFont];
     cell.message.delegate = self;
     cell.message.dataDetectorTypes = UIDataDetectorTypeNone;
     cell.message.text = e.formatted;
