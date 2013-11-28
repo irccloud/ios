@@ -692,7 +692,8 @@
         cell.unreadIndicator.hidden = NO;
 #ifdef __IPHONE_7_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-            cell.label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+            UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+            cell.label.font = [UIFont fontWithDescriptor:d size:d.pointSize];
         } else {
 #endif
         cell.label.font = [UIFont boldSystemFontOfSize:16.0f];
@@ -704,7 +705,8 @@
         cell.unreadIndicator.hidden = YES;
 #ifdef __IPHONE_7_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-            cell.label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+            UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+            cell.label.font = [UIFont fontWithDescriptor:d size:d.pointSize];
         } else {
 #endif
         cell.label.font = [UIFont systemFontOfSize:16.0f];
