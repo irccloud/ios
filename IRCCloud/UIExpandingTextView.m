@@ -153,6 +153,9 @@
      
 -(void)setMaximumNumberOfLines:(int)n
 {
+    if (maximumNumberOfLines == n)
+        return;
+    
     NSRange saveSelection     = internalTextView.selectedRange;
     NSString *saveText        = internalTextView.text;
     NSString *newText         = @"-";
@@ -181,6 +184,9 @@
 
 -(void)setMinimumNumberOfLines:(int)m
 {
+    if (minimumNumberOfLines == m)
+        return;
+    
     NSRange saveSelection     = internalTextView.selectedRange;
     NSString *saveText        = internalTextView.text;
     NSString *newText         = @"-";
