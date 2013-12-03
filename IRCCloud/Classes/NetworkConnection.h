@@ -130,6 +130,7 @@ typedef enum {
     NSOperationQueue *_queue;
     SCNetworkReachabilityRef _reachability;
     BOOL _reachabilityValid;
+    NSDictionary *_parserMap;
 }
 @property (readonly) kIRCCloudState state;
 @property (readonly) NSDictionary *userInfo;

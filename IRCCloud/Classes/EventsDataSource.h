@@ -88,6 +88,7 @@
     NSMutableDictionary *_events_sorted;
     NSTimeInterval _highestEid;
     BOOL _dirty;
+    NSDictionary *_formatterMap;
 }
 @property NSTimeInterval highestEid;
 +(EventsDataSource *)sharedInstance;
