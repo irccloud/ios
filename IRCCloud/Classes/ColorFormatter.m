@@ -209,6 +209,8 @@ UIFont *timestampFont;
                     output = [NSString stringWithFormat:@"%c25B100%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
             }
         }
+    } else if(color) {
+        output = [NSString stringWithFormat:@"%c%c%@%@%c%c", BOLD, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
     }
     return output;
 }
