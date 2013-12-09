@@ -233,6 +233,7 @@ int __timestampWidth;
     if(_buffer && [notification.object bid] == _buffer.bid) {
         _requestingBacklog = NO;
         self.tableView.tableHeaderView = _backlogFailedView;
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Unable to download chat history. Please try again shortly.");
     }
 }
 
@@ -258,6 +259,7 @@ int __timestampWidth;
             NSLog(@"Rebuilding the message table");
             [self refresh];
         }];
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Download complete. ");
     }
 }
 
@@ -1134,12 +1136,12 @@ int __timestampWidth;
     cell.message.delegate = self;
     cell.message.dataDetectorTypes = UIDataDetectorTypeNone;
     cell.message.text = e.formatted;
-    if(e.from.length) {
+    if(e.from.length && e.msg.length) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];
         cell.accessibilityValue = [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
     } else if([e.type isEqualToString:@"buffer_me_msg"]) {
-        cell.accessibilityLabel = [NSString stringWithFormat:@"Action from %@ at %@", e.nick, e.timestamp];
-        cell.accessibilityValue = [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+        cell.accessibilityLabel = [NSString stringWithFormat:@"Action at %@", e.timestamp];
+        cell.accessibilityValue = [NSString stringWithFormat:@"%@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
     }
     if(e.rowType == ROW_MESSAGE && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
         if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
@@ -1306,6 +1308,7 @@ int __timestampWidth;
             NSLog(@"The table scrolled and the loading header became visible, requesting more backlog");
             _requestingBacklog = YES;
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
+            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Downloading more chat history");
         }
     }
     
