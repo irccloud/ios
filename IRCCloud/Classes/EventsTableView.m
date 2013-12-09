@@ -478,7 +478,10 @@ int __timestampWidth;
                 if(groupMsg == nil && [type isEqualToString:@"nickchange"])
                     groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
                 if(groupMsg == nil && [type isEqualToString:@"user_channel_mode"]) {
-                    groupMsg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [ColorFormatter formatNick:event.from mode:event.fromMode colorize:NO], BOLD, BOLD, event.diff, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+                    if(event.from.length > 0)
+                        groupMsg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [ColorFormatter formatNick:event.from mode:event.fromMode colorize:NO], BOLD, BOLD, event.diff, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+                    else
+                        groupMsg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
                 }
                 Event *heading = [[Event alloc] init];
                 heading.cid = event.cid;
@@ -499,7 +502,10 @@ int __timestampWidth;
         if(msg == nil && [type isEqualToString:@"nickchange"])
             msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
         if(msg == nil && [type isEqualToString:@"user_channel_mode"]) {
-            msg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [ColorFormatter formatNick:event.from mode:event.fromMode colorize:NO], BOLD, BOLD, event.diff, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+            if(event.from.length > 0)
+                msg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [ColorFormatter formatNick:event.from mode:event.fromMode colorize:NO], BOLD, BOLD, event.diff, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+            else
+                msg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
             _currentCollapsedEid = eid;
         }
         if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
