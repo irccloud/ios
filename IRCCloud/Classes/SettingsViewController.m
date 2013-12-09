@@ -466,7 +466,7 @@
                     cell.accessoryView = _symbols;
                     break;
                 case 3:
-                    cell.textLabel.text = @"Colorize Nicknames";
+                    cell.textLabel.text = @"Colourise Nicknames";
                     cell.accessoryView = _colors;
                     break;
             }
@@ -474,11 +474,11 @@
         case 3:
             switch(row) {
                 case 0:
-                    cell.textLabel.text = @"Keep screen on";
+                    cell.textLabel.text = @"Prevent Auto-Lock";
                     cell.accessoryView = _screen;
                     break;
                 case 1:
-                    cell.textLabel.text = @"Disconnect in background";
+                    cell.textLabel.text = @"Background Disconnect Timer";
                     int seconds = [[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue];
                     if(seconds < 60)
                         cell.detailTextLabel.text = [NSString stringWithFormat:@"%is", seconds];
