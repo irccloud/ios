@@ -1033,6 +1033,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     [_socket close];
     _socket = nil;
+    for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
+        [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid];
+    }
 }
 
 -(void)clearPrefs {

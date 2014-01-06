@@ -1071,8 +1071,12 @@
         _eidToOpen = -1;
     }
 
-    if(_buffer)
+    if(_buffer) {
         _buffer.draft = _message.text;
+        
+        if(changed)
+            [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid];
+    }
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     
     [self _updateTitleArea];

@@ -178,7 +178,6 @@
 }
 
 - (void)refresh {
-    NSLog(@"*** Rebuild buffers table");
     @synchronized(self) {
         NSMutableArray *data = [[NSMutableArray alloc] init];
         int archiveCount = 0;
