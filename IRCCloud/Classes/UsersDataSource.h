@@ -40,7 +40,6 @@
 -(void)addUser:(User *)user;
 -(NSArray *)usersForBuffer:(int)bid;
 -(User *)getUser:(NSString *)nick cid:(int)cid bid:(int)bid;
--(User *)getUser:(NSString *)nick cid:(int)cid;
 -(void)removeUser:(NSString *)nick cid:(int)cid bid:(int)bid;
 -(void)removeUsersForBuffer:(int)bid;
 -(void)updateNick:(NSString *)nick oldNick:(NSString *)oldNick cid:(int)cid bid:(int)bid;

@@ -1737,7 +1737,7 @@
 -(void)userSelected:(NSString *)nick rect:(CGRect)rect {
     _selectedRect = rect;
     _selectedEvent = nil;
-    _selectedUser = [[UsersDataSource sharedInstance] getUser:nick cid:_buffer.cid];
+    _selectedUser = [[UsersDataSource sharedInstance] getUser:nick cid:_buffer.cid bid:_buffer.bid];
     if(_doubleTapTimer) {
         [_doubleTapTimer invalidate];
         _doubleTapTimer = nil;
@@ -1750,7 +1750,7 @@
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect {
     if(event.from) {
         _selectedEvent = event;
-        _selectedUser = [[UsersDataSource sharedInstance] getUser:event.from cid:_buffer.cid];
+        _selectedUser = [[UsersDataSource sharedInstance] getUser:event.from cid:_buffer.cid bid:_buffer.bid];
         if(!_selectedUser) {
             _selectedUser = [[User alloc] init];
             _selectedUser.cid = _selectedEvent.cid;

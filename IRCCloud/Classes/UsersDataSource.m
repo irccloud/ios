@@ -73,16 +73,6 @@
     }
 }
 
--(User *)getUser:(NSString *)nick cid:(int)cid {
-    @synchronized(_users) {
-        for(User *user in _users) {
-            if(user.cid == cid && [user.nick isEqualToString:nick])
-                return user;
-        }
-        return nil;
-    }
-}
-
 -(void)removeUser:(NSString *)nick cid:(int)cid bid:(int)bid {
     @synchronized(_users) {
         [[_users objectForKey:@(bid)] removeObjectForKey:nick];

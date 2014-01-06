@@ -229,13 +229,13 @@ NSLock *__parserLock = nil;
             User *user = [_users getUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             if(!user) {
                 user = [[User alloc] init];
+                user.cid = object.cid;
+                user.bid = object.bid;
+                user.nick = [object objectForKey:@"nick"];
                 [_users addUser:user];
             }
             if(user.nick)
                 user.old_nick = user.nick;
-            user.cid = object.cid;
-            user.bid = object.bid;
-            user.nick = [object objectForKey:@"nick"];
             user.hostmask = [object objectForKey:@"hostmask"];
             user.mode = @"";
             user.away = 0;
