@@ -33,7 +33,7 @@
 @end
 
 @interface UsersDataSource : NSObject {
-    NSMutableArray *_users;
+    NSMutableDictionary *_users;
 }
 +(UsersDataSource *)sharedInstance;
 -(void)clear;

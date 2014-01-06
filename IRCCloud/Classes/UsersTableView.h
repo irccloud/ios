@@ -27,6 +27,7 @@
     NSArray *_data;
     Buffer *_buffer;
     IBOutlet id<UsersTableViewDelegate> delegate;
+    NSTimer *_refreshTimer;
 }
 -(void)setBuffer:(Buffer *)buffer;
 @end

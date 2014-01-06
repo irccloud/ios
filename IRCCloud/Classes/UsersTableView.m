@@ -108,11 +108,18 @@
         case kIRCEventUserChannelMode:
         case kIRCEventKick:
         case kIRCEventWhoList:
-            [self performSelectorInBackground:@selector(refresh) withObject:nil];
+            if(!_refreshTimer) {
+                _refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(_refreshTimer) userInfo:nil repeats:NO];
+            }
             break;
         default:
             break;
     }
+}
+
+- (void)_refreshTimer {
+    [self refresh];
+    _refreshTimer = nil;
 }
 
 - (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data {

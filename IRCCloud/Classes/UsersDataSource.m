@@ -40,7 +40,7 @@
 
 -(id)init {
     self = [super init];
-    _users = [[NSMutableArray alloc] init];
+    _users = [[NSMutableDictionary alloc] init];
     return self;
 }
 
@@ -52,28 +52,24 @@
 
 -(void)addUser:(User *)user {
     @synchronized(_users) {
-        [_users addObject:user];
+        NSMutableDictionary *users = [_users objectForKey:@(user.bid)];
+        if(!users) {
+            users = [[NSMutableDictionary alloc] init];
+            [_users setObject:users forKey:@(user.bid)];
+        }
+        [users setObject:user forKey:user.nick];
     }
 }
 
 -(NSArray *)usersForBuffer:(int)bid {
     @synchronized(_users) {
-        NSMutableArray *users = [[NSMutableArray alloc] init];
-        for(User *user in _users) {
-            if(user.bid == bid)
-                [users addObject:user];
-        }
-        return [users sortedArrayUsingSelector:@selector(compare:)];
+        return [[[_users objectForKey:@(bid)] allValues] sortedArrayUsingSelector:@selector(compare:)];
     }
 }
 
 -(User *)getUser:(NSString *)nick cid:(int)cid bid:(int)bid {
     @synchronized(_users) {
-        for(User *user in _users) {
-            if(user.cid == cid && user.bid == bid && [user.nick isEqualToString:nick])
-                return user;
-        }
-        return nil;
+        return [[_users objectForKey:@(bid)] objectForKey:nick];
     }
 }
 
@@ -89,18 +85,13 @@
 
 -(void)removeUser:(NSString *)nick cid:(int)cid bid:(int)bid {
     @synchronized(_users) {
-        User *user = [self getUser:nick cid:cid bid:bid];
-        if(user)
-            [_users removeObject:user];
+        [[_users objectForKey:@(bid)] removeObjectForKey:nick];
     }
 }
 
 -(void)removeUsersForBuffer:(int)bid {
     @synchronized(_users) {
-        for(User *user in [_users copy]) {
-            if(user.bid == bid)
-                [_users removeObject:user];
-        }
+        [_users removeObjectForKey:@(bid)];
     }
 }
 
@@ -110,6 +101,8 @@
         if(user) {
             user.nick = nick;
             user.old_nick = oldNick;
+            [[_users objectForKey:@(bid)] removeObjectForKey:oldNick];
+            [[_users objectForKey:@(bid)] setObject:user forKey:nick];
         }
     }
 }
