@@ -198,8 +198,9 @@
             if(joined > 0 && buffer.archived == 0) {
                 int unread = 0;
                 int highlights = 0;
-                unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
-                highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                if(unreadCount == 0)
+                    unread = [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                highlights = [[EventsDataSource sharedInstance] highlightStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                 if(type == 1) {
                     if([[prefs objectForKey:@"channel-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
                         unread = 0;
@@ -213,17 +214,19 @@
                     unreadCount += unread;
                     highlightCount += highlights;
                 }
+                if(highlightCount > 0)
+                    break;
             }
         }
         
         if(highlightCount) {
             [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
-            _menuBtn.accessibilityValue = [NSString stringWithFormat:@"%i highlight%@", highlightCount, (highlightCount==1)?@"":@"s"];
+            _menuBtn.accessibilityValue = @"Unread highlights";
         } else if(unreadCount) {
             if(![_menuBtn.imageView.image isEqual:[UIImage imageNamed:@"menu_unread"]])
                 UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
             [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
-            _menuBtn.accessibilityValue = [NSString stringWithFormat:@"%i unread message%@", unreadCount, (highlightCount==1)?@"":@"s"];
+            _menuBtn.accessibilityValue = @"Unread messages";
         } else {
             [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
             _menuBtn.accessibilityValue = nil;
@@ -950,10 +953,6 @@
         [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
         _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
     }
-}
-
--(void)setUnreadColor:(UIColor *)color {
-    self.navigationItem.leftBarButtonItem.tintColor = color;
 }
 
 -(void)_updateTitleArea {

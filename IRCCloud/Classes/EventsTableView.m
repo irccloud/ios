@@ -244,6 +244,7 @@ int __timestampWidth;
             self.tableView.tableHeaderView = _backlogFailedView;
             return;
         }
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Download complete.");
     }
     if(notification.object == nil || [notification.object bid] == -1 || (_buffer && [notification.object bid] == _buffer.bid && _requestingBacklog)) {
         NSLog(@"Backlog loaded in current buffer, will find and remove the last seen EID marker");
@@ -259,7 +260,6 @@ int __timestampWidth;
             NSLog(@"Rebuilding the message table");
             [self refresh];
         }];
-        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Download complete. ");
     }
 }
 

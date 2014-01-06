@@ -550,8 +550,7 @@
     }
 }
 
--(int)unreadCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
-    int count = 0;
+-(int)unreadStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = [[Ignore alloc] init];
@@ -564,10 +563,10 @@
         if(event.eid > lastSeenEid && [event isImportant:type]) {
             if(event.ignoreMask && [ignore match:event.ignoreMask])
                 continue;
-            count++;
+            return 1;
         }
     }
-    return count;
+    return 0;
 }
 
 -(int)highlightCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
@@ -588,6 +587,25 @@
         }
     }
     return count;
+}
+
+-(int)highlightStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
+    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
+    Ignore *ignore = [[Ignore alloc] init];
+    [ignore setIgnores:s.ignores];
+    NSArray *copy;
+    @synchronized(_events) {
+        copy = [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
+    }
+    for(Event *event in copy) {
+        if(event.eid > lastSeenEid && [event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"])) {
+            if(event.ignoreMask && [ignore match:event.ignoreMask])
+                continue;
+            return 1;
+        }
+    }
+    return 0;
 }
 
 -(void)clearFormattingCache {

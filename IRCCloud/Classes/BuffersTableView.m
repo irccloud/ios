@@ -200,7 +200,7 @@
                     NSString *name = server.name;
                     if(!name || name.length == 0)
                         name = server.hostname;
-                    unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    unread = [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
                         unread = 0;
@@ -251,7 +251,7 @@
                 if(type > 0 && buffer.archived == 0) {
                     int unread = 0;
                     int highlights = 0;
-                    unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
+                    unread = [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                     if(type == TYPE_CHANNEL) {
                         if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
@@ -499,7 +499,7 @@
             NSDictionary *d = [_data objectAtIndex:i];
             if(b.bid == [[d objectForKey:@"bid"] intValue]) {
                 NSMutableDictionary *m = [d mutableCopy];
-                int unread = [[EventsDataSource sharedInstance] unreadCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                int unread = [[EventsDataSource sharedInstance] unreadStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
                 int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
                 if([b.type isEqualToString:@"channel"]) {
                     if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
