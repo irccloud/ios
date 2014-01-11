@@ -57,7 +57,7 @@
             users = [[NSMutableDictionary alloc] init];
             [_users setObject:users forKey:@(user.bid)];
         }
-        [users setObject:user forKey:user.nick];
+        [users setObject:user forKey:[user.nick lowercaseString]];
     }
 }
 
@@ -69,13 +69,13 @@
 
 -(User *)getUser:(NSString *)nick cid:(int)cid bid:(int)bid {
     @synchronized(_users) {
-        return [[_users objectForKey:@(bid)] objectForKey:nick];
+        return [[_users objectForKey:@(bid)] objectForKey:[nick lowercaseString]];
     }
 }
 
 -(void)removeUser:(NSString *)nick cid:(int)cid bid:(int)bid {
     @synchronized(_users) {
-        [[_users objectForKey:@(bid)] removeObjectForKey:nick];
+        [[_users objectForKey:@(bid)] removeObjectForKey:[nick lowercaseString]];
     }
 }
 
@@ -91,8 +91,8 @@
         if(user) {
             user.nick = nick;
             user.old_nick = oldNick;
-            [[_users objectForKey:@(bid)] removeObjectForKey:oldNick];
-            [[_users objectForKey:@(bid)] setObject:user forKey:nick];
+            [[_users objectForKey:@(bid)] removeObjectForKey:[oldNick lowercaseString]];
+            [[_users objectForKey:@(bid)] setObject:user forKey:[nick lowercaseString]];
         }
     }
 }
