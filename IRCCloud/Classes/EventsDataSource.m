@@ -335,6 +335,11 @@
                                       event.from = @"";
                                       event.msg = [NSString stringWithFormat:@"Channel ban set for %c%@%c (+b)", BOLD, [op objectForKey:@"param"], BOLD];
                                       unknown = NO;
+                                  } else if([[[op objectForKey:@"mode"] lowercaseString] isEqualToString:@"e"]) {
+                                      event.nick = event.from;
+                                      event.from = @"";
+                                      event.msg = [NSString stringWithFormat:@"Channel ban exception set for %c%@%c (+e)", BOLD, [op objectForKey:@"param"], BOLD];
+                                      unknown = NO;
                                   }
                               }
                               NSArray *remove = [ops objectForKey:@"remove"];
@@ -344,6 +349,11 @@
                                       event.nick = event.from;
                                       event.from = @"";
                                       event.msg = [NSString stringWithFormat:@"Channel ban removed for %c%@%c (-b)", BOLD, [op objectForKey:@"param"], BOLD];
+                                      unknown = NO;
+                                  } else if([[[op objectForKey:@"mode"] lowercaseString] isEqualToString:@"e"]) {
+                                      event.nick = event.from;
+                                      event.from = @"";
+                                      event.msg = [NSString stringWithFormat:@"Channel ban exception removed for %c%@%c (+e)", BOLD, [op objectForKey:@"param"], BOLD];
                                       unknown = NO;
                                   }
                               }
