@@ -31,11 +31,13 @@
     BOOL _valid;
     NSString *_draft;
     NSString *_chantypes;
+    BOOL _scrolledUp;
+    NSTimeInterval _scrolledUpFrom;
 }
 @property int bid, cid, archived, deferred, timeout;
-@property NSTimeInterval min_eid, last_seen_eid;
+@property NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom;
 @property NSString *name, *type, *away_msg, *chantypes;
-@property BOOL valid;
+@property BOOL valid, scrolledUp;
 @property (copy) NSString *draft;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;
 -(NSString *)accessibilityValue;

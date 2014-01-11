@@ -522,7 +522,7 @@
                         }
                     }
                 }
-                if(!e.isSelf && !_eventsView.scrolledUp) {
+                if(!e.isSelf && !_buffer.scrolledUp) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         if(e.from.length)
                             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"New message from %@: %@", e.from, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]]);

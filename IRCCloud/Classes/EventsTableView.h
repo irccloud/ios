@@ -52,12 +52,11 @@
     NSTimeInterval _maxEid, _minEid, _currentCollapsedEid, _earliestEid, _eidToOpen;
     int _currentGroupPosition, _newMsgs, _newHighlights, _lastSeenEidPos, _bottomRow;
     NSString *_lastCollpasedDay;
-    BOOL _requestingBacklog, _ready, _scrolledUp;
+    BOOL _requestingBacklog, _ready;
     NSTimer *_heartbeatTimer;
     NSTimer *_scrollTimer;
     Ignore *_ignore;
     NSRecursiveLock *_lock;
-    NSTimeInterval _scrolledUpFrom;
     UIInterfaceOrientation _lastOrientation;
     
     IBOutlet id<EventsTableViewDelegate> _delegate;
@@ -68,7 +67,6 @@
 @property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;
 @property (nonatomic) NSTimeInterval eidToOpen;
-@property (readonly) BOOL scrolledUp;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadBarClicked:(id)sender;
