@@ -469,7 +469,6 @@
                     switch(e.type) {
                         case kCollapsedEventNetSplit:
                             isNetsplit = YES;
-                            NSLog(@"Netsplit");
                             break;
                         case kCollapsedEventMode:
                             if(message.length)

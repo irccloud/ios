@@ -532,12 +532,47 @@
                 }
             } else {
                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
-                if(b && e.isHighlight && [e isImportant:b.type]) {
-                    AudioServicesPlaySystemSound(alertSound);
-                    AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+                if(b && [e isImportant:b.type]) {
+                    if(e.isHighlight) {
+                        AudioServicesPlaySystemSound(alertSound);
+                        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+                        [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
+                        _menuBtn.accessibilityValue = @"Unread highlights";
+                    } else if(_menuBtn.accessibilityValue == nil) {
+                        NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+                        if([b.type isEqualToString:@"channel"]) {
+                            if([[prefs objectForKey:@"channel-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                break;
+                        } else {
+                            if([[prefs objectForKey:@"buffer-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                break;
+                        }
+                        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
+                        [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
+                        _menuBtn.accessibilityValue = @"Unread messages";
+                    }
                 }
             }
             break;
+        case kIRCEventHeartbeatEcho:
+        {
+            o = notification.object;
+            BOOL important = NO;
+            NSDictionary *seenEids = [o objectForKey:@"seenEids"];
+            for(NSNumber *cid in seenEids.allKeys) {
+                NSDictionary *eids = [seenEids objectForKey:cid];
+                for(NSNumber *bid in eids.allKeys) {
+                    if([bid intValue] != _buffer.bid) {
+                        important = YES;
+                        break;
+                    }
+                }
+            }
+            if(important) {
+                [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
+            }
+            break;
+        }
         case kIRCEventDeleteBuffer:
         case kIRCEventBufferArchived:
             o = notification.object;
@@ -558,7 +593,6 @@
         default:
             break;
     }
-    [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
 }
 
 -(void)_showConnectingView {
