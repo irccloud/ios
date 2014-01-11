@@ -403,6 +403,13 @@
                           event.bgColor = [UIColor errorBackgroundColor];
                           event.monospace = YES;
                       },
+                      @"version":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor statusBackgroundColor];
+                          event.linkify = NO;
+                          event.from = @"";
+                          event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"server_version"], BOLD, [object objectForKey:@"comments"]];
+                          event.monospace = YES;
+                      },
                       };
     return self;
 }

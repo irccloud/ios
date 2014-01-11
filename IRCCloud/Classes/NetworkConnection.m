@@ -465,7 +465,7 @@ NSLock *__parserLock = nil;
                    @"sasl_aborted": msg, @"sasl_already": msg, @"you_are_operator": msg,
                    @"btn_metadata_set": msg, @"sasl_success": msg, @"cap_ls": msg,
                    @"cap_req": msg, @"cap_ack": msg,
-                   @"help_topics_start": msg, @"help_topics": msg, @"help_topics_end": msg, @"helphdr": msg, @"helpop": msg, @"helptlr": msg, @"helphlp": msg, @"helpfwd": msg, @"helpign": msg,
+                   @"help_topics_start": msg, @"help_topics": msg, @"help_topics_end": msg, @"helphdr": msg, @"helpop": msg, @"helptlr": msg, @"helphlp": msg, @"helpfwd": msg, @"helpign": msg, @"version": msg,
                    @"link_channel": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
                        if(!backlog)
