@@ -424,11 +424,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 - (NSUInteger)autoResizeToFillScreen
 {
   return (UIViewAutoresizingFlexibleWidth |
-          UIViewAutoresizingFlexibleHeight |
-          UIViewAutoresizingFlexibleTopMargin |
-          UIViewAutoresizingFlexibleBottomMargin |
-          UIViewAutoresizingFlexibleLeftMargin |
-          UIViewAutoresizingFlexibleRightMargin);
+          UIViewAutoresizingFlexibleHeight);
 }
 
 - (UIView *)topView
@@ -601,15 +597,15 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
         int sbwidth = [UIApplication sharedApplication].statusBarFrame.size.width;
         if(sbheight > 20)
             sbheight -= 20;
-        if(sbwidth > 2)
+        if(sbwidth > 20)
             sbwidth -= 20;
         CGRect frame = self.underLeftView.frame;
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            frame.origin.y += sbheight;
-            frame.size.height -= sbheight;
+            frame.origin.y = sbheight;
+            frame.size.height = self.view.bounds.size.height - sbheight;
         } else {
-            frame.origin.y += sbwidth;
-            frame.size.height -= sbwidth;
+            frame.origin.y = sbwidth;
+            frame.size.height = self.view.bounds.size.height - sbwidth;
         }
         self.underLeftView.frame = frame;
     }
@@ -657,15 +653,15 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
         int sbwidth = [UIApplication sharedApplication].statusBarFrame.size.width;
         if(sbheight > 20)
             sbheight -= 20;
-        if(sbwidth > 2)
+        if(sbwidth > 20)
             sbwidth -= 20;
         CGRect frame = self.underRightView.frame;
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            frame.origin.y += sbheight;
-            frame.size.height -= sbheight;
+            frame.origin.y = sbheight;
+            frame.size.height = self.view.bounds.size.height - sbheight;
         } else {
-            frame.origin.y += sbwidth;
-            frame.size.height -= sbwidth;
+            frame.origin.y = sbwidth;
+            frame.size.height = self.view.bounds.size.height - sbwidth;
         }
         self.underRightView.frame = frame;
     }
