@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1A78F36917D5EDF3008965DB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A78F36817D5EDF3008965DB /* Images.xcassets */; };
 		1A78F36B17D5F29C008965DB /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A78F36A17D5F29C008965DB /* Icons.xcassets */; };
+		22032A6F1884529700BE4A10 /* NickCompletionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22032A6E1884529700BE4A10 /* NickCompletionView.m */; };
 		2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
 		2212AF89175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
 		221F0BC5177368B40008EE04 /* CallerIDTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */; };
@@ -185,6 +186,8 @@
 /* Begin PBXFileReference section */
 		1A78F36817D5EDF3008965DB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		1A78F36A17D5F29C008965DB /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
+		22032A6D1884529700BE4A10 /* NickCompletionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NickCompletionView.h; sourceTree = "<group>"; };
+		22032A6E1884529700BE4A10 /* NickCompletionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NickCompletionView.m; sourceTree = "<group>"; };
 		2212AF86175F82F900D08C7F /* ChannelInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelInfoViewController.h; sourceTree = "<group>"; };
 		2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelInfoViewController.m; sourceTree = "<group>"; };
 		221F0BC3177368A20008EE04 /* CallerIDTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CallerIDTableViewController.h; sourceTree = "<group>"; };
@@ -587,6 +590,8 @@
 				2236F60916DBCBC6007BE535 /* MainViewController.m */,
 				22A35F27178A3F2B00529CDA /* NamesListTableViewController.h */,
 				22A35F28178A3F3500529CDA /* NamesListTableViewController.m */,
+				22032A6D1884529700BE4A10 /* NickCompletionView.h */,
+				22032A6E1884529700BE4A10 /* NickCompletionView.m */,
 				22B4284616D7E36300498507 /* NetworkConnection.h */,
 				22B4284716D7E36300498507 /* NetworkConnection.m */,
 				2236F5F816DA765C007BE535 /* ServersDataSource.h */,
@@ -873,6 +878,7 @@
 				22B4287E16D831A800498507 /* WebSocketMessage.m in Sources */,
 				22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */,
 				2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */,
+				22032A6F1884529700BE4A10 /* NickCompletionView.m in Sources */,
 				2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */,
 				2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */,
 				2236F60216DBC021007BE535 /* ChannelsDataSource.m in Sources */,

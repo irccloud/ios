@@ -21,8 +21,9 @@
 #import "UsersTableView.h"
 #import "EventsTableView.h"
 #import "UIExpandingTextView.h"
+#import "NickCompletionView.h"
 
-@interface MainViewController : UIViewController<BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate> {
+@interface MainViewController : UIViewController<NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
@@ -61,6 +62,7 @@
     SystemSoundID alertSound;
     UIView *_landscapeView;
     CGSize _kbSize;
+    NickCompletionView *_nickCompletionView;
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;

@@ -26,10 +26,13 @@
     NSString *_mode;
     int _away;
     NSString *_away_msg;
+    NSTimeInterval _lastMention;
 }
 @property int cid, bid, away;
 @property NSString *nick, *old_nick, *hostmask, *mode, *away_msg;
+@property NSTimeInterval lastMention;
 -(NSComparisonResult)compare:(User *)aUser;
+-(NSComparisonResult)compareByMentionTime:(User *)aUser;
 @end
 
 @interface UsersDataSource : NSObject {

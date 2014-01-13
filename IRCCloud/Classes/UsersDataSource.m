@@ -23,6 +23,15 @@
     return [[_nick lowercaseString] compare:[aUser.nick lowercaseString]];
 }
 
+-(NSComparisonResult)compareByMentionTime:(User *)aUser {
+    if(_lastMention == aUser.lastMention)
+        return [[_nick lowercaseString] compare:[aUser.nick lowercaseString]];
+    else if(_lastMention > aUser.lastMention)
+        return NSOrderedAscending;
+    else
+        return NSOrderedDescending;
+}
+
 @end
 
 @implementation UsersDataSource

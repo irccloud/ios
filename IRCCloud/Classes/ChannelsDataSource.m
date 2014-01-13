@@ -49,6 +49,9 @@
     }
     return NO;
 }
+-(NSComparisonResult)compare:(Channel *)aChannel {
+    return [[_name lowercaseString] compare:[aChannel.name lowercaseString]];
+}
 @end
 
 @implementation ChannelsDataSource
@@ -150,6 +153,17 @@
         }
         return nil;
     }
+}
+
+-(NSArray *)channelsForServer:(int)cid {
+    NSMutableArray *channels = [[NSMutableArray alloc] init];
+    @synchronized(_channels) {
+        for(Channel *channel in _channels) {
+            if(channel.cid == cid)
+                [channels addObject:channel];
+        }
+    }
+    return channels;
 }
 
 -(void)purgeInvalidChannels {

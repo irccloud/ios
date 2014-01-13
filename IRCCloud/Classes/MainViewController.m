@@ -146,6 +146,9 @@
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
+    _nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectMake(0,0,_bottomBar.frame.size.width,0)];
+    _nickCompletionView.completionDelegate = self;
+    _message.internalTextView.inputAccessoryView = _nickCompletionView;
     [_bottomBar addSubview:_message];
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[UIImage imageNamed:@"users"] forState:UIControlStateNormal];
@@ -499,8 +502,13 @@
         case kIRCEventBufferMsg:
             e = notification.object;
             if(e.bid == _buffer.bid) {
-                if(e.isHighlight)
+                if(e.isHighlight) {
                     [self showMentionTip];
+                    User *u = [[UsersDataSource sharedInstance] getUser:e.from cid:e.cid bid:e.bid];
+                    if(u && u.lastMention < e.eid) {
+                        u.lastMention = e.eid;
+                    }
+                }
                 if([[e.from lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
                     for(Event *e in [_pendingEvents copy]) {
                         if(e.bid == _buffer.bid) {
@@ -724,6 +732,7 @@
         [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
         [_buffersView scrollViewDidScroll:_buffersView.tableView];
         [UIView commitAnimations];
+        [self expandingTextViewDidChange:_message];
     }
     [self performSelector:@selector(_observeKeyboard) withObject:nil afterDelay:0.01];
 }
@@ -961,8 +970,71 @@
     }
 }
 
+-(void)nickSelected:(NSString *)nick {
+    NSRange rangeCopy = _message.selectedRange;
+    NSString *text = _message.text.copy;
+    [_message resignFirstResponder];
+    [_message becomeFirstResponder];
+    [_message setText:text];
+    [_message setSelectedRange:rangeCopy];
+    text = _message.text;
+    if(text.length == 0) {
+        _message.text = nick;
+    } else {
+        while(text.length > 0 && [text characterAtIndex:text.length - 1] != ' ') {
+            text = [text substringToIndex:text.length - 1];
+        }
+        text = [text stringByAppendingString:nick];
+        _message.text = text;
+    }
+    if(nick.length > 1)
+        _message.text = [_message.text stringByAppendingString:@" "];
+}
+
 -(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
     _sendBtn.enabled = expandingTextView.text.length > 0;
+    
+    NSMutableArray *suggestions = [[NSMutableArray alloc] init];
+    
+    if(expandingTextView.text.length == 0) {
+        [suggestions addObject:@"/"];
+        [suggestions addObject:@"#"];
+        NSArray *users = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
+        for(User *user in users) {
+            if(user.lastMention > 0)
+                [suggestions addObject:[user.nick stringByAppendingString:@":"]];
+        }
+    } else {
+        NSString *text = [expandingTextView.text lowercaseString];
+        int lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
+        if(lastSpace != NSNotFound && lastSpace != text.length) {
+            text = [text substringFromIndex:lastSpace + 1];
+        }
+        if(lastSpace == NSNotFound && [text isEqualToString:@"/"]) {
+            [suggestions addObjectsFromArray:@[@"/mode", @"/join", @"/part", @"/quit", @"/cycle", @"/op", @"/deop", @"/voice", @"/devoice"]];
+        } else if([text hasPrefix:@"#"]) {
+            NSArray *channels = [[[ChannelsDataSource sharedInstance] channelsForServer:_buffer.cid] sortedArrayUsingSelector:@selector(compare:)];
+            for(Channel *channel in channels) {
+                if([[channel.name lowercaseString] hasPrefix:text])
+                    [suggestions addObject:channel.name];
+            }
+        } else {
+            if(text.length == 0) {
+                [suggestions addObject:@"#"];
+            } else {
+                NSArray *users = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
+                for(User *user in users) {
+                    if([[user.nick lowercaseString] hasPrefix:text]) {
+                        if(lastSpace == NSNotFound)
+                            [suggestions addObject:[user.nick stringByAppendingString:@":"]];
+                        else
+                            [suggestions addObject:user.nick];
+                    }
+                }
+            }
+        }
+    }
+    [_nickCompletionView setSuggestions:suggestions];
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
@@ -1112,6 +1184,17 @@
             [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid];
     }
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    if(_buffer) {
+        NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
+        for(Event *event in events) {
+            if(event.isHighlight) {
+                User *u = [[UsersDataSource sharedInstance] getUser:event.from cid:event.cid bid:event.bid];
+                if(u && u.lastMention < event.eid) {
+                    u.lastMention = event.eid;
+                }
+            }
+        }
+    }
     
     [self _updateTitleArea];
     [_buffersView setBuffer:_buffer];
