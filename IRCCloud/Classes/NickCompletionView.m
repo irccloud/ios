@@ -13,6 +13,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        self.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
         [self setSuggestions:@[@"/", @"#"]];
     }
     return self;
@@ -33,11 +34,15 @@
         [b sizeToFit];
         CGRect frame = b.frame;
         frame.origin.x = x;
-        x += frame.size.width + 8;
+        if(frame.size.width < 32)
+            frame.size.width = 32;
+        if(frame.size.height < 32)
+            frame.size.height = 32;
         if(height == 0)
             height = frame.size.height;
         b.frame = frame;
         [self addSubview:b];
+        x += frame.size.width + 8;
     }
     CGRect frame = self.frame;
     if(frame.size.height == 0) {
@@ -53,6 +58,11 @@
 }
 
 -(void)suggestionTapped:(UIButton *)sender {
+    [[UIDevice currentDevice] playInputClick];
     [_completionDelegate nickSelected:sender.titleLabel.text];
+}
+
+- (BOOL) enableInputClicksWhenVisible {
+    return YES;
 }
 @end
