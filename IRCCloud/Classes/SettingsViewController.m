@@ -348,6 +348,9 @@
     _highlights.delegate = self;
 
     _version = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey];
+#ifdef BRAND_NAME
+    _version = [_version stringByAppendingFormat:@"-%@", BRAND_NAME];
+#endif
     
     [self refresh];
 }

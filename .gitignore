@@ -2,3 +2,7 @@ IRCCloud.xcodeproj/project.xcworkspace
 IRCCloud.xcodeproj/xcuserdata
 build/
 IRCCloud/config.h
+./*.png
+./*.sh
+./*.mobileprovision
+./*.ipa

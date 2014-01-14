@@ -25,7 +25,11 @@
 #import "UsersDataSource.h"
 #import "EventsDataSource.h"
 
+#ifdef BRAND_HOST
+#define IRCCLOUD_HOST BRAND_HOST
+#else
 #define IRCCLOUD_HOST @"www.irccloud.com"
+#endif
 
 extern NSString *kIRCCloudConnectivityNotification;
 extern NSString *kIRCCloudEventNotification;

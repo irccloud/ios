@@ -52,7 +52,11 @@
     login.adjustsImageWhenHighlighted = NO;
     login.enabled = NO;
     
+#ifdef BRAND_NAME
+    [version setText:[NSString stringWithFormat:@"Version %@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey], BRAND_NAME]];
+#else
     [version setText:[NSString stringWithFormat:@"Version %@",[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey]]];
+#endif
 }
 
 -(void)flyaway {
