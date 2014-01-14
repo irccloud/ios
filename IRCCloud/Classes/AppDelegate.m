@@ -68,8 +68,10 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     _conn = [NetworkConnection sharedInstance];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30)}];
+#ifndef BRAND_NAME
     if(TESTFLIGHT_KEY)
         [TestFlight takeOff:TESTFLIGHT_KEY];
+#endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {

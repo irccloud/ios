@@ -1180,7 +1180,7 @@
     if(_buffer) {
         _buffer.draft = _message.text;
         
-        if(changed)
+        if(changed && !_buffer.scrolledUp)
             [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid];
     }
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];

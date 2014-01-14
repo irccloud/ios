@@ -1034,7 +1034,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [_socket close];
     _socket = nil;
     for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
-        [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid];
+        if(!b.scrolledUp)
+            [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid];
     }
 }
 
