@@ -146,9 +146,9 @@
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
-    _nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectMake(0,0,_bottomBar.frame.size.width,0)];
+    _nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectZero];
     _nickCompletionView.completionDelegate = self;
-    _message.internalTextView.inputAccessoryView = _nickCompletionView;
+    [self.view addSubview:_nickCompletionView];
     [_bottomBar addSubview:_message];
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[UIImage imageNamed:@"users"] forState:UIControlStateNormal];
@@ -1023,6 +1023,15 @@
         }
     }
     [_nickCompletionView setSuggestions:suggestions];
+    if(suggestions.count == 0) {
+        if(_nickCompletionView.alpha > 0) {
+            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; }];
+        }
+    } else {
+        if(_nickCompletionView.alpha == 0) {
+            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; }];
+        }
+    }
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
@@ -1496,6 +1505,7 @@
         _connectingStatus.frame = frame;
     }
 #endif
+    _nickCompletionView.frame = CGRectMake(4,_bottomBar.frame.origin.y - 44, width - 8, 40);
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];
     [self _updateServerStatus];

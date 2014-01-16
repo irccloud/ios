@@ -7,54 +7,54 @@
 //
 
 #import "NickCompletionView.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation NickCompletionView
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor colorWithWhite:0.9 alpha:1];
-        [self setSuggestions:@[@"/", @"#"]];
+        self.backgroundColor = [UIColor selectedBlueColor];
+        _scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
+        _scrollView.backgroundColor = [UIColor backgroundBlueColor];
+        [self addSubview:_scrollView];
+        [self setSuggestions:@[]];
     }
     return self;
+}
+
+-(void)setFrame:(CGRect)frame {
+    [super setFrame:frame];
+    _scrollView.frame = CGRectMake(4, 4, frame.size.width - 8, frame.size.height - 8);
 }
 
 -(void)setSuggestions:(NSArray *)suggestions {
     _suggestions = suggestions;
     
-    [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    [[_scrollView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     
     int x = 0;
-    float height = 0;
     for(NSString *label in _suggestions) {
         UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
         [b setTitle:label forState:UIControlStateNormal];
-        [b setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [b setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
         [b addTarget:self action:@selector(suggestionTapped:) forControlEvents:UIControlEventTouchUpInside];
         [b sizeToFit];
         CGRect frame = b.frame;
         frame.origin.x = x;
         if(frame.size.width < 32)
             frame.size.width = 32;
-        if(frame.size.height < 32)
-            frame.size.height = 32;
-        if(height == 0)
-            height = frame.size.height;
+        frame.size.height = _scrollView.frame.size.height;
         b.frame = frame;
-        [self addSubview:b];
-        x += frame.size.width + 8;
+        [_scrollView addSubview:b];
+        x += frame.size.width + 12;
     }
-    CGRect frame = self.frame;
-    if(frame.size.height == 0 || _suggestions.count == 0) {
-        frame.size.height = height;
-        self.frame = frame;
-    }
-    if(frame.size.width < x) {
-        [self setContentInset:UIEdgeInsetsMake(0, 6, 0, 6)];
+    if(_scrollView.frame.size.width < x) {
+        [_scrollView setContentInset:UIEdgeInsetsMake(0, 6, 0, 6)];
     } else {
-        [self setContentInset:UIEdgeInsetsMake(0, (frame.size.width - x) / 2, 0, 0)];
+        [_scrollView setContentInset:UIEdgeInsetsMake(0, (_scrollView.frame.size.width - x) / 2, 0, 0)];
     }
-    [self setContentSize:CGSizeMake(x,height)];
+    [_scrollView setContentSize:CGSizeMake(x,_scrollView.frame.size.height)];
 }
 
 -(void)suggestionTapped:(UIButton *)sender {

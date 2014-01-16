@@ -13,7 +13,8 @@
 @end
 
 
-@interface NickCompletionView : UIScrollView<UIInputViewAudioFeedback> {
+@interface NickCompletionView : UIView<UIInputViewAudioFeedback> {
+    UIScrollView *_scrollView;
     NSArray *_suggestions;
 }
 @property (nonatomic, assign) id<NickCompletionViewDelegate> completionDelegate;
