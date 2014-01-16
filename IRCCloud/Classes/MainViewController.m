@@ -996,28 +996,30 @@
     
     NSMutableArray *suggestions = [[NSMutableArray alloc] init];
     
-    if(expandingTextView.text.length > 2) {
+    if(expandingTextView.text.length > 0) {
         NSString *text = [expandingTextView.text lowercaseString];
         int lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
         if(lastSpace != NSNotFound && lastSpace != text.length) {
             text = [text substringFromIndex:lastSpace + 1];
         }
-        if([text hasPrefix:@"#"]) {
-            NSArray *channels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
-            if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
-                [suggestions addObject:_buffer.name];
-            for(Channel *channel in channels) {
-                if(channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text])
-                    [suggestions addObject:channel.name];
-            }
-        } else {
-            NSArray *users = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
-            for(User *user in users) {
-                if([[user.nick lowercaseString] hasPrefix:text]) {
-                    if(lastSpace == NSNotFound)
-                        [suggestions addObject:[user.nick stringByAppendingString:@":"]];
-                    else
-                        [suggestions addObject:user.nick];
+        if(text.length > 2) {
+            if([text hasPrefix:@"#"]) {
+                NSArray *channels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
+                if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
+                    [suggestions addObject:_buffer.name];
+                for(Channel *channel in channels) {
+                    if(channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text])
+                        [suggestions addObject:channel.name];
+                }
+            } else {
+                NSArray *users = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
+                for(User *user in users) {
+                    if([[user.nick lowercaseString] hasPrefix:text]) {
+                        if(lastSpace == NSNotFound)
+                            [suggestions addObject:[user.nick stringByAppendingString:@":"]];
+                        else
+                            [suggestions addObject:user.nick];
+                    }
                 }
             }
         }
