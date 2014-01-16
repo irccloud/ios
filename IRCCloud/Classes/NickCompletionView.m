@@ -45,7 +45,7 @@
         x += frame.size.width + 8;
     }
     CGRect frame = self.frame;
-    if(frame.size.height == 0) {
+    if(frame.size.height == 0 || _suggestions.count == 0) {
         frame.size.height = height;
         self.frame = frame;
     }

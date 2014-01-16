@@ -56,5 +56,6 @@
 -(void)updateTimestamp:(NSTimeInterval)timestamp buffer:(int)bid;
 -(Channel *)channelForBuffer:(int)bid;
 -(NSArray *)channelsForServer:(int)cid;
+-(NSArray *)channels;
 -(void)purgeInvalidChannels;
 @end

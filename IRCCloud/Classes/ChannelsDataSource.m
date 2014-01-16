@@ -166,6 +166,10 @@
     return channels;
 }
 
+-(NSArray *)channels {
+    return _channels;
+}
+
 -(void)purgeInvalidChannels {
     NSLog(@"Cleaning up invalid channels");
     NSArray *copy;
