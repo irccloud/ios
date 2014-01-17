@@ -218,9 +218,17 @@ NSLock *__parserLock = nil;
     };
     
     void (^msg)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
-        Event *event = [_events addJSONObject:object];
-        if(!backlog)
-            [self postObject:event forEvent:kIRCEventBufferMsg];
+        if([_buffers getBuffer:object.bid]) {
+            Event *event = [_events addJSONObject:object];
+            if(!backlog)
+                [self postObject:event forEvent:kIRCEventBufferMsg];
+        } else {
+            NSLog(@"Event recieved for invalid BID, reconnecting!");
+            _streamId = nil;
+            [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
+            _state = kIRCCloudStateDisconnected;
+            [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
+        }
     };
     
     void (^joined_channel)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {

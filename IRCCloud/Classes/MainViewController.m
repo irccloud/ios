@@ -586,6 +586,7 @@
             o = notification.object;
             if(o.bid == _buffer.bid)
                 [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+            [self _updateUnreadIndicator];
             break;
         case kIRCEventConnectionDeleted:
             o = notification.object;
@@ -597,6 +598,7 @@
                     [(AppDelegate *)[UIApplication sharedApplication].delegate showConnectionView];
                 }
             }
+            [self _updateUnreadIndicator];
             break;
         default:
             break;
