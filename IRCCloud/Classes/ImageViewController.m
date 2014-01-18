@@ -34,6 +34,9 @@
     self = [super initWithNibName:@"ImageViewController" bundle:nil];
     if (self) {
         _url = url;
+        if([[_url.host lowercaseString] isEqualToString:@"www.dropbox.com"]) {
+            _url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?dl=1", url.absoluteString]];
+        }
         _chrome = [[OpenInChromeController alloc] init];
     }
     return self;
