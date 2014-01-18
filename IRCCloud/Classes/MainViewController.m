@@ -1004,7 +1004,7 @@
         if(lastSpace != NSNotFound && lastSpace != text.length) {
             text = [text substringFromIndex:lastSpace + 1];
         }
-        if(text.length > 2) {
+        if(text.length > 1) {
             if([text hasPrefix:@"#"]) {
                 NSArray *channels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
                 if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
@@ -1509,7 +1509,8 @@
         _connectingStatus.frame = frame;
     }
 #endif
-    _nickCompletionView.frame = CGRectMake(4,_bottomBar.frame.origin.y - 44, width - 8, 40);
+    float h = [@" " sizeWithFont:_nickCompletionView.font].height + 4;
+    _nickCompletionView.frame = CGRectMake(1,_bottomBar.frame.origin.y - h - 2, width - 2, h);
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];
     [self _updateServerStatus];

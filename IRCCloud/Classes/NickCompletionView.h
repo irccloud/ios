@@ -16,7 +16,9 @@
 @interface NickCompletionView : UIView<UIInputViewAudioFeedback> {
     UIScrollView *_scrollView;
     NSArray *_suggestions;
+    UIFont *_font;
 }
+@property (readonly) UIFont *font;
 @property (nonatomic, assign) id<NickCompletionViewDelegate> completionDelegate;
 -(void)setSuggestions:(NSArray *)suggestions;
 @end

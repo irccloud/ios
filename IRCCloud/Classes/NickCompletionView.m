@@ -8,6 +8,7 @@
 
 #import "NickCompletionView.h"
 #import "UIColor+IRCCloud.h"
+#import "ColorFormatter.h"
 
 @implementation NickCompletionView
 
@@ -25,7 +26,13 @@
 
 -(void)setFrame:(CGRect)frame {
     [super setFrame:frame];
-    _scrollView.frame = CGRectMake(4, 4, frame.size.width - 8, frame.size.height - 8);
+    _scrollView.frame = CGRectMake(1, 1, frame.size.width - 2, frame.size.height - 2);
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+        _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    else
+#endif
+        _font = [UIFont systemFontOfSize:FONT_SIZE];
 }
 
 -(void)setSuggestions:(NSArray *)suggestions {
@@ -36,6 +43,7 @@
     int x = 0;
     for(NSString *label in _suggestions) {
         UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
+        b.titleLabel.font = _font;
         [b setTitle:label forState:UIControlStateNormal];
         [b setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
         [b addTarget:self action:@selector(suggestionTapped:) forControlEvents:UIControlEventTouchUpInside];
