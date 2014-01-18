@@ -113,7 +113,7 @@
     NSString *l = [url.path lowercaseString];
     if([url.scheme hasPrefix:@"irc"]) {
         [self.mainViewController launchURL:[NSURL URLWithString:[url.description stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
-    } else if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"]) {
+    } else if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"] || ([[url.host lowercaseString] isEqualToString:@"imgur.com"] && [url.path rangeOfString:@"/a/"].location == NSNotFound)) {
         [self showImage:url];
     } else {
         if(!_openInChromeController)
