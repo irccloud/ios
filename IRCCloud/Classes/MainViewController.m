@@ -1430,6 +1430,8 @@
             _landscapeView.transform = CGAffineTransformIdentity;
         _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
         _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
+        float h = [@" " sizeWithFont:_nickCompletionView.font].height + 4;
+        _nickCompletionView.frame = CGRectMake(1,_bottomBar.frame.origin.y - h - 2, width - 2, h);
     } else {
         if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
             self.navigationItem.leftBarButtonItem = nil;
@@ -1459,6 +1461,8 @@
             frame.origin.x = _buffersView.view.frame.size.width;
             frame.size.width = _eventsView.view.frame.size.width;
             _serverStatusBar.frame = frame;
+            float h = [@" " sizeWithFont:_nickCompletionView.font].height + 4;
+            _nickCompletionView.frame = CGRectMake(221,_bottomBar.frame.origin.y - h - 2, width - 442, h);
         } else {
             _borders.hidden = YES;
             if(!self.slidingViewController.underLeftViewController)
@@ -1478,6 +1482,8 @@
             frame.origin.x = 0;
             frame.size.width = _eventsView.view.frame.size.width;
             _serverStatusBar.frame = frame;
+            float h = [@" " sizeWithFont:_nickCompletionView.font].height + 4;
+            _nickCompletionView.frame = CGRectMake(1,_bottomBar.frame.origin.y - h - 2, width - 2, h);
         }
     }
     if(duration > 0) {
@@ -1509,8 +1515,6 @@
         _connectingStatus.frame = frame;
     }
 #endif
-    float h = [@" " sizeWithFont:_nickCompletionView.font].height + 4;
-    _nickCompletionView.frame = CGRectMake(1,_bottomBar.frame.origin.y - h - 2, width - 2, h);
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];
     [self _updateServerStatus];
