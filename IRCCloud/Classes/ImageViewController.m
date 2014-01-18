@@ -39,7 +39,6 @@
         } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"] && [url.path rangeOfString:@"/a/"].location == NSNotFound) {
             _url = [NSURL URLWithString:[NSString stringWithFormat:@"http://i.imgur.com/%@.png", url.path]];
         }
-        NSLog(@"%@", _url);
         _chrome = [[OpenInChromeController alloc] init];
     }
     return self;
