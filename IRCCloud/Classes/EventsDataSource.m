@@ -546,7 +546,7 @@
     @synchronized(_events) {
         NSMutableArray *events = [_events objectForKey:@(bid)];
         while(events.count > 200) {
-            Event *e = [events firstObject];
+            Event *e = [events objectAtIndex:0];
             [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(e.eid)];
             [events removeObject:e];
         }
