@@ -32,7 +32,7 @@
         _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     else
 #endif
-        _font = [UIFont systemFontOfSize:FONT_SIZE];
+        _font = [UIFont fontWithName:@"Helvetica" size:FONT_SIZE + 4];
 }
 
 -(void)setSuggestions:(NSArray *)suggestions {
