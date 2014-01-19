@@ -40,7 +40,10 @@
         NSMutableArray *links = [[NSMutableArray alloc] init];
         NSMutableAttributedString *data = [[NSMutableAttributedString alloc] init];
         
-        [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ (%@@%@)", [object objectForKey:@"user_realname"], [object objectForKey:@"user_username"], [object objectForKey:@"user_host"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        NSString *actualHost = @"";
+        if([object objectForKey:@"actual_host"])
+            actualHost = [NSString stringWithFormat:@"/%@", [object objectForKey:@"actual_host"]];
+        [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ (%@@%@%@)", [object objectForKey:@"user_realname"], [object objectForKey:@"user_username"], [object objectForKey:@"user_host"], actualHost] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
         
         if([[object objectForKey:@"user_logged_in_as"] length]) {
             [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@" is authed as %@", [object objectForKey:@"user_logged_in_as"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
@@ -48,6 +51,14 @@
         
         [data appendAttributedString:[ColorFormatter format:@"\n" defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil]];
 
+        if([object objectForKey:@"away"]) {
+            NSString *away = @"Away";
+            if(![[object objectForKey:@"away"] isEqualToString:@"away"])
+                away = [away stringByAppendingFormat:@": %@", [object objectForKey:@"away"]];
+
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@\n", away] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        }
+        
         if([[object objectForKey:@"signon_time"] intValue]) {
             [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"Online for about %@", [self duration:([[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"signon_time"] doubleValue])]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
 
@@ -58,12 +69,12 @@
             [data appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
         }
         
-        if([[object objectForKey:@"op_msg"] length]) {
-            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"op_nick"], [object objectForKey:@"op_msg"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        if([[object objectForKey:@"op_nick"] length]) {
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"op_nick"], [object objectForKey:@"op_msg"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
         }
         
-        if([[object objectForKey:@"stats_dline"] length]) {
-            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"stats_dline"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        if([[object objectForKey:@"opername"] length]) {
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"opername"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
         }
         
         if([[object objectForKey:@"userip"] length]) {
@@ -74,23 +85,7 @@
             [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"bot_msg"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
         }
         
-        if([[object objectForKey:@"cgi"] length]) {
-            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"cgi"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
-        }
-        
-        if([[object objectForKey:@"help"] length]) {
-            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"help"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
-        }
-        
-        if([[object objectForKey:@"vworld"] length]) {
-            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"vworld"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
-        }
-        
-        if([[object objectForKey:@"secure"] length]) {
-            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"secure"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
-        }
-        
-        [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ is connected via %@", [object objectForKey:@"nick"], [object objectForKey:@"server_addr"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ is connected via: %@", [object objectForKey:@"nick"], [object objectForKey:@"server_addr"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
 
         if([[object objectForKey:@"server_extra"] length]) {
             [data appendAttributedString:[ColorFormatter format:@" (" defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil]];
@@ -113,6 +108,10 @@
         }
         
         [data appendAttributedString:[ColorFormatter format:@"\n" defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil]];
+
+        if([[object objectForKey:@"host"] length]) {
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"host"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        }
         
         [self addChannels:[object objectForKey:@"channels_owner"] forGroup:@"Owner" attributedString:data links:links server:s];
         [self addChannels:[object objectForKey:@"channels_admin"] forGroup:@"Admin" attributedString:data links:links server:s];
@@ -121,6 +120,35 @@
         [self addChannels:[object objectForKey:@"channels_voiced"] forGroup:@"Voiced" attributedString:data links:links server:s];
         [self addChannels:[object objectForKey:@"channels_member"] forGroup:@"Member" attributedString:data links:links server:s];
         
+        if([[object objectForKey:@"secure"] length]) {
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"secure"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        }
+        
+        if([[object objectForKey:@"client_cert"] length]) {
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"client_cert"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        }
+        
+        if([[object objectForKey:@"cgi"] length]) {
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"cgi"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        }
+        
+        if([[object objectForKey:@"help"] length]) {
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"help"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        }
+        
+        if([[object objectForKey:@"vworld"] length]) {
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"vworld"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        }
+        
+        if([[object objectForKey:@"modes"] length]) {
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"modes"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        }
+        
+        if([[object objectForKey:@"stats_dline"] length]) {
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"stats_dline"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
+        }
+        
+
         _label.attributedText = data;
         for(NSTextCheckingResult *result in links)
             [_label addLinkWithTextCheckingResult:result];
