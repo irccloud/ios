@@ -113,7 +113,10 @@
     NSString *l = [url.path lowercaseString];
     if([url.scheme hasPrefix:@"irc"]) {
         [self.mainViewController launchURL:[NSURL URLWithString:[url.description stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
-    } else if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"] || ([[url.host lowercaseString] isEqualToString:@"imgur.com"] && [url.path rangeOfString:@"/a/"].location == NSNotFound) || [[url.host lowercaseString] hasSuffix:@".flickr.com"]) {
+    } else if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"] ||
+              ([[url.host lowercaseString] isEqualToString:@"imgur.com"] && [url.path rangeOfString:@"/a/"].location == NSNotFound) ||
+              ([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [[url.path lowercaseString] hasPrefix:@"/photos/"]) ||
+              (([[url.host lowercaseString] isEqualToString:@"instagram.com"] || [[url.host lowercaseString] isEqualToString:@"instagr.am"]) && [[url.path lowercaseString] hasPrefix:@"/p/"])) {
         [self showImage:url];
     } else {
         if(!_openInChromeController)

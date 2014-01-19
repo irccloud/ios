@@ -201,6 +201,9 @@
     } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"]) {
         [self loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString]];
         return;
+    } else if([[url.host lowercaseString] hasSuffix:@"instagram.com"] || [[url.host lowercaseString] hasSuffix:@"instagr.am"]) {
+        [self loadOembed:[NSString stringWithFormat:@"http://api.instagram.com/oembed?url=%@", url.absoluteString]];
+        return;
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
