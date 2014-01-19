@@ -34,11 +34,6 @@
     self = [super initWithNibName:@"ImageViewController" bundle:nil];
     if (self) {
         _url = url;
-        if([[_url.host lowercaseString] isEqualToString:@"www.dropbox.com"]) {
-            _url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?dl=1", url.absoluteString]];
-        } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"] && [url.path rangeOfString:@"/a/"].location == NSNotFound) {
-            _url = [NSURL URLWithString:[NSString stringWithFormat:@"http://i.imgur.com/%@.png", url.path]];
-        }
         _chrome = [[OpenInChromeController alloc] init];
     }
     return self;
@@ -159,12 +154,56 @@
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
 }
 
+-(void)fail {
+    if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
+                                                                                  withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                                                                                     createNewTab:NO]))
+        [[UIApplication sharedApplication] openURL:_url];
+    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
+}
+
+-(void)loadOembed:(NSString *)url {
+    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error fetching oembed. Error %i : %@", error.code, error.userInfo);
+            [self fail];
+        } else {
+            SBJsonParser *parser = [[SBJsonParser alloc] init];
+            NSDictionary *dict = [parser objectWithData:data];
+            if([[dict objectForKey:@"type"] isEqualToString:@"photo"]) {
+                NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"url"]]];
+                NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                
+                [connection start];
+            } else {
+                NSLog(@"Invalid type from oembed");
+                [self fail];
+            }
+        }
+    }];
+}
+
 -(void)load {
 #ifdef DEBUG
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
 #endif
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:_url];
+    NSURL *url = _url;
+    if([[url.host lowercaseString] isEqualToString:@"www.dropbox.com"]) {
+        if([url.path hasPrefix:@"/s/"])
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"https://dl.dropboxusercontent.com%@", url.path]];
+        else
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?dl=1", url.absoluteString]];
+    } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"]) {
+        [self loadOembed:[NSString stringWithFormat:@"http://api.imgur.com/oembed.json?url=%@", url.absoluteString]];
+        return;
+    } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"]) {
+        [self loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString]];
+        return;
+    }
+    
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
     NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
     
     [connection start];
@@ -207,11 +246,7 @@
         }
     }
     if(!data || !img) {
-            [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
-            if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
-                                                                                          withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                                                                                             createNewTab:NO]))
-                [[UIApplication sharedApplication] openURL:_url];
+        [self fail];
     }
 }
 
@@ -278,10 +313,7 @@
     } else if([title hasPrefix:@"Open "]) {
         [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
-                      withCallbackURL:[NSURL URLWithString:@"irccloud://"]
-                         createNewTab:NO]))
-                [[UIApplication sharedApplication] openURL:_url];
+            [self fail];
         }];
     }
 }
