@@ -174,7 +174,7 @@ NSLock *__parserLock = nil;
     _background = NO;
     _writer = [[SBJsonWriter alloc] init];
     _reachabilityValid = NO;
-    _reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
+    _reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [@IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
     SCNetworkReachabilityScheduleWithRunLoop(_reachability, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
     SCNetworkReachabilitySetCallback(_reachability, ReachabilityCallback, NULL);
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogStarted:) name:kIRCCloudBacklogStartedNotification object:nil];
@@ -309,7 +309,7 @@ NSLock *__parserLock = nil;
                    @"oob_include": ^(IRCCloudJSONObject *object) {
                        _awayOverride = [[NSMutableDictionary alloc] init];
                        _reconnectTimestamp = 0;
-                       [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
+                       [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", @IRCCLOUD_HOST, [object objectForKey:@"url"]]];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object) {
                        _userInfo = object.dictionary;
@@ -734,7 +734,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     CFStringRef password_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)password, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/login", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/login", @IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setHTTPMethod:@"POST"];
@@ -777,7 +777,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], [[NSUserDefaults standardUserDefaults] stringForKey:@"session"]];
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-register", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-register", @IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
@@ -801,7 +801,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], [[NSUserDefaults standardUserDefaults] stringForKey:@"session"]];
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-unregister", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-unregister", @IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
@@ -1005,7 +1005,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [_oobQueue removeAllObjects];
     }
     
-    NSString *url = [NSString stringWithFormat:@"wss://%@",IRCCLOUD_HOST];
+    NSString *url = [NSString stringWithFormat:@"wss://%@",@IRCCLOUD_HOST];
     if(_events.highestEid > 0) {
         url = [url stringByAppendingFormat:@"/?since_id=%.0lf", _events.highestEid];
         if(_streamId)
@@ -1020,7 +1020,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _reconnectTimestamp = -1;
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:nil protocols:nil
-                                                                     tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
+                                                                     tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: @IRCCLOUD_HOST,
                                                                                     (NSString *)kCFStreamSSLLevel: (NSString *)kCFStreamSocketSecurityLevelSSLv3} mutableCopy]
                                                                          headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"],
                                                                                     [HandshakeHeader headerWithValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forKey:@"Cookie"]] mutableCopy]
@@ -1242,9 +1242,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid {
     NSString *URL = nil;
     if(eid > 0)
-        URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i&beforeid=%.0lf", IRCCLOUD_HOST, cid, bid, eid];
+        URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i&beforeid=%.0lf", @IRCCLOUD_HOST, cid, bid, eid];
     else
-        URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i", IRCCLOUD_HOST, cid, bid];
+        URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i", @IRCCLOUD_HOST, cid, bid];
     OOBFetcher *fetcher = [self fetchOOB:URL];
     fetcher.bid = bid;
 }

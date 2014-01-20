@@ -1114,11 +1114,7 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/IRCCloud\"",
 				);
-				OTHER_CFLAGS = (
-					"-DNS_BLOCK_ASSERTIONS=1",
-					"-DBRAND_HOST=$(BRAND_HOST)",
-					"-DBRAND_NAME=$(BRAND_NAME)",
-				);
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;

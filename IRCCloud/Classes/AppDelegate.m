@@ -142,11 +142,13 @@
 }
 
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
-    [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSDictionary *result = [_conn registerAPNs:devToken];
-        NSLog(@"Registration result: %@", result);
-    });
+    if(![devToken isEqualToData:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]]) {
+        [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSDictionary *result = [_conn registerAPNs:devToken];
+            NSLog(@"Registration result: %@", result);
+        });
+    }
 }
 
 - (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)err {
