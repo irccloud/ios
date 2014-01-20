@@ -17,8 +17,12 @@
     UIScrollView *_scrollView;
     NSArray *_suggestions;
     UIFont *_font;
+    int _selection;
 }
 @property (readonly) UIFont *font;
 @property (nonatomic, assign) id<NickCompletionViewDelegate> completionDelegate;
+@property int selection;
 -(void)setSuggestions:(NSArray *)suggestions;
+-(int)count;
+-(NSString *)suggestion;
 @end

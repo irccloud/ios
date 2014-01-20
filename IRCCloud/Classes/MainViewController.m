@@ -993,26 +993,26 @@
         _message.text = [_message.text stringByAppendingString:@" "];
 }
 
--(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
-    _sendBtn.enabled = expandingTextView.text.length > 0;
-    
+-(void)updateSuggestions:(BOOL)force {
     NSMutableArray *suggestions = [[NSMutableArray alloc] init];
     
-    if(expandingTextView.text.length > 0) {
-        NSString *text = [expandingTextView.text lowercaseString];
+    if(_message.text.length > 0) {
+        NSString *text = [_message.text lowercaseString];
         int lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
         if(lastSpace != NSNotFound && lastSpace != text.length) {
             text = [text substringFromIndex:lastSpace + 1];
         }
-        if(text.length > 1) {
-                NSArray *channels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
-                if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
-                    [suggestions addObject:_buffer.name];
-                for(Channel *channel in channels) {
-                    if(channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text])
-                        [suggestions addObject:channel.name];
-                }
-
+        if([text hasSuffix:@":"])
+            text = [text substringToIndex:text.length - 1];
+        if(text.length > 1 || force) {
+            NSArray *channels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
+            if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
+                [suggestions addObject:_buffer.name];
+            for(Channel *channel in channels) {
+                if(channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text])
+                    [suggestions addObject:channel.name];
+            }
+            
             NSArray *users = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
             for(User *user in users) {
                 if([[user.nick lowercaseString] hasPrefix:text]) {
@@ -1024,7 +1024,8 @@
             }
         }
     }
-    [_nickCompletionView setSuggestions:suggestions];
+    if(_nickCompletionView.selection == -1 || suggestions.count == 0)
+        [_nickCompletionView setSuggestions:suggestions];
     if(suggestions.count == 0) {
         if(_nickCompletionView.alpha > 0) {
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; }];
@@ -1034,6 +1035,40 @@
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; }];
         }
     }
+}
+
+-(BOOL)expandingTextView:(UIExpandingTextView *)expandingTextView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    if([text isEqualToString:@"\t"]) {
+        if(_nickCompletionView.count == 0)
+            [self updateSuggestions:YES];
+        if(_nickCompletionView.count > 0) {
+            int s = _nickCompletionView.selection;
+            if(s == -1 || s == _nickCompletionView.count - 1)
+                s = 0;
+            else
+                s++;
+            [_nickCompletionView setSelection:s];
+            text = _message.text;
+            if(text.length == 0) {
+                _message.text = [_nickCompletionView suggestion];
+            } else {
+                while(text.length > 0 && [text characterAtIndex:text.length - 1] != ' ') {
+                    text = [text substringToIndex:text.length - 1];
+                }
+                text = [text stringByAppendingString:[_nickCompletionView suggestion]];
+                _message.text = text;
+            }
+        }
+        return NO;
+    } else {
+        _nickCompletionView.selection = -1;
+    }
+    return YES;
+}
+
+-(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
+    _sendBtn.enabled = expandingTextView.text.length > 0;
+    [self updateSuggestions:NO];
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {

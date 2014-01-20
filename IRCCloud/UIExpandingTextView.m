@@ -461,6 +461,11 @@
 			return [delegate expandingTextViewShouldReturn:self];
         }
 	}
+
+    if ([delegate respondsToSelector:@selector(expandingTextView:shouldChangeTextInRange:replacementText:)])
+    {
+        return [delegate expandingTextView:self shouldChangeTextInRange:range replacementText:atext];
+    }
 	return YES;
 }
 
