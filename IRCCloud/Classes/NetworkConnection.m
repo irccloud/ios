@@ -657,7 +657,7 @@ NSLock *__parserLock = nil;
                        
                        for(int i = 0; i < order.count; i++) {
                            Server *s = [_servers getServer:[[order objectAtIndex:i] intValue]];
-                           s.order = i;
+                           s.order = i + 1;
                        }
                        [self postObject:object forEvent:kIRCEventReorderConnections];
                    }
