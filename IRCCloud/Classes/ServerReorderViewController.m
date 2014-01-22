@@ -56,6 +56,7 @@
     switch(event) {
         case kIRCEventMakeServer:
         case kIRCEventReorderConnections:
+        case kIRCEventConnectionDeleted:
             [self refresh];
             break;
         default:
