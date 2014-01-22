@@ -192,7 +192,7 @@
     NSURL *url = _url;
     if([[url.host lowercaseString] isEqualToString:@"www.dropbox.com"]) {
         if([url.path hasPrefix:@"/s/"])
-            url = [NSURL URLWithString:[NSString stringWithFormat:@"https://dl.dropboxusercontent.com%@", url.path]];
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"https://dl.dropboxusercontent.com%@", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
         else
             url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?dl=1", url.absoluteString]];
     } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"]) {
@@ -231,6 +231,7 @@
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     NSLog(@"Couldn't download image. Error code %i: %@", error.code, error.localizedDescription);
+    [self fail];
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
