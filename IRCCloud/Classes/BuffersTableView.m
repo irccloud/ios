@@ -22,6 +22,7 @@
 #import "HighlightsCountView.h"
 #import "ECSlidingViewController.h"
 #import "EditConnectionViewController.h"
+#import "ServerReorderViewController.h"
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
@@ -29,6 +30,7 @@
 #define TYPE_ARCHIVES_HEADER 3
 #define TYPE_ADD_NETWORK 4
 #define TYPE_JOIN_CHANNEL 5
+#define TYPE_REORDER 6
 
 @interface BuffersTableCell : UITableViewCell {
     UILabel *_label;
@@ -323,7 +325,7 @@
                  @"type":@TYPE_JOIN_CHANNEL,
                  @"cid":@(server.cid),
                  @"bid":@-1,
-                 @"name":@"Join a channel…",
+                 @"name":@"Join a channel",
                  @"unread":@0,
                  @"highlights":@0,
                  @"archived":@0,
@@ -334,11 +336,21 @@
          @"type":@TYPE_ADD_NETWORK,
          @"cid":@-1,
          @"bid":@-1,
-         @"name":@"Add a Network…",
+         @"name":@"Add a Network",
          @"unread":@0,
          @"highlights":@0,
          @"archived":@0,
          }];
+
+        [data addObject:@{
+          @"type":@TYPE_REORDER,
+          @"cid":@-1,
+          @"bid":@-1,
+          @"name":@"Reorder",
+          @"unread":@0,
+          @"highlights":@0,
+          @"archived":@0,
+          }];
 
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if(data.count <= 1) {
@@ -829,6 +841,12 @@
             cell.highlightColor = [UIColor colorWithRed:0.855 green:0.961 blue:0.667 alpha:1];
             cell.bgColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
             break;
+        case TYPE_REORDER:
+            cell.icon.image = [UIImage imageNamed:@"move"];
+            cell.icon.hidden = NO;
+            cell.label.textColor = [UIColor selectedBlueColor];
+            cell.bgColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
+            break;
     }
     return cell;
 }
@@ -894,6 +912,12 @@
         EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
         [self.slidingViewController resetTopView];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        [self presentViewController:nc animated:YES completion:nil];
+    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_REORDER) {
+        ServerReorderViewController *svc = [[ServerReorderViewController alloc] initWithStyle:UITableViewStylePlain];
+        [self.slidingViewController resetTopView];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
         [self presentViewController:nc animated:YES completion:nil];
     } else {

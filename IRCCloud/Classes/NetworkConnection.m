@@ -980,6 +980,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"reconnect" args:@{@"cid":@(cid)}];
 }
 
+-(int)reorderConnections:(NSString *)cids {
+    return [self _sendRequest:@"reorder-connections" args:@{@"cids":cids}];
+}
+
 -(void)connect {
     if([[[NSUserDefaults standardUserDefaults] stringForKey:@"session"] length] < 1)
         return;
