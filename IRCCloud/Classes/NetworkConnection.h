@@ -82,6 +82,7 @@ typedef enum {
     kIRCEventConnectionLag,
     kIRCEventGlobalMsg,
     kIRCEventAcceptList,
+    kIRCEventReorderConnections,
     kIRCEventFailureMsg,
     kIRCEventSuccess,
     kIRCEventAlert

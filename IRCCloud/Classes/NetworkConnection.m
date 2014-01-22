@@ -213,6 +213,7 @@ NSLock *__parserLock = nil;
         server.fail_info = [object objectForKey:@"fail_info"];
         server.away = (backlog && [_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
         server.ignores = [object objectForKey:@"ignores"];
+        server.order = [[object objectForKey:@"order"] intValue];
         if(!backlog)
             [self postObject:server forEvent:kIRCEventMakeServer];
     };
@@ -651,6 +652,15 @@ NSLock *__parserLock = nil;
                        }
                        [self postObject:object forEvent:kIRCEventHeartbeatEcho];
                    },
+                   @"reorder_connections": ^(IRCCloudJSONObject *object) {
+                       NSArray *order = [object objectForKey:@"order"];
+                       
+                       for(int i = 0; i < order.count; i++) {
+                           Server *s = [_servers getServer:[[order objectAtIndex:i] intValue]];
+                           s.order = i;
+                       }
+                       [self postObject:object forEvent:kIRCEventReorderConnections];
+                   }
                    };
     
     return self;

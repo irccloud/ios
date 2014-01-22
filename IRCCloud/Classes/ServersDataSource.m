@@ -19,7 +19,11 @@
 
 @implementation Server
 -(NSComparisonResult)compare:(Server *)aServer {
-    if(aServer.cid > _cid)
+    if(aServer.order > _order)
+        return NSOrderedAscending;
+    else if(aServer.order < _order)
+        return NSOrderedDescending;
+    else if(aServer.cid > _cid)
         return NSOrderedAscending;
     else if(aServer.cid < _cid)
         return NSOrderedDescending;

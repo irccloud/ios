@@ -36,8 +36,9 @@
     NSString *_mode;
     NSDictionary *_isupport;
     NSArray *_ignores;
+    int _order;
 }
-@property int cid, port, ssl, lag;
+@property int cid, port, ssl, lag, order;
 @property NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode;
 @property NSDictionary *fail_info, *isupport;
 @property NSArray *ignores;
