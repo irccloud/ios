@@ -692,6 +692,10 @@ static NSString * const ServerHasSSLKey = @"ssl";
                     msg = @"Invalid nickname";
                 } else if([msg isEqualToString:@"realname"]) {
                     msg = @"Invalid real name";
+                } else if([msg isEqualToString:@"passworded_servers"]) {
+                    msg = @"You can’t connect to passworded servers with free accounts";
+                } else if([msg isEqualToString:@"networks"]) {
+                    msg = @"You’ve exceeded the connection limit for free accounts";
                 }
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];

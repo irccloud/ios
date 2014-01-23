@@ -1286,7 +1286,6 @@
         } else if([s.status isEqualToString:@"quitting"]) {
             _serverStatus.text = @"Disconnecting";
         } else if([s.status isEqualToString:@"disconnected"]) {
-            NSLog(@"%@", s.fail_info);
             NSString *reason = [s.fail_info objectForKey:@"reason"];
             if([reason isKindOfClass:[NSString class]] && [reason length]) {
                 if([reason isEqualToString:@"pool_lost"])
@@ -1301,7 +1300,7 @@
                     reason = @"Host unreachable";
                 else if([reason isEqualToString:@"econnrefused"])
                     reason = @"Connection refused";
-                else if([reason isEqualToString:@"nxdomain"])
+                else if([reason isEqualToString:@"nxdomain"] || [reason isEqualToString:@"einval"])
                     reason = @"Invalid hostname";
                 else if([reason isEqualToString:@"server_ping_timeout"])
                     reason = @"PING timeout";
@@ -1311,10 +1310,19 @@
                     reason = @"SSL error";
                 else if([reason isEqualToString:@"crash"])
                     reason = @"Connection crashed";
-                if([[s.fail_info objectForKey:@"type"] isEqualToString:@"killed"])
+                else if([reason isEqualToString:@"networks"])
+                    reason = @"You've exceeded the connection limit for free accounts.";
+                else if([reason isEqualToString:@"passworded_servers"])
+                    reason = @"You can't connect to passworded servers with free accounts.";
+                if([[s.fail_info objectForKey:@"type"] isEqualToString:@"killed"]) {
                     _serverStatus.text = [NSString stringWithFormat:@"Disconnected - Killed: %@", reason];
-                else
+                } else if([[s.fail_info objectForKey:@"type"] isEqualToString:@"connecting_restricted"]) {
+                    if([[s.fail_info objectForKey:@"reason"] isEqualToString:reason])
+                        reason = @"You can’t connect to this server with a free account.";
+                    _serverStatus.text = reason;
+                } else {
                     _serverStatus.text = [NSString stringWithFormat:@"Disconnected: %@", reason];
+                }
                 _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
                 _serverStatus.textColor = [UIColor networkErrorColor];
             } else {
