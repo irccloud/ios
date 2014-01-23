@@ -215,6 +215,7 @@
                      @"highlights":@(highlights),
                      @"archived":@0,
                      @"status":server.status,
+                     @"fail_info":server.fail_info,
                      @"ssl":@(server.ssl),
                      @"count":@(buffers.count)
                      }];
@@ -742,19 +743,27 @@
             cell.icon.hidden = NO;
             if(selected) {
                 cell.label.textColor = [UIColor whiteColor];
-                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
+                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"]) {
                     cell.unreadIndicator.backgroundColor = cell.bgColor = [UIColor opsHeadingColor];
-                else
+                } else if([(NSDictionary *)[row objectForKey:@"fail_info"] count]) {
+                    cell.label.textColor = [UIColor networkErrorColor];
+                    cell.unreadIndicator.backgroundColor = cell.bgColor = [UIColor networkErrorBackgroundColor];
+                } else {
                     cell.bgColor = [UIColor selectedBlueColor];
+                }
             } else {
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
                     cell.label.textColor = [UIColor opsHeadingColor];
+                else if([(NSDictionary *)[row objectForKey:@"fail_info"] count])
+                    cell.label.textColor = [UIColor ownersHeadingColor];
                 else if(![status isEqualToString:@"connected_ready"])
                     cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
                 else
                     cell.label.textColor = [UIColor selectedBlueColor];
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
                     cell.bgColor = [UIColor opsGroupColor];
+                else if([(NSDictionary *)[row objectForKey:@"fail_info"] count])
+                    cell.bgColor = [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
                 else
                     cell.bgColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
             }

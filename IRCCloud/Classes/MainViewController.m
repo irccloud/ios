@@ -1286,6 +1286,7 @@
         } else if([s.status isEqualToString:@"quitting"]) {
             _serverStatus.text = @"Disconnecting";
         } else if([s.status isEqualToString:@"disconnected"]) {
+            NSLog(@"%@", s.fail_info);
             NSString *reason = [s.fail_info objectForKey:@"reason"];
             if([reason isKindOfClass:[NSString class]] && [reason length]) {
                 if([reason isEqualToString:@"pool_lost"])
@@ -1310,7 +1311,10 @@
                     reason = @"SSL error";
                 else if([reason isEqualToString:@"crash"])
                     reason = @"Connection crashed";
-                _serverStatus.text = [NSString stringWithFormat:@"Disconnected: %@", reason];
+                if([[s.fail_info objectForKey:@"type"] isEqualToString:@"killed"])
+                    _serverStatus.text = [NSString stringWithFormat:@"Disconnected - Killed: %@", reason];
+                else
+                    _serverStatus.text = [NSString stringWithFormat:@"Disconnected: %@", reason];
                 _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
                 _serverStatus.textColor = [UIColor networkErrorColor];
             } else {
