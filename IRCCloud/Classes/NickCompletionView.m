@@ -15,10 +15,10 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor selectedBlueColor];
+        self.backgroundColor = [UIColor blueBorderColor];
         _selection = -1;
         _scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
-        _scrollView.backgroundColor = [UIColor backgroundBlueColor];
+        _scrollView.backgroundColor = [UIColor bufferBlueColor];
         [self addSubview:_scrollView];
         [self setSuggestions:@[]];
     }
@@ -53,10 +53,11 @@
         frame.origin.x = x;
         if(frame.size.width < 32)
             frame.size.width = 32;
+        frame.size.width += 20;
         frame.size.height = _scrollView.frame.size.height;
         b.frame = frame;
         [_scrollView addSubview:b];
-        x += frame.size.width + 12;
+        x += frame.size.width;
     }
     if(_scrollView.frame.size.width < x) {
         [_scrollView setContentInset:UIEdgeInsetsMake(0, 6, 0, 6)];
@@ -91,11 +92,11 @@
             if([b isKindOfClass:[UIButton class]]) {
                 if(i == selection) {
                     [b setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                    b.titleLabel.backgroundColor = [UIColor selectedBlueColor];
+                    b.titleLabel.superview.backgroundColor = [UIColor selectedBlueColor];
                     [_scrollView scrollRectToVisible:b.frame animated:YES];
                 } else {
                     [b setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
-                    b.titleLabel.backgroundColor = [UIColor clearColor];
+                    b.titleLabel.superview.backgroundColor = [UIColor clearColor];
                 }
                 i++;
             }

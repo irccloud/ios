@@ -60,4 +60,5 @@
 +(UIColor *)collapsedHeadingBackgroundColor;
 +(UIColor *)navBarColor;
 +(UIColor *)lightLinkColor;
++(UIColor *)bufferBlueColor;
 @end

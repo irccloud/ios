@@ -148,6 +148,7 @@
     _message.autoresizesSubviews = NO;
     _nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectZero];
     _nickCompletionView.completionDelegate = self;
+    _nickCompletionView.alpha = 0;
     [self.view addSubview:_nickCompletionView];
     [_bottomBar addSubview:_message];
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -973,13 +974,7 @@
 }
 
 -(void)nickSelected:(NSString *)nick {
-    NSRange rangeCopy = _message.selectedRange;
-    NSString *text = _message.text.copy;
-    [_message resignFirstResponder];
-    [_message becomeFirstResponder];
-    [_message setText:text];
-    [_message setSelectedRange:rangeCopy];
-    text = _message.text;
+    NSString *text = _message.text;
     if(text.length == 0) {
         _message.text = nick;
     } else {
@@ -989,7 +984,10 @@
         text = [text stringByAppendingString:nick];
         _message.text = text;
     }
-    if(nick.length > 1)
+    
+    if([text rangeOfString:@" "].location == NSNotFound)
+        _message.text = [_message.text stringByAppendingString:@": "];
+    else
         _message.text = [_message.text stringByAppendingString:@" "];
 }
 
@@ -1016,10 +1014,7 @@
             NSArray *users = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
             for(User *user in users) {
                 if([[user.nick lowercaseString] hasPrefix:text]) {
-                    if(lastSpace == NSNotFound)
-                        [suggestions addObject:[user.nick stringByAppendingString:@":"]];
-                    else
-                        [suggestions addObject:user.nick];
+                    [suggestions addObject:user.nick];
                 }
             }
         }
@@ -1029,10 +1024,16 @@
     if(suggestions.count == 0) {
         if(_nickCompletionView.alpha > 0) {
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; }];
+            _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
+            [_message.internalTextView resignFirstResponder];
+            [_message.internalTextView becomeFirstResponder];
         }
     } else {
         if(_nickCompletionView.alpha == 0) {
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; }];
+            _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
+            [_message.internalTextView resignFirstResponder];
+            [_message.internalTextView becomeFirstResponder];
         }
     }
 }
@@ -1058,6 +1059,8 @@
                 text = [text stringByAppendingString:[_nickCompletionView suggestion]];
                 _message.text = text;
             }
+            if([text rangeOfString:@" "].location == NSNotFound)
+                _message.text = [_message.text stringByAppendingString:@":"];
         }
         return NO;
     } else {
@@ -1475,8 +1478,6 @@
             _landscapeView.transform = CGAffineTransformIdentity;
         _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
         _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
-        float h = [@" " sizeWithFont:_nickCompletionView.font].height + 4;
-        _nickCompletionView.frame = CGRectMake(1,_bottomBar.frame.origin.y - h - 2, width - 2, h);
     } else {
         if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
             self.navigationItem.leftBarButtonItem = nil;
@@ -1506,8 +1507,6 @@
             frame.origin.x = _buffersView.view.frame.size.width;
             frame.size.width = _eventsView.view.frame.size.width;
             _serverStatusBar.frame = frame;
-            float h = [@" " sizeWithFont:_nickCompletionView.font].height + 4;
-            _nickCompletionView.frame = CGRectMake(221,_bottomBar.frame.origin.y - h - 2, width - 442, h);
         } else {
             _borders.hidden = YES;
             if(!self.slidingViewController.underLeftViewController)
@@ -1527,8 +1526,6 @@
             frame.origin.x = 0;
             frame.size.width = _eventsView.view.frame.size.width;
             _serverStatusBar.frame = frame;
-            float h = [@" " sizeWithFont:_nickCompletionView.font].height + 4;
-            _nickCompletionView.frame = CGRectMake(1,_bottomBar.frame.origin.y - h - 2, width - 2, h);
         }
     }
     if(duration > 0) {
@@ -1547,6 +1544,8 @@
     _eventsView.topUnreadView.frame = frame;
     frame.origin.y += _eventsView.view.frame.size.height - 32;
     _eventsView.bottomUnreadView.frame = frame;
+    float h = [@" " sizeWithFont:_nickCompletionView.font].height + 12;
+    _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 2,_bottomBar.frame.origin.y - h - 2, _bottomBar.frame.size.width - 4, h);
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         frame = _connectingProgress.frame;

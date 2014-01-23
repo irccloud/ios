@@ -105,6 +105,9 @@ UIImage *__newMsgsBackgroundImage;
 +(UIColor *)networkErrorColor {
     return [UIColor colorWithRed:0.388 green:0.157 blue:0 alpha:1];
 }
++(UIColor *)bufferBlueColor {
+    return [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+}
 +(UIColor *) colorFromHexString:(NSString *)hexString {
     //From: http://stackoverflow.com/a/3805354
     

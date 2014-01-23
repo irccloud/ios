@@ -811,7 +811,7 @@
                         cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
                     else
                         cell.label.textColor = [UIColor selectedBlueColor];
-                    cell.bgColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+                    cell.bgColor = [UIColor bufferBlueColor];
                 }
             }
             if([[row objectForKey:@"timeout"] intValue]) {
