@@ -11,12 +11,39 @@
 #import "UIColor+IRCCloud.h"
 #import "NetworkConnection.h"
 
+@interface ReorderCell : UITableViewCell {
+    UIImageView *_icon;
+}
+@property (readonly) UIImageView *icon;
+@end
+
+@implementation ReorderCell
+
+-(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if(self) {
+        _icon = [[UIImageView alloc] initWithFrame:CGRectMake(0,14,16,16)];
+        [self.contentView addSubview:_icon];
+    }
+    return self;
+}
+
+-(void)layoutSubviews {
+    [super layoutSubviews];
+    CGRect frame = self.contentView.frame;
+    frame.origin.x = 10;
+    self.contentView.frame = frame;
+    self.textLabel.frame = CGRectMake(22,0,self.contentView.frame.size.width - 22,self.contentView.frame.size.height);
+}
+
+@end
+
 @implementation ServerReorderViewController
 
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        self.navigationItem.title = @"Network Order";
+        self.navigationItem.title = @"Connections";
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
     }
     return self;
@@ -79,9 +106,9 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"servercell"];
+    ReorderCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reordercell"];
     if(!cell)
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"servercell"];
+        cell = [[ReorderCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"reordercell"];
 
     Server *s = [servers objectAtIndex:indexPath.row];
     
@@ -90,11 +117,7 @@
     else
         cell.textLabel.text = s.hostname;
     
-    [[cell.textLabel subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    UIImageView *v = [[UIImageView alloc] initWithImage:[UIImage imageNamed:(s.ssl > 0)?@"world_shield":@"world"]];
-    v.frame = CGRectMake(-20,14,16,16);
-    [cell.textLabel addSubview:v];
-    cell.textLabel.clipsToBounds = NO;
+    cell.icon.image = [UIImage imageNamed:(s.ssl > 0)?@"world_shield":@"world"];
     
     return cell;
 }

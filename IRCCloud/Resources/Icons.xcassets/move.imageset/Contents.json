@@ -3,12 +3,12 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "transform_move-1.png"
+      "filename" : "move.png"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "transform_move.png"
+      "filename" : "move@2x.png"
     }
   ],
   "info" : {
