@@ -1024,16 +1024,10 @@
     if(suggestions.count == 0) {
         if(_nickCompletionView.alpha > 0) {
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; }];
-            _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
-            [_message.internalTextView resignFirstResponder];
-            [_message.internalTextView becomeFirstResponder];
         }
     } else {
         if(_nickCompletionView.alpha == 0) {
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; }];
-            _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
-            [_message.internalTextView resignFirstResponder];
-            [_message.internalTextView becomeFirstResponder];
         }
     }
 }
@@ -1545,7 +1539,7 @@
     frame.origin.y += _eventsView.view.frame.size.height - 32;
     _eventsView.bottomUnreadView.frame = frame;
     float h = [@" " sizeWithFont:_nickCompletionView.font].height + 12;
-    _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 2,_bottomBar.frame.origin.y - h - 2, _bottomBar.frame.size.width - 4, h);
+    _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 20,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 40, h);
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         frame = _connectingProgress.frame;
