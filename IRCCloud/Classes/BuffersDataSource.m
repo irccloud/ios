@@ -40,7 +40,7 @@
         if(_chantypes == nil) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
             if(s) {
-                _chantypes = [s.isupport objectForKey:@"CHANTYPES"];
+                _chantypes = s.CHANTYPES;
                 if(_chantypes == nil || _chantypes.length == 0)
                     _chantypes = @"#";
             }

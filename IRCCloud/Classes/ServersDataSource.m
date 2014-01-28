@@ -174,8 +174,21 @@
 
 -(void)updateIsupport:(NSDictionary *)isupport server:(int)cid {
     Server *server = [self getServer:cid];
-    if(server)
-        server.isupport = isupport;
+    if(server) {
+        if(server.isupport)
+            [server.isupport setValuesForKeysWithDictionary:isupport];
+        else
+            server.isupport = isupport.mutableCopy;
+        
+        if([[server.isupport objectForKey:@"PREFIX"] isKindOfClass:[NSDictionary class]])
+            server.PREFIX = [server.isupport objectForKey:@"PREFIX"];
+        else
+            server.PREFIX = nil;
+        if([[server.isupport objectForKey:@"CHANTYPES"] isKindOfClass:[NSString class]])
+            server.CHANTYPES = [server.isupport objectForKey:@"CHANTYPES"];
+        else
+            server.CHANTYPES = nil;
+    }
 }
 
 -(void)updateIgnores:(NSArray *)ignores server:(int)cid {

@@ -28,7 +28,6 @@
 
 @interface ColorFormatter : NSObject
 +(NSRegularExpression*)ircChannelRegexForServer:(Server *)s;
-+(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize;
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links;
 +(void)clearFontCache;
 +(UIFont *)timestampFont;

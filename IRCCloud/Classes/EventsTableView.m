@@ -475,12 +475,12 @@ int __timestampWidth;
             if(!nextIsGrouped) {
                 NSString *groupMsg = [_collapsedEvents collapse:showChan];
                 if(groupMsg == nil && [type isEqualToString:@"nickchange"])
-                    groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+                    groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
                 if(groupMsg == nil && [type isEqualToString:@"user_channel_mode"]) {
                     if(event.from.length > 0)
-                        groupMsg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [ColorFormatter formatNick:event.from mode:event.fromMode colorize:NO], BOLD, BOLD, event.diff, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+                        groupMsg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO], BOLD, BOLD, event.diff, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
                     else
-                        groupMsg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
+                        groupMsg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
                 }
                 Event *heading = [[Event alloc] init];
                 heading.cid = event.cid;
@@ -499,12 +499,12 @@ int __timestampWidth;
             msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse:showChan];
         }
         if(msg == nil && [type isEqualToString:@"nickchange"])
-            msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+            msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
         if(msg == nil && [type isEqualToString:@"user_channel_mode"]) {
             if(event.from.length > 0)
-                msg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [ColorFormatter formatNick:event.from mode:event.fromMode colorize:NO], BOLD, BOLD, event.diff, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+                msg = [NSString stringWithFormat:@"%c%@%c set mode: %c%@ %@%c", BOLD, [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO], BOLD, BOLD, event.diff, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
             else
-                msg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO], BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
+                msg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
             _currentCollapsedEid = eid;
         }
         if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
@@ -524,7 +524,7 @@ int __timestampWidth;
 
         if(!event.formatted) {
             if([event.from length]) {
-                event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [ColorFormatter formatNick:event.from mode:event.fromMode colorize:colors], event.msg];
+                event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.msg];
             } else {
                 event.formattedMsg = event.msg;
             }
@@ -542,14 +542,14 @@ int __timestampWidth;
     if(!event.formatted) {
         if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
             if(event.nick.length)
-                event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO]];
+                event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO]];
             else if(event.server.length)
                 event.formattedMsg = [NSString stringWithFormat:@"%@ by the server %c%@%c", event.msg, BOLD, event.server, CLEAR];
         } else if([type isEqualToString:@"buffer_me_msg"]) {
-            event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:colors], event.msg];
+            event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.msg];
         } else if([type isEqualToString:@"notice"]) {
             if(event.from.length)
-                event.formattedMsg = [NSString stringWithFormat:@"%@ ", [ColorFormatter formatNick:event.from mode:event.fromMode colorize:colors]];
+                event.formattedMsg = [NSString stringWithFormat:@"%@ ", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors]];
             else
                 event.formattedMsg = @"";
             if([_buffer.type isEqualToString:@"console"] && event.toChan && event.chan.length) {
@@ -567,13 +567,13 @@ int __timestampWidth;
                 event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
             else
                 event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
-            event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@ (%@)", [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:colors], event.hostmask];
+            event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@ (%@)", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.hostmask];
             if(event.msg.length > 0)
                 event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
         } else if([type isEqualToString:@"channel_mode_list_change"]) {
             if(event.from.length == 0) {
                 if(event.nick.length)
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [ColorFormatter formatNick:event.nick mode:event.fromMode colorize:NO]];
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO]];
                 else if(event.server.length)
                     event.formattedMsg = [NSString stringWithFormat:@"%@ by the server %c%@%c", event.msg, BOLD, event.server, CLEAR];
             }

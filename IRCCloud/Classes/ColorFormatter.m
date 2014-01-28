@@ -19,7 +19,6 @@
 #import "ColorFormatter.h"
 #import "TTTAttributedLabel.h"
 #import "UIColor+IRCCloud.h"
-#import "NetworkConnection.h"
 #import "NSURL+IDN.h"
 
 CTFontRef Courier, CourierBold, CourierOblique,CourierBoldOblique;
@@ -118,8 +117,8 @@ UIFont *timestampFont;
 
 +(NSRegularExpression *)ircChannelRegexForServer:(Server *)s {
     NSString *pattern;
-    if(s && s.isupport && [[s.isupport objectForKey:@"CHANTYPES"] isKindOfClass:[NSString class]]) {
-        pattern = [NSString stringWithFormat:@"(\\B)[%@][^<>!?\"()\\[\\],\\s\\u0001]+", [s.isupport objectForKey:@"CHANTYPES"]];
+    if(s && s.CHANTYPES.length) {
+        pattern = [NSString stringWithFormat:@"(\\B)[%@][^<>!?\"()\\[\\],\\s\\u0001]+", s.CHANTYPES];
     } else {
         pattern = [NSString stringWithFormat:@"(\\B)[#][^<>!?\"()\\[\\],\\s\\u0001]+"];
     }
@@ -130,90 +129,6 @@ UIFont *timestampFont;
             error:nil];
 }
 
-+(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize {
-    NSArray *colors = @[@"fc009a", @"ff1f1a", @"d20004", @"fd6508", @"880019", @"c7009c", @"804fc4", @"5200b7", @"123e92", @"1d40ff", @"108374", @"2e980d", @"207607", @"196d61"];
-    NSString *color = nil;
-    NSString *output = [NSString stringWithFormat:@"%c%@%c", BOLD, nick, BOLD];
-    BOOL showSymbol = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue];
-
-    if(colorize) {
-        // Normalise a bit
-        // typically ` and _ are used on the end alone
-        NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[`_]+$" options:NSRegularExpressionCaseInsensitive error:nil];
-        NSString *normalizedNick = [r stringByReplacingMatchesInString:[nick lowercaseString] options:0 range:NSMakeRange(0, nick.length) withTemplate:@""];
-        // remove |<anything> from the end
-        r = [NSRegularExpression regularExpressionWithPattern:@"|.*$" options:NSRegularExpressionCaseInsensitive error:nil];
-        normalizedNick = [r stringByReplacingMatchesInString:normalizedNick options:0 range:NSMakeRange(0, normalizedNick.length) withTemplate:@""];
-        
-        double hash = 0;
-        long lHash = 0;
-        for(int i = 0; i < normalizedNick.length; i++) {
-            hash = [normalizedNick characterAtIndex:i] + (double)(lHash << 6) + (double)(lHash << 16) - hash;
-            lHash = [[NSNumber numberWithDouble:hash] longValue];
-        }
-        
-        color = [colors objectAtIndex:abs([[NSNumber numberWithDouble:hash] longLongValue] % 14)];
-    }
-    
-    if(mode) {
-        if(color) {
-            if(showSymbol) {
-                if([mode rangeOfString:@"q"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cE7AA00%c~%c %c%@%@%c%c", COLOR_RGB, BOLD, COLOR_RGB, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-                else if([mode rangeOfString:@"a"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%c6500A5%c&%c %c%@%@%c%c", COLOR_RGB, BOLD, COLOR_RGB, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-                else if([mode rangeOfString:@"o"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cBA1719%c@%c %c%@%@%c%c", COLOR_RGB, BOLD, COLOR_RGB, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-                else if([mode rangeOfString:@"h"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cB55900%c%%%c %c%@%@%c%c", COLOR_RGB, BOLD, COLOR_RGB, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-                else if([mode rangeOfString:@"v"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%c25B100%c+%c %c%@%@%c%c", COLOR_RGB, BOLD, COLOR_RGB, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-                else
-                    output = [NSString stringWithFormat:@"%c%c%@%@%c%c", BOLD, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-            } else {
-                if([mode rangeOfString:@"q"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cE7AA00%c•%c %c%@%@%c%c", COLOR_RGB, BOLD, COLOR_RGB, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-                else if([mode rangeOfString:@"a"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%c6500A5%c•%c %c%@%@%c%c", COLOR_RGB, BOLD, COLOR_RGB, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-                else if([mode rangeOfString:@"o"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cBA1719%c•%c %c%@%@%c%c", COLOR_RGB, BOLD, COLOR_RGB, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-                else if([mode rangeOfString:@"h"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cB55900%c•%c %c%@%@%c%c", COLOR_RGB, BOLD, COLOR_RGB, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-                else if([mode rangeOfString:@"v"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%c25B100%c•%c %c%@%@%c%c", COLOR_RGB, BOLD, COLOR_RGB, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-                else
-                    output = [NSString stringWithFormat:@"%c%c%@%@%c%c", BOLD, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-            }
-        } else {
-            if(showSymbol) {
-                if([mode rangeOfString:@"q"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cE7AA00%c~%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
-                else if([mode rangeOfString:@"a"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%c6500A5%c&%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
-                else if([mode rangeOfString:@"o"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cBA1719%c@%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
-                else if([mode rangeOfString:@"h"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cB55900%c%%%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
-                else if([mode rangeOfString:@"v"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%c25B100%c+%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
-            } else {
-                if([mode rangeOfString:@"q"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cE7AA00%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
-                else if([mode rangeOfString:@"a"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%c6500A5%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
-                else if([mode rangeOfString:@"o"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cBA1719%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
-                else if([mode rangeOfString:@"h"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%cB55900%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
-                else if([mode rangeOfString:@"v"].location != NSNotFound)
-                    output = [NSString stringWithFormat:@"%c25B100%c•%c %@%c", COLOR_RGB, BOLD, COLOR_RGB, nick, BOLD];
-            }
-        }
-    } else if(color) {
-        output = [NSString stringWithFormat:@"%c%c%@%@%c%c", BOLD, COLOR_RGB, color, nick, COLOR_RGB, BOLD];
-    }
-    return output;
-}
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;

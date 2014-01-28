@@ -34,13 +34,15 @@
     NSString *_away;
     NSString *_usermask;
     NSString *_mode;
-    NSDictionary *_isupport;
+    NSMutableDictionary *_isupport;
     NSArray *_ignores;
+    NSString *_CHANTYPES;
+    NSDictionary *_PREFIX;
     int _order;
 }
 @property int cid, port, ssl, lag, order;
-@property NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode;
-@property NSDictionary *fail_info, *isupport;
+@property NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES;
+@property NSDictionary *fail_info, *isupport, *PREFIX;
 @property NSArray *ignores;
 -(NSComparisonResult)compare:(Server *)aServer;
 @end

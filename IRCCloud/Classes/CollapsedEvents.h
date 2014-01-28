@@ -71,9 +71,12 @@ typedef enum {
 
 @interface CollapsedEvents : NSObject {
     NSMutableArray *_data;
+    NSDictionary *_PREFIX;
 }
 -(void)clear;
 -(BOOL)addEvent:(Event *)event;
 -(NSString *)collapse:(BOOL)showChan;
 -(int)count;
+-(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize;
+@property NSDictionary *PREFIX;
 @end
