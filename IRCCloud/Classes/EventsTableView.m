@@ -900,6 +900,10 @@ int __timestampWidth;
     _currentGroupPosition = -1;
     _lastCollpasedDay = @"";
     [_collapsedEvents clear];
+    if(_server)
+        _collapsedEvents.PREFIX = _server.PREFIX;
+    else
+        _collapsedEvents.PREFIX = nil;
     [_unseenHighlightPositions removeAllObjects];
     
     if(!_buffer) {

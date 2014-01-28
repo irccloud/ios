@@ -157,6 +157,14 @@
 }
 
 - (void)refresh {
+    NSDictionary *PREFIX;
+    Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+    if(s) {
+        PREFIX = s.PREFIX;
+    }
+    if(!PREFIX || PREFIX.count == 0)
+        PREFIX = @{@"q":@"~", @"a":@"&", @"o":@"@", @"h":@"%", @"v":@"+"};
+    
     NSMutableArray *data = [[NSMutableArray alloc] init];
     NSMutableArray *owners = [[NSMutableArray alloc] init];
     NSMutableArray *admins = [[NSMutableArray alloc] init];
@@ -180,11 +188,11 @@
             [members addObject:user];
     }
     
-    [self _addUsersFromList:owners heading:@"Owners" symbol:@"~" headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data];
-    [self _addUsersFromList:admins heading:@"Admins" symbol:@"&" headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data];
-    [self _addUsersFromList:ops heading:@"Ops" symbol:@"@" headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data];
-    [self _addUsersFromList:halfops heading:@"Half Ops" symbol:@"%" headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data];
-    [self _addUsersFromList:voiced heading:@"Voiced" symbol:@"+" headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data];
+    [self _addUsersFromList:owners heading:@"Owners" symbol:[PREFIX objectForKey:@"q"] headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data];
+    [self _addUsersFromList:admins heading:@"Admins" symbol:[PREFIX objectForKey:@"a"] headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data];
+    [self _addUsersFromList:ops heading:@"Ops" symbol:[PREFIX objectForKey:@"o"] headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data];
+    [self _addUsersFromList:halfops heading:@"Half Ops" symbol:[PREFIX objectForKey:@"h"] headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data];
+    [self _addUsersFromList:voiced heading:@"Voiced" symbol:[PREFIX objectForKey:@"v"] headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data];
     [self _addUsersFromList:members heading:@"Members" symbol:@"" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor blueBorderColor] data:data];
     
     
