@@ -1224,7 +1224,7 @@
         _buffer.lastBuffer = lastBuffer;
         if(changed) {
             lastBuffer.draft = _message.text;
-            if(!lastBuffer.scrolledUp)
+            if(!lastBuffer.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:lastBuffer.bid lastSeenEid:lastBuffer.last_seen_eid type:lastBuffer.type] == 0)
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:lastBuffer.bid];
         }
     }
