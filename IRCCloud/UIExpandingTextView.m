@@ -481,4 +481,9 @@
     return [internalTextView becomeFirstResponder];
 }
 
+- (CGSize)intrinsicContentSize		// suport  autolayout
+{
+    return internalTextView.intrinsicContentSize;
+}
+
 @end
