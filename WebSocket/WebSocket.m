@@ -600,9 +600,6 @@ WebSocketWaitingState waitingState;
     }
     free(actualData);
 
-    //track if we need to release the fragment
-    BOOL releaseFragment = NO;
-
     //parse the data, if possible
     if (fragment.canBeParsed) {
         if (fragment.hasMask) {
@@ -614,7 +611,6 @@ WebSocketWaitingState waitingState;
 
         //if we have a complete fragment, handle it
         if (fragment.isValid && fragment.isFinal) {
-            releaseFragment = YES;
             [self handleCompleteFragment:fragment];
         }
     }
@@ -854,7 +850,7 @@ WebSocketWaitingState waitingState;
 
         //verify we have a "Upgrade: websocket" header
         HandshakeHeader *header = [self headerForKey:@"Upgrade" inHeaders:self.config.serverHeaders];
-        if ([@"websocket" caseInsensitiveCompare:header.value] != NSOrderedSame) {
+        if (header.value && [@"websocket" caseInsensitiveCompare:header.value] != NSOrderedSame) {
             return false;
         }
 

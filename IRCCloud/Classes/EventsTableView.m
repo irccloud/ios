@@ -157,6 +157,8 @@ int __timestampWidth;
 	[mutableLinkAttributes setObject:(__bridge id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
     _linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
     
+    CFRelease(paragraphStyle);
+    
     [mutableLinkAttributes setObject:(id)[[UIColor lightLinkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
     _lightLinkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
     

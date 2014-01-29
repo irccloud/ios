@@ -283,8 +283,8 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
             if (_framesetter) CFRelease(_framesetter);
             if (_highlightFramesetter) CFRelease(_highlightFramesetter);
             
-            self.framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.renderedAttributedText);
-            self.highlightFramesetter = nil;
+            _framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)self.renderedAttributedText);
+            _highlightFramesetter = nil;
             _needsFramesetter = NO;
         }
     }
@@ -897,13 +897,13 @@ afterInheritingLabelAttributesAndConfiguringWithBlock:(NSMutableAttributedString
         NSMutableAttributedString *highlightAttributedString = [self.renderedAttributedText mutableCopy];
         [highlightAttributedString addAttribute:(NSString *)kCTForegroundColorAttributeName value:(id)[self.highlightedTextColor CGColor] range:NSMakeRange(0, highlightAttributedString.length)];
         
-        if (!self.highlightFramesetter) {
-            self.highlightFramesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)highlightAttributedString);
+        if (!_highlightFramesetter) {
+            _highlightFramesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)highlightAttributedString);
         }
         
-        [self drawFramesetter:self.highlightFramesetter attributedString:highlightAttributedString textRange:textRange inRect:textRect context:c];
+        [self drawFramesetter:_highlightFramesetter attributedString:highlightAttributedString textRange:textRange inRect:textRect context:c];
     } else {
-        [self drawFramesetter:self.framesetter attributedString:self.renderedAttributedText textRange:textRange inRect:textRect context:c];
+        [self drawFramesetter:_framesetter attributedString:self.renderedAttributedText textRange:textRange inRect:textRect context:c];
     }  
     
     // If we adjusted the font size, set it back to its original size

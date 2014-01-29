@@ -168,7 +168,7 @@
     {
         bufferLength = data.length - aOffset;
     }
-    if (bufferLength < 0) {
+    if (bufferLength <= 0) {
         return NO;
     }
     unsigned char buffer[bufferLength];
