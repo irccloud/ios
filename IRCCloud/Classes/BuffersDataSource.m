@@ -181,6 +181,14 @@
 
 -(void)removeBuffer:(int)bid {
     @synchronized(_buffers) {
+        NSArray *copy;
+        @synchronized(_buffers) {
+            copy = _buffers.allValues;
+        }
+        for(Buffer *buffer in copy) {
+            if(buffer.lastBuffer.bid == bid)
+                buffer.lastBuffer = buffer.lastBuffer.lastBuffer;
+        }
         [_buffers removeObjectForKey:@(bid)];
     }
 }
@@ -188,9 +196,7 @@
 -(void)removeAllDataForBuffer:(int)bid {
     Buffer *buffer = [self getBuffer:bid];
     if(buffer) {
-        @synchronized(_buffers) {
-            [_buffers removeObjectForKey:@(bid)];
-        }
+        [self removeBuffer:bid];
         [[ChannelsDataSource sharedInstance] removeChannelForBuffer:bid];
         [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
         [[UsersDataSource sharedInstance] removeUsersForBuffer:bid];
@@ -223,7 +229,7 @@
                 NSLog(@"Removing CID: %i", buffer.cid);
                 [[ServersDataSource sharedInstance] removeServer:buffer.cid];
             }
-            [_buffers removeObjectForKey:@(buffer.bid)];
+            [self removeBuffer:buffer.bid];
         }
     }
 }

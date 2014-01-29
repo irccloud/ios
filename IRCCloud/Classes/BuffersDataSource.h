@@ -33,12 +33,14 @@
     NSString *_chantypes;
     BOOL _scrolledUp;
     NSTimeInterval _scrolledUpFrom;
+    Buffer *_lastBuffer;
 }
 @property int bid, cid, archived, deferred, timeout;
 @property NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom;
 @property NSString *name, *type, *away_msg, *chantypes;
 @property BOOL valid, scrolledUp;
 @property (copy) NSString *draft;
+@property Buffer *lastBuffer;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;
 -(NSString *)accessibilityValue;
 @end

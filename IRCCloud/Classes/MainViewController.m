@@ -585,14 +585,20 @@
         case kIRCEventDeleteBuffer:
         case kIRCEventBufferArchived:
             o = notification.object;
-            if(o.bid == _buffer.bid)
-                [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+            if(o.bid == _buffer.bid) {
+                if(_buffer && _buffer.lastBuffer)
+                    [self bufferSelected:_buffer.lastBuffer.bid];
+                else
+                    [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+            }
             [self _updateUnreadIndicator];
             break;
         case kIRCEventConnectionDeleted:
             o = notification.object;
             if(o.cid == _buffer.cid) {
-                if([[ServersDataSource sharedInstance] count]) {
+                if(_buffer && _buffer.lastBuffer) {
+                    [self bufferSelected:_buffer.lastBuffer.bid];
+                } else if([[ServersDataSource sharedInstance] count]) {
                     [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
                 } else {
                     [self bufferSelected:-1];
@@ -699,6 +705,8 @@
     } else {
         [[NSNotificationCenter defaultCenter] removeObserver:_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
         int bid = [BuffersDataSource sharedInstance].firstBid;
+        if(_buffer && _buffer.lastBuffer)
+            bid = _buffer.lastBuffer.bid;
         if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
             if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                 bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
@@ -1208,13 +1216,16 @@
         _eidToOpen = -1;
     }
 
-    if(_buffer) {
-        _buffer.draft = _message.text;
-        
-        if(changed && !_buffer.scrolledUp)
-            [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid];
-    }
+    Buffer *lastBuffer = _buffer;
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    if(lastBuffer) {
+        _buffer.lastBuffer = lastBuffer;
+        if(changed) {
+            lastBuffer.draft = _message.text;
+            if(!lastBuffer.scrolledUp)
+                [[EventsDataSource sharedInstance] pruneEventsForBuffer:lastBuffer.bid];
+        }
+    }
     if(_buffer) {
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         for(Event *event in events) {
@@ -2022,18 +2033,7 @@
             if(b) {
                 [self bufferSelected:b.bid];
             } else {
-                b = [[Buffer alloc] init];
-                b.cid = _buffer.cid;
-                b.bid = -1;
-                b.name = _selectedUser.nick;
-                b.type = @"conversation";
-                _buffer = b;
-                [_buffersView setBuffer:b];
-                [_usersView setBuffer:b];
-                [_eventsView setBuffer:b];
-                [self _updateUserListVisibility];
-                [self _updateTitleArea];
-                [self.slidingViewController resetTopView];
+                [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:_buffer.cid];
             }
         } else if([action isEqualToString:@"Whois"]) {
             [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
