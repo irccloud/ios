@@ -477,11 +477,12 @@
 	}
 }
 
-- (BOOL)becomeFirstResponder {
+- (BOOL)becomeFirstResponder
+{
     return [internalTextView becomeFirstResponder];
 }
 
-- (CGSize)intrinsicContentSize		// suport  autolayout
+- (CGSize)intrinsicContentSize
 {
     return internalTextView.intrinsicContentSize;
 }
