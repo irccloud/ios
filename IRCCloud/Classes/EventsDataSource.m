@@ -102,13 +102,20 @@
         event.bgColor = [UIColor errorBackgroundColor];
     };
     
+    void (^notice)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
+        event.bgColor = [UIColor noticeBackgroundColor];
+        event.chan = [object objectForKey:@"target"];
+        event.monospace = YES;
+    };
+    
     void (^status)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
         event.from = @"";
         event.bgColor = [UIColor statusBackgroundColor];
         if([object objectForKey:@"parts"] && [[object objectForKey:@"parts"] length] > 0)
             event.msg = [NSString stringWithFormat:@"%@: %@", [object objectForKey:@"parts"], event.msg];
         event.monospace = YES;
-        event.linkify = NO;
+        if(![event.type isEqualToString:@"server_motd"] && ![event.type isEqualToString:@"zurna_motd"])
+            event.linkify = NO;
     };
     
     void (^unhandled_line)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
@@ -160,12 +167,15 @@
             event.msg = @"Requesting: ";
         else if([event.type isEqualToString:@"cap_ack"])
             event.msg = @"Acknowledged: ";
+        else if([event.type isEqualToString:@"cap_raw"])
+            event.msg = [object objectForKey:@"line"];
         event.msg = [event.msg stringByAppendingString:[[object objectForKey:@"caps"] componentsJoinedByString:@" | "]];
         event.monospace = YES;
     };
     
     _formatterMap = @{@"too_fast":error, @"sasl_fail":error, @"sasl_too_long":error, @"sasl_aborted":error,
-                      @"sasl_already":error, @"no_bots":error, @"msg_services":error,
+                      @"sasl_already":error, @"no_bots":error, @"msg_services":error, @"bad_ping":error,
+                      @"not_for_halfops":error, @"ambiguous_error_message":error, @"list_syntax":error, @"who_syntax":error,
                       @"wait":status, @"stats": status, @"statslinkinfo": status, @"statscommands": status, @"statscline": status, @"statsnline": status, @"statsiline": status, @"statskline": status, @"statsqline": status, @"statsyline": status, @"statsbline": status, @"statsgline": status, @"statstline": status, @"statseline": status, @"statsvline": status, @"statslline": status, @"statsuptime": status, @"statsoline": status, @"statshline": status, @"statssline": status, @"statsuline": status, @"statsdebug": status, @"endofstats": status,
                       @"server_motdstart": status, @"server_welcome": status, @"server_endofmotd": status,
                       @"server_nomotd": status, @"server_luserclient": status, @"server_luserop": status,
@@ -174,10 +184,13 @@
                       @"server_created": status, @"server_luserunknown": status,
                       @"help_topics_start": status, @"help_topics": status, @"help_topics_end": status, @"helphdr": status, @"helpop": status, @"helptlr": status, @"helphlp": status, @"helpfwd": status, @"helpign": status,
                       @"btn_metadata_set": status, @"logged_in_as": status, @"sasl_success": status, @"you_are_operator": status,
-                      @"cap_ls": cap, @"cap_req": cap, @"cap_ack": cap,
+                      @"server_snomask": status, @"starircd_welcome": status, @"zurna_motd": status, @"codepage": status, @"logged_out": status,
+                      @"nick_locked": status, @"text": status, @"admin_info": status,
+                      @"cap_ls": cap, @"cap_req": cap, @"cap_ack": cap, @"cap_raw": cap,
                       @"unhandled_line":unhandled_line, @"unparsed_line":unhandled_line,
                       @"kicked_channel":kicked_channel, @"you_kicked_channel":kicked_channel,
-                      @"motd_response":motd, @"server_motd":motd,
+                      @"motd_response":motd, @"server_motd":motd, @"info_response":motd,
+                      @"notice":notice, @"newsflash":notice, @"generic_server_info":notice, @"list_usage":notice,
                       @"socket_closed":^(Event *event, IRCCloudJSONObject *object) {
                           event.from = @"";
                           event.rowType = ROW_SOCKETCLOSED;
@@ -262,6 +275,8 @@
                           event.msg = [event.msg stringByAppendingFormat:@"IRCd: %@\n", [object objectForKey:@"version"]];
                           event.msg = [event.msg stringByAppendingFormat:@"User modes: %@\n", [object objectForKey:@"user_modes"]];
                           event.msg = [event.msg stringByAppendingFormat:@"Channel modes: %@\n", [object objectForKey:@"channel_modes"]];
+                          if([[object objectForKey:@"rest"] length])
+                              event.msg = [event.msg stringByAppendingFormat:@"Parametric channel modes: %@\n", [object objectForKey:@"rest"]];
                           event.bgColor = [UIColor statusBackgroundColor];
                           event.linkify = NO;
                           event.monospace = YES;
@@ -366,11 +381,6 @@
                           event.bgColor = [UIColor statusBackgroundColor];
                           event.linkify = NO;
                       },
-                      @"notice":^(Event *event, IRCCloudJSONObject *object) {
-                          event.bgColor = [UIColor noticeBackgroundColor];
-                          event.chan = [object objectForKey:@"target"];
-                          event.monospace = YES;
-                      },
                       @"hidden_host_set":^(Event *event, IRCCloudJSONObject *object) {
                           event.bgColor = [UIColor statusBackgroundColor];
                           event.linkify = NO;
@@ -418,6 +428,75 @@
                           event.linkify = NO;
                           event.from = @"";
                           event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"server_version"], BOLD, [object objectForKey:@"comments"]];
+                          event.monospace = YES;
+                      },
+                      @"rehashed_config":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor noticeBackgroundColor];
+                          event.linkify = NO;
+                          event.from = @"";
+                          event.msg = [NSString stringWithFormat:@"Rehashed config: %@ (%@)", [object objectForKey:@"file"], event.msg];
+                          event.monospace = YES;
+                      },
+                      @"knock":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor noticeBackgroundColor];
+                          event.linkify = NO;
+                          event.monospace = YES;
+                          if(event.nick.length) {
+                              event.from = event.nick;
+                              if(event.hostmask.length)
+                                  event.msg = [event.msg stringByAppendingFormat:@" (%@)", event.hostmask];
+                          } else {
+                              event.msg = [NSString stringWithFormat:@"%@ %@", [object objectForKey:@"userhost"], event.msg];
+                          }
+                      },
+                      @"rehashed_config":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor noticeBackgroundColor];
+                          event.linkify = NO;
+                          event.from = @"";
+                          event.msg = [NSString stringWithFormat:@"Rehashed config: %@ (%@)", [object objectForKey:@"file"], event.msg];
+                          event.monospace = YES;
+                      },
+                      @"unknown_umode":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor errorBackgroundColor];
+                          event.linkify = NO;
+                          event.from = @"";
+                          if([[object objectForKey:@"flag"] length])
+                              event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"flag"], BOLD, event.msg];
+                      },
+                      @"kill_deny":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor errorBackgroundColor];
+                          event.from = [object objectForKey:@"channel"];
+                      },
+                      @"chan_own_priv_needed":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor errorBackgroundColor];
+                          event.from = [object objectForKey:@"channel"];
+                      },
+                      @"chan_forbidden":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor errorBackgroundColor];
+                          event.from = [object objectForKey:@"channel"];
+                      },
+                      @"time":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor statusBackgroundColor];
+                          event.linkify = NO;
+                          event.from = @"";
+                          event.monospace = YES;
+                          event.msg = [object objectForKey:@"time_string"];
+                          if([[object objectForKey:@"time_stamp"] length]) {
+                              event.msg = [event.msg stringByAppendingFormat:@" (%@)", [object objectForKey:@"time_stamp"]];
+                          }
+                          event.msg = [event.msg stringByAppendingFormat:@" — %c%@%c", BOLD, [object objectForKey:@"time_server"], CLEAR];
+                      },
+                      @"watch_status":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor statusBackgroundColor];
+                          event.linkify = NO;
+                          event.from = [object objectForKey:@"watch_nick"];
+                          event.msg = [event.msg stringByAppendingFormat:@" (%@@%@)", [object objectForKey:@"username"], [object objectForKey:@"userhost"]];
+                          event.monospace = YES;
+                      },
+                      @"sqline_nick":^(Event *event, IRCCloudJSONObject *object) {
+                          event.bgColor = [UIColor statusBackgroundColor];
+                          event.linkify = NO;
+                          event.from = [object objectForKey:@"charset"];
                           event.monospace = YES;
                       },
                       };

@@ -569,7 +569,10 @@ int __timestampWidth;
                 event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
             else
                 event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
-            event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@ (%@)", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.hostmask];
+            if(event.hostmask && event.hostmask.length)
+                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@ (%@)", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.hostmask];
+            else
+                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by the server %c%@%c", BOLD, event.nick, CLEAR];
             if(event.msg.length > 0)
                 event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
         } else if([type isEqualToString:@"channel_mode_list_change"]) {

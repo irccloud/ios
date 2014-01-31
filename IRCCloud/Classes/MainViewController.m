@@ -354,6 +354,13 @@
                     msg = [NSString stringWithFormat:@"Silence list change: %@", mask];
             } else if([type isEqualToString:@"no_channel_topic"])
                 msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"time"]) {
+                msg = [o objectForKey:@"time_string"];
+                if([[o objectForKey:@"time_stamp"] length]) {
+                    msg = [msg stringByAppendingFormat:@" (%@)", [o objectForKey:@"time_stamp"]];
+                }
+                msg = [msg stringByAppendingFormat:@" — %@", [o objectForKey:@"time_server"]];
+            }
             else
                 msg = [o objectForKey:@"msg"];
 
