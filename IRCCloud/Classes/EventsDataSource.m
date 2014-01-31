@@ -587,8 +587,10 @@
     @synchronized(_events) {
         copy = [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
     }
-    for(Event *event in copy) {
-        if(event.eid > lastSeenEid && [event isImportant:type]) {
+    for(Event *event in copy.reverseObjectEnumerator) {
+        if(event.eid <= lastSeenEid) {
+            break;
+        } else if([event isImportant:type]) {
             if(event.ignoreMask && [ignore match:event.ignoreMask])
                 continue;
             return 1;
@@ -607,8 +609,10 @@
     @synchronized(_events) {
         copy = [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
     }
-    for(Event *event in copy) {
-        if(event.eid > lastSeenEid && [event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"])) {
+    for(Event *event in copy.reverseObjectEnumerator) {
+        if(event.eid <= lastSeenEid) {
+            break;
+        } else if([event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"])) {
             if(event.ignoreMask && [ignore match:event.ignoreMask])
                 continue;
             count++;
@@ -626,8 +630,10 @@
     @synchronized(_events) {
         copy = [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
     }
-    for(Event *event in copy) {
-        if(event.eid > lastSeenEid && [event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"])) {
+    for(Event *event in copy.reverseObjectEnumerator) {
+        if(event.eid <= lastSeenEid) {
+            break;
+        } else if([event isImportant:type] && (event.isHighlight || [type isEqualToString:@"conversation"])) {
             if(event.ignoreMask && [ignore match:event.ignoreMask])
                 continue;
             return 1;

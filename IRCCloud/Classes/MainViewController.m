@@ -1005,6 +1005,10 @@
     NSMutableArray *suggestions = [[NSMutableArray alloc] init];
     
     if(_message.text.length > 0) {
+        if(!_sortedChannels)
+            _sortedChannels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
+        if(!_sortedUsers)
+            _sortedUsers = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
         NSString *text = [_message.text lowercaseString];
         int lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
         if(lastSpace != NSNotFound && lastSpace != text.length) {
@@ -1013,16 +1017,14 @@
         if([text hasSuffix:@":"])
             text = [text substringToIndex:text.length - 1];
         if(text.length > 1 || force) {
-            NSArray *channels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
             if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
                 [suggestions addObject:_buffer.name];
-            for(Channel *channel in channels) {
+            for(Channel *channel in _sortedChannels) {
                 if(channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text])
                     [suggestions addObject:channel.name];
             }
             
-            NSArray *users = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
-            for(User *user in users) {
+            for(User *user in _sortedUsers) {
                 if([[user.nick lowercaseString] hasPrefix:text]) {
                     [suggestions addObject:user.nick];
                 }
@@ -1034,6 +1036,8 @@
     if(suggestions.count == 0) {
         if(_nickCompletionView.alpha > 0) {
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; }];
+            _sortedChannels = nil;
+            _sortedUsers = nil;
         }
     } else {
         if(_nickCompletionView.alpha == 0) {
@@ -1073,9 +1077,20 @@
     return YES;
 }
 
+-(void)_updateSuggestionsTimer {
+    _nickCompletionTimer = nil;
+    [self updateSuggestions:NO];
+}
+
 -(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
     _sendBtn.enabled = expandingTextView.text.length > 0;
-    [self updateSuggestions:NO];
+    if(_nickCompletionView.alpha == 1) {
+        [self updateSuggestions:NO];
+    } else {
+        if(_nickCompletionTimer)
+            [_nickCompletionTimer invalidate];
+        _nickCompletionTimer = [NSTimer scheduledTimerWithTimeInterval:0.250 target:self selector:@selector(_updateSuggestionsTimer) userInfo:nil repeats:NO];
+    }
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
@@ -1270,6 +1285,7 @@
     [self _updateServerStatus];
     [self.slidingViewController resetTopView];
     [self _updateUnreadIndicator];
+    [self updateSuggestions:NO];
 }
 
 -(void)_updateServerStatus {

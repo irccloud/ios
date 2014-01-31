@@ -63,6 +63,9 @@
     UIView *_landscapeView;
     CGSize _kbSize;
     NickCompletionView *_nickCompletionView;
+    NSTimer *_nickCompletionTimer;
+    NSArray *_sortedUsers;
+    NSArray *_sortedChannels;
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;
