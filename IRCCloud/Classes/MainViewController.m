@@ -1031,7 +1031,7 @@
             if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
                 [suggestions addObject:_buffer.name];
             for(Channel *channel in _sortedChannels) {
-                if(channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text])
+                if([channel.name characterAtIndex:0] == [text characterAtIndex:0] && channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text])
                     [suggestions addObject:channel.name];
             }
             
@@ -1100,7 +1100,7 @@
     } else {
         if(_nickCompletionTimer)
             [_nickCompletionTimer invalidate];
-        _nickCompletionTimer = [NSTimer scheduledTimerWithTimeInterval:0.250 target:self selector:@selector(_updateSuggestionsTimer) userInfo:nil repeats:NO];
+        _nickCompletionTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(_updateSuggestionsTimer) userInfo:nil repeats:NO];
     }
 }
 
