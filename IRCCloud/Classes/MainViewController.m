@@ -865,6 +865,10 @@
                                              selector:@selector(didSwipe:)
                                                  name:ECSlidingViewUnderRightWillDisappear object:nil];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(viewWillLayoutSubviews)
+                                                 name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
+    
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable && session != nil && [session length] > 0)
         [[NetworkConnection sharedInstance] connect];
@@ -1508,6 +1512,8 @@
             _landscapeView.transform = CGAffineTransformIdentity;
         _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
         _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
+        [self.slidingViewController updateUnderLeftLayout];
+        [self.slidingViewController updateUnderRightLayout];
     } else {
         if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
             self.navigationItem.leftBarButtonItem = nil;
