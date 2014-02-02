@@ -1047,13 +1047,39 @@
         [_nickCompletionView setSuggestions:suggestions];
     if(suggestions.count == 0) {
         if(_nickCompletionView.alpha > 0) {
-            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; }];
+            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:^(BOOL finished) {
+                _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
+                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+                [_message resignFirstResponder];
+                [_message becomeFirstResponder];
+                [[NSNotificationCenter defaultCenter] addObserver:self
+                                                         selector:@selector(keyboardWillShow:)
+                                                             name:UIKeyboardWillShowNotification object:nil];
+                
+                [[NSNotificationCenter defaultCenter] addObserver:self
+                                                         selector:@selector(keyboardWillBeHidden:)
+                                                             name:UIKeyboardWillHideNotification object:nil];
+            }];
             _sortedChannels = nil;
             _sortedUsers = nil;
         }
     } else {
         if(_nickCompletionView.alpha == 0) {
-            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; }];
+            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:^(BOOL finished) {
+                _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
+                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+                [_message resignFirstResponder];
+                [_message becomeFirstResponder];
+                [[NSNotificationCenter defaultCenter] addObserver:self
+                                                         selector:@selector(keyboardWillShow:)
+                                                             name:UIKeyboardWillShowNotification object:nil];
+                
+                [[NSNotificationCenter defaultCenter] addObserver:self
+                                                         selector:@selector(keyboardWillBeHidden:)
+                                                             name:UIKeyboardWillHideNotification object:nil];
+            }];
         }
     }
 }
