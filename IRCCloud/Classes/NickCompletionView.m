@@ -15,7 +15,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor blueBorderColor];
+        self.backgroundColor = [UIColor selectedBlueColor];
         _selection = -1;
         _scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
         _scrollView.backgroundColor = [UIColor bufferBlueColor];
@@ -27,7 +27,9 @@
 
 -(void)setFrame:(CGRect)frame {
     [super setFrame:frame];
-    _scrollView.frame = CGRectMake(1, 1, frame.size.width - 2, frame.size.height - 2);
+    _scrollView.frame = CGRectMake(1, 1, frame.size.width - 2, frame.size.height - 3);
+    _scrollView.layer.masksToBounds = YES;
+    _scrollView.layer.cornerRadius = 4;
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
@@ -46,7 +48,7 @@
         UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
         b.titleLabel.font = _font;
         [b setTitle:label forState:UIControlStateNormal];
-        [b setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
+        [b setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [b addTarget:self action:@selector(suggestionTapped:) forControlEvents:UIControlEventTouchUpInside];
         [b sizeToFit];
         CGRect frame = b.frame;
@@ -95,7 +97,7 @@
                     b.titleLabel.superview.backgroundColor = [UIColor selectedBlueColor];
                     [_scrollView scrollRectToVisible:b.frame animated:YES];
                 } else {
-                    [b setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
+                    [b setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
                     b.titleLabel.superview.backgroundColor = [UIColor clearColor];
                 }
                 i++;

@@ -1581,7 +1581,8 @@
     frame.origin.y += _eventsView.view.frame.size.height - 32;
     _eventsView.bottomUnreadView.frame = frame;
     float h = [@" " sizeWithFont:_nickCompletionView.font].height + 12;
-    _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 20,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 40, h);
+    _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
+    _nickCompletionView.layer.cornerRadius = 5;
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         frame = _connectingProgress.frame;
