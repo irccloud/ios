@@ -995,6 +995,7 @@
 }
 
 -(void)nickSelected:(NSString *)nick {
+    _message.selectedRange = NSMakeRange(0, 0);
     NSString *text = _message.text;
     if(text.length == 0) {
         _message.text = nick;
