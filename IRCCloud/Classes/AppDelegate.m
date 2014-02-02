@@ -181,6 +181,7 @@
             self.slideViewController.view.alpha = 0;
         } completion:^(BOOL finished){
             [self.slideViewController.view removeFromSuperview];
+            [UIApplication sharedApplication].statusBarHidden = YES;
         }];
     }];
 }
@@ -191,6 +192,7 @@
 
 -(void)showMainView:(BOOL)animated {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [UIApplication sharedApplication].statusBarHidden = NO;
         if([[ServersDataSource sharedInstance] count]) {
             [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
             self.slideViewController.view.alpha = 1;
