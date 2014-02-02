@@ -198,10 +198,10 @@
     } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"]) {
         [self loadOembed:[NSString stringWithFormat:@"http://api.imgur.com/oembed.json?url=%@", url.absoluteString]];
         return;
-    } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"]) {
+    } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
         [self loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString]];
         return;
-    } else if([[url.host lowercaseString] hasSuffix:@"instagram.com"] || [[url.host lowercaseString] hasSuffix:@"instagr.am"]) {
+    } else if(([[url.host lowercaseString] hasSuffix:@"instagram.com"] || [[url.host lowercaseString] hasSuffix:@"instagr.am"]) && [url.path hasPrefix:@"/p/"]) {
         [self loadOembed:[NSString stringWithFormat:@"http://api.instagram.com/oembed?url=%@", url.absoluteString]];
         return;
     }
