@@ -259,6 +259,9 @@
             [self presentViewController:nc animated:YES completion:nil];
         }
             break;
+        case kIRCEventChannelTopicIs:
+            [self titleAreaPressed:nil];
+            break;
         case kIRCEventChannelInit:
         case kIRCEventChannelTopic:
             [self _updateTitleArea];

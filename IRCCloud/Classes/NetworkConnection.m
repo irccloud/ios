@@ -535,6 +535,15 @@ NSLock *__parserLock = nil;
                            [self postObject:object forEvent:kIRCEventChannelTopic];
                        }
                    },
+                   @"channel_topic_is": ^(IRCCloudJSONObject *object) {
+                       if(!backlog) {
+                           Buffer *b = [_buffers getBufferWithName:[object objectForKey:@"chan"] server:object.cid];
+                           if(b) {
+                               [_channels updateTopic:[object objectForKey:@"text"] time:[[object objectForKey:@"time"] longValue] author:[object objectForKey:@"author"] buffer:b.bid];
+                           }
+                           [self postObject:object forEvent:kIRCEventChannelTopicIs];
+                       }
+                   },
                    @"channel_url": ^(IRCCloudJSONObject *object) {
                        if(!backlog)
                            [_channels updateURL:[object objectForKey:@"url"] buffer:object.bid];
