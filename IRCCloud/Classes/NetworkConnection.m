@@ -452,8 +452,15 @@ NSLock *__parserLock = nil;
                    },
                    @"status_changed": ^(IRCCloudJSONObject *object) {
                        [_servers updateStatus:[object objectForKey:@"new_status"] failInfo:[object objectForKey:@"fail_info"] server:object.cid];
-                       if(!backlog)
+                       if(!backlog) {
+                           if([[object objectForKey:@"new_status"] isEqualToString:@"disconnected"]) {
+                               NSArray *channels = [_channels channelsForServer:object.cid];
+                               for(Channel *c in channels) {
+                                   [_channels removeChannelForBuffer:c.bid];
+                               }
+                           }
                            [self postObject:object forEvent:kIRCEventStatusChanged];
+                       }
                    },
                    @"buffer_msg": msg, @"buffer_me_msg": msg, @"wait": msg,
                    @"banned": msg, @"kill": msg, @"connecting_cancelled": msg,

@@ -522,8 +522,11 @@
                     if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
                         highlights = 0;
                 }
+                Server *s = [[ServersDataSource sharedInstance] getServer:[[m objectForKey:@"cid"] intValue]];
                 [m setObject:@(unread) forKey:@"unread"];
                 [m setObject:@(highlights) forKey:@"highlights"];
+                [m setObject:s.status forKey:@"status"];
+                [m setObject:s.fail_info forKey:@"fail_info"];
                 [_data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
                 if(unread) {
                     if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
@@ -642,6 +645,28 @@
                 if([e isImportant:b.type]) {
                     [self refreshBuffer:b];
                 }
+            }
+            break;
+        case kIRCEventStatusChanged:
+            if(o) {
+                NSArray *buffers = [_buffers getBuffersForServer:o.cid];
+                for(Buffer *b in buffers) {
+                    [self refreshBuffer:b];
+                }
+            }
+            break;
+        case kIRCEventChannelInit:
+            if(notification.object) {
+                Buffer *b = [_buffers getBuffer:((Channel *)notification.object).bid];
+                if(b)
+                    [self refreshBuffer:b];
+            }
+            break;
+        case kIRCEventChannelMode:
+            if(o) {
+                Buffer *b = [_buffers getBuffer:o.bid];
+                if(b)
+                    [self refreshBuffer:b];
             }
             break;
         default:

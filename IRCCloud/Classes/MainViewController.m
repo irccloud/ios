@@ -368,9 +368,10 @@
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
             [_alertView show];
             break;
+        case kIRCEventStatusChanged:
+            [self _updateUserListVisibility];
         case kIRCEventSelfBack:
         case kIRCEventAway:
-        case kIRCEventStatusChanged:
         case kIRCEventConnectionLag:
             [self _updateServerStatus];
             break;
@@ -1275,11 +1276,8 @@
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if(lastBuffer) {
         _buffer.lastBuffer = lastBuffer;
-        if(changed) {
+        if(changed)
             lastBuffer.draft = _message.text;
-            if(!lastBuffer.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:lastBuffer.bid lastSeenEid:lastBuffer.last_seen_eid type:lastBuffer.type] == 0)
-                [[EventsDataSource sharedInstance] pruneEventsForBuffer:lastBuffer.bid];
-        }
     }
     if(_buffer) {
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
