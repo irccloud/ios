@@ -1033,6 +1033,8 @@
         if([text hasSuffix:@":"])
             text = [text substringToIndex:text.length - 1];
         if(text.length > 1 || force) {
+            NSLog(@"Suggestions fragment: %@", text);
+            
             if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
                 [suggestions addObject:_buffer.name];
             for(Channel *channel in _sortedChannels) {
@@ -1045,12 +1047,15 @@
                     [suggestions addObject:user.nick];
                 }
             }
+
+            NSLog(@"Suggestions fragment: %@ results: %i", text, suggestions.count);
         }
     }
     if(_nickCompletionView.selection == -1 || suggestions.count == 0)
         [_nickCompletionView setSuggestions:suggestions];
     if(suggestions.count == 0) {
         if(_nickCompletionView.alpha > 0) {
+            NSLog(@"*** Hide suggestions view");
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:^(BOOL finished) {
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
                 [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
@@ -1070,12 +1075,15 @@
         }
     } else {
         if(_nickCompletionView.alpha == 0) {
+            NSLog(@"*** Show suggestions view");
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:^(BOOL finished) {
+                NSString *text = _message.text;
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
                 [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
                 [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
                 [_message resignFirstResponder];
                 [_message becomeFirstResponder];
+                _message.text = text;
                 [[NSNotificationCenter defaultCenter] addObserver:self
                                                          selector:@selector(keyboardWillShow:)
                                                              name:UIKeyboardWillShowNotification object:nil];
@@ -1124,14 +1132,24 @@
     [self updateSuggestions:NO];
 }
 
+-(void)scheduleSuggestionsTimer {
+    if(_nickCompletionTimer)
+        [_nickCompletionTimer invalidate];
+    _nickCompletionTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(_updateSuggestionsTimer) userInfo:nil repeats:NO];
+}
+
+-(void)cancelSuggestionsTimer {
+    if(_nickCompletionTimer)
+        [_nickCompletionTimer invalidate];
+    _nickCompletionTimer = nil;
+}
+
 -(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
     _sendBtn.enabled = expandingTextView.text.length > 0;
     if(_nickCompletionView.alpha == 1) {
         [self updateSuggestions:NO];
     } else {
-        if(_nickCompletionTimer)
-            [_nickCompletionTimer invalidate];
-        _nickCompletionTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(_updateSuggestionsTimer) userInfo:nil repeats:NO];
+        [self performSelectorOnMainThread:@selector(scheduleSuggestionsTimer) withObject:nil waitUntilDone:NO];
     }
 }
 
@@ -1269,6 +1287,9 @@
 }
 
 -(void)bufferSelected:(int)bid {
+    [self performSelectorOnMainThread:@selector(cancelSuggestionsTimer) withObject:nil waitUntilDone:NO];
+    _sortedChannels = nil;
+    _sortedUsers = nil;
     BOOL changed = (_buffer && _buffer.bid != bid) || !_buffer;
     TFLog(@"BID selected: %i", bid);
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
