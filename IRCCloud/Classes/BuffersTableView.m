@@ -522,6 +522,18 @@
                     if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
                         highlights = 0;
                 }
+                if([b.type isEqualToString:@"channel"]) {
+                    Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:b.bid];
+                    if(channel) {
+                        if(channel.key)
+                            [m setObject:@1 forKey:@"key"];
+                        else
+                            [m setObject:@0 forKey:@"key"];
+                        [m setObject:@1 forKey:@"joined"];
+                    } else {
+                        [m setObject:@0 forKey:@"joined"];
+                    }
+                }
                 Server *s = [[ServersDataSource sharedInstance] getServer:[[m objectForKey:@"cid"] intValue]];
                 [m setObject:@(unread) forKey:@"unread"];
                 [m setObject:@(highlights) forKey:@"highlights"];
