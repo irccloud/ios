@@ -1258,14 +1258,11 @@
     int ssl = [url.scheme hasSuffix:@"s"]?1:0;
     BOOL match = NO;
     kIRCCloudState state = [NetworkConnection sharedInstance].state;
-    for(Server *s in [[ServersDataSource sharedInstance] getServers]) {
-        if([[s.hostname lowercaseString] isEqualToString:[url.host lowercaseString]])
+    
+    if([url.host intValue] > 0) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:[url.host intValue]];
+        if(s != nil) {
             match = YES;
-        if(port > 0 && port != 6667 && port != s.port)
-            match = NO;
-        if(ssl == 1 && !s.ssl)
-            match = NO;
-        if(match) {
             NSString *channel = [url.path substringFromIndex:1];
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:channel server:s.cid];
             if([b.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:b.bid])
@@ -1276,7 +1273,30 @@
                 [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid];
             else
                 match = NO;
-            break;
+        }
+    }
+    
+    if(!match) {
+        for(Server *s in [[ServersDataSource sharedInstance] getServers]) {
+            if([[s.hostname lowercaseString] isEqualToString:[url.host lowercaseString]])
+                match = YES;
+            if(port > 0 && port != 6667 && port != s.port)
+                match = NO;
+            if(ssl == 1 && !s.ssl)
+                match = NO;
+            if(match) {
+                NSString *channel = [url.path substringFromIndex:1];
+                Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:channel server:s.cid];
+                if([b.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:b.bid])
+                    b = nil;
+                if(b)
+                    [self bufferSelected:b.bid];
+                else if(state == kIRCCloudStateConnected)
+                    [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid];
+                else
+                    match = NO;
+                break;
+            }
         }
     }
 

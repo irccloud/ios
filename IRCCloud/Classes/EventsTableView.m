@@ -1197,7 +1197,7 @@ int __timestampWidth;
                 } else {
                     NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
                     if(![url hasPrefix:@"irc"])
-                        url = [NSString stringWithFormat:@"irc%@://%@:%i/%@", (_server.ssl==1)?@"s":@"", _server.hostname, _server.port, url];
+                        url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url];
                     [cell.message addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
                 }
             }
