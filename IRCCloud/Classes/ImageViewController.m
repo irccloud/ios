@@ -204,6 +204,28 @@
     } else if(([[url.host lowercaseString] hasSuffix:@"instagram.com"] || [[url.host lowercaseString] hasSuffix:@"instagr.am"]) && [url.path hasPrefix:@"/p/"]) {
         [self loadOembed:[NSString stringWithFormat:@"http://api.instagram.com/oembed?url=%@", url.absoluteString]];
         return;
+    } else if([url.host.lowercaseString isEqualToString:@"cl.ly"]) {
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            if (error) {
+                NSLog(@"Error fetching cl.ly metadata. Error %i : %@", error.code, error.userInfo);
+                [self fail];
+            } else {
+                SBJsonParser *parser = [[SBJsonParser alloc] init];
+                NSDictionary *dict = [parser objectWithData:data];
+                if([[dict objectForKey:@"item_type"] isEqualToString:@"image"]) {
+                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"content_url"]]];
+                    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    
+                    [connection start];
+                } else {
+                    NSLog(@"Invalid type from cl.ly");
+                    [self fail];
+                }
+            }
+        }];
+        return;
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
@@ -215,7 +237,7 @@
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     _bytesExpected = [response expectedContentLength];
     _imageData = [[NSMutableData alloc] initWithCapacity:_bytesExpected + 32]; // Just in case? Unsure if the extra 32 bytes are necessary
-    if(response.MIMEType.length && ![response.MIMEType.lowercaseString hasPrefix:@"image/"]) {
+    if(response.MIMEType.length && ![response.MIMEType.lowercaseString hasPrefix:@"image/"] && ![response.MIMEType.lowercaseString isEqualToString:@"binary/octet-stream"]) {
         [connection cancel];
         [self fail];
     }
