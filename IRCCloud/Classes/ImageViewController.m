@@ -215,6 +215,10 @@
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     _bytesExpected = [response expectedContentLength];
     _imageData = [[NSMutableData alloc] initWithCapacity:_bytesExpected + 32]; // Just in case? Unsure if the extra 32 bytes are necessary
+    if(response.MIMEType.length && ![response.MIMEType.lowercaseString hasPrefix:@"image/"]) {
+        [connection cancel];
+        [self fail];
+    }
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
