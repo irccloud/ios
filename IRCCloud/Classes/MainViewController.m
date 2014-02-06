@@ -441,11 +441,19 @@
             break;
         case kIRCEventLinkChannel:
             o = notification.object;
-            if(_cidToOpen == o.cid && [[[o objectForKey:@"invalid_chan"] lowercaseString] isEqualToString:[_bufferToOpen lowercaseString]]) {
+            if(_cidToOpen == o.cid && [[o objectForKey:@"invalid_chan"] isKindOfClass:[NSString class]] && [[[o objectForKey:@"invalid_chan"] lowercaseString] isEqualToString:[_bufferToOpen lowercaseString]]) {
                 if([[o objectForKey:@"valid_chan"] isKindOfClass:[NSString class]] && [[o objectForKey:@"valid_chan"] length]) {
                     _bufferToOpen = [o objectForKey:@"valid_chan"];
                     b = [[BuffersDataSource sharedInstance] getBuffer:o.bid];
                 }
+            } else {
+                _cidToOpen = o.cid;
+                _bufferToOpen = nil;
+            }
+            if(o.eid != -1) {
+                s = [[ServersDataSource sharedInstance] getServer:o.cid];
+                _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[o objectForKey:@"msg"] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [_alertView show];
             }
             if(!b)
                 break;
@@ -460,7 +468,7 @@
                 [self bufferSelected:b.bid];
                 _bufferToOpen = nil;
                 _cidToOpen = -1;
-            } else if([b.type isEqualToString:@"console"]) {
+            } else if([b.type isEqualToString:@"console"] || (_cidToOpen == b.cid && _bufferToOpen == nil)) {
                 [self bufferSelected:b.bid];
             }
             break;
