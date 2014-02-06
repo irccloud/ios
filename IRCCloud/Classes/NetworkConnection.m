@@ -129,6 +129,7 @@ NSLock *__parserLock = nil;
 	}
 }
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    //NSLog(@"%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     if(!_cancelled) {
         [_parser parse:data];
     }
@@ -288,7 +289,7 @@ NSLock *__parserLock = nil;
     };
     
     _parserMap = @{
-                   @"idle":ignored, @"end_of_backlog":ignored, @"oob_skipped":ignored, @"global_system_message":ignored, @"num_invites":ignored,
+                   @"idle":ignored, @"end_of_backlog":ignored, @"oob_skipped":ignored, @"num_invites":ignored,
                    @"header": ^(IRCCloudJSONObject *object) {
                        _idleInterval = ([[object objectForKey:@"idle_interval"] doubleValue] / 1000.0) + 10;
                        _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
@@ -305,6 +306,12 @@ NSLock *__parserLock = nil;
                            TFLog(@"Socket was not resumed, invalidating BIDs");
                            [_buffers invalidate];
                            [_channels invalidate];
+                       }
+                   },
+                   @"global_system_message": ^(IRCCloudJSONObject *object) {
+                       if([object objectForKey:@"system_message_type"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"eval"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"refresh"]) {
+                           _globalMsg = [object objectForKey:@"msg"];
+                           [self postObject:object forEvent:kIRCEventGlobalMsg];
                        }
                    },
                    @"oob_include": ^(IRCCloudJSONObject *object) {

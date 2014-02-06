@@ -252,6 +252,9 @@
     NSString *msg = nil;
     NSString *type = nil;
     switch(event) {
+        case kIRCEventGlobalMsg:
+            [self _updateGlobalMsg];
+            break;
         case kIRCEventWhois:
         {
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[WhoisViewController alloc] initWithJSONObject:notification.object]];
@@ -1033,8 +1036,6 @@
         if([text hasSuffix:@":"])
             text = [text substringToIndex:text.length - 1];
         if(text.length > 1 || force) {
-            NSLog(@"Suggestions fragment: %@", text);
-            
             if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
                 [suggestions addObject:_buffer.name];
             for(Channel *channel in _sortedChannels) {
@@ -1047,15 +1048,12 @@
                     [suggestions addObject:user.nick];
                 }
             }
-
-            NSLog(@"Suggestions fragment: %@ results: %i", text, suggestions.count);
         }
     }
     if(_nickCompletionView.selection == -1 || suggestions.count == 0)
         [_nickCompletionView setSuggestions:suggestions];
     if(suggestions.count == 0) {
         if(_nickCompletionView.alpha > 0) {
-            NSLog(@"*** Hide suggestions view");
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:^(BOOL finished) {
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
                 [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
@@ -1075,7 +1073,6 @@
         }
     } else {
         if(_nickCompletionView.alpha == 0) {
-            NSLog(@"*** Show suggestions view");
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:^(BOOL finished) {
                 NSString *text = _message.text;
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
@@ -1346,6 +1343,50 @@
     [self.slidingViewController resetTopView];
     [self _updateUnreadIndicator];
     [self updateSuggestions:NO];
+}
+
+-(void)_updateGlobalMsg {
+    if([NetworkConnection sharedInstance].globalMsg.length) {
+        _globalMsgContainer.hidden = NO;
+        _globalMsg.userInteractionEnabled = NO;
+        NSString *msg = [NetworkConnection sharedInstance].globalMsg;
+        msg = [msg stringByReplacingOccurrencesOfString:@"<b>" withString:[NSString stringWithFormat:@"%c", BOLD]];
+        msg = [msg stringByReplacingOccurrencesOfString:@"</b>" withString:[NSString stringWithFormat:@"%c", BOLD]];
+        msg = [msg stringByReplacingOccurrencesOfString:@"<strong>" withString:[NSString stringWithFormat:@"%c", BOLD]];
+        msg = [msg stringByReplacingOccurrencesOfString:@"</strong>" withString:[NSString stringWithFormat:@"%c", BOLD]];
+        msg = [msg stringByReplacingOccurrencesOfString:@"<i>" withString:[NSString stringWithFormat:@"%c", ITALICS]];
+        msg = [msg stringByReplacingOccurrencesOfString:@"</i>" withString:[NSString stringWithFormat:@"%c", ITALICS]];
+        msg = [msg stringByReplacingOccurrencesOfString:@"<u>" withString:[NSString stringWithFormat:@"%c", UNDERLINE]];
+        msg = [msg stringByReplacingOccurrencesOfString:@"</u>" withString:[NSString stringWithFormat:@"%c", UNDERLINE]];
+        msg = [msg stringByReplacingOccurrencesOfString:@"<br>" withString:@"\n"];
+        msg = [msg stringByReplacingOccurrencesOfString:@"<br/>" withString:@"\n"];
+        
+        NSMutableAttributedString *s = (NSMutableAttributedString *)[ColorFormatter format:msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil];
+        
+        CTTextAlignment alignment = kCTCenterTextAlignment;
+        CTParagraphStyleSetting paragraphStyle;
+        paragraphStyle.spec = kCTParagraphStyleSpecifierAlignment;
+        paragraphStyle.valueSize = sizeof(CTTextAlignment);
+        paragraphStyle.value = &alignment;
+        
+        CTParagraphStyleRef style = CTParagraphStyleCreate((const CTParagraphStyleSetting*) &paragraphStyle, 1);
+        [s addAttribute:(NSString*)kCTParagraphStyleAttributeName value:(__bridge id)style range:NSMakeRange(0, [s length])];
+        CFRelease(style);
+
+        _globalMsg.attributedText = s;
+        
+        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(_globalMsg.attributedText));
+        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_bottomBar.frame.size.width,CGFLOAT_MAX), NULL);
+        _globalMsgContainer.frame = CGRectMake(_bottomBar.frame.origin.x, 0, _bottomBar.frame.size.width, suggestedSize.height + 4);
+        CFRelease(framesetter);
+    } else {
+        _globalMsgContainer.hidden = YES;
+    }
+}
+
+-(IBAction)globalMsgPressed:(id)sender {
+    _globalMsgContainer.hidden = YES;
+    [NetworkConnection sharedInstance].globalMsg = nil;
 }
 
 -(void)_updateServerStatus {
@@ -1649,6 +1690,7 @@
     [self _updateTitleArea];
     [self _updateServerStatus];
     [self _updateUserListVisibility];
+    [self _updateGlobalMsg];
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {

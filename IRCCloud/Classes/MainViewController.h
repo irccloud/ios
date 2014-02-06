@@ -43,6 +43,8 @@
     IBOutlet UIView *_borders;
     IBOutlet UIView *_swipeTip;
     IBOutlet UIView *_mentionTip;
+    IBOutlet UIView *_globalMsgContainer;
+    IBOutlet TTTAttributedLabel *_globalMsg;
     UIButton *_menuBtn;
     UIButton *_sendBtn;
     UIBarButtonItem *_usersButtonItem;
@@ -75,5 +77,6 @@
 -(void)listButtonPressed:(id)sender;
 -(IBAction)serverStatusBarPressed:(id)sender;
 -(IBAction)titleAreaPressed:(id)sender;
+-(IBAction)globalMsgPressed:(id)sender;
 -(void)launchURL:(NSURL *)url;
 @end

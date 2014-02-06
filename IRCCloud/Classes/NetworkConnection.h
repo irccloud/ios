@@ -137,6 +137,7 @@ typedef enum {
     SCNetworkReachabilityRef _reachability;
     BOOL _reachabilityValid;
     NSDictionary *_parserMap;
+    NSString *_globalMsg;
 }
 @property (readonly) kIRCCloudState state;
 @property (readonly) NSDictionary *userInfo;
@@ -145,6 +146,7 @@ typedef enum {
 @property NSTimeInterval reconnectTimestamp;
 @property BOOL background, reachabilityValid;
 @property (readonly) kIRCCloudReachability reachable;
+@property NSString *globalMsg;
 
 +(NetworkConnection*)sharedInstance;
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password;
