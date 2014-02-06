@@ -791,6 +791,7 @@
 
     [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
+    _nickCompletionView.alpha = 0;
     [UIView commitAnimations];
 }
 
@@ -1140,7 +1141,7 @@
 -(void)scheduleSuggestionsTimer {
     if(_nickCompletionTimer)
         [_nickCompletionTimer invalidate];
-    _nickCompletionTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(_updateSuggestionsTimer) userInfo:nil repeats:NO];
+    _nickCompletionTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_updateSuggestionsTimer) userInfo:nil repeats:NO];
 }
 
 -(void)cancelSuggestionsTimer {
