@@ -1087,9 +1087,11 @@
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
                 [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
                 [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+                _message.delegate = nil;
                 [_message resignFirstResponder];
                 [_message becomeFirstResponder];
                 _message.text = text;
+                _message.delegate = self;
                 [[NSNotificationCenter defaultCenter] addObserver:self
                                                          selector:@selector(keyboardWillShow:)
                                                              name:UIKeyboardWillShowNotification object:nil];
