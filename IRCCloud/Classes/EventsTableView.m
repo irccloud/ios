@@ -570,7 +570,7 @@ int __timestampWidth;
             else
                 event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
             if(event.hostmask && event.hostmask.length)
-                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@ (%@)", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.hostmask];
+                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %c%@%c (%@)", BOLD, event.nick, BOLD, event.hostmask];
             else
                 event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by the server %c%@%c", BOLD, event.nick, CLEAR];
             if(event.msg.length > 0)
