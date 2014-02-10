@@ -11,6 +11,8 @@
 #define fromCF (id)
 #endif
 
+NSString *UIImageAnimatedGIFProgressNotification = @"UIImageAnimatedGIFProgressNotification";
+
 @implementation UIImage (animatedGIF)
 
 static int delayCentisecondsForImageAtIndex(CGImageSourceRef const source, size_t const i) {
@@ -68,12 +70,60 @@ static NSArray *frameArray(size_t const count, CGImageRef const images[count], i
     int const gcd = vectorGCD(count, delayCentiseconds);
     size_t const frameCount = totalDurationCentiseconds / gcd;
     UIImage *frames[frameCount];
+    
+    //Snippit from: https://github.com/rs/SDWebImage/blob/master/SDWebImage/SDWebImageDecoder.m
+    CGSize imageSize = CGSizeMake(CGImageGetWidth(images[0]), CGImageGetHeight(images[0]));
+    CGRect imageRect = (CGRect){.origin = CGPointZero, .size = imageSize};
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+    CGBitmapInfo bitmapInfo = CGImageGetBitmapInfo(images[0]);
+    
+    int infoMask = (bitmapInfo & kCGBitmapAlphaInfoMask);
+    BOOL anyNonAlpha = (infoMask == kCGImageAlphaNone ||
+                        infoMask == kCGImageAlphaNoneSkipFirst ||
+                        infoMask == kCGImageAlphaNoneSkipLast);
+    
+    // CGBitmapContextCreate doesn't support kCGImageAlphaNone with RGB.
+    // https://developer.apple.com/library/mac/#qa/qa1037/_index.html
+    if (infoMask == kCGImageAlphaNone && CGColorSpaceGetNumberOfComponents(colorSpace) > 1) {
+        // Unset the old alpha info.
+        bitmapInfo &= ~kCGBitmapAlphaInfoMask;
+        
+        // Set noneSkipFirst.
+        bitmapInfo |= kCGImageAlphaNoneSkipFirst;
+    }
+    // Some PNGs tell us they have alpha but only 3 components. Odd.
+    else if (!anyNonAlpha && CGColorSpaceGetNumberOfComponents(colorSpace) == 3) {
+        // Unset the old alpha info.
+        bitmapInfo &= ~kCGBitmapAlphaInfoMask;
+        bitmapInfo |= kCGImageAlphaPremultipliedFirst;
+    }
+    
+    // It calculates the bytes-per-row based on the bitsPerComponent and width arguments.
+    CGContextRef context = CGBitmapContextCreate(NULL,
+                                                 imageSize.width,
+                                                 imageSize.height,
+                                                 CGImageGetBitsPerComponent(images[0]),
+                                                 0,
+                                                 colorSpace,
+                                                 bitmapInfo);
+    CGColorSpaceRelease(colorSpace);
     for (size_t i = 0, f = 0; i < count; ++i) {
-        UIImage *const frame = [UIImage imageWithCGImage:images[i]];
+        CGImageRef imageRef = images[i];
+        
+        CGContextClearRect(context, imageRect);
+        CGContextDrawImage(context, imageRect, imageRef);
+        CGImageRef decompressedImageRef = CGBitmapContextCreateImage(context);
+        UIImage *frame = [UIImage imageWithCGImage:decompressedImageRef scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
+        CGImageRelease(decompressedImageRef);
+        
         for (size_t j = delayCentiseconds[i] / gcd; j > 0; --j) {
             frames[f++] = frame;
         }
+        
+        [[NSNotificationCenter defaultCenter] postNotificationName:UIImageAnimatedGIFProgressNotification object:nil userInfo:@{@"progress":@((float)f/(float)count)}];
     }
+    CGContextRelease(context);
     return [NSArray arrayWithObjects:frames count:frameCount];
 }
 

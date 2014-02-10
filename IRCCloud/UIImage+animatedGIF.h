@@ -32,3 +32,5 @@
 + (UIImage *)animatedImageWithAnimatedGIFURL:(NSURL *)theURL;
 
 @end
+
+extern NSString *UIImageAnimatedGIFProgressNotification;

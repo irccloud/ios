@@ -261,27 +261,38 @@
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    UIImage *img = nil;
-    NSData *data = _imageData;
-    if(data) {
-        char GIF[3];
-        [data getBytes:&GIF length:3];
-        if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F')
-            img = [UIImage animatedImageWithAnimatedGIFData:data];
-        else
-            img = [UIImage imageWithData:data];
-        if(img) {
-            _progressView.progress = 1.f;
-            [self performSelectorOnMainThread:@selector(_setImage:) withObject:img waitUntilDone:YES];
-        }
-    }
-    if(!data || !img) {
+    if(_imageData) {
+        [self performSelectorInBackground:@selector(_parseImageData:) withObject:_imageData];
+    } else {
         [self fail];
     }
 }
 
+- (void)_parseImageData:(NSData *)data {
+    UIImage *img = nil;
+    char GIF[3];
+    [data getBytes:&GIF length:3];
+    if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F')
+        img = [UIImage animatedImageWithAnimatedGIFData:data];
+    else
+        img = [UIImage imageWithData:data];
+    if(img) {
+        _progressView.progress = 1.f;
+        [self performSelectorOnMainThread:@selector(_setImage:) withObject:img waitUntilDone:NO];
+    } else {
+        [self fail];
+    }
+}
+
+-(void)_gifProgress:(NSNotification *)n {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _progressView.progress = [[n.userInfo objectForKey:@"progress"] floatValue];
+    }];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
         self.view.frame = _scrollView.frame = CGRectMake(0,0,[UIScreen mainScreen].bounds.size.height,[UIScreen mainScreen].bounds.size.width);
     } else {
@@ -289,6 +300,10 @@
     }
     
     [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
+}
+
+-(void)viewDidUnload {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
