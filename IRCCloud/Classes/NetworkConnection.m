@@ -283,7 +283,7 @@ NSLock *__parserLock = nil;
         if(!backlog) {
             [_users updateNick:[object objectForKey:@"newnick"] oldNick:[object objectForKey:@"oldnick"] cid:object.cid bid:object.bid];
             if([object.type isEqualToString:@"you_nickchange"])
-                [_servers updateNick:[object objectForKey:@"new_nick"] server:object.cid];
+                [_servers updateNick:[object objectForKey:@"newnick"] server:object.cid];
             [self postObject:object forEvent:kIRCEventNickChange];
         }
     };
