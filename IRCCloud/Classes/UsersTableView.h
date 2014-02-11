@@ -25,6 +25,9 @@
 
 @interface UsersTableView : UITableViewController {
     NSArray *_data;
+    NSMutableArray *_sectionTitles;
+    NSMutableArray *_sectionIndexes;
+    NSMutableArray *_sectionSizes;
     Buffer *_buffer;
     IBOutlet id<UsersTableViewDelegate> delegate;
     NSTimer *_refreshTimer;

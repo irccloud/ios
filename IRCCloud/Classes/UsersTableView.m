@@ -84,13 +84,6 @@
 
 @implementation UsersTableView
 
-- (id)initWithCoder:(NSCoder *)aDecoder {
-    self = [super initWithCoder:aDecoder];
-    if (self) {
-    }
-    return self;
-}
-
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
     [self.tableView reloadData];
 }
@@ -122,9 +115,10 @@
     _refreshTimer = nil;
 }
 
-- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data {
+- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data sectionTitles:(NSMutableArray *)sectionTitles sectionIndexes:(NSMutableArray *)sectionIndexes sectionSizes:(NSMutableArray *)sectionSizes {
     int first;
     if(users.count) {
+        unichar lastChar = 0;
         [data addObject:@{
          @"type":@TYPE_HEADING,
          @"text":heading,
@@ -134,8 +128,20 @@
          @"countColor":countColor,
          @"symbol":symbol
          }];
+        int size = data.count;
         first = 1;
         for(User *user in users) {
+            if(sectionTitles != nil) {
+                if([[user.nick lowercaseString] characterAtIndex:0] != lastChar) {
+                    lastChar = [[user.nick lowercaseString] characterAtIndex:0];
+                    [sectionIndexes addObject:@(data.count)];
+                    [sectionTitles addObject:[[user.nick uppercaseString] substringToIndex:1]];
+                    [sectionSizes addObject:@(size)];
+                    size = 1;
+                } else {
+                    size++;
+                }
+            }
             [data addObject:@{
              @"type":@TYPE_USER,
              @"text":user.nick,
@@ -146,6 +152,8 @@
              }];
             first = 0;
         }
+        if(sectionSizes != nil)
+            [sectionSizes addObject:@(size)];
     }
 }
 
@@ -172,6 +180,9 @@
     NSMutableArray *halfops = [[NSMutableArray alloc] init];
     NSMutableArray *voiced = [[NSMutableArray alloc] init];
     NSMutableArray *members = [[NSMutableArray alloc] init];
+    NSMutableArray *sectionTitles = [[NSMutableArray alloc] init];
+    NSMutableArray *sectionIndexes = [[NSMutableArray alloc] init];
+    NSMutableArray *sectionSizes = [[NSMutableArray alloc] init];
     
     for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
         if([user.mode rangeOfString:@"q"].location != NSNotFound)
@@ -188,16 +199,21 @@
             [members addObject:user];
     }
     
-    [self _addUsersFromList:owners heading:@"Owners" symbol:[PREFIX objectForKey:@"q"] headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data];
-    [self _addUsersFromList:admins heading:@"Admins" symbol:[PREFIX objectForKey:@"a"] headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data];
-    [self _addUsersFromList:ops heading:@"Ops" symbol:[PREFIX objectForKey:@"o"] headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data];
-    [self _addUsersFromList:halfops heading:@"Half Ops" symbol:[PREFIX objectForKey:@"h"] headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data];
-    [self _addUsersFromList:voiced heading:@"Voiced" symbol:[PREFIX objectForKey:@"v"] headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data];
-    [self _addUsersFromList:members heading:@"Members" symbol:@"" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor blueBorderColor] data:data];
-    
+    [self _addUsersFromList:owners heading:@"Owners" symbol:[PREFIX objectForKey:@"q"] headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:admins heading:@"Admins" symbol:[PREFIX objectForKey:@"a"] headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:ops heading:@"Ops" symbol:[PREFIX objectForKey:@"o"] headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:halfops heading:@"Half Ops" symbol:[PREFIX objectForKey:@"h"] headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:voiced heading:@"Voiced" symbol:[PREFIX objectForKey:@"v"] headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [sectionIndexes addObject:@(0)];
+    [self _addUsersFromList:members heading:@"Members" symbol:@"" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor blueBorderColor] data:data sectionTitles:sectionTitles sectionIndexes:sectionIndexes sectionSizes:sectionSizes];
+    if(sectionSizes.count == 0)
+        [sectionSizes addObject:@(data.count)];
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         _data = data;
+        _sectionTitles = sectionTitles;
+        _sectionIndexes = sectionIndexes;
+        _sectionSizes = sectionSizes;
         [self.tableView reloadData];
     }];
 }
@@ -233,22 +249,43 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
+    if(_data.count > 20)
+        return _sectionIndexes.count;
+    else
+        return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return _data.count;
+    if(_data.count > 20)
+        return [[_sectionSizes objectAtIndex:section] intValue];
+    else
+        return _data.count;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return 32;
 }
 
+-(NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
+    if(_data.count > 20)
+        return _sectionTitles;
+    else
+        return nil;
+}
+
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if(section == 0)
+        return nil;
+    else
+        return [_sectionTitles objectAtIndex:section - 1];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UsersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"userscell"];
     if(!cell)
         cell = [[UsersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"userscell"];
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    int idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
+    NSDictionary *row = [_data objectAtIndex:idx];
     cell.type = [[row objectForKey:@"type"] intValue];
     cell.contentView.backgroundColor = [row objectForKey:@"bgColor"];
     cell.label.text = [row objectForKey:@"text"];
@@ -333,8 +370,9 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    if([[[_data objectAtIndex:[indexPath row]] objectForKey:@"type"] intValue] == TYPE_USER)
-        [delegate userSelected:[[_data objectAtIndex:[indexPath row]] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+    int idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
+    if([[[_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
+        [delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
 }
 
 @end
