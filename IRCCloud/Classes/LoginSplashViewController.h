@@ -25,6 +25,7 @@
     IBOutlet UIView *loginView;
     IBOutlet UITextField *username;
     IBOutlet UITextField *password;
+    IBOutlet UITextField *host;
     IBOutlet UIButton *login;
     
     IBOutlet UIView *loadingView;

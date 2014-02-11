@@ -69,6 +69,103 @@
 		2250176D1783434900066E71 /* TUSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 225017601783434900066E71 /* TUSafariActivity.m */; };
 		2251693317B5A8040093ADC5 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
 		2253BA251770CD7200CCA77F /* ChannelListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */; };
+		225D973818AA995900065087 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A057B16D3DABA0029769C /* main.m */; };
+		225D973918AA995900065087 /* ServerReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22462B5118906B03009EF986 /* ServerReorderViewController.m */; };
+		225D973A18AA995900065087 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05AF16D3DB7B0029769C /* AppDelegate.m */; };
+		225D973B18AA995900065087 /* TTTAttributedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05D316D3DFB80029769C /* TTTAttributedLabel.m */; };
+		225D973C18AA995900065087 /* LoginSplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05DC16D3E40E0029769C /* LoginSplashViewController.m */; };
+		225D973D18AA995900065087 /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280716D7E21200498507 /* SBJsonParser.m */; };
+		225D973E18AA995900065087 /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280916D7E21200498507 /* SBJsonStreamParser.m */; };
+		225D973F18AA995900065087 /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280B16D7E21200498507 /* SBJsonStreamParserAccumulator.m */; };
+		225D974018AA995900065087 /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280D16D7E21200498507 /* SBJsonStreamParserAdapter.m */; };
+		225D974118AA995900065087 /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4280F16D7E21200498507 /* SBJsonStreamParserState.m */; };
+		225D974218AA995900065087 /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4281116D7E21200498507 /* SBJsonStreamTokeniser.m */; };
+		225D974318AA995900065087 /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4281316D7E21200498507 /* SBJsonStreamWriter.m */; };
+		225D974418AA995900065087 /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4281516D7E21200498507 /* SBJsonStreamWriterAccumulator.m */; };
+		225D974518AA995900065087 /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4281716D7E21200498507 /* SBJsonStreamWriterState.m */; };
+		225D974618AA995900065087 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4281916D7E21200498507 /* SBJsonWriter.m */; };
+		225D974718AA995900065087 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
+		225D974818AA995900065087 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284C16D831A800498507 /* AsyncSocket.m */; };
+		225D974918AA995900065087 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
+		225D974A18AA995900065087 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
+		225D974B18AA995900065087 /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
+		225D974C18AA995900065087 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
+		225D974D18AA995900065087 /* WebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285716D831A800498507 /* WebSocket.m */; };
+		225D974E18AA995900065087 /* WebSocketConnectConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286116D831A800498507 /* WebSocketConnectConfig.m */; };
+		225D974F18AA995900065087 /* WebSocketFragment.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286316D831A800498507 /* WebSocketFragment.m */; };
+		225D975018AA995900065087 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
+		225D975118AA995900065087 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		225D975218AA995900065087 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
+		225D975318AA995900065087 /* NickCompletionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22032A6E1884529700BE4A10 /* NickCompletionView.m */; };
+		225D975418AA995900065087 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
+		225D975518AA995900065087 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
+		225D975618AA995900065087 /* ChannelsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60116DBC021007BE535 /* ChannelsDataSource.m */; };
+		225D975718AA995900065087 /* BuffersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60516DBCA85007BE535 /* BuffersTableView.m */; };
+		225D975818AA995900065087 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60916DBCBC6007BE535 /* MainViewController.m */; };
+		225D975918AA995900065087 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
+		225D975A18AA995900065087 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
+		225D975B18AA995900065087 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
+		225D975C18AA995900065087 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
+		225D975D18AA995900065087 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
+		225D975E18AA995900065087 /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
+		225D975F18AA995900065087 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
+		225D976018AA995900065087 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
+		225D976118AA995900065087 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
+		225D976218AA995900065087 /* BansTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* BansTableViewController.m */; };
+		225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
+		225D976418AA995900065087 /* UIExpandingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A31725AAEA003C0684 /* UIExpandingTextView.m */; };
+		225D976518AA995900065087 /* UIExpandingTextViewInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A51725AAEA003C0684 /* UIExpandingTextViewInternal.m */; };
+		225D976618AA995900065087 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
+		225D976718AA995900065087 /* ECSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF817301BAF0075EBA7 /* ECSlidingViewController.m */; };
+		225D976818AA995900065087 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */; };
+		225D976918AA995900065087 /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
+		225D976A18AA995900065087 /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
+		225D976B18AA995900065087 /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
+		225D976C18AA995900065087 /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */; };
+		225D976D18AA995900065087 /* ChannelListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */; };
+		225D976E18AA995900065087 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF8221772063F00394114 /* SettingsViewController.m */; };
+		225D976F18AA995900065087 /* CallerIDTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */; };
+		225D977018AA995900065087 /* WhoisViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A1D0261778A86900F8A89C /* WhoisViewController.m */; };
+		225D977118AA995900065087 /* DisplayOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */; };
+		225D977218AA995900065087 /* ARChromeActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 225017431783434800066E71 /* ARChromeActivity.m */; };
+		225D977318AA995900065087 /* TUSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 225017601783434900066E71 /* TUSafariActivity.m */; };
+		225D977418AA995900065087 /* LicenseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 224FCF351787288400FC3879 /* LicenseViewController.m */; };
+		225D977518AA995900065087 /* WhoListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F25178A317100529CDA /* WhoListTableViewController.m */; };
+		225D977618AA995900065087 /* NamesListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F28178A3F3500529CDA /* NamesListTableViewController.m */; };
+		225D977718AA995900065087 /* UINavigationController+iPadSux.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */; };
+		225D977918AA995900065087 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
+		225D977A18AA995900065087 /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
+		225D977B18AA995900065087 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
+		225D977C18AA995900065087 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
+		225D977D18AA995900065087 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
+		225D977E18AA995900065087 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
+		225D977F18AA995900065087 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
+		225D978018AA995900065087 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CD16D3DD310029769C /* libicucore.dylib */; };
+		225D978118AA995900065087 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CB16D3DCE20029769C /* Security.framework */; };
+		225D978218AA995900065087 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
+		225D978318AA995900065087 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
+		225D978418AA995900065087 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
+		225D978518AA995900065087 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
+		225D978618AA995900065087 /* libTestFlight.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3416EE35FC0086BB42 /* libTestFlight.a */; };
+		225D978918AA995900065087 /* LoginSplashViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */; };
+		225D978A18AA995900065087 /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */; };
+		225D978B18AA995900065087 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
+		225D978C18AA995900065087 /* LoginSplashViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 224027EC1702028F008940B1 /* LoginSplashViewController_iPad.xib */; };
+		225D978D18AA995900065087 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22D4F9101743F3790095EE8F /* Localizable.strings */; };
+		225D978E18AA995900065087 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A78F36817D5EDF3008965DB /* Images.xcassets */; };
+		225D978F18AA995900065087 /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
+		225D979018AA995900065087 /* ARChromeActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017441783434800066E71 /* ARChromeActivity.png */; };
+		225D979118AA995900065087 /* ARChromeActivity@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017451783434800066E71 /* ARChromeActivity@2x.png */; };
+		225D979218AA995900065087 /* ARChromeActivity@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017461783434800066E71 /* ARChromeActivity@2x~ipad.png */; };
+		225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017471783434800066E71 /* ARChromeActivity~ipad.png */; };
+		225D979418AA995900065087 /* Safari.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017591783434900066E71 /* Safari.png */; };
+		225D979518AA995900065087 /* Safari@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2250175A1783434900066E71 /* Safari@2x.png */; };
+		225D979618AA995900065087 /* Safari@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 2250175B1783434900066E71 /* Safari@2x~ipad.png */; };
+		225D979718AA995900065087 /* Safari~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 2250175C1783434900066E71 /* Safari~ipad.png */; };
+		225D979818AA995900065087 /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A78F36A17D5F29C008965DB /* Icons.xcassets */; };
+		225D979918AA995900065087 /* licenses.txt in Resources */ = {isa = PBXBuildFile; fileRef = 224FCF321787286000FC3879 /* licenses.txt */; };
+		225D979A18AA995900065087 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
+		225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
 		22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		22695F5616E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
@@ -250,6 +347,8 @@
 		2251693217B5A8040093ADC5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/TUSafariActivity.strings; sourceTree = "<group>"; };
 		2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelListTableViewController.m; sourceTree = "<group>"; };
 		2253BA261770CDC500CCA77F /* ChannelListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelListTableViewController.h; sourceTree = "<group>"; };
+		225D979F18AA995900065087 /* IRCCloud Enterprise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "IRCCloud Enterprise.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IRCCloud-Enterprise-Info.plist"; sourceTree = "<group>"; };
 		22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollapsedEvents.h; sourceTree = "<group>"; };
 		22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollapsedEvents.m; sourceTree = "<group>"; };
 		2274F49D1756723F0039B4CB /* OpenInChromeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInChromeController.h; path = OpenInChrome/OpenInChromeController.h; sourceTree = SOURCE_ROOT; };
@@ -364,6 +463,27 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		225D977818AA995900065087 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225D977918AA995900065087 /* AudioToolbox.framework in Frameworks */,
+				225D977A18AA995900065087 /* Twitter.framework in Frameworks */,
+				225D977B18AA995900065087 /* SystemConfiguration.framework in Frameworks */,
+				225D977C18AA995900065087 /* ImageIO.framework in Frameworks */,
+				225D977D18AA995900065087 /* MobileCoreServices.framework in Frameworks */,
+				225D977E18AA995900065087 /* libz.dylib in Frameworks */,
+				225D977F18AA995900065087 /* CoreText.framework in Frameworks */,
+				225D978018AA995900065087 /* libicucore.dylib in Frameworks */,
+				225D978118AA995900065087 /* Security.framework in Frameworks */,
+				225D978218AA995900065087 /* UIKit.framework in Frameworks */,
+				225D978318AA995900065087 /* CFNetwork.framework in Frameworks */,
+				225D978418AA995900065087 /* Foundation.framework in Frameworks */,
+				225D978518AA995900065087 /* CoreGraphics.framework in Frameworks */,
+				225D978618AA995900065087 /* libTestFlight.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		228A056916D3DABA0029769C /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -452,6 +572,7 @@
 			children = (
 				228A056C16D3DABA0029769C /* IRCCloud.app */,
 				228A059516D3DABB0029769C /* IRCCloudTests.octest */,
+				225D979F18AA995900065087 /* IRCCloud Enterprise.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -496,22 +617,23 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */,
-				2293AF0017F9CCD10022BD06 /* NSURL+IDN.h */,
 				225017411783434800066E71 /* ARChromeActivity */,
 				22F5C4BB1791EFCD005E09A9 /* config.h */,
 				22B15CF617301BAE0075EBA7 /* ECSlidingViewController */,
 				228A057816D3DABA0029769C /* InfoPlist.strings */,
 				228A057716D3DABA0029769C /* IRCCloud-Info.plist */,
+				225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */,
 				228A057D16D3DABA0029769C /* IRCCloud-Prefix.pch */,
 				2248DF3416EE35FC0086BB42 /* libTestFlight.a */,
 				228A057B16D3DABA0029769C /* main.m */,
+				2293AF0017F9CCD10022BD06 /* NSURL+IDN.h */,
+				2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */,
 				2274F49D1756723F0039B4CB /* OpenInChromeController.h */,
 				2274F49E1756723F0039B4CB /* OpenInChromeController.m */,
 				22B4280416D7E21100498507 /* SBJson */,
-				2248DF3516EE35FC0086BB42 /* TestFlight.h */,
 				2283BD3917D689F300E077D0 /* TestFlight+AsyncLogging.h */,
 				2283BD3A17D689F300E077D0 /* TestFlight+ManualSessions.h */,
+				2248DF3516EE35FC0086BB42 /* TestFlight.h */,
 				228A05D116D3DFB70029769C /* TTTAttributedLabel */,
 				225017481783434800066E71 /* TUSafariActivity */,
 				22D430A21725AAE9003C0684 /* UIExpandingTextView.h */,
@@ -707,6 +829,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		225D973618AA995900065087 /* IRCCloud Enterprise */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 225D979C18AA995900065087 /* Build configuration list for PBXNativeTarget "IRCCloud Enterprise" */;
+			buildPhases = (
+				225D973718AA995900065087 /* Sources */,
+				225D977818AA995900065087 /* Frameworks */,
+				225D978718AA995900065087 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "IRCCloud Enterprise";
+			productName = IRCCloud;
+			productReference = 225D979F18AA995900065087 /* IRCCloud Enterprise.app */;
+			productType = "com.apple.product-type.application";
+		};
 		228A056B16D3DABA0029769C /* IRCCloud */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 228A05A716D3DABB0029769C /* Build configuration list for PBXNativeTarget "IRCCloud" */;
@@ -789,11 +928,38 @@
 			targets = (
 				228A056B16D3DABA0029769C /* IRCCloud */,
 				228A059416D3DABB0029769C /* IRCCloudTests */,
+				225D973618AA995900065087 /* IRCCloud Enterprise */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		225D978718AA995900065087 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225D978918AA995900065087 /* LoginSplashViewController_iPhone.xib in Resources */,
+				225D978A18AA995900065087 /* MainViewController_iPhone.xib in Resources */,
+				225D978B18AA995900065087 /* MainViewController_iPad.xib in Resources */,
+				225D978C18AA995900065087 /* LoginSplashViewController_iPad.xib in Resources */,
+				225D978D18AA995900065087 /* Localizable.strings in Resources */,
+				225D978E18AA995900065087 /* Images.xcassets in Resources */,
+				225D978F18AA995900065087 /* ImageViewController.xib in Resources */,
+				225D979018AA995900065087 /* ARChromeActivity.png in Resources */,
+				225D979118AA995900065087 /* ARChromeActivity@2x.png in Resources */,
+				225D979218AA995900065087 /* ARChromeActivity@2x~ipad.png in Resources */,
+				225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */,
+				225D979418AA995900065087 /* Safari.png in Resources */,
+				225D979518AA995900065087 /* Safari@2x.png in Resources */,
+				225D979618AA995900065087 /* Safari@2x~ipad.png in Resources */,
+				225D979718AA995900065087 /* Safari~ipad.png in Resources */,
+				225D979818AA995900065087 /* Icons.xcassets in Resources */,
+				225D979918AA995900065087 /* licenses.txt in Resources */,
+				225D979A18AA995900065087 /* a.caf in Resources */,
+				225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		228A056A16D3DABA0029769C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -853,6 +1019,77 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		225D973718AA995900065087 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				225D973818AA995900065087 /* main.m in Sources */,
+				225D973918AA995900065087 /* ServerReorderViewController.m in Sources */,
+				225D973A18AA995900065087 /* AppDelegate.m in Sources */,
+				225D973B18AA995900065087 /* TTTAttributedLabel.m in Sources */,
+				225D973C18AA995900065087 /* LoginSplashViewController.m in Sources */,
+				225D973D18AA995900065087 /* SBJsonParser.m in Sources */,
+				225D973E18AA995900065087 /* SBJsonStreamParser.m in Sources */,
+				225D973F18AA995900065087 /* SBJsonStreamParserAccumulator.m in Sources */,
+				225D974018AA995900065087 /* SBJsonStreamParserAdapter.m in Sources */,
+				225D974118AA995900065087 /* SBJsonStreamParserState.m in Sources */,
+				225D974218AA995900065087 /* SBJsonStreamTokeniser.m in Sources */,
+				225D974318AA995900065087 /* SBJsonStreamWriter.m in Sources */,
+				225D974418AA995900065087 /* SBJsonStreamWriterAccumulator.m in Sources */,
+				225D974518AA995900065087 /* SBJsonStreamWriterState.m in Sources */,
+				225D974618AA995900065087 /* SBJsonWriter.m in Sources */,
+				225D974718AA995900065087 /* NetworkConnection.m in Sources */,
+				225D974818AA995900065087 /* AsyncSocket.m in Sources */,
+				225D974918AA995900065087 /* GCDAsyncSocket.m in Sources */,
+				225D974A18AA995900065087 /* HandshakeHeader.m in Sources */,
+				225D974B18AA995900065087 /* MutableQueue.m in Sources */,
+				225D974C18AA995900065087 /* NSData+Base64.m in Sources */,
+				225D974D18AA995900065087 /* WebSocket.m in Sources */,
+				225D974E18AA995900065087 /* WebSocketConnectConfig.m in Sources */,
+				225D974F18AA995900065087 /* WebSocketFragment.m in Sources */,
+				225D975018AA995900065087 /* WebSocketMessage.m in Sources */,
+				225D975118AA995900065087 /* IRCCloudJSONObject.m in Sources */,
+				225D975218AA995900065087 /* ServersDataSource.m in Sources */,
+				225D975318AA995900065087 /* NickCompletionView.m in Sources */,
+				225D975418AA995900065087 /* NSURL+IDN.m in Sources */,
+				225D975518AA995900065087 /* BuffersDataSource.m in Sources */,
+				225D975618AA995900065087 /* ChannelsDataSource.m in Sources */,
+				225D975718AA995900065087 /* BuffersTableView.m in Sources */,
+				225D975818AA995900065087 /* MainViewController.m in Sources */,
+				225D975918AA995900065087 /* UIColor+IRCCloud.m in Sources */,
+				225D975A18AA995900065087 /* UsersDataSource.m in Sources */,
+				225D975B18AA995900065087 /* UsersTableView.m in Sources */,
+				225D975C18AA995900065087 /* EventsDataSource.m in Sources */,
+				225D975D18AA995900065087 /* EventsTableView.m in Sources */,
+				225D975E18AA995900065087 /* ColorFormatter.m in Sources */,
+				225D975F18AA995900065087 /* CollapsedEvents.m in Sources */,
+				225D976018AA995900065087 /* HighlightsCountView.m in Sources */,
+				225D976118AA995900065087 /* Ignore.m in Sources */,
+				225D976218AA995900065087 /* BansTableViewController.m in Sources */,
+				225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */,
+				225D976418AA995900065087 /* UIExpandingTextView.m in Sources */,
+				225D976518AA995900065087 /* UIExpandingTextViewInternal.m in Sources */,
+				225D976618AA995900065087 /* EditConnectionViewController.m in Sources */,
+				225D976718AA995900065087 /* ECSlidingViewController.m in Sources */,
+				225D976818AA995900065087 /* UIImage+ImageWithUIView.m in Sources */,
+				225D976918AA995900065087 /* OpenInChromeController.m in Sources */,
+				225D976A18AA995900065087 /* ChannelInfoViewController.m in Sources */,
+				225D976B18AA995900065087 /* ImageViewController.m in Sources */,
+				225D976C18AA995900065087 /* UIImage+animatedGIF.m in Sources */,
+				225D976D18AA995900065087 /* ChannelListTableViewController.m in Sources */,
+				225D976E18AA995900065087 /* SettingsViewController.m in Sources */,
+				225D976F18AA995900065087 /* CallerIDTableViewController.m in Sources */,
+				225D977018AA995900065087 /* WhoisViewController.m in Sources */,
+				225D977118AA995900065087 /* DisplayOptionsViewController.m in Sources */,
+				225D977218AA995900065087 /* ARChromeActivity.m in Sources */,
+				225D977318AA995900065087 /* TUSafariActivity.m in Sources */,
+				225D977418AA995900065087 /* LicenseViewController.m in Sources */,
+				225D977518AA995900065087 /* WhoListTableViewController.m in Sources */,
+				225D977618AA995900065087 /* NamesListTableViewController.m in Sources */,
+				225D977718AA995900065087 /* UINavigationController+iPadSux.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		228A056816D3DABA0029769C /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1023,6 +1260,55 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		225D979D18AA995900065087 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				INFOPLIST_FILE = "IRCCloud/IRCCloud-Enterprise-Info.plist";
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/IRCCloud\"",
+				);
+				OTHER_CFLAGS = "-DENTERPRISE";
+				PRODUCT_NAME = "IRCCloud Enterprise";
+				PROVISIONING_PROFILE = "";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		225D979E18AA995900065087 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				INFOPLIST_FILE = "IRCCloud/IRCCloud-Enterprise-Info.plist";
+				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/IRCCloud\"",
+				);
+				OTHER_CFLAGS = (
+					"-DNS_BLOCK_ASSERTIONS=1",
+					"-DENTERPRISE",
+				);
+				PRODUCT_NAME = "IRCCloud Enterprise";
+				PROVISIONING_PROFILE = "";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
 		228A05A516D3DABB0029769C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1172,6 +1458,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		225D979C18AA995900065087 /* Build configuration list for PBXNativeTarget "IRCCloud Enterprise" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				225D979D18AA995900065087 /* Debug */,
+				225D979E18AA995900065087 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		228A056716D3DABA0029769C /* Build configuration list for PBXProject "IRCCloud" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

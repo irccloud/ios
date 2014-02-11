@@ -32,7 +32,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.frame = [UIScreen mainScreen].applicationFrame;
-    username.background = password.background = [[UIImage imageNamed:@"textbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)];
+    username.background = password.background = host.background = [[UIImage imageNamed:@"textbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)];
     username.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, username.frame.size.height)];
     username.leftViewMode = UITextFieldViewModeAlways;
     username.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, username.frame.size.height)];
@@ -41,6 +41,10 @@
     password.leftViewMode = UITextFieldViewModeAlways;
     password.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, password.frame.size.height)];
     password.rightViewMode = UITextFieldViewModeAlways;
+    host.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, host.frame.size.height)];
+    host.leftViewMode = UITextFieldViewModeAlways;
+    host.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, host.frame.size.height)];
+    host.rightViewMode = UITextFieldViewModeAlways;
     [login setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
     [login setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateDisabled];
     [login setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
@@ -56,6 +60,11 @@
     [version setText:[NSString stringWithFormat:@"Version %@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey], @BRAND_NAME]];
 #else
     [version setText:[NSString stringWithFormat:@"Version %@",[[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey]]];
+#endif
+    host.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
+#ifndef ENTERPRISE
+    host.hidden = YES;
+    login.frame = host.frame;
 #endif
 }
 
@@ -235,21 +244,29 @@
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
             logo.frame = CGRectMake(92, 36, 138, 138);
-            loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 160);
+            loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 170);
         } else {
             logo.frame = CGRectMake(26, 76, 138, 138);
-            loadingView.frame = CGRectMake(160, 100, 320, 160);
-            loginView.frame = CGRectMake(160, 70, 320, 160);
+            loadingView.frame = CGRectMake(160, 100, 320, 170);
+#ifdef ENTERPRISE
+            loginView.frame = CGRectMake(160, 54, 320, 170);
+#else
+            loginView.frame = CGRectMake(160, 70, 320, 170);
+#endif
         }
     } else {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
             logo.frame = CGRectMake(249, 118, 276, 276);
-            loadingView.frame = loginView.frame = CGRectMake(78, 392, 612, 160);
+            loadingView.frame = loginView.frame = CGRectMake(78, 392, 612, 170);
             version.frame = CGRectMake(0, 984, 768, 20);
         } else {
             logo.frame = CGRectMake(128, 240, 276, 276);
-            loadingView.frame = CGRectMake(392, 344, 612, 160);
-            loginView.frame = CGRectMake(392, 302, 612, 160);
+            loadingView.frame = CGRectMake(392, 344, 612, 170);
+#ifdef ENTERPRISE
+            loginView.frame = CGRectMake(392, 286, 612, 170);
+#else
+            loginView.frame = CGRectMake(392, 302, 612, 170);
+#endif
             version.frame = CGRectMake(0, 728, 1024, 20);
         }
     }
@@ -262,16 +279,31 @@
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+#ifdef ENTERPRISE
+            logo.frame = CGRectMake(124, 10, 72, 72);
+            loadingView.frame = loginView.frame = CGRectMake(0, 76, 320, 170);
+#else
             logo.frame = CGRectMake(112, 16, 96, 96);
-            loadingView.frame = loginView.frame = CGRectMake(0, 112, 320, 160);
+            loadingView.frame = loginView.frame = CGRectMake(0, 112, 320, 170);
+#endif
         } else {
+#ifdef ENTERPRISE
             logo.frame = CGRectMake(52, 24, 96, 96);
-            loadingView.frame = loginView.frame = CGRectMake(160, 0, 320, 160);
+            loadingView.frame = loginView.frame = CGRectMake(160, -16, 320, 170);
+#else
+            logo.frame = CGRectMake(52, 24, 96, 96);
+            loadingView.frame = loginView.frame = CGRectMake(160, 0, 320, 170);
+#endif
         }
     } else {
         if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+#ifdef ENTERPRISE
+            logo.frame = CGRectMake(128, 246-180, 256, 256);
+            loadingView.frame = loginView.frame = CGRectMake(392, 302-200, 612, 144);
+#else
             logo.frame = CGRectMake(128, 246-180, 256, 256);
             loadingView.frame = loginView.frame = CGRectMake(392, 302-180, 612, 144);
+#endif
         }
     }
     [UIView commitAnimations];
@@ -285,17 +317,17 @@
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
             logo.frame = CGRectMake(96, 36, 128, 128);
-            loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 160);
+            loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 170);
         } else {
             logo.frame = CGRectMake(36, 76, 128, 128);
-            loadingView.frame = loginView.frame = CGRectMake(160, 70, 320, 160);
+            loadingView.frame = loginView.frame = CGRectMake(160, 70, 320, 170);
         }
     } else {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
         } else {
             logo.frame = CGRectMake(128, 246, 256, 256);
-            loadingView.frame = CGRectMake(392, 344, 612, 160);
-            loginView.frame = CGRectMake(392, 302, 612, 160);
+            loadingView.frame = CGRectMake(392, 344, 612, 170);
+            loginView.frame = CGRectMake(392, 302, 612, 170);
         }
     }
     [UIView commitAnimations];
@@ -321,10 +353,16 @@
     activity.hidden = NO;
     error.text = nil;
     error.hidden = YES;
+#ifdef ENTERPRISE
+    IRCCLOUD_HOST = host.text;
+#endif
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] login:[username text] password:[password text]];
         if([[result objectForKey:@"success"] intValue] == 1) {
             [[NSUserDefaults standardUserDefaults] setObject:[result objectForKey:@"session"] forKey:@"session"];
+#ifdef ENTERPRISE
+            [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+#endif
             [[NSUserDefaults standardUserDefaults] synchronize];
             [status setText:@"Connecting"];
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");

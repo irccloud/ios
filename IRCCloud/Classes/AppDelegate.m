@@ -67,10 +67,17 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     _conn = [NetworkConnection sharedInstance];
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30)}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"host":IRCCLOUD_HOST}];
+    IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
 #ifndef BRAND_NAME
+#ifdef ENTERPRISE
+    NSLog(@"Hello, Enterprise!");
+    if(TESTFLIGHT_KEY_ENTERPRISE)
+        [TestFlight takeOff:TESTFLIGHT_KEY_ENTERPRISE];
+#else
     if(TESTFLIGHT_KEY)
         [TestFlight takeOff:TESTFLIGHT_KEY];
+#endif
 #endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
