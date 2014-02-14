@@ -564,7 +564,7 @@
             } else {
                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
                 if(b && [e isImportant:b.type]) {
-                    if(e.isHighlight) {
+                    if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
                         AudioServicesPlaySystemSound(alertSound);
                         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
                         [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
