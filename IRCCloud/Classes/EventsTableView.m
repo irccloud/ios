@@ -873,13 +873,13 @@ int __timestampWidth;
 
 - (void)_scrollToBottom {
     [_lock lock];
+    _scrollTimer = nil;
+    _buffer.scrolledUp = NO;
+    _buffer.scrolledUpFrom = -1;
     if(_data.count) {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
         [self scrollViewDidScroll:self.tableView];
     }
-    _scrollTimer = nil;
-    _buffer.scrolledUp = NO;
-    _buffer.scrolledUpFrom = -1;
     [_lock unlock];
 }
 
@@ -1064,7 +1064,7 @@ int __timestampWidth;
     if(_data.count) {
         int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
         if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
-            if(!_buffer.scrolledUp) {
+            if(_topUnreadView.alpha == 0) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
                 _topUnreadView.alpha = 1;
