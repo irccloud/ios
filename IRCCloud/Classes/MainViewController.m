@@ -1858,6 +1858,7 @@
 }
 
 -(IBAction)settingsButtonPressed:(id)sender {
+    _selectedBuffer = _buffer;
     User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     if([_buffer.type isEqualToString:@"console"]) {
@@ -2075,6 +2076,43 @@
     }
 }
 
+-(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
+    _selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    if([_selectedBuffer.type isEqualToString:@"console"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
+        if([s.status isEqualToString:@"disconnected"]) {
+            [sheet addButtonWithTitle:@"Reconnect"];
+            [sheet addButtonWithTitle:@"Delete"];
+        } else {
+            [sheet addButtonWithTitle:@"Disconnect"];
+        }
+        [sheet addButtonWithTitle:@"Edit Connection"];
+    } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
+        if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
+            [sheet addButtonWithTitle:@"Leave"];
+        } else {
+            [sheet addButtonWithTitle:@"Rejoin"];
+            [sheet addButtonWithTitle:(_selectedBuffer.archived)?@"Unarchive":@"Archive"];
+            [sheet addButtonWithTitle:@"Delete"];
+        }
+    } else {
+        if(_selectedBuffer.archived) {
+            [sheet addButtonWithTitle:@"Unarchive"];
+        } else {
+            [sheet addButtonWithTitle:@"Archive"];
+        }
+        [sheet addButtonWithTitle:@"Delete"];
+    }
+    sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+        [self.view.window addSubview:_landscapeView];
+        [sheet showInView:_landscapeView];
+    } else {
+        [sheet showFromRect:rect inView:_buffersView.tableView animated:YES];
+    }
+}
+
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect {
     if(event.from) {
         _selectedEvent = event;
@@ -2226,28 +2264,28 @@
             [_alertView textFieldAtIndex:0].delegate = self;
             [_alertView show];
         } else if([action isEqualToString:@"Archive"]) {
-            [[NetworkConnection sharedInstance] archiveBuffer:_buffer.bid cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Unarchive"]) {
-            [[NetworkConnection sharedInstance] unarchiveBuffer:_buffer.bid cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Delete"]) {
             //TODO: prompt for confirmation
-            if([_buffer.type isEqualToString:@"console"]) {
-                [[NetworkConnection sharedInstance] deleteServer:_buffer.cid];
-            } else if(_buffer == nil || _buffer.bid == -1) {
+            if([_selectedBuffer.type isEqualToString:@"console"]) {
+                [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
+            } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
                 [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
             } else {
-                [[NetworkConnection sharedInstance] deleteBuffer:_buffer.bid cid:_buffer.cid];
+                [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
             }
         } else if([action isEqualToString:@"Leave"]) {
-            [[NetworkConnection sharedInstance] part:_buffer.name msg:nil cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Rejoin"]) {
-            [[NetworkConnection sharedInstance] join:_buffer.name key:nil cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Ban List"]) {
-            [[NetworkConnection sharedInstance] mode:@"b" chan:_buffer.name cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:@"b" chan:_selectedBuffer.name cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Disconnect"]) {
-            [[NetworkConnection sharedInstance] disconnect:_buffer.cid msg:nil];
+            [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil];
         } else if([action isEqualToString:@"Reconnect"]) {
-            [[NetworkConnection sharedInstance] reconnect:_buffer.cid];
+            [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Logout"]) {
             [[NetworkConnection sharedInstance] logout];
             [self bufferSelected:-1];
@@ -2266,7 +2304,7 @@
             [self _mention];
         } else if([action isEqualToString:@"Edit Connection"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
-            [ecv setServer:_buffer.cid];
+            [ecv setServer:_selectedBuffer.cid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];

@@ -449,6 +449,11 @@
     [super viewDidLoad];
     self.tableView.scrollsToTop = YES;
 
+    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    lp.minimumPressDuration = 1.0;
+    lp.delegate = self;
+    [self.tableView addGestureRecognizer:lp];
+    
     if(!_delegate) {
         _delegate = (UIViewController<BuffersTableViewDelegate> *)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
     }
@@ -1043,6 +1048,19 @@
         pos = _data.count - 1;
     
     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+}
+
+-(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
+        if(indexPath) {
+            if(indexPath.row < _data.count) {
+                int type = [[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue];
+                if(type == TYPE_SERVER || type == TYPE_CHANNEL || type == TYPE_CONVERSATION)
+                    [_delegate bufferLongPressed:[[[_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+            }
+        }
+    }
 }
 
 @end

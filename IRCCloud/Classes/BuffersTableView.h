@@ -21,10 +21,11 @@
 
 @protocol BuffersTableViewDelegate<NSObject>
 -(void)bufferSelected:(int)bid;
+-(void)bufferLongPressed:(int)bid rect:(CGRect)rect;
 -(void)dismissKeyboard;
 @end
 
-@interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate> {
+@interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate> {
     NSMutableArray *_data;
     int _selectedRow;
     IBOutlet UIViewController<BuffersTableViewDelegate> *_delegate;

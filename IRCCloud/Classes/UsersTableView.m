@@ -221,7 +221,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.scrollsToTop = YES;
-    
+
+    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    lp.minimumPressDuration = 1.0;
+    lp.delegate = self;
+    [self.tableView addGestureRecognizer:lp];
+
     if(!delegate)
         delegate = (id<UsersTableViewDelegate>)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
 
@@ -373,6 +378,19 @@
     int idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
     if([[[_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
         [delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+}
+
+-(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
+        if(indexPath) {
+            if(indexPath.row < _data.count) {
+                int idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
+                if([[[_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
+                    [delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+            }
+        }
+    }
 }
 
 @end
