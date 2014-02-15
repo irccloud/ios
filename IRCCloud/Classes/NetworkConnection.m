@@ -214,7 +214,10 @@ NSLock *__parserLock = nil;
         server.fail_info = [object objectForKey:@"fail_info"];
         server.away = (backlog && [_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
         server.ignores = [object objectForKey:@"ignores"];
-        server.order = [[object objectForKey:@"order"] intValue];
+        if([[object objectForKey:@"order"] isKindOfClass:[NSDecimalNumber class]])
+            server.order = [[object objectForKey:@"order"] intValue];
+        else
+            server.order = 0;
         if(!backlog)
             [self postObject:server forEvent:kIRCEventMakeServer];
     };
