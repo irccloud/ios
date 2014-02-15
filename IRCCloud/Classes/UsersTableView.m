@@ -249,16 +249,16 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if(_data.count > 20)
+/*    if(_data.count > 20)
         return _sectionIndexes.count;
-    else
+    else*/
         return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if(_data.count > 20)
+/*    if(_data.count > 20)
         return [[_sectionSizes objectAtIndex:section] intValue];
-    else
+    else*/
         return _data.count;
 }
 
@@ -266,7 +266,7 @@
     return 32;
 }
 
--(NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
+/*-(NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
     if(_data.count > 20)
         return _sectionTitles;
     else
@@ -278,7 +278,7 @@
         return nil;
     else
         return [_sectionTitles objectAtIndex:section - 1];
-}
+}*/
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UsersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"userscell"];
