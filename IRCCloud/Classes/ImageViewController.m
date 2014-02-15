@@ -35,6 +35,7 @@
     if (self) {
         _url = url;
         _chrome = [[OpenInChromeController alloc] init];
+        _progressScale = 0;
     }
     return self;
 }
@@ -246,12 +247,21 @@
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     NSInteger receivedDataLength = [data length];
     _totalBytesReceived += receivedDataLength;
-    
     [_imageData appendData:data];
+
+    if(_progressScale == 0 && _totalBytesReceived > 3) {
+        char GIF[3];
+        [data getBytes:&GIF length:3];
+        if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F')
+            _progressScale = 0.5;
+        else
+            _progressScale = 1.0;
+    }
     
     if(_bytesExpected != NSURLResponseUnknownLength) {
-        float progress = ((_totalBytesReceived/(float)_bytesExpected) * 100.f) / 100.f;
-        _progressView.progress = progress;
+        float progress = (((_totalBytesReceived/(float)_bytesExpected) * 100.f) / 100.f) * _progressScale;
+        if(_progressView.progress < progress)
+            _progressView.progress = progress;
     }
 }
 
@@ -286,7 +296,7 @@
 
 -(void)_gifProgress:(NSNotification *)n {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _progressView.progress = [[n.userInfo objectForKey:@"progress"] floatValue];
+        _progressView.progress = 0.5 + ([[n.userInfo objectForKey:@"progress"] floatValue] / 2.0f);
     }];
 }
 
