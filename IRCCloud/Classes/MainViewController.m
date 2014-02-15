@@ -33,6 +33,7 @@
 #import "DisplayOptionsViewController.h"
 #import "WhoListTableViewController.h"
 #import "NamesListTableViewController.h"
+#import <objc/message.h>
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -1063,43 +1064,31 @@
         [_nickCompletionView setSuggestions:suggestions];
     if(suggestions.count == 0) {
         if(_nickCompletionView.alpha > 0) {
-            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:^(BOOL finished) {
-                _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
-                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
-                [_message resignFirstResponder];
-                [_message becomeFirstResponder];
-                [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(keyboardWillShow:)
-                                                             name:UIKeyboardWillShowNotification object:nil];
-                
-                [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(keyboardWillBeHidden:)
-                                                             name:UIKeyboardWillHideNotification object:nil];
-            }];
+            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:nil];
+            _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
+            [_message.internalTextView reloadInputViews];
+            id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+            if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
+                objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), YES);
+            }
             _sortedChannels = nil;
             _sortedUsers = nil;
         }
     } else {
         if(_nickCompletionView.alpha == 0) {
-            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:^(BOOL finished) {
-                NSString *text = _message.text;
-                _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
-                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
-                _message.delegate = nil;
-                [_message resignFirstResponder];
-                [_message becomeFirstResponder];
-                _message.text = text;
-                _message.delegate = self;
-                [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(keyboardWillShow:)
-                                                             name:UIKeyboardWillShowNotification object:nil];
-                
-                [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(keyboardWillBeHidden:)
-                                                             name:UIKeyboardWillHideNotification object:nil];
-            }];
+            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:nil];
+            NSString *text = _message.text;
+            _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
+            _message.delegate = nil;
+            _message.text = text;
+            _message.selectedRange = NSMakeRange(text.length, 0);
+            _message.delegate = self;
+            [_message.internalTextView reloadInputViews];
+            id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+            if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
+                objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
+                objc_msgSend(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
+            }
         }
     }
 }
