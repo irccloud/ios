@@ -142,7 +142,7 @@
 }
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
+    if (editingStyle == UITableViewCellEditingStyleDelete && indexPath.row < _ignores.count) {
         NSString *mask = [_ignores objectAtIndex:indexPath.row];
         [[NetworkConnection sharedInstance] unignore:mask cid:_cid];
     }

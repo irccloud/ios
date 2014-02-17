@@ -1061,8 +1061,9 @@ int __timestampWidth;
         [self scrollToBottom];
     }
     
-    if(_data.count) {
-        int firstRow = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row];
+    NSArray *rows = self.tableView.indexPathsForVisibleRows;
+    if(_data.count && rows.count) {
+        int firstRow = [[rows objectAtIndex:0] row];
         if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
             if(_topUnreadView.alpha == 0) {
                 [UIView beginAnimations:nil context:nil];
