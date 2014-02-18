@@ -472,6 +472,7 @@ int __timestampWidth;
         NSString *msg;
         if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
             CollapsedEvents *c = [[CollapsedEvents alloc] init];
+            c.server = _server;
             [c addEvent:event];
             msg = [c collapse:showChan];
             if(!nextIsGrouped) {
@@ -905,10 +906,7 @@ int __timestampWidth;
     _currentGroupPosition = -1;
     _lastCollpasedDay = @"";
     [_collapsedEvents clear];
-    if(_server)
-        _collapsedEvents.PREFIX = _server.PREFIX;
-    else
-        _collapsedEvents.PREFIX = nil;
+    _collapsedEvents.server = _server;
     [_unseenHighlightPositions removeAllObjects];
     
     if(!_buffer) {

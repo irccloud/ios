@@ -33,30 +33,30 @@
     }
 }
 -(NSString *)description {
-    return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, modes: %@, msg: %@, netsplit: %i}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, [self modes:YES], _msg, _netsplit];
+    return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, modes: %@, msg: %@, netsplit: %i}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, [self modes:YES mode_modes:nil], _msg, _netsplit];
 }
--(BOOL)addMode:(NSString *)mode {
-    if([mode rangeOfString:@"q"].location != NSNotFound) {
+-(BOOL)addMode:(NSString *)mode server:(Server *)server {
+    if([mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeOwner])
             _modes[kCollapsedModeDeOwner] = false;
         else
             _modes[kCollapsedModeOwner] = true;
-    } else if([mode rangeOfString:@"a"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeAdmin])
             _modes[kCollapsedModeDeAdmin] = false;
         else
             _modes[kCollapsedModeAdmin] = true;
-    } else if([mode rangeOfString:@"o"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeOp])
             _modes[kCollapsedModeDeOp] = false;
         else
             _modes[kCollapsedModeOp] = true;
-    } else if([mode rangeOfString:@"h"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeHalfOp])
             _modes[kCollapsedModeDeHalfOp] = false;
         else
             _modes[kCollapsedModeHalfOp] = true;
-    } else if([mode rangeOfString:@"v"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_VOICED:@"v"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeVoice])
             _modes[kCollapsedModeDeVoice] = false;
         else
@@ -65,31 +65,31 @@
         return NO;
     }
     if([self modeCount] == 0)
-        return [self addMode:mode];
+        return [self addMode:mode server:server];
     return YES;
 }
--(BOOL)removeMode:(NSString *)mode {
-    if([mode rangeOfString:@"q"].location != NSNotFound) {
+-(BOOL)removeMode:(NSString *)mode server:(Server *)server {
+    if([mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound) {
         if(_modes[kCollapsedModeOwner])
             _modes[kCollapsedModeOwner] = false;
         else
             _modes[kCollapsedModeDeOwner] = true;
-    } else if([mode rangeOfString:@"a"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound) {
         if(_modes[kCollapsedModeAdmin])
             _modes[kCollapsedModeAdmin] = false;
         else
             _modes[kCollapsedModeDeAdmin] = true;
-    } else if([mode rangeOfString:@"o"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
         if(_modes[kCollapsedModeOp])
             _modes[kCollapsedModeOp] = false;
         else
             _modes[kCollapsedModeDeOp] = true;
-    } else if([mode rangeOfString:@"h"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
         if(_modes[kCollapsedModeHalfOp])
             _modes[kCollapsedModeHalfOp] = false;
         else
             _modes[kCollapsedModeDeHalfOp] = true;
-    } else if([mode rangeOfString:@"v"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_VOICED:@"v"].location != NSNotFound) {
         if(_modes[kCollapsedModeVoice])
             _modes[kCollapsedModeVoice] = false;
         else
@@ -98,7 +98,7 @@
         return NO;
     }
     if([self modeCount] == 0)
-        return [self removeMode:mode];
+        return [self removeMode:mode server:server];
     return YES;
 }
 -(void)_copyModes:(BOOL *)to {
@@ -109,7 +109,7 @@
 -(void)copyModes:(CollapsedEvent *)from {
     [from _copyModes:_modes];
 }
--(NSString *)modes:(BOOL)showSymbol {
+-(NSString *)modes:(BOOL)showSymbol mode_modes:(NSArray *)mode_modes {
     static NSString *mode_msgs[] = {
         @"promoted to owner",
         @"promoted to admin",
@@ -122,18 +122,6 @@
         @"de-halfopped",
         @"de-voiced"
     };
-    static NSString *mode_modes[] = {
-        @"+q",
-        @"+a",
-        @"+o",
-        @"+h",
-        @"+v",
-        @"-q",
-        @"-a",
-        @"-o",
-        @"-h",
-        @"-v"
-    };
     static NSString *mode_colors[] = {
         @"E7AA00",
         @"6500A5",
@@ -142,6 +130,20 @@
         @"25B100"
     };
     NSString *output = nil;
+    if(!mode_modes) {
+        mode_modes = @[
+                        @"+q",
+                        @"+a",
+                        @"+o",
+                        @"+h",
+                        @"+v",
+                        @"-q",
+                        @"-a",
+                        @"-o",
+                        @"-h",
+                        @"-v"
+                        ];
+    }
     
     if([self modeCount]) {
         output = @"";
@@ -174,12 +176,32 @@
     self = [super init];
     if(self) {
         _data = [[NSMutableArray alloc] init];
+        [self setServer:nil];
     }
     return self;
 }
 -(void)clear {
     @synchronized(_data) {
         [_data removeAllObjects];
+    }
+}
+-(void)setServer:(Server *)server {
+    _server = server;
+    if(server) {
+        _mode_modes = @[
+            [NSString stringWithFormat:@"+%@", server.MODE_OWNER],
+            [NSString stringWithFormat:@"+%@", server.MODE_ADMIN],
+            [NSString stringWithFormat:@"+%@", server.MODE_OP],
+            [NSString stringWithFormat:@"+%@", server.MODE_HALFOP],
+            [NSString stringWithFormat:@"+%@", server.MODE_VOICED],
+            [NSString stringWithFormat:@"-%@", server.MODE_OWNER],
+            [NSString stringWithFormat:@"-%@", server.MODE_ADMIN],
+            [NSString stringWithFormat:@"-%@", server.MODE_OP],
+            [NSString stringWithFormat:@"-%@", server.MODE_HALFOP],
+            [NSString stringWithFormat:@"-%@", server.MODE_VOICED],
+        ];
+    } else {
+        _mode_modes = nil;
     }
 }
 -(CollapsedEvent *)findEvent:(NSString *)nick chan:(NSString *)chan {
@@ -284,7 +306,7 @@
             }
             if(event.ops) {
                 for(NSDictionary *op in [event.ops objectForKey:@"add"]) {
-                    if(![c addMode:[op objectForKey:@"mode"]])
+                    if(![c addMode:[op objectForKey:@"mode"] server:_server])
                         return NO;
                     if(c.type == kCollapsedEventMode) {
                         c.nick = [op objectForKey:@"param"];
@@ -304,7 +326,7 @@
                     }
                 }
                 for(NSDictionary *op in [event.ops objectForKey:@"remove"]) {
-                    if(![c removeMode:[op objectForKey:@"mode"]])
+                    if(![c removeMode:[op objectForKey:@"mode"] server:_server])
                         return NO;
                     if(c.type == kCollapsedEventMode) {
                         c.nick = [op objectForKey:@"param"];
@@ -369,7 +391,7 @@
 }
 -(NSString *)was:(CollapsedEvent *)e {
     NSString *output = @"";
-    NSString *modes = [e modes:NO];
+    NSString *modes = [e modes:NO mode_modes:_mode_modes];
     
     if(e.oldNick && e.type != kCollapsedEventMode)
         output = [NSString stringWithFormat:@"was %@", e.oldNick];
@@ -398,7 +420,7 @@
                     output = [e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "];
                     break;
                 case kCollapsedEventMode:
-                    output = [NSString stringWithFormat:@"%@ was %@", [self formatNick:e.nick mode:e.targetMode colorize:NO], [e modes:YES]];
+                    output = [NSString stringWithFormat:@"%@ was %@", [self formatNick:e.nick mode:e.targetMode colorize:NO], [e modes:YES mode_modes:_mode_modes]];
                     if(e.fromNick) {
                         if([e.fromMode isEqualToString:@"__the_server__"])
                             output = [output stringByAppendingFormat:@" by the server %c%@%c", BOLD, e.fromNick, CLEAR];
@@ -579,9 +601,18 @@
 }
 
 -(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize {
-    if(!_PREFIX) {
-        _PREFIX = @{@"q":@"~", @"a":@"&", @"o":@"@", @"h":@"%", @"v":@"+"};
+    NSDictionary *PREFIX = nil;
+    if(_server)
+        PREFIX = _server.PREFIX;
+    
+    if(!PREFIX || PREFIX.count == 0) {
+        PREFIX = @{_server?_server.MODE_OWNER:@"q":@"~",
+                   _server?_server.MODE_ADMIN:@"a":@"&",
+                   _server?_server.MODE_OP:@"o":@"@",
+                   _server?_server.MODE_HALFOP:@"h":@"%",
+                   _server?_server.MODE_VOICED:@"v":@"+"};
     }
+    
     NSDictionary *mode_colors = @{
         @"q":@"E7AA00",
         @"a":@"6500A5",
@@ -614,25 +645,25 @@
     }
     
     if(mode.length) {
-        if([mode rangeOfString:@"q"].location != NSNotFound)
-            mode = @"q";
-        else if([mode rangeOfString:@"a"].location != NSNotFound)
-            mode = @"a";
-        else if([mode rangeOfString:@"o"].location != NSNotFound)
-            mode = @"o";
-        else if([mode rangeOfString:@"h"].location != NSNotFound)
-            mode = @"h";
-        else if([mode rangeOfString:@"v"].location != NSNotFound)
-            mode = @"v";
+        if([mode rangeOfString:_server?_server.MODE_OWNER:@"q"].location != NSNotFound)
+            mode = _server?_server.MODE_OWNER:@"q";
+        else if([mode rangeOfString:_server?_server.MODE_ADMIN:@"a"].location != NSNotFound)
+            mode = _server?_server.MODE_ADMIN:@"a";
+        else if([mode rangeOfString:_server?_server.MODE_OP:@"o"].location != NSNotFound)
+            mode = _server?_server.MODE_OP:@"o";
+        else if([mode rangeOfString:_server?_server.MODE_HALFOP:@"h"].location != NSNotFound)
+            mode = _server?_server.MODE_HALFOP:@"h";
+        else if([mode rangeOfString:_server?_server.MODE_VOICED:@"v"].location != NSNotFound)
+            mode = _server?_server.MODE_VOICED:@"v";
         else
             mode = [mode substringToIndex:1];
         
         if(showSymbol) {
-            if([_PREFIX objectForKey:mode]) {
+            if([PREFIX objectForKey:mode]) {
                 if([mode_colors objectForKey:mode]) {
-                    [output appendFormat:@"%c%@%@%c ", COLOR_RGB, [mode_colors objectForKey:mode], [_PREFIX objectForKey:mode], COLOR_RGB];
+                    [output appendFormat:@"%c%@%@%c ", COLOR_RGB, [mode_colors objectForKey:mode], [PREFIX objectForKey:mode], COLOR_RGB];
                 } else {
-                    [output appendFormat:@"%@ ", [_PREFIX objectForKey:mode]];
+                    [output appendFormat:@"%@ ", [PREFIX objectForKey:mode]];
                 }
             }
         } else {

@@ -2026,14 +2026,15 @@
     [sheet addButtonWithTitle:@"Invite to channel"];
     [sheet addButtonWithTitle:@"Ignore"];
     if([_buffer.type isEqualToString:@"channel"]) {
+        Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
-        if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
-            if([_selectedUser.mode rangeOfString:@"o"].location != NSNotFound)
+        if([me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
+            if([_selectedUser.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound)
                 [sheet addButtonWithTitle:@"Deop"];
             else
                 [sheet addButtonWithTitle:@"Op"];
         }
-        if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound || [me.mode rangeOfString:@"h"].location != NSNotFound) {
+        if([me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
             [sheet addButtonWithTitle:@"Kick"];
             [sheet addButtonWithTitle:@"Ban"];
         }
@@ -2224,9 +2225,11 @@
         } else if([action isEqualToString:@"Whois"]) {
             [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
         } else if([action isEqualToString:@"Op"]) {
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
         } else if([action isEqualToString:@"Deop"]) {
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
         } else if([action isEqualToString:@"Ban"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];

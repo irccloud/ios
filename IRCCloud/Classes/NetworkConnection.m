@@ -663,6 +663,7 @@ NSLock *__parserLock = nil;
                            [self postObject:object forEvent:kIRCEventConnectionLag];
                    },
                    @"isupport_params": ^(IRCCloudJSONObject *object) {
+                       [_servers updateUserModes:[object objectForKey:@"usermodes"] server:object.cid];
                        [_servers updateIsupport:[object objectForKey:@"params"] server:object.cid];
                    },
                    @"set_ignores": ^(IRCCloudJSONObject *object) {
