@@ -67,7 +67,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     _conn = [NetworkConnection sharedInstance];
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30)}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES)}];
 #ifndef BRAND_NAME
     if(TESTFLIGHT_KEY)
         [TestFlight takeOff:TESTFLIGHT_KEY];

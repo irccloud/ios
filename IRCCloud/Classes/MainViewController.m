@@ -889,6 +889,11 @@
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable && session != nil && [session length] > 0)
         [[NetworkConnection sharedInstance] connect];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
+        _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+    } else {
+        _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {

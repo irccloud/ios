@@ -28,6 +28,7 @@
     UISwitch *_colors;
     UISwitch *_screen;
     UISwitch *_chrome;
+    UISwitch *_autoCaps;
     NSString *_version;
     int _userinforeqid;
     int _prefsreqid;
