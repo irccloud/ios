@@ -73,8 +73,9 @@
     self = [super initWithStyle:style];
     if (self) {
         _addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
-        _placeholder = [[UITextView alloc] initWithFrame:CGRectZero];
+        _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
         _placeholder.text = @"No bans in effect.\n\nYou can ban someone by tapping their nickname in the user list, long-pressing a message, or by using /ban.";
+        _placeholder.numberOfLines = 0;
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
         _placeholder.textAlignment = NSTextAlignmentCenter;

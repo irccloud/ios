@@ -44,8 +44,9 @@
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
 #endif
-    UITextView *tv = [[UITextView alloc] initWithFrame:self.view.bounds];
+    UILabel *tv = [[UILabel alloc] initWithFrame:self.view.bounds];
     tv.text = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"licenses" ofType:@"txt"] encoding:NSUTF8StringEncoding error:nil];
+    tv.numberOfLines = 0;
     tv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [self.view addSubview:tv];
 }
