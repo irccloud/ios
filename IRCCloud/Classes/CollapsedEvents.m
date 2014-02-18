@@ -614,12 +614,13 @@
     }
     
     NSDictionary *mode_colors = @{
-        @"q":@"E7AA00",
-        @"a":@"6500A5",
-        @"o":@"BA1719",
-        @"h":@"B55900",
-        @"v":@"25B100"
+        _server?_server.MODE_OWNER:@"q":@"E7AA00",
+        _server?_server.MODE_ADMIN:@"a":@"6500A5",
+        _server?_server.MODE_OP:@"o":@"BA1719",
+        _server?_server.MODE_HALFOP:@"h":@"B55900",
+        _server?_server.MODE_VOICED:@"v":@"25B100"
     };
+    
     NSArray *colors = @[@"fc009a", @"ff1f1a", @"d20004", @"fd6508", @"880019", @"c7009c", @"804fc4", @"5200b7", @"123e92", @"1d40ff", @"108374", @"2e980d", @"207607", @"196d61"];
     NSString *color = nil;
     NSMutableString *output = [[NSMutableString alloc] initWithFormat:@"%c", BOLD];
