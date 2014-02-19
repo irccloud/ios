@@ -12,6 +12,7 @@
 #endif
 
 NSString *UIImageAnimatedGIFProgressNotification = @"UIImageAnimatedGIFProgressNotification";
+BOOL __GIF_Decode_Cancelled;
 
 @implementation UIImage (animatedGIF)
 
@@ -67,6 +68,12 @@ static int vectorGCD(size_t const count, int const *const values) {
 }
 
 static NSArray *frameArray(size_t const count, CGImageRef const images[count], int const delayCentiseconds[count], int const totalDurationCentiseconds) {
+    __GIF_Decode_Cancelled = NO;
+    
+    id observer = [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidReceiveMemoryWarningNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
+        __GIF_Decode_Cancelled = YES;
+    }];
+    
     int const gcd = vectorGCD(count, delayCentiseconds);
     size_t const frameCount = totalDurationCentiseconds / gcd;
     UIImage *frames[frameCount];
@@ -109,6 +116,8 @@ static NSArray *frameArray(size_t const count, CGImageRef const images[count], i
                                                  bitmapInfo);
     CGColorSpaceRelease(colorSpace);
     for (size_t i = 0, f = 0; i < count; ++i) {
+        if(__GIF_Decode_Cancelled)
+            break;
         CGImageRef imageRef = images[i];
         
         CGContextClearRect(context, imageRect);
@@ -124,7 +133,11 @@ static NSArray *frameArray(size_t const count, CGImageRef const images[count], i
         [[NSNotificationCenter defaultCenter] postNotificationName:UIImageAnimatedGIFProgressNotification object:nil userInfo:@{@"progress":@((float)f/(float)count)}];
     }
     CGContextRelease(context);
-    return [NSArray arrayWithObjects:frames count:frameCount];
+    [[NSNotificationCenter defaultCenter] removeObserver:observer];
+    if(__GIF_Decode_Cancelled)
+        return nil;
+    else
+        return [NSArray arrayWithObjects:frames count:frameCount];
 }
 
 static void releaseImages(size_t const count, CGImageRef const images[count]) {
@@ -140,9 +153,13 @@ static UIImage *animatedImageWithAnimatedGIFImageSource(CGImageSourceRef const s
     createImagesAndDelays(source, count, images, delayCentiseconds);
     int const totalDurationCentiseconds = sum(count, delayCentiseconds);
     NSArray *const frames = frameArray(count, images, delayCentiseconds, totalDurationCentiseconds);
-    UIImage *const animation = [UIImage animatedImageWithImages:frames duration:(NSTimeInterval)totalDurationCentiseconds / 100.0];
     releaseImages(count, images);
-    return animation;
+    if(frames) {
+        UIImage *const animation = [UIImage animatedImageWithImages:frames duration:(NSTimeInterval)totalDurationCentiseconds / 100.0];
+        return animation;
+    } else {
+        return nil;
+    }
 }
 
 static UIImage *animatedImageWithAnimatedGIFReleasingImageSource(CGImageSourceRef source) {
