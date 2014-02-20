@@ -41,6 +41,8 @@
 	int _lastUnreadPosition;
 	int _firstHighlightPosition;
 	int _lastHighlightPosition;
+    int _firstFailurePosition;
+    int _lastFailurePosition;
     
     UIAlertView *_alertView;
     ServersDataSource *_servers;
