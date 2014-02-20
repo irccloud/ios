@@ -2109,14 +2109,17 @@
 }
 
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect {
-    if(event.from) {
+    NSString *from = event.from;
+    if(!from.length)
+        from = event.nick;
+    if(from) {
         _selectedEvent = event;
-        _selectedUser = [[UsersDataSource sharedInstance] getUser:event.from cid:_buffer.cid bid:_buffer.bid];
+        _selectedUser = [[UsersDataSource sharedInstance] getUser:from cid:_buffer.cid bid:_buffer.bid];
         if(!_selectedUser) {
             _selectedUser = [[User alloc] init];
             _selectedUser.cid = _selectedEvent.cid;
             _selectedUser.bid = _selectedEvent.bid;
-            _selectedUser.nick = _selectedEvent.from;
+            _selectedUser.nick = from;
             _selectedUser.hostmask = _selectedEvent.hostmask;
         }
         [self _showUserPopupInRect:rect];
