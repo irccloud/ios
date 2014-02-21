@@ -229,6 +229,30 @@
             }
         }];
         return;
+    } else if([url.path hasPrefix:@"/wiki/File:"]) {
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@%@", url.scheme, url.host, url.port,[[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", [url.path substringFromIndex:6]] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            if (error) {
+                NSLog(@"Error fetching MediaWiki metadata. Error %i : %@", error.code, error.userInfo);
+                [self fail];
+            } else {
+                SBJsonParser *parser = [[SBJsonParser alloc] init];
+                NSDictionary *dict = [parser objectWithData:data];
+                NSDictionary *page = [[[[dict objectForKey:@"query"] objectForKey:@"pages"] allValues] objectAtIndex:0];
+                if(page && [page objectForKey:@"imageinfo"]) {
+                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]]];
+                    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    
+                    [connection start];
+                } else {
+                    NSLog(@"Invalid data from MediaWiki");
+                    [self fail];
+                }
+            }
+        }];
+        return;
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
