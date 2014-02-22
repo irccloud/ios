@@ -9,6 +9,8 @@
 #ifndef IRCCloud_config_h
 #define IRCCloud_config_h
 
-#define TESTFLIGHT_KEY nil
+#define HOCKEYAPP_TOKEN nil
+#define CRASHLYTICS_TOKEN nil
+#define CRASHLYTICS_SECRET nil
 
 #endif
