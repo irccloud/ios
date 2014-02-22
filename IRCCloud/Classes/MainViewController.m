@@ -1361,7 +1361,6 @@
         }];
     } else {
         [_eventsView setBuffer:_buffer];
-        _message.text = _buffer.draft;
     }
     [_usersView setBuffer:_buffer];
     [self _updateUserListVisibility];
