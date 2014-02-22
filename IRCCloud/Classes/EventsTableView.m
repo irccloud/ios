@@ -809,7 +809,7 @@ int __timestampWidth;
     }
     
     if(insertPos == -1) {
-        TFLog(@"Couldn't insert EID: %f MSG: %@", eid, e.formattedMsg);
+        CLS_LOG(@"Couldn't insert EID: %f MSG: %@", eid, e.formattedMsg);
         [_lock unlock];
         return;
     }
@@ -1123,7 +1123,7 @@ int __timestampWidth;
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links];
             e.links = links;
         } else if(e.formattedMsg.length == 0) {
-            //TFLog(@"No formatted message: %@", e);
+            //CLS_LOG(@"No formatted message: %@", e);
             return 26;
         }
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));

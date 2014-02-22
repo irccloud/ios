@@ -952,6 +952,7 @@
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
             Event *e = [[Event alloc] init];
             NSString *msg = _message.text;
+            
             if([msg hasPrefix:@"//"])
                 msg = [msg substringFromIndex:1];
             else if([msg hasPrefix:@"/"] && ![[msg lowercaseString] hasPrefix:@"/me "])
@@ -1313,7 +1314,7 @@
     _sortedChannels = nil;
     _sortedUsers = nil;
     BOOL changed = (_buffer && _buffer.bid != bid) || !_buffer;
-    TFLog(@"BID selected: %i", bid);
+    CLS_LOG(@"BID selected: %i", bid);
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
         _eidToOpen = -1;
     }
@@ -1536,7 +1537,7 @@
         } else if([s.status isEqualToString:@"ip_retry"]) {
             _serverStatus.text = @"Trying another IP address";
         } else {
-            TFLog(@"Unhandled server status: %@", s.status);
+            CLS_LOG(@"Unhandled server status: %@", s.status);
         }
         CGRect frame = _serverStatus.frame;
         frame.origin.x = 8;

@@ -89,14 +89,14 @@ NSLock *__parserLock = nil;
         while(!_cancelled && _running && [loop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
         [__parserLock unlock];
     } else {
-        TFLog(@"Failed to create NSURLConnection");
+        CLS_LOG(@"Failed to create NSURLConnection");
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
     }
 }
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     if(_cancelled)
         return;
-	TFLog(@"Request failed: %@", error);
+	CLS_LOG(@"Request failed: %@", error);
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
     }];
@@ -106,7 +106,7 @@ NSLock *__parserLock = nil;
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if(_cancelled)
         return;
-	TFLog(@"Backlog download completed");
+	CLS_LOG(@"Backlog download completed");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
     }];
@@ -115,13 +115,13 @@ NSLock *__parserLock = nil;
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
     if(_cancelled)
         return nil;
-	TFLog(@"Fetching: %@", [request URL]);
+	CLS_LOG(@"Fetching: %@", [request URL]);
 	return request;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
 	if([response statusCode] != 200) {
-        TFLog(@"HTTP status code: %i", [response statusCode]);
-		TFLog(@"HTTP headers: %@", [response allHeaderFields]);
+        CLS_LOG(@"HTTP status code: %i", [response statusCode]);
+		CLS_LOG(@"HTTP headers: %@", [response allHeaderFields]);
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
         }];
@@ -183,7 +183,7 @@ NSLock *__parserLock = nil;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey];
     _userAgent = [NSString stringWithFormat:@"IRCCloud/%@ (%@; %@; %@ %@)", version, [UIDevice currentDevice].model, [[[NSUserDefaults standardUserDefaults] objectForKey: @"AppleLanguages"] objectAtIndex:0], [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
-    TFLog(@"%@", _userAgent);
+    CLS_LOG(@"%@", _userAgent);
     
     void (^ignored)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
     };
@@ -299,14 +299,14 @@ NSLock *__parserLock = nil;
                        _streamId = [object objectForKey:@"streamid"];
                        _accrued = [[object objectForKey:@"accrued"] intValue];
                        _currentCount = 0;
-                       TFLog(@"idle interval: %f clock offset: %f stream id: %@", _idleInterval, _clockOffset, _streamId);
+                       CLS_LOG(@"idle interval: %f clock offset: %f stream id: %@", _idleInterval, _clockOffset, _streamId);
                        if(_accrued > 0) {
                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
                            }];
                        }
                        if(![[object objectForKey:@"resumed"] boolValue]) {
-                           TFLog(@"Socket was not resumed, invalidating BIDs");
+                           CLS_LOG(@"Socket was not resumed, invalidating BIDs");
                            [_buffers invalidate];
                            [_channels invalidate];
                        }
@@ -742,7 +742,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [NetworkConnection sharedInstance].reachabilityValid = YES;
     kIRCCloudReachability reachable = [[NetworkConnection sharedInstance] reachable];
     kIRCCloudState state = [NetworkConnection sharedInstance].state;
-    TFLog(@"IRCCloud state: %i Reconnect timestamp: %f Reachable: %i lastType: %i", state, [NetworkConnection sharedInstance].reconnectTimestamp, reachable, lastType);
+    CLS_LOG(@"IRCCloud state: %i Reconnect timestamp: %f Reachable: %i lastType: %i", state, [NetworkConnection sharedInstance].reconnectTimestamp, reachable, lastType);
     
     if(flags & kSCNetworkReachabilityFlagsIsWWAN)
         type = TYPE_WWAN;
@@ -760,10 +760,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     lastType = type;
     
     if(reachable == kIRCCloudReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0 && [[[NSUserDefaults standardUserDefaults] stringForKey:@"session"] length]) {
-        TFLog(@"IRCCloud server became reachable, connecting");
+        CLS_LOG(@"IRCCloud server became reachable, connecting");
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:YES];
     } else if(reachable == kIRCCloudUnreachable && state == kIRCCloudStateConnected) {
-        TFLog(@"IRCCloud server became unreachable, disconnecting");
+        CLS_LOG(@"IRCCloud server became unreachable, disconnecting");
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
         [NetworkConnection sharedInstance].reconnectTimestamp = -1;
     }
@@ -1038,7 +1038,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     kIRCCloudReachability reachability = [self reachable];
     if(reachability != kIRCCloudReachable) {
-        TFLog(@"IRCCloud is unreachable");
+        CLS_LOG(@"IRCCloud is unreachable");
         _reconnectTimestamp = -1;
         _state = kIRCCloudStateDisconnected;
         if(reachability == kIRCCloudUnreachable)
@@ -1060,7 +1060,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(_streamId)
             url = [url stringByAppendingFormat:@"&stream_id=%@", _streamId];
     }
-    TFLog(@"Connecting: %@", url);
+    CLS_LOG(@"Connecting: %@", url);
     _state = kIRCCloudStateConnecting;
     _idleInterval = 20;
     _accrued = 0;
@@ -1115,7 +1115,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocketDidOpen:(WebSocket *)socket {
     if(socket == _socket) {
-        TFLog(@"Socket connected");
+        CLS_LOG(@"Socket connected");
         _idleInterval = 20;
         _reconnectTimestamp = 0;
         _state = kIRCCloudStateConnected;
@@ -1137,9 +1137,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocket:(WebSocket *)socket didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError {
     if(socket == _socket) {
-        TFLog(@"Status Code: %i", aStatusCode);
-        TFLog(@"Close Message: %@", aMessage);
-        TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
+        CLS_LOG(@"Status Code: %i", aStatusCode);
+        CLS_LOG(@"Close Message: %@", aMessage);
+        CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
         if([self reachable] == kIRCCloudReachable && _reconnectTimestamp != 0) {
             [self fail];
@@ -1159,7 +1159,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocket:(WebSocket *)socket didReceiveError: (NSError*) aError {
     if(socket == _socket) {
-        TFLog(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
+        CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
         if([self reachable] && _reconnectTimestamp != 0) {
             [self fail];
@@ -1229,7 +1229,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(block != nil) {
             block(object);
         } else {
-            TFLog(@"Unhandled type: %@", object);
+            CLS_LOG(@"Unhandled type: %@", object);
         }
         if(backlog) {
             if(_numBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
@@ -1251,7 +1251,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         } else if([object objectForKey:@"success"]) {
             [self postObject:object forEvent:kIRCEventSuccess];
         }
-        TFLog(@"Response: %@", object);
+        CLS_LOG(@"Response: %@", object);
     }
     if(!backlog && _reconnectTimestamp != 0)
         [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
@@ -1259,14 +1259,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)cancelIdleTimer {
     if(![NSThread currentThread].isMainThread)
-        TFLog(@"WARNING: cancel idle timer called outside of main thread");
+        CLS_LOG(@"WARNING: cancel idle timer called outside of main thread");
     [_idleTimer invalidate];
     _idleTimer = nil;
 }
 
 -(void)scheduleIdleTimer {
     if(![NSThread currentThread].isMainThread)
-        TFLog(@"WARNING: schedule idle timer called outside of main thread");
+        CLS_LOG(@"WARNING: schedule idle timer called outside of main thread");
     [_idleTimer invalidate];
     _idleTimer = nil;
     if(_reconnectTimestamp == 0)
@@ -1279,7 +1279,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)_idle {
     _reconnectTimestamp = 0;
     _idleTimer = nil;
-    TFLog(@"Websocket idle time exceeded, reconnecting...");
+    CLS_LOG(@"Websocket idle time exceeded, reconnecting...");
     [_socket close];
     [self connect];
 }
@@ -1302,7 +1302,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(OOBFetcher *)fetchOOB:(NSString *)url {
     for(OOBFetcher *fetcher in _oobQueue) {
         if([fetcher.url isEqualToString:url]) {
-            TFLog(@"Ignoring duplicate OOB request");
+            CLS_LOG(@"Ignoring duplicate OOB request");
             return fetcher;
         }
     }
@@ -1313,7 +1313,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [fetcher start];
         }];
     } else {
-        TFLog(@"OOB Request has been queued");
+        CLS_LOG(@"OOB Request has been queued");
     }
     return fetcher;
 }
@@ -1367,13 +1367,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
     [_oobQueue removeObject:notification.object];
     if([_servers count] < 1) {
-        TFLog(@"Initial backlog download failed");
+        CLS_LOG(@"Initial backlog download failed");
         [self disconnect];
         _state = kIRCCloudStateDisconnected;
         [self fail];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     } else {
-        TFLog(@"Backlog download failed, rescheduling timed out buffers");
+        CLS_LOG(@"Backlog download failed, rescheduling timed out buffers");
         [self _scheduleTimedoutBuffers];
     }
 }
@@ -1381,7 +1381,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)_scheduleTimedoutBuffers {
     for(Buffer *buffer in [_buffers getBuffers]) {
         if(buffer.timeout > 0) {
-            TFLog(@"Requesting backlog for timed-out buffer: %@", buffer.name);
+            CLS_LOG(@"Requesting backlog for timed-out buffer: %@", buffer.name);
             [self requestBacklogForBuffer:buffer.bid server:buffer.cid];
         }
     }

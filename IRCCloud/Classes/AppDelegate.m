@@ -14,6 +14,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <HockeySDK/HockeySDK.h>
+#import <Crashlytics/Crashlytics.h>
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
 #import "ImageViewController.h"
@@ -68,9 +70,18 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     _conn = [NetworkConnection sharedInstance];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES)}];
-#ifndef BRAND_NAME
-    if(TESTFLIGHT_KEY)
-        [TestFlight takeOff:TESTFLIGHT_KEY];
+#ifdef HOCKEYAPP_TOKEN
+    if(@HOCKEYAPP_TOKEN.length) {
+        [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@HOCKEYAPP_TOKEN];
+        [[BITHockeyManager sharedHockeyManager] setDisableCrashManager:YES];
+        [[BITHockeyManager sharedHockeyManager] setDisableFeedbackManager:YES];
+        [[BITHockeyManager sharedHockeyManager] startManager];
+        if(![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment)
+             [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
+    }
+#endif
+#ifdef CRASHLYTICS_TOKEN
+    [Crashlytics startWithAPIKey:@CRASHLYTICS_TOKEN];
 #endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -154,7 +165,7 @@
 }
 
 - (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)err {
-    TFLog(@"Error in APNs registration. Error: %@", err);
+    CLS_LOG(@"Error in APNs registration. Error: %@", err);
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
