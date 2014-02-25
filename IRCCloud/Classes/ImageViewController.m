@@ -157,7 +157,13 @@
 
 -(void)fail {
     if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
-                                                                                  withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                                                                                  withCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                   @"irccloud-enterprise://"
+#else
+                                                                                                   @"irccloud://"
+#endif
+                                                                                                   ]
                                                                                      createNewTab:NO]))
         [[UIApplication sharedApplication] openURL:_url];
     [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
@@ -362,7 +368,13 @@
 
 -(IBAction)shareButtonPressed:(id)sender {
     if(NSClassFromString(@"UIActivityViewController")) {
-        UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:_imageView.image?@[_url,_imageView.image]:@[_url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:@"irccloud://"]]:[[TUSafariActivity alloc] init]]];
+        UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:_imageView.image?@[_url,_imageView.image]:@[_url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                                                                                                                                                                                                                                                         @"irccloud-enterprise://"
+#else
+                                                                                                                                                                                                                                                                                                                                         @"irccloud://"
+#endif
+                                                                                                                                                                                                                                                                                                                                         ]]:[[TUSafariActivity alloc] init]]];
         [self presentViewController:activityController animated:YES completion:nil];
     } else {
         UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Copy To Clipboard", @"Share on Twitter", ([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?@"Open In Chrome":@"Open In Safari",nil];

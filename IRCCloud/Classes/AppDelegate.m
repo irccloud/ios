@@ -126,7 +126,7 @@
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
-    if(![url.scheme isEqualToString:@"irccloud"])
+    if(![url.scheme hasPrefix:@"irccloud"])
         [self launchURL:url];
     return YES;
 }
@@ -149,7 +149,13 @@
             _openInChromeController = [[OpenInChromeController alloc] init];
         if([[NSUserDefaults standardUserDefaults] objectForKey:@"useChrome"] || ![_openInChromeController isChromeInstalled]) {
             if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_openInChromeController openInChrome:url
-                                             withCallbackURL:[NSURL URLWithString:@"irccloud://"]
+                                             withCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                              @"irccloud-enterprise://"
+#else
+                                                              @"irccloud://"
+#endif
+                                                              ]
                                                 createNewTab:NO]))
                 [[UIApplication sharedApplication] openURL:url];
         } else {
@@ -242,7 +248,7 @@
                             self.window.backgroundColor = [UIColor whiteColor];
 #endif
                     }];
-                } else {
+                } else if(self.window.rootViewController != self.slideViewController) {
                     UIView *v = self.window.rootViewController.view;
                     self.window.rootViewController = self.slideViewController;
                     [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
@@ -256,7 +262,7 @@
 #endif
                     }];
                 }
-            } else {
+            } else if(self.window.rootViewController != self.slideViewController) {
                 [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
                 self.window.rootViewController = self.slideViewController;
             }

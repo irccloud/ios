@@ -31,7 +31,7 @@
 			<string>com.irccloud.launch</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>irccloud</string>
+				<string>irccloud-enterprise</string>
 			</array>
 		</dict>
 		<dict>
