@@ -22,7 +22,7 @@
     NSArray *_channels;
     NSArray *_data;
     IRCCloudJSONObject *_event;
-    UITextView *_placeholder;
+    UILabel *_placeholder;
     UIActivityIndicatorView *_activity;
     UIAlertView *_alertView;
 }

@@ -35,6 +35,7 @@
     if (self) {
         _url = url;
         _chrome = [[OpenInChromeController alloc] init];
+        _progressScale = 0;
     }
     return self;
 }
@@ -195,6 +196,8 @@
             url = [NSURL URLWithString:[NSString stringWithFormat:@"https://dl.dropboxusercontent.com%@", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
         else
             url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?dl=1", url.absoluteString]];
+    } else if(([[url.host lowercaseString] isEqualToString:@"d.pr"] || [[url.host lowercaseString] isEqualToString:@"droplr.com"]) && [url.path hasPrefix:@"/i/"] && ![url.path hasSuffix:@"+"]) {
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"https://droplr.com%@+", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
     } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"]) {
         [self loadOembed:[NSString stringWithFormat:@"http://api.imgur.com/oembed.json?url=%@", url.absoluteString]];
         return;
@@ -226,6 +229,30 @@
             }
         }];
         return;
+    } else if([url.path hasPrefix:@"/wiki/File:"]) {
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@%@", url.scheme, url.host, url.port,[[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", [url.path substringFromIndex:6]] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            if (error) {
+                NSLog(@"Error fetching MediaWiki metadata. Error %i : %@", error.code, error.userInfo);
+                [self fail];
+            } else {
+                SBJsonParser *parser = [[SBJsonParser alloc] init];
+                NSDictionary *dict = [parser objectWithData:data];
+                NSDictionary *page = [[[[dict objectForKey:@"query"] objectForKey:@"pages"] allValues] objectAtIndex:0];
+                if(page && [page objectForKey:@"imageinfo"]) {
+                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]]];
+                    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    
+                    [connection start];
+                } else {
+                    NSLog(@"Invalid data from MediaWiki");
+                    [self fail];
+                }
+            }
+        }];
+        return;
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
@@ -246,12 +273,21 @@
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     NSInteger receivedDataLength = [data length];
     _totalBytesReceived += receivedDataLength;
-    
     [_imageData appendData:data];
+
+    if(_progressScale == 0 && _totalBytesReceived > 3) {
+        char GIF[3];
+        [data getBytes:&GIF length:3];
+        if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F')
+            _progressScale = 0.5;
+        else
+            _progressScale = 1.0;
+    }
     
     if(_bytesExpected != NSURLResponseUnknownLength) {
-        float progress = ((_totalBytesReceived/(float)_bytesExpected) * 100.f) / 100.f;
-        _progressView.progress = progress;
+        float progress = (((_totalBytesReceived/(float)_bytesExpected) * 100.f) / 100.f) * _progressScale;
+        if(_progressView.progress < progress)
+            _progressView.progress = progress;
     }
 }
 
@@ -286,7 +322,7 @@
 
 -(void)_gifProgress:(NSNotification *)n {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _progressView.progress = [[n.userInfo objectForKey:@"progress"] floatValue];
+        _progressView.progress = 0.5 + ([[n.userInfo objectForKey:@"progress"] floatValue] / 2.0f);
     }];
 }
 

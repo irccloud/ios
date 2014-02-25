@@ -39,9 +39,10 @@
     NSString *_CHANTYPES;
     NSDictionary *_PREFIX;
     int _order;
+    NSString *_MODE_OWNER, *_MODE_ADMIN, *_MODE_OP, *_MODE_HALFOP, *_MODE_VOICED;
 }
 @property int cid, port, ssl, lag, order;
-@property NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES;
+@property NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED;
 @property NSDictionary *fail_info, *isupport, *PREFIX;
 @property NSArray *ignores;
 -(NSComparisonResult)compare:(Server *)aServer;
@@ -68,4 +69,5 @@
 -(void)updateMode:(NSString *)mode server:(int)cid;
 -(void)updateIsupport:(NSDictionary *)isupport server:(int)cid;
 -(void)updateIgnores:(NSArray *)ignores server:(int)cid;
+-(void)updateUserModes:(NSString *)modes server:(int)cid;
 @end

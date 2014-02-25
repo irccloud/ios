@@ -25,8 +25,9 @@
     self = [super initWithStyle:style];
     if (self) {
         _addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
-        _placeholder = [[UITextView alloc] initWithFrame:CGRectZero];
+        _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
         _placeholder.text = @"You're not ignoring anyone at the moment.\n\nYou can ignore someone by tapping their nickname in the user list, long-pressing a message, or by using /ignore.";
+        _placeholder.numberOfLines = 0;
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
         _placeholder.textAlignment = NSTextAlignmentCenter;
@@ -142,7 +143,7 @@
 }
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
+    if (editingStyle == UITableViewCellEditingStyleDelete && indexPath.row < _ignores.count) {
         NSString *mask = [_ignores objectAtIndex:indexPath.row];
         [[NetworkConnection sharedInstance] unignore:mask cid:_cid];
     }

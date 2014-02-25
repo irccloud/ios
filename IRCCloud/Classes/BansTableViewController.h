@@ -23,7 +23,7 @@
     IRCCloudJSONObject *_event;
     UIBarButtonItem *_addButton;
     int _bid;
-    UITextView *_placeholder;
+    UILabel *_placeholder;
     UIAlertView *_alertView;
 }
 @property (strong, nonatomic) NSArray *bans;

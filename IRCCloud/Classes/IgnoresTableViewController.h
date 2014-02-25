@@ -22,7 +22,7 @@
     NSArray *_ignores;
     UIBarButtonItem *_addButton;
     int _cid;
-    UITextView *_placeholder;
+    UILabel *_placeholder;
     UIAlertView *_alertView;
 }
 @property (strong, nonatomic) NSArray *ignores;

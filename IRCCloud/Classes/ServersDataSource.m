@@ -18,6 +18,17 @@
 #import "BuffersDataSource.h"
 
 @implementation Server
+-(id)init {
+    self = [super init];
+    @synchronized(self) {
+        _MODE_OWNER = @"q";
+        _MODE_ADMIN = @"a";
+        _MODE_OP = @"o";
+        _MODE_HALFOP = @"h";
+        _MODE_VOICED = @"v";
+    }
+    return self;
+}
 -(NSComparisonResult)compare:(Server *)aServer {
     if(aServer.order > _order)
         return NSOrderedAscending;
@@ -195,6 +206,14 @@
     Server *server = [self getServer:cid];
     if(server)
         server.ignores = ignores;
+}
+
+-(void)updateUserModes:(NSString *)modes server:(int)cid {
+    if([modes isKindOfClass:[NSString class]] && modes.length == 5 && [modes characterAtIndex:0] != 'q') {
+        Server *server = [self getServer:cid];
+        if(server)
+            server.MODE_OWNER = [modes substringToIndex:1];
+    }
 }
 
 -(void)finalize {

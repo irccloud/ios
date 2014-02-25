@@ -22,7 +22,7 @@
     NSArray *_nicks;
     IRCCloudJSONObject *_event;
     UIBarButtonItem *_addButton;
-    UITextView *_placeholder;
+    UILabel *_placeholder;
     UIAlertView *_alertView;
 }
 @property (strong, nonatomic) NSArray *nicks;

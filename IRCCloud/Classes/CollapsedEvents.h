@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 #import "EventsDataSource.h"
+#import "ServersDataSource.h"
 
 typedef enum {
     kCollapsedEventNetSplit,
@@ -62,21 +63,22 @@ typedef enum {
 @property NSString *nick, *oldNick, *hostname, *msg, *fromMode, *fromNick, *targetMode, *chan;
 @property BOOL netsplit;
 -(NSComparisonResult)compare:(CollapsedEvent *)aEvent;
--(BOOL)addMode:(NSString *)mode;
--(BOOL)removeMode:(NSString *)mode;
--(NSString *)modes:(BOOL)showSymbol;
+-(BOOL)addMode:(NSString *)mode server:(Server *)server;
+-(BOOL)removeMode:(NSString *)mode server:(Server *)server;
+-(NSString *)modes:(BOOL)showSymbol mode_modes:(NSArray *)mode_modes;
 -(void)copyModes:(CollapsedEvent *)from;
 -(int)modeCount;
 @end
 
 @interface CollapsedEvents : NSObject {
     NSMutableArray *_data;
-    NSDictionary *_PREFIX;
+    Server *_server;
+    NSArray *_mode_modes;
 }
 -(void)clear;
 -(BOOL)addEvent:(Event *)event;
 -(NSString *)collapse:(BOOL)showChan;
 -(int)count;
 -(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize;
-@property NSDictionary *PREFIX;
+-(void)setServer:(Server *)server;
 @end

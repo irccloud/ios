@@ -167,7 +167,7 @@
                 case 't':
                     [_modeHints addObject:@{@"mode":@"Topic Control (+t)", @"hint":@"Only ops can set the topic."}];
                     User *u = [[UsersDataSource sharedInstance] getUser:server.nick cid:_channel.cid bid:_channel.bid];
-                    if(u && [u.mode rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:@"qao"]].location == NSNotFound)
+                    if(u && [u.mode rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:server?[NSString stringWithFormat:@"%@%@%@",server.MODE_OWNER, server.MODE_ADMIN, server.MODE_OP]:@"qao"]].location == NSNotFound)
                         self.navigationItem.rightBarButtonItem = nil;
                     break;
             }

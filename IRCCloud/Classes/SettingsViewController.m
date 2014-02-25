@@ -138,6 +138,7 @@
     
     [[NSUserDefaults standardUserDefaults] setBool:_screen.on forKey:@"keepScreenOn"];
     [[NSUserDefaults standardUserDefaults] setBool:_chrome.on forKey:@"useChrome"];
+    [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -273,6 +274,7 @@
     
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
+    _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
 }
 
 - (void)viewDidLoad {
@@ -321,6 +323,7 @@
     _colors = [[UISwitch alloc] init];
     _screen = [[UISwitch alloc] init];
     _chrome = [[UISwitch alloc] init];
+    _autoCaps = [[UISwitch alloc] init];
 
     int width;
     
@@ -399,7 +402,7 @@
         case 2:
             return 4;
         case 3:
-            return (_chromeInstalled)?3:2;
+            return (_chromeInstalled)?4:3;
         case 4:
             return 4;
     }
@@ -490,6 +493,10 @@
                     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
                     break;
                 case 2:
+                    cell.textLabel.text = @"Auto-capitalization";
+                    cell.accessoryView = _autoCaps;
+                    break;
+                case 3:
                     cell.textLabel.text = @"Open URLs in Chrome";
                     cell.accessoryView = _chrome;
                     break;

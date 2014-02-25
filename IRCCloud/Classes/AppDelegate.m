@@ -14,6 +14,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <HockeySDK/HockeySDK.h>
+#import <Crashlytics/Crashlytics.h>
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
 #import "ImageViewController.h"
@@ -67,17 +69,32 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     _conn = [NetworkConnection sharedInstance];
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"host":IRCCLOUD_HOST}];
-    IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
-#ifndef BRAND_NAME
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES)}];
 #ifdef ENTERPRISE
-    NSLog(@"Hello, Enterprise!");
-    if(TESTFLIGHT_KEY_ENTERPRISE)
-        [TestFlight takeOff:TESTFLIGHT_KEY_ENTERPRISE];
-#else
-    if(TESTFLIGHT_KEY)
-        [TestFlight takeOff:TESTFLIGHT_KEY];
+#ifdef HOCKEYAPP_TOKEN_ENTERPRISE
+    if(@HOCKEYAPP_TOKEN_ENTERPRISE.length) {
+        [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@HOCKEYAPP_TOKEN_ENTERPRISE];
+        [[BITHockeyManager sharedHockeyManager] setDisableCrashManager:YES];
+        [[BITHockeyManager sharedHockeyManager] setDisableFeedbackManager:YES];
+        [[BITHockeyManager sharedHockeyManager] startManager];
+        if(![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment)
+            [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
+    }
 #endif
+#else
+#ifdef HOCKEYAPP_TOKEN
+    if(@HOCKEYAPP_TOKEN.length) {
+        [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@HOCKEYAPP_TOKEN];
+        [[BITHockeyManager sharedHockeyManager] setDisableCrashManager:YES];
+        [[BITHockeyManager sharedHockeyManager] setDisableFeedbackManager:YES];
+        [[BITHockeyManager sharedHockeyManager] startManager];
+        if(![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment)
+             [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
+    }
+#endif
+#endif
+#ifdef CRASHLYTICS_TOKEN
+    [Crashlytics startWithAPIKey:@CRASHLYTICS_TOKEN];
 #endif
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -124,6 +141,7 @@
               ([[url.host lowercaseString] isEqualToString:@"imgur.com"] && [url.path rangeOfString:@"/a/"].location == NSNotFound) ||
               ([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [[url.path lowercaseString] hasPrefix:@"/photos/"]) ||
               (([[url.host lowercaseString] isEqualToString:@"instagram.com"] || [[url.host lowercaseString] isEqualToString:@"instagr.am"]) && [[url.path lowercaseString] hasPrefix:@"/p/"]) ||
+              (([[url.host lowercaseString] isEqualToString:@"droplr.com"] || [[url.host lowercaseString] isEqualToString:@"d.pr"]) && [[url.path lowercaseString] hasPrefix:@"/i/"]) ||
               ([url.host.lowercaseString isEqualToString:@"cl.ly"] && url.path.length && ![url.path.lowercaseString isEqualToString:@"/robots.txt"] && ![url.path.lowercaseString isEqualToString:@"/image"])) {
         [self showImage:url];
     } else {
@@ -160,7 +178,7 @@
 }
 
 - (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)err {
-    TFLog(@"Error in APNs registration. Error: %@", err);
+    CLS_LOG(@"Error in APNs registration. Error: %@", err);
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {

@@ -33,6 +33,7 @@
 #import "DisplayOptionsViewController.h"
 #import "WhoListTableViewController.h"
 #import "NamesListTableViewController.h"
+#import <objc/message.h>
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -564,7 +565,7 @@
             } else {
                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
                 if(b && [e isImportant:b.type]) {
-                    if(e.isHighlight) {
+                    if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
                         AudioServicesPlaySystemSound(alertSound);
                         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
                         [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
@@ -888,6 +889,11 @@
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable && session != nil && [session length] > 0)
         [[NetworkConnection sharedInstance] connect];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
+        _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+    } else {
+        _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -946,6 +952,7 @@
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
             Event *e = [[Event alloc] init];
             NSString *msg = _message.text;
+            
             if([msg hasPrefix:@"//"])
                 msg = [msg substringFromIndex:1];
             else if([msg hasPrefix:@"/"] && ![[msg lowercaseString] hasPrefix:@"/me "])
@@ -1063,43 +1070,31 @@
         [_nickCompletionView setSuggestions:suggestions];
     if(suggestions.count == 0) {
         if(_nickCompletionView.alpha > 0) {
-            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:^(BOOL finished) {
-                _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
-                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
-                [_message resignFirstResponder];
-                [_message becomeFirstResponder];
-                [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(keyboardWillShow:)
-                                                             name:UIKeyboardWillShowNotification object:nil];
-                
-                [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(keyboardWillBeHidden:)
-                                                             name:UIKeyboardWillHideNotification object:nil];
-            }];
+            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:nil];
+            _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
+            [_message.internalTextView reloadInputViews];
+            id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+            if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
+                objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), YES);
+            }
             _sortedChannels = nil;
             _sortedUsers = nil;
         }
     } else {
         if(_nickCompletionView.alpha == 0) {
-            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:^(BOOL finished) {
-                NSString *text = _message.text;
-                _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
-                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-                [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
-                _message.delegate = nil;
-                [_message resignFirstResponder];
-                [_message becomeFirstResponder];
-                _message.text = text;
-                _message.delegate = self;
-                [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(keyboardWillShow:)
-                                                             name:UIKeyboardWillShowNotification object:nil];
-                
-                [[NSNotificationCenter defaultCenter] addObserver:self
-                                                         selector:@selector(keyboardWillBeHidden:)
-                                                             name:UIKeyboardWillHideNotification object:nil];
-            }];
+            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:nil];
+            NSString *text = _message.text;
+            _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
+            _message.delegate = nil;
+            _message.text = text;
+            _message.selectedRange = NSMakeRange(text.length, 0);
+            _message.delegate = self;
+            [_message.internalTextView reloadInputViews];
+            id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+            if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
+                objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
+                objc_msgSend(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
+            }
         }
     }
 }
@@ -1319,7 +1314,7 @@
     _sortedChannels = nil;
     _sortedUsers = nil;
     BOOL changed = (_buffer && _buffer.bid != bid) || !_buffer;
-    TFLog(@"BID selected: %i", bid);
+    CLS_LOG(@"BID selected: %i", bid);
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
         _eidToOpen = -1;
     }
@@ -1366,7 +1361,6 @@
         }];
     } else {
         [_eventsView setBuffer:_buffer];
-        _message.text = _buffer.draft;
     }
     [_usersView setBuffer:_buffer];
     [self _updateUserListVisibility];
@@ -1542,7 +1536,7 @@
         } else if([s.status isEqualToString:@"ip_retry"]) {
             _serverStatus.text = @"Trying another IP address";
         } else {
-            TFLog(@"Unhandled server status: %@", s.status);
+            CLS_LOG(@"Unhandled server status: %@", s.status);
         }
         CGRect frame = _serverStatus.frame;
         frame.origin.x = 8;
@@ -1858,6 +1852,7 @@
 }
 
 -(IBAction)settingsButtonPressed:(id)sender {
+    _selectedBuffer = _buffer;
     User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     if([_buffer.type isEqualToString:@"console"]) {
@@ -2031,14 +2026,15 @@
     [sheet addButtonWithTitle:@"Invite to channel"];
     [sheet addButtonWithTitle:@"Ignore"];
     if([_buffer.type isEqualToString:@"channel"]) {
+        Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
-        if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
-            if([_selectedUser.mode rangeOfString:@"o"].location != NSNotFound)
+        if([me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
+            if([_selectedUser.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound)
                 [sheet addButtonWithTitle:@"Deop"];
             else
                 [sheet addButtonWithTitle:@"Op"];
         }
-        if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound || [me.mode rangeOfString:@"h"].location != NSNotFound) {
+        if([me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
             [sheet addButtonWithTitle:@"Kick"];
             [sheet addButtonWithTitle:@"Ban"];
         }
@@ -2075,15 +2071,55 @@
     }
 }
 
+-(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
+    _selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    if([_selectedBuffer.type isEqualToString:@"console"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
+        if([s.status isEqualToString:@"disconnected"]) {
+            [sheet addButtonWithTitle:@"Reconnect"];
+            [sheet addButtonWithTitle:@"Delete"];
+        } else {
+            [sheet addButtonWithTitle:@"Disconnect"];
+        }
+        [sheet addButtonWithTitle:@"Edit Connection"];
+    } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
+        if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
+            [sheet addButtonWithTitle:@"Leave"];
+        } else {
+            [sheet addButtonWithTitle:@"Rejoin"];
+            [sheet addButtonWithTitle:(_selectedBuffer.archived)?@"Unarchive":@"Archive"];
+            [sheet addButtonWithTitle:@"Delete"];
+        }
+    } else {
+        if(_selectedBuffer.archived) {
+            [sheet addButtonWithTitle:@"Unarchive"];
+        } else {
+            [sheet addButtonWithTitle:@"Archive"];
+        }
+        [sheet addButtonWithTitle:@"Delete"];
+    }
+    sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+        [self.view.window addSubview:_landscapeView];
+        [sheet showInView:_landscapeView];
+    } else {
+        [sheet showFromRect:rect inView:_buffersView.tableView animated:YES];
+    }
+}
+
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect {
-    if(event.from) {
+    NSString *from = event.from;
+    if(!from.length)
+        from = event.nick;
+    if(from) {
         _selectedEvent = event;
-        _selectedUser = [[UsersDataSource sharedInstance] getUser:event.from cid:_buffer.cid bid:_buffer.bid];
+        _selectedUser = [[UsersDataSource sharedInstance] getUser:from cid:_buffer.cid bid:_buffer.bid];
         if(!_selectedUser) {
             _selectedUser = [[User alloc] init];
             _selectedUser.cid = _selectedEvent.cid;
             _selectedUser.bid = _selectedEvent.bid;
-            _selectedUser.nick = _selectedEvent.from;
+            _selectedUser.nick = from;
             _selectedUser.hostmask = _selectedEvent.hostmask;
         }
         [self _showUserPopupInRect:rect];
@@ -2176,7 +2212,7 @@
         
         if([action isEqualToString:@"Copy Message"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            NSString *plaintext = [NSString stringWithFormat:@"%@ <%@> %@", _selectedEvent.timestamp,_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
+            NSString *plaintext = [_selectedEvent.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ — %@ %@", _selectedEvent.timestamp,_selectedEvent.nick,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]]:[NSString stringWithFormat:@"%@ <%@> %@", _selectedEvent.timestamp,_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
             [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
         } else if([action isEqualToString:@"Copy Hostmask"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
@@ -2192,9 +2228,11 @@
         } else if([action isEqualToString:@"Whois"]) {
             [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
         } else if([action isEqualToString:@"Op"]) {
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
         } else if([action isEqualToString:@"Deop"]) {
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-o %@",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
         } else if([action isEqualToString:@"Ban"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
@@ -2226,28 +2264,28 @@
             [_alertView textFieldAtIndex:0].delegate = self;
             [_alertView show];
         } else if([action isEqualToString:@"Archive"]) {
-            [[NetworkConnection sharedInstance] archiveBuffer:_buffer.bid cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Unarchive"]) {
-            [[NetworkConnection sharedInstance] unarchiveBuffer:_buffer.bid cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Delete"]) {
             //TODO: prompt for confirmation
-            if([_buffer.type isEqualToString:@"console"]) {
-                [[NetworkConnection sharedInstance] deleteServer:_buffer.cid];
-            } else if(_buffer == nil || _buffer.bid == -1) {
+            if([_selectedBuffer.type isEqualToString:@"console"]) {
+                [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
+            } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
                 [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
             } else {
-                [[NetworkConnection sharedInstance] deleteBuffer:_buffer.bid cid:_buffer.cid];
+                [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
             }
         } else if([action isEqualToString:@"Leave"]) {
-            [[NetworkConnection sharedInstance] part:_buffer.name msg:nil cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Rejoin"]) {
-            [[NetworkConnection sharedInstance] join:_buffer.name key:nil cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Ban List"]) {
-            [[NetworkConnection sharedInstance] mode:@"b" chan:_buffer.name cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:@"b" chan:_selectedBuffer.name cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Disconnect"]) {
-            [[NetworkConnection sharedInstance] disconnect:_buffer.cid msg:nil];
+            [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil];
         } else if([action isEqualToString:@"Reconnect"]) {
-            [[NetworkConnection sharedInstance] reconnect:_buffer.cid];
+            [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Logout"]) {
             [[NetworkConnection sharedInstance] logout];
             [self bufferSelected:-1];
@@ -2266,7 +2304,7 @@
             [self _mention];
         } else if([action isEqualToString:@"Edit Connection"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
-            [ecv setServer:_buffer.cid];
+            [ecv setServer:_selectedBuffer.cid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];

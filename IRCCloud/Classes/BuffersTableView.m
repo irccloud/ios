@@ -185,8 +185,10 @@
         int archiveCount = 0;
         int firstHighlightPosition = -1;
         int firstUnreadPosition = -1;
+        int firstFailurePosition = -1;
         int lastHighlightPosition = -1;
         int lastUnreadPosition = -1;
+        int lastFailurePosition = -1;
         int selectedRow = -1;
         
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
@@ -228,6 +230,10 @@
                         firstHighlightPosition = data.count - 1;
                     if(highlights > 0 && (lastHighlightPosition == -1 || lastHighlightPosition < data.count - 1))
                         lastHighlightPosition = data.count - 1;
+                    if(server.fail_info.count > 0 && firstFailurePosition == -1)
+                        firstFailurePosition = data.count - 1;
+                    if(server.fail_info.count > 0 && (lastFailurePosition == -1 || lastFailurePosition < data.count - 1))
+                        lastFailurePosition = data.count - 1;
 
                     if(buffer.bid == _selectedBuffer.bid)
                         selectedRow = data.count - 1;
@@ -362,8 +368,10 @@
             _selectedRow = selectedRow;
             _firstUnreadPosition = firstUnreadPosition;
             _firstHighlightPosition = firstHighlightPosition;
+            _firstFailurePosition = firstFailurePosition;
             _lastUnreadPosition = lastUnreadPosition;
             _lastHighlightPosition = lastHighlightPosition;
+            _lastFailurePosition = lastFailurePosition;
             [self.tableView reloadData];
             [self _updateUnreadIndicators];
         }];
@@ -376,33 +384,43 @@
         int first = [[rows objectAtIndex:0] row];
         int last = [[rows lastObject] row];
         
-        if(_firstUnreadPosition != -1 && first > _firstUnreadPosition) {
+        if(_firstFailurePosition != -1 && first > _firstFailurePosition) {
             topUnreadIndicator.hidden = NO;
-            topUnreadIndicator.alpha = 1; //TODO: animate this
-            topUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+            topUnreadIndicator.alpha = 1;
+            topUnreadIndicatorColor.backgroundColor = [UIColor networkErrorBackgroundColor];
         } else {
             topUnreadIndicator.hidden = YES;
-            topUnreadIndicator.alpha = 0; //TODO: animate this
+            topUnreadIndicator.alpha = 0;
+        }
+        if(_firstUnreadPosition != -1 && first > _firstUnreadPosition) {
+            topUnreadIndicator.hidden = NO;
+            topUnreadIndicator.alpha = 1;
+            topUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
         }
         if((_lastHighlightPosition != -1 && first > _lastHighlightPosition) ||
            (_firstHighlightPosition != -1 && first > _firstHighlightPosition)) {
             topUnreadIndicator.hidden = NO;
-            topUnreadIndicator.alpha = 1; //TODO: animate this
+            topUnreadIndicator.alpha = 1;
             topUnreadIndicatorColor.backgroundColor = [UIColor redColor];
         }
-
-        if(_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
+        
+        if(_lastFailurePosition != -1 && last < _lastFailurePosition) {
             bottomUnreadIndicator.hidden = NO;
-            bottomUnreadIndicator.alpha = 1; //TODO: animate this
-            bottomUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+            bottomUnreadIndicator.alpha = 1;
+            bottomUnreadIndicatorColor.backgroundColor = [UIColor networkErrorBackgroundColor];
         } else {
             bottomUnreadIndicator.hidden = YES;
-            bottomUnreadIndicator.alpha = 0; //TODO: animate this
+            bottomUnreadIndicator.alpha = 0;
+        }
+        if(_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
+            bottomUnreadIndicator.hidden = NO;
+            bottomUnreadIndicator.alpha = 1;
+            bottomUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
         }
         if((_firstHighlightPosition != -1 && last < _firstHighlightPosition) ||
            (_lastHighlightPosition != -1 && last < _lastHighlightPosition)) {
             bottomUnreadIndicator.hidden = NO;
-            bottomUnreadIndicator.alpha = 1; //TODO: animate this
+            bottomUnreadIndicator.alpha = 1;
             bottomUnreadIndicatorColor.backgroundColor = [UIColor redColor];
         }
     }
@@ -449,6 +467,11 @@
     [super viewDidLoad];
     self.tableView.scrollsToTop = YES;
 
+    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    lp.minimumPressDuration = 1.0;
+    lp.delegate = self;
+    [self.tableView addGestureRecognizer:lp];
+    
     if(!_delegate) {
         _delegate = (UIViewController<BuffersTableViewDelegate> *)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
     }
@@ -588,6 +611,34 @@
                                 break;
                             }
                         }
+                    }
+                }
+                if([[m objectForKey:@"type"] intValue] == TYPE_SERVER) {
+                    if(s.fail_info.count) {
+                        if(_firstFailurePosition == -1 || _firstFailurePosition > i)
+                            _firstFailurePosition = i;
+                        if(_lastFailurePosition == -1 || _lastFailurePosition < i)
+                            _lastFailurePosition = i;
+                    } else {
+                        if(_firstFailurePosition == i) {
+                            _firstFailurePosition = -1;
+                            for(int j = i; j < _data.count; j++) {
+                                if([[[_data objectAtIndex:j] objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[[_data objectAtIndex:j] objectForKey:@"fail_info"] count]) {
+                                    _firstFailurePosition = j;
+                                    break;
+                                }
+                            }
+                        }
+                        if(_lastFailurePosition == i) {
+                            _lastFailurePosition = -1;
+                            for(int j = i; j >= 0; j--) {
+                                if([[[_data objectAtIndex:j] objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[[_data objectAtIndex:j] objectForKey:@"fail_info"] count]) {
+                                    _lastFailurePosition = j;
+                                    break;
+                                }
+                            }
+                        }
+                        
                     }
                 }
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -781,26 +832,20 @@
             cell.icon.hidden = NO;
             if(selected) {
                 cell.label.textColor = [UIColor whiteColor];
-                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"]) {
-                    cell.unreadIndicator.backgroundColor = cell.bgColor = [UIColor opsHeadingColor];
-                } else if([(NSDictionary *)[row objectForKey:@"fail_info"] count]) {
+                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count]) {
                     cell.label.textColor = [UIColor networkErrorColor];
                     cell.unreadIndicator.backgroundColor = cell.bgColor = [UIColor networkErrorBackgroundColor];
                 } else {
                     cell.bgColor = [UIColor selectedBlueColor];
                 }
             } else {
-                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
-                    cell.label.textColor = [UIColor opsHeadingColor];
-                else if([(NSDictionary *)[row objectForKey:@"fail_info"] count])
+                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
                     cell.label.textColor = [UIColor ownersHeadingColor];
                 else if(![status isEqualToString:@"connected_ready"])
                     cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
                 else
                     cell.label.textColor = [UIColor selectedBlueColor];
-                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"])
-                    cell.bgColor = [UIColor opsGroupColor];
-                else if([(NSDictionary *)[row objectForKey:@"fail_info"] count])
+                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
                     cell.bgColor = [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
                 else
                     cell.bgColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
@@ -1015,7 +1060,7 @@
     
     for(int i = first; i >= 0; i--) {
         NSDictionary *d = [_data objectAtIndex:i];
-        if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue]) {
+        if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
             pos = i - 1;
             break;
         }
@@ -1033,7 +1078,7 @@
     
     for(int i = last; i  < _data.count; i++) {
         NSDictionary *d = [_data objectAtIndex:i];
-        if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue]) {
+        if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
             pos = i + 1;
             break;
         }
@@ -1043,6 +1088,19 @@
         pos = _data.count - 1;
     
     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+}
+
+-(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+        NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
+        if(indexPath) {
+            if(indexPath.row < _data.count) {
+                int type = [[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue];
+                if(type == TYPE_SERVER || type == TYPE_CHANNEL || type == TYPE_CONVERSATION)
+                    [_delegate bufferLongPressed:[[[_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+            }
+        }
+    }
 }
 
 @end

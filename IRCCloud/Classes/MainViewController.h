@@ -52,6 +52,7 @@
     User *_selectedUser;
     Event *_selectedEvent;
     CGRect _selectedRect;
+    Buffer *_selectedBuffer;
     int _cidToOpen;
     NSString *_bufferToOpen;
     NSURL *_urlToOpen;

@@ -9,6 +9,4 @@
 #ifndef IRCCloud_config_h
 #define IRCCloud_config_h
 
-#define TESTFLIGHT_KEY nil
-
 #endif
