@@ -159,6 +159,9 @@ NSLock *__parserLock = nil;
 
 -(id)init {
     self = [super init];
+#ifdef ENTERPRISE
+    IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
+#endif
     __parserLock = [[NSLock alloc] init];
     _queue = [[NSOperationQueue alloc] init];
     _servers = [ServersDataSource sharedInstance];
