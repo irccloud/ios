@@ -235,6 +235,7 @@
                         e.fromMode = event.fromMode;
                     if(event.targetMode)
                         e.targetMode = event.targetMode;
+                    e.hostname = event.hostname;
                 } else if(e.type == kCollapsedEventNickChange) {
                     e.type = event.type;
                     e.msg = event.msg;
@@ -413,7 +414,7 @@
         if(_data.count == 0)
             return nil;
         
-        if(_data.count == 1 && [[_data objectAtIndex:0] modeCount] < 2) {
+        if(_data.count == 1 && [[_data objectAtIndex:0] modeCount] < ((((CollapsedEvent*)[_data objectAtIndex:0]).type == kCollapsedEventMode)?2:1)) {
             CollapsedEvent *e = [_data objectAtIndex:0];
             switch(e.type) {
                 case kCollapsedEventNetSplit:
