@@ -69,7 +69,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     _conn = [NetworkConnection sharedInstance];
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES)}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":@"www.irccloud.com"}];
 #ifdef ENTERPRISE
 #ifdef HOCKEYAPP_TOKEN_ENTERPRISE
     if(@HOCKEYAPP_TOKEN_ENTERPRISE.length) {
