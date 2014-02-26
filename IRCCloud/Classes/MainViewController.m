@@ -1730,7 +1730,7 @@
         return;
     }
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+        if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             self.navigationItem.rightBarButtonItem = _usersButtonItem;
             if(self.slidingViewController.underRightViewController == nil)
                 self.slidingViewController.underRightViewController = _usersView;
@@ -1761,6 +1761,14 @@
                 frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
                 _eventsView.bottomUnreadView.frame = frame;
             } else {
+                if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
+                    self.navigationItem.rightBarButtonItem = _usersButtonItem;
+                    if(self.slidingViewController.underRightViewController == nil)
+                        self.slidingViewController.underRightViewController = _usersView;
+                } else {
+                    self.navigationItem.rightBarButtonItem = nil;
+                    self.slidingViewController.underRightViewController = nil;
+                }
                 CGRect frame = _eventsView.view.frame;
                 frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
                 _eventsView.view.frame = frame;
@@ -1785,7 +1793,7 @@
             frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
             _message.frame = frame;
         } else {
-            if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+            if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
                 self.navigationItem.rightBarButtonItem = _usersButtonItem;
                 if(self.slidingViewController.underRightViewController == nil)
                     self.slidingViewController.underRightViewController = _usersView;
