@@ -1438,41 +1438,42 @@
         } else if([s.status isEqualToString:@"quitting"]) {
             _serverStatus.text = @"Disconnecting";
         } else if([s.status isEqualToString:@"disconnected"]) {
-            NSString *reason = [s.fail_info objectForKey:@"reason"];
-            if([reason isKindOfClass:[NSString class]] && [reason length]) {
-                if([reason isEqualToString:@"pool_lost"])
-                    reason = @"Connection pool failed";
-                else if([reason isEqualToString:@"no_pool"])
-                    reason = @"No available connection pools";
-                else if([reason isEqualToString:@"enetdown"])
-                    reason = @"Network down";
-                else if([reason isEqualToString:@"etimedout"] || [reason isEqualToString:@"timeout"])
-                    reason = @"Timed out";
-                else if([reason isEqualToString:@"ehostunreach"])
-                    reason = @"Host unreachable";
-                else if([reason isEqualToString:@"econnrefused"])
-                    reason = @"Connection refused";
-                else if([reason isEqualToString:@"nxdomain"] || [reason isEqualToString:@"einval"])
-                    reason = @"Invalid hostname";
-                else if([reason isEqualToString:@"server_ping_timeout"])
-                    reason = @"PING timeout";
-                else if([reason isEqualToString:@"ssl_certificate_error"])
-                    reason = @"SSL certificate error";
-                else if([reason isEqualToString:@"ssl_error"])
-                    reason = @"SSL error";
-                else if([reason isEqualToString:@"crash"])
-                    reason = @"Connection crashed";
-                else if([reason isEqualToString:@"networks"])
-                    reason = @"You've exceeded the connection limit for free accounts.";
-                else if([reason isEqualToString:@"passworded_servers"])
-                    reason = @"You can't connect to passworded servers with free accounts.";
-                if([[s.fail_info objectForKey:@"type"] isEqualToString:@"killed"]) {
+            NSString *type = [s.fail_info objectForKey:@"type"];
+            if([type isKindOfClass:[NSString class]] && [type length]) {
+                NSString *reason = [s.fail_info objectForKey:@"reason"];
+                if([type isEqualToString:@"killed"]) {
                     _serverStatus.text = [NSString stringWithFormat:@"Disconnected - Killed: %@", reason];
-                } else if([[s.fail_info objectForKey:@"type"] isEqualToString:@"connecting_restricted"]) {
-                    if([[s.fail_info objectForKey:@"reason"] isEqualToString:reason])
-                        reason = @"You can’t connect to this server with a free account.";
-                    _serverStatus.text = reason;
+                } else if([type isEqualToString:@"connecting_restricted"]) {
+                    _serverStatus.text = @"You can’t connect to this server with a free account.";
+                } else if([type isEqualToString:@"connection_blocked"]) {
+                    _serverStatus.text = @"Disconnected - Connections to this server have been blocked";
                 } else {
+                    if([reason isEqualToString:@"pool_lost"])
+                        reason = @"Connection pool failed";
+                    else if([reason isEqualToString:@"no_pool"])
+                        reason = @"No available connection pools";
+                    else if([reason isEqualToString:@"enetdown"])
+                        reason = @"Network down";
+                    else if([reason isEqualToString:@"etimedout"] || [reason isEqualToString:@"timeout"])
+                        reason = @"Timed out";
+                    else if([reason isEqualToString:@"ehostunreach"])
+                        reason = @"Host unreachable";
+                    else if([reason isEqualToString:@"econnrefused"])
+                        reason = @"Connection refused";
+                    else if([reason isEqualToString:@"nxdomain"] || [reason isEqualToString:@"einval"])
+                        reason = @"Invalid hostname";
+                    else if([reason isEqualToString:@"server_ping_timeout"])
+                        reason = @"PING timeout";
+                    else if([reason isEqualToString:@"ssl_certificate_error"])
+                        reason = @"SSL certificate error";
+                    else if([reason isEqualToString:@"ssl_error"])
+                        reason = @"SSL error";
+                    else if([reason isEqualToString:@"crash"])
+                        reason = @"Connection crashed";
+                    else if([reason isEqualToString:@"networks"])
+                        reason = @"You've exceeded the connection limit for free accounts.";
+                    else if([reason isEqualToString:@"passworded_servers"])
+                        reason = @"You can't connect to passworded servers with free accounts.";
                     _serverStatus.text = [NSString stringWithFormat:@"Disconnected: %@", reason];
                 }
                 _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
