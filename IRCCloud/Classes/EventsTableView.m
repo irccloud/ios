@@ -822,11 +822,6 @@ int __timestampWidth;
     if(eid < _minEid || _minEid == 0)
         _minEid = eid;
     
-    if(eid == _currentCollapsedEid && e.eid == eid)
-        _currentGroupPosition = insertPos;
-    else
-        _currentGroupPosition = -1;
-    
     if(![lastDay isEqualToString:e.day]) {
         [_formatter setDateFormat:@"EEEE, MMMM dd, yyyy"];
         Event *d = [[Event alloc] init];
@@ -838,8 +833,6 @@ int __timestampWidth;
         d.bgColor = [UIColor timestampBackgroundColor];
         d.day = e.day;
         [_data insertObject:d atIndex:insertPos];
-        if(_currentGroupPosition > -1)
-            _currentGroupPosition++;
     }
     
     [_lock unlock];
@@ -912,7 +905,6 @@ int __timestampWidth;
     _minEid = _maxEid = _earliestEid = _newMsgs = _newHighlights = 0;
     _lastSeenEidPos = -1;
     _currentCollapsedEid = 0;
-    _currentGroupPosition = -1;
     _lastCollpasedDay = @"";
     [_collapsedEvents clear];
     _collapsedEvents.server = _server;
@@ -1016,6 +1008,7 @@ int __timestampWidth;
                 }
                 [[EventsDataSource sharedInstance] addEvent:e];
                 [self _addItem:e eid:e.eid];
+                e.groupEid = -1;
             }
         } else {
             _lastSeenEidPos = -1;
