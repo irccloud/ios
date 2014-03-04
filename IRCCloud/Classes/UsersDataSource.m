@@ -82,6 +82,17 @@
     }
 }
 
+-(User *)getUser:(NSString *)nick cid:(int)cid {
+    @synchronized(_users) {
+        for(NSDictionary *buffer in _users.allValues) {
+            User *u = [buffer objectForKey:[nick lowercaseString]];
+            if(u && u.cid == cid)
+                return u;
+        }
+        return nil;
+    }
+}
+
 -(void)removeUser:(NSString *)nick cid:(int)cid bid:(int)bid {
     @synchronized(_users) {
         [[_users objectForKey:@(bid)] removeObjectForKey:[nick lowercaseString]];

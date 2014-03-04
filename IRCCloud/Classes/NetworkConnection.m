@@ -624,19 +624,19 @@ NSLock *__parserLock = nil;
                    },
                    @"user_away": ^(IRCCloudJSONObject *object) {
                        [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
-                       [_buffers updateAway:[object objectForKey:@"msg"] buffer:object.bid];
+                       [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
                        if(!backlog)
                            [self postObject:object forEvent:kIRCEventAway];
                    },
                    @"away": ^(IRCCloudJSONObject *object) {
                        [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
-                       [_buffers updateAway:[object objectForKey:@"msg"] buffer:object.bid];
+                       [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
                        if(!backlog)
                            [self postObject:object forEvent:kIRCEventAway];
                    },
                    @"user_back": ^(IRCCloudJSONObject *object) {
                        [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
-                       [_buffers updateAway:@"" buffer:object.bid];
+                       [_buffers updateAway:@"" nick:[object objectForKey:@"nick"] server:object.cid];
                        if(!backlog)
                            [self postObject:object forEvent:kIRCEventAway];
                    },

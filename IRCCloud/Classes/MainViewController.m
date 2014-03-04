@@ -377,8 +377,9 @@
             break;
         case kIRCEventStatusChanged:
             [self _updateUserListVisibility];
-        case kIRCEventSelfBack:
         case kIRCEventAway:
+            [self _updateTitleArea];
+        case kIRCEventSelfBack:
         case kIRCEventConnectionLag:
             [self _updateServerStatus];
             break;
@@ -1242,11 +1243,23 @@
             _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
             _titleLabel.font = [UIFont boldSystemFontOfSize:18];
             _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            if(s.name.length)
-                _topicLabel.text = s.name;
-            else
-                _topicLabel.text = s.hostname;
+            if(_buffer.away_msg.length) {
+                _topicLabel.text = [NSString stringWithFormat:@"Away: %@", _buffer.away_msg];
+            } else {
+                User *u = [[UsersDataSource sharedInstance] getUser:_buffer.name cid:_buffer.cid];
+                if(u && u.away) {
+                    if(u.away_msg.length)
+                        _topicLabel.text = [NSString stringWithFormat:@"Away: %@", u.away_msg];
+                    else
+                        _topicLabel.text = @"Away";
+                } else {
+                    Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                    if(s.name.length)
+                        _topicLabel.text = s.name;
+                    else
+                        _topicLabel.text = s.hostname;
+                }
+            }
         }
     }
 }

@@ -62,7 +62,7 @@
 -(void)updateArchived:(int)archived buffer:(int)bid;
 -(void)updateTimeout:(int)timeout buffer:(int)bid;
 -(void)updateName:(NSString *)name buffer:(int)bid;
--(void)updateAway:(NSString *)away buffer:(int)bid;
+-(void)updateAway:(NSString *)away nick:(NSString *)nick server:(int)cid;
 -(void)removeBuffer:(int)bid;
 -(void)removeAllDataForBuffer:(int)bid;
 -(void)purgeInvalidBIDs;

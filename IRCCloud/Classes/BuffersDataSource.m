@@ -173,8 +173,8 @@
         buffer.name = name;
 }
 
--(void)updateAway:(NSString *)away buffer:(int)bid {
-    Buffer *buffer = [self getBuffer:bid];
+-(void)updateAway:(NSString *)away nick:(NSString *)nick server:(int)cid {
+    Buffer *buffer = [self getBufferWithName:nick server:cid];
     if(buffer)
         buffer.away_msg = away;
 }
