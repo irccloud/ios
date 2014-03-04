@@ -1653,7 +1653,7 @@
             [self.view insertSubview:_usersView.view atIndex:1];
             _borders.hidden = NO;
             CGRect frame = _titleView.frame;
-            frame.size.width = 900;
+            frame.size.width = 800;
             _titleView.frame = frame;
             frame = _serverStatusBar.frame;
             frame.origin.x = _buffersView.view.frame.size.width;
@@ -1672,7 +1672,7 @@
             _eventsView.view.frame = CGRectMake(0,0,(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height);
             _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             CGRect frame = _titleView.frame;
-            frame.size.width = 552;
+            frame.size.width = 500;
             _titleView.frame = frame;
             frame = _serverStatusBar.frame;
             frame.origin.x = 0;
