@@ -237,7 +237,7 @@
 }
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
+    if (editingStyle == UITableViewCellEditingStyleDelete && indexPath.row < _bans.count) {
         NSDictionary *row = [_bans objectAtIndex:indexPath.row];
         [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-b %@", [row objectForKey:@"mask"]] chan:[_event objectForKey:@"channel"] cid:_event.cid];
     }
