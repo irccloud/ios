@@ -143,6 +143,7 @@ typedef enum {
 @property BOOL background, reachabilityValid;
 @property (readonly) kIRCCloudReachability reachable;
 @property NSString *globalMsg;
+@property int failCount;
 
 +(NetworkConnection*)sharedInstance;
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password;

@@ -1032,9 +1032,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if([[[NSUserDefaults standardUserDefaults] stringForKey:@"session"] length] < 1)
         return;
     
-    if(_state == kIRCCloudStateConnecting)
-        return;
-    
     if(_socket) {
         WebSocket *s = _socket;
         _socket = nil;

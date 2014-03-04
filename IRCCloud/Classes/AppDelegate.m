@@ -280,6 +280,10 @@
 
 - (void)applicationWillResignActive:(UIApplication *)application {
     _conn.background = YES;
+    _conn.failCount = 0;
+    _conn.reconnectTimestamp = -1;
+    if(_conn.state == kIRCCloudStateDisconnected)
+        [_conn cancelIdleTimer];
     [_disconnectTimer invalidate];
     _disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:[[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] target:_conn selector:@selector(disconnect) userInfo:nil repeats:NO];
     if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {

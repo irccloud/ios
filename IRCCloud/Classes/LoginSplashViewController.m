@@ -111,7 +111,7 @@
 
     NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
     if(session != nil && [session length] > 0) {
-        if(_conn.state == kIRCCloudStateDisconnected) {
+        if(_conn.state != kIRCCloudStateConnected) {
             loginView.alpha = 0;
             loadingView.alpha = 1;
             progress.hidden = YES;
