@@ -765,9 +765,10 @@ static NSString * const ServerHasSSLKey = @"ssl";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     int row = indexPath.row;
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"connectioncell"];
+    NSString *identifier = [NSString stringWithFormat:@"connectioncell-%i-%i", indexPath.section, indexPath.row];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if(!cell)
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:@"connectioncell"];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
     
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.accessoryView = nil;
