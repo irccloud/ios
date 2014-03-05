@@ -1566,7 +1566,7 @@
         frame.size.height = _serverStatusBar.frame.origin.y;
         _eventsView.view.frame = frame;
         frame = _eventsView.bottomUnreadView.frame;
-        frame.origin.y -= _serverStatusBar.frame.size.height;
+        frame.origin.y = _serverStatusBar.frame.origin.y - frame.size.height;
         _eventsView.bottomUnreadView.frame = frame;
     } else {
         if(!_serverStatusBar.hidden) {
