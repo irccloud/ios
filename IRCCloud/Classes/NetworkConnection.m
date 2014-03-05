@@ -1086,6 +1086,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)disconnect {
+    CLS_LOG(@"Closing websocket");
     for(OOBFetcher *fetcher in _oobQueue) {
         [fetcher cancel];
     }

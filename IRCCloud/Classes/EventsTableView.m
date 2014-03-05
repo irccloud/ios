@@ -214,6 +214,7 @@ int __timestampWidth;
                 e.height = 0;
             }
             [_lock unlock];
+            _ready = NO;
             [self.tableView reloadData];
             if(_bottomRow >= 0) {
                 [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
@@ -221,9 +222,11 @@ int __timestampWidth;
             } else {
                 [self _scrollToBottom];
             }
+            _ready = YES;
         }
     }
     _lastOrientation = [UIApplication sharedApplication].statusBarOrientation;
+    [self updateUnread];
 }
 
 - (IBAction)loadMoreBacklogButtonPressed:(id)sender {
