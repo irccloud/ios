@@ -190,10 +190,12 @@ int __timestampWidth;
 
 - (void)viewWillDisappear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    if(_data.count && _buffer.scrolledUp)
+    if(_data.count && _buffer.scrolledUp) {
         _bottomRow = [[[self.tableView indexPathsForVisibleRows] lastObject] row];
-    else
+        _buffer.scrolledUpFrom = [[_data objectAtIndex:_bottomRow] eid];
+    } else {
         _bottomRow = -1;
+    }
 }
 
 -(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
@@ -843,6 +845,7 @@ int __timestampWidth;
     [_scrollTimer invalidate];
     _scrollTimer = nil;
     _requestingBacklog = NO;
+    _bottomRow = -1;
     if(_buffer && buffer.bid != _buffer.bid) {
         if(_data.count) {
             int lastRow = -1;
@@ -1095,6 +1098,8 @@ int __timestampWidth;
     
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
+    
+    [self.tableView flashScrollIndicators];
 }
 
 - (void)didReceiveMemoryWarning {
