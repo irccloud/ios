@@ -117,6 +117,11 @@
     else
         cell.textLabel.text = s.hostname;
     
+    if([s.status isEqualToString:@"connected_ready"])
+        cell.textLabel.textColor = [UIColor blackColor];
+    else
+        cell.textLabel.textColor = [UIColor grayColor];
+    
     cell.icon.image = [UIImage imageNamed:(s.ssl > 0)?@"world_shield":@"world"];
     
     return cell;
