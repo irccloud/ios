@@ -68,9 +68,9 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    _conn = [NetworkConnection sharedInstance];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":@"www.irccloud.com"}];
 #ifdef ENTERPRISE
+    IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
 #ifdef HOCKEYAPP_TOKEN_ENTERPRISE
     if(@HOCKEYAPP_TOKEN_ENTERPRISE.length) {
         [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@HOCKEYAPP_TOKEN_ENTERPRISE];
@@ -96,6 +96,7 @@
 #ifdef CRASHLYTICS_TOKEN
     [Crashlytics startWithAPIKey:@CRASHLYTICS_TOKEN];
 #endif
+    _conn = [NetworkConnection sharedInstance];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
