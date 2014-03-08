@@ -21,6 +21,7 @@
 @interface DisplayOptionsViewController : UITableViewController {
     Buffer *_buffer;
     UISwitch *_showMembers;
+    UISwitch *_notifyAll;
     UISwitch *_trackUnread;
     UISwitch *_showJoinPart;
     UISwitch *_collapseJoinPart;

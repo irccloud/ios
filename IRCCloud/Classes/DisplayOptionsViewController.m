@@ -41,6 +41,7 @@
 -(void)saveButtonPressed:(id)sender {
     NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[[NetworkConnection sharedInstance] prefs]];
     NSMutableDictionary *disableTrackUnread = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *notifyAll = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hideJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *expandJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
@@ -57,6 +58,17 @@
         else
             [prefs removeObjectForKey:@"channel-disableTrackUnread"];
 
+        if([[prefs objectForKey:@"channel-notifications-all"] isKindOfClass:[NSDictionary class]])
+            [notifyAll addEntriesFromDictionary:[prefs objectForKey:@"channel-notifications-all"]];
+        if(_notifyAll.on)
+            [notifyAll setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [notifyAll removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(notifyAll.count)
+            [prefs setObject:notifyAll forKey:@"channel-notifications-all"];
+        else
+            [prefs removeObjectForKey:@"channel-notifications-all"];
+        
         if([[prefs objectForKey:@"channel-hideJoinPart"] isKindOfClass:[NSDictionary class]])
             [hideJoinPart addEntriesFromDictionary:[prefs objectForKey:@"channel-hideJoinPart"]];
         if(_showJoinPart.on)
@@ -182,6 +194,11 @@
         else
             _trackUnread.on = YES;
         
+        if([[[prefs objectForKey:@"channel-notifications-all"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+            _notifyAll.on = YES;
+        else
+            _notifyAll.on = NO;
+        
         if([[[prefs objectForKey:@"channel-hideJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
             _showJoinPart.on = NO;
         else
@@ -225,6 +242,7 @@
 #endif
         
     _showMembers = [[UISwitch alloc] init];
+    _notifyAll = [[UISwitch alloc] init];
     _trackUnread = [[UISwitch alloc] init];
     _showJoinPart = [[UISwitch alloc] init];
     _collapseJoinPart = [[UISwitch alloc] init];
@@ -252,7 +270,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if([_buffer.type isEqualToString:@"channel"])
-        return 4;
+        return 5;
     else if([_buffer.type isEqualToString:@"console"])
         return 1;
     else
@@ -269,7 +287,7 @@
     cell.accessoryView = nil;
     
     if(![_buffer.type isEqualToString:@"channel"] && row > 0)
-        row++;
+        row+=2;
     
     switch(row) {
         case 0:
@@ -281,10 +299,14 @@
             cell.accessoryView = _showMembers;
             break;
         case 2:
+            cell.textLabel.text = @"Notify on all messages";
+            cell.accessoryView = _notifyAll;
+            break;
+        case 3:
             cell.textLabel.text = @"Show joins/parts";
             cell.accessoryView = _showJoinPart;
             break;
-        case 3:
+        case 4:
             cell.textLabel.text = @"Collapse joins/parts";
             cell.accessoryView = _collapseJoinPart;
             break;
