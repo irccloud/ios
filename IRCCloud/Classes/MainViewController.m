@@ -566,6 +566,11 @@
             } else {
                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
                 if(b && [e isImportant:b.type]) {
+                    Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
+                    Ignore *ignore = [[Ignore alloc] init];
+                    [ignore setIgnores:s.ignores];
+                    if(e.ignoreMask && [ignore match:e.ignoreMask])
+                        break;
                     if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
                         AudioServicesPlaySystemSound(alertSound);
                         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
