@@ -223,7 +223,7 @@ NSLock *__parserLock = nil;
         server.fail_info = [object objectForKey:@"fail_info"];
         server.away = (backlog && [_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
         server.ignores = [object objectForKey:@"ignores"];
-        if([[object objectForKey:@"order"] isKindOfClass:[NSDecimalNumber class]])
+        if([[object objectForKey:@"order"] isKindOfClass:[NSNumber class]])
             server.order = [[object objectForKey:@"order"] intValue];
         else
             server.order = 0;
@@ -1204,8 +1204,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_postLoadingProgress:(NSNumber *)progress {
-    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogProgressNotification object:progress];
-    
+    static NSNumber *lastProgress = nil;
+    if(!lastProgress || (int)(lastProgress.floatValue * 100) != (int)(progress.floatValue * 100))
+        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogProgressNotification object:progress];
+    lastProgress = progress;
 }
 
 -(void)_postConnectivityChange {

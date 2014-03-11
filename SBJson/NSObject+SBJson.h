@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2009-2011 Stig Brautaset. All rights reserved.
+ Copyright (C) 2009 Stig Brautaset. All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -27,10 +27,56 @@
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import "SBJsonParser.h"
-#import "SBJsonWriter.h"
-#import "SBJsonStreamParser.h"
-#import "SBJsonStreamParserAdapter.h"
-#import "SBJsonStreamWriter.h"
-#import "NSObject+SBJson.h"
+#import <Foundation/Foundation.h>
 
+#pragma mark JSON Writing
+
+/// Adds JSON generation to NSObject
+@interface NSObject (NSObject_SBJsonWriting)
+
+/**
+ Encodes the receiver into a JSON string
+
+ Although defined as a category on NSObject it is only defined for NSArray and NSDictionary.
+
+ @return the receiver encoded in JSON, or nil on error.
+
+ @warning Deprecated in Version 3.2; will be removed in 4.0
+
+ */
+- (NSString *)JSONRepresentation __attribute__ ((deprecated));
+
+@end
+
+
+#pragma mark JSON Parsing
+
+/// Adds JSON parsing methods to NSString
+@interface NSString (NSString_SBJsonParsing)
+
+/**
+ Decodes the receiver's JSON text
+
+ @return the NSDictionary or NSArray represented by the receiver, or nil on error.
+
+ @warning Deprecated in Version 3.2; will be removed in 4.0
+
+ */
+- (id)JSONValue __attribute__ ((deprecated));
+
+@end
+
+/// Adds JSON parsing methods to NSData
+@interface NSData (NSData_SBJsonParsing)
+
+/**
+ Decodes the receiver's JSON data
+
+ @return the NSDictionary or NSArray represented by the receiver, or nil on error.
+
+ @warning Deprecated in Version 3.2; will be removed in 4.0
+
+ */
+- (id)JSONValue __attribute__ ((deprecated));
+
+@end

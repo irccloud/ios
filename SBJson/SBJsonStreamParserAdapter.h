@@ -63,7 +63,6 @@ typedef enum {
 //IRCCloud: parse the top-level array objects as they arrive
 @optional
 - (void)parser:(SBJsonStreamParser*)parser foundObjectInArray:(NSDictionary*)dict;
-
 @end
 
 /**

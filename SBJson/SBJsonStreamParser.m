@@ -35,14 +35,10 @@
 #endif
 
 #import "SBJsonStreamParser.h"
-#import "SBJsonStreamTokeniser.h"
+#import "SBJsonTokeniser.h"
 #import "SBJsonStreamParserState.h"
 
-#define SBStringIsSurrogateHighCharacter(character) ((character >= 0xD800UL) && (character <= 0xDBFFUL))
-
-@implementation SBJsonStreamParser {
-    SBJsonStreamTokeniser *tokeniser;
-}
+@implementation SBJsonStreamParser
 
 @synthesize supportMultipleDocuments;
 @synthesize error;
@@ -59,7 +55,7 @@
 		maxDepth = 32u;
         stateStack = [[NSMutableArray alloc] initWithCapacity:maxDepth];
         state = [SBJsonStreamParserStateStart sharedInstance];
-		tokeniser = [[SBJsonStreamTokeniser alloc] init];
+		tokeniser = [[SBJsonTokeniser alloc] init];
 	}
 	return self;
 }
@@ -69,25 +65,24 @@
 
 - (NSString*)tokenName:(sbjson_token_t)token {
 	switch (token) {
-		case sbjson_token_array_open:
+		case sbjson_token_array_start:
 			return @"start of array";
 			break;
 
-		case sbjson_token_array_close:
+		case sbjson_token_array_end:
 			return @"end of array";
 			break;
 
-        case sbjson_token_integer:
-        case sbjson_token_real:
+		case sbjson_token_number:
 			return @"number";
 			break;
 
-        case sbjson_token_string:
-        case sbjson_token_encoded:
+		case sbjson_token_string:
 			return @"string";
 			break;
 
-        case sbjson_token_bool:
+		case sbjson_token_true:
+		case sbjson_token_false:
 			return @"boolean";
 			break;
 
@@ -95,19 +90,19 @@
 			return @"null";
 			break;
 
-        case sbjson_token_entry_sep:
+		case sbjson_token_keyval_separator:
 			return @"key-value separator";
 			break;
 
-        case sbjson_token_value_sep:
+		case sbjson_token_separator:
 			return @"value separator";
 			break;
 
-		case sbjson_token_object_open:
+		case sbjson_token_object_start:
 			return @"start of object";
 			break;
 
-		case sbjson_token_object_close:
+		case sbjson_token_object_end:
 			return @"end of object";
 			break;
 
@@ -177,10 +172,8 @@
             if ([state isError])
                 return SBJsonStreamParserError;
             
-            char *token;
-            NSUInteger token_len;
-            sbjson_token_t tok = [tokeniser getToken:&token length:&token_len];
-            
+            NSObject *token;
+            sbjson_token_t tok = [tokeniser getToken:&token];
             switch (tok) {
                 case sbjson_token_eof:
                     return [state parserShouldReturn:self];
@@ -200,72 +193,55 @@
                     }
                     
                     switch (tok) {
-                        case sbjson_token_object_open:
+                        case sbjson_token_object_start:
                             [self handleObjectStart];
                             break;
                             
-                        case sbjson_token_object_close:
+                        case sbjson_token_object_end:
                             [self handleObjectEnd: tok];
                             break;
                             
-                        case sbjson_token_array_open:
+                        case sbjson_token_array_start:
                             [self handleArrayStart];
                             break;
                             
-                        case sbjson_token_array_close:
+                        case sbjson_token_array_end:
                             [self handleArrayEnd: tok];
                             break;
                             
-                        case sbjson_token_value_sep:
-                        case sbjson_token_entry_sep:
+                        case sbjson_token_separator:
+                        case sbjson_token_keyval_separator:
                             [state parser:self shouldTransitionTo:tok];
                             break;
                             
-                        case sbjson_token_bool:
-                            [delegate parser:self foundBoolean:token[0] == 't'];
+                        case sbjson_token_true:
+                            [delegate parser:self foundBoolean:YES];
                             [state parser:self shouldTransitionTo:tok];
                             break;
                             
-
+                        case sbjson_token_false:
+                            [delegate parser:self foundBoolean:NO];
+                            [state parser:self shouldTransitionTo:tok];
+                            break;
+                            
                         case sbjson_token_null:
                             [delegate parserFoundNull:self];
                             [state parser:self shouldTransitionTo:tok];
                             break;
-
-                        case sbjson_token_integer: {
-                            NSString *string = [[NSString alloc] initWithBytes:token length:token_len encoding:NSUTF8StringEncoding];
-                            [delegate parser:self foundNumber:[NSDecimalNumber decimalNumberWithString:string]];
+                            
+                        case sbjson_token_number:
+                            [delegate parser:self foundNumber:(NSNumber*)token];
                             [state parser:self shouldTransitionTo:tok];
                             break;
-                        }
-
-                        case sbjson_token_real: {
-                            NSString *string = [[NSString alloc] initWithBytes:token length:token_len encoding:NSUTF8StringEncoding];
-                            [delegate parser:self foundNumber:[NSDecimalNumber decimalNumberWithString:string]];
-                            [state parser:self shouldTransitionTo:tok];
-                            break;
-                        }
-
-                        case sbjson_token_string: {
-                            NSString *string = [[NSString alloc] initWithBytes:token length:token_len encoding:NSUTF8StringEncoding];
+                            
+                        case sbjson_token_string:
                             if ([state needKey])
-                                [delegate parser:self foundObjectKey:string];
+                                [delegate parser:self foundObjectKey:(NSString*)token];
                             else
-                                [delegate parser:self foundString:string];
+                                [delegate parser:self foundString:(NSString*)token];
                             [state parser:self shouldTransitionTo:tok];
                             break;
-                        }
-
-                        case sbjson_token_encoded: {
-                            NSString *string = [self decodeStringToken:token length:token_len];
-                            if ([state needKey])
-                                [delegate parser:self foundObjectKey:string];
-                            else
-                                [delegate parser:self foundString:string];
-                            [state parser:self shouldTransitionTo:tok];
-                            break;
-                        }
-
+                            
                         default:
                             break;
                     }
@@ -274,60 +250,6 @@
         }
         return SBJsonStreamParserComplete;
     }
-}
-
-- (unichar)decodeHexQuad:(NSString *)quad offset:(int)offset {
-    unichar ch = 0;
-    for (NSUInteger i = 0; i < 4; i++) {
-        int c = [quad characterAtIndex:i+offset];
-        ch *= 16;
-        switch (c) {
-            case '0' ... '9': ch += c - '0'; break;
-            case 'a' ... 'f': ch += 10 + c - 'a'; break;
-            case 'A' ... 'F': ch += 10 + c - 'A'; break;
-            default: @throw @"FUT FUT FUT";
-        }
-    }
-    return ch;
-}
-
-- (NSString*)decodeStringToken:(char*)bytes length:(NSUInteger)len {
-    NSString *input = [[NSString alloc] initWithBytes:bytes length:len encoding:NSUTF8StringEncoding];
-    NSMutableString *string = [NSMutableString stringWithCapacity:len];
-
-    for (NSUInteger i = 0; i < input.length;) {
-        switch ([input characterAtIndex:i]) {
-            case '\\': {
-                switch ([input characterAtIndex:++i]) {
-                    case '"': [string appendString:@"\""]; i++; break;
-                    case '/': [string appendString:@"/"]; i++; break;
-                    case '\\': [string appendString:@"\\"]; i++; break;
-                    case 'b': [string appendString:@"\b"]; i++; break;
-                    case 'f': [string appendString:@"\f"]; i++; break;
-                    case 'n': [string appendString:@"\n"]; i++; break;
-                    case 'r': [string appendString:@"\r"]; i++; break;
-                    case 't': [string appendString:@"\t"]; i++; break;
-                    case 'u': {
-                        unichar hi = [self decodeHexQuad:input offset:i+1];
-                        i += 5;
-                        if (SBStringIsSurrogateHighCharacter(hi)) {
-                            // Skip past \u that we know is there..
-                            unichar lo = [self decodeHexQuad:input offset:i+2];
-                            i += 6;
-                            [string appendFormat:@"%C%C", hi, lo];
-                        } else {
-                            [string appendFormat:@"%C", hi];
-                        }
-                        break;
-                    }
-                    default: @throw @"FUT FUT FUT";
-                }
-                break;
-            }
-            default: [string appendFormat:@"%C", [input characterAtIndex:i++]]; break;
-        }
-    }
-    return string;
 }
 
 @end

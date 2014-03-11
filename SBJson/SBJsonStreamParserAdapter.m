@@ -94,7 +94,7 @@
             } else {
                 [array addObject:obj];
             }
-			break;
+            break;
 
 		case SBJsonStreamParserAdapterObject:
 			NSParameterAssert(keyStack.count);

@@ -32,6 +32,7 @@
 
 #import <Foundation/Foundation.h>
 
+@class SBJsonTokeniser;
 @class SBJsonStreamParser;
 @class SBJsonStreamParserState;
 
@@ -116,7 +117,10 @@ typedef enum {
  See also SBJsonStreamParserAdapter for more information.
 
  */
-@interface SBJsonStreamParser : NSObject
+@interface SBJsonStreamParser : NSObject {
+@private
+	SBJsonTokeniser *tokeniser;
+}
 
 @property (nonatomic, unsafe_unretained) SBJsonStreamParserState *state; // Private
 @property (nonatomic, readonly, strong) NSMutableArray *stateStack; // Private

@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 IRCCloud, Ltd. All rights reserved.
 //
 
-#import <SenTestingKit/SenTestingKit.h>
+#import <XCTest/XCTest.h>
 
-@interface IRCCloudTests : SenTestCase
+@interface IRCCloudTests : XCTestCase
 
 @end
