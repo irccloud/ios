@@ -68,7 +68,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:NetworksListLink]];
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
-            NSLog(@"Error fetching remote networks list, falling back to default. Error %i : %@", error.code, error.userInfo);
+            NSLog(@"Error fetching remote networks list, falling back to default. Error %li : %@", (long)error.code, error.userInfo);
             
             _networks = @[
                           @{@"network":@"IRCCloud", @"host":@"irc.irccloud.com", @"port":@(6667), @"SSL":@(NO)},
@@ -764,8 +764,8 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    int row = indexPath.row;
-    NSString *identifier = [NSString stringWithFormat:@"connectioncell-%i-%i", indexPath.section, indexPath.row];
+    NSUInteger row = indexPath.row;
+    NSString *identifier = [NSString stringWithFormat:@"connectioncell-%li-%li", (long)indexPath.section, (long)indexPath.row];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if(!cell)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];

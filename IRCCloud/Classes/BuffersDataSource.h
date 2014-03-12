@@ -51,7 +51,7 @@
 +(BuffersDataSource *)sharedInstance;
 -(void)clear;
 -(void)invalidate;
--(int)count;
+-(NSUInteger)count;
 -(int)firstBid;
 -(void)addBuffer:(Buffer *)buffer;
 -(Buffer *)getBuffer:(int)bid;

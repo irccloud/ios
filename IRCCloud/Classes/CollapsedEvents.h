@@ -78,7 +78,7 @@ typedef enum {
 -(void)clear;
 -(BOOL)addEvent:(Event *)event;
 -(NSString *)collapse:(BOOL)showChan;
--(int)count;
+-(NSUInteger)count;
 -(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize;
 -(void)setServer:(Server *)server;
 @end

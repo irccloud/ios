@@ -69,7 +69,7 @@ typedef NSUInteger WebSocketWaitingState;
 
 - (void)sendMessage:(WebSocketFragment *)aFragment;
 
-- (int)handleMessageData:(NSData *)aData offset:(NSUInteger)aOffset;
+- (NSInteger)handleMessageData:(NSData *)aData offset:(NSUInteger)aOffset;
 
 - (void)handleCompleteFragment:(WebSocketFragment *)aFragment;
 
@@ -237,7 +237,7 @@ WebSocketWaitingState waitingState;
         }
         else {
             NSMutableArray *fragments = [NSMutableArray array];
-            unsigned int fragmentCount = messageLength / self.config.maxPayloadSize;
+            NSUInteger fragmentCount = messageLength / self.config.maxPayloadSize;
             if (messageLength % self.config.maxPayloadSize) {
                 fragmentCount++;
             }
@@ -245,7 +245,7 @@ WebSocketWaitingState waitingState;
             //build fragments
             for (int i = 0; i < fragmentCount; i++) {
                 WebSocketFragment *fragment;
-                unsigned int fragmentLength = self.config.maxPayloadSize;
+                NSUInteger fragmentLength = self.config.maxPayloadSize;
                 if (i == 0) {
                     fragment = [WebSocketFragment fragmentWithOpCode:aOpCode isFinal:NO payload:[aMessage subdataWithRange:NSMakeRange(i * self.config.maxPayloadSize, fragmentLength)]];
                 }
@@ -368,15 +368,15 @@ WebSocketWaitingState waitingState;
     NSMutableData *data = [d mutableCopy];
     [data appendBytes:tail length:4];
     
-    unsigned full_length = [data length];
-    unsigned half_length = [data length] / 2;
+    NSUInteger full_length = [data length];
+    NSUInteger half_length = [data length] / 2;
     
     NSMutableData *decompressed = [NSMutableData dataWithLength: full_length + half_length];
     BOOL done = NO;
     int status;
     
     zstrm_in.next_in = (Bytef *)[data bytes];
-    zstrm_in.avail_in = [data length];
+    zstrm_in.avail_in = (unsigned int)[data length];
     zstrm_in.total_out = 0;
     
     while (!done) {
@@ -384,7 +384,7 @@ WebSocketWaitingState waitingState;
         if (zstrm_in.total_out >= [decompressed length])
             [decompressed increaseLengthBy: half_length];
         zstrm_in.next_out = [decompressed mutableBytes] + zstrm_in.total_out;
-        zstrm_in.avail_out = [decompressed length] - zstrm_in.total_out;
+        zstrm_in.avail_out = (unsigned int)([decompressed length] - zstrm_in.total_out);
         
         // Inflate another chunk.
         status = inflate(&zstrm_in, Z_FULL_FLUSH);
@@ -407,7 +407,7 @@ WebSocketWaitingState waitingState;
     if ([data length] == 0) return data;
     
     zstrm_out.next_in=(Bytef *)[data bytes];
-    zstrm_out.avail_in = [data length];
+    zstrm_out.avail_in = (unsigned int)[data length];
     zstrm_out.total_out = 0;
     
     NSMutableData *compressed = [NSMutableData dataWithLength:16384];  // 16K chunks for expansion
@@ -417,7 +417,7 @@ WebSocketWaitingState waitingState;
             [compressed increaseLengthBy: 16384];
         
         zstrm_out.next_out = [compressed mutableBytes] + zstrm_out.total_out;
-        zstrm_out.avail_out = [compressed length] - zstrm_out.total_out;
+        zstrm_out.avail_out = (unsigned int)([compressed length] - zstrm_out.total_out);
         
         deflate(&zstrm_out, Z_FULL_FLUSH);
         
@@ -513,11 +513,11 @@ WebSocketWaitingState waitingState;
 }
 
 // TODO: use a temporary buffer for the fragment payload instead of a queue of fragments
-- (int)handleMessageData:(NSData *)aData offset:(NSUInteger)aOffset {
+- (NSInteger)handleMessageData:(NSData *)aData offset:(NSUInteger)aOffset {
     //init
     NSUInteger lengthOfRemainder = 0;
     NSUInteger existingLength = 0;
-    int offset = -1;
+    NSInteger offset = -1;
 
     //grab last fragment, use if not complete
     WebSocketFragment *fragment = [pendingFragments lastObject];
@@ -572,12 +572,12 @@ WebSocketWaitingState waitingState;
     //validate continuation state
     if (fragment.isFinal) {
         if (fragment.opCode == MessageOpCodeContinuation && !isInContinuation) {
-            [self close:WebSocketCloseStatusProtocolError message:[NSString stringWithFormat:@"Cannot send the final fragment without a fragmented stream: isFinal=%@, opCode=%i", fragment.isFinal ? @"YES" : @"NO", fragment.opCode]];
+            [self close:WebSocketCloseStatusProtocolError message:[NSString stringWithFormat:@"Cannot send the final fragment without a fragmented stream: isFinal=%@, opCode=%li", fragment.isFinal ? @"YES" : @"NO", (long)fragment.opCode]];
         } else if (isInContinuation && !fragment.isControlFrame && fragment.opCode != MessageOpCodeContinuation) {
-            [self close:WebSocketCloseStatusProtocolError message:[NSString stringWithFormat:@"Cannot embed complete messages in a fragmented stream: isFinal=%@, opCode=%i", fragment.isFinal ? @"YES" : @"NO", fragment.opCode]];
+            [self close:WebSocketCloseStatusProtocolError message:[NSString stringWithFormat:@"Cannot embed complete messages in a fragmented stream: isFinal=%@, opCode=%li", fragment.isFinal ? @"YES" : @"NO", (long)fragment.opCode]];
         }
     } else if (isInContinuation && fragment.opCode != MessageOpCodeContinuation) {
-        [self close:WebSocketCloseStatusProtocolError message:[NSString stringWithFormat:@"Cannot embed non-control, non-continuation frames in a fragmented stream: isFinal=%@, opCode=%i", fragment.isFinal ? @"YES" : @"NO", fragment.opCode]];
+        [self close:WebSocketCloseStatusProtocolError message:[NSString stringWithFormat:@"Cannot embed non-control, non-continuation frames in a fragmented stream: isFinal=%@, opCode=%li", fragment.isFinal ? @"YES" : @"NO", (long)fragment.opCode]];
     } else if (!isInContinuation && fragment.opCode != MessageOpCodeText && fragment.opCode != MessageOpCodeBinary) {
         [self close:WebSocketCloseStatusProtocolError message:@"Illegal continuation start frame"];
     }
@@ -647,7 +647,7 @@ WebSocketWaitingState waitingState;
     // Initialize the context.
     CC_SHA1_Init(&ctx);
     // Perform the hash.
-    CC_SHA1_Update(&ctx, (void *) [aPlainText bytes], [aPlainText length]);
+    CC_SHA1_Update(&ctx, (void *) [aPlainText bytes], (CC_LONG)[aPlainText length]);
     // Finalize the output.
     CC_SHA1_Final(hashBytes, &ctx);
 
@@ -689,7 +689,7 @@ WebSocketWaitingState waitingState;
     } else if (self.config.version == WebSocketVersionRFC6455) {
         [headers addObject:[HandshakeHeader headerWithValue:[NSString stringWithFormat:@"%i", 13] forKey:@"Sec-WebSocket-Version"]];
     } else {
-        [headers addObject:[HandshakeHeader headerWithValue:[NSString stringWithFormat:@"%i", self.config.version] forKey:@"Sec-WebSocket-Version"]];
+        [headers addObject:[HandshakeHeader headerWithValue:[NSString stringWithFormat:@"%lu", (unsigned long)self.config.version] forKey:@"Sec-WebSocket-Version"]];
     }
 
     //handle protocol
@@ -1191,9 +1191,9 @@ WebSocketWaitingState waitingState;
     }
     else if (aTag == TagMessage) {
         //handle data
-        int offset = 0;
+        NSInteger offset = 0;
         do {
-            offset = [self handleMessageData:aData offset:(NSUInteger) offset];
+            offset = [self handleMessageData:aData offset:offset];
         } while (offset >= 0);
 
         //keep reading

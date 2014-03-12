@@ -24,7 +24,6 @@
     int _port;
     NSString *_nick;
     NSString *_status;
-    int _lag;
     int _ssl;
     NSString *_realname;
     NSString *_server_pass;
@@ -41,7 +40,7 @@
     int _order;
     NSString *_MODE_OWNER, *_MODE_ADMIN, *_MODE_OP, *_MODE_HALFOP, *_MODE_VOICED;
 }
-@property int cid, port, ssl, lag, order;
+@property int cid, port, ssl, order;
 @property NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED;
 @property NSDictionary *fail_info, *isupport, *PREFIX;
 @property NSArray *ignores;
@@ -60,8 +59,7 @@
 -(Server *)getServer:(NSString *)hostname SSL:(BOOL)ssl;
 -(void)removeServer:(int)cid;
 -(void)removeAllDataForServer:(int)cid;
--(int)count;
--(void)updateLag:(long)lag server:(int)cid;
+-(NSUInteger)count;
 -(void)updateNick:(NSString *)nick server:(int)cid;
 -(void)updateStatus:(NSString *)status failInfo:(NSDictionary *)failInfo server:(int)cid;
 -(void)updateAway:(NSString *)away server:(int)cid;

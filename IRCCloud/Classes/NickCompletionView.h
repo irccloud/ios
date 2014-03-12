@@ -23,6 +23,6 @@
 @property (nonatomic, assign) id<NickCompletionViewDelegate> completionDelegate;
 @property int selection;
 -(void)setSuggestions:(NSArray *)suggestions;
--(int)count;
+-(NSUInteger)count;
 -(NSString *)suggestion;
 @end

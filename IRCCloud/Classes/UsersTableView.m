@@ -128,7 +128,7 @@
          @"countColor":countColor,
          @"symbol":symbol
          }];
-        int size = data.count;
+        NSUInteger size = data.count;
         first = 1;
         for(User *user in users) {
             if(sectionTitles != nil) {
@@ -294,7 +294,7 @@
     UsersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"userscell"];
     if(!cell)
         cell = [[UsersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"userscell"];
-    int idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
+    NSUInteger idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
     NSDictionary *row = [_data objectAtIndex:idx];
     cell.type = [[row objectForKey:@"type"] intValue];
     cell.contentView.backgroundColor = [row objectForKey:@"bgColor"];
@@ -380,7 +380,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    int idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
+    NSUInteger idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
     if([[[_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
         [delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
 }
@@ -390,7 +390,7 @@
         NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
         if(indexPath) {
             if(indexPath.row < _data.count) {
-                int idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
+                NSUInteger idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
                 if([[[_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
                     [delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
             }

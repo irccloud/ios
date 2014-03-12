@@ -274,7 +274,7 @@ int __timestampWidth;
     NSTimeInterval eid = _buffer.scrolledUpFrom;
     if(eid <= 0) {
         Event *last;
-        for(int i = events.count - 1; i >= 0; i--) {
+        for(NSInteger i = events.count - 1; i >= 0; i--) {
             last = [events objectAtIndex:i];
             if(!last.pending && last.rowType != ROW_LASTSEENEID)
                 break;
@@ -608,7 +608,7 @@ int __timestampWidth;
     }
 }
 
--(void)updateTopUnread:(int)firstRow {
+-(void)updateTopUnread:(NSInteger)firstRow {
     int highlights = 0;
     for(NSNumber *pos in _unseenHighlightPositions) {
         if([pos intValue] > firstRow)
@@ -669,9 +669,9 @@ int __timestampWidth;
         }
     } else {
         if(firstRow - _lastSeenEidPos == 1) {
-            _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i unread message", firstRow - _lastSeenEidPos];
+            _topUnreadlabel.text = [msg stringByAppendingFormat:@"%li unread message", (long)(firstRow - _lastSeenEidPos)];
         } else if(firstRow - _lastSeenEidPos > 0) {
-            _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i unread messages", firstRow - _lastSeenEidPos];
+            _topUnreadlabel.text = [msg stringByAppendingFormat:@"%li unread messages", (long)(firstRow - _lastSeenEidPos)];
         } else {
             _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
             self.tableView.tableHeaderView = self.tableView.tableHeaderView;
@@ -688,7 +688,7 @@ int __timestampWidth;
             msg = @"mention";
         else
             msg = @"mentions";
-        _bottomHighlightsCountView.count = [NSString stringWithFormat:@"%i", _newHighlights];
+        _bottomHighlightsCountView.count = [NSString stringWithFormat:@"%li", (long)_newHighlights];
         CGSize size = [_bottomHighlightsCountView.count sizeWithFont:_bottomHighlightsCountView.font];
         size.width += 6;
         size.height = rect.size.height - 12;
@@ -705,9 +705,9 @@ int __timestampWidth;
         if(_newHighlights)
             msg = [msg stringByAppendingString:@" and "];
         if(_newMsgs - _newHighlights == 1)
-            msg = [msg stringByAppendingFormat:@"%i unread message", _newMsgs - _newHighlights];
+            msg = [msg stringByAppendingFormat:@"%li unread message", (long)(_newMsgs - _newHighlights)];
         else
-            msg = [msg stringByAppendingFormat:@"%i unread messages", _newMsgs - _newHighlights];
+            msg = [msg stringByAppendingFormat:@"%li unread messages", (long)(_newMsgs - _newHighlights)];
     }
     if(msg.length) {
         _bottomUndreadlabel.text = msg;
@@ -720,7 +720,7 @@ int __timestampWidth;
 
 -(void)_addItem:(Event *)e eid:(NSTimeInterval)eid {
     [_lock lock];
-    int insertPos = -1;
+    NSInteger insertPos = -1;
     NSString *lastDay = nil;
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
     if(!e.timestamp) {
@@ -851,7 +851,7 @@ int __timestampWidth;
     _bottomRow = -1;
     if(_buffer && buffer.bid != _buffer.bid) {
         if(_data.count) {
-            int lastRow = -1;
+            NSInteger lastRow = -1;
             NSArray *rows = [self.tableView indexPathsForVisibleRows];
             if(rows.count) {
                 lastRow = [[rows lastObject] row];
@@ -901,7 +901,7 @@ int __timestampWidth;
     [_lock lock];
     [_scrollTimer invalidate];
     _ready = NO;
-    int oldPosition = (_requestingBacklog && _data.count && [self.tableView indexPathsForVisibleRows].count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
+    NSInteger oldPosition = (_requestingBacklog && _data.count && [self.tableView indexPathsForVisibleRows].count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
     NSTimeInterval backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
     if(backlogEid < 1)
         backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
@@ -1071,8 +1071,8 @@ int __timestampWidth;
     
     NSArray *rows = self.tableView.indexPathsForVisibleRows;
     if(_data.count && rows.count) {
-        int firstRow = [[rows objectAtIndex:0] row];
-        int lastRow = [[rows lastObject] row];
+        NSInteger firstRow = [[rows objectAtIndex:0] row];
+        NSInteger lastRow = [[rows lastObject] row];
         if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
             if(_topUnreadView.alpha == 0) {
                 [UIView beginAnimations:nil context:nil];
@@ -1118,7 +1118,7 @@ int __timestampWidth;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     [_lock lock];
-    int count = _data.count;
+    NSInteger count = _data.count;
     [_lock unlock];
     return count;
 }
@@ -1334,8 +1334,8 @@ int __timestampWidth;
     if(!_ready || !_buffer)
         return;
 
-    int firstRow = -1;
-    int lastRow = -1;
+    NSInteger firstRow = -1;
+    NSInteger lastRow = -1;
     NSArray *rows = [self.tableView indexPathsForVisibleRows];
     if(rows.count) {
         firstRow = [[rows objectAtIndex:0] row];
@@ -1408,7 +1408,7 @@ int __timestampWidth;
                     e.formatted = nil;
                 }
                 NSTimeInterval oldPos = _buffer.scrolledUpFrom;
-                int lastRow = -1;
+                NSInteger lastRow = -1;
                 NSArray *rows = [self.tableView indexPathsForVisibleRows];
                 if(rows.count) {
                     lastRow = [[rows lastObject] row];

@@ -50,7 +50,7 @@
     NetworkConnection *_conn;
     
     NSTimeInterval _maxEid, _minEid, _currentCollapsedEid, _earliestEid, _eidToOpen;
-    int _newMsgs, _newHighlights, _lastSeenEidPos, _bottomRow;
+    NSInteger _newMsgs, _newHighlights, _lastSeenEidPos, _bottomRow;
     NSString *_lastCollpasedDay;
     BOOL _requestingBacklog, _ready;
     NSTimer *_heartbeatTimer;

@@ -77,7 +77,7 @@
 }
 
 
--(int)count {
+-(NSUInteger)count {
     return _suggestions.count;
 }
 

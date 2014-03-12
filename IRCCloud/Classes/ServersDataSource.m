@@ -139,16 +139,10 @@
     }
 }
 
--(int)count {
+-(NSUInteger)count {
     @synchronized(_servers) {
         return _servers.count;
     }
-}
-
--(void)updateLag:(long)lag server:(int)cid {
-    Server *server = [self getServer:cid];
-    if(server)
-        server.lag = lag;
 }
 
 -(void)updateNick:(NSString *)nick server:(int)cid {

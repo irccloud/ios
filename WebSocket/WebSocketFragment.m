@@ -104,7 +104,7 @@
 
 - (NSUInteger) messageLength
 {
-    if (payloadStart > 0 && payloadLength >= 0)
+    if (payloadStart > 0)
     {
         return (NSUInteger) payloadStart + payloadLength;
     }
@@ -144,7 +144,7 @@
 
 - (BOOL) parseHeader:(NSData *) aData from:(NSUInteger) aOffset {
     //get header data bits
-    int bufferLength = 14;
+    NSUInteger bufferLength = 14;
 
     NSData* data = aData;
 
@@ -341,8 +341,8 @@
     maskBytes[2] = (int)((aMask >> 8) & 0XFF);
     maskBytes[3] = (int)((aMask & 0XFF));
     unsigned char current;
-    int index = aRange.location;
-    int end = aRange.location + aRange.length;
+    NSUInteger index = aRange.location;
+    NSUInteger end = aRange.location + aRange.length;
     if (end > [aData length])
     {
         end = [aData length];
@@ -377,8 +377,8 @@
     maskBytes[2] = (int)((aMask >> 8) & 0XFF);
     maskBytes[3] = (int)((aMask & 0XFF));
     unsigned char current;
-    int index = aRange.location;
-    int end = aRange.location + aRange.length;
+    NSUInteger index = aRange.location;
+    NSUInteger end = aRange.location + aRange.length;
     if (end > [aData length])
     {
         end = [aData length];

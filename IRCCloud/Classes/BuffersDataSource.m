@@ -93,7 +93,7 @@
     }
 }
 
--(int)count {
+-(NSUInteger)count {
     @synchronized(_buffers) {
         return _buffers.count;
     }

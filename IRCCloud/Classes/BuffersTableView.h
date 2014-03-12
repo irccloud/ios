@@ -27,7 +27,7 @@
 
 @interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate> {
     NSMutableArray *_data;
-    int _selectedRow;
+    NSInteger _selectedRow;
     IBOutlet UIViewController<BuffersTableViewDelegate> *_delegate;
     NSMutableDictionary *_expandedArchives;
     Buffer *_selectedBuffer;
@@ -37,12 +37,12 @@
     IBOutlet UIControl *bottomUnreadIndicator;
     IBOutlet UIView *bottomUnreadIndicatorColor;
 
-    int _firstUnreadPosition;
-	int _lastUnreadPosition;
-	int _firstHighlightPosition;
-	int _lastHighlightPosition;
-    int _firstFailurePosition;
-    int _lastFailurePosition;
+    NSInteger _firstUnreadPosition;
+	NSInteger _lastUnreadPosition;
+	NSInteger _firstHighlightPosition;
+	NSInteger _lastHighlightPosition;
+    NSInteger _firstFailurePosition;
+    NSInteger _lastFailurePosition;
     
     UIAlertView *_alertView;
     ServersDataSource *_servers;

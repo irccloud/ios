@@ -182,14 +182,14 @@
 - (void)refresh {
     @synchronized(self) {
         NSMutableArray *data = [[NSMutableArray alloc] init];
-        int archiveCount = 0;
-        int firstHighlightPosition = -1;
-        int firstUnreadPosition = -1;
-        int firstFailurePosition = -1;
-        int lastHighlightPosition = -1;
-        int lastUnreadPosition = -1;
-        int lastFailurePosition = -1;
-        int selectedRow = -1;
+        NSInteger archiveCount = 0;
+        NSInteger firstHighlightPosition = -1;
+        NSInteger firstUnreadPosition = -1;
+        NSInteger firstFailurePosition = -1;
+        NSInteger lastHighlightPosition = -1;
+        NSInteger lastUnreadPosition = -1;
+        NSInteger lastFailurePosition = -1;
+        NSInteger selectedRow = -1;
         
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         
@@ -362,7 +362,7 @@
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if(data.count <= 1) {
                 NSLog(@"The buffer list doesn't have any buffers: %@", data);
-                NSLog(@"I should have %i servers with %i buffers", [_servers count], [_buffers count]);
+                NSLog(@"I should have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
             }
             _data = data;
             _selectedRow = selectedRow;
@@ -381,8 +381,8 @@
 -(void)_updateUnreadIndicators {
     NSArray *rows = [self.tableView indexPathsForVisibleRows];
     if(rows.count) {
-        int first = [[rows objectAtIndex:0] row];
-        int last = [[rows lastObject] row];
+        NSInteger first = [[rows objectAtIndex:0] row];
+        NSInteger last = [[rows lastObject] row];
         
         if(_firstFailurePosition != -1 && first > _firstFailurePosition) {
             topUnreadIndicator.hidden = NO;
@@ -429,7 +429,7 @@
 }
 
 - (void)joinBtnPressed:(UIButton *)sender {
-    Server *s = [_servers getServer:sender.tag];
+    Server *s = [_servers getServer:(int)sender.tag];
     _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     _alertView.tag = sender.tag;
@@ -456,7 +456,7 @@
                 key = [channel substringFromIndex:pos + 1];
                 channel = [channel substringToIndex:pos];
             }
-           [[NetworkConnection sharedInstance] join:channel key:key cid:alertView.tag];
+           [[NetworkConnection sharedInstance] join:channel key:key cid:(int)alertView.tag];
         }
     }
     
@@ -1055,10 +1055,10 @@
 }
 
 -(IBAction)topUnreadIndicatorClicked:(id)sender {
-    int first = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row] - 1;
-    int pos = 0;
+    NSInteger first = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row] - 1;
+    NSInteger pos = 0;
     
-    for(int i = first; i >= 0; i--) {
+    for(NSInteger i = first; i >= 0; i--) {
         NSDictionary *d = [_data objectAtIndex:i];
         if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
             pos = i - 1;
@@ -1073,10 +1073,10 @@
 }
 
 -(IBAction)bottomUnreadIndicatorClicked:(id)sender {
-    int last = [[[self.tableView indexPathsForVisibleRows] lastObject] row] + 1;
-    int pos = _data.count - 1;
+    NSInteger last = [[[self.tableView indexPathsForVisibleRows] lastObject] row] + 1;
+    NSInteger pos = _data.count - 1;
     
-    for(int i = last; i  < _data.count; i++) {
+    for(NSInteger i = last; i  < _data.count; i++) {
         NSDictionary *d = [_data objectAtIndex:i];
         if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
             pos = i + 1;

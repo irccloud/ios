@@ -55,8 +55,8 @@ typedef NSInteger PayloadLength;
 {
     BOOL isFinal;
     int mask;
-    int payloadStart;
-    int payloadLength;
+    NSUInteger payloadStart;
+    NSUInteger payloadLength;
     BOOL isRSV1;
     BOOL isRSV2;
     BOOL isRSV3;
@@ -82,8 +82,8 @@ typedef NSInteger PayloadLength;
 @property (nonatomic,assign) PayloadType payloadType;
 @property (nonatomic,retain) NSMutableData* fragment;
 @property (nonatomic,readonly) NSUInteger messageLength;
-@property (nonatomic,readonly) int payloadLength;
-@property (nonatomic,readonly) int payloadStart;
+@property (nonatomic,readonly) NSUInteger payloadLength;
+@property (nonatomic,readonly) NSUInteger payloadStart;
 
 @property (nonatomic,readonly) BOOL isDataValid;
 

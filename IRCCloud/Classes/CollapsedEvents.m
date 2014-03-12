@@ -597,7 +597,7 @@
     }
 }
 
--(int)count {
+-(NSUInteger)count {
     return _data.count;
 }
 
@@ -637,10 +637,10 @@
         normalizedNick = [r stringByReplacingMatchesInString:normalizedNick options:0 range:NSMakeRange(0, normalizedNick.length) withTemplate:@""];
         
         double hash = 0;
-        long lHash = 0;
+        int32_t lHash = 0;
         for(int i = 0; i < normalizedNick.length; i++) {
             hash = [normalizedNick characterAtIndex:i] + (double)(lHash << 6) + (double)(lHash << 16) - hash;
-            lHash = [[NSNumber numberWithDouble:hash] longValue];
+            lHash = [[NSNumber numberWithDouble:hash] intValue];
         }
         
         color = [colors objectAtIndex:abs([[NSNumber numberWithDouble:hash] longLongValue] % 14)];

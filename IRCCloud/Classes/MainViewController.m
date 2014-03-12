@@ -1051,7 +1051,7 @@
         if(!_sortedUsers)
             _sortedUsers = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
         NSString *text = [_message.text lowercaseString];
-        int lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
+        NSUInteger lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
         if(lastSpace != NSNotFound && lastSpace != text.length) {
             text = [text substringFromIndex:lastSpace + 1];
         }
@@ -1434,7 +1434,7 @@
 
 -(void)_updateServerStatus {
     Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-    if(s && (![s.status isEqualToString:@"connected_ready"] || s.lag > 2*1000*1000 || ([s.away isKindOfClass:[NSString class]] && s.away.length))) {
+    if(s && (![s.status isEqualToString:@"connected_ready"] || ([s.away isKindOfClass:[NSString class]] && s.away.length))) {
         if(_serverStatusBar.hidden) {
             _serverStatusBar.hidden = NO;
         }
@@ -1450,8 +1450,6 @@
                 } else {
                     _serverStatus.text = @"Away. Tap to come back.";
                 }
-            } else {
-                _serverStatus.text = [NSString stringWithFormat:@"Slow ping response from %@ (%is)", s.hostname, s.lag / 1000 / 1000];
             }
         } else if([s.status isEqualToString:@"quitting"]) {
             _serverStatus.text = @"Disconnecting";
@@ -1976,17 +1974,17 @@
         _message.text = [NSString stringWithFormat:@"%@: ",_selectedUser.nick];
     } else {
         NSString *from = _selectedUser.nick;
-        int oldPosition = _message.selectedRange.location;
+        NSInteger oldPosition = _message.selectedRange.location;
         NSString *text = _message.text;
-        int start = oldPosition - 1;
+        NSInteger start = oldPosition - 1;
         if(start > 0 && [text characterAtIndex:start] == ' ')
             start--;
         while(start > 0 && [text characterAtIndex:start] != ' ')
             start--;
         if(start < 0)
             start = 0;
-        int match = [text rangeOfString:from options:0 range:NSMakeRange(start, text.length - start)].location;
-        int end = oldPosition + from.length;
+        NSInteger match = [text rangeOfString:from options:0 range:NSMakeRange(start, text.length - start)].location;
+        NSInteger end = oldPosition + from.length;
         if(end > text.length - 1)
             end = text.length - 1;
         if(match >= 0 && match < end) {

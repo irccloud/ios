@@ -126,7 +126,7 @@ NSLock *__parserLock = nil;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
 	if([response statusCode] != 200) {
-        CLS_LOG(@"HTTP status code: %i", [response statusCode]);
+        CLS_LOG(@"HTTP status code: %li", (long)[response statusCode]);
 		CLS_LOG(@"HTTP headers: %@", [response allHeaderFields]);
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
@@ -214,7 +214,6 @@ NSLock *__parserLock = nil;
         server.port = [[object objectForKey:@"port"] intValue];
         server.nick = [object objectForKey:@"nick"];
         server.status = [object objectForKey:@"status"];
-        server.lag = [[object objectForKey:@"lag"] intValue];
         server.ssl = [[object objectForKey:@"ssl"] intValue];
         server.realname = [object objectForKey:@"realname"];
         server.server_pass = [object objectForKey:@"server_pass"];
@@ -338,7 +337,7 @@ NSLock *__parserLock = nil;
                    },
                    @"backlog_starts": ^(IRCCloudJSONObject *object) {
                        if([object objectForKey:@"numbuffers"]) {
-                           NSLog(@"I currently have %i servers with %i buffers", [_servers count], [_buffers count]);
+                           NSLog(@"I currently have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
                            _numBuffers = [[object objectForKey:@"numbuffers"] intValue];
                            _totalBuffers = 0;
                            NSLog(@"OOB includes has %i buffers", _numBuffers);
@@ -665,11 +664,6 @@ NSLock *__parserLock = nil;
                            [_servers updateMode:[object objectForKey:@"newmode"] server:object.cid];
                            [self postObject:object forEvent:kIRCEventUserMode];
                        }
-                   },
-                   @"connection_lag": ^(IRCCloudJSONObject *object) {
-                       [_servers updateLag:[[object objectForKey:@"lag"] intValue] server:object.cid];
-                       if(!backlog)
-                           [self postObject:object forEvent:kIRCEventConnectionLag];
                    },
                    @"isupport_params": ^(IRCCloudJSONObject *object) {
                        [_servers updateUserModes:[object objectForKey:@"usermodes"] server:object.cid];
@@ -1144,7 +1138,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocket:(WebSocket *)socket didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError {
     if(socket == _socket) {
-        CLS_LOG(@"Status Code: %i", aStatusCode);
+        CLS_LOG(@"Status Code: %lu", (unsigned long)aStatusCode);
         CLS_LOG(@"Close Message: %@", aMessage);
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
@@ -1337,7 +1331,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)_backlogStarted:(NSNotification *)notification {
     if(_awayOverride.count)
-        NSLog(@"Caught %i self_back events", _awayOverride.count);
+        NSLog(@"Caught %lu self_back events", (unsigned long)_awayOverride.count);
     _currentBid = -1;
     _currentCount = 0;
     _firstEID = 0;
@@ -1356,7 +1350,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(fetcher.bid > 0) {
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     } else {
-        NSLog(@"I now have %i servers with %i buffers", [_servers count], [_buffers count]);
+        NSLog(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
         [_buffers purgeInvalidBIDs];
         [_channels purgeInvalidChannels];
         _numBuffers = 0;

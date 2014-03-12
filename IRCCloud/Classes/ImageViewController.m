@@ -173,7 +173,7 @@
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
-            NSLog(@"Error fetching oembed. Error %i : %@", error.code, error.userInfo);
+            NSLog(@"Error fetching oembed. Error %li : %@", (long)error.code, error.userInfo);
             [self fail];
         } else {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
@@ -218,7 +218,7 @@
         [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
         [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
             if (error) {
-                NSLog(@"Error fetching cl.ly metadata. Error %i : %@", error.code, error.userInfo);
+                NSLog(@"Error fetching cl.ly metadata. Error %li : %@", (long)error.code, error.userInfo);
                 [self fail];
             } else {
                 SBJsonParser *parser = [[SBJsonParser alloc] init];
@@ -241,7 +241,7 @@
         [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
         [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
             if (error) {
-                NSLog(@"Error fetching MediaWiki metadata. Error %i : %@", error.code, error.userInfo);
+                NSLog(@"Error fetching MediaWiki metadata. Error %li : %@", (long)error.code, error.userInfo);
                 [self fail];
             } else {
                 SBJsonParser *parser = [[SBJsonParser alloc] init];
@@ -298,7 +298,7 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    NSLog(@"Couldn't download image. Error code %i: %@", error.code, error.localizedDescription);
+    NSLog(@"Couldn't download image. Error code %li: %@", (long)error.code, error.localizedDescription);
     [self fail];
 }
 

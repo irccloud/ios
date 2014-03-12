@@ -1052,7 +1052,7 @@ afterInheritingLabelAttributesAndConfiguringWithBlock:(NSMutableAttributedString
     [coder encodeFloat:self.leading forKey:@"leading"];
     [coder encodeFloat:self.lineHeightMultiple forKey:@"lineHeightMultiple"];
     [coder encodeUIEdgeInsets:self.textInsets forKey:@"textInsets"];
-    [coder encodeInteger:self.verticalAlignment forKey:@"verticalAlignment"];
+    [coder encodeInt:self.verticalAlignment forKey:@"verticalAlignment"];
     [coder encodeObject:self.truncationTokenString forKey:@"truncationTokenString"];
     [coder encodeObject:self.attributedText forKey:@"attributedText"];
 }
@@ -1114,7 +1114,7 @@ afterInheritingLabelAttributesAndConfiguringWithBlock:(NSMutableAttributedString
     }
 
     if ([coder containsValueForKey:@"verticalAlignment"]) {
-        self.verticalAlignment = [coder decodeIntegerForKey:@"verticalAlignment"];
+        self.verticalAlignment = [coder decodeIntForKey:@"verticalAlignment"];
     }
 
     if ([coder containsValueForKey:@"truncationTokenString"]) {

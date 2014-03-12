@@ -89,7 +89,7 @@
 
         if([[object objectForKey:@"server_extra"] length]) {
             [data appendAttributedString:[ColorFormatter format:@" (" defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil]];
-            int offset = data.length;
+            NSUInteger offset = data.length;
             [data appendAttributedString:[ColorFormatter format:[object objectForKey:@"server_extra"] defaultColor:[UIColor blackColor] mono:NO linkify:YES server:s links:&matches]];
             [data appendAttributedString:[ColorFormatter format:@")" defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil]];
             for(NSTextCheckingResult *result in matches) {
@@ -170,7 +170,7 @@
     if(channels.count) {
         [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ of:\n", group] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil]];
         for(NSString *channel in channels) {
-            int offset = data.length;
+            NSUInteger offset = data.length;
             [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@" • %@\n", channel] defaultColor:[UIColor blackColor] mono:NO linkify:YES server:s links:&matches]];
             for(NSTextCheckingResult *result in matches) {
                 NSURL *u;
