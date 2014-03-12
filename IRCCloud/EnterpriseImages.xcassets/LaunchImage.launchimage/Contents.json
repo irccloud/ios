@@ -79,6 +79,13 @@
       "scale" : "1x"
     },
     {
+      "orientation" : "portrait",
+      "idiom" : "ipad",
+      "extent" : "full-screen",
+      "filename" : "iOS7-Default-Portrait-1.png",
+      "scale" : "1x"
+    },
+    {
       "orientation" : "landscape",
       "idiom" : "ipad",
       "extent" : "to-status-bar",
@@ -97,6 +104,13 @@
       "idiom" : "ipad",
       "extent" : "to-status-bar",
       "filename" : "Default-Landscape@2x.png",
+      "scale" : "2x"
+    },
+    {
+      "orientation" : "landscape",
+      "idiom" : "ipad",
+      "extent" : "full-screen",
+      "filename" : "iOS7-Default-Landscape@2x-1.png",
       "scale" : "2x"
     }
   ],
