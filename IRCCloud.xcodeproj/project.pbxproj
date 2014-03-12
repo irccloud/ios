@@ -1354,8 +1354,8 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Users/sam/Projects/irccloud-ios",
-					"/Users/sam/Projects/irccloud-ios/HockeySDK.embeddedframework",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/HockeySDK.embeddedframework",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
@@ -1364,7 +1364,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/IRCCloud\"",
+					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				OTHER_CFLAGS = "-DENTERPRISE";
 				PRODUCT_NAME = "IRCCloud Enterprise";
@@ -1382,8 +1382,8 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Users/sam/Projects/irccloud-ios",
-					"/Users/sam/Projects/irccloud-ios/HockeySDK.embeddedframework",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/HockeySDK.embeddedframework",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
@@ -1392,7 +1392,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/IRCCloud\"",
+					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				OTHER_CFLAGS = (
 					"-DNS_BLOCK_ASSERTIONS=1",
@@ -1474,8 +1474,8 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Users/sam/Projects/irccloud-ios/HockeySDK.embeddedframework",
-					"/Users/sam/Projects/irccloud-ios",
+					"$(PROJECT_DIR)/HockeySDK.embeddedframework",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
@@ -1483,7 +1483,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/IRCCloud\"",
+					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				OTHER_CFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1501,8 +1501,8 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Users/sam/Projects/irccloud-ios/HockeySDK.embeddedframework",
-					"/Users/sam/Projects/irccloud-ios",
+					"$(PROJECT_DIR)/HockeySDK.embeddedframework",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
@@ -1510,7 +1510,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/IRCCloud\"",
+					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
