@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		1A73829B18D0A0760039FDB3 /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A73829A18D0A0760039FDB3 /* EnterpriseImages.xcassets */; };
 		1A73829C18D0A4C70039FDB3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A78F36817D5EDF3008965DB /* Images.xcassets */; };
+		1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */; };
+		1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */; };
 		1A78F36B17D5F29C008965DB /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A78F36A17D5F29C008965DB /* Icons.xcassets */; };
 		2200DB4518B7EDC000343583 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4418B7EDC000343583 /* HockeySDK.framework */; };
 		2200DB4718B7EDF100343583 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
@@ -299,6 +301,8 @@
 
 /* Begin PBXFileReference section */
 		1A73829A18D0A0760039FDB3 /* EnterpriseImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = EnterpriseImages.xcassets; sourceTree = "<group>"; };
+		1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = EnterpriseLogo.xcassets; sourceTree = "<group>"; };
+		1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Logo.xcassets; sourceTree = "<group>"; };
 		1A78F36817D5EDF3008965DB /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		1A78F36A17D5F29C008965DB /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
 		2200DB4418B7EDC000343583 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = HockeySDK.embeddedframework/HockeySDK.framework; sourceTree = "<group>"; };
@@ -776,6 +780,8 @@
 		228A05B416D3DB930029769C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */,
+				1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */,
 				22F5C4BC1791F205005E09A9 /* a.caf */,
 				1A78F36A17D5F29C008965DB /* Icons.xcassets */,
 				224FCF321787286000FC3879 /* licenses.txt */,
@@ -984,6 +990,7 @@
 				225D978A18AA995900065087 /* MainViewController_iPhone.xib in Resources */,
 				225D978B18AA995900065087 /* MainViewController_iPad.xib in Resources */,
 				225D978C18AA995900065087 /* LoginSplashViewController_iPad.xib in Resources */,
+				1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */,
 				225D978D18AA995900065087 /* Localizable.strings in Resources */,
 				225D978F18AA995900065087 /* ImageViewController.xib in Resources */,
 				225D979018AA995900065087 /* ARChromeActivity.png in Resources */,
@@ -1018,6 +1025,7 @@
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,
 				1A73829C18D0A4C70039FDB3 /* Images.xcassets in Resources */,
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
+				1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */,
 				225017661783434900066E71 /* ARChromeActivity@2x~ipad.png in Resources */,
 				225017671783434900066E71 /* ARChromeActivity~ipad.png in Resources */,
 				225017691783434900066E71 /* Safari.png in Resources */,
