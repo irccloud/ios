@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1A78F36917D5EDF3008965DB /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A78F36817D5EDF3008965DB /* Images.xcassets */; };
 		1A73829B18D0A0760039FDB3 /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A73829A18D0A0760039FDB3 /* EnterpriseImages.xcassets */; };
+		1A73829C18D0A4C70039FDB3 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A78F36817D5EDF3008965DB /* Images.xcassets */; };
 		1A78F36B17D5F29C008965DB /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A78F36A17D5F29C008965DB /* Icons.xcassets */; };
 		2200DB4518B7EDC000343583 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4418B7EDC000343583 /* HockeySDK.framework */; };
 		2200DB4718B7EDF100343583 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
@@ -149,7 +149,6 @@
 		225D978B18AA995900065087 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
 		225D978C18AA995900065087 /* LoginSplashViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 224027EC1702028F008940B1 /* LoginSplashViewController_iPad.xib */; };
 		225D978D18AA995900065087 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22D4F9101743F3790095EE8F /* Localizable.strings */; };
-		225D978E18AA995900065087 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A78F36817D5EDF3008965DB /* Images.xcassets */; };
 		225D978F18AA995900065087 /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
 		225D979018AA995900065087 /* ARChromeActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017441783434800066E71 /* ARChromeActivity.png */; };
 		225D979118AA995900065087 /* ARChromeActivity@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017451783434800066E71 /* ARChromeActivity@2x.png */; };
@@ -986,7 +985,6 @@
 				225D978B18AA995900065087 /* MainViewController_iPad.xib in Resources */,
 				225D978C18AA995900065087 /* LoginSplashViewController_iPad.xib in Resources */,
 				225D978D18AA995900065087 /* Localizable.strings in Resources */,
-				225D978E18AA995900065087 /* Images.xcassets in Resources */,
 				225D978F18AA995900065087 /* ImageViewController.xib in Resources */,
 				225D979018AA995900065087 /* ARChromeActivity.png in Resources */,
 				225D979118AA995900065087 /* ARChromeActivity@2x.png in Resources */,
@@ -1016,9 +1014,9 @@
 				2236F64216DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */,
 				224027ED17020290008940B1 /* LoginSplashViewController_iPad.xib in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
-				1A78F36917D5EDF3008965DB /* Images.xcassets in Resources */,
 				2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */,
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,
+				1A73829C18D0A4C70039FDB3 /* Images.xcassets in Resources */,
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
 				225017661783434900066E71 /* ARChromeActivity@2x~ipad.png in Resources */,
 				225017671783434900066E71 /* ARChromeActivity~ipad.png in Resources */,
