@@ -368,7 +368,7 @@
 		2251693217B5A8040093ADC5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/TUSafariActivity.strings; sourceTree = "<group>"; };
 		2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelListTableViewController.m; sourceTree = "<group>"; };
 		2253BA261770CDC500CCA77F /* ChannelListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelListTableViewController.h; sourceTree = "<group>"; };
-		225D979F18AA995900065087 /* IRCCloud Enterprise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "IRCCloud Enterprise.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		225D979F18AA995900065087 /* IRCEnterprise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCEnterprise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IRCCloud-Enterprise-Info.plist"; sourceTree = "<group>"; };
 		22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollapsedEvents.h; sourceTree = "<group>"; };
 		22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollapsedEvents.m; sourceTree = "<group>"; };
@@ -604,7 +604,7 @@
 			children = (
 				228A056C16D3DABA0029769C /* IRCCloud.app */,
 				228A059516D3DABB0029769C /* IRCCloudTests.octest */,
-				225D979F18AA995900065087 /* IRCCloud Enterprise.app */,
+				225D979F18AA995900065087 /* IRCEnterprise.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -887,7 +887,7 @@
 			);
 			name = "IRCCloud Enterprise";
 			productName = IRCCloud;
-			productReference = 225D979F18AA995900065087 /* IRCCloud Enterprise.app */;
+			productReference = 225D979F18AA995900065087 /* IRCEnterprise.app */;
 			productType = "com.apple.product-type.application";
 		};
 		228A056B16D3DABA0029769C /* IRCCloud */ = {
@@ -1367,7 +1367,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				OTHER_CFLAGS = "-DENTERPRISE";
-				PRODUCT_NAME = "IRCCloud Enterprise";
+				PRODUCT_NAME = IRCEnterprise;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1398,7 +1398,7 @@
 					"-DNS_BLOCK_ASSERTIONS=1",
 					"-DENTERPRISE",
 				);
-				PRODUCT_NAME = "IRCCloud Enterprise";
+				PRODUCT_NAME = IRCEnterprise;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
