@@ -268,6 +268,7 @@
             break;
         case kIRCEventChannelInit:
         case kIRCEventChannelTopic:
+        case kIRCEventChannelMode:
             [self _updateTitleArea];
             [self _updateUserListVisibility];
             break;
