@@ -937,6 +937,9 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "IRCCloud, Ltd.";
 				TargetAttributes = {
+					225D973618AA995900065087 = {
+						DevelopmentTeam = GED45EQAGA;
+					};
 					228A056B16D3DABA0029769C = {
 						DevelopmentTeam = GED45EQAGA;
 					};
@@ -1487,7 +1490,6 @@
 				);
 				OTHER_CFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1514,7 +1516,6 @@
 				);
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

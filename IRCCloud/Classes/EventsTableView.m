@@ -539,7 +539,7 @@ int __timestampWidth;
         }
     }
     
-    if(event.ignoreMask.length && ![type isEqualToString:@"user_channel_mode"] && [type rangeOfString:@"kicked"].location == NSNotFound) {
+    if(event.ignoreMask.length && ([type isEqualToString:@"buffer_msg"] || [type isEqualToString:@"buffer_me_msg"] || [type isEqualToString:@"callerid"] ||[type isEqualToString:@"channel_invite"] ||[type isEqualToString:@"wallops"] ||[type isEqualToString:@"notice"])) {
         if((!_buffer || ![_buffer.type isEqualToString:@"conversation"]) && [_ignore match:event.ignoreMask]) {
             if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0)
                 [self sendHeartbeat];
