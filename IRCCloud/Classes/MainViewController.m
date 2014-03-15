@@ -489,6 +489,7 @@
         case kIRCEventUserInfo:
         case kIRCEventPart:
         case kIRCEventKick:
+            [self _updateTitleArea];
             [self _updateUserListVisibility];
             break;
         case kIRCEventFailureMsg:
@@ -2153,7 +2154,7 @@
 }
 
 -(IBAction)titleAreaPressed:(id)sender {
-    if([_buffer.type isEqualToString:@"channel"]) {
+    if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
         ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
