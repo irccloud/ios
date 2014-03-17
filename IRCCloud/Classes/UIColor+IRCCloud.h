@@ -61,4 +61,7 @@
 +(UIColor *)navBarColor;
 +(UIColor *)lightLinkColor;
 +(UIColor *)bufferBlueColor;
++(UIColor *)unreadBorderColor;
++(UIColor *)highlightBorderColor;
++(UIColor *)networkErrorBorderColor;
 @end

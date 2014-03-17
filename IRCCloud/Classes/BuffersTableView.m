@@ -100,7 +100,7 @@
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
-    frame.size.width -= 6;
+    frame.size.width -= 8;
     if(_type == TYPE_SERVER || _type == TYPE_ADD_NETWORK) {
         frame.origin.y += 6;
         frame.size.height -= (_type == TYPE_ADD_NETWORK)?12:6;
@@ -388,6 +388,7 @@
             topUnreadIndicator.hidden = NO;
             topUnreadIndicator.alpha = 1;
             topUnreadIndicatorColor.backgroundColor = [UIColor networkErrorBackgroundColor];
+            topUnreadIndicatorBorder.backgroundColor = [UIColor networkErrorBorderColor];
         } else {
             topUnreadIndicator.hidden = YES;
             topUnreadIndicator.alpha = 0;
@@ -396,18 +397,21 @@
             topUnreadIndicator.hidden = NO;
             topUnreadIndicator.alpha = 1;
             topUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+            topUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
         }
         if((_lastHighlightPosition != -1 && first > _lastHighlightPosition) ||
            (_firstHighlightPosition != -1 && first > _firstHighlightPosition)) {
             topUnreadIndicator.hidden = NO;
             topUnreadIndicator.alpha = 1;
             topUnreadIndicatorColor.backgroundColor = [UIColor redColor];
+            topUnreadIndicatorBorder.backgroundColor = [UIColor highlightBorderColor];
         }
         
         if(_lastFailurePosition != -1 && last < _lastFailurePosition) {
             bottomUnreadIndicator.hidden = NO;
             bottomUnreadIndicator.alpha = 1;
             bottomUnreadIndicatorColor.backgroundColor = [UIColor networkErrorBackgroundColor];
+            bottomUnreadIndicatorBorder.backgroundColor = [UIColor networkErrorBorderColor];
         } else {
             bottomUnreadIndicator.hidden = YES;
             bottomUnreadIndicator.alpha = 0;
@@ -416,12 +420,14 @@
             bottomUnreadIndicator.hidden = NO;
             bottomUnreadIndicator.alpha = 1;
             bottomUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+            bottomUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
         }
         if((_firstHighlightPosition != -1 && last < _firstHighlightPosition) ||
            (_lastHighlightPosition != -1 && last < _lastHighlightPosition)) {
             bottomUnreadIndicator.hidden = NO;
             bottomUnreadIndicator.alpha = 1;
             bottomUnreadIndicatorColor.backgroundColor = [UIColor redColor];
+            bottomUnreadIndicatorBorder.backgroundColor = [UIColor highlightBorderColor];
         }
     }
     topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y,self.view.frame.size.width, 40);
@@ -477,37 +483,53 @@
     }
     
     if(!topUnreadIndicatorColor) {
-        topUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,16)];
+        topUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,15)];
         topUnreadIndicatorColor.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         topUnreadIndicatorColor.userInteractionEnabled = NO;
         topUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
     }
 
+    if(!topUnreadIndicatorBorder) {
+        topUnreadIndicatorBorder = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,16)];
+        topUnreadIndicatorBorder.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        topUnreadIndicatorBorder.userInteractionEnabled = NO;
+        topUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
+        [topUnreadIndicatorBorder addSubview:topUnreadIndicatorColor];
+    }
+    
     if(!topUnreadIndicator) {
         topUnreadIndicator = [[UIControl alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,40)];
         topUnreadIndicator.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         topUnreadIndicator.autoresizesSubviews = YES;
         topUnreadIndicator.userInteractionEnabled = YES;
         topUnreadIndicator.backgroundColor = [UIColor clearColor];
-        [topUnreadIndicator addSubview: topUnreadIndicatorColor];
+        [topUnreadIndicator addSubview: topUnreadIndicatorBorder];
         [topUnreadIndicator addTarget:self action:@selector(topUnreadIndicatorClicked:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview: topUnreadIndicator];
     }
 
     if(!bottomUnreadIndicatorColor) {
-        bottomUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,24,self.view.frame.size.width,16)];
+        bottomUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,1,self.view.frame.size.width,15)];
         bottomUnreadIndicatorColor.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         bottomUnreadIndicatorColor.userInteractionEnabled = NO;
         bottomUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
     }
 
+    if(!bottomUnreadIndicatorBorder) {
+        bottomUnreadIndicatorBorder = [[UIView alloc] initWithFrame:CGRectMake(0,24,self.view.frame.size.width,16)];
+        bottomUnreadIndicatorBorder.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        bottomUnreadIndicatorBorder.userInteractionEnabled = NO;
+        bottomUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
+        [bottomUnreadIndicatorBorder addSubview:bottomUnreadIndicatorColor];
+    }
+    
     if(!bottomUnreadIndicator) {
         bottomUnreadIndicator = [[UIControl alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,40)];
         bottomUnreadIndicator.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
         bottomUnreadIndicator.autoresizesSubviews = YES;
         bottomUnreadIndicator.userInteractionEnabled = YES;
         bottomUnreadIndicator.backgroundColor = [UIColor clearColor];
-        [bottomUnreadIndicator addSubview: bottomUnreadIndicatorColor];
+        [bottomUnreadIndicator addSubview: bottomUnreadIndicatorBorder];
         [bottomUnreadIndicator addTarget:self action:@selector(bottomUnreadIndicatorClicked:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview: bottomUnreadIndicator];
     }

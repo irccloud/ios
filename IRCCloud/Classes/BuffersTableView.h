@@ -34,8 +34,10 @@
     
     IBOutlet UIControl *topUnreadIndicator;
     IBOutlet UIView *topUnreadIndicatorColor;
+    IBOutlet UIView *topUnreadIndicatorBorder;
     IBOutlet UIControl *bottomUnreadIndicator;
     IBOutlet UIView *bottomUnreadIndicatorColor;
+    IBOutlet UIView *bottomUnreadIndicatorBorder;
 
     NSInteger _firstUnreadPosition;
 	NSInteger _lastUnreadPosition;

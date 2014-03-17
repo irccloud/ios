@@ -244,4 +244,13 @@ UIImage *__newMsgsBackgroundImage;
 +(UIColor *)lightLinkColor {
     return [UIColor colorWithRed:0.612 green:0.78 blue:1 alpha:1];
 }
++(UIColor *)unreadBorderColor {
+    return [UIColor colorWithRed:0.071 green:0.243 blue:0.573 alpha:1];
+}
++(UIColor *)highlightBorderColor {
+    return [UIColor colorWithRed:0.824 green:0 blue:0.016 alpha:1];
+}
++(UIColor *)networkErrorBorderColor{
+    return [UIColor colorWithRed:0.859 green:0.702 blue:0 alpha:1];
+}
 @end
