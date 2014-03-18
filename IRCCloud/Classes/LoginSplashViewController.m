@@ -217,6 +217,7 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [username resignFirstResponder];
     [password resignFirstResponder];
+    [host resignFirstResponder];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
