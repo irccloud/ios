@@ -23,6 +23,7 @@
 #import "UIColor+IRCCloud.h"
 #import "ColorFormatter.h"
 #import "config.h"
+#import "SVWebViewController.h"
 
 //From: http://stackoverflow.com/a/19313559
 @interface NavBarHax : UINavigationBar
@@ -157,8 +158,11 @@
                                                               @"irccloud://"
 #endif
                                                               ]
-                                                createNewTab:NO]))
-                [[UIApplication sharedApplication] openURL:url];
+                                                                                                             createNewTab:NO])) {
+                SVWebViewController *controller = [[SVWebViewController alloc] initWithURL:url];
+                [self.mainViewController.navigationController pushViewController:controller animated:YES];
+            }
+                
         } else {
             _pendingURL = url;
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Choose A Browser" message:@"Would you prefer to open links in Safari or Chrome?" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Chrome", @"Safari", nil];
