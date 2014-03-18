@@ -876,6 +876,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 225D979C18AA995900065087 /* Build configuration list for PBXNativeTarget "IRCCloud Enterprise" */;
 			buildPhases = (
+				22DE05B018D8C16200590FC3 /* ShellScript */,
 				225D973718AA995900065087 /* Sources */,
 				225D977818AA995900065087 /* Frameworks */,
 				225D978718AA995900065087 /* Resources */,
@@ -894,6 +895,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 228A05A716D3DABB0029769C /* Build configuration list for PBXNativeTarget "IRCCloud" */;
 			buildPhases = (
+				22DE05AF18D8B88900590FC3 /* ShellScript */,
 				228A056816D3DABA0029769C /* Sources */,
 				228A056916D3DABA0029769C /* Frameworks */,
 				228A056A16D3DABA0029769C /* Resources */,
@@ -1094,6 +1096,32 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+		22DE05AF18D8B88900590FC3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo -n \"#define GIT_VERSION \" > $PROJECT_DIR/IRCCloud/InfoPlist.h\ngit rev-parse --short HEAD >> $PROJECT_DIR/IRCCloud/InfoPlist.h\ntouch IRCCloud/IRCCloud-Info.plist";
+		};
+		22DE05B018D8C16200590FC3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo -n \"#define GIT_VERSION \" > $PROJECT_DIR/IRCCloud/InfoPlist.h\ngit rev-parse --short HEAD >> $PROJECT_DIR/IRCCloud/InfoPlist.h\ntouch IRCCloud/IRCCloud-Enterprise-Info.plist";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1353,8 +1381,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -1363,6 +1390,8 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				INFOPLIST_FILE = "IRCCloud/IRCCloud-Enterprise-Info.plist";
+				INFOPLIST_PREFIX_HEADER = IRCCloud/InfoPlist.h;
+				INFOPLIST_PREPROCESS = YES;
 				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
@@ -1371,7 +1400,7 @@
 				);
 				OTHER_CFLAGS = "-DENTERPRISE";
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "B1AA194E-282F-4845-918C-50CEB4D81591";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1381,8 +1410,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -1391,6 +1419,8 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				INFOPLIST_FILE = "IRCCloud/IRCCloud-Enterprise-Info.plist";
+				INFOPLIST_PREFIX_HEADER = IRCCloud/InfoPlist.h;
+				INFOPLIST_PREPROCESS = YES;
 				INFOPLIST_PREPROCESSOR_DEFINITIONS = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
@@ -1402,7 +1432,7 @@
 					"-DENTERPRISE",
 				);
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "857EEE44-ACBB-490C-9153-60303596CD63";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -1473,8 +1503,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/HockeySDK.embeddedframework",
@@ -1483,6 +1512,8 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				INFOPLIST_FILE = "IRCCloud/IRCCloud-Info.plist";
+				INFOPLIST_PREFIX_HEADER = IRCCloud/InfoPlist.h;
+				INFOPLIST_PREPROCESS = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1490,6 +1521,7 @@
 				);
 				OTHER_CFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "B1AA194E-282F-4845-918C-50CEB4D81591";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1499,8 +1531,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/HockeySDK.embeddedframework",
@@ -1509,6 +1540,8 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				INFOPLIST_FILE = "IRCCloud/IRCCloud-Info.plist";
+				INFOPLIST_PREFIX_HEADER = IRCCloud/InfoPlist.h;
+				INFOPLIST_PREPROCESS = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1516,6 +1549,7 @@
 				);
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "9820D946-B063-427D-902C-CCEFEED88954";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

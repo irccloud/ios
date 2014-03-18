@@ -2,6 +2,8 @@ IRCCloud.xcodeproj/project.xcworkspace
 IRCCloud.xcodeproj/xcuserdata
 build/
 IRCCloud/config.h
+IRCCloud/InfoPlist.h
+Crashlytics.framework/*
 /*.png
 /*.sh
 /*.mobileprovision
