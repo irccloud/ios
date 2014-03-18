@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		22DE05B118D8CA0700590FC3 /* GitRevision */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 22DE05B218D8CA0800590FC3 /* Build configuration list for PBXAggregateTarget "GitRevision" */;
+			buildPhases = (
+				22DE05B518D8CA2C00590FC3 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = GitRevision;
+			productName = GitRevision;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */; };
 		1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */; };
@@ -296,6 +310,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = 228A056B16D3DABA0029769C;
 			remoteInfo = IRCCloud;
+		};
+		22DE05B618D8CA4800590FC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22DE05B118D8CA0700590FC3;
+			remoteInfo = GitRevision;
+		};
+		22DE05B818D8CA4F00590FC3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22DE05B118D8CA0700590FC3;
+			remoteInfo = GitRevision;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -876,7 +904,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 225D979C18AA995900065087 /* Build configuration list for PBXNativeTarget "IRCCloud Enterprise" */;
 			buildPhases = (
-				22DE05B018D8C16200590FC3 /* ShellScript */,
 				225D973718AA995900065087 /* Sources */,
 				225D977818AA995900065087 /* Frameworks */,
 				225D978718AA995900065087 /* Resources */,
@@ -885,6 +912,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				22DE05B918D8CA4F00590FC3 /* PBXTargetDependency */,
 			);
 			name = "IRCCloud Enterprise";
 			productName = IRCCloud;
@@ -895,7 +923,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 228A05A716D3DABB0029769C /* Build configuration list for PBXNativeTarget "IRCCloud" */;
 			buildPhases = (
-				22DE05AF18D8B88900590FC3 /* ShellScript */,
 				228A056816D3DABA0029769C /* Sources */,
 				228A056916D3DABA0029769C /* Frameworks */,
 				228A056A16D3DABA0029769C /* Resources */,
@@ -904,6 +931,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				22DE05B718D8CA4800590FC3 /* PBXTargetDependency */,
 			);
 			name = IRCCloud;
 			productName = IRCCloud;
@@ -980,6 +1008,7 @@
 				228A056B16D3DABA0029769C /* IRCCloud */,
 				228A059416D3DABB0029769C /* IRCCloudTests */,
 				225D973618AA995900065087 /* IRCCloud Enterprise */,
+				22DE05B118D8CA0700590FC3 /* GitRevision */,
 			);
 		};
 /* End PBXProject section */
@@ -1097,7 +1126,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 		};
-		22DE05AF18D8B88900590FC3 /* ShellScript */ = {
+		22DE05B518D8CA2C00590FC3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1105,23 +1134,11 @@
 			inputPaths = (
 			);
 			outputPaths = (
+				"$(PROJECT_DIR)/IRCCloud/InfoPlist.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo -n \"#define GIT_VERSION \" > $PROJECT_DIR/IRCCloud/InfoPlist.h\ngit rev-parse --short HEAD >> $PROJECT_DIR/IRCCloud/InfoPlist.h\ntouch IRCCloud/IRCCloud-Info.plist";
-		};
-		22DE05B018D8C16200590FC3 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "echo -n \"#define GIT_VERSION \" > $PROJECT_DIR/IRCCloud/InfoPlist.h\ngit rev-parse --short HEAD >> $PROJECT_DIR/IRCCloud/InfoPlist.h\ntouch IRCCloud/IRCCloud-Enterprise-Info.plist";
+			shellScript = "echo -n \"#define GIT_VERSION \" > $PROJECT_DIR/IRCCloud/InfoPlist.h\ngit rev-parse --short HEAD >> $PROJECT_DIR/IRCCloud/InfoPlist.h\ntouch IRCCloud/IRCCloud-Info.plist\ntouch IRCCloud/IRCCloud-Enterprise-Info.plist";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1337,6 +1354,16 @@
 			isa = PBXTargetDependency;
 			target = 228A056B16D3DABA0029769C /* IRCCloud */;
 			targetProxy = 228A059A16D3DABB0029769C /* PBXContainerItemProxy */;
+		};
+		22DE05B718D8CA4800590FC3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22DE05B118D8CA0700590FC3 /* GitRevision */;
+			targetProxy = 22DE05B618D8CA4800590FC3 /* PBXContainerItemProxy */;
+		};
+		22DE05B918D8CA4F00590FC3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22DE05B118D8CA0700590FC3 /* GitRevision */;
+			targetProxy = 22DE05B818D8CA4F00590FC3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1600,6 +1627,20 @@
 			};
 			name = Release;
 		};
+		22DE05B318D8CA0800590FC3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		22DE05B418D8CA0800590FC3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1638,6 +1679,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		22DE05B218D8CA0800590FC3 /* Build configuration list for PBXAggregateTarget "GitRevision" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22DE05B318D8CA0800590FC3 /* Debug */,
+				22DE05B418D8CA0800590FC3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
