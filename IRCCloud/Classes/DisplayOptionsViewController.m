@@ -270,7 +270,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if([_buffer.type isEqualToString:@"channel"])
-        return 5;
+        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?4:5;
     else if([_buffer.type isEqualToString:@"console"])
         return 1;
     else
@@ -288,6 +288,8 @@
     
     if(![_buffer.type isEqualToString:@"channel"] && row > 0)
         row+=2;
+    else if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && row > 0)
+        row++;
     
     switch(row) {
         case 0:
