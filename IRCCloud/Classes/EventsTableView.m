@@ -143,7 +143,7 @@ int __timestampWidth;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    float lineSpacing = 6;
+    CGFloat lineSpacing = 6;
     CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
     CTParagraphStyleSetting paragraphStyles[2] = {
         {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
