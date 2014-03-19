@@ -421,9 +421,9 @@
                           event.from = @"";
                           if([[object objectForKey:@"invalid_chan"] isKindOfClass:[NSString class]] && [[object objectForKey:@"invalid_chan"] length]) {
                               if([[object objectForKey:@"valid_chan"] isKindOfClass:[NSString class]] && [[object objectForKey:@"valid_chan"] length]) {
-                                  event.msg = [NSString stringWithFormat:@"%@ → %@: %@", [object objectForKey:@"invalid_chan"], [object objectForKey:@"valid_chan"], event.msg];
+                                  event.msg = [NSString stringWithFormat:@"%@ → %@ %@", [object objectForKey:@"invalid_chan"], [object objectForKey:@"valid_chan"], event.msg];
                               } else {
-                                  event.msg = [NSString stringWithFormat:@"%@: %@", [object objectForKey:@"invalid_chan"], event.msg];
+                                  event.msg = [NSString stringWithFormat:@"%@ %@", [object objectForKey:@"invalid_chan"], event.msg];
                               }
                           }
                           event.bgColor = [UIColor errorBackgroundColor];
