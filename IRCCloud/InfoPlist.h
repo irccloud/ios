@@ -1,0 +1,1 @@
+#define GIT_VERSION a5b6487

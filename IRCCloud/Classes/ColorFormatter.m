@@ -134,7 +134,7 @@ UIFont *timestampFont;
     UIColor *fgColor = nil, *bgColor = nil;
     static NSDataDetector *dataDetector;
     CTFontRef font, boldFont, italicFont, boldItalicFont;
-    float lineSpacing = 6;
+    CGFloat lineSpacing = 6;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
     
     if(!Courier) {
