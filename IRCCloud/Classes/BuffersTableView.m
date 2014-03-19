@@ -180,7 +180,7 @@
 }
 
 - (void)refresh {
-    @synchronized(self) {
+    @synchronized(_data) {
         NSMutableArray *data = [[NSMutableArray alloc] init];
         NSInteger archiveCount = 0;
         NSInteger firstHighlightPosition = -1;
@@ -552,8 +552,9 @@
 - (void)refreshBuffer:(Buffer *)b {
     @synchronized(_data) {
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
-        for(int i = 0; i < _data.count; i++) {
-            NSDictionary *d = [_data objectAtIndex:i];
+        NSMutableArray *data = _data;
+        for(int i = 0; i < data.count; i++) {
+            NSDictionary *d = [data objectAtIndex:i];
             if(b.bid == [[d objectForKey:@"bid"] intValue]) {
                 NSMutableDictionary *m = [d mutableCopy];
                 int unread = [[EventsDataSource sharedInstance] unreadStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
@@ -584,7 +585,7 @@
                 [m setObject:@(highlights) forKey:@"highlights"];
                 [m setObject:s.status forKey:@"status"];
                 [m setObject:s.fail_info forKey:@"fail_info"];
-                [_data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
+                [data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
                 if(unread) {
                     if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
                         _firstUnreadPosition = i;
