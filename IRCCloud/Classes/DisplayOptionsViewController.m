@@ -291,7 +291,7 @@
     
     switch(row) {
         case 0:
-            cell.textLabel.text = @"Unread messages";
+            cell.textLabel.text = @"Track unread messages";
             cell.accessoryView = _trackUnread;
             break;
         case 1:
