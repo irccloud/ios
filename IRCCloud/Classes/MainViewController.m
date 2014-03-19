@@ -231,7 +231,7 @@
             if(![_menuBtn.imageView.image isEqual:[UIImage imageNamed:@"menu_unread"]])
                 UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
             [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
-            _menuBtn.accessibilityValue = @"Track unread messages";
+            _menuBtn.accessibilityValue = @"Unread messages";
         } else {
             [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
             _menuBtn.accessibilityValue = nil;
@@ -589,7 +589,7 @@
                         }
                         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
                         [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
-                        _menuBtn.accessibilityValue = @"Track unread messages";
+                        _menuBtn.accessibilityValue = @"Unread messages";
                     }
                 }
             }
