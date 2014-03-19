@@ -126,6 +126,21 @@
         NSArray *links;
         _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
         _topicLabel.text = _topic;
+        CGFloat lineSpacing = 6;
+        CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
+        CTParagraphStyleSetting paragraphStyles[2] = {
+            {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
+            {.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
+        };
+        CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
+        
+        NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
+        [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+        [mutableLinkAttributes setObject:[NSNumber numberWithBool:YES] forKey:(NSString *)kCTUnderlineStyleAttributeName];
+        [mutableLinkAttributes setObject:(__bridge id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
+        _topicLabel.linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+        
+        CFRelease(paragraphStyle);
         for(NSTextCheckingResult *result in links) {
             if(result.resultType == NSTextCheckingTypeLink) {
                 [_topicLabel addLinkWithTextCheckingResult:result];
