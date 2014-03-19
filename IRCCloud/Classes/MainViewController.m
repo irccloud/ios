@@ -453,11 +453,6 @@
                 _cidToOpen = o.cid;
                 _bufferToOpen = nil;
             }
-            if(o.eid != -1) {
-                s = [[ServersDataSource sharedInstance] getServer:o.cid];
-                _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[o objectForKey:@"msg"] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [_alertView show];
-            }
             if(!b)
                 break;
         case kIRCEventMakeBuffer:
