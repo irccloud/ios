@@ -1427,7 +1427,7 @@
 				);
 				OTHER_CFLAGS = "-DENTERPRISE";
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "B1AA194E-282F-4845-918C-50CEB4D81591";
+				PROVISIONING_PROFILE = "FD1B9A4E-4E76-4F33-8BB8-455CE16C3E3F";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1548,7 +1548,7 @@
 				);
 				OTHER_CFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "B1AA194E-282F-4845-918C-50CEB4D81591";
+				PROVISIONING_PROFILE = "1FE063D0-D11A-48EE-BFA5-7C8815B8F80E";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1687,6 +1687,7 @@
 				22DE05B418D8CA0800590FC3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
