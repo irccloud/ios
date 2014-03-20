@@ -1134,7 +1134,6 @@
 			inputPaths = (
 			);
 			outputPaths = (
-				"$(PROJECT_DIR)/IRCCloud/InfoPlist.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1544,7 +1543,6 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
-				OTHER_CFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "1FE063D0-D11A-48EE-BFA5-7C8815B8F80E";
 				WRAPPER_EXTENSION = app;
@@ -1570,7 +1568,6 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
-				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "9820D946-B063-427D-902C-CCEFEED88954";
 				WRAPPER_EXTENSION = app;
@@ -1659,7 +1656,10 @@
 				INFOPLIST_PREPROCESS = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
 				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				OTHER_CFLAGS = (
+					"-DNS_BLOCK_ASSERTIONS=1",
+					"-DAPPSTORE",
+				);
 				PROVISIONING_PROFILE = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1686,7 +1686,6 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
-				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "9820D946-B063-427D-902C-CCEFEED88954";
 				WRAPPER_EXTENSION = app;
@@ -1738,6 +1737,7 @@
 				);
 				OTHER_CFLAGS = (
 					"-DNS_BLOCK_ASSERTIONS=1",
+					"-DAPPSTORE",
 					"-DENTERPRISE",
 				);
 				PRODUCT_NAME = IRCEnterprise;

@@ -354,9 +354,9 @@
 #ifdef BRAND_NAME
     _version = [_version stringByAppendingFormat:@"-%@", BRAND_NAME];
 #endif
-    if(![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment)
-        _version = [_version stringByAppendingFormat:@" (%@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
-    
+#ifndef APPSTORE
+    _version = [_version stringByAppendingFormat:@" (%@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
+#endif
     [self refresh];
 }
 

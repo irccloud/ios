@@ -71,6 +71,7 @@
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":@"www.irccloud.com"}];
 #ifdef ENTERPRISE
     IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
+#ifndef APPSTORE
 #ifdef HOCKEYAPP_TOKEN_ENTERPRISE
     if(@HOCKEYAPP_TOKEN_ENTERPRISE.length && ![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment) {
         [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@HOCKEYAPP_TOKEN_ENTERPRISE];
@@ -80,7 +81,9 @@
         [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
     }
 #endif
+#endif
 #else
+#ifndef APPSTORE
 #ifdef HOCKEYAPP_TOKEN
     if(@HOCKEYAPP_TOKEN.length && ![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment) {
         [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@HOCKEYAPP_TOKEN];
@@ -89,6 +92,7 @@
         [[BITHockeyManager sharedHockeyManager] startManager];
         [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
     }
+#endif
 #endif
 #endif
 #ifdef CRASHLYTICS_TOKEN
