@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+#import <HockeySDK/HockeySDK.h>
 #import "SettingsViewController.h"
 #import "NetworkConnection.h"
 #import "LicenseViewController.h"
@@ -354,7 +354,8 @@
 #ifdef BRAND_NAME
     _version = [_version stringByAppendingFormat:@"-%@", BRAND_NAME];
 #endif
-    _version = [_version stringByAppendingFormat:@" (%@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
+    if(![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment)
+        _version = [_version stringByAppendingFormat:@" (%@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
     
     [self refresh];
 }
