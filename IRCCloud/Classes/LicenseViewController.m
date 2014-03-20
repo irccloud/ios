@@ -44,7 +44,8 @@
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
 #endif
-    UILabel *tv = [[UILabel alloc] initWithFrame:self.view.bounds];
+    UILabel *tv = [[UILabel alloc] initWithFrame:self.view.frame];
+    tv.backgroundColor = [UIColor whiteColor];
     tv.text = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"licenses" ofType:@"txt"] encoding:NSUTF8StringEncoding error:nil];
     tv.numberOfLines = 0;
     tv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
