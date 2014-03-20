@@ -350,10 +350,11 @@
     _highlights.returnKeyType = UIReturnKeyDone;
     _highlights.delegate = self;
 
-    _version = [[[NSBundle mainBundle] infoDictionary] objectForKey:(NSString*)kCFBundleVersionKey];
+    _version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 #ifdef BRAND_NAME
     _version = [_version stringByAppendingFormat:@"-%@", BRAND_NAME];
 #endif
+    _version = [_version stringByAppendingFormat:@" (%@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
     
     [self refresh];
 }
