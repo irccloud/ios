@@ -72,8 +72,8 @@
 #ifdef ENTERPRISE
     IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
 #ifdef HOCKEYAPP_TOKEN_ENTERPRISE
-    if(HOCKEYAPP_TOKEN_ENTERPRISE.length && ![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment) {
-        [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:HOCKEYAPP_TOKEN_ENTERPRISE];
+    if(@HOCKEYAPP_TOKEN_ENTERPRISE.length && ![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment) {
+        [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@HOCKEYAPP_TOKEN_ENTERPRISE];
         [[BITHockeyManager sharedHockeyManager] setDisableCrashManager:YES];
         [[BITHockeyManager sharedHockeyManager] setDisableFeedbackManager:YES];
         [[BITHockeyManager sharedHockeyManager] startManager];
