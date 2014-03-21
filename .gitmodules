@@ -1,0 +1,3 @@
+[submodule "SVWebViewController"]
+	path = SVWebViewController
+	url = https://github.com/samvermette/SVWebViewController.git
