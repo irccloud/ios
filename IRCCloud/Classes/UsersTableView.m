@@ -159,6 +159,7 @@
 
 - (void)setBuffer:(Buffer *)buffer {
     _buffer = buffer;
+    _refreshTimer = nil;
     [self refresh];
     if(_data.count)
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
@@ -215,6 +216,7 @@
         [sectionSizes addObject:@(data.count)];
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _refreshTimer = nil;
         _data = data;
         _sectionTitles = sectionTitles;
         _sectionIndexes = sectionIndexes;
@@ -240,15 +242,19 @@
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
+    
+    _refreshTimer = nil;
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [self refresh];
+    _refreshTimer = nil;
 }
 
 - (void)viewDidUnload {
     [super viewDidUnload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    _refreshTimer = nil;
 }
 
 - (void)didReceiveMemoryWarning {
