@@ -383,6 +383,7 @@ int __timestampWidth;
             for(Event *e in _data) {
                 e.formatted = nil;
                 e.timestamp = nil;
+                e.height = 0;
             }
             [self refresh];
             break;
