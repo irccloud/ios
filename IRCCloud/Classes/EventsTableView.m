@@ -216,7 +216,7 @@ int __timestampWidth;
             [_lock unlock];
             _ready = NO;
             [self.tableView reloadData];
-            if(_bottomRow >= 0) {
+            if(_bottomRow >= 0 && _bottomRow < [self.tableView numberOfRowsInSection:0]) {
                 [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
                 _bottomRow = -1;
             } else {

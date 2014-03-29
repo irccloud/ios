@@ -1060,7 +1060,7 @@
             if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
                 [suggestions addObject:_buffer.name];
             for(Channel *channel in _sortedChannels) {
-                if([channel.name characterAtIndex:0] == [text characterAtIndex:0] && channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text])
+                if(text.length > 0 && channel.name.length > 0 && [channel.name characterAtIndex:0] == [text characterAtIndex:0] && channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text])
                     [suggestions addObject:channel.name];
             }
             

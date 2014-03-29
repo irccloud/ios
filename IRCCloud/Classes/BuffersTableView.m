@@ -583,8 +583,10 @@
                 Server *s = [[ServersDataSource sharedInstance] getServer:[[m objectForKey:@"cid"] intValue]];
                 [m setObject:@(unread) forKey:@"unread"];
                 [m setObject:@(highlights) forKey:@"highlights"];
-                [m setObject:s.status forKey:@"status"];
-                [m setObject:s.fail_info forKey:@"fail_info"];
+                if(s.status)
+                    [m setObject:s.status forKey:@"status"];
+                if(s.fail_info)
+                    [m setObject:s.fail_info forKey:@"fail_info"];
                 [data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
                 if(unread) {
                     if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
