@@ -411,7 +411,8 @@ static NSString * const ServerHasSSLKey = @"ssl";
         else
             _ssl.on = NO;
         
-        _channels.text = [_url.path substringFromIndex:1];
+        if(_url.path && _url.path.length > 1)
+            _channels.text = [_url.path substringFromIndex:1];
     } else {
         Server *server = [[ServersDataSource sharedInstance] getServer:_cid];
         if(server) {

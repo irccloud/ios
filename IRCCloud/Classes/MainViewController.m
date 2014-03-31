@@ -1274,7 +1274,7 @@
     BOOL match = NO;
     kIRCCloudState state = [NetworkConnection sharedInstance].state;
     
-    if([url.host intValue] > 0) {
+    if([url.host intValue] > 0 && url.path && url.path.length > 1) {
         Server *s = [[ServersDataSource sharedInstance] getServer:[url.host intValue]];
         if(s != nil) {
             match = YES;
@@ -1300,16 +1300,24 @@
             if(ssl == 1 && !s.ssl)
                 match = NO;
             if(match) {
-                NSString *channel = [url.path substringFromIndex:1];
-                Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:channel server:s.cid];
-                if([b.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:b.bid])
-                    b = nil;
-                if(b)
-                    [self bufferSelected:b.bid];
-                else if(state == kIRCCloudStateConnected)
-                    [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid];
-                else
-                    match = NO;
+                if(url.path && url.path.length > 1) {
+                    NSString *channel = [url.path substringFromIndex:1];
+                    Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:channel server:s.cid];
+                    if([b.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:b.bid])
+                        b = nil;
+                    if(b)
+                        [self bufferSelected:b.bid];
+                    else if(state == kIRCCloudStateConnected)
+                        [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid];
+                    else
+                        match = NO;
+                } else {
+                    Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:@"*" server:s.cid];
+                    if(b)
+                        [self bufferSelected:b.bid];
+                    else
+                        match = NO;
+                }
                 break;
             }
         }
