@@ -228,11 +228,13 @@ UIFont *timestampFont;
                     italics = i;
                 } else {
                     if(bold != -1) {
-                        [attributes addObject:@{
-                         (NSString *)kCTFontAttributeName:(__bridge id)boldFont,
-                         @"start":@(bold),
-                         @"length":@(italics - bold)
-                         }];
+                        if(bold < italics - 1) {
+                            [attributes addObject:@{
+                             (NSString *)kCTFontAttributeName:(__bridge id)boldFont,
+                             @"start":@(bold),
+                             @"length":@(italics - bold)
+                             }];
+                        }
                         [attributes addObject:@{
                          (NSString *)kCTFontAttributeName:(__bridge id)boldItalicFont,
                          @"start":@(italics),
