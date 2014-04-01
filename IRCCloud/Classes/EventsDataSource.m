@@ -664,6 +664,8 @@
 }
 
 -(int)unreadStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
+    if(![_events objectForKey:@(bid)])
+        return 0;
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = [[Ignore alloc] init];
@@ -685,6 +687,8 @@
 }
 
 -(int)highlightCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
+    if(![_events objectForKey:@(bid)])
+        return 0;
     int count = 0;
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
@@ -707,6 +711,8 @@
 }
 
 -(int)highlightStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
+    if(![_events objectForKey:@(bid)])
+        return 0;
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = [[Ignore alloc] init];

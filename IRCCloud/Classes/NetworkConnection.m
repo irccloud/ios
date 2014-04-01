@@ -936,29 +936,29 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(int)addServer:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands channels:(NSString *)channels {
     return [self _sendRequest:@"add-server" args:@{
-                                                   @"hostname":hostname,
+                                                   @"hostname":hostname?hostname:@"",
                                                    @"port":@(port),
                                                    @"ssl":[NSString stringWithFormat:@"%i",ssl],
-                                                   @"netname":netname,
-                                                   @"nickname":nick,
-                                                   @"realname":realname,
-                                                   @"server_pass":serverPass,
-                                                   @"nspass":nickservPass,
-                                                   @"joincommands":joinCommands,
-                                                   @"channels":channels}];
+                                                   @"netname":netname?netname:@"",
+                                                   @"nickname":nick?nick:@"",
+                                                   @"realname":realname?realname:@"",
+                                                   @"server_pass":serverPass?serverPass:@"",
+                                                   @"nspass":nickservPass?nickservPass:@"",
+                                                   @"joincommands":joinCommands?joinCommands:@"",
+                                                   @"channels":channels?channels:@""}];
 }
 
 -(int)editServer:(int)cid hostname:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands {
     return [self _sendRequest:@"edit-server" args:@{
-                                                    @"hostname":hostname,
+                                                    @"hostname":hostname?hostname:@"",
                                                     @"port":@(port),
                                                     @"ssl":[NSString stringWithFormat:@"%i",ssl],
-                                                    @"netname":netname,
-                                                    @"nickname":nick,
-                                                    @"realname":realname,
-                                                    @"server_pass":serverPass,
-                                                    @"nspass":nickservPass,
-                                                    @"joincommands":joinCommands,
+                                                    @"netname":netname?netname:@"",
+                                                    @"nickname":nick?nick:@"",
+                                                    @"realname":realname?realname:@"",
+                                                    @"server_pass":serverPass?serverPass:@"",
+                                                    @"nspass":nickservPass?nickservPass:@"",
+                                                    @"joincommands":joinCommands?joinCommands:@"",
                                                     @"cid":@(cid)}];
 }
 
