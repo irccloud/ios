@@ -903,9 +903,9 @@ int __timestampWidth;
     [_scrollTimer invalidate];
     _ready = NO;
     NSInteger oldPosition = (_requestingBacklog && _data.count && [self.tableView indexPathsForVisibleRows].count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
-    NSTimeInterval backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
+    NSTimeInterval backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
     if(backlogEid < 1)
-        backlogEid = (_requestingBacklog && _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
+        backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
     oldPosition = (_data.count && [self.tableView indexPathsForVisibleRows].count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
 
     [_data removeAllObjects];

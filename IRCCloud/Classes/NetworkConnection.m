@@ -1232,7 +1232,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(block != nil) {
             block(object);
         } else {
-            CLS_LOG(@"Unhandled type: %@", object);
+            CLS_LOG(@"Unhandled type: %@", object.type);
         }
         if(backlog) {
             if(_numBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
@@ -1254,7 +1254,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         } else if([object objectForKey:@"success"]) {
             [self postObject:object forEvent:kIRCEventSuccess];
         }
-        CLS_LOG(@"Response: %@", object);
     }
     if(!backlog && _reconnectTimestamp != 0)
         [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];

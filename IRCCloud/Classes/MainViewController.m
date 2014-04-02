@@ -2246,55 +2246,6 @@
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
             NSString *plaintext = [_selectedEvent.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ — %@ %@", _selectedEvent.timestamp,_selectedEvent.nick,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]]:[NSString stringWithFormat:@"%@ <%@> %@", _selectedEvent.timestamp,_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
             [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-        } else if([action isEqualToString:@"Copy Hostmask"]) {
-            UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            NSString *plaintext = [NSString stringWithFormat:@"%@!%@", _selectedUser.nick, _selectedUser.hostmask];
-            [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-        } else if([action isEqualToString:@"Send a message"]) {
-            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];
-            if(b) {
-                [self bufferSelected:b.bid];
-            } else {
-                [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:_buffer.cid];
-            }
-        } else if([action isEqualToString:@"Whois"]) {
-            [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
-        } else if([action isEqualToString:@"Op"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
-        } else if([action isEqualToString:@"Deop"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
-        } else if([action isEqualToString:@"Ban"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
-            _alertView.tag = TAG_BAN;
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
-            [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView show];
-        } else if([action isEqualToString:@"Ignore"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
-            _alertView.tag = TAG_IGNORE;
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
-            [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView show];
-        } else if([action isEqualToString:@"Kick"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
-            _alertView.tag = TAG_KICK;
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView show];
-        } else if([action isEqualToString:@"Invite to channel"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
-            _alertView.tag = TAG_INVITE;
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView show];
         } else if([action isEqualToString:@"Archive"]) {
             [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Unarchive"]) {
@@ -2357,6 +2308,61 @@
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];
+        }
+        
+        if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)
+            return;
+        
+        if([action isEqualToString:@"Copy Hostmask"]) {
+            UIPasteboard *pb = [UIPasteboard generalPasteboard];
+            NSString *plaintext = [NSString stringWithFormat:@"%@!%@", _selectedUser.nick, _selectedUser.hostmask];
+            [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+        } else if([action isEqualToString:@"Send a message"]) {
+            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];
+            if(b) {
+                [self bufferSelected:b.bid];
+            } else {
+                [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:_buffer.cid];
+            }
+        } else if([action isEqualToString:@"Whois"]) {
+            if(_selectedUser && _selectedUser.nick.length > 0)
+                [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
+        } else if([action isEqualToString:@"Op"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+        } else if([action isEqualToString:@"Deop"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+        } else if([action isEqualToString:@"Ban"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
+            _alertView.tag = TAG_BAN;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
+        } else if([action isEqualToString:@"Ignore"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
+            _alertView.tag = TAG_IGNORE;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
+        } else if([action isEqualToString:@"Kick"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
+            _alertView.tag = TAG_KICK;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
+        } else if([action isEqualToString:@"Invite to channel"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
+            _alertView.tag = TAG_INVITE;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
         }
     }
 }
