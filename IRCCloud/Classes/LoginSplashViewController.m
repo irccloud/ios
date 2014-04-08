@@ -317,16 +317,16 @@
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            logo.frame = CGRectMake(96, 36, 128, 128);
+            logo.frame = CGRectMake(92, 36, 138, 138);
             loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 170);
         } else {
-            logo.frame = CGRectMake(36, 76, 128, 128);
+            logo.frame = CGRectMake(26, 76, 138, 138);
             loadingView.frame = loginView.frame = CGRectMake(160, 70, 320, 170);
         }
     } else {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
         } else {
-            logo.frame = CGRectMake(128, 246, 256, 256);
+            logo.frame = CGRectMake(128, 240, 276, 276);
             loadingView.frame = CGRectMake(392, 344, 612, 170);
             loginView.frame = CGRectMake(392, 302, 612, 170);
         }
