@@ -14,7 +14,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import <HockeySDK/HockeySDK.h>
 #import <Crashlytics/Crashlytics.h>
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
@@ -71,25 +70,6 @@
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":@"www.irccloud.com"}];
 #ifdef ENTERPRISE
     IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
-#if !defined(APPSTORE) && defined(HOCKEYAPP_TOKEN_ENTERPRISE)
-    if(@HOCKEYAPP_TOKEN_ENTERPRISE.length && ![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment) {
-        [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@HOCKEYAPP_TOKEN_ENTERPRISE];
-        [[BITHockeyManager sharedHockeyManager] setDisableCrashManager:YES];
-        [[BITHockeyManager sharedHockeyManager] setDisableFeedbackManager:YES];
-        [[BITHockeyManager sharedHockeyManager] startManager];
-        [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
-    }
-#endif
-#else
-#if !defined(APPSTORE) && defined(HOCKEYAPP_TOKEN)
-    if(@HOCKEYAPP_TOKEN.length && ![BITHockeyManager sharedHockeyManager].isAppStoreEnvironment) {
-        [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@HOCKEYAPP_TOKEN];
-        [[BITHockeyManager sharedHockeyManager] setDisableCrashManager:YES];
-        [[BITHockeyManager sharedHockeyManager] setDisableFeedbackManager:YES];
-        [[BITHockeyManager sharedHockeyManager] startManager];
-        [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
-    }
-#endif
 #endif
 #ifdef CRASHLYTICS_TOKEN
     [Crashlytics startWithAPIKey:@CRASHLYTICS_TOKEN];
