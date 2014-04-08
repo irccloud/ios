@@ -1084,9 +1084,9 @@ WebSocketWaitingState waitingState;
                     SecCertificateRef cert = SecTrustGetCertificateAtIndex(tm, 0);
                     CFDataRef data = SecCertificateCopyData(cert);
                     const unsigned char *bytes = CFDataGetBytePtr(data);
-                    int len = CFDataGetLength(data);
+                    CFIndex len = CFDataGetLength(data);
                     unsigned char sha1[CC_SHA1_DIGEST_LENGTH];
-                    CC_SHA1(bytes, len, sha1);
+                    CC_SHA1(bytes, (CC_LONG)len, sha1);
                     NSMutableString *hex = [[NSMutableString alloc] initWithCapacity:len*2];
                     for(int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
                         [hex appendFormat:@"%02X:", sha1[i]];
