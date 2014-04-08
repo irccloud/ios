@@ -7301,12 +7301,6 @@ static void CFWriteStreamCallback (CFWriteStreamRef stream, CFStreamEventType ty
 
 - (SSLContextRef)sslContext
 {
-	if (!dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
-	{
-		LogWarn(@"%@ - Method only available from within the context of a performBlock: invocation", THIS_METHOD);
-		return NULL;
-	}
-	
 	return sslContext;
 }
 

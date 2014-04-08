@@ -1070,7 +1070,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:nil protocols:nil
                                                                      tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
-                                                                                    (NSString *)kCFStreamSSLLevel: (NSString *)kCFStreamSocketSecurityLevelSSLv3} mutableCopy]
+                                                                                    (NSString *)kCFStreamSSLLevel: (NSString *)kCFStreamSocketSecurityLevelSSLv3,
+#ifndef ENTERPRISE
+                                                                                    @"fingerprint":@"8D:3B:E1:98:3F:75:F4:A4:54:6F:42:F5:EC:18:9B:C6:5A:9D:3A:42"
+#endif
+                                                                                    } mutableCopy]
                                                                          headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"],
                                                                                     [HandshakeHeader headerWithValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forKey:@"Cookie"]] mutableCopy]
                                                                verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
@@ -1148,7 +1152,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
         }
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-        if([aError.domain isEqualToString:@"kCFStreamErrorDomainSSL"]) {
+        if([aError.domain isEqualToString:@"kCFStreamErrorDomainSSL"] || aStatusCode == WebSocketCloseStatusTlsHandshakeError) {
             IRCCloudJSONObject *o = [[IRCCloudJSONObject alloc] initWithDictionary:@{@"success":@0,@"message":@"Unable to establish a secure connection"}];
             [self postObject:o forEvent:kIRCEventFailureMsg];
         } else if([aError localizedDescription]) {
