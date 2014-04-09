@@ -1651,6 +1651,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/HockeySDK.embeddedframework",
@@ -1698,6 +1699,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -1718,7 +1720,7 @@
 					"-DENTERPRISE",
 				);
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "AC972946-321F-4F4D-A435-ABC031133B73";
+				PROVISIONING_PROFILE = "677414F8-EBAC-4DEC-AFDC-B715C772B5E8";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
