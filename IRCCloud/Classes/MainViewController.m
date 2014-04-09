@@ -940,17 +940,10 @@
 
 -(void)sendButtonPressed:(id)sender {
     if(_message.text && _message.text.length) {
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
-        [_message resignFirstResponder];
-        [_message becomeFirstResponder];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(keyboardWillShow:)
-                                                     name:UIKeyboardWillShowNotification object:nil];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(keyboardWillBeHidden:)
-                                                     name:UIKeyboardWillHideNotification object:nil];
+        id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+        if([k respondsToSelector:NSSelectorFromString(@"acceptAutocorrection")]) {
+            objc_msgSend(k, NSSelectorFromString(@"acceptAutocorrection"));
+        }
 
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s) {
