@@ -84,7 +84,7 @@ NSLock *__parserLock = nil;
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
+    [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
     
     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     if(_connection) {
@@ -762,7 +762,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     lastType = type;
     
-    if(reachable == kIRCCloudReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0 && [[[NSUserDefaults standardUserDefaults] stringForKey:@"session"] length]) {
+    if(reachable == kIRCCloudReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0 && [[NetworkConnection sharedInstance].session length]) {
         CLS_LOG(@"IRCCloud server became reachable, connecting");
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:YES];
     } else if(reachable == kIRCCloudUnreachable && state == kIRCCloudStateConnected) {
@@ -822,13 +822,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	NSData *data;
 	NSURLResponse *response = nil;
 	NSError *error = nil;
-    NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], [[NSUserDefaults standardUserDefaults] stringForKey:@"session"]];
+    NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], self.session];
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-register", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
+    [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
     
@@ -846,13 +846,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	NSData *data;
 	NSURLResponse *response = nil;
 	NSError *error = nil;
-    NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], [[NSUserDefaults standardUserDefaults] stringForKey:@"session"]];
+    NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], self.session];
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-unregister", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
+    [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
     
@@ -1040,7 +1040,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)connect {
-    if([[[NSUserDefaults standardUserDefaults] stringForKey:@"session"] length] < 1)
+    if(self.session.length < 1)
         return;
     
     if(_socket) {
@@ -1093,7 +1093,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #endif
                                                                                     } mutableCopy]
                                                                          headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"],
-                                                                                    [HandshakeHeader headerWithValue:[NSString stringWithFormat:@"session=%@",[[NSUserDefaults standardUserDefaults] stringForKey:@"session"]] forKey:@"Cookie"]] mutableCopy]
+                                                                                    [HandshakeHeader headerWithValue:[NSString stringWithFormat:@"session=%@",self.session] forKey:@"Cookie"]] mutableCopy]
                                                                verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
     _socket = [WebSocket webSocketWithConfig:config delegate:self];
     
@@ -1419,7 +1419,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSLog(@"Unregister result: %@", [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]]);
     //TODO: check the above result, and retry if it fails
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self disconnect];
     [self cancelIdleTimer];
@@ -1431,5 +1430,25 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [_users clear];
     [_channels clear];
     [_events clear];
+    SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, nil]);
+}
+
+-(NSString *)session {
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"session"]) {
+        self.session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    
+    CFDataRef data = nil;
+    OSStatus err = SecItemCopyMatching((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, kCFBooleanTrue, kSecReturnData, nil], (CFTypeRef*)&data);
+    if(!err) {
+        return [[NSString alloc] initWithData:CFBridgingRelease(data) encoding:NSUTF8StringEncoding];
+    }
+    return nil;
+}
+
+-(void)setSession:(NSString *)session {
+    SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, nil], NULL);
 }
 @end

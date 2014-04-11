@@ -510,8 +510,7 @@
                     [self bufferSelected:-1];
                     [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
                 } else if([[o objectForKey:@"message"] isEqualToString:@"set_shard"]) {
-                    [[NSUserDefaults standardUserDefaults] setObject:[o objectForKey:@"cookie"] forKey:@"session"];
-                    [[NSUserDefaults standardUserDefaults] synchronize];
+                    [NetworkConnection sharedInstance].session = [o objectForKey:@"cookie"];
                     [[NetworkConnection sharedInstance] connect];
                 } else {
                     [[NetworkConnection sharedInstance] disconnect];
@@ -891,7 +890,7 @@
                                              selector:@selector(viewWillLayoutSubviews)
                                                  name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
     
-    NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
+    NSString *session = [NetworkConnection sharedInstance].session;
     if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable && session != nil && [session length] > 0)
         [[NetworkConnection sharedInstance] connect];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {

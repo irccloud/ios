@@ -109,7 +109,8 @@
                                              selector:@selector(backlogProgress:)
                                                  name:kIRCCloudBacklogProgressNotification object:nil];
 
-    NSString *session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
+    
+    NSString *session = [NetworkConnection sharedInstance].session;
     if(session != nil && [session length] > 0) {
         if(_conn.state != kIRCCloudStateConnected) {
             loginView.alpha = 0;
@@ -146,8 +147,7 @@
                 loginView.alpha = 1;
                 loadingView.alpha = 0;
             } else if([[o objectForKey:@"message"] isEqualToString:@"set_shard"]) {
-                [[NSUserDefaults standardUserDefaults] setObject:[o objectForKey:@"cookie"] forKey:@"session"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
+                [NetworkConnection sharedInstance].session = [o objectForKey:@"cookie"];
                 progress.hidden = YES;
                 progress.progress = 0;
                 [activity startAnimating];
@@ -362,7 +362,7 @@
         if([[result objectForKey:@"success"] intValue] == 1) {
             result = [[NetworkConnection sharedInstance] login:[username text] password:[password text] token:[result objectForKey:@"token"]];
             if([[result objectForKey:@"success"] intValue] == 1) {
-                [[NSUserDefaults standardUserDefaults] setObject:[result objectForKey:@"session"] forKey:@"session"];
+                [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
 #ifdef ENTERPRISE
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
 #endif

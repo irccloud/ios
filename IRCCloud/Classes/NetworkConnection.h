@@ -144,6 +144,7 @@ typedef enum {
 @property (readonly) kIRCCloudReachability reachable;
 @property NSString *globalMsg;
 @property int failCount;
+@property NSString *session;
 
 +(NetworkConnection*)sharedInstance;
 -(NSDictionary *)requestAuthToken;
