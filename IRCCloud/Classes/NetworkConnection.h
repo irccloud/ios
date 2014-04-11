@@ -146,7 +146,8 @@ typedef enum {
 @property int failCount;
 
 +(NetworkConnection*)sharedInstance;
--(NSDictionary *)login:(NSString *)email password:(NSString *)password;
+-(NSDictionary *)requestAuthToken;
+-(NSDictionary *)login:(NSString *)email password:(NSString *)password token:(NSString *)token;
 -(NSDictionary *)prefs;
 -(void)connect;
 -(void)disconnect;

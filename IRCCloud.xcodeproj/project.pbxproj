@@ -1549,7 +1549,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "3846B152-5A76-4B3D-B4FF-BD5BEB9F9EA5";
+				PROVISIONING_PROFILE = "3BB19FF4-B6E3-4D39-81FC-3BF133FBDFF5";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -1651,7 +1651,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/HockeySDK.embeddedframework",

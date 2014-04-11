@@ -773,7 +773,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
 }
 
--(NSDictionary *)login:(NSString *)email password:(NSString *)password {
+-(NSDictionary *)login:(NSString *)email password:(NSString *)password token:(NSString *)token {
 	NSData *data;
 	NSURLResponse *response = nil;
 	NSError *error = nil;
@@ -786,7 +786,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[NSString stringWithFormat:@"email=%@&password=%@", email_escaped, password_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
+    [request setHTTPBody:[[NSString stringWithFormat:@"email=%@&password=%@&token=%@", email_escaped, password_escaped, token] dataUsingEncoding:NSUTF8StringEncoding]];
     
     CFRelease(email_escaped);
     CFRelease(password_escaped);
@@ -861,6 +861,23 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     return [[[SBJsonParser alloc] init] objectWithData:data];
 #endif
+}
+
+-(NSDictionary *)requestAuthToken {
+	NSData *data;
+	NSURLResponse *response = nil;
+	NSError *error = nil;
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/auth-formtoken", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    [request setHTTPMethod:@"POST"];
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    
+    return [[[SBJsonParser alloc] init] objectWithData:data];
 }
 
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args {

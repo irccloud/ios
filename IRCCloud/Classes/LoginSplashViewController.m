@@ -358,28 +358,41 @@
     IRCCLOUD_HOST = host.text;
 #endif
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSDictionary *result = [[NetworkConnection sharedInstance] login:[username text] password:[password text]];
+        NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
-            [[NSUserDefaults standardUserDefaults] setObject:[result objectForKey:@"session"] forKey:@"session"];
+            result = [[NetworkConnection sharedInstance] login:[username text] password:[password text] token:[result objectForKey:@"token"]];
+            if([[result objectForKey:@"success"] intValue] == 1) {
+                [[NSUserDefaults standardUserDefaults] setObject:[result objectForKey:@"session"] forKey:@"session"];
 #ifdef ENTERPRISE
-            [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+                [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
 #endif
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            [status setText:@"Connecting"];
-            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
-            [_conn connect];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                [status setText:@"Connecting"];
+                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
+                [_conn connect];
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [UIView beginAnimations:nil context:nil];
+                    loginView.alpha = 1;
+                    loadingView.alpha = 0;
+                    [UIView commitAnimations];
+                    NSString *message = @"Unable to login to IRCCloud.  Please check your username and password, and try again shortly.";
+                    if([[result objectForKey:@"message"] isEqualToString:@"auth"]
+                       || [[result objectForKey:@"message"] isEqualToString:@"email"]
+                       || [[result objectForKey:@"message"] isEqualToString:@"password"]
+                       || [[result objectForKey:@"message"] isEqualToString:@"legacy_account"])
+                        message = @"Incorrect username or password.  Please try again.";
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                });
+            }
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [UIView beginAnimations:nil context:nil];
                 loginView.alpha = 1;
                 loadingView.alpha = 0;
                 [UIView commitAnimations];
-                NSString *message = @"Unable to login to IRCCloud.  Please check your username and password, and try again shortly.";
-                if([[result objectForKey:@"message"] isEqualToString:@"auth"]
-                   || [[result objectForKey:@"message"] isEqualToString:@"email"]
-                   || [[result objectForKey:@"message"] isEqualToString:@"password"]
-                   || [[result objectForKey:@"message"] isEqualToString:@"legacy_account"])
-                    message = @"Incorrect username or password.  Please try again.";
+                NSString *message = @"Unable to communicate with the IRCCloud servers.  Please try again shortly.";
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
