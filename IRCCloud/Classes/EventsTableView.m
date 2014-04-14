@@ -291,9 +291,8 @@ int __timestampWidth;
 }
 
 - (void)sendHeartbeat {
-    [_heartbeatTimer invalidate];
-    
-    _heartbeatTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(_sendHeartbeat) userInfo:nil repeats:NO];
+    if(!_heartbeatTimer)
+        _heartbeatTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(_sendHeartbeat) userInfo:nil repeats:NO];
 }
 
 - (void)handleEvent:(NSNotification *)notification {
@@ -846,6 +845,8 @@ int __timestampWidth;
 
 -(void)setBuffer:(Buffer *)buffer {
     _ready = NO;
+    [_heartbeatTimer invalidate];
+    _heartbeatTimer = nil;
     [_scrollTimer invalidate];
     _scrollTimer = nil;
     _requestingBacklog = NO;
