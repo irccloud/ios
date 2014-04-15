@@ -132,7 +132,6 @@ UIFont *timestampFont;
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;
-    static NSDataDetector *dataDetector;
     CTFontRef font, boldFont, italicFont, boldItalicFont;
     CGFloat lineSpacing = 6;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
@@ -167,7 +166,6 @@ UIFont *timestampFont;
             HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)[boldItalicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldItalicBodyFontDescriptor.pointSize * 0.8, NULL);
         }
 #endif
-        dataDetector = [NSDataDetector dataDetectorWithTypes:(NSTextCheckingTypes)NSTextCheckingTypeLink error:nil];
     }
     if(mono) {
         font = Courier;
