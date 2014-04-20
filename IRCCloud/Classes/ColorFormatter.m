@@ -1067,10 +1067,18 @@ NSDictionary *emojiMap;
     
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", input, CLEAR];
     
+    NSInteger offset = 0;
     NSArray *results = [[self emoji] matchesInString:[text lowercaseString] options:0 range:NSMakeRange(0, text.length)];
     for(NSTextCheckingResult *result in results) {
-        NSString *token = [text substringWithRange:[result rangeAtIndex:1]];
-        [text replaceCharactersInRange:result.range withString:[emojiMap objectForKey:token.lowercaseString]];
+        for(int i = 1; i < result.numberOfRanges; i++) {
+            NSRange range = [result rangeAtIndex:i];
+            range.location -= offset;
+            NSString *token = [text substringWithRange:range];
+            if([emojiMap objectForKey:token.lowercaseString]) {
+                [text replaceCharactersInRange:NSMakeRange(range.location-1, range.length+2) withString:[emojiMap objectForKey:token.lowercaseString]];
+                offset += range.length;
+            }
+        }
     }
     
     for(int i = 0; i < text.length; i++) {
