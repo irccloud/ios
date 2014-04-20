@@ -699,8 +699,8 @@ NSLock *__parserLock = nil;
                        }
                        [self postObject:object forEvent:kIRCEventReorderConnections];
                    }
-                   };
-    
+               };
+
     return self;
 }
 
