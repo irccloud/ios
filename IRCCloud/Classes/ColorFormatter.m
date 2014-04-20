@@ -1066,7 +1066,6 @@ NSDictionary *emojiMap;
     NSMutableArray *arrowIndex = [[NSMutableArray alloc] init];
     
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", input, CLEAR];
-    
     NSInteger offset = 0;
     NSArray *results = [[self emoji] matchesInString:[text lowercaseString] options:0 range:NSMakeRange(0, text.length)];
     for(NSTextCheckingResult *result in results) {
@@ -1075,8 +1074,9 @@ NSDictionary *emojiMap;
             range.location -= offset;
             NSString *token = [text substringWithRange:range];
             if([emojiMap objectForKey:token.lowercaseString]) {
-                [text replaceCharactersInRange:NSMakeRange(range.location-1, range.length+2) withString:[emojiMap objectForKey:token.lowercaseString]];
-                offset += range.length;
+                NSString *emoji = [emojiMap objectForKey:token.lowercaseString];
+                [text replaceCharactersInRange:NSMakeRange(range.location - 1, range.length + 2) withString:emoji];
+                offset += range.length - emoji.length + 2;
             }
         }
     }
