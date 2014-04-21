@@ -361,6 +361,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
             _netname = _server.text;
         _reqid = [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text];
     } else {
+        _netname = _network.text;
         _reqid = [[NetworkConnection sharedInstance] editServer:_cid hostname:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text];
     }
 }
@@ -382,7 +383,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(void)setNetwork:(NSString *)network host:(NSString *)host port:(int)port SSL:(BOOL)SSL {
-    _netname = network;
+    _network.text = _netname = network;
     _server.text = host;
     _port.text = [NSString stringWithFormat:@"%i", port];
     _ssl.on = SSL;
@@ -391,7 +392,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 
 -(void)setURL:(NSURL *)url {
     _url = url;
-    _netname = url.host;
+    _network.text = _netname = url.host;
     [self refresh];
 }
 
@@ -416,7 +417,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
     } else {
         Server *server = [[ServersDataSource sharedInstance] getServer:_cid];
         if(server) {
-            _netname = server.name;
+            _network.text = _netname = server.name;
+            if(_netname.length == 0)
+                _network.text = _netname = server.hostname;
             
             if([server.hostname isKindOfClass:[NSString class]] && server.hostname.length)
                 _server.text = server.hostname;
@@ -532,6 +535,18 @@ static NSString * const ServerHasSSLKey = @"ssl";
     }
 #endif
 
+    _network = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _network.placeholder = @"Network";
+    _network.text = @"";
+    _network.textAlignment = NSTextAlignmentRight;
+    _network.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _network.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    _network.autocorrectionType = UITextAutocorrectionTypeNo;
+    _network.keyboardType = UIKeyboardTypeDefault;
+    _network.adjustsFontSizeToFitWidth = YES;
+    _network.returnKeyType = UIReturnKeyDone;
+    _network.delegate = self;
+    
     _server = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
     _server.placeholder = @"irc.example.net";
     _server.text = @"";
@@ -735,7 +750,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch(section) {
         case 0:
-            return (_cid==-1 && !_url)?4:3;
+            return 4;
         case 1:
             return 2;
         case 2:
@@ -778,16 +793,19 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     switch(indexPath.section) {
         case 0:
-            if(_cid!=-1 || _url)
-                row++;
             switch(row) {
                 case 0:
-                    cell.textLabel.text = @"Network";
-                    if(_netname.length)
-                        cell.detailTextLabel.text = _netname;
-                    else
-                        cell.detailTextLabel.text = @"Choose a Network";
-                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    if(_cid!=-1 || _url) {
+                        cell.textLabel.text = @"Network";
+                        cell.accessoryView = _network;
+                    } else {
+                        cell.textLabel.text = @"Network";
+                        if(_netname.length)
+                            cell.detailTextLabel.text = _netname;
+                        else
+                            cell.detailTextLabel.text = @"Choose a Network";
+                        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    }
                     break;
                 case 1:
                     cell.textLabel.text = @"Hostname";
