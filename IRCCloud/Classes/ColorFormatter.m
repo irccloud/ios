@@ -1002,9 +1002,9 @@ NSDictionary *emojiMap;
 +(NSRegularExpression *)ircChannelRegexForServer:(Server *)s {
     NSString *pattern;
     if(s && s.CHANTYPES.length) {
-        pattern = [NSString stringWithFormat:@"(\\s|^)([%@][^\\u20E3\\ufe0f<>!?\"()\\[\\],\\s\\u0001]+)", s.CHANTYPES];
+        pattern = [NSString stringWithFormat:@"(\\s|^)([%@][^\\ufe0e\\ufe0f\\u20e3<>!?\"()\\[\\],\\s\\u0001]+)", s.CHANTYPES];
     } else {
-        pattern = [NSString stringWithFormat:@"(\\s|^)([#][^\\u20E3\\ufe0f<>!?\"()\\[\\],\\s\\u0001]+)"];
+        pattern = [NSString stringWithFormat:@"(\\s|^)([#][^\\ufe0e\\ufe0f\\u20e3<>!?\"()\\[\\],\\s\\u0001]+)"];
     }
     
     return [NSRegularExpression
