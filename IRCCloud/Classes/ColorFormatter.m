@@ -924,7 +924,7 @@ NSDictionary *emojiMap;
     static NSRegularExpression *_pattern;
     if(!_pattern) {
         NSError *err;
-        NSString *pattern = [NSString stringWithFormat:@":(%@):", [[[emojiMap.allKeys componentsJoinedByString:@"|"] stringByReplacingOccurrencesOfString:@"-" withString:@"\\-"] stringByReplacingOccurrencesOfString:@"+" withString:@"\\+"]];
+        NSString *pattern = [NSString stringWithFormat:@"\\B:(%@):\\B", [[[emojiMap.allKeys componentsJoinedByString:@"|"] stringByReplacingOccurrencesOfString:@"-" withString:@"\\-"] stringByReplacingOccurrencesOfString:@"+" withString:@"\\+"]];
         _pattern = [NSRegularExpression
                     regularExpressionWithPattern:pattern
                     options:0
