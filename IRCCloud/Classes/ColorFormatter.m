@@ -20,6 +20,7 @@
 #import "TTTAttributedLabel.h"
 #import "UIColor+IRCCloud.h"
 #import "NSURL+IDN.h"
+#import "NetworkConnection.h"
 
 CTFontRef Courier, CourierBold, CourierOblique,CourierBoldOblique;
 CTFontRef Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
@@ -1066,17 +1067,20 @@ NSDictionary *emojiMap;
     NSMutableArray *arrowIndex = [[NSMutableArray alloc] init];
     
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", input, CLEAR];
-    NSInteger offset = 0;
-    NSArray *results = [[self emoji] matchesInString:[text lowercaseString] options:0 range:NSMakeRange(0, text.length)];
-    for(NSTextCheckingResult *result in results) {
-        for(int i = 1; i < result.numberOfRanges; i++) {
-            NSRange range = [result rangeAtIndex:i];
-            range.location -= offset;
-            NSString *token = [text substringWithRange:range];
-            if([emojiMap objectForKey:token.lowercaseString]) {
-                NSString *emoji = [emojiMap objectForKey:token.lowercaseString];
-                [text replaceCharactersInRange:NSMakeRange(range.location - 1, range.length + 2) withString:emoji];
-                offset += range.length - emoji.length + 2;
+    BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
+    if(!disableConvert) {
+        NSInteger offset = 0;
+        NSArray *results = [[self emoji] matchesInString:[text lowercaseString] options:0 range:NSMakeRange(0, text.length)];
+        for(NSTextCheckingResult *result in results) {
+            for(int i = 1; i < result.numberOfRanges; i++) {
+                NSRange range = [result rangeAtIndex:i];
+                range.location -= offset;
+                NSString *token = [text substringWithRange:range];
+                if([emojiMap objectForKey:token.lowercaseString]) {
+                    NSString *emoji = [emojiMap objectForKey:token.lowercaseString];
+                    [text replaceCharactersInRange:NSMakeRange(range.location - 1, range.length + 2) withString:emoji];
+                    offset += range.length - emoji.length + 2;
+                }
             }
         }
     }
