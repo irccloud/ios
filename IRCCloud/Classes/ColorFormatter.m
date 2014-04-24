@@ -1034,12 +1034,23 @@ NSDictionary *emojiMap;
                      @"notebook":@"📓",
                      @"twisted_rightwards_arrows":@"🔀",
                      @"zero":@"0️⃣",
-                     @"racehorse":@"🐎"};
+                     @"racehorse":@"🐎",
+                     
+                     @"doge":@"🐶",
+                     @"<3":@"❤️",
+                     @"</3":@"💔",
+                     @")":@"😃",
+                     @"-)":@"😃",
+                     @"(":@"😞",
+                     @"'(":@"😢",
+                     @"_(":@"😭",
+                     @";)":@"😉",
+                     @";p":@"😜"};
     
     static NSRegularExpression *_pattern;
     if(!_pattern) {
         NSError *err;
-        NSString *pattern = [NSString stringWithFormat:@"\\B:(%@):\\B", [[[emojiMap.allKeys componentsJoinedByString:@"|"] stringByReplacingOccurrencesOfString:@"-" withString:@"\\-"] stringByReplacingOccurrencesOfString:@"+" withString:@"\\+"]];
+        NSString *pattern = [NSString stringWithFormat:@"\\B:(%@):\\B", [[[[[emojiMap.allKeys componentsJoinedByString:@"|"] stringByReplacingOccurrencesOfString:@"-" withString:@"\\-"] stringByReplacingOccurrencesOfString:@"+" withString:@"\\+"] stringByReplacingOccurrencesOfString:@"(" withString:@"\\("] stringByReplacingOccurrencesOfString:@")" withString:@"\\)"]];
         _pattern = [NSRegularExpression
                     regularExpressionWithPattern:pattern
                     options:0
