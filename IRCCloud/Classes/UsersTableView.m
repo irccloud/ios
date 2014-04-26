@@ -117,7 +117,7 @@
 
 - (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data sectionTitles:(NSMutableArray *)sectionTitles sectionIndexes:(NSMutableArray *)sectionIndexes sectionSizes:(NSMutableArray *)sectionSizes {
     int first;
-    if(users.count) {
+    if(users.count && symbol) {
         unichar lastChar = 0;
         [data addObject:@{
          @"type":@TYPE_HEADING,
@@ -191,15 +191,15 @@
     NSMutableArray *sectionSizes = [[NSMutableArray alloc] init];
     
     for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
-        if([user.mode rangeOfString:s?s.MODE_OWNER:@"q"].location != NSNotFound)
+        if([user.mode rangeOfString:s?s.MODE_OWNER:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
             [owners addObject:user];
-        else if([user.mode rangeOfString:s?s.MODE_ADMIN:@"a"].location != NSNotFound)
+        else if([user.mode rangeOfString:s?s.MODE_ADMIN:@"a"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_ADMIN:@"a"])
             [admins addObject:user];
-        else if([user.mode rangeOfString:s?s.MODE_OP:@"o"].location != NSNotFound)
+        else if([user.mode rangeOfString:s?s.MODE_OP:@"o"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OP:@"o"])
             [ops addObject:user];
-        else if([user.mode rangeOfString:s?s.MODE_HALFOP:@"h"].location != NSNotFound)
+        else if([user.mode rangeOfString:s?s.MODE_HALFOP:@"h"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_HALFOP:@"h"])
             [halfops addObject:user];
-        else if([user.mode rangeOfString:s?s.MODE_VOICED:@"v"].location != NSNotFound)
+        else if([user.mode rangeOfString:s?s.MODE_VOICED:@"v"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_VOICED:@"v"])
             [voiced addObject:user];
         else
             [members addObject:user];
