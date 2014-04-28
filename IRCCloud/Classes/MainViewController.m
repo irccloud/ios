@@ -1884,6 +1884,10 @@
         if([s.status isEqualToString:@"disconnected"]) {
             [sheet addButtonWithTitle:@"Reconnect"];
             [sheet addButtonWithTitle:@"Delete"];
+#ifdef __IPHONE_7_0
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                sheet.destructiveButtonIndex = sheet.numberOfButtons - 1;
+#endif
         } else {
             //[sheet addButtonWithTitle:@"Identify Nickname…"];
             [sheet addButtonWithTitle:@"Disconnect"];
@@ -1899,6 +1903,10 @@
             [sheet addButtonWithTitle:@"Rejoin"];
             [sheet addButtonWithTitle:(_buffer.archived)?@"Unarchive":@"Archive"];
             [sheet addButtonWithTitle:@"Delete"];
+#ifdef __IPHONE_7_0
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                sheet.destructiveButtonIndex = sheet.numberOfButtons - 1;
+#endif
         }
     } else {
         if(_buffer.archived) {
@@ -1907,6 +1915,10 @@
             [sheet addButtonWithTitle:@"Archive"];
         }
         [sheet addButtonWithTitle:@"Delete"];
+#ifdef __IPHONE_7_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+            sheet.destructiveButtonIndex = sheet.numberOfButtons - 1;
+#endif
     }
     [sheet addButtonWithTitle:@"Ignore List"];
     [sheet addButtonWithTitle:@"Add Network"];
