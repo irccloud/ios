@@ -1366,7 +1366,7 @@ int __timestampWidth;
                     [self _sendHeartbeat];
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
-            } else if (!_buffer.scrolledUp) {
+            } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
                 _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
                 _buffer.scrolledUp = YES;
             }
