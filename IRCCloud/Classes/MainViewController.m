@@ -533,22 +533,22 @@
                 if([[e.from lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
                     for(Event *e in [_pendingEvents copy]) {
                         if(e.bid == _buffer.bid) {
-                            [_pendingEvents removeObject:e];
-                            [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
                             if(e.expirationTimer && [e.expirationTimer isValid])
                                 [e.expirationTimer invalidate];
                             e.expirationTimer = nil;
+                            [_pendingEvents removeObject:e];
+                            [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
                         }
                     }
                 } else {
                     int reqid = e.reqId;
                     for(Event *e in _pendingEvents) {
                         if(e.reqId == reqid) {
-                            [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
-                            [_pendingEvents removeObject:e];
                             if(e.expirationTimer && [e.expirationTimer isValid])
                                 [e.expirationTimer invalidate];
                             e.expirationTimer = nil;
+                            [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                            [_pendingEvents removeObject:e];
                             break;
                         }
                     }
