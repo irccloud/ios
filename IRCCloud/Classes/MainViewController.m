@@ -1331,7 +1331,6 @@
     _sortedChannels = nil;
     _sortedUsers = nil;
     BOOL changed = (_buffer && _buffer.bid != bid) || !_buffer;
-    CLS_LOG(@"BID selected: %i", bid);
     if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
         _eidToOpen = -1;
     }
@@ -1344,6 +1343,7 @@
             lastBuffer.draft = _message.text;
     }
     if(_buffer) {
+        CLS_LOG(@"BID selected: cid%i bid%i", _buffer.cid, bid);
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         for(Event *event in events) {
             if(event.isHighlight) {
@@ -1353,6 +1353,8 @@
                 }
             }
         }
+    } else {
+        CLS_LOG(@"BID selected but not found: bid%i", bid);
     }
     
     [self _updateTitleArea];
