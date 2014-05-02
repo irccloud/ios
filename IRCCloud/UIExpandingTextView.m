@@ -147,7 +147,7 @@
 
 -(void)clearText
 {
-    self.text = @"";
+    self.text = nil;
     [self textViewDidChange:self.internalTextView];
 }
      
@@ -238,7 +238,7 @@
 
         if(animateHeightChange)
         {
-            [UIView beginAnimations:@"" context:nil];
+            [UIView beginAnimations:nil context:nil];
             [UIView setAnimationDelegate:self];
             [UIView setAnimationDidStopSelector:@selector(growDidStop)];
             [UIView setAnimationBeginsFromCurrentState:YES];
