@@ -613,7 +613,7 @@
         case kIRCEventBufferArchived:
             o = notification.object;
             if(o.bid == _buffer.bid) {
-                if(_buffer && _buffer.lastBuffer)
+                if(_buffer && _buffer.lastBuffer && [[BuffersDataSource sharedInstance] getBuffer:_buffer.lastBuffer.bid])
                     [self bufferSelected:_buffer.lastBuffer.bid];
                 else
                     [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
@@ -1337,10 +1337,9 @@
 
     Buffer *lastBuffer = _buffer;
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
-    if(lastBuffer) {
+    if(lastBuffer && changed) {
         _buffer.lastBuffer = lastBuffer;
-        if(changed)
-            lastBuffer.draft = _message.text;
+        lastBuffer.draft = _message.text;
     }
     if(_buffer) {
         CLS_LOG(@"BID selected: cid%i bid%i", _buffer.cid, bid);
