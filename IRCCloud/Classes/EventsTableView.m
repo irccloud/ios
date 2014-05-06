@@ -192,6 +192,8 @@ int __timestampWidth;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if(_data.count && _buffer.scrolledUp) {
         _bottomRow = [[[self.tableView indexPathsForVisibleRows] lastObject] row];
+        if(_bottomRow >= _data.count)
+            _bottomRow = _data.count - 1;
         _buffer.scrolledUpFrom = [[_data objectAtIndex:_bottomRow] eid];
     } else {
         _bottomRow = -1;
@@ -858,6 +860,8 @@ int __timestampWidth;
             if(rows.count) {
                 lastRow = [[rows lastObject] row];
             }
+            if(lastRow >= _data.count)
+                lastRow = _data.count - 1;
             _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow] eid];
         }
         for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid]) {

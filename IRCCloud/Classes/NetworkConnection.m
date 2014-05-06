@@ -333,8 +333,7 @@ NSLock *__parserLock = nil;
                    @"stat_user": ^(IRCCloudJSONObject *object) {
                        _userInfo = object.dictionary;
                        _prefs = nil;
-                       [[Crashlytics sharedInstance] setUserName:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];
-                       [[Crashlytics sharedInstance] setUserIdentifier:[_userInfo objectForKey:@"id"]];
+                       [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];
                        [self postObject:object forEvent:kIRCEventUserInfo];
                    },
                    @"backlog_starts": ^(IRCCloudJSONObject *object) {
