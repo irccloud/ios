@@ -126,6 +126,7 @@
     [prefs setObject:@(_seconds.isOn) forKey:@"time-seconds"];
     [prefs setObject:@(_symbols.isOn) forKey:@"mode-showsymbol"];
     [prefs setObject:@(_colors.isOn) forKey:@"nick-colors"];
+    [prefs setObject:@(!_emocodes.isOn) forKey:@"emoji-disableconvert"];
     
     SBJsonWriter *writer = [[SBJsonWriter alloc] init];
     NSString *json = [writer stringWithObject:prefs];
@@ -271,6 +272,12 @@
         _colors.on = NO;
     }
     
+    if([[prefs objectForKey:@"emoji-disableconvert"] isKindOfClass:[NSNumber class]]) {
+        _emocodes.on = ![[prefs objectForKey:@"emoji-disableconvert"] boolValue];
+    } else {
+        _emocodes.on = YES;
+    }
+    
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
@@ -323,6 +330,7 @@
     _screen = [[UISwitch alloc] init];
     _chrome = [[UISwitch alloc] init];
     _autoCaps = [[UISwitch alloc] init];
+    _emocodes = [[UISwitch alloc] init];
 
     int width;
     
@@ -401,7 +409,7 @@
         case 1:
             return 1;
         case 2:
-            return 4;
+            return 5;
         case 3:
             return (_chromeInstalled)?4:3;
         case 4:
@@ -476,6 +484,13 @@
                 case 3:
                     cell.textLabel.text = @"Colourise Nicknames";
                     cell.accessoryView = _colors;
+                    break;
+                case 4:
+                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+                        cell.textLabel.text = @"Convert :emocodes:";
+                    else
+                        cell.textLabel.text = @"Convert :emocodes: to Emoji";
+                    cell.accessoryView = _emocodes;
                     break;
             }
             break;
