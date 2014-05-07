@@ -727,9 +727,11 @@
     }
     [self _hideConnectingView];
     if(_buffer && !_urlToOpen && _bidToOpen == -1 && _eidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
+        [self _updateTitleArea];
         [self _updateServerStatus];
         [self _updateUserListVisibility];
         [self _updateUnreadIndicator];
+        [self _updateGlobalMsg];
     } else {
         [[NSNotificationCenter defaultCenter] removeObserver:_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
         int bid = [BuffersDataSource sharedInstance].firstBid;

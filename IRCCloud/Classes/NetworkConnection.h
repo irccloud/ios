@@ -118,6 +118,7 @@ typedef enum {
     int _totalCount;
     int _currentBid;
     int _failCount;
+    BOOL _resuming;
     BOOL _background;
     BOOL backlog;
     NSTimeInterval _firstEID;
