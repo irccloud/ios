@@ -2259,9 +2259,9 @@
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    [self.slidingViewController dismissModalViewControllerAnimated:YES];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-    [self.slidingViewController dismissModalViewControllerAnimated:YES];
     UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
     if(!img)
         img = [info objectForKey:UIImagePickerControllerOriginalImage];
@@ -2273,50 +2273,42 @@
         _connectingActivity.hidden = NO;
         _connectingProgress.progress = 0;
         _connectingProgress.hidden = YES;
-        [self performSelectorInBackground:@selector(_uploadPhoto:) withObject:img];
+        ImageUploader *u = [[ImageUploader alloc] init];
+        u.delegate = self;
+        [u upload:img];
     }
 }
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     [self.slidingViewController dismissModalViewControllerAnimated:YES];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
 }
 
--(void)_uploadPhoto:(UIImage *)img {
-	NSURLResponse *response = nil;
-	NSError *error = nil;
-    NSData *data = UIImageJPEGRepresentation(img, 0.8);
-    CFStringRef data_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[data base64EncodedString], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-    
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.imgur.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
-    [request setHTTPShouldHandleCookies:NO];
-#ifdef IMGUR_KEY
-    [request setValue:[NSString stringWithFormat:@"Client-ID %@", @IMGUR_KEY] forHTTPHeaderField:@"Authorization"];
-#endif
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    CFRelease(data_escaped);
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    if(error)
-        NSLog(@"Error: %@", error);
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
-    NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:data];
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if([[d objectForKey:@"success"] intValue] == 1) {
-            if(_message.text.length == 0)
-                _message.text = [[d objectForKey:@"data"] objectForKey:@"link"];
-            else
-                _message.text = [_message.text stringByAppendingString:[[d objectForKey:@"data"] objectForKey:@"link"]];
-        } else {
-            _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [_alertView show];
-        }
-        [self _hideConnectingView];
-    }];
+-(void)imageUploadProgress:(float)progress {
+    [_connectingActivity stopAnimating];
+    _connectingActivity.hidden = YES;
+    _connectingProgress.hidden = NO;
+    [_connectingProgress setProgress:progress animated:YES];
+}
+
+-(void)imageUploadDidFail {
+    _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+    [_alertView show];
+    [self _hideConnectingView];
+}
+
+-(void)imageUploadDidFinish:(NSDictionary *)d {
+    if([[d objectForKey:@"success"] intValue] == 1) {
+        if(_message.text.length == 0)
+            _message.text = [[d objectForKey:@"data"] objectForKey:@"link"];
+        else
+            _message.text = [_message.text stringByAppendingString:[[d objectForKey:@"data"] objectForKey:@"link"]];
+    } else {
+        _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [_alertView show];
+    }
+    [self _hideConnectingView];
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {

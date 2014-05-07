@@ -42,6 +42,8 @@
 		2230F8E817162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
 		2230F8E917162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
 		22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
+		223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
+		223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2236F5FB16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
@@ -344,6 +346,8 @@
 		2230F8E617162ACC007F7C98 /* Ignore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ignore.h; sourceTree = "<group>"; };
 		2230F8E717162ACC007F7C98 /* Ignore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ignore.m; sourceTree = "<group>"; };
 		22324FDF177DE51A008B6912 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		223581C1191AD79B00A4B124 /* ImageUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUploader.h; sourceTree = "<group>"; };
+		223581C2191AD79B00A4B124 /* ImageUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUploader.m; sourceTree = "<group>"; };
 		2236F5F816DA765C007BE535 /* ServersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServersDataSource.h; sourceTree = "<group>"; };
 		2236F5F916DA765C007BE535 /* ServersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServersDataSource.m; sourceTree = "<group>"; };
 		2236F5FC16DA8928007BE535 /* BuffersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuffersDataSource.h; sourceTree = "<group>"; };
@@ -754,6 +758,8 @@
 				22D4309F171C663A003C0684 /* IgnoresTableViewController.m */,
 				2223C6A71768D7150032544B /* ImageViewController.h */,
 				2223C6A81768D7150032544B /* ImageViewController.m */,
+				223581C1191AD79B00A4B124 /* ImageUploader.h */,
+				223581C2191AD79B00A4B124 /* ImageUploader.m */,
 				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
 				224FCF341787288400FC3879 /* LicenseViewController.h */,
@@ -1177,6 +1183,7 @@
 				225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */,
 				228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */,
 				225D976418AA995900065087 /* UIExpandingTextView.m in Sources */,
+				223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				225D976518AA995900065087 /* UIExpandingTextViewInternal.m in Sources */,
 				225D976618AA995900065087 /* EditConnectionViewController.m in Sources */,
 				228E2B8918CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */,
@@ -1251,6 +1258,7 @@
 				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
 				228E2BA218CF770D0011DEAB /* SBJsonWriter.m in Sources */,
 				22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
+				223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				22D430A81725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
 				22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
 				228E2B8718CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */,

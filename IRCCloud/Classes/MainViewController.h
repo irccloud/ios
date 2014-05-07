@@ -22,8 +22,9 @@
 #import "EventsTableView.h"
 #import "UIExpandingTextView.h"
 #import "NickCompletionView.h"
+#import "ImageUploader.h"
 
-@interface MainViewController : UIViewController<NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate> {
+@interface MainViewController : UIViewController<NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
