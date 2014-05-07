@@ -2259,7 +2259,6 @@
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    NSLog(@"Image picked: %@", info);
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     [self.slidingViewController dismissModalViewControllerAnimated:YES];
@@ -2279,16 +2278,14 @@
 }
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    NSLog(@"Image picker cancelled");
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     [self.slidingViewController dismissModalViewControllerAnimated:YES];
 }
 
 -(void)_uploadPhoto:(UIImage *)img {
-    NSLog(@"Uploading image (%fx%f)", img.size.width, img.size.height);
 	NSURLResponse *response = nil;
 	NSError *error = nil;
-    NSData *data = UIImagePNGRepresentation(img);
+    NSData *data = UIImageJPEGRepresentation(img, 0.8);
     CFStringRef data_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[data base64EncodedString], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
@@ -2305,12 +2302,9 @@
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     if(error)
         NSLog(@"Error: %@", error);
-    else
-        NSLog(@"Response: %s", [data bytes]);
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     
     NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:data];
-    NSLog(@"%@", d);
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if([[d objectForKey:@"success"] intValue] == 1) {
             if(_message.text.length == 0)
