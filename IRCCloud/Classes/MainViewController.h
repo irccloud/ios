@@ -23,7 +23,7 @@
 #import "UIExpandingTextView.h"
 #import "NickCompletionView.h"
 
-@interface MainViewController : UIViewController<NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate> {
+@interface MainViewController : UIViewController<NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;

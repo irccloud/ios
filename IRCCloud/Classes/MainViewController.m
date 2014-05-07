@@ -34,6 +34,7 @@
 #import "WhoListTableViewController.h"
 #import "NamesListTableViewController.h"
 #import <objc/message.h>
+#import "config.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -1895,6 +1896,7 @@
         }
         [sheet addButtonWithTitle:@"Edit Connection"];
     } else if([_buffer.type isEqualToString:@"channel"]) {
+        [sheet addButtonWithTitle:@"Insert a Photo"];
         if([[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             [sheet addButtonWithTitle:@"Leave"];
             if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
@@ -1910,6 +1912,7 @@
 #endif
         }
     } else {
+        [sheet addButtonWithTitle:@"Insert a Photo"];
         if(_buffer.archived) {
             [sheet addButtonWithTitle:@"Unarchive"];
         } else {
@@ -2241,6 +2244,78 @@
         return YES;
 }
 
+-(void)_choosePhoto:(UIImagePickerControllerSourceType)sourceType {
+    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    picker.sourceType = sourceType;
+    picker.delegate = (id)self;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        [picker.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
+    }
+    [self.slidingViewController presentModalViewController:picker animated:YES];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    [self.slidingViewController dismissModalViewControllerAnimated:YES];
+    UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
+    if(!img)
+        img = [info objectForKey:UIImagePickerControllerOriginalImage];
+    
+    if(img) {
+        [self _showConnectingView];
+        _connectingStatus.text = @"Uploading";
+        [_connectingActivity startAnimating];
+        _connectingActivity.hidden = NO;
+        _connectingProgress.progress = 0;
+        _connectingProgress.hidden = YES;
+        [self performSelectorInBackground:@selector(_uploadPhoto:) withObject:img];
+    }
+}
+
+-(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    [self.slidingViewController dismissModalViewControllerAnimated:YES];
+}
+
+-(void)_uploadPhoto:(UIImage *)img {
+	NSURLResponse *response = nil;
+	NSError *error = nil;
+    NSData *data = UIImagePNGRepresentation(img);
+    CFStringRef data_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[data base64EncodedString], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.imgur.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+#ifdef IMGUR_KEY
+    [request setValue:[NSString stringWithFormat:@"Client-ID %@", @IMGUR_KEY] forHTTPHeaderField:@"Authorization"];
+#endif
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    CFRelease(data_escaped);
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    
+    NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:data];
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if([[d objectForKey:@"success"] intValue] == 1) {
+            if(_message.text.length == 0)
+                _message.text = [[d objectForKey:@"data"] objectForKey:@"link"];
+            else
+                _message.text = [_message.text stringByAppendingString:[[d objectForKey:@"data"] objectForKey:@"link"]];
+        } else {
+            _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [_alertView show];
+        }
+        [self _hideConnectingView];
+    }];
+}
+
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     [_landscapeView removeFromSuperview];
     [_message resignFirstResponder];
@@ -2313,6 +2388,22 @@
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];
+        } else if([action isEqualToString:@"Take a Photo"]) {
+            [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
+        } else if([action isEqualToString:@"Choose Existing"]) {
+            [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+        } else if([action isEqualToString:@"Insert a Photo"]) {
+            if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+                UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Existing", nil];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+                    [self.view.window addSubview:_landscapeView];
+                    [sheet showInView:_landscapeView];
+                } else {
+                    [sheet showInView:self.slidingViewController.view.superview];
+                }
+            } else {
+                [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+            }
         }
         
         if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)
