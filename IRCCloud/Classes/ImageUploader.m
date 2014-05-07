@@ -13,6 +13,10 @@
 
 @implementation ImageUploader
 -(void)upload:(UIImage *)img {
+    [self performSelectorInBackground:@selector(_upload:) withObject:img];
+}
+
+-(void)_upload:(UIImage *)img {
     NSData *data = UIImageJPEGRepresentation(img, 0.8);
     CFStringRef data_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[data base64EncodedString], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
     
@@ -27,16 +31,19 @@
     
     CFRelease(data_escaped);
     
-    _response = [[NSMutableData alloc] init];
-    _connection = [NSURLConnection connectionWithRequest:request delegate:self];
-    [_connection start];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _response = [[NSMutableData alloc] init];
+        _connection = [NSURLConnection connectionWithRequest:request delegate:self];
+        [_connection start];
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    }];
 }
 
 -(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     if(_delegate)
-        [_delegate imageUploadProgress:(float)totalBytesWritten / (float)totalBytesExpectedToWrite];
-    
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [_delegate imageUploadProgress:(float)totalBytesWritten / (float)totalBytesExpectedToWrite];
+        }];
 }
 
 -(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {

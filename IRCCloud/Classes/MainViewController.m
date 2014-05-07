@@ -2273,6 +2273,8 @@
         _connectingActivity.hidden = NO;
         _connectingProgress.progress = 0;
         _connectingProgress.hidden = YES;
+        _message.editable = NO;
+        _sendBtn.enabled = NO;
         ImageUploader *u = [[ImageUploader alloc] init];
         u.delegate = self;
         [u upload:img];
@@ -2296,6 +2298,8 @@
     _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
     [_alertView show];
     [self _hideConnectingView];
+    _message.editable = YES;
+    _sendBtn.enabled = YES;
 }
 
 -(void)imageUploadDidFinish:(NSDictionary *)d {
@@ -2309,6 +2313,8 @@
         [_alertView show];
     }
     [self _hideConnectingView];
+    _message.editable = YES;
+    _sendBtn.enabled = YES;
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
