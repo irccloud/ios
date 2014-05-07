@@ -2304,10 +2304,13 @@
 
 -(void)imageUploadDidFinish:(NSDictionary *)d {
     if([[d objectForKey:@"success"] intValue] == 1) {
-        if(_message.text.length == 0)
+        if(_message.text.length == 0) {
             _message.text = [[d objectForKey:@"data"] objectForKey:@"link"];
-        else
+        } else {
+            if(![_message.text hasSuffix:@" "])
+                _message.text = [_message.text stringByAppendingString:@" "];
             _message.text = [_message.text stringByAppendingString:[[d objectForKey:@"data"] objectForKey:@"link"]];
+        }
     } else {
         _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
         [_alertView show];
