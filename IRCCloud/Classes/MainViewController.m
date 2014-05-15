@@ -930,7 +930,7 @@
             [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:50];
     }
     if(!_buffer.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type] == 0) {
-        [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid maxSize:50];
+        [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid maxSize:100];
         [_eventsView setBuffer:_buffer];
     }
 }
