@@ -152,10 +152,24 @@
             }
         }
         _topicEdit.text = [_topic string];
+        
+        if(_channel.topic_author) {
+            _topicSetBy = [NSString stringWithFormat:@"Set by %@", _channel.topic_author];
+            if(_channel.topic_time > 0) {
+                NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+                [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+                
+                _topicSetBy = [_topicSetBy stringByAppendingFormat:@" on %@", [dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:_channel.topic_time]]];
+            }
+        } else {
+            _topicSetBy = nil;
+        }
     } else {
         _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor grayColor] mono:NO linkify:NO server:nil links:nil];
         _topicLabel.text = _topic;
         _topicEdit.text = @"";
+        _topicSetBy = nil;
     }
     if(_channel.mode.length) {
         for(NSDictionary *mode in _channel.modes) {
@@ -258,6 +272,12 @@
             return [hint sizeWithFont:[UIFont systemFontOfSize:14] constrainedToSize:CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX) lineBreakMode:NSLineBreakByWordWrapping].height + 32;
         }
     }
+}
+
+-(NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
+    if(section == 0 && _topicSetBy.length)
+        return _topicSetBy;
+    return nil;
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {

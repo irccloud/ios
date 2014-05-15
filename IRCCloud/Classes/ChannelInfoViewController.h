@@ -25,6 +25,7 @@
     NSAttributedString *_topic;
     TTTAttributedLabel *_topicLabel;
     NSMutableArray *_modeHints;
+    NSString *_topicSetBy;
     BOOL _topicChanged;
     int offset;
 }
