@@ -317,7 +317,10 @@
                       },
                       @"channel_topic":^(Event *event, IRCCloudJSONObject *object) {
                           event.from = [object objectForKey:@"author"];
-                          event.msg = [NSString stringWithFormat:@"set the topic: %@", [object objectForKey:@"topic"]];
+                          if([object objectForKey:@"topic"] && [[object objectForKey:@"topic"] length])
+                              event.msg = [NSString stringWithFormat:@"set the topic: %@", [object objectForKey:@"topic"]];
+                          else
+                              event.msg = @"cleared the topic";
                           event.bgColor = [UIColor statusBackgroundColor];
                       },
                       @"channel_mode":^(Event *event, IRCCloudJSONObject *object) {
