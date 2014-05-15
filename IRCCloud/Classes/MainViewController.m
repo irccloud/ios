@@ -924,7 +924,15 @@
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    CLS_LOG(@"Received low memory warning, cleaning up backlog");
+    for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
+        if(b != _buffer && !b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
+            [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:50];
+    }
+    if(!_buffer.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type] == 0) {
+        [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid maxSize:50];
+        [_eventsView setBuffer:_buffer];
+    }
 }
 
 -(IBAction)serverStatusBarPressed:(id)sender {

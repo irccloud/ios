@@ -1130,7 +1130,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _socket = nil;
     for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
         if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
-            [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid];
+            [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
     }
 }
 

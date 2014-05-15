@@ -282,7 +282,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
             if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
-                [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid];
+                [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
         }
         [NSThread sleepForTimeInterval:[[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] + 5];
         [application endBackgroundTask: background_task];

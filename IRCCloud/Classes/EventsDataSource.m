@@ -630,10 +630,10 @@
     }
 }
 
--(void)pruneEventsForBuffer:(int)bid {
+-(void)pruneEventsForBuffer:(int)bid maxSize:(int)size {
     @synchronized(_events) {
         NSMutableArray *events = [_events objectForKey:@(bid)];
-        while(events.count > 200) {
+        while(events.count > size) {
             Event *e = [events objectAtIndex:0];
             [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(e.eid)];
             [events removeObject:e];
