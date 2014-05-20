@@ -20,6 +20,7 @@
 #import "AppDelegate.h"
 #import "UIColor+IRCCloud.h"
 #import "OpenInChromeController.h"
+#import "ImgurLoginViewController.h"
 
 @interface BGTimeoutViewController : UITableViewController
 @end
@@ -411,7 +412,7 @@
         case 2:
             return 5;
         case 3:
-            return (_chromeInstalled)?4:3;
+            return (_chromeInstalled)?5:4;
         case 4:
             return 4;
     }
@@ -514,6 +515,11 @@
                     cell.accessoryView = _autoCaps;
                     break;
                 case 3:
+                    cell.textLabel.text = @"Imgur.com Account";
+                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"];
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    break;
+                case 4:
                     cell.textLabel.text = @"Open URLs in Chrome";
                     cell.accessoryView = _chrome;
                     break;
@@ -547,6 +553,15 @@
     [self.tableView endEditing:YES];
     if(indexPath.section == 3 && indexPath.row == 1) {
         [self.navigationController pushViewController:[[BGTimeoutViewController alloc] init] animated:YES];
+    }
+    if(indexPath.section == 3 && indexPath.row == 3) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
     }
     if(indexPath.section == 4 && indexPath.row == 0) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];

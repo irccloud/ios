@@ -1449,6 +1449,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self disconnect];
     [self cancelIdleTimer];

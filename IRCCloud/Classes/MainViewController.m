@@ -33,6 +33,7 @@
 #import "DisplayOptionsViewController.h"
 #import "WhoListTableViewController.h"
 #import "NamesListTableViewController.h"
+#import "ImgurLoginViewController.h"
 #import <objc/message.h>
 #import "config.h"
 
@@ -2308,6 +2309,23 @@
     [self _hideConnectingView];
     _message.editable = YES;
     _sendBtn.enabled = YES;
+}
+
+-(void)imageUploadNotAuthorized {
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self _hideConnectingView];
+    _message.editable = YES;
+    _sendBtn.enabled = YES;
+    SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+    [nc pushViewController:[[ImgurLoginViewController alloc] init] animated:NO];
+    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    [self presentViewController:nc animated:YES completion:nil];
 }
 
 -(void)imageUploadDidFinish:(NSDictionary *)d {

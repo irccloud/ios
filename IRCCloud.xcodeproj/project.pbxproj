@@ -289,6 +289,8 @@
 		22D430A91725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A51725AAEA003C0684 /* UIExpandingTextViewInternal.m */; };
 		22D4F9121743F3790095EE8F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22D4F9101743F3790095EE8F /* Localizable.strings */; };
 		22D4F9131743F3790095EE8F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22D4F9101743F3790095EE8F /* Localizable.strings */; };
+		22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
+		22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
 		22EEA94C18CF7F20007D5022 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22EEA94B18CF7F20007D5022 /* XCTest.framework */; };
 		22EEA94E18D0AC08007D5022 /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */; };
 		22EEA94F18D0AC4D007D5022 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
@@ -505,6 +507,8 @@
 		22D430A41725AAEA003C0684 /* UIExpandingTextViewInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIExpandingTextViewInternal.h; sourceTree = "<group>"; };
 		22D430A51725AAEA003C0684 /* UIExpandingTextViewInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIExpandingTextViewInternal.m; sourceTree = "<group>"; };
 		22D4F9111743F3790095EE8F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		22E442A3192AB85B00A6C687 /* ImgurLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImgurLoginViewController.h; sourceTree = "<group>"; };
+		22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImgurLoginViewController.m; sourceTree = "<group>"; };
 		22EEA94B18CF7F20007D5022 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = EnterpriseImages.xcassets; sourceTree = "<group>"; };
 		22EEA95018D0B117007D5022 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -760,6 +764,8 @@
 				2223C6A81768D7150032544B /* ImageViewController.m */,
 				223581C1191AD79B00A4B124 /* ImageUploader.h */,
 				223581C2191AD79B00A4B124 /* ImageUploader.m */,
+				22E442A3192AB85B00A6C687 /* ImgurLoginViewController.h */,
+				22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */,
 				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
 				224FCF341787288400FC3879 /* LicenseViewController.h */,
@@ -1148,6 +1154,7 @@
 				225D974918AA995900065087 /* GCDAsyncSocket.m in Sources */,
 				225D974A18AA995900065087 /* HandshakeHeader.m in Sources */,
 				228E2B9218CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
+				22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
 				228E2B8618CF770D0011DEAB /* SBJsonStreamParser.m in Sources */,
 				225D974B18AA995900065087 /* MutableQueue.m in Sources */,
 				225D974C18AA995900065087 /* NSData+Base64.m in Sources */,
@@ -1223,6 +1230,7 @@
 				22B4286816D831A800498507 /* GCDAsyncSocket.m in Sources */,
 				22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */,
 				228E2B9018CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
+				22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
 				228E2B8418CF770D0011DEAB /* SBJsonStreamParser.m in Sources */,
 				22B4286C16D831A800498507 /* MutableQueue.m in Sources */,
 				22B4286E16D831A800498507 /* NSData+Base64.m in Sources */,

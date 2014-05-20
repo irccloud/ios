@@ -11,6 +11,7 @@
 @protocol ImageUploaderDelegate<NSObject>
 -(void)imageUploadProgress:(float)progress;
 -(void)imageUploadDidFail;
+-(void)imageUploadNotAuthorized;
 -(void)imageUploadDidFinish:(NSDictionary *)response;
 @end
 
