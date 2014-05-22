@@ -27,6 +27,17 @@
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
 #endif
+    NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
+    if (cookies != nil && cookies.count > 0) {
+        for (NSHTTPCookie *cookie in cookies) {
+            [[NSHTTPCookieStorage sharedHTTPCookieStorage] deleteCookie:cookie];
+        }
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
+    _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    _activity.hidesWhenStopped = YES;
+    [_activity startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_activity];
     self.view.backgroundColor = [UIColor blackColor];
     _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height)];
     _webView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
@@ -42,6 +53,17 @@
     if([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102)
         return;
     NSLog(@"Error: %@", error);
+    [_activity stopAnimating];
+}
+
+-(void)webViewDidStartLoad:(UIWebView *)webView {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [_activity startAnimating];
+}
+
+-(void)webViewDidFinishLoad:(UIWebView *)webView {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [_activity stopAnimating];
 }
 
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {

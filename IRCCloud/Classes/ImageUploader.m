@@ -14,7 +14,38 @@
 @implementation ImageUploader
 -(void)upload:(UIImage *)img {
     _image = img;
-    [self performSelectorInBackground:@selector(_upload:) withObject:img];
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
+        [self _authorize];
+    else
+        [self performSelectorInBackground:@selector(_upload:) withObject:img];
+}
+
+-(void)_authorize {
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.imgur.com/oauth2/token"]];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[[NSString stringWithFormat:@"refresh_token=%@&client_id=%@&client_secret=%@&grant_type=refresh_token", [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"], @IMGUR_KEY, @IMGUR_SECRET] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error renewing token. Error %li : %@", (long)error.code, error.userInfo);
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [_delegate imageUploadDidFail];
+            }];
+        } else {
+            SBJsonParser *parser = [[SBJsonParser alloc] init];
+            NSDictionary *dict = [parser objectWithData:data];
+            if([dict objectForKey:@"access_token"]) {
+                for(NSString *key in dict.allKeys) {
+                    if([[dict objectForKey:key] isKindOfClass:[NSString class]])
+                        [[NSUserDefaults standardUserDefaults] setObject:[dict objectForKey:key] forKey:[NSString stringWithFormat:@"imgur_%@", key]];
+                }
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                [self performSelectorInBackground:@selector(_upload:) withObject:_image];
+            } else {
+                [_delegate performSelector:@selector(imageUploadNotAuthorized) withObject:nil afterDelay:0.25];
+            }
+        }
+    }];
 }
 
 -(void)_upload:(UIImage *)img {
@@ -66,23 +97,7 @@
     NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:_response];
 #ifdef IMGUR_KEY
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] && [[d objectForKey:@"success"] intValue] == 0 && [[d objectForKey:@"status"] intValue] == 403) {
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.imgur.com/oauth2/token"]];
-        [request setHTTPMethod:@"POST"];
-        [request setHTTPBody:[[NSString stringWithFormat:@"refresh_token=%@&client_id=%@&client_secret=%@&grant_type=refresh_token", [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"], @IMGUR_KEY, @IMGUR_SECRET] dataUsingEncoding:NSUTF8StringEncoding]];
-
-        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-            if (error) {
-                NSLog(@"Error renewing token. Error %li : %@", (long)error.code, error.userInfo);
-                [_delegate imageUploadDidFail];
-            } else {
-                SBJsonParser *parser = [[SBJsonParser alloc] init];
-                NSDictionary *dict = [parser objectWithData:data];
-                if([[dict objectForKey:@"success"] intValue] == 1)
-                    [self performSelectorInBackground:@selector(_upload:) withObject:_image];
-                else
-                    [_delegate imageUploadNotAuthorized];
-            }
-        }];
+        [self _authorize];
         return;
     }
 #endif

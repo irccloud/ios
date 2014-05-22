@@ -19,8 +19,8 @@
     NSURLConnection *_connection;
     UIImage *_image;
     NSMutableData *_response;
-    id<ImageUploaderDelegate> _delegate;
+    NSObject<ImageUploaderDelegate> *_delegate;
 }
-@property id<ImageUploaderDelegate> delegate;
+@property NSObject<ImageUploaderDelegate> *delegate;
 -(void)upload:(UIImage *)image;
 @end

@@ -10,5 +10,6 @@
 
 @interface ImgurLoginViewController : UIViewController<UIWebViewDelegate> {
     UIWebView *_webView;
+    UIActivityIndicatorView *_activity;
 }
 @end
