@@ -744,13 +744,6 @@
                 }
             }
             break;
-        case kIRCEventChannelInit:
-            if(notification.object) {
-                Buffer *b = [_buffers getBuffer:((Channel *)notification.object).bid];
-                if(b)
-                    [self refreshBuffer:b];
-            }
-            break;
         case kIRCEventChannelMode:
             if(o) {
                 Buffer *b = [_buffers getBuffer:o.bid];
