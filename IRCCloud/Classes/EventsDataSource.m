@@ -261,6 +261,7 @@
                           event.from = @"";
                           event.msg = @"⇐ You disconnected";
                           event.color = [UIColor timestampColor];
+                          event.isSelf = NO;
                       },
                       @"self_details":^(Event *event, IRCCloudJSONObject *object) {
                           event.from = @"";

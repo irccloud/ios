@@ -27,7 +27,8 @@ typedef enum {
     kCollapsedEventMode,
     kCollapsedEventPopIn,
     kCollapsedEventPopOut,
-    kCollapsedEventNickChange
+    kCollapsedEventNickChange,
+    kCollapsedEventConnectionStatus
 } kCollapsedEvent;
 
 typedef enum {
@@ -57,11 +58,13 @@ typedef enum {
     NSString *_fromNick;
     NSString *_targetMode;
     NSString *_chan;
+    int _count;
 }
 @property NSTimeInterval eid;
 @property kCollapsedEvent type;
 @property NSString *nick, *oldNick, *hostname, *msg, *fromMode, *fromNick, *targetMode, *chan;
 @property BOOL netsplit;
+@property int count;
 -(NSComparisonResult)compare:(CollapsedEvent *)aEvent;
 -(BOOL)addMode:(NSString *)mode server:(Server *)server;
 -(BOOL)removeMode:(NSString *)mode server:(Server *)server;

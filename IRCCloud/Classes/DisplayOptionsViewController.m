@@ -44,6 +44,7 @@
     NSMutableDictionary *notifyAll = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hideJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *expandJoinPart = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *expandDisco = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
     
     if([_buffer.type isEqualToString:@"channel"]) {
@@ -135,7 +136,20 @@
                 [prefs setObject:expandJoinPart forKey:@"buffer-expandJoinPart"];
             else
                 [prefs removeObjectForKey:@"buffer-expandJoinPart"];
-}
+        }
+        
+        if([_buffer.type isEqualToString:@"console"]) {
+            if([[prefs objectForKey:@"buffer-expandDisco"] isKindOfClass:[NSDictionary class]])
+                [expandDisco addEntriesFromDictionary:[prefs objectForKey:@"buffer-expandDisco"]];
+            if(_expandDisco.on)
+                [expandDisco removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [expandDisco setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(expandDisco.count)
+                [prefs setObject:expandDisco forKey:@"buffer-expandDisco"];
+            else
+                [prefs removeObjectForKey:@"buffer-expandDisco"];
+        }
     }
     
     SBJsonWriter *writer = [[SBJsonWriter alloc] init];
@@ -229,6 +243,10 @@
         else
             _collapseJoinPart.on = YES;
         
+        if([[[prefs objectForKey:@"buffer-expandDisco"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+            _expandDisco.on = NO;
+        else
+            _expandDisco.on = YES;
     }
 }
 
@@ -246,6 +264,7 @@
     _trackUnread = [[UISwitch alloc] init];
     _showJoinPart = [[UISwitch alloc] init];
     _collapseJoinPart = [[UISwitch alloc] init];
+    _expandDisco = [[UISwitch alloc] init];
 
     [self refresh];
 }
@@ -272,7 +291,7 @@
     if([_buffer.type isEqualToString:@"channel"])
         return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?4:5;
     else if([_buffer.type isEqualToString:@"console"])
-        return 1;
+        return 2;
     else
         return 3;
 }
@@ -305,8 +324,13 @@
             cell.accessoryView = _notifyAll;
             break;
         case 3:
-            cell.textLabel.text = @"Show joins/parts";
-            cell.accessoryView = _showJoinPart;
+            if([_buffer.type isEqualToString:@"console"]) {
+                cell.textLabel.text = @"Group repeated disconnects";
+                cell.accessoryView = _expandDisco;
+            } else {
+                cell.textLabel.text = @"Show joins/parts";
+                cell.accessoryView = _showJoinPart;
+            }
             break;
         case 4:
             cell.textLabel.text = @"Collapse joins/parts";

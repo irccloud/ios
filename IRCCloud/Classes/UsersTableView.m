@@ -111,8 +111,8 @@
 }
 
 - (void)_refreshTimer {
-    [self refresh];
     _refreshTimer = nil;
+    [self refresh];
 }
 
 - (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data sectionTitles:(NSMutableArray *)sectionTitles sectionIndexes:(NSMutableArray *)sectionIndexes sectionSizes:(NSMutableArray *)sectionSizes {

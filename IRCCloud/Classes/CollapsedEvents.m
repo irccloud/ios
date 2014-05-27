@@ -289,6 +289,14 @@
                     }
                 }
                 [_data addObject:event];
+            } else if(event.type == kCollapsedEventConnectionStatus) {
+                for(CollapsedEvent *e1 in _data) {
+                    if([e1.msg isEqualToString:event.msg]) {
+                        e1.count++;
+                        return;
+                    }
+                }
+                [_data addObject:event];
             } else {
                 [_data addObject:event];
             }
@@ -382,6 +390,9 @@
             } else if([event.type hasSuffix:@"nickchange"]) {
                 c.type = kCollapsedEventNickChange;
                 c.oldNick = event.oldNick;
+            } else if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"]) {
+                c.type = kCollapsedEventConnectionStatus;
+                c.msg = event.msg;
             } else {
                 return NO;
             }
@@ -463,6 +474,8 @@
                     if(showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
+                case kCollapsedEventConnectionStatus:
+                    output = e.msg;
             }
         } else {
             BOOL isNetsplit = NO;
@@ -516,6 +529,8 @@
                         case kCollapsedEventPopOut:
                             [message appendString:@"↔ "];
                             break;
+                        case kCollapsedEventConnectionStatus:
+                            break;
                     }
                 }
                 
@@ -527,6 +542,10 @@
                     e.oldNick = oldNick;
                 } else if(e.type == kCollapsedEventNetSplit) {
                     [message appendString:[e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "]];
+                } else if(e.type == kCollapsedEventConnectionStatus) {
+                    [message appendString:e.msg];
+                    if(e.count > 0)
+                        [message appendFormat:@" (x%i)", e.count + 1];
                 } else if(!showChan) {
                     [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO]];
                     [message appendString:[self was:e]];
@@ -552,7 +571,7 @@
                         default:
                             break;
                     }
-                } else if(showChan && e.type != kCollapsedEventNetSplit) {
+                } else if(showChan && e.type != kCollapsedEventNetSplit && e.type != kCollapsedEventConnectionStatus) {
                     if(groupcount == 0) {
                         [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO]];
                         [message appendString:[self was:e]];

@@ -82,8 +82,8 @@ int __timestampWidth;
         frame.size.height -= 6;
         frame.size.width -= 12;
         if(_type == ROW_SOCKETCLOSED) {
-            frame.size.height -= 26;
-            _socketClosedBar.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height, frame.size.width, 26);
+            frame.size.height -= 20;
+            _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, frame.size.width + 12, 26);
             _socketClosedBar.hidden = NO;
         } else if(_type == ROW_FAILED) {
             frame.size.width -= 20;
@@ -413,7 +413,7 @@ int __timestampWidth;
         type = [type substringFromIndex:4];
     }
 
-    if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]) {
+    if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"]) {
         BOOL showChan = ![_buffer.type isEqualToString:@"channel"];
         NSDictionary *prefs = _conn.prefs;
         if(prefs) {
@@ -441,6 +441,8 @@ int __timestampWidth;
             
             if([_buffer.type isEqualToString:@"channel"]) {
                 expandMap = [prefs objectForKey:@"channel-expandJoinPart"];
+            } else if([_buffer.type isEqualToString:@"console"]) {
+                expandMap = [prefs objectForKey:@"buffer-expandDisco"];
             } else {
                 expandMap = [prefs objectForKey:@"buffer-expandJoinPart"];
             }
@@ -503,6 +505,13 @@ int __timestampWidth;
                 heading.formatted = nil;
                 heading.linkify = NO;
                 [self _addItem:heading eid:_currentCollapsedEid - 1];
+                if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"]) {
+                    Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
+                    if(last) {
+                        last.rowType = ROW_MESSAGE;
+                    }
+                    event.rowType = ROW_SOCKETCLOSED;
+                }
             }
             event.timestamp = nil;
         } else {
@@ -528,8 +537,16 @@ int __timestampWidth;
         event.formattedMsg = nil;
         event.formatted = nil;
         event.linkify = NO;
+        _lastCollapsedEid = event.eid;
+        if([_buffer.type isEqualToString:@"console"] && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"]) {
+            _currentCollapsedEid = -1;
+            _lastCollapsedEid = -1;
+            [_collapsedEvents clear];
+        }
+            
     } else {
         _currentCollapsedEid = -1;
+        _lastCollapsedEid = -1;
         [_collapsedEvents clear];
 
         if(!event.formatted) {
@@ -1183,7 +1200,7 @@ int __timestampWidth;
         cell.accessibilityLabel = [NSString stringWithFormat:@"Action at %@", e.timestamp];
         cell.accessibilityValue = [NSString stringWithFormat:@"%@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
     }
-    if(e.rowType == ROW_MESSAGE && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
+    if((e.rowType == ROW_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
         if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
             if(e.groupEid == e.eid + 1) {
                 cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_minus"];
