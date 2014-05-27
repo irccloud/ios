@@ -362,6 +362,7 @@
             c.hostname = event.hostmask;
             c.fromMode = event.fromMode;
             c.chan = event.chan;
+            c.count = 1;
             if([event.type hasSuffix:@"joined_channel"]) {
                 c.type = kCollapsedEventJoin;
             } else if([event.type hasSuffix:@"parted_channel"]) {
@@ -544,8 +545,8 @@
                     [message appendString:[e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "]];
                 } else if(e.type == kCollapsedEventConnectionStatus) {
                     [message appendString:e.msg];
-                    if(e.count > 0)
-                        [message appendFormat:@" (x%i)", e.count + 1];
+                    if(e.count > 1)
+                        [message appendFormat:@" (x%i)", e.count];
                 } else if(!showChan) {
                     [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO]];
                     [message appendString:[self was:e]];
