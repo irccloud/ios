@@ -413,7 +413,7 @@ int __timestampWidth;
         type = [type substringFromIndex:4];
     }
 
-    if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"]) {
+    if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"] || [type isEqualToString:@"connecting_cancelled"]) {
         BOOL showChan = ![_buffer.type isEqualToString:@"channel"];
         NSDictionary *prefs = _conn.prefs;
         if(prefs) {
@@ -505,7 +505,7 @@ int __timestampWidth;
                 heading.formatted = nil;
                 heading.linkify = NO;
                 [self _addItem:heading eid:_currentCollapsedEid - 1];
-                if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"]) {
+                if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"] || [event.type isEqualToString:@"connecting_cancelled"]) {
                     Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
                     if(last) {
                         last.rowType = ROW_MESSAGE;
@@ -538,7 +538,7 @@ int __timestampWidth;
         event.formatted = nil;
         event.linkify = NO;
         _lastCollapsedEid = event.eid;
-        if([_buffer.type isEqualToString:@"console"] && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"]) {
+        if([_buffer.type isEqualToString:@"console"] && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"] && ![type isEqualToString:@"connecting_cancelled"]) {
             _currentCollapsedEid = -1;
             _lastCollapsedEid = -1;
             [_collapsedEvents clear];

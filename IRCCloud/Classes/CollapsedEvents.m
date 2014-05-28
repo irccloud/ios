@@ -391,7 +391,7 @@
             } else if([event.type hasSuffix:@"nickchange"]) {
                 c.type = kCollapsedEventNickChange;
                 c.oldNick = event.oldNick;
-            } else if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"]) {
+            } else if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"] || [event.type isEqualToString:@"connecting_cancelled"]) {
                 c.type = kCollapsedEventConnectionStatus;
                 c.msg = event.msg;
             } else {
@@ -477,6 +477,9 @@
                     break;
                 case kCollapsedEventConnectionStatus:
                     output = e.msg;
+                    if(e.count > 1)
+                        output = [output stringByAppendingFormat:@" (x%i)", e.count];
+                    break;
             }
         } else {
             BOOL isNetsplit = NO;
