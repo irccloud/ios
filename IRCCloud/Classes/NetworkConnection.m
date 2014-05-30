@@ -32,8 +32,9 @@ NSString *kIRCCloudEventKey = @"com.irccloud.event";
 #ifdef BRAND_HOST
 NSString *IRCCLOUD_HOST = @BRAND_HOST
 #else
-NSString *IRCCLOUD_HOST = @"www.irccloud.com";
+NSString *IRCCLOUD_HOST = @"api.irccloud.com";
 #endif
+NSString *IRCCLOUD_PATH = @"/";
 
 #define BACKLOG_BUFFER_MAX 99
 
@@ -1086,9 +1087,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [_oobQueue removeAllObjects];
     }
     
-    NSString *url = [NSString stringWithFormat:@"wss://%@",IRCCLOUD_HOST];
+    NSString *url = [NSString stringWithFormat:@"wss://%@%@",IRCCLOUD_HOST,IRCCLOUD_PATH];
     if(_events.highestEid > 0) {
-        url = [url stringByAppendingFormat:@"/?since_id=%.0lf", _events.highestEid];
+        url = [url stringByAppendingFormat:@"?since_id=%.0lf", _events.highestEid];
         if(_streamId)
             url = [url stringByAppendingFormat:@"&stream_id=%@", _streamId];
     }
@@ -1101,7 +1102,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _reconnectTimestamp = -1;
     _resuming = NO;
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-    WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:nil protocols:nil
+    WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
                                                                      tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
                                                                                     (NSString *)kCFStreamSSLLevel: (NSString *)kCFStreamSocketSecurityLevelSSLv3,
 #ifndef ENTERPRISE
@@ -1449,6 +1450,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"host"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"path"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];

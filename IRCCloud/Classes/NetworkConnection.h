@@ -26,6 +26,7 @@
 #import "EventsDataSource.h"
 
 extern NSString *IRCCLOUD_HOST;
+extern NSString *IRCCLOUD_PATH;
 
 extern NSString *kIRCCloudConnectivityNotification;
 extern NSString *kIRCCloudEventNotification;

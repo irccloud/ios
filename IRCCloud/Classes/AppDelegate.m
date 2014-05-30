@@ -67,10 +67,23 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":@"www.irccloud.com"}];
-#ifdef ENTERPRISE
-    IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
-#endif
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":@"api.irccloud.com"}];
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"www.irccloud.com"]) {
+        CLS_LOG(@"Migrating host");
+        [[NSUserDefaults standardUserDefaults] setObject:@"api.irccloud.com" forKey:@"host"];
+    }
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"path"]) {
+        IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
+        IRCCLOUD_PATH = [[NSUserDefaults standardUserDefaults] objectForKey:@"path"];
+    } else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"api.irccloud.com"]) {
+        NSString *session = [NetworkConnection sharedInstance].session;
+        if(session.length) {
+            CLS_LOG(@"Migrating path from session cookie");
+            IRCCLOUD_PATH = [NSString stringWithFormat:@"/websocket/%c", [session characterAtIndex:0]];
+            [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+        }
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
 #ifdef CRASHLYTICS_TOKEN
     [Crashlytics startWithAPIKey:@CRASHLYTICS_TOKEN];
 #endif

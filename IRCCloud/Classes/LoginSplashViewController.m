@@ -362,10 +362,11 @@
         if([[result objectForKey:@"success"] intValue] == 1) {
             result = [[NetworkConnection sharedInstance] login:[username text] password:[password text] token:[result objectForKey:@"token"]];
             if([[result objectForKey:@"success"] intValue] == 1) {
+                IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
+                IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
                 [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
-#ifdef ENTERPRISE
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
-#endif
+                [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
                 [[NSUserDefaults standardUserDefaults] synchronize];
                 [status setText:@"Connecting"];
                 UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
