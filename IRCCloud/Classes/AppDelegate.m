@@ -180,7 +180,7 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    if(_disconnectTimer) {
+    if(_conn.background && application.applicationState != UIApplicationStateActive) {
         self.mainViewController.bidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
         self.mainViewController.eidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
         [self.mainViewController bufferSelected:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
@@ -270,7 +270,7 @@
     }];
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application {
+- (void)applicationDidEnterBackground:(UIApplication *)application {
     _conn.background = YES;
     _conn.failCount = 0;
     _conn.reconnectTimestamp = -1;
@@ -304,21 +304,23 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [ColorFormatter clearFontCache];
-    [[EventsDataSource sharedInstance] clearFormattingCache];
-    if(_conn.reconnectTimestamp == 0)
-        _conn.reconnectTimestamp = -1;
-    _conn.background = NO;
-    application.applicationIconBadgeNumber = 1;
-    application.applicationIconBadgeNumber = 0;
-    [application cancelAllLocalNotifications];
-    [_disconnectTimer invalidate];
-    _disconnectTimer = nil;
-    if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
-        ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
-        [evc.topViewController viewWillAppear:NO];
-    } else {
-        [self.window.rootViewController viewWillAppear:NO];
+    if(_conn.background) {
+        [ColorFormatter clearFontCache];
+        [[EventsDataSource sharedInstance] clearFormattingCache];
+        if(_conn.reconnectTimestamp == 0)
+            _conn.reconnectTimestamp = -1;
+        _conn.background = NO;
+        application.applicationIconBadgeNumber = 1;
+        application.applicationIconBadgeNumber = 0;
+        [application cancelAllLocalNotifications];
+        [_disconnectTimer invalidate];
+        _disconnectTimer = nil;
+        if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
+            ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
+            [evc.topViewController viewWillAppear:NO];
+        } else {
+            [self.window.rootViewController viewWillAppear:NO];
+        }
     }
 }
 
