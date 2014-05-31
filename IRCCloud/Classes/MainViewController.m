@@ -771,7 +771,10 @@
 
         [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
         
-        [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+        if(((NSIndexPath *)[rows lastObject]).row < [_eventsView tableView:_eventsView.tableView numberOfRowsInSection:0])
+            [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+        else
+            [_eventsView scrollToBottom];
         [_buffersView scrollViewDidScroll:_buffersView.tableView];
         [UIView commitAnimations];
         [self expandingTextViewDidChange:_message];

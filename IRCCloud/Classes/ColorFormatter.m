@@ -1296,19 +1296,21 @@ NSDictionary *emojiMap;
             case COLOR_MIRC:
             case COLOR_RGB:
                 if(fg != -1) {
-                    [attributes addObject:@{
-                     (NSString *)kCTForegroundColorAttributeName:(__bridge id)[fgColor CGColor],
-                     @"start":@(fg),
-                     @"length":@(i - fg)
-                     }];
+                    if(fgColor)
+                        [attributes addObject:@{
+                         (NSString *)kCTForegroundColorAttributeName:(__bridge id)[fgColor CGColor],
+                         @"start":@(fg),
+                         @"length":@(i - fg)
+                         }];
                     fg = -1;
                 }
                 if(bg != -1) {
-                    [attributes addObject:@{
-                     (NSString *)kTTTBackgroundFillColorAttributeName:(__bridge id)[bgColor CGColor],
-                     @"start":@(bg),
-                     @"length":@(i - bg)
-                     }];
+                    if(bgColor)
+                        [attributes addObject:@{
+                         (NSString *)kTTTBackgroundFillColorAttributeName:(__bridge id)[bgColor CGColor],
+                         @"start":@(bg),
+                         @"length":@(i - bg)
+                         }];
                     bg = -1;
                 }
                 BOOL rgb = [text characterAtIndex:i] == COLOR_RGB;

@@ -362,8 +362,10 @@
         if([[result objectForKey:@"success"] intValue] == 1) {
             result = [[NetworkConnection sharedInstance] login:[username text] password:[password text] token:[result objectForKey:@"token"]];
             if([[result objectForKey:@"success"] intValue] == 1) {
-                IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
-                IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
+                if([result objectForKey:@"websocket_host"])
+                    IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
+                if([result objectForKey:@"websocket_path"])
+                    IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
                 [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
