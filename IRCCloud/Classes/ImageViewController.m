@@ -156,6 +156,7 @@
 }
 
 -(void)fail {
+    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
     if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
                                                                                   withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
@@ -166,7 +167,6 @@
                                                                                                    ]
                                                                                      createNewTab:NO]))
         [[UIApplication sharedApplication] openURL:_url];
-    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
 }
 
 -(void)loadOembed:(NSString *)url {
