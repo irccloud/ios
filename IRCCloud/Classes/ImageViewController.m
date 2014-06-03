@@ -22,6 +22,7 @@
 #import "UIImage+animatedGIF.h"
 #import "ARChromeActivity.h"
 #import "TUSafariActivity.h"
+#import "config.h"
 
 @implementation ImageViewController
 {
@@ -170,7 +171,17 @@
 }
 
 -(void)loadOembed:(NSString *)url {
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+#ifdef IMGUR_KEY
+    if([url hasPrefix:@"https://imgur-apiv3.p.mashape.com/"]) {
+        [request setValue:@MASHAPE_KEY forKey:@"X-Mashape-Authorization"];
+        if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"]) {
+            [request setValue:[NSString stringWithFormat:@"Bearer %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"]] forHTTPHeaderField:@"Authorization"];
+        } else {
+            [request setValue:[NSString stringWithFormat:@"Client-ID %@", @IMGUR_KEY] forHTTPHeaderField:@"Authorization"];
+        }
+    }
+#endif
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
             NSLog(@"Error fetching oembed. Error %li : %@", (long)error.code, error.userInfo);
@@ -205,7 +216,7 @@
     } else if(([[url.host lowercaseString] isEqualToString:@"d.pr"] || [[url.host lowercaseString] isEqualToString:@"droplr.com"]) && [url.path hasPrefix:@"/i/"] && ![url.path hasSuffix:@"+"]) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"https://droplr.com%@+", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
     } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"]) {
-        [self loadOembed:[NSString stringWithFormat:@"http://api.imgur.com/oembed.json?url=%@", url.absoluteString]];
+        [self loadOembed:[NSString stringWithFormat:@"https://imgur-apiv3.p.mashape.com/oembed.json?url=%@", url.absoluteString]];
         return;
     } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
         [self loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString]];

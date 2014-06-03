@@ -2330,8 +2330,9 @@
             _message.text = [_message.text stringByAppendingString:link];
         }
     } else {
-        _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [_alertView show];
+        CLS_LOG(@"imgur upload failed: %@", d);
+        [self imageUploadDidFail];
+        return;
     }
     [self _hideConnectingView];
     _message.editable = YES;

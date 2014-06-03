@@ -21,6 +21,7 @@
 }
 
 -(void)_authorize {
+#ifdef IMGUR_KEY
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.imgur.com/oauth2/token"]];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[[NSString stringWithFormat:@"refresh_token=%@&client_id=%@&client_secret=%@&grant_type=refresh_token", [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"], @IMGUR_KEY, @IMGUR_SECRET] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -46,6 +47,9 @@
             }
         }
     }];
+#else
+    [_delegate performSelector:@selector(imageUploadNotAuthorized) withObject:nil afterDelay:0.25];
+#endif
 }
 
 -(void)_upload:(UIImage *)img {
@@ -53,9 +57,10 @@
     CFStringRef data_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[data base64EncodedString], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.imgur.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://imgur-apiv3.p.mashape.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
 #ifdef IMGUR_KEY
+    [request setValue:@MASHAPE_KEY forKey:@"X-Mashape-Authorization"];
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"]) {
         [request setValue:[NSString stringWithFormat:@"Bearer %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"]] forHTTPHeaderField:@"Authorization"];
     } else {

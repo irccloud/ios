@@ -62,7 +62,10 @@
     [version setText:[NSString stringWithFormat:@"Version %@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]]];
 #endif
     host.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
-#ifndef ENTERPRISE
+#ifdef ENTERPRISE
+    if([host.text isEqualToString:@"api.irccloud.com"] || [host.text isEqualToString:@"www.irccloud.com"])
+        host.text = nil;
+#else
     host.hidden = YES;
     login.frame = host.frame;
 #endif
