@@ -175,7 +175,7 @@
 #ifdef IMGUR_KEY
     if([url hasPrefix:@"https://imgur-apiv3.p.mashape.com/"]) {
 #ifdef MASHAPE_KEY
-        [request setValue:@MASHAPE_KEY forKey:@"X-Mashape-Authorization"];
+        [request setValue:@MASHAPE_KEY forHTTPHeaderField:@"X-Mashape-Authorization"];
 #endif
         if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"]) {
             [request setValue:[NSString stringWithFormat:@"Bearer %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"]] forHTTPHeaderField:@"Authorization"];

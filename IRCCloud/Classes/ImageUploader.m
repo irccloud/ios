@@ -59,7 +59,7 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #ifdef MASHAPE_KEY
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://imgur-apiv3.p.mashape.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
-    [request setValue:@MASHAPE_KEY forKey:@"X-Mashape-Authorization"];
+    [request setValue:@MASHAPE_KEY forHTTPHeaderField:@"X-Mashape-Authorization"];
 #else
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.imgur.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
 #endif
