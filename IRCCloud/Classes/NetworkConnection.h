@@ -161,6 +161,7 @@ typedef enum {
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid;
 -(int)say:(NSString *)message to:(NSString *)cid cid:(int)cid;
 -(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid;
+-(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids;
 -(int)join:(NSString *)channel key:(NSString *)key cid:(int)cid;
 -(int)part:(NSString *)channel msg:(NSString *)msg cid:(int)cid;
 -(int)kick:(NSString *)nick chan:(NSString *)chan msg:(NSString *)msg cid:(int)cid;

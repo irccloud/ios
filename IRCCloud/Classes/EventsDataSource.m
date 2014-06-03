@@ -652,6 +652,16 @@
     }
 }
 
+-(NSTimeInterval)lastEidForBuffer:(int)bid {
+    @synchronized(_events) {
+        if(_dirty) {
+            [[_events objectForKey:@(bid)] sortUsingSelector:@selector(compare:)];
+            _dirty = NO;
+        }
+        return [[[_events objectForKey:@(bid)] lastObject] eid];
+    }
+}
+
 -(void)removeEventsBefore:(NSTimeInterval)min_eid buffer:(int)bid {
     @synchronized(_events) {
         NSMutableArray *eventsToRemove = [[NSMutableArray alloc] init];

@@ -174,7 +174,9 @@
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
 #ifdef IMGUR_KEY
     if([url hasPrefix:@"https://imgur-apiv3.p.mashape.com/"]) {
+#ifdef MASHAPE_KEY
         [request setValue:@MASHAPE_KEY forKey:@"X-Mashape-Authorization"];
+#endif
         if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"]) {
             [request setValue:[NSString stringWithFormat:@"Bearer %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"]] forHTTPHeaderField:@"Authorization"];
         } else {
@@ -216,7 +218,11 @@
     } else if(([[url.host lowercaseString] isEqualToString:@"d.pr"] || [[url.host lowercaseString] isEqualToString:@"droplr.com"]) && [url.path hasPrefix:@"/i/"] && ![url.path hasSuffix:@"+"]) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"https://droplr.com%@+", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
     } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"]) {
+#ifdef MASHAPE_KEY
         [self loadOembed:[NSString stringWithFormat:@"https://imgur-apiv3.p.mashape.com/oembed.json?url=%@", url.absoluteString]];
+#else
+        [self loadOembed:[NSString stringWithFormat:@"https://api.imgur.com/oembed.json?url=%@", url.absoluteString]];
+#endif
         return;
     } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
         [self loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString]];

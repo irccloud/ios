@@ -2141,6 +2141,7 @@
         }
         [sheet addButtonWithTitle:@"Delete"];
     }
+    [sheet addButtonWithTitle:@"Mark All As Read"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
         [self.view.window addSubview:_landscapeView];
@@ -2427,6 +2428,20 @@
             } else {
                 [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
             }
+        } else if([action isEqualToString:@"Mark All As Read"]) {
+            NSMutableArray *cids = [[NSMutableArray alloc] init];
+            NSMutableArray *bids = [[NSMutableArray alloc] init];
+            NSMutableArray *eids = [[NSMutableArray alloc] init];
+            
+            for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
+                if([[EventsDataSource sharedInstance] lastEidForBuffer:b.bid]) {
+                    [cids addObject:@(b.cid)];
+                    [bids addObject:@(b.bid)];
+                    [eids addObject:@([[EventsDataSource sharedInstance] lastEidForBuffer:b.bid])];
+                }
+            }
+            
+            [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cids:cids bids:bids lastSeenEids:eids];
         }
         
         if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)

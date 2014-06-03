@@ -917,11 +917,23 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message}];
 }
 
--(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid {
+-(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids {
     @synchronized(_writer) {
-        NSString *seenEids = [_writer stringWithObject:@{[NSString stringWithFormat:@"%i",cid]:@{[NSString stringWithFormat:@"%i",bid]:@(lastSeenEid)}}];
+        NSMutableDictionary *heartbeat = [[NSMutableDictionary alloc] init];
+        for(int i = 0; i < cids.count; i++) {
+            NSMutableDictionary *d = [heartbeat objectForKey:[NSString stringWithFormat:@"%@",[cids objectAtIndex:i]]];
+            if(!d) {
+                d = [[NSMutableDictionary alloc] init];
+                [heartbeat setObject:d forKey:[NSString stringWithFormat:@"%@",[cids objectAtIndex:i]]];
+            }
+            [d setObject:[lastSeenEids objectAtIndex:i] forKey:[NSString stringWithFormat:@"%@",[bids objectAtIndex:i]]];
+        }
+        NSString *seenEids = [_writer stringWithObject:heartbeat];
         return [self _sendRequest:@"heartbeat" args:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids}];
     }
+}
+-(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid {
+    return [self heartbeat:selectedBuffer cids:@[@(cid)] bids:@[@(bid)] lastSeenEids:@[@(lastSeenEid)]];
 }
 
 -(int)join:(NSString *)channel key:(NSString *)key cid:(int)cid {
