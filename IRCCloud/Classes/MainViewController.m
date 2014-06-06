@@ -77,15 +77,15 @@
     
     self.navigationItem.titleView = _titleView;
 
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.contentMode = UIViewContentModeScaleToFill;
-    button.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-    [button setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
-    [button addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [button sizeToFit];
-    button.frame = CGRectMake(12,12,button.frame.size.width, button.frame.size.height);
-    button.accessibilityLabel = @"Menu";
-    [_bottomBar addSubview:button];
+    _cameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    _cameraBtn.contentMode = UIViewContentModeScaleToFill;
+    _cameraBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    [_cameraBtn setImage:[UIImage imageNamed:@"camera"] forState:UIControlStateNormal];
+    [_cameraBtn addTarget:self action:@selector(cameraButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [_cameraBtn sizeToFit];
+    _cameraBtn.frame = CGRectMake(6,6,_cameraBtn.frame.size.width, _cameraBtn.frame.size.height);
+    _cameraBtn.accessibilityLabel = @"Insert a Photo";
+    [_bottomBar addSubview:_cameraBtn];
 
     _sendBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     _sendBtn.contentMode = UIViewContentModeScaleToFill;
@@ -167,6 +167,20 @@
 #endif
     users.accessibilityLabel = @"Channel members list";
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+
+    _settingsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [_settingsBtn setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
+    [_settingsBtn addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    _settingsBtn.accessibilityLabel = @"Menu";
+#ifdef __IPHONE_7_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+        _settingsBtn.frame = CGRectMake(0,0,40,40);
+    else
+        _settingsBtn.frame = CGRectMake(0,0,28,22);
+#else
+    _settingsBtn.frame = CGRectMake(0,0,40,40);
+#endif
+    _settingsButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_settingsBtn];
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar addSubview:_connectingProgress];
@@ -1650,7 +1664,7 @@
         _eventsView.view.frame = CGRectMake(0,0, width, height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
         CGRect frame = _titleView.frame;
-        frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:204;
+        frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:196;
         frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
         _titleView.frame = frame;
         if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
@@ -1763,16 +1777,17 @@
     }
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-            self.navigationItem.rightBarButtonItem = _usersButtonItem;
+            self.navigationItem.rightBarButtonItems = @[_usersButtonItem, _settingsButtonItem];
             if(self.slidingViewController.underRightViewController == nil)
                 self.slidingViewController.underRightViewController = _usersView;
         } else {
-            self.navigationItem.rightBarButtonItem = nil;
+            self.navigationItem.rightBarButtonItems = @[_settingsButtonItem];
             self.slidingViewController.underRightViewController = nil;
         }
     } else {
         if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+                self.navigationItem.rightBarButtonItems = @[_settingsButtonItem];
                 CGRect frame = _eventsView.view.frame;
                 frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
                 _eventsView.view.frame = frame;
@@ -1794,11 +1809,11 @@
                 _eventsView.bottomUnreadView.frame = frame;
             } else {
                 if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-                    self.navigationItem.rightBarButtonItem = _usersButtonItem;
+                    self.navigationItem.rightBarButtonItems = @[_usersButtonItem, _settingsButtonItem];
                     if(self.slidingViewController.underRightViewController == nil)
                         self.slidingViewController.underRightViewController = _usersView;
                 } else {
-                    self.navigationItem.rightBarButtonItem = nil;
+                    self.navigationItem.rightBarButtonItems = @[_settingsButtonItem];
                     self.slidingViewController.underRightViewController = nil;
                 }
                 CGRect frame = _eventsView.view.frame;
@@ -1826,11 +1841,11 @@
             _message.frame = frame;
         } else {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-                self.navigationItem.rightBarButtonItem = _usersButtonItem;
+                self.navigationItem.rightBarButtonItems = @[_usersButtonItem, _settingsButtonItem];
                 if(self.slidingViewController.underRightViewController == nil)
                     self.slidingViewController.underRightViewController = _usersView;
             } else {
-                self.navigationItem.rightBarButtonItem = nil;
+                self.navigationItem.rightBarButtonItems = @[_settingsButtonItem];
                 self.slidingViewController.underRightViewController = nil;
             }
         }
@@ -2340,6 +2355,20 @@
     _sendBtn.enabled = YES;
 }
 
+-(void)cameraButtonPressed:(id)sender {
+    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Existing", nil];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+            [self.view.window addSubview:_landscapeView];
+            [sheet showInView:_landscapeView];
+        } else {
+            [sheet showInView:self.slidingViewController.view.superview];
+        }
+    } else {
+        [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+    }
+}
+
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     [_landscapeView removeFromSuperview];
     [_message resignFirstResponder];
@@ -2417,17 +2446,7 @@
         } else if([action isEqualToString:@"Choose Existing"]) {
             [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
         } else if([action isEqualToString:@"Insert a Photo"]) {
-            if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-                UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Existing", nil];
-                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-                    [self.view.window addSubview:_landscapeView];
-                    [sheet showInView:_landscapeView];
-                } else {
-                    [sheet showInView:self.slidingViewController.view.superview];
-                }
-            } else {
-                [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
-            }
+            [self cameraButtonPressed:self];
         } else if([action isEqualToString:@"Mark All As Read"]) {
             NSMutableArray *cids = [[NSMutableArray alloc] init];
             NSMutableArray *bids = [[NSMutableArray alloc] init];
