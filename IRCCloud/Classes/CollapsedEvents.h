@@ -77,10 +77,12 @@ typedef enum {
     NSMutableArray *_data;
     Server *_server;
     NSArray *_mode_modes;
+    BOOL _showChan;
 }
+@property BOOL showChan;
 -(void)clear;
 -(BOOL)addEvent:(Event *)event;
--(NSString *)collapse:(BOOL)showChan;
+-(NSString *)collapse;
 -(NSUInteger)count;
 -(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize;
 -(void)setServer:(Server *)server;

@@ -218,6 +218,27 @@
         CollapsedEvent *e = nil;
         
         if(event.type < kCollapsedEventNickChange) {
+            if(_showChan) {
+                if(event.type == kCollapsedEventQuit) {
+                    BOOL found = NO;
+                    for(e in _data) {
+                        if(e.type == kCollapsedEventJoin) {
+                            e.type = kCollapsedEventPopIn;
+                            found = YES;
+                        }
+                    }
+                    if(found)
+                        return;
+                } else if(event.type == kCollapsedEventJoin) {
+                    for(e in _data) {
+                        if(e.type == kCollapsedEventQuit) {
+                            [_data removeObject:e];
+                            break;
+                        }
+                    }
+                }
+                e = nil;
+            }
             if(event.oldNick.length > 0 && event.type != kCollapsedEventMode) {
                 e = [self findEvent:event.oldNick chan:event.chan];
                 if(e)
@@ -419,7 +440,7 @@
     
     return output;
 }
--(NSString *)collapse:(BOOL)showChan {
+-(NSString *)collapse {
     @synchronized(_data) {
         NSString *output;
         
@@ -442,13 +463,13 @@
                     }
                     break;
                 case kCollapsedEventJoin:
-                    if(showChan)
+                    if(_showChan)
                         output = [NSString stringWithFormat:@"→ %@%@ joined %@ (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.chan, e.hostname];
                     else
                         output = [NSString stringWithFormat:@"→ %@%@ joined (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.hostname];
                     break;
                 case kCollapsedEventPart:
-                    if(showChan)
+                    if(_showChan)
                         output = [NSString stringWithFormat:@"← %@%@ left %@ (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.chan, e.hostname];
                     else
                         output = [NSString stringWithFormat:@"← %@%@ left (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.hostname];
@@ -467,12 +488,12 @@
                     break;
                 case kCollapsedEventPopIn:
                     output = [NSString stringWithFormat:@"↔ %@%@ popped in", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
-                    if(showChan)
+                    if(_showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
                 case kCollapsedEventPopOut:
                     output = [NSString stringWithFormat:@"↔ %@%@ nipped out", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
-                    if(showChan)
+                    if(_showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
                 case kCollapsedEventConnectionStatus:
@@ -550,12 +571,12 @@
                     [message appendString:e.msg];
                     if(e.count > 1)
                         [message appendFormat:@" (x%i)", e.count];
-                } else if(!showChan) {
+                } else if(!_showChan) {
                     [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO]];
                     [message appendString:[self was:e]];
                 }
                 
-                if((next == nil || next.type != e.type) && !showChan) {
+                if((next == nil || next.type != e.type) && !_showChan) {
                     switch(e.type) {
                         case kCollapsedEventJoin:
                             [message appendString:@" joined"];
@@ -575,7 +596,7 @@
                         default:
                             break;
                     }
-                } else if(showChan && e.type != kCollapsedEventNetSplit && e.type != kCollapsedEventConnectionStatus) {
+                } else if(_showChan && e.type != kCollapsedEventNetSplit && e.type != kCollapsedEventConnectionStatus) {
                     if(groupcount == 0) {
                         [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO]];
                         [message appendString:[self was:e]];

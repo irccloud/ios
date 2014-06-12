@@ -414,7 +414,7 @@ int __timestampWidth;
     }
 
     if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"] || [type isEqualToString:@"connecting_cancelled"]) {
-        BOOL showChan = ![_buffer.type isEqualToString:@"channel"];
+        _collapsedEvents.showChan = ![_buffer.type isEqualToString:@"channel"];
         NSDictionary *prefs = _conn.prefs;
         if(prefs) {
             NSDictionary *hiddenMap;
@@ -463,7 +463,7 @@ int __timestampWidth;
             _lastCollpasedDay = [_formatter stringFromDate:date];
         }
         
-        if(!showChan)
+        if(!_collapsedEvents.showChan)
             event.chan = _buffer.name;
         
         if(![_collapsedEvents addEvent:event]) {
@@ -481,11 +481,12 @@ int __timestampWidth;
         NSString *msg;
         if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
             CollapsedEvents *c = [[CollapsedEvents alloc] init];
+            c.showChan = _collapsedEvents.showChan;
             c.server = _server;
             [c addEvent:event];
-            msg = [c collapse:showChan];
+            msg = [c collapse];
             if(!nextIsGrouped) {
-                NSString *groupMsg = [_collapsedEvents collapse:showChan];
+                NSString *groupMsg = [_collapsedEvents collapse];
                 if(groupMsg == nil && [type isEqualToString:@"nickchange"])
                     groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
                 if(groupMsg == nil && [type isEqualToString:@"user_channel_mode"]) {
@@ -515,7 +516,7 @@ int __timestampWidth;
             }
             event.timestamp = nil;
         } else {
-            msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse:showChan];
+            msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse];
         }
         if(msg == nil && [type isEqualToString:@"nickchange"])
             msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
