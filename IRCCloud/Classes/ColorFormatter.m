@@ -1497,11 +1497,13 @@ NSDictionary *emojiMap;
             NSArray *results = [[self ircChannelRegexForServer:server] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
             if(results.count) {
                 for(NSTextCheckingResult *match in results) {
-                    if([[[output string] substringWithRange:match.range] hasSuffix:@"."]) {
-                        NSRange ranges[1] = {NSMakeRange(match.range.location, match.range.length - 1)};
+                    NSRange matchRange = [match rangeAtIndex:2];
+                    if([[[output string] substringWithRange:matchRange] hasSuffix:@"."]) {
+                        NSRange ranges[1] = {NSMakeRange(matchRange.location, matchRange.length - 1)};
                         [matches addObject:[NSTextCheckingResult regularExpressionCheckingResultWithRanges:ranges count:1 regularExpression:match.regularExpression]];
                     } else {
-                        [matches addObject:match];
+                        NSRange ranges[1] = {NSMakeRange(matchRange.location, matchRange.length)};
+                        [matches addObject:[NSTextCheckingResult regularExpressionCheckingResultWithRanges:ranges count:1 regularExpression:match.regularExpression]];
                     }
                 }
             }
