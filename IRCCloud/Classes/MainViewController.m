@@ -169,18 +169,16 @@
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
 
     _settingsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    _settingsBtn.contentMode = UIViewContentModeBottom;
+    _settingsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
     [_settingsBtn setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
     [_settingsBtn addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [_settingsBtn sizeToFit];
     _settingsBtn.accessibilityLabel = @"Menu";
-#ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        _settingsBtn.frame = CGRectMake(0,0,40,40);
-    else
-        _settingsBtn.frame = CGRectMake(0,0,28,22);
-#else
-    _settingsBtn.frame = CGRectMake(0,0,40,40);
-#endif
-    _settingsButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_settingsBtn];
+    _settingsBtn.enabled = NO;
+    _settingsBtn.alpha = 0;
+    _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 12,10,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height);
+    [_bottomBar addSubview:_settingsBtn];
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar addSubview:_connectingProgress];
@@ -1174,7 +1172,25 @@
 }
 
 -(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
-    _sendBtn.enabled = expandingTextView.text.length > 0;
+    [UIView beginAnimations:nil context:nil];
+    if(expandingTextView.text.length > 0) {
+        CGRect frame = _message.frame;
+        frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
+        _message.frame = frame;
+        _sendBtn.enabled = YES;
+        _sendBtn.alpha = 1;
+        _settingsBtn.enabled = NO;
+        _settingsBtn.alpha = 0;
+    } else {
+        CGRect frame = _message.frame;
+        frame.size.width = _bottomBar.frame.size.width - _settingsBtn.frame.size.width - frame.origin.x - 24;
+        _message.frame = frame;
+        _sendBtn.enabled = NO;
+        _sendBtn.alpha = 0;
+        _settingsBtn.enabled = YES;
+        _settingsBtn.alpha = 1;
+    }
+    [UIView commitAnimations];
     if(_nickCompletionView.alpha == 1) {
         [self updateSuggestions:NO];
     } else {
@@ -1664,7 +1680,7 @@
         _eventsView.view.frame = CGRectMake(0,0, width, height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
         CGRect frame = _titleView.frame;
-        frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:196;
+        frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:204;
         frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
         _titleView.frame = frame;
         if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
@@ -1730,9 +1746,6 @@
         _eventActivity.alpha = 1;
         [_eventActivity startAnimating];
     }
-    frame = _message.frame;
-    frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
-    _message.frame = frame;
     _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;
     if(duration > 0)
         _message.text = _message.text;
@@ -1762,6 +1775,7 @@
     [self _updateServerStatus];
     [self _updateUserListVisibility];
     [self _updateGlobalMsg];
+    [self expandingTextViewDidChange:_message];
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
@@ -1777,17 +1791,17 @@
     }
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-            self.navigationItem.rightBarButtonItems = @[_usersButtonItem, _settingsButtonItem];
+            self.navigationItem.rightBarButtonItem = _usersButtonItem;
             if(self.slidingViewController.underRightViewController == nil)
                 self.slidingViewController.underRightViewController = _usersView;
         } else {
-            self.navigationItem.rightBarButtonItems = @[_settingsButtonItem];
+            self.navigationItem.rightBarButtonItem = nil;
             self.slidingViewController.underRightViewController = nil;
         }
     } else {
         if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
-                self.navigationItem.rightBarButtonItems = @[_settingsButtonItem];
+                self.navigationItem.rightBarButtonItem = nil;
                 CGRect frame = _eventsView.view.frame;
                 frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
                 _eventsView.view.frame = frame;
@@ -1809,11 +1823,11 @@
                 _eventsView.bottomUnreadView.frame = frame;
             } else {
                 if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-                    self.navigationItem.rightBarButtonItems = @[_usersButtonItem, _settingsButtonItem];
+                    self.navigationItem.rightBarButtonItem = _usersButtonItem;
                     if(self.slidingViewController.underRightViewController == nil)
                         self.slidingViewController.underRightViewController = _usersView;
                 } else {
-                    self.navigationItem.rightBarButtonItems = @[_settingsButtonItem];
+                    self.navigationItem.rightBarButtonItem = nil;
                     self.slidingViewController.underRightViewController = nil;
                 }
                 CGRect frame = _eventsView.view.frame;
@@ -1841,11 +1855,11 @@
             _message.frame = frame;
         } else {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-                self.navigationItem.rightBarButtonItems = @[_usersButtonItem, _settingsButtonItem];
+                self.navigationItem.rightBarButtonItem = _usersButtonItem;
                 if(self.slidingViewController.underRightViewController == nil)
                     self.slidingViewController.underRightViewController = _usersView;
             } else {
-                self.navigationItem.rightBarButtonItems = @[_settingsButtonItem];
+                self.navigationItem.rightBarButtonItem = nil;
                 self.slidingViewController.underRightViewController = nil;
             }
         }
@@ -1933,7 +1947,6 @@
             [sheet addButtonWithTitle:@"Delete"];
         }
     } else {
-        [sheet addButtonWithTitle:@"Insert a Photo"];
         if(_buffer.archived) {
             [sheet addButtonWithTitle:@"Unarchive"];
         } else {
@@ -2445,8 +2458,6 @@
             [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
         } else if([action isEqualToString:@"Choose Existing"]) {
             [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
-        } else if([action isEqualToString:@"Insert a Photo"]) {
-            [self cameraButtonPressed:self];
         } else if([action isEqualToString:@"Mark All As Read"]) {
             NSMutableArray *cids = [[NSMutableArray alloc] init];
             NSMutableArray *bids = [[NSMutableArray alloc] init];
