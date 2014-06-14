@@ -177,7 +177,7 @@
     _settingsBtn.accessibilityLabel = @"Menu";
     _settingsBtn.enabled = NO;
     _settingsBtn.alpha = 0;
-    _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 12,10,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height);
+    _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
     [_bottomBar addSubview:_settingsBtn];
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
@@ -1183,7 +1183,7 @@
         _settingsBtn.alpha = 0;
     } else {
         CGRect frame = _message.frame;
-        frame.size.width = _bottomBar.frame.size.width - _settingsBtn.frame.size.width - frame.origin.x - 24;
+        frame.size.width = _bottomBar.frame.size.width - _settingsBtn.frame.size.width - frame.origin.x - 8;
         _message.frame = frame;
         _sendBtn.enabled = NO;
         _sendBtn.alpha = 0;
@@ -1935,7 +1935,6 @@
         }
         [sheet addButtonWithTitle:@"Edit Connection"];
     } else if([_buffer.type isEqualToString:@"channel"]) {
-        [sheet addButtonWithTitle:@"Insert a Photo"];
         if([[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             [sheet addButtonWithTitle:@"Leave"];
             if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
