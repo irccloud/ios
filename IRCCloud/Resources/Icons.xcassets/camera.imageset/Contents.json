@@ -3,12 +3,12 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "ic_action_photo-1.png"
+      "filename" : "camera.png"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "ic_action_photo.png"
+      "filename" : "camera@2x.png"
     }
   ],
   "info" : {

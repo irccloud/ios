@@ -83,7 +83,7 @@
     [_cameraBtn setImage:[UIImage imageNamed:@"camera"] forState:UIControlStateNormal];
     [_cameraBtn addTarget:self action:@selector(cameraButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_cameraBtn sizeToFit];
-    _cameraBtn.frame = CGRectMake(6,6,_cameraBtn.frame.size.width, _cameraBtn.frame.size.height);
+    _cameraBtn.frame = CGRectMake(13,10,_cameraBtn.frame.size.width, _cameraBtn.frame.size.height);
     _cameraBtn.accessibilityLabel = @"Insert a Photo";
     [_bottomBar addSubview:_cameraBtn];
 
