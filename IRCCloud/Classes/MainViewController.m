@@ -78,32 +78,51 @@
     self.navigationItem.titleView = _titleView;
 
     _cameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _cameraBtn.contentMode = UIViewContentModeScaleToFill;
+    _cameraBtn.contentMode = UIViewContentModeCenter;
     _cameraBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
     [_cameraBtn setImage:[UIImage imageNamed:@"camera"] forState:UIControlStateNormal];
     [_cameraBtn addTarget:self action:@selector(cameraButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_cameraBtn sizeToFit];
-    _cameraBtn.frame = CGRectMake(13,10,_cameraBtn.frame.size.width, _cameraBtn.frame.size.height);
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 6)
+        _cameraBtn.frame = CGRectMake(5,5,_cameraBtn.frame.size.width + 16, _cameraBtn.frame.size.height + 16);
+    else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 6)
+        _cameraBtn.frame = CGRectMake(5,3,_cameraBtn.frame.size.width + 16, _cameraBtn.frame.size.height + 16);
+    else
+        _cameraBtn.frame = CGRectMake(5,2,_cameraBtn.frame.size.width + 16, _cameraBtn.frame.size.height + 16);
     _cameraBtn.accessibilityLabel = @"Insert a Photo";
     [_bottomBar addSubview:_cameraBtn];
 
     _sendBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _sendBtn.contentMode = UIViewContentModeScaleToFill;
+    _sendBtn.contentMode = UIViewContentModeCenter;
     _sendBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
     [_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
     [_sendBtn setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
     [_sendBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-    [_sendBtn setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    _sendBtn.titleLabel.shadowOffset = CGSizeMake(0, 1);
-    [_sendBtn.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
-    [_sendBtn setBackgroundImage:[UIImage imageNamed:@"sendbg_active"] forState:UIControlStateNormal];
-    [_sendBtn setBackgroundImage:[UIImage imageNamed:@"sendbg"] forState:UIControlStateDisabled];
+    [_sendBtn sizeToFit];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+        _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,12,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
+    else
+        _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,4,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
     [_sendBtn addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_sendBtn sizeToFit];
     _sendBtn.enabled = NO;
     _sendBtn.adjustsImageWhenHighlighted = NO;
-    _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,8,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
     [_bottomBar addSubview:_sendBtn];
+
+    _settingsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    _settingsBtn.contentMode = UIViewContentModeCenter;
+    _settingsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
+    [_settingsBtn setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
+    [_settingsBtn addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [_settingsBtn sizeToFit];
+    _settingsBtn.accessibilityLabel = @"Menu";
+    _settingsBtn.enabled = NO;
+    _settingsBtn.alpha = 0;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+        _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,4,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
+    else
+        _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
+    [_bottomBar addSubview:_settingsBtn];
     
     self.slidingViewController.view.frame = [UIScreen mainScreen].applicationFrame;
     self.slidingViewController.shouldAllowPanningPastAnchor = NO;
@@ -141,10 +160,10 @@
     [self.slidingViewController.view addSubview:_mentionTip];
     
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,0,36)];
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(44,8,0,36)];
         _landscapeView = [[UIView alloc] initWithFrame:CGRectZero];
     } else {
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(46,8,0,36)];
+        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(44,8,0,36)];
     }
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
@@ -168,17 +187,6 @@
     users.accessibilityLabel = @"Channel members list";
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
 
-    _settingsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _settingsBtn.contentMode = UIViewContentModeBottom;
-    _settingsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
-    [_settingsBtn setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
-    [_settingsBtn addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [_settingsBtn sizeToFit];
-    _settingsBtn.accessibilityLabel = @"Menu";
-    _settingsBtn.enabled = NO;
-    _settingsBtn.alpha = 0;
-    _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
-    [_bottomBar addSubview:_settingsBtn];
 #ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar addSubview:_connectingProgress];
