@@ -118,7 +118,7 @@
     _settingsBtn.accessibilityLabel = @"Menu";
     _settingsBtn.enabled = NO;
     _settingsBtn.alpha = 0;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 6)
         _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,4,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
     else
         _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
@@ -1179,9 +1179,8 @@
     _nickCompletionTimer = nil;
 }
 
--(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
-    [UIView beginAnimations:nil context:nil];
-    if(expandingTextView.text.length > 0) {
+-(void)_updateMessageWidth {
+    if(_message.text.length > 0) {
         CGRect frame = _message.frame;
         frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
         _message.frame = frame;
@@ -1198,6 +1197,11 @@
         _settingsBtn.enabled = YES;
         _settingsBtn.alpha = 1;
     }
+}
+
+-(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
+    [UIView beginAnimations:nil context:nil];
+    [self _updateMessageWidth];
     [UIView commitAnimations];
     if(_nickCompletionView.alpha == 1) {
         [self updateSuggestions:NO];
@@ -1783,7 +1787,7 @@
     [self _updateServerStatus];
     [self _updateUserListVisibility];
     [self _updateGlobalMsg];
-    [self expandingTextViewDidChange:_message];
+    [self _updateMessageWidth];
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
@@ -1858,9 +1862,7 @@
                 frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
                 _eventsView.bottomUnreadView.frame = frame;
             }
-            CGRect frame = _message.frame;
-            frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
-            _message.frame = frame;
+            [self _updateMessageWidth];
         } else {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
                 self.navigationItem.rightBarButtonItem = _usersButtonItem;
