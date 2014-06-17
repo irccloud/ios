@@ -247,10 +247,10 @@
     self.view.frame = [UIScreen mainScreen].applicationFrame;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            logo.frame = CGRectMake(92, 36, 138, 138);
+            logo.frame = CGRectMake(96, 39, 128, 128);
             loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 170);
         } else {
-            logo.frame = CGRectMake(26, 76, 138, 138);
+            logo.frame = CGRectMake(30, 80, 128, 128);
             loadingView.frame = CGRectMake(160, 100, 320, 170);
 #ifdef ENTERPRISE
             loginView.frame = CGRectMake(160, 54, 320, 170);
@@ -260,11 +260,11 @@
         }
     } else {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            logo.frame = CGRectMake(249, 118, 276, 276);
+            logo.frame = CGRectMake(256, 124, 256, 256);
             loadingView.frame = loginView.frame = CGRectMake(78, 392, 612, 170);
             version.frame = CGRectMake(0, 984, 768, 20);
         } else {
-            logo.frame = CGRectMake(128, 240, 276, 276);
+            logo.frame = CGRectMake(135, 246, 256, 256);
             loadingView.frame = CGRectMake(392, 344, 612, 170);
 #ifdef ENTERPRISE
             loginView.frame = CGRectMake(392, 286, 612, 170);
