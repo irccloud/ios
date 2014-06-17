@@ -1077,17 +1077,8 @@ int __timestampWidth;
             if(!_buffer.scrolledUp)
                 _buffer.scrolledUpFrom = -1;
         }
-    } else if(_buffer.scrolledUpFrom == -2 && oldPosition > 0 && oldPosition < _data.count) {
+    } else if(_buffer.scrolledUp && _buffer.scrolledUpFrom > 0 && oldPosition > 0 && oldPosition < _data.count) {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:oldPosition inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-    } else if(_buffer.scrolledUp && _buffer.scrolledUpFrom > 0) {
-        int i = 0;
-        for(Event *e in _data) {
-            if(e.eid == _buffer.scrolledUpFrom) {
-                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-                break;
-            }
-            i++;
-        }
     } else if(!_buffer.scrolledUp || (_data.count && _scrollTimer)) {
         [self _scrollToBottom];
         [self scrollToBottom];
@@ -1431,15 +1422,12 @@ int __timestampWidth;
                     e.timestamp = nil;
                     e.formatted = nil;
                 }
-                NSTimeInterval oldPos = _buffer.scrolledUpFrom;
                 NSInteger lastRow = -1;
                 NSArray *rows = [self.tableView indexPathsForVisibleRows];
                 if(rows.count) {
                     lastRow = [[rows lastObject] row];
                 }
-                _buffer.scrolledUpFrom = -2;
                 [self refresh];
-                _buffer.scrolledUpFrom = oldPos;
             }
         } else if(indexPath.row < _data.count) {
             Event *e = [_data objectAtIndex:indexPath.row];
