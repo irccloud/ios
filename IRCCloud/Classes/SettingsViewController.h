@@ -30,6 +30,7 @@
     UISwitch *_chrome;
     UISwitch *_autoCaps;
     UISwitch *_emocodes;
+    UISwitch *_saveToCameraRoll;
     NSString *_version;
     int _userinforeqid;
     int _prefsreqid;

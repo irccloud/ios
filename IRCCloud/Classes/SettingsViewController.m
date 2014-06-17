@@ -140,6 +140,7 @@
     [[NSUserDefaults standardUserDefaults] setBool:_screen.on forKey:@"keepScreenOn"];
     [[NSUserDefaults standardUserDefaults] setBool:_chrome.on forKey:@"useChrome"];
     [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
+    [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -282,6 +283,7 @@
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
+    _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
 }
 
 - (void)viewDidLoad {
@@ -332,6 +334,7 @@
     _chrome = [[UISwitch alloc] init];
     _autoCaps = [[UISwitch alloc] init];
     _emocodes = [[UISwitch alloc] init];
+    _saveToCameraRoll = [[UISwitch alloc] init];
 
     int width;
     
@@ -400,7 +403,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 5;
+    return 6;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -412,8 +415,10 @@
         case 2:
             return 5;
         case 3:
-            return (_chromeInstalled)?5:4;
+            return (_chromeInstalled)?4:3;
         case 4:
+            return 2;
+        case 5:
             return 4;
     }
     return 0;
@@ -430,6 +435,8 @@
         case 3:
             return @"Device";
         case 4:
+            return @"Photo Uploads";
+        case 5:
             return @"About";
     }
     return nil;
@@ -515,17 +522,25 @@
                     cell.accessoryView = _autoCaps;
                     break;
                 case 3:
-                    cell.textLabel.text = @"Imgur.com Account";
-                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"];
-                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    break;
-                case 4:
                     cell.textLabel.text = @"Open URLs in Chrome";
                     cell.accessoryView = _chrome;
                     break;
             }
             break;
         case 4:
+            switch (row) {
+                case 0:
+                    cell.textLabel.text = @"Imgur.com Account";
+                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"];
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    break;
+                case 1:
+                    cell.textLabel.text = @"Save to Camera Roll";
+                    cell.accessoryView = _saveToCameraRoll;
+                    break;
+            }
+            break;
+        case 5:
             switch(row) {
                 case 0:
                     cell.textLabel.text = @"FAQ";
@@ -554,7 +569,7 @@
     if(indexPath.section == 3 && indexPath.row == 1) {
         [self.navigationController pushViewController:[[BGTimeoutViewController alloc] init] animated:YES];
     }
-    if(indexPath.section == 3 && indexPath.row == 3) {
+    if(indexPath.section == 4 && indexPath.row == 0) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
@@ -563,16 +578,16 @@
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
     }
-    if(indexPath.section == 4 && indexPath.row == 0) {
+    if(indexPath.section == 5 && indexPath.row == 0) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];
     }
-    if(indexPath.section == 4 && indexPath.row == 1) {
+    if(indexPath.section == 5 && indexPath.row == 1) {
         [self.tableView endEditing:YES];
         [self dismissViewControllerAnimated:YES completion:^{
             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
         }];
     }
-    if(indexPath.section == 4 && indexPath.row == 2) {
+    if(indexPath.section == 5 && indexPath.row == 2) {
         [self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];
     }
 }

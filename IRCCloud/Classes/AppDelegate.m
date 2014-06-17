@@ -67,7 +67,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":@"api.irccloud.com"}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":@"api.irccloud.com", @"saveToCameraRoll":@(YES)}];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"www.irccloud.com"]) {
         CLS_LOG(@"Migrating host");
         [[NSUserDefaults standardUserDefaults] setObject:@"api.irccloud.com" forKey:@"host"];

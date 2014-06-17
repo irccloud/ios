@@ -2300,11 +2300,14 @@
     [self.slidingViewController dismissModalViewControllerAnimated:YES];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+
     UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
     if(!img)
         img = [info objectForKey:UIImagePickerControllerOriginalImage];
     
     if(img) {
+        if(picker.sourceType == UIImagePickerControllerSourceTypeCamera && [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"])
+            UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
         [self _showConnectingView];
         _connectingStatus.text = @"Uploading";
         [_connectingActivity startAnimating];
