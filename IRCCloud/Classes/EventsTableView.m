@@ -194,7 +194,6 @@ int __timestampWidth;
         _bottomRow = [[[self.tableView indexPathsForVisibleRows] lastObject] row];
         if(_bottomRow >= _data.count)
             _bottomRow = _data.count - 1;
-        _buffer.scrolledUpFrom = [[_data objectAtIndex:_bottomRow] eid];
     } else {
         _bottomRow = -1;
     }
@@ -872,16 +871,6 @@ int __timestampWidth;
     _requestingBacklog = NO;
     _bottomRow = -1;
     if(_buffer && buffer.bid != _buffer.bid) {
-        if(_data.count) {
-            NSInteger lastRow = -1;
-            NSArray *rows = [self.tableView indexPathsForVisibleRows];
-            if(rows.count) {
-                lastRow = [[rows lastObject] row];
-            }
-            if(lastRow >= _data.count)
-                lastRow = _data.count - 1;
-            _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow] eid];
-        }
         for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid]) {
             if(event.rowType == ROW_LASTSEENEID) {
                 [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
@@ -1077,8 +1066,17 @@ int __timestampWidth;
             if(!_buffer.scrolledUp)
                 _buffer.scrolledUpFrom = -1;
         }
-    } else if(_buffer.scrolledUp && _buffer.scrolledUpFrom > 0 && oldPosition > 0 && oldPosition < _data.count) {
+    } else if(_buffer.savedScrollPosition == -2 && oldPosition > 0 && oldPosition < _data.count) {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:oldPosition inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    } else if(_buffer.scrolledUp && _buffer.savedScrollPosition > 0) {
+        int i = 0;
+        for(Event *e in _data) {
+            if(e.eid == _buffer.savedScrollPosition) {
+                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+                break;
+            }
+            i++;
+        }
     } else if(!_buffer.scrolledUp || (_data.count && _scrollTimer)) {
         [self _scrollToBottom];
         [self scrollToBottom];
@@ -1368,6 +1366,9 @@ int __timestampWidth;
     
     if(rows.count) {
         if(_data.count) {
+            if(lastRow < _data.count)
+                _buffer.savedScrollPosition = [[_data objectAtIndex:lastRow] eid];
+            
             if(lastRow == _data.count - 1) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
@@ -1379,6 +1380,7 @@ int __timestampWidth;
                     [self _sendHeartbeat];
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
+                _buffer.savedScrollPosition = -1;
             } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
                 _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
                 _buffer.scrolledUp = YES;
@@ -1422,12 +1424,10 @@ int __timestampWidth;
                     e.timestamp = nil;
                     e.formatted = nil;
                 }
-                NSInteger lastRow = -1;
-                NSArray *rows = [self.tableView indexPathsForVisibleRows];
-                if(rows.count) {
-                    lastRow = [[rows lastObject] row];
-                }
+                NSTimeInterval saved = _buffer.savedScrollPosition;
+                _buffer.savedScrollPosition = -2;
                 [self refresh];
+                _buffer.savedScrollPosition = saved;
             }
         } else if(indexPath.row < _data.count) {
             Event *e = [_data objectAtIndex:indexPath.row];

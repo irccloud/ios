@@ -679,7 +679,6 @@
             _connectingActivity.hidden = NO;
             _connectingProgress.progress = 0;
             _connectingProgress.hidden = YES;
-            _eventsView.tableView.tableHeaderView = nil;
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
             break;
         case kIRCCloudStateDisconnected:
@@ -702,7 +701,6 @@
                 _connectingProgress.progress = 0;
                 _connectingProgress.hidden = YES;
             }
-            _eventsView.tableView.tableHeaderView = nil;
             break;
         case kIRCCloudStateConnected:
             [_connectingActivity stopAnimating];
