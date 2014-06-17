@@ -77,9 +77,11 @@
             }
             [[NSUserDefaults standardUserDefaults] synchronize];
             [self.navigationController popViewControllerAnimated:YES];
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             return NO;
         } else if([request.URL.query isEqualToString:@"error=access_denied"]) {
             [self.navigationController popViewControllerAnimated:YES];
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             return NO;
         } else {
             return YES;
