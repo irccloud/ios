@@ -556,7 +556,7 @@ NSLock *__parserLock = nil;
                    @"channel_topic": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
                        if(!backlog || _resuming) {
-                           [_channels updateTopic:[object objectForKey:@"topic"] time:object.eid author:[object objectForKey:@"author"] buffer:object.bid];
+                           [_channels updateTopic:[object objectForKey:@"topic"] time:object.eid/1000000 author:[object objectForKey:@"author"] buffer:object.bid];
                            if(!backlog)
                                [self postObject:object forEvent:kIRCEventChannelTopic];
                        }
