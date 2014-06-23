@@ -2312,10 +2312,9 @@
         _connectingActivity.hidden = NO;
         _connectingProgress.progress = 0;
         _connectingProgress.hidden = YES;
-        _message.editable = NO;
-        _sendBtn.enabled = NO;
         ImageUploader *u = [[ImageUploader alloc] init];
         u.delegate = self;
+        u.bid = _buffer.bid;
         [u upload:img];
     }
 }
@@ -2337,8 +2336,6 @@
     _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
     [_alertView show];
     [self _hideConnectingView];
-    _message.editable = YES;
-    _sendBtn.enabled = YES;
 }
 
 -(void)imageUploadNotAuthorized {
@@ -2349,8 +2346,6 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self _hideConnectingView];
-    _message.editable = YES;
-    _sendBtn.enabled = YES;
     SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
     [nc pushViewController:[[ImgurLoginViewController alloc] init] animated:NO];
@@ -2358,15 +2353,28 @@
     [self presentViewController:nc animated:YES completion:nil];
 }
 
--(void)imageUploadDidFinish:(NSDictionary *)d {
+-(void)imageUploadDidFinish:(NSDictionary *)d bid:(int)bid {
     if([[d objectForKey:@"success"] intValue] == 1) {
         NSString *link = [[[d objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
-        if(_message.text.length == 0) {
-            _message.text = link;
+        if(bid == _buffer.bid) {
+            if(_message.text.length == 0) {
+                _message.text = link;
+            } else {
+                if(![_message.text hasSuffix:@" "])
+                    _message.text = [_message.text stringByAppendingString:@" "];
+                _message.text = [_message.text stringByAppendingString:link];
+            }
         } else {
-            if(![_message.text hasSuffix:@" "])
-                _message.text = [_message.text stringByAppendingString:@" "];
-            _message.text = [_message.text stringByAppendingString:link];
+            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
+            if(b) {
+                if(b.draft.length == 0) {
+                    b.draft = link;
+                } else {
+                    if(![b.draft hasSuffix:@" "])
+                        b.draft = [b.draft stringByAppendingString:@" "];
+                    b.draft = [b.draft stringByAppendingString:link];
+                }
+            }
         }
     } else {
         CLS_LOG(@"imgur upload failed: %@", d);
@@ -2374,8 +2382,6 @@
         return;
     }
     [self _hideConnectingView];
-    _message.editable = YES;
-    _sendBtn.enabled = YES;
 }
 
 -(void)cameraButtonPressed:(id)sender {

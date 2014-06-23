@@ -12,7 +12,7 @@
 -(void)imageUploadProgress:(float)progress;
 -(void)imageUploadDidFail;
 -(void)imageUploadNotAuthorized;
--(void)imageUploadDidFinish:(NSDictionary *)response;
+-(void)imageUploadDidFinish:(NSDictionary *)response bid:(int)bid;
 @end
 
 @interface ImageUploader : NSObject<NSURLConnectionDelegate,NSURLConnectionDataDelegate> {
@@ -20,7 +20,9 @@
     UIImage *_image;
     NSMutableData *_response;
     NSObject<ImageUploaderDelegate> *_delegate;
+    int _bid;
 }
 @property NSObject<ImageUploaderDelegate> *delegate;
+@property int bid;
 -(void)upload:(UIImage *)image;
 @end

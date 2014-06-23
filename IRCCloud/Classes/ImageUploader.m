@@ -110,6 +110,6 @@
         return;
     }
 #endif
-    [_delegate imageUploadDidFinish:d];
+    [_delegate imageUploadDidFinish:d bid:_bid];
 }
 @end
