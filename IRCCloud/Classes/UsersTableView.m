@@ -191,18 +191,20 @@
     NSMutableArray *sectionSizes = [[NSMutableArray alloc] init];
     
     for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
-        if([user.mode rangeOfString:s?s.MODE_OWNER:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
-            [owners addObject:user];
-        else if([user.mode rangeOfString:s?s.MODE_ADMIN:@"a"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_ADMIN:@"a"])
-            [admins addObject:user];
-        else if([user.mode rangeOfString:s?s.MODE_OP:@"o"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OP:@"o"])
-            [ops addObject:user];
-        else if([user.mode rangeOfString:s?s.MODE_HALFOP:@"h"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_HALFOP:@"h"])
-            [halfops addObject:user];
-        else if([user.mode rangeOfString:s?s.MODE_VOICED:@"v"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_VOICED:@"v"])
-            [voiced addObject:user];
-        else
-            [members addObject:user];
+        if(user.nick.length) {
+            if([user.mode rangeOfString:s?s.MODE_OWNER:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
+                [owners addObject:user];
+            else if([user.mode rangeOfString:s?s.MODE_ADMIN:@"a"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_ADMIN:@"a"])
+                [admins addObject:user];
+            else if([user.mode rangeOfString:s?s.MODE_OP:@"o"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OP:@"o"])
+                [ops addObject:user];
+            else if([user.mode rangeOfString:s?s.MODE_HALFOP:@"h"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_HALFOP:@"h"])
+                [halfops addObject:user];
+            else if([user.mode rangeOfString:s?s.MODE_VOICED:@"v"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_VOICED:@"v"])
+                [voiced addObject:user];
+            else
+                [members addObject:user];
+        }
     }
     
     [self _addUsersFromList:owners heading:@"Owners" symbol:[PREFIX objectForKey:s?s.MODE_OWNER:@"q"] headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
