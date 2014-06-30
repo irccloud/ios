@@ -295,6 +295,13 @@
                         e1.eid = event.eid;
                         e1.oldNick = event.oldNick;
                         e1.nick = event.nick;
+                        for(CollapsedEvent *e2 in _data) {
+                            if((e2.type == kCollapsedEventQuit || e2.type == kCollapsedEventPart) && [[e2.nick lowercaseString] isEqualToString:[event.nick lowercaseString]]) {
+                                e1.type = kCollapsedEventPopOut;
+                                [_data removeObject:e2];
+                                break;
+                            }
+                        }
                         return;
                     }
                     if((e1.type == kCollapsedEventQuit || e1.type == kCollapsedEventPart) && [[e1.nick lowercaseString] isEqualToString:[event.oldNick lowercaseString]]) {
