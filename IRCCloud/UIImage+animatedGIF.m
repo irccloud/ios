@@ -75,7 +75,7 @@ static NSArray *frameArray(size_t const count, CGImageRef const images[count], i
     }];
     
     int const gcd = vectorGCD(count, delayCentiseconds);
-    size_t const frameCount = totalDurationCentiseconds / gcd;
+    size_t frameCount = totalDurationCentiseconds / gcd;
     UIImage *frames[frameCount];
     
     //Snippit from: https://github.com/rs/SDWebImage/blob/master/SDWebImage/SDWebImageDecoder.m
@@ -115,7 +115,8 @@ static NSArray *frameArray(size_t const count, CGImageRef const images[count], i
                                                  colorSpace,
                                                  bitmapInfo);
     CGColorSpaceRelease(colorSpace);
-    for (size_t i = 0, f = 0; i < count; ++i) {
+    frameCount = 0;
+    for (size_t i = 0; i < count; ++i) {
         if(__GIF_Decode_Cancelled)
             break;
         CGImageRef imageRef = images[i];
@@ -126,15 +127,17 @@ static NSArray *frameArray(size_t const count, CGImageRef const images[count], i
         UIImage *frame = [UIImage imageWithCGImage:decompressedImageRef scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
         CGImageRelease(decompressedImageRef);
         
-        for (size_t j = delayCentiseconds[i] / gcd; j > 0; --j) {
-            frames[f++] = frame;
+        if(frame) {
+            for (size_t j = delayCentiseconds[i] / gcd; j > 0; --j) {
+                frames[frameCount++] = frame;
+            }
         }
         
-        [[NSNotificationCenter defaultCenter] postNotificationName:UIImageAnimatedGIFProgressNotification object:nil userInfo:@{@"progress":@((float)f/(float)count)}];
+        [[NSNotificationCenter defaultCenter] postNotificationName:UIImageAnimatedGIFProgressNotification object:nil userInfo:@{@"progress":@((float)frameCount/(float)count)}];
     }
     CGContextRelease(context);
     [[NSNotificationCenter defaultCenter] removeObserver:observer];
-    if(__GIF_Decode_Cancelled)
+    if(__GIF_Decode_Cancelled || frameCount == 0)
         return nil;
     else
         return [NSArray arrayWithObjects:frames count:frameCount];

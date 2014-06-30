@@ -1971,7 +1971,7 @@
         [self.view.window addSubview:_landscapeView];
         [sheet showInView:_landscapeView];
     } else {
-        [sheet showInView:self.slidingViewController.view.superview];
+        [sheet showFromRect:CGRectMake(_settingsBtn.frame.origin.x, _bottomBar.frame.origin.y,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height) inView:self.view animated:YES];
     }
 }
 
@@ -2392,7 +2392,7 @@
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
         } else {
-            [sheet showInView:self.slidingViewController.view.superview];
+            [sheet showInView:self.slidingViewController.view];
         }
     } else {
         [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];

@@ -57,6 +57,7 @@ int __timestampWidth;
         _message.lineBreakMode = NSLineBreakByWordWrapping;
         _message.backgroundColor = [UIColor clearColor];
         _message.textColor = [UIColor blackColor];
+        _message.dataDetectorTypes = UIDataDetectorTypeNone;
         [self.contentView addSubview:_message];
         
         _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
@@ -1181,7 +1182,6 @@ int __timestampWidth;
     cell.timestamp.font = [ColorFormatter timestampFont];
     cell.message.font = [ColorFormatter timestampFont];
     cell.message.delegate = self;
-    cell.message.dataDetectorTypes = UIDataDetectorTypeNone;
     cell.message.text = e.formatted;
     if(e.from.length && e.msg.length) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];

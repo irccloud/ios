@@ -132,7 +132,7 @@
         first = 1;
         for(User *user in users) {
             if(sectionTitles != nil) {
-                if([[user.nick lowercaseString] characterAtIndex:0] != lastChar) {
+                if(user.nick.length && [[user.nick lowercaseString] characterAtIndex:0] != lastChar) {
                     lastChar = [[user.nick lowercaseString] characterAtIndex:0];
                     [sectionIndexes addObject:@(data.count)];
                     [sectionTitles addObject:[[user.nick uppercaseString] substringToIndex:1]];
