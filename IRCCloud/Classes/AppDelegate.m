@@ -129,6 +129,9 @@
     NSString *l = [url.path lowercaseString];
     if([url.scheme hasPrefix:@"irc"]) {
         [self.mainViewController launchURL:[NSURL URLWithString:[url.description stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
+    } else if([url.scheme isEqualToString:@"spotify"]) {
+        if(![[UIApplication sharedApplication] openURL:url])
+            [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://open.spotify.com/%@",[[url.absoluteString substringFromIndex:8] stringByReplacingOccurrencesOfString:@":" withString:@"/"]]]];
     } else if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"] ||
               ([[url.host lowercaseString] isEqualToString:@"imgur.com"] && [url.path rangeOfString:@"/a/"].location == NSNotFound && [url.path rangeOfString:@","].location == NSNotFound) ||
               ([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [[url.path lowercaseString] hasPrefix:@"/photos/"]) ||

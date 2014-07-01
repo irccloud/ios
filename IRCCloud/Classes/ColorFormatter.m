@@ -1059,6 +1059,18 @@ NSDictionary *emojiMap;
     return _pattern;
 }
 
++(NSRegularExpression *)spotify {
+    static NSRegularExpression *_pattern = nil;
+    if(!_pattern) {
+        NSString *pattern = @"spotify:([a-zA-Z0-9:]+)";
+        _pattern = [NSRegularExpression
+                    regularExpressionWithPattern:pattern
+                    options:0
+                    error:nil];
+    }
+    return _pattern;
+}
+
 +(NSRegularExpression *)email {
     static NSRegularExpression *_pattern = nil;
     if(!_pattern) {
@@ -1459,6 +1471,11 @@ NSDictionary *emojiMap;
         for(NSTextCheckingResult *result in results) {
             NSString *url = [[output string] substringWithRange:result.range];
             url = [NSString stringWithFormat:@"mailto:%@", url];
+            [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
+        }
+        results = [[self spotify] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
+        for(NSTextCheckingResult *result in results) {
+            NSString *url = [[output string] substringWithRange:result.range];
             [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
         }
         if(server) {
