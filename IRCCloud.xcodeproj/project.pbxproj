@@ -287,6 +287,7 @@
 		22F5C4BD1791F205005E09A9 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
 		22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
 		22F9EE1D16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
+		BF0B3E2D196543090080479F /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = BF0B3E2C196543090080479F /* URLHandler.m */; };
 		BFBA26F818D808C300EE0724 /* SVWebViewController.strings in Resources */ = {isa = PBXBuildFile; fileRef = BFBA26DB18D808C300EE0724 /* SVWebViewController.strings */; };
 		BFBA26F918D808C300EE0724 /* SVWebViewController.strings in Resources */ = {isa = PBXBuildFile; fileRef = BFBA26DB18D808C300EE0724 /* SVWebViewController.strings */; };
 		BFBA26FA18D808C300EE0724 /* SVModalWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BFBA26E318D808C300EE0724 /* SVModalWebViewController.m */; };
@@ -513,6 +514,8 @@
 		22F5C4BC1791F205005E09A9 /* a.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = a.caf; sourceTree = "<group>"; };
 		22F9EE1A16DE6F21004615C0 /* EventsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsDataSource.h; sourceTree = "<group>"; };
 		22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsDataSource.m; sourceTree = "<group>"; };
+		BF0B3E2B196543090080479F /* URLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLHandler.h; sourceTree = "<group>"; };
+		BF0B3E2C196543090080479F /* URLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLHandler.m; sourceTree = "<group>"; };
 		BFBA26DC18D808C300EE0724 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/SVWebViewController.strings; sourceTree = "<group>"; };
 		BFBA26DD18D808C300EE0724 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/SVWebViewController.strings; sourceTree = "<group>"; };
 		BFBA26DE18D808C300EE0724 /* es-ES */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "es-ES"; path = "es-ES.lproj/SVWebViewController.strings"; sourceTree = "<group>"; };
@@ -755,6 +758,8 @@
 			children = (
 				228A05AE16D3DB7B0029769C /* AppDelegate.h */,
 				228A05AF16D3DB7B0029769C /* AppDelegate.m */,
+				BF0B3E2B196543090080479F /* URLHandler.h */,
+				BF0B3E2C196543090080479F /* URLHandler.m */,
 				22AD75EB1718567D00141257 /* BansTableViewController.h */,
 				22AD75EC1718567D00141257 /* BansTableViewController.m */,
 				2236F5FC16DA8928007BE535 /* BuffersDataSource.h */,
@@ -1374,6 +1379,7 @@
 				22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */,
 				22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */,
 				228E2B8A18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */,
+				BF0B3E2D196543090080479F /* URLHandler.m in Sources */,
 				22A19C60178FCCAC00772C60 /* UINavigationController+iPadSux.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
