@@ -37,6 +37,9 @@
     username.leftViewMode = UITextFieldViewModeAlways;
     username.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, username.frame.size.height)];
     username.rightViewMode = UITextFieldViewModeAlways;
+#ifdef ENTERPRISE
+    username.placeholder = @"Email or Username";
+#endif
     password.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, password.frame.size.height)];
     password.leftViewMode = UITextFieldViewModeAlways;
     password.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, password.frame.size.height)];
@@ -359,6 +362,12 @@
     error.hidden = YES;
 #ifdef ENTERPRISE
     IRCCLOUD_HOST = host.text;
+    if([IRCCLOUD_HOST hasPrefix:@"http://"])
+        IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:7];
+    if([IRCCLOUD_HOST hasPrefix:@"https://"])
+        IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:8];
+    if([IRCCLOUD_HOST hasSuffix:@"/"])
+        IRCCLOUD_HOST = [IRCCLOUD_HOST substringToIndex:IRCCLOUD_HOST.length - 1];
 #endif
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
