@@ -56,6 +56,9 @@
     
     if([url.scheme hasPrefix:@"irc"]) {
         [mainViewController launchURL:[NSURL URLWithString:[url.description stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
+    } else if([url.scheme isEqualToString:@"spotify"]) {
+        if(![[UIApplication sharedApplication] openURL:url])
+            [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://open.spotify.com/%@",[[url.absoluteString substringFromIndex:8] stringByReplacingOccurrencesOfString:@":" withString:@"/"]]]];
     } else if([[self class] isImageURL:url]) {
         [self showImage:url];
     } else {
