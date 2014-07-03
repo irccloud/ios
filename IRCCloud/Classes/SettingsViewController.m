@@ -141,6 +141,7 @@
     [[NSUserDefaults standardUserDefaults] setBool:_chrome.on forKey:@"useChrome"];
     [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
     [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
+    [[NSUserDefaults standardUserDefaults] setBool:_resize.on forKey:@"resize"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -284,6 +285,7 @@
     _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
+    _resize.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"resize"];
 }
 
 - (void)viewDidLoad {
@@ -335,6 +337,7 @@
     _autoCaps = [[UISwitch alloc] init];
     _emocodes = [[UISwitch alloc] init];
     _saveToCameraRoll = [[UISwitch alloc] init];
+    _resize = [[UISwitch alloc] init];
 
     int width;
     
@@ -417,7 +420,7 @@
         case 3:
             return (_chromeInstalled)?4:3;
         case 4:
-            return 2;
+            return 3;
         case 5:
             return 4;
     }
@@ -537,6 +540,10 @@
                 case 1:
                     cell.textLabel.text = @"Save to Camera Roll";
                     cell.accessoryView = _saveToCameraRoll;
+                    break;
+                case 2:
+                    cell.textLabel.text = @"Resize Before Upload";
+                    cell.accessoryView = _resize;
                     break;
             }
             break;
