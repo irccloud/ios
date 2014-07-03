@@ -17,11 +17,11 @@
 #import <Crashlytics/Crashlytics.h>
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
-#import "ImageViewController.h"
 #import "EditConnectionViewController.h"
 #import "UIColor+IRCCloud.h"
 #import "ColorFormatter.h"
 #import "config.h"
+#import "URLHandler.h"
 
 //From: http://stackoverflow.com/a/19313559
 @interface NavBarHax : UINavigationBar
@@ -124,48 +124,16 @@
 }
 
 - (void)launchURL:(NSURL *)url {
-    if(self.window.rootViewController.presentedViewController)
-       [self.window.rootViewController dismissModalViewControllerAnimated:NO];
-    NSString *l = [url.path lowercaseString];
-    if([url.scheme hasPrefix:@"irc"]) {
-        [self.mainViewController launchURL:[NSURL URLWithString:[url.description stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
-    } else if([url.scheme isEqualToString:@"spotify"]) {
-        if(![[UIApplication sharedApplication] openURL:url])
-            [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://open.spotify.com/%@",[[url.absoluteString substringFromIndex:8] stringByReplacingOccurrencesOfString:@":" withString:@"/"]]]];
-    } else if([l hasSuffix:@"jpg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"] ||
-              ([[url.host lowercaseString] isEqualToString:@"imgur.com"] && [url.path rangeOfString:@"/a/"].location == NSNotFound && [url.path rangeOfString:@","].location == NSNotFound) ||
-              ([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [[url.path lowercaseString] hasPrefix:@"/photos/"]) ||
-              (([[url.host lowercaseString] isEqualToString:@"instagram.com"] || [[url.host lowercaseString] isEqualToString:@"instagr.am"]) && [[url.path lowercaseString] hasPrefix:@"/p/"]) ||
-              (([[url.host lowercaseString] isEqualToString:@"droplr.com"] || [[url.host lowercaseString] isEqualToString:@"d.pr"]) && [[url.path lowercaseString] hasPrefix:@"/i/"]) ||
-              ([url.host.lowercaseString isEqualToString:@"cl.ly"] && url.path.length && ![url.path.lowercaseString isEqualToString:@"/robots.txt"] && ![url.path.lowercaseString isEqualToString:@"/image"])) {
-        [self showImage:url];
-    } else {
-        if(!_openInChromeController)
-            _openInChromeController = [[OpenInChromeController alloc] init];
-        if([[NSUserDefaults standardUserDefaults] objectForKey:@"useChrome"] || ![_openInChromeController isChromeInstalled]) {
-            if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_openInChromeController openInChrome:url
-                                             withCallbackURL:[NSURL URLWithString:
+    if (!_urlHandler) {
+        _urlHandler = [[URLHandler alloc] init];
 #ifdef ENTERPRISE
-                                                              @"irccloud-enterprise://"
+        _urlHandler.appCallbackURL = [NSURL URLWithString:@"irccloud-enterprise://"];
 #else
-                                                              @"irccloud://"
+        _urlHandler.appCallbackURL = [NSURL URLWithString:@"irccloud://"];
 #endif
-                                                              ]
-                                                createNewTab:NO]))
-                [[UIApplication sharedApplication] openURL:url];
-        } else {
-            _pendingURL = url;
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Choose A Browser" message:@"Would you prefer to open links in Safari or Chrome?" delegate:self cancelButtonTitle:nil otherButtonTitles:@"Chrome", @"Safari", nil];
-            [alert show];
-        }
+        
     }
-}
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    [[NSUserDefaults standardUserDefaults] setObject:@(buttonIndex == 0) forKey:@"useChrome"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    [self launchURL:_pendingURL];
-    _pendingURL = nil;
+    [_urlHandler launchURL:url];
 }
 
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
@@ -196,23 +164,6 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
         self.loginSplashViewController.view.alpha = 1;
         self.window.rootViewController = self.loginSplashViewController;
-    }];
-}
-
--(void)showImage:(NSURL *)url {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        self.window.backgroundColor = [UIColor blackColor];
-        self.window.rootViewController = [[ImageViewController alloc] initWithURL:url];
-        [self.window insertSubview:self.slideViewController.view aboveSubview:self.window.rootViewController.view];
-        [UIView animateWithDuration:0.5f animations:^{
-            self.slideViewController.view.alpha = 0;
-        } completion:^(BOOL finished){
-            [self.slideViewController.view removeFromSuperview];
-#ifdef __IPHONE_7_0
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                [UIApplication sharedApplication].statusBarHidden = YES;
-#endif
-        }];
     }];
 }
 

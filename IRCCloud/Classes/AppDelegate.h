@@ -18,16 +18,15 @@
 #import "LoginSplashViewController.h"
 #import "MainViewController.h"
 #import "ECSlidingViewController.h"
-#import "OpenInChromeController.h"
 #import "NetworkConnection.h"
+#import "URLHandler.h"
 
 @class ViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate> {
     NSTimer *_disconnectTimer;
-    OpenInChromeController *_openInChromeController;
-    NSURL *_pendingURL;
     NetworkConnection *_conn;
+    URLHandler *_urlHandler;
 }
 
 @property (strong, nonatomic) UIWindow *window;
@@ -36,7 +35,6 @@
 @property (strong, nonatomic) MainViewController *mainViewController;
 @property (strong, nonatomic) ECSlidingViewController *slideViewController;
 
--(void)showImage:(NSURL *)url;
 -(void)showLoginView;
 -(void)showMainView:(BOOL)animated;
 -(void)showConnectionView;

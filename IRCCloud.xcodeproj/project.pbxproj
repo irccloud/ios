@@ -171,6 +171,8 @@
 		225D979918AA995900065087 /* licenses.txt in Resources */ = {isa = PBXBuildFile; fileRef = 224FCF321787286000FC3879 /* licenses.txt */; };
 		225D979A18AA995900065087 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
 		225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
+		2264A30119659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
+		2264A30219659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
 		22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		22695F5616E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
@@ -397,6 +399,8 @@
 		2253BA261770CDC500CCA77F /* ChannelListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelListTableViewController.h; sourceTree = "<group>"; };
 		225D979F18AA995900065087 /* IRCEnterprise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCEnterprise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IRCCloud-Enterprise-Info.plist"; sourceTree = "<group>"; };
+		2264A2FF19659BB100DCFDDD /* URLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLHandler.h; sourceTree = "<group>"; };
+		2264A30019659BB100DCFDDD /* URLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLHandler.m; sourceTree = "<group>"; };
 		22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollapsedEvents.h; sourceTree = "<group>"; };
 		22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollapsedEvents.m; sourceTree = "<group>"; };
 		2274F49D1756723F0039B4CB /* OpenInChromeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInChromeController.h; path = OpenInChrome/OpenInChromeController.h; sourceTree = SOURCE_ROOT; };
@@ -790,6 +794,8 @@
 				2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */,
 				22A19C5E178FCCAB00772C60 /* UINavigationController+iPadSux.h */,
 				22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */,
+				2264A2FF19659BB100DCFDDD /* URLHandler.h */,
+				2264A30019659BB100DCFDDD /* URLHandler.m */,
 				2236F64416DD138A007BE535 /* UsersDataSource.h */,
 				2236F64516DD138B007BE535 /* UsersDataSource.m */,
 				2236F64816DD30E0007BE535 /* UsersTableView.h */,
@@ -1148,6 +1154,7 @@
 				225D973918AA995900065087 /* ServerReorderViewController.m in Sources */,
 				225D973A18AA995900065087 /* AppDelegate.m in Sources */,
 				225D973B18AA995900065087 /* TTTAttributedLabel.m in Sources */,
+				2264A30219659BB100DCFDDD /* URLHandler.m in Sources */,
 				225D973C18AA995900065087 /* LoginSplashViewController.m in Sources */,
 				225D974718AA995900065087 /* NetworkConnection.m in Sources */,
 				225D974818AA995900065087 /* AsyncSocket.m in Sources */,
@@ -1224,6 +1231,7 @@
 				22462B5218906B03009EF986 /* ServerReorderViewController.m in Sources */,
 				228A05B216D3DB7B0029769C /* AppDelegate.m in Sources */,
 				228A05D416D3DFB80029769C /* TTTAttributedLabel.m in Sources */,
+				2264A30119659BB100DCFDDD /* URLHandler.m in Sources */,
 				228A05DE16D3E40F0029769C /* LoginSplashViewController.m in Sources */,
 				22B4284816D7E36300498507 /* NetworkConnection.m in Sources */,
 				22B4286616D831A800498507 /* AsyncSocket.m in Sources */,
