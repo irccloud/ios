@@ -106,6 +106,90 @@
 
 @end
 
+@interface PhotoSizeViewController : UITableViewController
+@end
+
+@implementation PhotoSizeViewController
+
+-(id)init {
+    self = [super initWithStyle:UITableViewStyleGrouped];
+    if (self) {
+        self.navigationItem.title = @"Photo Size";
+    }
+    return self;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Table view data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 4;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"photosizecell"];
+    if(!cell)
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"photosizecell"];
+    
+    cell.accessoryType = UITableViewCellAccessoryNone;
+    
+    switch(indexPath.row) {
+        case 0:
+            cell.textLabel.text = @"Small";
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue] == 512)
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+        case 1:
+            cell.textLabel.text = @"Medium";
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue] == 1024)
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+        case 2:
+            cell.textLabel.text = @"Large";
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue] == 2048)
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+        case 3:
+            cell.textLabel.text = @"Original";
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue] == -1)
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+    }
+    
+    return cell;
+}
+
+#pragma mark - Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    switch(indexPath.row) {
+        case 0:
+            [[NSUserDefaults standardUserDefaults] setObject:@(512) forKey:@"photoSize"];
+            break;
+        case 1:
+            [[NSUserDefaults standardUserDefaults] setObject:@(1024) forKey:@"photoSize"];
+            break;
+        case 2:
+            [[NSUserDefaults standardUserDefaults] setObject:@(2048) forKey:@"photoSize"];
+            break;
+        case 3:
+            [[NSUserDefaults standardUserDefaults] setObject:@(-1) forKey:@"photoSize"];
+            break;
+    }
+    [tableView reloadData];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+@end
+
 @implementation SettingsViewController
 
 - (id)initWithStyle:(UITableViewStyle)style {
@@ -141,7 +225,6 @@
     [[NSUserDefaults standardUserDefaults] setBool:_chrome.on forKey:@"useChrome"];
     [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
     [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
-    [[NSUserDefaults standardUserDefaults] setBool:_resize.on forKey:@"resize"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -285,7 +368,6 @@
     _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
-    _resize.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"resize"];
 }
 
 - (void)viewDidLoad {
@@ -337,7 +419,6 @@
     _autoCaps = [[UISwitch alloc] init];
     _emocodes = [[UISwitch alloc] init];
     _saveToCameraRoll = [[UISwitch alloc] init];
-    _resize = [[UISwitch alloc] init];
 
     int width;
     
@@ -438,7 +519,7 @@
         case 3:
             return @"Device";
         case 4:
-            return @"Photo Uploads";
+            return @"Photo Sharing";
         case 5:
             return @"About";
     }
@@ -542,8 +623,23 @@
                     cell.accessoryView = _saveToCameraRoll;
                     break;
                 case 2:
-                    cell.textLabel.text = @"Resize Before Upload";
-                    cell.accessoryView = _resize;
+                    cell.textLabel.text = @"Image Size";
+                    int size = [[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue];
+                    switch(size) {
+                        case 512:
+                            cell.detailTextLabel.text = @"Small";
+                            break;
+                        case 1024:
+                            cell.detailTextLabel.text = @"Medium";
+                            break;
+                        case 2048:
+                            cell.detailTextLabel.text = @"Large";
+                            break;
+                        case -1:
+                            cell.detailTextLabel.text = @"Original";
+                            break;
+                    }
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
                     break;
             }
             break;
@@ -584,6 +680,9 @@
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
+    }
+    if(indexPath.section == 4 && indexPath.row == 2) {
+        [self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];
     }
     if(indexPath.section == 5 && indexPath.row == 0) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];

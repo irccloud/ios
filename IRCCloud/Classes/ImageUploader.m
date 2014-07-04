@@ -158,7 +158,8 @@
 }
 
 -(void)_upload:(UIImage *)img {
-    NSData *data = UIImageJPEGRepresentation([[NSUserDefaults standardUserDefaults] boolForKey:@"resize"]?[self image:img scaledCopyOfSize:CGSizeMake(2048,2048)]:img, 0.8);
+    int size = [[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue];
+    NSData *data = UIImageJPEGRepresentation((size != -1)?[self image:img scaledCopyOfSize:CGSizeMake(size,size)]:img, 0.8);
     CFStringRef data_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[data base64EncodedString], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
