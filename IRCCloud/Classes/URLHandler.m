@@ -1,10 +1,18 @@
 //
 //  URLHandler.m
-//  IRCCloud
 //
-//  Created by Aditya KD on 03/07/14.
-//  Copyright (c) 2014 IRCCloud, Ltd. All rights reserved.
+//  Copyright (C) 2013 IRCCloud, Ltd.
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 
 #import "URLHandler.h"
 #import "AppDelegate.h"
@@ -37,11 +45,13 @@
                           && ![url.path.lowercaseString isEqualToString:@"/robots.txt"] \
                           && ![url.path.lowercaseString isEqualToString:@"/image"])
 
+#define IS_STEAM(url) ([url.host.lowercaseString hasSuffix:@".steampowered.com"] && [url.path.lowercaseString hasPrefix:@"/ugc/"])
+
 + (BOOL)isImageURL:(NSURL *)url
 {
     NSString *l = [url.path lowercaseString];
     // Use pre-processor macros instead of variables so conditions are still evaluated lazily
-    return (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url));
+    return (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url));
 }
 
 - (void)launchURL:(NSURL *)url
