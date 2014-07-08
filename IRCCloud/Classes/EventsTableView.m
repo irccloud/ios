@@ -457,6 +457,20 @@ int __timestampWidth;
         if(shouldExpand)
             [_expandedSectionEids removeAllObjects];
         
+        if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"] || [event.type isEqualToString:@"connecting_cancelled"]) {
+            Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
+            if(last) {
+                if(![last.type isEqualToString:@"socket_closed"] && ![last.type isEqualToString:@"connecting_failed"] && ![last.type isEqualToString:@"connecting_cancelled"])
+                    _currentCollapsedEid = -1;
+            }
+        } else {
+            Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
+            if(last) {
+                if([last.type isEqualToString:@"socket_closed"] || [last.type isEqualToString:@"connecting_failed"] || [last.type isEqualToString:@"connecting_cancelled"])
+                    _currentCollapsedEid = -1;
+            }
+        }
+        
         if(_currentCollapsedEid == -1 || ![[_formatter stringFromDate:date] isEqualToString:_lastCollpasedDay] || shouldExpand) {
             [_collapsedEvents clear];
             _currentCollapsedEid = eid;
