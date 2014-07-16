@@ -25,7 +25,7 @@
 
 @protocol EventsTableViewDelegate<NSObject>
 -(void)rowSelected:(Event *)event;
--(void)rowLongPressed:(Event *)event rect:(CGRect)rect;
+-(void)rowLongPressed:(Event *)event rect:(CGRect)rect link:(NSString *)url;
 -(void)dismissKeyboard;
 @end
 

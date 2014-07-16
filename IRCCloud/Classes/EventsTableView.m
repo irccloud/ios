@@ -1476,7 +1476,22 @@ int __timestampWidth;
         NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
         if(indexPath) {
             if(indexPath.row < _data.count) {
-                [_delegate rowLongPressed:[_data objectAtIndex:indexPath.row] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+                EventsTableCell *c = (EventsTableCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+                NSTextCheckingResult *r = [c.message linkAtPoint:[gestureRecognizer locationInView:c.message]];
+                NSURL *url = nil;
+                if(r) {
+                    url = r.URL;
+                    if([url.host intValue] > 0 && url.path && url.path.length > 1) {
+                        Server *s = [[ServersDataSource sharedInstance] getServer:[url.host intValue]];
+                        if(s != nil) {
+                            if(s.ssl > 0)
+                                url = [NSURL URLWithString:[NSString stringWithFormat:@"ircs://%@%@", s.hostname, [url.path stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
+                            else
+                                url = [NSURL URLWithString:[NSString stringWithFormat:@"irc://%@%@", s.hostname, [url.path stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
+                        }
+                    }
+                }
+                [_delegate rowLongPressed:[_data objectAtIndex:indexPath.row] rect:[self.tableView rectForRowAtIndexPath:indexPath] link:url.absoluteString];
             }
         }
     }

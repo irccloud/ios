@@ -53,6 +53,7 @@
     Event *_selectedEvent;
     CGRect _selectedRect;
     Buffer *_selectedBuffer;
+    NSString *_selectedURL;
     int _cidToOpen;
     NSString *_bufferToOpen;
     NSURL *_urlToOpen;

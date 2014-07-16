@@ -2089,35 +2089,40 @@
 }
 
 -(void)_showUserPopupInRect:(CGRect)rect {
-    NSString *title;
-    if([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length)
-        title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,_selectedUser.hostmask];
-    else
-        title = _selectedUser.nick;
+    NSString *title = @"";;
+    if(_selectedUser) {
+        if([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length)
+            title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,_selectedUser.hostmask];
+        else
+            title = _selectedUser.nick;
+    }
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:title delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    if(_selectedURL)
+        [sheet addButtonWithTitle:@"Copy URL"];
     if(_selectedEvent)
         [sheet addButtonWithTitle:@"Copy Message"];
-    [sheet addButtonWithTitle:@"Whois"];
-    [sheet addButtonWithTitle:@"Send a message"];
-    [sheet addButtonWithTitle:@"Mention"];
-    [sheet addButtonWithTitle:@"Invite to channel"];
-    [sheet addButtonWithTitle:@"Ignore"];
-    if([_buffer.type isEqualToString:@"channel"]) {
-        Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-        User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
-        if([me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
-            if([_selectedUser.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound)
-                [sheet addButtonWithTitle:@"Deop"];
-            else
-                [sheet addButtonWithTitle:@"Op"];
+    if(_selectedUser) {
+        [sheet addButtonWithTitle:@"Whois"];
+        [sheet addButtonWithTitle:@"Send a message"];
+        [sheet addButtonWithTitle:@"Mention"];
+        [sheet addButtonWithTitle:@"Invite to channel"];
+        [sheet addButtonWithTitle:@"Ignore"];
+        if([_buffer.type isEqualToString:@"channel"]) {
+            Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
+            if([me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
+                if([_selectedUser.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound)
+                    [sheet addButtonWithTitle:@"Deop"];
+                else
+                    [sheet addButtonWithTitle:@"Op"];
+            }
+            if([me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
+                [sheet addButtonWithTitle:@"Kick"];
+                [sheet addButtonWithTitle:@"Ban"];
+            }
         }
-        if([me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
-            [sheet addButtonWithTitle:@"Kick"];
-            [sheet addButtonWithTitle:@"Ban"];
-        }
+        [sheet addButtonWithTitle:@"Copy Hostmask"];
     }
-    [sheet addButtonWithTitle:@"Copy Hostmask"];
-    
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
         [self.view.window addSubview:_landscapeView];
@@ -2186,20 +2191,25 @@
     }
 }
 
--(void)rowLongPressed:(Event *)event rect:(CGRect)rect {
-    NSString *from = event.from;
-    if(!from.length)
-        from = event.nick;
-    if(from) {
-        _selectedEvent = event;
-        _selectedUser = [[UsersDataSource sharedInstance] getUser:from cid:_buffer.cid bid:_buffer.bid];
-        if(!_selectedUser) {
-            _selectedUser = [[User alloc] init];
-            _selectedUser.cid = _selectedEvent.cid;
-            _selectedUser.bid = _selectedEvent.bid;
-            _selectedUser.nick = from;
-            _selectedUser.hostmask = _selectedEvent.hostmask;
+-(void)rowLongPressed:(Event *)event rect:(CGRect)rect link:(NSString *)url {
+    if(event && (event.msg.length || event.groupMsg.length)) {
+        NSString *from = event.from;
+        if(!from.length)
+            from = event.nick;
+        if(from) {
+            _selectedUser = [[UsersDataSource sharedInstance] getUser:from cid:_buffer.cid bid:_buffer.bid];
+            if(!_selectedUser) {
+                _selectedUser = [[User alloc] init];
+                _selectedUser.cid = _selectedEvent.cid;
+                _selectedUser.bid = _selectedEvent.bid;
+                _selectedUser.nick = from;
+                _selectedUser.hostmask = _selectedEvent.hostmask;
+            }
+        } else {
+            _selectedUser = nil;
         }
+        _selectedEvent = event;
+        _selectedURL = url;
         [self _showUserPopupInRect:rect];
     }
 }
@@ -2415,6 +2425,9 @@
             } else {
                 [pb setValue:[NSString stringWithFormat:@"%@ %@", _selectedEvent.timestamp, [[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
             }
+        } else if([action isEqualToString:@"Copy URL"]) {
+            UIPasteboard *pb = [UIPasteboard generalPasteboard];
+            [pb setValue:_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
         } else if([action isEqualToString:@"Archive"]) {
             [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Unarchive"]) {
@@ -2552,5 +2565,8 @@
             [_alertView show];
         }
     }
+    _selectedUser = nil;
+    _selectedEvent = nil;
+    _selectedURL = nil;
 }
 @end

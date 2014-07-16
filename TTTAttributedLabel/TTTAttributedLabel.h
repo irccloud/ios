@@ -120,6 +120,8 @@ extern NSString * const kTTTBackgroundCornerRadiusAttributeName;
  */
 @property (nonatomic, strong) NSDictionary *activeLinkAttributes;
 
+- (NSTextCheckingResult *)linkAtPoint:(CGPoint)p;
+
 ///---------------------------------------
 /// @name Acccessing Text Style Attributes
 ///---------------------------------------
