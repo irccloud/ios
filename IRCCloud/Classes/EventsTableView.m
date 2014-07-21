@@ -1101,7 +1101,8 @@ int __timestampWidth;
     if(_data.count && rows.count) {
         NSInteger firstRow = [[rows objectAtIndex:0] row];
         NSInteger lastRow = [[rows lastObject] row];
-        if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos) {
+        Event *e = [_data objectAtIndex:_lastSeenEidPos+1];
+        if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos && e.eid > _buffer.last_seen_eid) {
             if(_topUnreadView.alpha == 0) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
@@ -1477,11 +1478,9 @@ int __timestampWidth;
         if(indexPath) {
             if(indexPath.row < _data.count) {
                 EventsTableCell *c = (EventsTableCell *)[self.tableView cellForRowAtIndexPath:indexPath];
-                NSTextCheckingResult *r = [c.message linkAtPoint:[gestureRecognizer locationInView:c.message]];
-                NSURL *url = nil;
-                if(r) {
-                    url = r.URL;
-                    if([url.host intValue] > 0 && url.path && url.path.length > 1) {
+                NSURL *url = [c.message linkAtPoint:[gestureRecognizer locationInView:c.message]].URL;
+                if(url) {
+                    if([url.scheme hasPrefix:@"irc"] && [url.host intValue] > 0 && url.path && url.path.length > 1) {
                         Server *s = [[ServersDataSource sharedInstance] getServer:[url.host intValue]];
                         if(s != nil) {
                             if(s.ssl > 0)
