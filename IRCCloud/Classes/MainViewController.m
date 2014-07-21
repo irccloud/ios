@@ -1655,23 +1655,28 @@
     if(duration > 0)
         [self.slidingViewController resetTopView];
 
-    int height = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - _kbSize.height;
-    int width = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
-#ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+    int height = ((UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - _kbSize.height;
+    int width = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+        height += [UIApplication sharedApplication].statusBarFrame.size.height;
+    else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
         height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
-#endif
-    
+
     CGRect frame = self.slidingViewController.view.frame;
-    if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
-        frame.origin.y = _kbSize.height;
-    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
-        frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
-    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
-        frame.origin.x = _kbSize.height;
-    else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
-        frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
-    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+        if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
+            frame.origin.y = _kbSize.height;
+        else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
+            frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
+        else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
+            frame.origin.x = _kbSize.height;
+        else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
+            frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
+    } else {
+        frame.origin.x = 0;
+        frame.origin.y = 0;
+    }
+    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         frame.size.width = height;
         frame.size.height = width;
     } else {
@@ -1682,7 +1687,9 @@
     
     height -= self.navigationController.navigationBar.frame.size.height;
 #ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+        height -= [UIApplication sharedApplication].statusBarFrame.size.height;
+    else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
         height -= UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
 #endif
 
@@ -1813,23 +1820,24 @@
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
                 self.navigationItem.rightBarButtonItem = nil;
                 CGRect frame = _eventsView.view.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+                int width = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].bounds.size.height:[UIScreen mainScreen].bounds.size.width;
+                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
                 _eventsView.view.frame = frame;
                 frame = _bottomBar.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
                 _bottomBar.frame = frame;
                 frame = _serverStatusBar.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
                 _serverStatusBar.frame = frame;
                 _usersView.view.hidden = NO;
                 frame = _borders.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width + 2;
+                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width + 2;
                 _borders.frame = frame;
                 frame = _eventsView.topUnreadView.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
                 _eventsView.topUnreadView.frame = frame;
                 frame = _eventsView.bottomUnreadView.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
+                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
                 _eventsView.bottomUnreadView.frame = frame;
             } else {
                 if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
