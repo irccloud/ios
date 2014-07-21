@@ -1971,7 +1971,7 @@
         [self.view.window addSubview:_landscapeView];
         [sheet showInView:_landscapeView];
     } else {
-        [sheet showFromRect:CGRectMake(_settingsBtn.frame.origin.x, _bottomBar.frame.origin.y,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height) inView:self.view animated:YES];
+        [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _settingsBtn.frame.origin.x, _bottomBar.frame.origin.y,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height) inView:self.view animated:YES];
     }
 }
 
@@ -2299,10 +2299,18 @@
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [picker.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     }
-    picker.modalPresentationStyle = UIModalPresentationFormSheet;
-    [self presentViewController:picker animated:YES completion:nil];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+        [self presentViewController:picker animated:YES completion:nil];
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+    } else {
+        _popover = [[UIPopoverController alloc] initWithContentViewController:picker];
+        [_popover presentPopoverFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
+    }
+}
+
+-(void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
+    _popover = nil;
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
@@ -2402,7 +2410,7 @@
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
         } else {
-            [sheet showInView:self.slidingViewController.view];
+            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view animated:YES];
         }
     } else {
         [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
