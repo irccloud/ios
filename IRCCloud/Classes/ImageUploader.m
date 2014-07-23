@@ -162,7 +162,9 @@
     NSData *data = UIImageJPEGRepresentation((size != -1)?[self image:img scaledCopyOfSize:CGSizeMake(size,size)]:img, 0.8);
     CFStringRef data_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[data base64EncodedString], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
     
+#ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
 #ifdef MASHAPE_KEY
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://imgur-apiv3.p.mashape.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setValue:@MASHAPE_KEY forHTTPHeaderField:@"X-Mashape-Authorization"];
@@ -186,7 +188,9 @@
         _response = [[NSMutableData alloc] init];
         _connection = [NSURLConnection connectionWithRequest:request delegate:self];
         [_connection start];
+#ifndef EXTENSION
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
     }];
 }
 
@@ -202,12 +206,16 @@
 }
 
 -(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+#ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
     [_delegate imageUploadDidFail];
 }
 
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection {
+#ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
     
     NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:_response];
 #ifdef IMGUR_KEY

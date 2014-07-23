@@ -339,6 +339,7 @@
                  }];
             }
         }
+#ifndef EXTENSION
         [data addObject:@{
          @"type":@TYPE_ADD_NETWORK,
          @"cid":@-1,
@@ -358,7 +359,7 @@
           @"highlights":@0,
           @"archived":@0,
           }];
-
+#endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if(data.count <= 1) {
                 NSLog(@"The buffer list doesn't have any buffers: %@", data);
@@ -379,6 +380,7 @@
 }
 
 -(void)_updateUnreadIndicators {
+#ifndef EXTENSION
     NSArray *rows = [self.tableView indexPathsForVisibleRows];
     if(rows.count) {
         NSInteger first = [[rows objectAtIndex:0] row];
@@ -432,9 +434,11 @@
     }
     topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y,self.view.frame.size.width, 40);
     bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
+#endif
 }
 
 - (void)joinBtnPressed:(UIButton *)sender {
+#ifndef EXTENSION
     Server *s = [_servers getServer:(int)sender.tag];
     _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
@@ -442,6 +446,7 @@
     [_alertView textFieldAtIndex:0].placeholder = @"#example";
     [_alertView textFieldAtIndex:0].delegate = self;
     [_alertView show];
+#endif
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -478,6 +483,7 @@
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
     
+#ifndef EXTENSION
     if(!_delegate) {
         _delegate = (UIViewController<BuffersTableViewDelegate> *)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
     }
@@ -533,6 +539,7 @@
         [bottomUnreadIndicator addTarget:self action:@selector(bottomUnreadIndicatorClicked:) forControlEvents:UIControlEventTouchUpInside];
         [self.view addSubview: bottomUnreadIndicator];
     }
+#endif
 
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.view.backgroundColor = [UIColor backgroundBlueColor];
@@ -876,7 +883,9 @@
                 [cell.activity stopAnimating];
                 cell.activity.hidden = YES;
             }
+#ifndef EXTENSION
             cell.joinBtn.hidden = ![status isEqualToString:@"connected_ready"] || [[row objectForKey:@"count"] intValue] < 2;
+#endif
             cell.joinBtn.tag = [[row objectForKey:@"cid"] intValue];
             break;
         case TYPE_CHANNEL:
@@ -1019,17 +1028,21 @@
         b.tag = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
         [self joinBtnPressed:b];
     } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
+#ifndef EXTENSION
         EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
         [self.slidingViewController resetTopView];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
         [self presentViewController:nc animated:YES completion:nil];
+#endif
     } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_REORDER) {
+#ifndef EXTENSION
         ServerReorderViewController *svc = [[ServerReorderViewController alloc] initWithStyle:UITableViewStylePlain];
         [self.slidingViewController resetTopView];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
         [self presentViewController:nc animated:YES completion:nil];
+#endif
     } else {
         _selectedRow = indexPath.row;
         [self.tableView reloadData];

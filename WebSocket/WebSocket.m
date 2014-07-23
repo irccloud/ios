@@ -1246,7 +1246,6 @@ WebSocketWaitingState waitingState;
     NSString *gcdDelegateQueueName = [NSString stringWithFormat:@"com.unitt.ws.delegate:%@", uuidString];
     dispatch_queue_t gcdDelegateQueue = dispatch_queue_create([gcdDelegateQueueName cStringUsingEncoding:NSASCIIStringEncoding], NULL);
     id result = [self initWithConfig:aConfig queue:gcdDelegateQueue delegate:aDelegate];
-    dispatch_release(gcdDelegateQueue);
     return result;
 }
 
@@ -1258,7 +1257,6 @@ WebSocketWaitingState waitingState;
         self.config = aConfig;
         delegateQueue = aDispatchQueue;
         socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:delegateQueue];
-        dispatch_retain(delegateQueue);
         pendingFragments = [[MutableQueue alloc] init];
         isClosing = NO;
         isInContinuation = NO;

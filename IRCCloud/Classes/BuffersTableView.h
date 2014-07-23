@@ -50,6 +50,7 @@
     ServersDataSource *_servers;
     BuffersDataSource *_buffers;
 }
+@property UIViewController<BuffersTableViewDelegate> *delegate;
 -(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadIndicatorClicked:(id)sender;
 -(IBAction)bottomUnreadIndicatorClicked:(id)sender;

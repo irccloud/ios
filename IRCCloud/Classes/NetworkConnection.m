@@ -795,8 +795,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     CFStringRef email_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)email, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
     CFStringRef password_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)password, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-    
+#ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/login", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
@@ -808,8 +809,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     CFRelease(password_escaped);
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+#ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
+#endif
     return [[[SBJsonParser alloc] init] objectWithData:data];
 }
 
@@ -884,15 +886,18 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	NSURLResponse *response = nil;
 	NSError *error = nil;
     
+#ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/auth-formtoken", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setHTTPMethod:@"POST"];
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+#ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
+#endif
     return [[[SBJsonParser alloc] init] objectWithData:data];
 }
 
@@ -1452,7 +1457,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	NSError *error = nil;
     NSString *body = [NSString stringWithFormat:@"session=%@", self.session];
     
+#ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/logout", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
@@ -1491,7 +1498,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
     
     CFDataRef data = nil;
-    OSStatus err = SecItemCopyMatching((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, kCFBooleanTrue, kSecReturnData, nil], (CFTypeRef*)&data);
+    OSStatus err = SecItemCopyMatching((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, kCFBooleanTrue, kSecReturnData, nil], (CFTypeRef*)&data);
     if(!err) {
         return [[NSString alloc] initWithData:CFBridgingRelease(data) encoding:NSUTF8StringEncoding];
     }
@@ -1499,6 +1506,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)setSession:(NSString *)session {
-    SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, nil], NULL);
+    SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, nil], NULL);
 }
 @end

@@ -522,6 +522,7 @@
 }
 
 -(void)addEvent:(Event *)event {
+#ifndef EXTENSION
     @synchronized(_events) {
         NSMutableArray *events = [_events objectForKey:@(event.bid)];
         if(!events) {
@@ -537,9 +538,13 @@
         [events_sorted setObject:event forKey:@(event.eid)];
         _dirty = YES;
     }
+#endif
 }
 
 -(Event *)addJSONObject:(IRCCloudJSONObject *)object {
+#ifdef EXTENSION
+    return nil;
+#else
     Event *event = [self event:object.eid buffer:object.bid];
     if(!event) {
         event = [[Event alloc] init];
@@ -603,6 +608,7 @@
         _highestEid = event.eid;
     
     return event;
+#endif
 }
 
 -(Event *)event:(NSTimeInterval)eid buffer:(int)bid {
