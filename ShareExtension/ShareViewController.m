@@ -17,7 +17,7 @@
 
 - (void)presentationAnimationDidFinish {
     if(_conn.state != kIRCCloudStateConnected) {
-        //[_conn connect];
+        [_conn connect];
     }
 }
 
@@ -25,8 +25,8 @@
     [super viewDidLoad];
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     _conn = [NetworkConnection sharedInstance];
-    _splash = [self.storyboard instantiateViewControllerWithIdentifier:@"splash"];
-    [self pushConfigurationViewController:_splash];
+    //_splash = [self.storyboard instantiateViewControllerWithIdentifier:@"splash"];
+    //[self pushConfigurationViewController:_splash];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

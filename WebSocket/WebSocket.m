@@ -553,7 +553,7 @@ WebSocketWaitingState waitingState;
 
     //validate reserved bits
     if (!self.config.activeExtensionModifiesReservedBits) {
-        if ((!deflate && fragment.isRSV1) || fragment.isRSV2 || fragment.isRSV3) {
+        if (!deflate || fragment.isRSV2 || fragment.isRSV3) {
             [self close:WebSocketCloseStatusProtocolError message:[NSString stringWithFormat:@"No extension is defined that modifies reserved bits: RSV1=%@, RSV2=%@, RSV3=%@", fragment.isRSV1 ? @"YES" : @"NO", fragment.isRSV2 ? @"YES" : @"NO", fragment.isRSV3 ? @"YES" : @"NO"]];
         }
     }

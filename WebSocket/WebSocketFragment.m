@@ -202,7 +202,7 @@
             BOOL hasMask = buffer[index] & 0x80;
             
             //get payload length
-            unsigned long long dataLength = buffer[index++] & 0x7F;
+            NSUInteger dataLength = buffer[index++] & 0x7F;
             if (dataLength == 126)
             {
                 //exit if we are missing bytes
@@ -227,7 +227,7 @@
                 unsigned long long len;
                 memcpy(&len, &buffer[index], sizeof(len));
                 index += sizeof(len);
-                dataLength = ntohll(len);                   
+                dataLength = ntohl(len);                   
             }
             
             //if applicable, set mask value
@@ -322,7 +322,7 @@
     
     //payload data
     payloadStart = [temp length];
-    payloadLength = fullPayloadLength;
+    payloadLength = (NSUInteger)fullPayloadLength;
     [temp appendData:[self mask:self.mask data:self.payloadData]];
     self.fragment = temp;
 }

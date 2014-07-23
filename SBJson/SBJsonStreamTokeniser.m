@@ -207,8 +207,6 @@
                 break;
         }
     }
-
-    @throw @"FUT FUT FUT";
 }
 
 - (sbjson_token_t)getNumberToken:(char **)token length:(NSUInteger *)length {
