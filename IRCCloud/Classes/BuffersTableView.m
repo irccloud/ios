@@ -1044,11 +1044,13 @@
         [self presentViewController:nc animated:YES completion:nil];
 #endif
     } else {
+#ifndef EXTENSION
         _selectedRow = indexPath.row;
+#endif
         [self.tableView reloadData];
         [self _updateUnreadIndicators];
         if(_delegate)
-            [_delegate bufferSelected:[[[_data objectAtIndex:_selectedRow] objectForKey:@"bid"] intValue]];
+            [_delegate bufferSelected:[[[_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue]];
     }
 }
 

@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 IRCCloud, Ltd. All rights reserved.
 //
 
+#import <AudioToolbox/AudioToolbox.h>
 #import "ShareViewController.h"
 #import "BuffersTableView.h"
 
@@ -35,13 +36,17 @@
     NSLog(@"Backlog complete");
     if(!_buffer)
         _buffer = [[BuffersDataSource sharedInstance] getBuffer:[[_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
+    if(!_buffer)
+        _buffer = [[BuffersDataSource sharedInstance] getBuffer:[BuffersDataSource sharedInstance].firstBid];
     NSLog(@"Buffer: %@", _buffer);
-    [self reloadConfigurationItems];
-    [self validateContent];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self reloadConfigurationItems];
+        [self validateContent];
+    }];
 }
 
 - (BOOL)isContentValid {
-    return _buffer != nil;
+    return _buffer != nil && ![_buffer.type isEqualToString:@"console"];
 }
 
 - (void)didSelectPost {
@@ -59,6 +64,7 @@
                     [_conn say:item.absoluteString to:_buffer.name cid:_buffer.cid];
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+                    AudioServicesPlaySystemSound(1001);
                 }];
            }];
         } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
@@ -75,19 +81,25 @@
     } else {
         [_conn say:self.contentText to:_buffer.name cid:_buffer.cid];
         [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+        AudioServicesPlaySystemSound(1001);
     }
 }
 
 - (NSArray *)configurationItems {
     SLComposeSheetConfigurationItem *bufferConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
     bufferConfigItem.title = @"Conversation";
-    if(_buffer)
-        bufferConfigItem.value = _buffer.name;
-    else
+    if(_buffer) {
+        if(![_buffer.type isEqualToString:@"console"])
+            bufferConfigItem.value = _buffer.name;
+        else
+            bufferConfigItem.value = nil;
+    } else {
         bufferConfigItem.valuePending = YES;
+    }
     
     bufferConfigItem.tapHandler = ^() {
         BuffersTableView *b = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
+        [b setPreferredContentSize:CGSizeMake(self.navigationController.preferredContentSize.width, [BuffersDataSource sharedInstance].count * 42)];
         b.navigationItem.title = @"Conversations";
         b.delegate = self;
         [self pushConfigurationViewController:b];
@@ -96,10 +108,13 @@
 }
 
 -(void)bufferSelected:(int)bid {
-    _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
-    [self reloadConfigurationItems];
-    [self validateContent];
-    [self popConfigurationViewController];
+    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    if(b && ![b.type isEqualToString:@"console"]) {
+        _buffer = b;
+        [self reloadConfigurationItems];
+        [self validateContent];
+        [self popConfigurationViewController];
+    }
 }
 
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
@@ -134,6 +149,7 @@
         NSLog(@"Image upload failed");
     }
     [_conn disconnect];
+    AudioServicesPlaySystemSound(1001);
 }
 
 @end

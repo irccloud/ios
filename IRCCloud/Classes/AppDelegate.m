@@ -84,20 +84,21 @@
         }
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
-    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
-    [d setObject:IRCCLOUD_HOST forKey:@"host"];
-    [d setObject:IRCCLOUD_PATH forKey:@"path"];
-    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
-        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] forKey:@"imgur_access_token"];
-    else
-        [d removeObjectForKey:@"imgur_access_token"];
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"])
-        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"] forKey:@"imgur_refresh_token"];
-    else
-        [d removeObjectForKey:@"imgur_refresh_token"];
-    [d synchronize];
-
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+        [d setObject:IRCCLOUD_HOST forKey:@"host"];
+        [d setObject:IRCCLOUD_PATH forKey:@"path"];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
+        if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
+            [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] forKey:@"imgur_access_token"];
+        else
+            [d removeObjectForKey:@"imgur_access_token"];
+        if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"])
+            [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"] forKey:@"imgur_refresh_token"];
+        else
+            [d removeObjectForKey:@"imgur_refresh_token"];
+        [d synchronize];
+    }
 #ifdef CRASHLYTICS_TOKEN
     [Crashlytics startWithAPIKey:@CRASHLYTICS_TOKEN];
 #endif
@@ -300,9 +301,11 @@
     //TODO: When this starts working, implement posting after the app was suspended
     NSLog(@"Background URL session finished: %@", identifier);
     
-    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
-    NSDictionary *uploadtasks = [d dictionaryForKey:@"uploadtasks"];
-    NSLog(@"%@", uploadtasks);
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+        NSDictionary *uploadtasks = [d dictionaryForKey:@"uploadtasks"];
+        NSLog(@"%@", uploadtasks);
+    }
     
     completionHandler();
 }
