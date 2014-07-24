@@ -15,30 +15,26 @@
 
 @implementation ShareViewController
 
-- (void)presentationAnimationDidFinish {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+- (void)viewDidLoad {
+    [super viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogComplete:)
                                                  name:kIRCCloudBacklogCompletedNotification object:nil];
-    if(_conn.state != kIRCCloudStateConnected) {
-        [_conn connect];
-    }
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
     NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
     IRCCLOUD_HOST = [d objectForKey:@"host"];
     IRCCLOUD_PATH = [d objectForKey:@"path"];
-    _conn = [NetworkConnection sharedInstance];
     _uploader = [[ImageUploader alloc] init];
     _uploader.delegate = self;
+    _conn = [NetworkConnection sharedInstance];
+    [_conn connect];
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
 }
 
 - (void)backlogComplete:(NSNotification *)n {
+    NSLog(@"Backlog complete");
     if(!_buffer)
         _buffer = [[BuffersDataSource sharedInstance] getBuffer:[[_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
+    NSLog(@"Buffer: %@", _buffer);
     [self reloadConfigurationItems];
     [self validateContent];
 }

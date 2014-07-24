@@ -382,6 +382,10 @@
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
                 [[NSUserDefaults standardUserDefaults] synchronize];
+                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+                [d setObject:IRCCLOUD_HOST forKey:@"host"];
+                [d setObject:IRCCLOUD_PATH forKey:@"path"];
+                [d synchronize];
                 [status setText:@"Connecting"];
                 UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
                 [_conn connect];
