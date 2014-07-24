@@ -834,7 +834,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)registerAPNs:(NSData *)token {
-#ifdef DEBUG
+#if defined(DEBUG) || defined(EXTENSION)
     return nil;
 #else
 	NSData *data;
@@ -858,7 +858,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)unregisterAPNs:(NSData *)token {
-#ifdef DEBUG
+#if defined(DEBUG) || defined(EXTENSION)
     return nil;
 #else
 	NSData *data;

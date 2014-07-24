@@ -16,6 +16,10 @@
 @implementation ShareViewController
 
 - (void)presentationAnimationDidFinish {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogComplete:)
+                                                 name:kIRCCloudBacklogCompletedNotification object:nil];
     if(_conn.state != kIRCCloudStateConnected) {
         [_conn connect];
     }
@@ -23,21 +27,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+    IRCCLOUD_HOST = [d objectForKey:@"host"];
+    IRCCLOUD_PATH = [d objectForKey:@"path"];
     _conn = [NetworkConnection sharedInstance];
-    //_splash = [self.storyboard instantiateViewControllerWithIdentifier:@"splash"];
-    //[self pushConfigurationViewController:_splash];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(backlogComplete:)
-                                                 name:kIRCCloudBacklogCompletedNotification object:nil];
-    if(_conn.state == kIRCCloudStateConnected) {
-        _buffer = [[BuffersDataSource sharedInstance] getBuffer:[[_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
-    }
+    _uploader = [[ImageUploader alloc] init];
+    _uploader.delegate = self;
+    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
 }
 
 - (void)backlogComplete:(NSNotification *)n {
@@ -60,11 +56,24 @@
         NSItemProvider *i = output.attachments.firstObject;
         if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
             [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:^(NSURL *item, NSError *error) {
-               [_conn say:[NSString stringWithFormat:@"%@ [%@]",self.contentText,item.absoluteString] to:_buffer.name cid:_buffer.cid];
-               [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+                if(self.contentText.length)
+                    [_conn say:[NSString stringWithFormat:@"%@ [%@]",self.contentText,item.absoluteString] to:_buffer.name cid:_buffer.cid];
+                else
+                    [_conn say:item.absoluteString to:_buffer.name cid:_buffer.cid];
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+                }];
            }];
-        } else if([i.registeredTypeIdentifiers indexOfObject:@"public.image"] != NSNotFound) {
-            
+        } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
+            [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:^(UIImage *item, NSError *error) {
+                NSLog(@"Uploading image");
+                _uploader.bid = _buffer.bid;
+                _uploader.msg = self.contentText;
+                [_uploader upload:item];
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+                }];
+            }];
         }
     } else {
         [_conn say:self.contentText to:_buffer.name cid:_buffer.cid];
@@ -104,5 +113,30 @@
     
 }
 
+-(void)imageUploadProgress:(float)progress {
+    NSLog(@"Progress: %f", progress);
+}
+
+-(void)imageUploadDidFail {
+    NSLog(@"Image upload failed");
+}
+
+-(void)imageUploadNotAuthorized {
+    NSLog(@"Image upload not authorized");
+}
+
+-(void)imageUploadDidFinish:(NSDictionary *)d bid:(int)bid {
+    if([[d objectForKey:@"success"] intValue] == 1) {
+        NSLog(@"Image upload successful");
+        NSString *link = [[[d objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
+        if(self.contentText.length)
+            [_conn say:[NSString stringWithFormat:@"%@ %@", self.contentText, link] to:_buffer.name cid:_buffer.cid];
+        else
+            [_conn say:link to:_buffer.name cid:_buffer.cid];
+    } else {
+        NSLog(@"Image upload failed");
+    }
+    [_conn disconnect];
+}
 
 @end

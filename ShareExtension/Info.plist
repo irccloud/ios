@@ -13,7 +13,7 @@
 	<key>CFBundleIcons~ipad</key>
 	<dict/>
 	<key>CFBundleIdentifier</key>
-	<string>com.irccloud.IRCCloud.${PRODUCT_NAME:rfc1034identifier}</string>
+	<string>com.irccloud.IRCCloud.ShareExtension</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -48,12 +48,10 @@
 			<key>NSExtensionPointVersion</key>
 			<string>1.0</string>
 		</dict>
-		<key>NSExtensionMainStoryboard</key>
-		<string>MainInterface</string>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
+		<key>NSExtensionPrincipalClass</key>
+		<string>ShareViewController</string>
 	</dict>
-	<key>UILaunchStoryboardName</key>
-	<string>MainInterface</string>
 </dict>
 </plist>

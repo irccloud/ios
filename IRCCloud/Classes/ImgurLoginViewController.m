@@ -76,6 +76,16 @@
                 [[NSUserDefaults standardUserDefaults] setObject:value forKey:[NSString stringWithFormat:@"imgur_%@", name]];
             }
             [[NSUserDefaults standardUserDefaults] synchronize];
+            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+            if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
+                [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] forKey:@"imgur_access_token"];
+            else
+                [d removeObjectForKey:@"imgur_access_token"];
+            if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"])
+                [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"] forKey:@"imgur_refresh_token"];
+            else
+                [d removeObjectForKey:@"imgur_refresh_token"];
+            [d synchronize];
             [self.navigationController popViewControllerAnimated:YES];
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             return NO;

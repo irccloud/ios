@@ -12,19 +12,45 @@
 #import "config.h"
 
 @implementation ImageUploader
+
+-(id)init {
+    self = [super init];
+    if(self) {
+#if 0 //This seems to be broken on beta 4
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+        config.discretionary = NO;
+        config.sharedContainerIdentifier = @"group.com.irccloud.share";
+#else
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+#endif
+        _session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+    }
+    return self;
+}
+
 -(void)upload:(UIImage *)img {
+#ifdef EXTENSION
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#else
+    NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+#endif
     _image = img;
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
-        [self _authorize];
+    if([d objectForKey:@"imgur_access_token"])
+        [self performSelectorOnMainThread:@selector(_authorize) withObject:nil waitUntilDone:NO];
     else
         [self performSelectorInBackground:@selector(_upload:) withObject:img];
 }
 
 -(void)_authorize {
+#ifdef EXTENSION
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#else
+    NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+#endif
 #ifdef IMGUR_KEY
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.imgur.com/oauth2/token"]];
     [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[NSString stringWithFormat:@"refresh_token=%@&client_id=%@&client_secret=%@&grant_type=refresh_token", [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"], @IMGUR_KEY, @IMGUR_SECRET] dataUsingEncoding:NSUTF8StringEncoding]];
+    [request setHTTPBody:[[NSString stringWithFormat:@"refresh_token=%@&client_id=%@&client_secret=%@&grant_type=refresh_token", [d objectForKey:@"imgur_refresh_token"], @IMGUR_KEY, @IMGUR_SECRET] dataUsingEncoding:NSUTF8StringEncoding]];
     
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
@@ -38,9 +64,9 @@
             if([dict objectForKey:@"access_token"]) {
                 for(NSString *key in dict.allKeys) {
                     if([[dict objectForKey:key] isKindOfClass:[NSString class]])
-                        [[NSUserDefaults standardUserDefaults] setObject:[dict objectForKey:key] forKey:[NSString stringWithFormat:@"imgur_%@", key]];
+                        [d setObject:[dict objectForKey:key] forKey:[NSString stringWithFormat:@"imgur_%@", key]];
                 }
-                [[NSUserDefaults standardUserDefaults] synchronize];
+                [d synchronize];
                 [self performSelectorInBackground:@selector(_upload:) withObject:_image];
             } else {
                 [_delegate performSelector:@selector(imageUploadNotAuthorized) withObject:nil afterDelay:0.25];
@@ -54,6 +80,9 @@
 
 //http://stackoverflow.com/a/19697172
 - (UIImage *)image:(UIImage *)image scaledCopyOfSize:(CGSize)newSize {
+    if(image.size.width <= newSize.width && image.size.height <= newSize.height)
+        return image;
+
     CGImageRef imgRef = image.CGImage;
     
     CGFloat width = CGImageGetWidth(imgRef);
@@ -158,7 +187,13 @@
 }
 
 -(void)_upload:(UIImage *)img {
-    int size = [[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue];
+    _response = [[NSMutableData alloc] init];
+#ifdef EXTENSION
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#else
+    NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
+#endif
+    int size = [[d objectForKey:@"photoSize"] intValue];
     NSData *data = UIImageJPEGRepresentation((size != -1)?[self image:img scaledCopyOfSize:CGSizeMake(size,size)]:img, 0.8);
     CFStringRef data_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[data base64EncodedString], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
     
@@ -173,32 +208,49 @@
 #endif
     [request setHTTPShouldHandleCookies:NO];
 #ifdef IMGUR_KEY
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"]) {
-        [request setValue:[NSString stringWithFormat:@"Bearer %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"]] forHTTPHeaderField:@"Authorization"];
+    if([d objectForKey:@"imgur_access_token"]) {
+        [request setValue:[NSString stringWithFormat:@"Bearer %@", [d objectForKey:@"imgur_access_token"]] forHTTPHeaderField:@"Authorization"];
     } else {
         [request setValue:[NSString stringWithFormat:@"Client-ID %@", @IMGUR_KEY] forHTTPHeaderField:@"Authorization"];
     }
 #endif
     [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    CFRelease(data_escaped);
-    
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _response = [[NSMutableData alloc] init];
-        _connection = [NSURLConnection connectionWithRequest:request delegate:self];
-        [_connection start];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
+        [request setHTTPBody:[[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
+
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            _connection = [NSURLConnection connectionWithRequest:request delegate:self];
+            [_connection start];
 #ifndef EXTENSION
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    }];
+        }];
+    } else {
+        _body = [[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding];
+        NSURLSessionTask *task = [_session uploadTaskWithStreamedRequest:request];
+        
+        if(_session.configuration.identifier) {
+            NSMutableDictionary *tasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
+            if(!tasks)
+                tasks = [[NSMutableDictionary alloc] init];
+            
+            if(_msg)
+                [tasks setObject:@{@"bid":@(_bid), @"msg":_msg} forKey:_session.configuration.identifier];
+            else
+                [tasks setObject:@{@"bid":@(_bid)} forKey:_session.configuration.identifier];
+
+            [d setObject:tasks forKey:@"uploadtasks"];
+            [d synchronize];
+        }
+
+        [task resume];
+    }
+    CFRelease(data_escaped);
 }
 
 -(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     if(_delegate)
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [_delegate imageUploadProgress:(float)totalBytesWritten / (float)totalBytesExpectedToWrite];
-        }];
+        [_delegate imageUploadProgress:(float)totalBytesWritten / (float)totalBytesExpectedToWrite];
 }
 
 -(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
@@ -213,17 +265,44 @@
 }
 
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection {
-#ifndef EXTENSION
+#ifdef EXTENSION
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#else
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
     
     NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:_response];
 #ifdef IMGUR_KEY
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] && [[d objectForKey:@"success"] intValue] == 0 && [[d objectForKey:@"status"] intValue] == 403) {
+    if([defaults objectForKey:@"imgur_access_token"] && [[d objectForKey:@"success"] intValue] == 0 && [[d objectForKey:@"status"] intValue] == 403) {
         [self _authorize];
         return;
     }
 #endif
     [_delegate imageUploadDidFinish:d bid:_bid];
+}
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend {
+    [self connection:nil didSendBodyData:(NSInteger)bytesSent totalBytesWritten:(NSInteger)totalBytesSent totalBytesExpectedToWrite:(NSInteger)_body.length];
+}
+
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
+    [self connection:nil didReceiveData:data];
+}
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
+    [self connectionDidFinishLoading:nil];
+    if(session.configuration.identifier) {
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+        NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
+        [uploadtasks removeObjectForKey:session.configuration.identifier];
+        [d setObject:uploadtasks forKey:@"uploadtasks"];
+        [d synchronize];
+    }
+    [session finishTasksAndInvalidate];
+}
+
+-(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task needNewBodyStream:(void (^)(NSInputStream *))completionHandler {
+    completionHandler([NSInputStream inputStreamWithData:_body]);
 }
 @end
