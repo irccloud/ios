@@ -2321,10 +2321,14 @@
     _popover = nil;
 }
 
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    [self.slidingViewController dismissModalViewControllerAnimated:YES];
+- (void)_resetStatusBar {
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    [self.slidingViewController dismissModalViewControllerAnimated:YES];
+    [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
 
     UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
     if(!img)
@@ -2348,8 +2352,7 @@
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [self.slidingViewController dismissModalViewControllerAnimated:YES];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
 }
 
 -(void)imageUploadProgress:(float)progress {

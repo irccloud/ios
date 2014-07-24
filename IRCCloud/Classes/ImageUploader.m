@@ -16,14 +16,19 @@
 -(id)init {
     self = [super init];
     if(self) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
 #if 0 //This seems to be broken on beta 4
-        NSURLSessionConfiguration *config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
-        config.discretionary = NO;
-        config.sharedContainerIdentifier = @"group.com.irccloud.share";
+            NSURLSessionConfiguration *config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+            config.sharedContainerIdentifier = @"group.com.irccloud.share";
 #else
-        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+            NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
 #endif
-        _session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+            config.HTTPCookieStorage = nil;
+            config.URLCache = nil;
+            config.requestCachePolicy = NSURLCacheStorageNotAllowed;
+            config.discretionary = NO;
+            _session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+        }
     }
     return self;
 }
