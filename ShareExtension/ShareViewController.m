@@ -28,6 +28,7 @@
     _conn = [NetworkConnection sharedInstance];
     [_conn connect];
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
+    self.title = @"IRCCloud";
 }
 
 - (void)backlogComplete:(NSNotification *)n {
