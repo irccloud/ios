@@ -616,7 +616,13 @@
 -(void)serialize {
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
     
-    [NSKeyedArchiver archiveRootObject:[_events copy] toFile:cacheFile];
+    NSMutableDictionary *events = [[NSMutableDictionary alloc] init];
+    @synchronized(_events) {
+        for(NSNumber *bid in _events) {
+            [events setObject:[[_events objectForKey:bid] mutableCopy] forKey:bid];
+        }
+    }
+    [NSKeyedArchiver archiveRootObject:events toFile:cacheFile];
     [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
 }
 
