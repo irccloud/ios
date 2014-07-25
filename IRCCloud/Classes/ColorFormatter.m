@@ -27,6 +27,7 @@ CTFontRef Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
 CTFontRef arrowFont;
 UIFont *timestampFont;
 NSDictionary *emojiMap;
+NSDictionary *quotes;
 
 @implementation ColorFormatter
 
@@ -1116,7 +1117,8 @@ NSDictionary *emojiMap;
 |(?:yachts|yandex|yokohama|y[et])\
 |(?:zone|z[amw])))";
     NSString *GOOD_IRI_CHAR = @"a-zA-Z0-9\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF";
-    NSString *pattern = [NSString stringWithFormat:@"((?:(http|https|Http|Https|rtsp|Rtsp|irc|ircs):\\/\\/(?:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)\
+    NSString *pattern = [NSString stringWithFormat:@"([a-z_-]+:\\/{1,3}[^<>\"\\s]+)|\
+(((?:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)\
 \\,\\;\\?\\&\\=]|(?:\\%%[a-fA-F0-9]{2})){1,64}(?:\\:(?:[a-zA-Z0-9\\$\\-\\_\
 \\.\\+\\!\\*\\'\\(\\)\\,\\;\\?\\&\\=]|(?:\\%%[a-fA-F0-9]{2})){1,25})?\\@)?)?\
 ((?:(?:[%@][%@\\-]{0,64}\\.)+%@\
@@ -1149,6 +1151,15 @@ NSDictionary *emojiMap;
             regularExpressionWithPattern:pattern
             options:0
             error:nil];
+}
+
++(BOOL)unbalanced:(NSString *)input {
+    if(!quotes)
+        quotes = @{@"\"":@"\"",@"'": @"'",@")": @"(",@"]": @"[",@"}": @"{",@">": @"<",@"”": @"“",@"’": @"‘",@"»": @"«"};
+    
+    NSString *lastChar = [input substringFromIndex:input.length - 1];
+    
+    return [quotes objectForKey:lastChar] && [input componentsSeparatedByString:lastChar].count != [input componentsSeparatedByString:[quotes objectForKey:lastChar]].count;
 }
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
@@ -1189,6 +1200,7 @@ NSDictionary *emojiMap;
         }
 #endif
     }
+    
     if(mono) {
         font = Courier;
         boldFont = CourierBold;
@@ -1506,7 +1518,11 @@ NSDictionary *emojiMap;
                 NSString *url = [NSURL IDNEncodedURL:[[output string] substringWithRange:result.range]];
                 if([url rangeOfString:@"://"].location == NSNotFound)
                     url = [NSString stringWithFormat:@"http://%@", url];
-                [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
+                if([self unbalanced:url]) {
+                    [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:NSMakeRange(result.range.location, result.range.length - 1) URL:[NSURL URLWithString:[url substringToIndex:url.length - 1]]]];
+                } else {
+                    [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
+                }
             }
         }
     } else {
