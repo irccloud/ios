@@ -756,6 +756,7 @@
         int bid = [BuffersDataSource sharedInstance].firstBid;
         if(_buffer && _buffer.lastBuffer)
             bid = _buffer.lastBuffer.bid;
+        
         if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
             if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                 bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];

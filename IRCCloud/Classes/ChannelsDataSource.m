@@ -52,6 +52,40 @@
 -(NSComparisonResult)compare:(Channel *)aChannel {
     return [[_name lowercaseString] compare:[aChannel.name lowercaseString]];
 }
+-(id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super init];
+    if(self) {
+        decodeInt(_cid);
+        decodeInt(_bid);
+        decodeObject(_name);
+        decodeObject(_topic_text);
+        decodeDouble(_topic_time);
+        decodeObject(_topic_author);
+        decodeObject(_type);
+        decodeObject(_modes);
+        decodeObject(_mode);
+        decodeDouble(_timestamp);
+        decodeObject(_url);
+        decodeBool(_valid);
+        decodeBool(_key);
+    }
+    return self;
+}
+-(void)encodeWithCoder:(NSCoder *)aCoder {
+    encodeInt(_cid);
+    encodeInt(_bid);
+    encodeObject(_name);
+    encodeObject(_topic_text);
+    encodeDouble(_topic_time);
+    encodeObject(_topic_author);
+    encodeObject(_type);
+    encodeObject(_modes);
+    encodeObject(_mode);
+    encodeDouble(_timestamp);
+    encodeObject(_url);
+    encodeBool(_valid);
+    encodeBool(_key);
+}
 @end
 
 @implementation ChannelsDataSource
@@ -69,8 +103,18 @@
 
 -(id)init {
     self = [super init];
-    _channels = [[NSMutableArray alloc] init];
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"channels"];
+    
+    _channels = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+    if(!_channels)
+        _channels = [[NSMutableArray alloc] init];
     return self;
+}
+
+-(void)serialize {
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"channels"];
+    
+    [NSKeyedArchiver archiveRootObject:[_channels copy] toFile:cacheFile];
 }
 
 -(void)clear {

@@ -13,3 +13,16 @@
     #import <Foundation/Foundation.h>
     #import "Crashlytics/Crashlytics.h"
 #endif
+
+#define OBJC_STRINGIFY(x) @#x
+#define encodeObject(x) [aCoder encodeObject:x forKey:OBJC_STRINGIFY(x)]
+#define encodeInt(x) [aCoder encodeInt:x forKey:OBJC_STRINGIFY(x)]
+#define encodeDouble(x) [aCoder encodeDouble:x forKey:OBJC_STRINGIFY(x)]
+#define encodeFloat(x) [aCoder encodeFloat:x forKey:OBJC_STRINGIFY(x)]
+#define encodeBool(x) [aCoder encodeBool:x forKey:OBJC_STRINGIFY(x)]
+
+#define decodeObject(x) x = [aDecoder decodeObjectForKey:OBJC_STRINGIFY(x)]
+#define decodeInt(x) x = [aDecoder decodeIntForKey:OBJC_STRINGIFY(x)]
+#define decodeDouble(x) x = [aDecoder decodeDoubleForKey:OBJC_STRINGIFY(x)]
+#define decodeFloat(x) x = [aDecoder decodeFloatForKey:OBJC_STRINGIFY(x)]
+#define decodeBool(x) x = [aDecoder decodeBoolForKey:OBJC_STRINGIFY(x)]

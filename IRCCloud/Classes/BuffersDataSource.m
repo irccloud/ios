@@ -66,6 +66,48 @@
     NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
     return [r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""];
 }
+-(id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super init];
+    if(self) {
+        decodeInt(_bid);
+        decodeInt(_cid);
+        decodeDouble(_min_eid);
+        decodeDouble(_last_seen_eid);
+        decodeObject(_name);
+        decodeObject(_type);
+        decodeInt(_archived);
+        decodeInt(_deferred);
+        decodeInt(_timeout);
+        decodeObject(_away_msg);
+        decodeBool(_valid);
+        decodeObject(_draft);
+        decodeObject(_chantypes);
+        decodeBool(_scrolledUp);
+        decodeDouble(_scrolledUpFrom);
+        decodeDouble(_savedScrollPosition);
+        decodeObject(_lastBuffer);
+    }
+    return self;
+}
+-(void)encodeWithCoder:(NSCoder *)aCoder {
+    encodeInt(_bid);
+    encodeInt(_cid);
+    encodeDouble(_min_eid);
+    encodeDouble(_last_seen_eid);
+    encodeObject(_name);
+    encodeObject(_type);
+    encodeInt(_archived);
+    encodeInt(_deferred);
+    encodeInt(_timeout);
+    encodeObject(_away_msg);
+    encodeBool(_valid);
+    encodeObject(_draft);
+    encodeObject(_chantypes);
+    encodeBool(_scrolledUp);
+    encodeDouble(_scrolledUpFrom);
+    encodeDouble(_savedScrollPosition);
+    encodeObject(_lastBuffer);
+}
 @end
 
 @implementation BuffersDataSource
@@ -83,8 +125,19 @@
 
 -(id)init {
     self = [super init];
-    _buffers = [[NSMutableDictionary alloc] init];
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"buffers"];
+    
+    _buffers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+    if(!_buffers)
+        _buffers = [[NSMutableDictionary alloc] init];
+    
     return self;
+}
+
+-(void)serialize {
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"buffers"];
+    
+    [NSKeyedArchiver archiveRootObject:[_buffers copy] toFile:cacheFile];
 }
 
 -(void)clear {

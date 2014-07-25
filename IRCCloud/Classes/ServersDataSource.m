@@ -44,6 +44,64 @@
 -(NSString *)description {
     return [NSString stringWithFormat:@"{cid: %i, name: %@, hostname: %@, port: %i}", _cid, _name, _hostname, _port];
 }
+-(void)encodeWithCoder:(NSCoder *)aCoder {
+    encodeInt(_cid);
+    encodeObject(_name);
+    encodeObject(_hostname);
+    encodeInt(_port);
+    encodeObject(_nick);
+    encodeObject(_status);
+    encodeInt(_ssl);
+    encodeObject(_realname);
+    encodeObject(_server_pass);
+    encodeObject(_nickserv_pass);
+    encodeObject(_join_commands);
+    encodeObject(_fail_info);
+    encodeObject(_away);
+    encodeObject(_usermask);
+    encodeObject(_mode);
+    encodeObject(_isupport);
+    encodeObject(_ignores);
+    encodeObject(_CHANTYPES);
+    encodeObject(_PREFIX);
+    encodeInt(_order);
+    encodeObject(_MODE_OWNER);
+    encodeObject(_MODE_ADMIN);
+    encodeObject(_MODE_OP);
+    encodeObject(_MODE_HALFOP);
+    encodeObject(_MODE_VOICED);
+}
+-(id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super init];
+    if(self) {
+        decodeInt(_cid);
+        decodeObject(_name);
+        decodeObject(_hostname);
+        decodeInt(_port);
+        decodeObject(_nick);
+        decodeObject(_status);
+        decodeInt(_ssl);
+        decodeObject(_realname);
+        decodeObject(_server_pass);
+        decodeObject(_nickserv_pass);
+        decodeObject(_join_commands);
+        decodeObject(_fail_info);
+        decodeObject(_away);
+        decodeObject(_usermask);
+        decodeObject(_mode);
+        decodeObject(_isupport);
+        decodeObject(_ignores);
+        decodeObject(_CHANTYPES);
+        decodeObject(_PREFIX);
+        decodeInt(_order);
+        decodeObject(_MODE_OWNER);
+        decodeObject(_MODE_ADMIN);
+        decodeObject(_MODE_OP);
+        decodeObject(_MODE_HALFOP);
+        decodeObject(_MODE_VOICED);
+    }
+    return self;
+}
 @end
 
 @implementation ServersDataSource
@@ -61,8 +119,19 @@
 
 -(id)init {
     self = [super init];
-    _servers = [[NSMutableArray alloc] init];
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"servers"];
+    
+    _servers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+    if(!_servers)
+        _servers = [[NSMutableArray alloc] init];
+    
     return self;
+}
+
+-(void)serialize {
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"servers"];
+    
+    [NSKeyedArchiver archiveRootObject:[_servers copy] toFile:cacheFile];
 }
 
 -(void)clear {

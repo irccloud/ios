@@ -193,6 +193,12 @@ NSLock *__parserLock = nil;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
     NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
     _userAgent = [NSString stringWithFormat:@"IRCCloud/%@ (%@; %@; %@ %@)", version, [UIDevice currentDevice].model, [[[NSUserDefaults standardUserDefaults] objectForKey: @"AppleLanguages"] objectAtIndex:0], [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
+    
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
+    _userInfo = [NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile];
+    if(_userInfo)
+        _streamId = [_userInfo objectForKey:@"streamId"];
+
     CLS_LOG(@"%@", _userAgent);
     
     void (^ignored)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
@@ -1145,6 +1151,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
             [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
     }
+    [self performSelectorInBackground:@selector(serialize) withObject:nil];
 }
 
 -(void)clearPrefs {
@@ -1410,6 +1417,19 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if([_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }
+    [self performSelectorInBackground:@selector(serialize) withObject:nil];
+}
+
+-(void)serialize {
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
+    NSMutableDictionary *stream = [_userInfo mutableCopy];
+    [stream setObject:_streamId forKey:@"streamId"];
+    [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
+    [_servers serialize];
+    [_buffers serialize];
+    [_channels serialize];
+    [_users serialize];
+    [_events serialize];
 }
 
 -(void)_backlogFailed:(NSNotification *)notification {

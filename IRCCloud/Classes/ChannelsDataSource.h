@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Channel : NSObject {
+@interface Channel : NSObject<NSCoding> {
     int _cid;
     int _bid;
     NSString *_name;
@@ -46,6 +46,7 @@
     NSMutableArray *_channels;
 }
 +(ChannelsDataSource *)sharedInstance;
+-(void)serialize;
 -(void)clear;
 -(void)invalidate;
 -(void)addChannel:(Channel *)channel;

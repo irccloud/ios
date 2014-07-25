@@ -255,6 +255,7 @@
         [application endBackgroundTask: background_task];
         background_task = UIBackgroundTaskInvalid;
     });
+    [_conn performSelectorInBackground:@selector(serialize) withObject:nil];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {

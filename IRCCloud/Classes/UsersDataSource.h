@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface User : NSObject {
+@interface User : NSObject<NSCoding> {
     int _cid;
     int _bid;
     NSString *_nick;
@@ -39,6 +39,7 @@
     NSMutableDictionary *_users;
 }
 +(UsersDataSource *)sharedInstance;
+-(void)serialize;
 -(void)clear;
 -(void)addUser:(User *)user;
 -(NSArray *)usersForBuffer:(int)bid;
