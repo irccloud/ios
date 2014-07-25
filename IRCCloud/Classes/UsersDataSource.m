@@ -60,6 +60,7 @@
 }
 
 -(void)addUser:(User *)user {
+#ifndef EXTENSION
     @synchronized(_users) {
         NSMutableDictionary *users = [_users objectForKey:@(user.bid)];
         if(!users) {
@@ -68,6 +69,7 @@
         }
         [users setObject:user forKey:[user.nick lowercaseString]];
     }
+#endif
 }
 
 -(NSArray *)usersForBuffer:(int)bid {
