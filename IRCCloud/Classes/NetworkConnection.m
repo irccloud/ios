@@ -1478,7 +1478,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)serialize {
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
     NSMutableDictionary *stream = [_userInfo mutableCopy];
-    [stream setObject:_streamId forKey:@"streamId"];
+    if(_streamId)
+        [stream setObject:_streamId forKey:@"streamId"];
+    else
+        [stream removeObjectForKey:@"streamId"];
     [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
     [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
     [_servers serialize];
