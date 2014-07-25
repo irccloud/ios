@@ -129,6 +129,8 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
     self.window.rootViewController = self.loginSplashViewController;
     [self.window makeKeyAndVisible];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+        [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
     return YES;
 }
 
@@ -170,6 +172,31 @@
         self.mainViewController.bidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
         self.mainViewController.eidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
         [self.mainViewController bufferSelected:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
+    }
+}
+
+- (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
+    if(_conn.state != kIRCCloudStateConnected) {
+        CLSLog(@"Fetching backlog in the background");
+        _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
+            CLSLog(@"Backlog complete");
+            [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+            [_conn disconnect];
+            _conn.background = YES;
+            completionHandler(UIBackgroundFetchResultNewData);
+        }];
+        _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
+            CLSLog(@"Backlog failed");
+            [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+            [_conn disconnect];
+            _conn.background = YES;
+            completionHandler(UIBackgroundFetchResultFailed);
+        }];
+        _conn.background = NO;
+        [_conn connect];
+    } else {
+        NSLog(@"Background fetch requested but we're still connected");
+        completionHandler(UIBackgroundFetchResultNoData);
     }
 }
 
@@ -240,6 +267,7 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
+    NSLog(@"Entering background");
     _conn.background = YES;
     _conn.failCount = 0;
     _conn.reconnectTimestamp = -1;

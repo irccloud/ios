@@ -27,6 +27,8 @@
     NSTimer *_disconnectTimer;
     NetworkConnection *_conn;
     URLHandler *_urlHandler;
+    id _backlogCompletedObserver;
+    id _backlogFailedObserver;
 }
 
 @property (strong, nonatomic) UIWindow *window;
