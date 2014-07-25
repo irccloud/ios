@@ -32,6 +32,33 @@
         return NSOrderedDescending;
 }
 
+-(id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super init];
+    if(self) {
+        decodeInt(_cid);
+        decodeInt(_bid);
+        decodeObject(_nick);
+        decodeObject(_old_nick);
+        decodeObject(_hostmask);
+        decodeObject(_mode);
+        decodeInt(_away);
+        decodeObject(_away_msg);
+        decodeDouble(_lastMention);
+    }
+    return self;
+}
+
+-(void)encodeWithCoder:(NSCoder *)aCoder {
+    encodeInt(_cid);
+    encodeInt(_bid);
+    encodeObject(_nick);
+    encodeObject(_old_nick);
+    encodeObject(_hostmask);
+    encodeObject(_mode);
+    encodeInt(_away);
+    encodeObject(_away_msg);
+    encodeDouble(_lastMention);
+}
 @end
 
 @implementation UsersDataSource
@@ -49,8 +76,18 @@
 
 -(id)init {
     self = [super init];
-    _users = [[NSMutableDictionary alloc] init];
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"users"];
+    
+    _users = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+    if(!_users)
+        _users = [[NSMutableDictionary alloc] init];
     return self;
+}
+
+-(void)serialize {
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"users"];
+    
+    [NSKeyedArchiver archiveRootObject:[_users copy] toFile:cacheFile];
 }
 
 -(void)clear {

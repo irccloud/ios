@@ -28,7 +28,7 @@
 #define TYPE_BACKLOG @"__backlog__"
 #define TYPE_LASTSEENEID @"__lastseeneid"
 
-@interface Event : NSObject {
+@interface Event : NSObject<NSCoding> {
     int _cid;
     int _bid;
     NSTimeInterval _eid;
@@ -92,6 +92,7 @@
 }
 @property NSTimeInterval highestEid;
 +(EventsDataSource *)sharedInstance;
+-(void)serialize;
 -(void)clear;
 -(void)clearFormattingCache;
 -(void)addEvent:(Event *)event;

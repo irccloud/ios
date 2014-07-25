@@ -75,6 +75,84 @@
     }
     return _ignoreMask;
 }
+-(id)initWithCoder:(NSCoder *)aDecoder{
+    self = [super init];
+    if(self) {
+        decodeInt(_cid);
+        decodeInt(_bid);
+        decodeDouble(_eid);
+        decodeObject(_timestamp);
+        decodeObject(_type);
+        decodeObject(_msg);
+        decodeObject(_hostmask);
+        decodeObject(_from);
+        decodeObject(_fromMode);
+        decodeObject(_nick);
+        decodeObject(_oldNick);
+        decodeObject(_server);
+        decodeObject(_diff);
+        decodeObject(_formattedMsg);
+        decodeBool(_isHighlight);
+        decodeBool(_isSelf);
+        decodeBool(_toChan);
+        decodeBool(_toBuffer);
+        decodeObject(_color);
+        decodeObject(_bgColor);
+        decodeObject(_ops);
+        decodeDouble(_groupEid);
+        decodeInt(_rowType);
+        decodeObject(_groupMsg);
+        decodeBool(_linkify);
+        decodeObject(_targetMode);
+        decodeInt(_reqid);
+        decodeBool(_pending);
+        decodeBool(_monospace);
+        decodeObject(_links);
+        decodeObject(_to);
+        decodeObject(_command);
+        decodeObject(_day);
+        decodeObject(_ignoreMask);
+        decodeObject(_chan);
+    }
+    return self;
+}
+-(void)encodeWithCoder:(NSCoder *)aCoder {
+    encodeInt(_cid);
+    encodeInt(_bid);
+    encodeDouble(_eid);
+    encodeObject(_timestamp);
+    encodeObject(_type);
+    encodeObject(_msg);
+    encodeObject(_hostmask);
+    encodeObject(_from);
+    encodeObject(_fromMode);
+    encodeObject(_nick);
+    encodeObject(_oldNick);
+    encodeObject(_server);
+    encodeObject(_diff);
+    encodeObject(_formattedMsg);
+    encodeBool(_isHighlight);
+    encodeBool(_isSelf);
+    encodeBool(_toChan);
+    encodeBool(_toBuffer);
+    encodeObject(_color);
+    encodeObject(_bgColor);
+    encodeObject(_ops);
+    encodeDouble(_groupEid);
+    encodeInt(_rowType);
+    encodeObject(_groupMsg);
+    encodeBool(_linkify);
+    encodeObject(_targetMode);
+    encodeInt(_reqid);
+    encodeBool(_pending);
+    encodeBool(_monospace);
+    encodeObject(_links);
+    encodeObject(_to);
+    encodeObject(_command);
+    encodeObject(_day);
+    encodeObject(_ignoreMask);
+    encodeObject(_chan);
+}
 @end
 
 @implementation EventsDataSource
@@ -92,9 +170,25 @@
 
 -(id)init {
     self = [super init];
-    _events = [[NSMutableDictionary alloc] init];
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
+    
+    _events = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
     _events_sorted = [[NSMutableDictionary alloc] init];
     _highestEid = 0;
+    if(_events) {
+        for(NSNumber *bid in _events) {
+            NSArray *events = [_events objectForKey:bid];
+            NSMutableDictionary *events_sorted = [[NSMutableDictionary alloc] init];
+            for(Event *e in events) {
+                [events_sorted setObject:e forKey:@(e.eid)];
+                if(e.eid > _highestEid)
+                    _highestEid = e.eid;
+            }
+            [_events_sorted setObject:events_sorted forKey:bid];
+        }
+    } else {
+        _events = [[NSMutableDictionary alloc] init];
+    }
     _dirty = YES;
     
     void (^error)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
@@ -511,6 +605,12 @@
                       },
                       };
     return self;
+}
+
+-(void)serialize {
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
+    
+    [NSKeyedArchiver archiveRootObject:[_events copy] toFile:cacheFile];
 }
 
 -(void)clear {

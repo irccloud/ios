@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Server : NSObject {
+@interface Server : NSObject<NSCoding> {
     int _cid;
     NSString *_name;
     NSString *_hostname;
@@ -51,6 +51,7 @@
     NSMutableArray *_servers;
 }
 +(ServersDataSource *)sharedInstance;
+-(void)serialize;
 -(void)clear;
 -(void)addServer:(Server *)server;
 -(NSArray *)getServers;

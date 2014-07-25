@@ -149,6 +149,7 @@ typedef enum {
 @property NSString *session;
 
 +(NetworkConnection*)sharedInstance;
+-(void)serialize;
 -(NSDictionary *)requestAuthToken;
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password token:(NSString *)token;
 -(NSDictionary *)prefs;

@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Buffer : NSObject {
+@interface Buffer : NSObject<NSCoding> {
     int _bid;
     int _cid;
     NSTimeInterval _min_eid;
@@ -50,6 +50,7 @@
     NSMutableDictionary *_buffers;
 }
 +(BuffersDataSource *)sharedInstance;
+-(void)serialize;
 -(void)clear;
 -(void)invalidate;
 -(NSUInteger)count;
