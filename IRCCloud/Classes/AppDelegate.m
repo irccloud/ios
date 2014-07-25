@@ -85,7 +85,11 @@
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+#ifdef ENTERPRISE
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
         [d setObject:IRCCLOUD_HOST forKey:@"host"];
         [d setObject:IRCCLOUD_PATH forKey:@"path"];
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
@@ -328,7 +332,11 @@
     NSLog(@"Background URL session finished: %@", identifier);
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+#ifdef ENTERPRISE
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
         NSDictionary *uploadtasks = [d dictionaryForKey:@"uploadtasks"];
         NSLog(@"%@", uploadtasks);
     }

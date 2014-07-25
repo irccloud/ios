@@ -21,7 +21,11 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogComplete:)
                                                  name:kIRCCloudBacklogCompletedNotification object:nil];
+#ifdef ENTERPRISE
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
     NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
     IRCCLOUD_HOST = [d objectForKey:@"host"];
     IRCCLOUD_PATH = [d objectForKey:@"path"];
     _uploader = [[ImageUploader alloc] init];

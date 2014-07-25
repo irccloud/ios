@@ -19,7 +19,11 @@
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
 #if 0 //This seems to be broken on beta 4
             NSURLSessionConfiguration *config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+#ifdef ENTERPRISE
+            config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
+#else
             config.sharedContainerIdentifier = @"group.com.irccloud.share";
+#endif
 #else
             NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
 #endif
@@ -35,7 +39,11 @@
 
 -(void)upload:(UIImage *)img {
 #ifdef EXTENSION
+#ifdef ENTERPRISE
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
     NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
 #else
     NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
 #endif
@@ -48,7 +56,11 @@
 
 -(void)_authorize {
 #ifdef EXTENSION
+#ifdef ENTERPRISE
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
     NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
 #else
     NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
 #endif
@@ -194,7 +206,11 @@
 -(void)_upload:(UIImage *)img {
     _response = [[NSMutableData alloc] init];
 #ifdef EXTENSION
+#ifdef ENTERPRISE
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
     NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
 #else
     NSUserDefaults *d = [NSUserDefaults standardUserDefaults];
 #endif
@@ -271,7 +287,11 @@
 
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection {
 #ifdef EXTENSION
+#ifdef ENTERPRISE
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
 #else
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -298,7 +318,11 @@
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     [self connectionDidFinishLoading:nil];
     if(session.configuration.identifier && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+#ifdef ENTERPRISE
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
         NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
         [uploadtasks removeObjectForKey:session.configuration.identifier];
         [d setObject:uploadtasks forKey:@"uploadtasks"];
