@@ -345,6 +345,15 @@ NSLock *__parserLock = nil;
                    @"stat_user": ^(IRCCloudJSONObject *object) {
                        _userInfo = object.dictionary;
                        _prefs = nil;
+#ifndef EXTENSION
+                       if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+                           if(_userInfo && [_userInfo objectForKey:@"limits"] && [[[_userInfo objectForKey:@"limits"] objectForKey:@"zombiehours"] intValue] > 0) {
+                               [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
+                           } else {
+                               [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
+                           }
+                       }
+#endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];
                        [self postObject:object forEvent:kIRCEventUserInfo];
                    },
@@ -1501,6 +1510,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self cancelIdleTimer];
     _reconnectTimestamp = 0;
     _streamId = nil;
+    _userInfo = @{};
     [self clearPrefs];
     [_servers clear];
     [_buffers clear];
@@ -1508,6 +1518,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [_channels clear];
     [_events clear];
     SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, nil]);
+    [self serialize];
 }
 
 -(NSString *)session {
