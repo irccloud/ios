@@ -97,7 +97,6 @@
         decodeBool(_toChan);
         decodeBool(_toBuffer);
         decodeObject(_color);
-        decodeObject(_bgColor);
         decodeObject(_ops);
         decodeDouble(_groupEid);
         decodeInt(_rowType);
@@ -113,6 +112,12 @@
         decodeObject(_day);
         decodeObject(_ignoreMask);
         decodeObject(_chan);
+        if(_rowType == ROW_TIMESTAMP)
+            _bgColor = [UIColor timestampBackgroundColor];
+        else if(_rowType == ROW_LASTSEENEID)
+            _bgColor = [UIColor newMsgsBackgroundColor];
+        else
+            decodeObject(_bgColor);
     }
     return self;
 }
@@ -136,7 +141,6 @@
     encodeBool(_toChan);
     encodeBool(_toBuffer);
     encodeObject(_color);
-    encodeObject(_bgColor);
     encodeObject(_ops);
     encodeDouble(_groupEid);
     encodeInt(_rowType);
@@ -152,6 +156,8 @@
     encodeObject(_day);
     encodeObject(_ignoreMask);
     encodeObject(_chan);
+    if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
+        encodeObject(_bgColor);
 }
 @end
 
