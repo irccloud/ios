@@ -26,19 +26,21 @@
     IRCCLOUD_PATH = [d objectForKey:@"path"];
     _uploader = [[ImageUploader alloc] init];
     _uploader.delegate = self;
+    [NetworkConnection sync];
     _conn = [NetworkConnection sharedInstance];
+    if([BuffersDataSource sharedInstance].count && _conn.userInfo) {
+        _buffer = [[BuffersDataSource sharedInstance] getBuffer:[[_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
+    }
     [_conn connect];
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.title = @"IRCCloud";
 }
 
 - (void)backlogComplete:(NSNotification *)n {
-    NSLog(@"Backlog complete");
     if(!_buffer)
         _buffer = [[BuffersDataSource sharedInstance] getBuffer:[[_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
     if(!_buffer)
         _buffer = [[BuffersDataSource sharedInstance] getBuffer:[BuffersDataSource sharedInstance].firstBid];
-    NSLog(@"Buffer: %@", _buffer);
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [self reloadConfigurationItems];
         [self validateContent];

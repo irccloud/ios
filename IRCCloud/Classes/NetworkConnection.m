@@ -158,6 +158,38 @@ NSLock *__parserLock = nil;
 	return nil;
 }
 
++(void)sync:(NSURL *)file1 with:(NSURL *)file2 {
+    NSDictionary *a1 = [[NSFileManager defaultManager] attributesOfItemAtPath:file1.path error:nil];
+    NSDictionary *a2 = [[NSFileManager defaultManager] attributesOfItemAtPath:file2.path error:nil];
+
+    if(a1) {
+        if(a2 == nil || [[a2 fileModificationDate] compare:[a1 fileModificationDate]] == NSOrderedAscending) {
+            [[NSFileManager defaultManager] copyItemAtURL:file1 toURL:file2 error:NULL];
+        }
+    }
+    
+    if(a2) {
+        if(a1 == nil || [[a1 fileModificationDate] compare:[a2 fileModificationDate]] == NSOrderedAscending) {
+            [[NSFileManager defaultManager] copyItemAtURL:file2 toURL:file1 error:NULL];
+        }
+    }
+
+    [file1 setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    [file2 setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+}
+
++(void)sync {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
+        NSURL *caches = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
+        
+        [NetworkConnection sync:[caches URLByAppendingPathComponent:@"servers"] with:[sharedcontainer URLByAppendingPathComponent:@"servers"]];
+        [NetworkConnection sync:[caches URLByAppendingPathComponent:@"buffers"] with:[sharedcontainer URLByAppendingPathComponent:@"buffers"]];
+        [NetworkConnection sync:[caches URLByAppendingPathComponent:@"channels"] with:[sharedcontainer URLByAppendingPathComponent:@"channels"]];
+        [NetworkConnection sync:[caches URLByAppendingPathComponent:@"stream"] with:[sharedcontainer URLByAppendingPathComponent:@"stream"]];
+    }
+}
+
 -(id)init {
     self = [super init];
 #ifdef ENTERPRISE
@@ -196,9 +228,11 @@ NSLock *__parserLock = nil;
     
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
     _userInfo = [NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile];
+#ifndef EXTENSION
     if(_userInfo)
         _streamId = [_userInfo objectForKey:@"streamId"];
-
+#endif
+    
     CLS_LOG(@"%@", _userAgent);
     
     void (^ignored)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
@@ -949,6 +983,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [d setObject:[lastSeenEids objectAtIndex:i] forKey:[NSString stringWithFormat:@"%@",[bids objectAtIndex:i]]];
         }
         NSString *seenEids = [_writer stringWithObject:heartbeat];
+        NSMutableDictionary *d = _userInfo.mutableCopy;
+        [d setObject:@(selectedBuffer) forKey:@"last_selected_bid"];
+        _userInfo = d;
         return [self _sendRequest:@"heartbeat" args:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids}];
     }
 }
@@ -1439,11 +1476,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSMutableDictionary *stream = [_userInfo mutableCopy];
     [stream setObject:_streamId forKey:@"streamId"];
     [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
+    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
     [_servers serialize];
     [_buffers serialize];
     [_channels serialize];
     [_users serialize];
     [_events serialize];
+    [NetworkConnection sync];
 }
 
 -(void)_backlogFailed:(NSNotification *)notification {

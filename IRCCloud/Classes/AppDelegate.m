@@ -265,7 +265,6 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    NSLog(@"Entering background");
     _conn.background = YES;
     _conn.failCount = 0;
     _conn.reconnectTimestamp = -1;
