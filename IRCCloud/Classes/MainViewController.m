@@ -1802,6 +1802,12 @@
     [_eventActivity stopAnimating];
 }
 
+-(void)refresh {
+    [_buffersView refresh];
+    [_eventsView refresh];
+    [_usersView refresh];
+}
+
 -(void)_updateUserListVisibility {
     if(![NSThread currentThread].isMainThread) {
         [self performSelectorOnMainThread:@selector(_updateUserListVisibility) withObject:nil waitUntilDone:YES];

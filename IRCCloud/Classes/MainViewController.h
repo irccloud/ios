@@ -82,4 +82,5 @@
 -(IBAction)titleAreaPressed:(id)sender;
 -(IBAction)globalMsgPressed:(id)sender;
 -(void)launchURL:(NSURL *)url;
+-(void)refresh;
 @end

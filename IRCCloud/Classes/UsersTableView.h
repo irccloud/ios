@@ -33,4 +33,5 @@
     NSTimer *_refreshTimer;
 }
 -(void)setBuffer:(Buffer *)buffer;
+-(void)refresh;
 @end

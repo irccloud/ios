@@ -54,4 +54,5 @@
 -(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadIndicatorClicked:(id)sender;
 -(IBAction)bottomUnreadIndicatorClicked:(id)sender;
+-(void)refresh;
 @end

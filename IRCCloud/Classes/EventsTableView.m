@@ -1102,7 +1102,7 @@ int __timestampWidth;
         NSInteger firstRow = [[rows objectAtIndex:0] row];
         NSInteger lastRow = [[rows lastObject] row];
         Event *e = [_data objectAtIndex:_lastSeenEidPos+1];
-        if(_lastSeenEidPos >=0 && firstRow > _lastSeenEidPos && e.eid > _buffer.last_seen_eid) {
+        if(_lastSeenEidPos >= 0 && firstRow > _lastSeenEidPos && e.eid > _buffer.last_seen_eid) {
             if(_topUnreadView.alpha == 0) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
@@ -1118,6 +1118,11 @@ int __timestampWidth;
                         _newHighlights++;
                 }
             }
+        } else {
+            [UIView beginAnimations:nil context:nil];
+            [UIView setAnimationDuration:0.1];
+            _topUnreadView.alpha = 0;
+            [UIView commitAnimations];
         }
         _requestingBacklog = NO;
     }
@@ -1349,6 +1354,7 @@ int __timestampWidth;
         if(_data.count)
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
         _buffer.scrolledUp = NO;
+        _buffer.scrolledUpFrom = -1;
     }
 }
 
@@ -1391,11 +1397,11 @@ int __timestampWidth;
                 [UIView commitAnimations];
                 _newMsgs = 0;
                 _newHighlights = 0;
-                if(_topUnreadView.alpha == 0)
-                    [self _sendHeartbeat];
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
                 _buffer.savedScrollPosition = -1;
+                if(_topUnreadView.alpha == 0)
+                    [self _sendHeartbeat];
             } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
                 _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
                 _buffer.scrolledUp = YES;
@@ -1407,6 +1413,9 @@ int __timestampWidth;
                     [UIView setAnimationDuration:0.1];
                     _topUnreadView.alpha = 0;
                     [UIView commitAnimations];
+                    _buffer.scrolledUp = NO;
+                    _buffer.scrolledUpFrom = -1;
+                    _buffer.savedScrollPosition = -1;
                     [self _sendHeartbeat];
                 } else {
                     [self updateTopUnread:firstRow];

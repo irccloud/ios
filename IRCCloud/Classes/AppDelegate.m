@@ -178,26 +178,34 @@
 }
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
+    NSTimeInterval highestEid = [EventsDataSource sharedInstance].highestEid;
     if(_conn.state != kIRCCloudStateConnected) {
         CLSLog(@"Fetching backlog in the background");
         _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
             CLSLog(@"Backlog complete");
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
-            [_conn disconnect];
-            _conn.background = YES;
-            completionHandler(UIBackgroundFetchResultNewData);
+            [self.mainViewController refresh];
+            if(_conn.background)
+                [_conn disconnect];
+
+            if(highestEid < [EventsDataSource sharedInstance].highestEid) {
+                CLSLog(@"Got new events");
+                completionHandler(UIBackgroundFetchResultNewData);
+            } else {
+                CLSLog(@"No new events");
+                completionHandler(UIBackgroundFetchResultNoData);
+            }
         }];
         _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
             CLSLog(@"Backlog failed");
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
             [_conn disconnect];
-            _conn.background = YES;
             completionHandler(UIBackgroundFetchResultFailed);
         }];
-        _conn.background = NO;
+        _conn.background = YES;
         [_conn connect];
     } else {
-        NSLog(@"Background fetch requested but we're still connected");
+        CLSLog(@"Background fetch requested but we're still connected");
         completionHandler(UIBackgroundFetchResultNoData);
     }
 }

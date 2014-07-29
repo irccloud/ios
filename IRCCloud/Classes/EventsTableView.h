@@ -75,4 +75,5 @@
 -(IBAction)loadMoreBacklogButtonPressed:(id)sender;
 -(void)scrollToBottom;
 -(void)clearLastSeenMarker;
+-(void)refresh;
 @end

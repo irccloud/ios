@@ -1139,9 +1139,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [s close];
     }
     
-    if(_background)
-        return;
-    
     kIRCCloudReachability reachability = [self reachable];
     if(reachability != kIRCCloudReachable) {
         CLS_LOG(@"IRCCloud is unreachable");
@@ -1393,9 +1390,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)_idle {
     _reconnectTimestamp = 0;
     _idleTimer = nil;
-    CLS_LOG(@"Websocket idle time exceeded, reconnecting...");
     [_socket close];
-    [self connect];
+    if(!_background) {
+        CLS_LOG(@"Websocket idle time exceeded, reconnecting...");
+        [self connect];
+    }
 }
 
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid {
@@ -1465,6 +1464,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         NSLog(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
         [_buffers purgeInvalidBIDs];
         [_channels purgeInvalidChannels];
+        for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
+            if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
+                [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
+        }
         _numBuffers = 0;
     }
     NSLog(@"I downloaded %i events", _totalCount);
