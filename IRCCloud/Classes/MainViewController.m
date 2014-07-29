@@ -1806,6 +1806,8 @@
     [_buffersView refresh];
     [_eventsView refresh];
     [_usersView refresh];
+    [self _updateTitleArea];
+    [self _updateUnreadIndicator];
 }
 
 -(void)_updateUserListVisibility {

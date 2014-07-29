@@ -285,7 +285,7 @@ int __timestampWidth;
             eid = last.eid;
         }
     }
-    if(eid >= 0 && eid > _buffer.last_seen_eid) {
+    if(eid >= 0 && eid > _buffer.last_seen_eid && _conn.state == kIRCCloudStateConnected) {
         [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
         _buffer.last_seen_eid = eid;
     }
@@ -914,7 +914,8 @@ int __timestampWidth;
     _buffer.scrolledUpFrom = -1;
     if(_data.count) {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
-        [self scrollViewDidScroll:self.tableView];
+        if(!_conn.background)
+            [self scrollViewDidScroll:self.tableView];
     }
     [_lock unlock];
 }

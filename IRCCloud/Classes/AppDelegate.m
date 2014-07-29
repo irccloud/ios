@@ -185,6 +185,7 @@
             CLSLog(@"Backlog complete");
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
             [self.mainViewController refresh];
+            
             if(_conn.background)
                 [_conn disconnect];
 
