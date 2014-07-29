@@ -192,7 +192,7 @@ int __timestampWidth;
 - (void)viewWillDisappear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if(_data.count && _buffer.scrolledUp) {
-        _bottomRow = [[[self.tableView indexPathsForVisibleRows] lastObject] row];
+        _bottomRow = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row];
         if(_bottomRow >= _data.count)
             _bottomRow = _data.count - 1;
     } else {
@@ -202,7 +202,7 @@ int __timestampWidth;
 
 -(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     if(_data.count && _buffer.scrolledUp)
-        _bottomRow = [[[self.tableView indexPathsForVisibleRows] lastObject] row];
+        _bottomRow = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row];
     else
         _bottomRow = -1;
 }
@@ -930,11 +930,11 @@ int __timestampWidth;
     [_lock lock];
     [_scrollTimer invalidate];
     _ready = NO;
-    NSInteger oldPosition = (_requestingBacklog && _data.count && [self.tableView indexPathsForVisibleRows].count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
+    NSInteger oldPosition = (_requestingBacklog && _data.count && [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)].count)?[[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] objectAtIndex: 0] row]:-1;
     NSTimeInterval backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
     if(backlogEid < 1)
         backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
-    oldPosition = (_data.count && [self.tableView indexPathsForVisibleRows].count)?[[[self.tableView indexPathsForVisibleRows] objectAtIndex: 0] row]:-1;
+    oldPosition = (_data.count && [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)].count)?[[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] objectAtIndex: 0] row]:-1;
 
     [_data removeAllObjects];
     _minEid = _maxEid = _earliestEid = _newMsgs = _newHighlights = 0;
@@ -1072,7 +1072,7 @@ int __timestampWidth;
             for(Event *e in _data) {
                 if(e.eid == _eidToOpen) {
                     [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-                    _buffer.scrolledUpFrom = [[_data objectAtIndex:[[[self.tableView indexPathsForVisibleRows] lastObject] row]] eid];
+                    _buffer.scrolledUpFrom = [[_data objectAtIndex:[[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row]] eid];
                     break;
                 }
                 i++;
@@ -1098,7 +1098,7 @@ int __timestampWidth;
         [self scrollToBottom];
     }
     
-    NSArray *rows = self.tableView.indexPathsForVisibleRows;
+    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
     if(_data.count && rows.count) {
         NSInteger firstRow = [[rows objectAtIndex:0] row];
         NSInteger lastRow = [[rows lastObject] row];
@@ -1371,7 +1371,7 @@ int __timestampWidth;
 
     NSInteger firstRow = -1;
     NSInteger lastRow = -1;
-    NSArray *rows = [self.tableView indexPathsForVisibleRows];
+    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
     if(rows.count) {
         firstRow = [[rows objectAtIndex:0] row];
         lastRow = [[rows lastObject] row];

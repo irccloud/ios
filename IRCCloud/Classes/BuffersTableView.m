@@ -381,7 +381,7 @@
 
 -(void)_updateUnreadIndicators {
 #ifndef EXTENSION
-    NSArray *rows = [self.tableView indexPathsForVisibleRows];
+    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
     if(rows.count) {
         NSInteger first = [[rows objectAtIndex:0] row];
         NSInteger last = [[rows lastObject] row];
@@ -432,7 +432,7 @@
             bottomUnreadIndicatorBorder.backgroundColor = [UIColor highlightBorderColor];
         }
     }
-    topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y,self.view.frame.size.width, 40);
+    topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y + self.tableView.contentInset.top,self.view.frame.size.width, 40);
     bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
 #endif
 }
@@ -1088,7 +1088,7 @@
 }
 
 -(IBAction)topUnreadIndicatorClicked:(id)sender {
-    NSInteger first = [[[self.tableView indexPathsForVisibleRows] objectAtIndex:0] row] - 1;
+    NSInteger first = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] objectAtIndex:0] row] - 1;
     NSInteger pos = 0;
     
     for(NSInteger i = first; i >= 0; i--) {
@@ -1106,7 +1106,7 @@
 }
 
 -(IBAction)bottomUnreadIndicatorClicked:(id)sender {
-    NSInteger last = [[[self.tableView indexPathsForVisibleRows] lastObject] row] + 1;
+    NSInteger last = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row] + 1;
     NSInteger pos = _data.count - 1;
     
     for(NSInteger i = last; i  < _data.count; i++) {
