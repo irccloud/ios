@@ -131,7 +131,13 @@
 -(void)serialize {
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"servers"];
     
-    [NSKeyedArchiver archiveRootObject:[_servers copy] toFile:cacheFile];
+    NSArray *servers;
+    @synchronized(_servers) {
+        servers = [_servers copy];
+    }
+    
+    [NSKeyedArchiver archiveRootObject:servers toFile:cacheFile];
+    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
 }
 
 -(void)clear {

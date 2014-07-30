@@ -973,6 +973,10 @@
 
 -(void)sendButtonPressed:(id)sender {
     if(_message.text && _message.text.length) {
+        if([_message.text isEqualToString:@"/crash"]) {
+            [[Crashlytics sharedInstance] crash];
+            return;
+        }
         id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
         if([k respondsToSelector:NSSelectorFromString(@"acceptAutocorrection")]) {
             objc_msgSend(k, NSSelectorFromString(@"acceptAutocorrection"));

@@ -97,7 +97,6 @@
         decodeBool(_toChan);
         decodeBool(_toBuffer);
         decodeObject(_color);
-        decodeObject(_bgColor);
         decodeObject(_ops);
         decodeDouble(_groupEid);
         decodeInt(_rowType);
@@ -113,6 +112,12 @@
         decodeObject(_day);
         decodeObject(_ignoreMask);
         decodeObject(_chan);
+        if(_rowType == ROW_TIMESTAMP)
+            _bgColor = [UIColor timestampBackgroundColor];
+        else if(_rowType == ROW_LASTSEENEID)
+            _bgColor = [UIColor newMsgsBackgroundColor];
+        else
+            decodeObject(_bgColor);
     }
     return self;
 }
@@ -136,7 +141,6 @@
     encodeBool(_toChan);
     encodeBool(_toBuffer);
     encodeObject(_color);
-    encodeObject(_bgColor);
     encodeObject(_ops);
     encodeDouble(_groupEid);
     encodeInt(_rowType);
@@ -152,6 +156,8 @@
     encodeObject(_day);
     encodeObject(_ignoreMask);
     encodeObject(_chan);
+    if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
+        encodeObject(_bgColor);
 }
 @end
 
@@ -610,7 +616,14 @@
 -(void)serialize {
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
     
-    [NSKeyedArchiver archiveRootObject:[_events copy] toFile:cacheFile];
+    NSMutableDictionary *events = [[NSMutableDictionary alloc] init];
+    @synchronized(_events) {
+        for(NSNumber *bid in _events) {
+            [events setObject:[[_events objectForKey:bid] mutableCopy] forKey:bid];
+        }
+    }
+    [NSKeyedArchiver archiveRootObject:events toFile:cacheFile];
+    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
 }
 
 -(void)clear {
@@ -622,6 +635,7 @@
 }
 
 -(void)addEvent:(Event *)event {
+#ifndef EXTENSION
     @synchronized(_events) {
         NSMutableArray *events = [_events objectForKey:@(event.bid)];
         if(!events) {
@@ -637,9 +651,13 @@
         [events_sorted setObject:event forKey:@(event.eid)];
         _dirty = YES;
     }
+#endif
 }
 
 -(Event *)addJSONObject:(IRCCloudJSONObject *)object {
+#ifdef EXTENSION
+    return nil;
+#else
     Event *event = [self event:object.eid buffer:object.bid];
     if(!event) {
         event = [[Event alloc] init];
@@ -703,6 +721,7 @@
         _highestEid = event.eid;
     
     return event;
+#endif
 }
 
 -(Event *)event:(NSTimeInterval)eid buffer:(int)bid {

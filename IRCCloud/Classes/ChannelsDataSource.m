@@ -114,7 +114,12 @@
 -(void)serialize {
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"channels"];
     
-    [NSKeyedArchiver archiveRootObject:[_channels copy] toFile:cacheFile];
+    NSArray *channels;
+    @synchronized(_channels) {
+        channels = [_channels copy];
+    }
+    [NSKeyedArchiver archiveRootObject:channels toFile:cacheFile];
+    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
 }
 
 -(void)clear {

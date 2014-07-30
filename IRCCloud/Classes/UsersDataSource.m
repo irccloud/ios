@@ -87,7 +87,14 @@
 -(void)serialize {
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"users"];
     
-    [NSKeyedArchiver archiveRootObject:[_users copy] toFile:cacheFile];
+    NSMutableDictionary *users = [[NSMutableDictionary alloc] init];
+    @synchronized(_users) {
+        for(NSNumber *bid in _users) {
+            [users setObject:[[_users objectForKey:bid] mutableCopy] forKey:bid];
+        }
+    }
+    [NSKeyedArchiver archiveRootObject:users toFile:cacheFile];
+    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
 }
 
 -(void)clear {
@@ -97,6 +104,7 @@
 }
 
 -(void)addUser:(User *)user {
+#ifndef EXTENSION
     @synchronized(_users) {
         NSMutableDictionary *users = [_users objectForKey:@(user.bid)];
         if(!users) {
@@ -105,6 +113,7 @@
         }
         [users setObject:user forKey:[user.nick lowercaseString]];
     }
+#endif
 }
 
 -(NSArray *)usersForBuffer:(int)bid {
