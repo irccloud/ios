@@ -707,6 +707,8 @@ static NSString * const ServerHasSSLKey = @"ssl";
                     msg = @"You can’t connect to passworded servers with free accounts";
                 } else if([msg isEqualToString:@"networks"]) {
                     msg = @"You’ve exceeded the connection limit for free accounts";
+                } else if([msg isEqualToString:@"unverified"]) {
+                    msg = @"You can’t connect to external servers until you confirm your email address";
                 }
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
