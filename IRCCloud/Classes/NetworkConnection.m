@@ -276,10 +276,14 @@ NSLock *__parserLock = nil;
     };
     
     void (^msg)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
-        if([_buffers getBuffer:object.bid]) {
+        Buffer *b = [_buffers getBuffer:object.bid];
+        if(b) {
             Event *event = [_events addJSONObject:object];
-            if(!backlog)
+            if(!backlog) {
+                if([event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"]))
+                    [self updateBadgeCount];
                 [self postObject:event forEvent:kIRCEventBufferMsg];
+            }
         } else {
             NSLog(@"Event recieved for invalid BID, reconnecting!");
             _streamId = nil;
@@ -757,6 +761,7 @@ NSLock *__parserLock = nil;
                            }
                        }
                        [self postObject:object forEvent:kIRCEventHeartbeatEcho];
+                       [self updateBadgeCount];
                    },
                    @"reorder_connections": ^(IRCCloudJSONObject *object) {
                        NSArray *order = [object objectForKey:@"order"];
@@ -1476,6 +1481,25 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }
     [self performSelectorInBackground:@selector(serialize) withObject:nil];
+    [self updateBadgeCount];
+}
+
+-(void)updateBadgeCount {
+#ifndef EXTENSION
+    int count = 0;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
+            count += [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+        }
+        if(count) {
+            [UIApplication sharedApplication].applicationIconBadgeNumber = count;
+        } else {
+            [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
+            [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
+            [[UIApplication sharedApplication] cancelAllLocalNotifications];
+        }
+    }
+#endif
 }
 
 -(void)serialize {

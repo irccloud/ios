@@ -192,4 +192,5 @@ typedef enum {
 -(NSDictionary *)unregisterAPNs:(NSData *)token;
 -(void)logout;
 -(void)fail;
+-(void)updateBadgeCount;
 @end

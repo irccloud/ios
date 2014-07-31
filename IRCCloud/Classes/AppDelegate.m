@@ -318,9 +318,13 @@
         if(_conn.reconnectTimestamp == 0)
             _conn.reconnectTimestamp = -1;
         _conn.background = NO;
-        application.applicationIconBadgeNumber = 1;
-        application.applicationIconBadgeNumber = 0;
-        [application cancelAllLocalNotifications];
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
+            [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
+            [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
+            [[UIApplication sharedApplication] cancelAllLocalNotifications];
+        } else {
+            [_conn updateBadgeCount];
+        }
         [_disconnectTimer invalidate];
         _disconnectTimer = nil;
         if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
