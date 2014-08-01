@@ -1780,9 +1780,10 @@
     if(duration > 0)
         _message.text = _message.text;
     frame = _eventsView.view.frame;
+    frame.origin.y = 0;
     frame.size.height = 32;
     _eventsView.topUnreadView.frame = frame;
-    frame.origin.y += _eventsView.view.frame.size.height - 32;
+    frame.origin.y += _eventsView.view.frame.size.height - 32 -(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?0:self.navigationController.navigationBar.frame.size.height);
     _eventsView.bottomUnreadView.frame = frame;
     float h = [@" " sizeWithFont:_nickCompletionView.font].height + 12;
     _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
