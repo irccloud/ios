@@ -805,7 +805,7 @@
     [ignore setIgnores:s.ignores];
     NSArray *copy;
     @synchronized(_events) {
-        copy = [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
+        copy = [self eventsForBuffer:bid];
     }
     for(Event *event in copy.reverseObjectEnumerator) {
         if(event.eid <= lastSeenEid) {
@@ -829,7 +829,7 @@
     [ignore setIgnores:s.ignores];
     NSArray *copy;
     @synchronized(_events) {
-        copy = [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
+        copy = [self eventsForBuffer:bid];
     }
     for(Event *event in copy.reverseObjectEnumerator) {
         if(event.eid <= lastSeenEid) {
@@ -852,7 +852,7 @@
     [ignore setIgnores:s.ignores];
     NSArray *copy;
     @synchronized(_events) {
-        copy = [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
+        copy = [self eventsForBuffer:bid];
     }
     for(Event *event in copy.reverseObjectEnumerator) {
         if(event.eid <= lastSeenEid) {

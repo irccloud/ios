@@ -188,7 +188,7 @@
             
             if(_conn.background)
                 [_conn disconnect];
-
+            
             if(highestEid < [EventsDataSource sharedInstance].highestEid) {
                 CLSLog(@"Got new events");
                 completionHandler(UIBackgroundFetchResultNewData);

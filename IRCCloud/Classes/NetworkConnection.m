@@ -279,10 +279,13 @@ NSLock *__parserLock = nil;
         Buffer *b = [_buffers getBuffer:object.bid];
         if(b) {
             Event *event = [_events addJSONObject:object];
-            if(!backlog) {
-                if([event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"]))
+            if(!backlog || _resuming) {
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"]))
                     [self updateBadgeCount];
-                [self postObject:event forEvent:kIRCEventBufferMsg];
+
+                if(!backlog) {
+                    [self postObject:event forEvent:kIRCEventBufferMsg];
+                }
             }
         } else {
             NSLog(@"Event recieved for invalid BID, reconnecting!");
@@ -1481,12 +1484,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }
     [self performSelectorInBackground:@selector(serialize) withObject:nil];
-    [self updateBadgeCount];
 }
 
 -(void)updateBadgeCount {
 #ifndef EXTENSION
     int count = 0;
+    
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
             count += [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
