@@ -997,6 +997,8 @@
                 e.cid = s.cid;
                 e.bid = _buffer.bid;
                 e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset) * 1000000;
+                if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
+                    e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
                 e.isSelf = YES;
                 e.from = s.nick;
                 e.nick = s.nick;
