@@ -299,9 +299,33 @@
                               event.msg = @"Connection pool lost";
                           else if([object objectForKey:@"server_ping_timeout"])
                               event.msg = @"Server PING timed out";
-                          else if([object objectForKey:@"reason"] && [[object objectForKey:@"reason"] length] > 0)
-                              event.msg = [NSString stringWithFormat:@"Connection lost: %@", [object objectForKey:@"reason"]];
-                          else if([object objectForKey:@"abnormal"])
+                          else if([object objectForKey:@"reason"] && [[object objectForKey:@"reason"] length] > 0) {
+                              NSString *reason = [object objectForKey:@"reason"];
+                              if([reason isKindOfClass:[NSString class]] && [reason length]) {
+                                  if([reason isEqualToString:@"pool_lost"])
+                                      reason = @"Connection pool failed";
+                                  else if([reason isEqualToString:@"no_pool"])
+                                      reason = @"No available connection pools";
+                                  else if([reason isEqualToString:@"enetdown"])
+                                      reason = @"Network down";
+                                  else if([reason isEqualToString:@"etimedout"] || [reason isEqualToString:@"timeout"])
+                                      reason = @"Timed out";
+                                  else if([reason isEqualToString:@"ehostunreach"])
+                                      reason = @"Host unreachable";
+                                  else if([reason isEqualToString:@"econnrefused"])
+                                      reason = @"Connection refused";
+                                  else if([reason isEqualToString:@"nxdomain"])
+                                      reason = @"Invalid hostname";
+                                  else if([reason isEqualToString:@"server_ping_timeout"])
+                                      reason = @"PING timeout";
+                                  else if([reason isEqualToString:@"ssl_certificate_error"])
+                                      reason = @"SSL certificate error";
+                                  else if([reason isEqualToString:@"ssl_error"])
+                                      reason = @"SSL error";
+                                  else if([reason isEqualToString:@"crash"])
+                                      reason = @"Connection crashed";
+                                  event.msg = [@"Connection lost: " stringByAppendingString:reason];
+                          } else if([object objectForKey:@"abnormal"])
                               event.msg = @"Connection closed unexpectedly";
                           else
                               event.msg = @"";
