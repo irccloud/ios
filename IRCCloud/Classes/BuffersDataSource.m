@@ -84,7 +84,7 @@
         decodeObject(_chantypes);
         decodeBool(_scrolledUp);
         decodeDouble(_scrolledUpFrom);
-        decodeDouble(_savedScrollPosition);
+        decodeFloat(_savedScrollOffset);
         decodeObject(_lastBuffer);
     }
     return self;
@@ -105,7 +105,7 @@
     encodeObject(_chantypes);
     encodeBool(_scrolledUp);
     encodeDouble(_scrolledUpFrom);
-    encodeDouble(_savedScrollPosition);
+    encodeFloat(_savedScrollOffset);
     encodeObject(_lastBuffer);
 }
 @end
