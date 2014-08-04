@@ -33,11 +33,12 @@
     NSString *_chantypes;
     BOOL _scrolledUp;
     NSTimeInterval _scrolledUpFrom;
-    NSTimeInterval _savedScrollPosition;
+    CGFloat _savedScrollOffset;
     Buffer *_lastBuffer;
 }
 @property int bid, cid, archived, deferred, timeout;
-@property NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom, savedScrollPosition;
+@property NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom;
+@property CGFloat savedScrollOffset;
 @property NSString *name, *type, *away_msg, *chantypes;
 @property BOOL valid, scrolledUp;
 @property (copy) NSString *draft;
