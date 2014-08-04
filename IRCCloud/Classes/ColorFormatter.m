@@ -1063,7 +1063,7 @@ NSDictionary *quotes;
 +(NSRegularExpression *)spotify {
     static NSRegularExpression *_pattern = nil;
     if(!_pattern) {
-        NSString *pattern = @"spotify:([a-zA-Z0-9:]+)";
+        NSString *pattern = @"spotify:([^<>\"\\s]+)";
         _pattern = [NSRegularExpression
                     regularExpressionWithPattern:pattern
                     options:0
