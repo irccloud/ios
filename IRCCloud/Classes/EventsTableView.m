@@ -1334,6 +1334,7 @@ int __timestampWidth;
             [UIView commitAnimations];
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_lastSeenEidPos+1 inSection:0] atScrollPosition: UITableViewScrollPositionTop animated: YES];
             [self scrollViewDidScroll:self.tableView];
+            [self _sendHeartbeat];
         } else {
             if(self.tableView.tableHeaderView == _backlogFailedView)
                 [self loadMoreBacklogButtonPressed:nil];
@@ -1397,6 +1398,8 @@ int __timestampWidth;
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
                 _buffer.savedScrollOffset = -1;
+                if(_topUnreadView.alpha == 0)
+                    [self _sendHeartbeat];
             } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
                 _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
                 _buffer.scrolledUp = YES;

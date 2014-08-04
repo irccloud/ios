@@ -324,7 +324,8 @@
                                       reason = @"SSL error";
                                   else if([reason isEqualToString:@"crash"])
                                       reason = @"Connection crashed";
-                                  event.msg = [@"Connection lost: " stringByAppendingString:reason];
+                              }
+                              event.msg = [@"Connection lost: " stringByAppendingString:reason];
                           } else if([object objectForKey:@"abnormal"])
                               event.msg = @"Connection closed unexpectedly";
                           else
