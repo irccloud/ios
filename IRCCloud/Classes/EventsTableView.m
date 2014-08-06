@@ -904,26 +904,26 @@ int __timestampWidth;
     _scrollTimer = nil;
     _requestingBacklog = NO;
     _bottomRow = -1;
-    if(_buffer && buffer.bid != _buffer.bid) {
-        if(_buffer.scrolledUp && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type] == 0) {
-            NSLog(@"Table was scrolled up, adjusting scroll offset");
-            [_lock lock];
-            int row = 0;
-            int toprow = [self.tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
-            if(self.tableView.tableHeaderView != nil)
-                row++;
-            for(Event *event in _data) {
-                if(event.rowType == ROW_LASTSEENEID || event.rowType == ROW_BACKLOG) {
-                    if(toprow > row) {
-                        NSLog(@"Adjusting scroll offset");
-                        _buffer.savedScrollOffset -= 26;
-                    }
+    if(_buffer && _buffer.scrolledUp) {
+        NSLog(@"Table was scrolled up, adjusting scroll offset");
+        [_lock lock];
+        int row = 0;
+        int toprow = [self.tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
+        if(self.tableView.tableHeaderView != nil)
+            row++;
+        for(Event *event in _data) {
+            if((event.rowType == ROW_LASTSEENEID && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type] == 0) || event.rowType == ROW_BACKLOG) {
+                if(toprow > row) {
+                    NSLog(@"Adjusting scroll offset");
+                    _buffer.savedScrollOffset -= 26;
                 }
-                if(++row > toprow)
-                    break;
             }
-            [_lock unlock];
+            if(++row > toprow)
+                break;
         }
+        [_lock unlock];
+    }
+    if(_buffer && buffer.bid != _buffer.bid) {
         for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid]) {
             if(event.rowType == ROW_LASTSEENEID) {
                 [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
