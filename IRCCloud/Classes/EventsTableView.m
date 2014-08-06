@@ -257,6 +257,25 @@ int __timestampWidth;
     if(notification.object == nil || [notification.object bid] == -1 || (_buffer && [notification.object bid] == _buffer.bid && _requestingBacklog)) {
         NSLog(@"Backlog loaded in current buffer, will find and remove the last seen EID marker");
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if(_buffer.scrolledUp) {
+                NSLog(@"Table was scrolled up, adjusting scroll offset");
+                [_lock lock];
+                int row = 0;
+                int toprow = [self.tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
+                if(self.tableView.tableHeaderView != nil)
+                    row++;
+                for(Event *event in _data) {
+                    if((event.rowType == ROW_LASTSEENEID && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type] == 0) || event.rowType == ROW_BACKLOG) {
+                        if(toprow > row) {
+                            NSLog(@"Adjusting scroll offset");
+                            _buffer.savedScrollOffset -= 26;
+                        }
+                    }
+                    if(++row > toprow)
+                        break;
+                }
+                [_lock unlock];
+            }
             for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
                 if(event.rowType == ROW_LASTSEENEID) {
                     NSLog(@"removing the last seen EID marker");
@@ -886,6 +905,25 @@ int __timestampWidth;
     _requestingBacklog = NO;
     _bottomRow = -1;
     if(_buffer && buffer.bid != _buffer.bid) {
+        if(_buffer.scrolledUp && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type] == 0) {
+            NSLog(@"Table was scrolled up, adjusting scroll offset");
+            [_lock lock];
+            int row = 0;
+            int toprow = [self.tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
+            if(self.tableView.tableHeaderView != nil)
+                row++;
+            for(Event *event in _data) {
+                if(event.rowType == ROW_LASTSEENEID || event.rowType == ROW_BACKLOG) {
+                    if(toprow > row) {
+                        NSLog(@"Adjusting scroll offset");
+                        _buffer.savedScrollOffset -= 26;
+                    }
+                }
+                if(++row > toprow)
+                    break;
+            }
+            [_lock unlock];
+        }
         for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid]) {
             if(event.rowType == ROW_LASTSEENEID) {
                 [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
@@ -1083,8 +1121,8 @@ int __timestampWidth;
                 _buffer.scrolledUpFrom = -1;
         }
     } else if(_buffer.scrolledUp && _buffer.savedScrollOffset > 0) {
-        if(_buffer.savedScrollOffset < self.tableView.contentSize.height - self.tableView.bounds.size.height) {
-            self.tableView.contentOffset = CGPointMake(0, _buffer.savedScrollOffset);
+        if((_buffer.savedScrollOffset + self.tableView.tableHeaderView.bounds.size.height) < self.tableView.contentSize.height - self.tableView.bounds.size.height) {
+            self.tableView.contentOffset = CGPointMake(0, (_buffer.savedScrollOffset + self.tableView.tableHeaderView.bounds.size.height));
         } else {
             [self _scrollToBottom];
             [self scrollToBottom];
@@ -1386,9 +1424,9 @@ int __timestampWidth;
     if(rows.count) {
         if(_data.count) {
             if(lastRow < _data.count)
-                _buffer.savedScrollOffset = self.tableView.contentOffset.y;
+                _buffer.savedScrollOffset = self.tableView.contentOffset.y - self.tableView.tableHeaderView.bounds.size.height;
             
-            if(lastRow == _data.count - 1) {
+            if(self.tableView.contentOffset.y >= (self.tableView.contentSize.height - self.tableView.bounds.size.height)) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
                 _bottomUnreadView.alpha = 0;
@@ -1411,9 +1449,6 @@ int __timestampWidth;
                     [UIView setAnimationDuration:0.1];
                     _topUnreadView.alpha = 0;
                     [UIView commitAnimations];
-                    _buffer.scrolledUp = NO;
-                    _buffer.scrolledUpFrom = -1;
-                    _buffer.savedScrollOffset = -1;
                     [self _sendHeartbeat];
                 } else {
                     [self updateTopUnread:firstRow];
@@ -1450,7 +1485,7 @@ int __timestampWidth;
                     _buffer.scrolledUpFrom = [[_data lastObject] eid];
                     _buffer.scrolledUp = YES;
                 }
-                _buffer.savedScrollOffset = self.tableView.contentOffset.y;
+                _buffer.savedScrollOffset = self.tableView.contentOffset.y - self.tableView.tableHeaderView.bounds.size.height;
                 [self refresh];
             }
         } else if(indexPath.row < _data.count) {
