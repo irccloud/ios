@@ -1168,8 +1168,13 @@ int __timestampWidth;
     _ready = YES;
     [_lock unlock];
     
-    if(_conn.state == kIRCCloudStateConnected)
+    if(_conn.state == kIRCCloudStateConnected) {
+        if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
+            _requestingBacklog = YES;
+            [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
+        }
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
+    }
     
     [self.tableView flashScrollIndicators];
 }
