@@ -421,6 +421,8 @@ NSLock *__parserLock = nil;
                        if(!buffer) {
                            buffer = [[Buffer alloc] init];
                            buffer.bid = object.bid;
+                           buffer.scrolledUpFrom = -1;
+                           buffer.savedScrollOffset = -1;
                            [_buffers addBuffer:buffer];
                        }
                        buffer.bid = object.bid;

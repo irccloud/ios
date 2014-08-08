@@ -180,6 +180,7 @@ int __timestampWidth;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogCompleted:)
@@ -649,8 +650,13 @@ int __timestampWidth;
     if(!backlog) {
         [self.tableView reloadData];
         if(!_buffer.scrolledUp) {
-            [self scrollToBottom];
-            [self _scrollToBottom];
+            if(_topUnreadView.alpha == 0 && _data.count > 200) {
+                [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid maxSize:100];
+                [self refresh];
+            } else {
+                [self scrollToBottom];
+                [self _scrollToBottom];
+            }
         } else if(!event.isSelf && [event isImportant:_buffer.type]) {
             _newMsgs++;
             if(event.isHighlight)

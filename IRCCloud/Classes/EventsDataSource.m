@@ -183,12 +183,27 @@
     _highestEid = 0;
     if(_events) {
         for(NSNumber *bid in _events) {
-            NSArray *events = [_events objectForKey:bid];
+            NSMutableArray *events = [_events objectForKey:bid];
             NSMutableDictionary *events_sorted = [[NSMutableDictionary alloc] init];
             for(Event *e in events) {
                 [events_sorted setObject:e forKey:@(e.eid)];
                 if(e.eid > _highestEid)
                     _highestEid = e.eid;
+            }
+            
+            if(events.count > 1000) {
+                NSLog(@"Cleaning up excessive backlog in BID: %@", bid);
+                Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid.intValue];
+                if(b) {
+                    b.scrolledUp = NO;
+                    b.scrolledUpFrom = -1;
+                    b.savedScrollOffset = -1;
+                }
+                while(events.count > 1000) {
+                    Event *e = [events firstObject];
+                    [events removeObject:e];
+                    [events_sorted removeObjectForKey:@(e.eid)];
+                }
             }
             [_events_sorted setObject:events_sorted forKey:bid];
         }
@@ -793,6 +808,12 @@
             _dirty = NO;
         }
         return [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
+    }
+}
+
+-(int)sizeOfBuffer:(int)bid {
+    @synchronized(_events) {
+        return [[_events objectForKey:@(bid)] count];
     }
 }
 

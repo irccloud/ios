@@ -304,11 +304,11 @@
             if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
         }
+        [_conn serialize];
         [NSThread sleepForTimeInterval:[[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] + 5];
         [application endBackgroundTask: background_task];
         background_task = UIBackgroundTaskInvalid;
     });
-    [_conn performSelectorInBackground:@selector(serialize) withObject:nil];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -337,6 +337,7 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    [_conn serialize];
     [_conn disconnect];
 }
 
