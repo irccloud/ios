@@ -358,7 +358,7 @@
             else if([type isEqualToString:@"save_nick"])
                 msg = [NSString stringWithFormat:@"%@: %@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"], [o objectForKey:@"new_nick"]];
             else if([type isEqualToString:@"unknown_mode"])
-                msg = [NSString stringWithFormat:@"Missing mode: %@", [o objectForKey:@"params"]];
+                msg = [NSString stringWithFormat:@"Missing mode: %@", [o objectForKey:@"param"]];
             else if([type isEqualToString:@"user_not_in_channel"])
                 msg = [NSString stringWithFormat:@"%@ is not in %@", [o objectForKey:@"nick"], [o objectForKey:@"channel"]];
             else if([type isEqualToString:@"need_more_params"])
