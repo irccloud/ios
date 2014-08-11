@@ -991,8 +991,24 @@
             objc_msgSend(k, NSSelectorFromString(@"acceptAutocorrection"));
         }
 
+        if(_message.text.length > 1 && [_message.text hasSuffix:@" "])
+            _message.text = [_message.text substringToIndex:_message.text.length - 1];
+        
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s) {
+            if([_message.text isEqualToString:@"/ignore"]) {
+                [_message clearText];
+                _buffer.draft = nil;
+                IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
+                itv.ignores = s.ignores;
+                itv.cid = s.cid;
+                itv.navigationItem.title = @"Ignore List";
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                [self presentViewController:nc animated:YES completion:nil];
+                return;
+            }
+            
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
             Event *e = [[Event alloc] init];
             NSString *msg = _message.text;
