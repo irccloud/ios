@@ -593,8 +593,11 @@
                     if(e.ignoreMask && [ignore match:e.ignoreMask])
                         break;
                     if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
-                        AudioServicesPlaySystemSound(alertSound);
-                        AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+                        if(_lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
+                            _lastNotificationTime = [NSDate date].timeIntervalSince1970;
+                            AudioServicesPlaySystemSound(alertSound);
+                            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+                        }
                         [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
                         _menuBtn.accessibilityValue = @"Unread highlights";
                     } else if(_menuBtn.accessibilityValue == nil) {
