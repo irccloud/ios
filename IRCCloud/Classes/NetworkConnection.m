@@ -391,13 +391,7 @@ NSLock *__parserLock = nil;
                        _userInfo = object.dictionary;
                        _prefs = nil;
 #ifndef EXTENSION
-                       if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-                           if(_userInfo && [_userInfo objectForKey:@"limits"] && [[[_userInfo objectForKey:@"limits"] objectForKey:@"zombiehours"] intValue] > 0) {
-                               [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
-                           } else {
-                               [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
-                           }
-                       }
+                       [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];
                        [self postObject:object forEvent:kIRCEventUserInfo];
@@ -1173,6 +1167,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(_streamId)
             url = [url stringByAppendingFormat:@"&stream_id=%@", _streamId];
     }
+    if(_background) {
+        if([url rangeOfString:@"?"].location == NSNotFound)
+            url = [url stringByAppendingFormat:@"?notifier=1"];
+        else
+            url = [url stringByAppendingFormat:@"&notifier=1"];
+    }
     CLS_LOG(@"Connecting: %@", url);
     _state = kIRCCloudStateConnecting;
     _idleInterval = 20;
@@ -1566,6 +1566,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
 #endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/logout", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];

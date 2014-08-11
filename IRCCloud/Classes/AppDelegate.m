@@ -313,11 +313,11 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     if(_conn.background) {
+        _conn.background = NO;
         [ColorFormatter clearFontCache];
         [[EventsDataSource sharedInstance] clearFormattingCache];
         if(_conn.reconnectTimestamp == 0)
             _conn.reconnectTimestamp = -1;
-        _conn.background = NO;
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
             [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
             [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
