@@ -1626,4 +1626,16 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, nil], NULL);
 #endif
 }
+
+-(BOOL)background {
+    return _background;
+}
+
+-(void)setBackground:(BOOL)background {
+    _background = background;
+    if(_state == kIRCCloudStateConnected && !background) {
+        CLS_LOG(@"Upgrading websocket");
+        [self _sendRequest:@"upgrade_notifier" args:nil];
+    }
+}
 @end
