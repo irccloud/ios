@@ -1491,6 +1491,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)updateBadgeCount {
 #ifndef EXTENSION
+#if 0
     int count = 0;
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
@@ -1500,11 +1501,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(count) {
             [UIApplication sharedApplication].applicationIconBadgeNumber = count;
         } else {
+#endif
             [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
             [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
             [[UIApplication sharedApplication] cancelAllLocalNotifications];
+#if 0
         }
     }
+#endif
 #endif
 }
 
