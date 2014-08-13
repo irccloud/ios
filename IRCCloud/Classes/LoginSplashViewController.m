@@ -53,26 +53,33 @@
     name.leftViewMode = UITextFieldViewModeAlways;
     name.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, name.frame.size.height)];
     name.rightViewMode = UITextFieldViewModeAlways;
-    [login setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
-    [login setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateDisabled];
-    [login setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
-    [login setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-    [login setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    login.titleLabel.shadowOffset = CGSizeMake(0, 1);
-    [login.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
-    login.adjustsImageWhenDisabled = YES;
-    login.adjustsImageWhenHighlighted = NO;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
+        [login setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
+        [login setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateDisabled];
+        [login setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
+        [login setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+        [login setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        login.titleLabel.shadowOffset = CGSizeMake(0, 1);
+        [login.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
+        login.adjustsImageWhenDisabled = YES;
+        login.adjustsImageWhenHighlighted = NO;
+        [signup setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
+        [signup setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateDisabled];
+        [signup setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
+        [signup setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+        [signup setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        signup.titleLabel.shadowOffset = CGSizeMake(0, 1);
+        [signup.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
+        signup.adjustsImageWhenDisabled = YES;
+        signup.adjustsImageWhenHighlighted = NO;
+    } else {
+        [login setTitleColor:[UIColor backgroundBlueColor] forState:UIControlStateNormal];
+        [login setTitleColor:[UIColor backgroundBlueColor] forState:UIControlStateDisabled];
+        [signup setTitleColor:[UIColor backgroundBlueColor] forState:UIControlStateNormal];
+        [signup setTitleColor:[UIColor backgroundBlueColor] forState:UIControlStateDisabled];
+        
+    }
     login.enabled = NO;
-    [signup setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
-    [signup setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateDisabled];
-    [signup setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
-    [signup setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-    [signup setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    signup.titleLabel.shadowOffset = CGSizeMake(0, 1);
-    [signup.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
-    signup.adjustsImageWhenDisabled = YES;
-    signup.adjustsImageWhenHighlighted = NO;
-    
 #ifdef BRAND_NAME
     [version setText:[NSString stringWithFormat:@"Version %@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], @BRAND_NAME]];
 #else
@@ -286,7 +293,7 @@
     if(name.alpha) {
         signup.frame = CGRectMake(32, topoffset + ((offset + 2) * 38), loginView.bounds.size.width - 64, 30);
     } else {
-        if(_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        if(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) || (_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)) {
             login.frame = CGRectMake(32, topoffset + ((offset + 2) * 38), ((loginView.bounds.size.width - 64) / 2) - 2, 30);
             signup.frame = CGRectMake(32 + ((loginView.bounds.size.width - 64) / 2) + 2, topoffset + ((offset + 2) * 38), ((loginView.bounds.size.width - 64) / 2) - 2, 30);
         } else {
