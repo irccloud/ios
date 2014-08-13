@@ -25,6 +25,7 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
         _conn = [NetworkConnection sharedInstance];
+        _kbSize = CGSizeZero;
     }
     return self;
 }
@@ -32,7 +33,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.frame = [UIScreen mainScreen].applicationFrame;
-    username.background = password.background = host.background = [[UIImage imageNamed:@"textbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)];
+    username.background = password.background = host.background = name.background = [[UIImage imageNamed:@"textbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)];
     username.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, username.frame.size.height)];
     username.leftViewMode = UITextFieldViewModeAlways;
     username.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, username.frame.size.height)];
@@ -48,6 +49,10 @@
     host.leftViewMode = UITextFieldViewModeAlways;
     host.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, host.frame.size.height)];
     host.rightViewMode = UITextFieldViewModeAlways;
+    name.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, name.frame.size.height)];
+    name.leftViewMode = UITextFieldViewModeAlways;
+    name.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, name.frame.size.height)];
+    name.rightViewMode = UITextFieldViewModeAlways;
     [login setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
     [login setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateDisabled];
     [login setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
@@ -58,6 +63,15 @@
     login.adjustsImageWhenDisabled = YES;
     login.adjustsImageWhenHighlighted = NO;
     login.enabled = NO;
+    [signup setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
+    [signup setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateDisabled];
+    [signup setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
+    [signup setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+    [signup setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    signup.titleLabel.shadowOffset = CGSizeMake(0, 1);
+    [signup.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
+    signup.adjustsImageWhenDisabled = YES;
+    signup.adjustsImageWhenHighlighted = NO;
     
 #ifdef BRAND_NAME
     [version setText:[NSString stringWithFormat:@"Version %@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], @BRAND_NAME]];
@@ -70,8 +84,8 @@
         host.text = nil;
 #else
     host.hidden = YES;
-    login.frame = host.frame;
 #endif
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
 -(void)flyaway {
@@ -255,37 +269,89 @@
     [progress setProgress:[notification.object floatValue] animated:YES];
 }
 
--(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    self.view.frame = [UIScreen mainScreen].applicationFrame;
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            logo.frame = CGRectMake(96, 39, 128, 128);
-            loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 170);
-        } else {
-            logo.frame = CGRectMake(30, 80, 128, 128);
-            loadingView.frame = CGRectMake(160, 100, 320, 170);
+-(void)_updateFieldPositions {
+    int offset = 0;
+    if(name.alpha)
+        offset = 1;
+    
+    int topoffset = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone || UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))?20:280;
+    
+    name.frame = CGRectMake(32, topoffset, loginView.bounds.size.width - 64, 30);
+    username.frame = CGRectMake(32, topoffset + (offset * 38), loginView.bounds.size.width - 64, 30);
+    password.frame = CGRectMake(32, topoffset + ((offset + 1) * 38), loginView.bounds.size.width - 64, 30);
+    host.frame = CGRectMake(32, topoffset + ((offset + 2) * 38), loginView.bounds.size.width - 64, 30);
 #ifdef ENTERPRISE
-            loginView.frame = CGRectMake(160, 54, 320, 170);
-#else
-            loginView.frame = CGRectMake(160, 70, 320, 170);
+    offset++;
 #endif
-        }
+    if(name.alpha) {
+        signup.frame = CGRectMake(32, topoffset + ((offset + 2) * 38), loginView.bounds.size.width - 64, 30);
     } else {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            logo.frame = CGRectMake(256, 124, 256, 256);
-            loadingView.frame = loginView.frame = CGRectMake(78, 392, 612, 170);
-            version.frame = CGRectMake(0, 984, 768, 20);
+        if(_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            login.frame = CGRectMake(32, topoffset + ((offset + 2) * 38), ((loginView.bounds.size.width - 64) / 2) - 2, 30);
+            signup.frame = CGRectMake(32 + ((loginView.bounds.size.width - 64) / 2) + 2, topoffset + ((offset + 2) * 38), ((loginView.bounds.size.width - 64) / 2) - 2, 30);
         } else {
-            logo.frame = CGRectMake(135, 246, 256, 256);
-            loadingView.frame = CGRectMake(392, 344, 612, 170);
-#ifdef ENTERPRISE
-            loginView.frame = CGRectMake(392, 286, 612, 170);
-#else
-            loginView.frame = CGRectMake(392, 302, 612, 170);
-#endif
-            version.frame = CGRectMake(0, 728, 1024, 20);
+            login.frame = CGRectMake(32, topoffset + ((offset + 2) * 38), loginView.bounds.size.width - 64, 30);
+            signup.frame = CGRectMake(32, topoffset + ((offset + 3) * 38), loginView.bounds.size.width - 64, 30);
         }
     }
+    
+    status.frame = CGRectMake(32, topoffset, loginView.bounds.size.width - 64, 21);
+    progress.frame = CGRectMake(32, topoffset + 38, loginView.bounds.size.width - 64, 21);
+    activity.center = progress.center;
+    error.frame = CGRectMake(32, topoffset + 76, loginView.bounds.size.width - 64, 100);
+    
+    version.frame = CGRectMake(loginView.frame.origin.x, version.frame.origin.y, loginView.frame.size.width, version.frame.size.height);
+}
+
+-(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    self.view.frame = [UIScreen mainScreen].applicationFrame;
+    if(_kbSize.height) {
+        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            int offset = 0;
+            if(name.alpha)
+                offset += 38;
+            logo.frame = CGRectMake(124 + (offset / 2), 10, 72 - offset, 72 - offset);
+            IRC.frame = CGRectMake(0, logo.frame.origin.y + logo.frame.size.height + 4, 154, 20);
+            Cloud.frame = CGRectMake(154, logo.frame.origin.y + logo.frame.size.height + 4, 166, 20);
+            loadingView.frame = loginView.frame = CGRectMake(0, 112 - offset, 320, self.view.bounds.size.height - 112 - offset);
+        } else {
+            if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+                logo.frame = CGRectMake(256, 72, 256, 256);
+                IRC.frame = CGRectMake(0, 340, 380, 40);
+                Cloud.frame = CGRectMake(380, 340, 388, 40);
+                loadingView.frame = loginView.frame = CGRectMake(0, 400, 768, self.view.bounds.size.height - 392);
+                version.frame = CGRectMake(0, 984, 768, 20);
+            } else {
+                logo.frame = CGRectMake(72, 226 - _kbSize.height/2, 256, 256);
+                IRC.frame = CGRectMake(0, 500 - _kbSize.height/2, 196, 40);
+                Cloud.frame = CGRectMake(196, 500 - _kbSize.height/2, 206, 40);
+                loadingView.frame = loginView.frame = CGRectMake(400, 0 - _kbSize.height/2, 624, self.view.bounds.size.height + _kbSize.height/2);
+                version.frame = CGRectMake(0, 728, 1024, 20);
+            }
+        }
+    } else {
+        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+            logo.frame = CGRectMake(96, 24, 128, 128);
+            IRC.frame = CGRectMake(0, 165, 154, 20);
+            Cloud.frame = CGRectMake(154, 165, 166, 20);
+            loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, self.view.bounds.size.height - 200);
+        } else {
+            if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
+                logo.frame = CGRectMake(256, 72, 256, 256);
+                IRC.frame = CGRectMake(0, 340, 380, 40);
+                Cloud.frame = CGRectMake(380, 340, 388, 40);
+                loadingView.frame = loginView.frame = CGRectMake(0, 400, 768, self.view.bounds.size.height - 392);
+                version.frame = CGRectMake(0, 984, 768, 20);
+            } else {
+                logo.frame = CGRectMake(72, 226, 256, 256);
+                IRC.frame = CGRectMake(0, 500, 196, 40);
+                Cloud.frame = CGRectMake(196, 500, 206, 40);
+                loadingView.frame = loginView.frame = CGRectMake(400, 0, 624, self.view.bounds.size.height);
+                version.frame = CGRectMake(0, 728, 1024, 20);
+            }
+        }
+    }
+    [self _updateFieldPositions];
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
@@ -293,35 +359,8 @@
     [UIView setAnimationBeginsFromCurrentState:YES];
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-#ifdef ENTERPRISE
-            logo.frame = CGRectMake(124, 10, 72, 72);
-            loadingView.frame = loginView.frame = CGRectMake(0, 76, 320, 170);
-#else
-            logo.frame = CGRectMake(112, 16, 96, 96);
-            loadingView.frame = loginView.frame = CGRectMake(0, 112, 320, 170);
-#endif
-        } else {
-#ifdef ENTERPRISE
-            logo.frame = CGRectMake(52, 24, 96, 96);
-            loadingView.frame = loginView.frame = CGRectMake(160, -16, 320, 170);
-#else
-            logo.frame = CGRectMake(52, 24, 96, 96);
-            loadingView.frame = loginView.frame = CGRectMake(160, 0, 320, 170);
-#endif
-        }
-    } else {
-        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-#ifdef ENTERPRISE
-            logo.frame = CGRectMake(128, 246-180, 256, 256);
-            loadingView.frame = loginView.frame = CGRectMake(392, 302-200, 612, 144);
-#else
-            logo.frame = CGRectMake(128, 246-180, 256, 256);
-            loadingView.frame = loginView.frame = CGRectMake(392, 302-180, 612, 144);
-#endif
-        }
-    }
+    _kbSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [UIView commitAnimations];
 }
 
@@ -330,28 +369,28 @@
     [UIView setAnimationBeginsFromCurrentState:YES];
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            logo.frame = CGRectMake(92, 36, 138, 138);
-            loadingView.frame = loginView.frame = CGRectMake(0, 200, 320, 170);
-        } else {
-            logo.frame = CGRectMake(26, 76, 138, 138);
-            loadingView.frame = loginView.frame = CGRectMake(160, 70, 320, 170);
-        }
-    } else {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-        } else {
-            logo.frame = CGRectMake(128, 240, 276, 276);
-            loadingView.frame = CGRectMake(392, 344, 612, 170);
-            loginView.frame = CGRectMake(392, 302, 612, 170);
-        }
-    }
+    _kbSize = CGSizeZero;
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [UIView commitAnimations];
 }
 
 -(void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(IBAction)signupButtonPressed:(id)sender {
+    if(name.alpha == 0) {
+        [UIView beginAnimations:nil context:NULL];
+        name.alpha = 1;
+        login.alpha = 0;
+        [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+        [UIView commitAnimations];
+        [name becomeFirstResponder];
+        [self textFieldChanged:name];
+    } else {
+        [self loginButtonPressed:sender];
+    }
 }
 
 -(IBAction)loginButtonPressed:(id)sender {
@@ -361,8 +400,11 @@
     loginView.alpha = 0;
     loadingView.alpha = 1;
     [UIView commitAnimations];
-    [status setText:@"Signing in"];
-    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Signing in");
+    if(name.alpha)
+        [status setText:@"Creating Account"];
+    else
+        [status setText:@"Signing in"];
+    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
     progress.hidden = YES;
     progress.progress = 0;
     [activity startAnimating];
@@ -381,7 +423,10 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
-            result = [[NetworkConnection sharedInstance] login:[username text] password:[password text] token:[result objectForKey:@"token"]];
+            if(name.alpha)
+                result = [[NetworkConnection sharedInstance] signup:[username text] password:[password text] realname:[name text] token:[result objectForKey:@"token"]];
+            else
+                result = [[NetworkConnection sharedInstance] login:[username text] password:[password text] token:[result objectForKey:@"token"]];
             if([[result objectForKey:@"success"] intValue] == 1) {
                 if([result objectForKey:@"websocket_host"])
                     IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
@@ -410,13 +455,19 @@
                     loginView.alpha = 1;
                     loadingView.alpha = 0;
                     [UIView commitAnimations];
-                    NSString *message = @"Unable to login to IRCCloud.  Please check your username and password, and try again shortly.";
+                    NSString *message = name.alpha?@"Invalid email address or password. Please try again.":@"Unable to login to IRCCloud.  Please check your username and password, and try again shortly.";
                     if([[result objectForKey:@"message"] isEqualToString:@"auth"]
                        || [[result objectForKey:@"message"] isEqualToString:@"email"]
                        || [[result objectForKey:@"message"] isEqualToString:@"password"]
                        || [[result objectForKey:@"message"] isEqualToString:@"legacy_account"])
                         message = @"Incorrect username or password.  Please try again.";
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    if([[result objectForKey:@"message"] isEqualToString:@"realname"])
+                        message = @"Please enter a valid name and try again.";
+                    if([[result objectForKey:@"message"] isEqualToString:@"email_exists"])
+                        message = @"This email address is already in use, please sign in or try another.";
+                    if([[result objectForKey:@"message"] isEqualToString:@"rate_limited"])
+                        message = @"Rate limited, please try again in a few minutes.";
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:name.alpha?@"Sign Up Failed":@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [alert show];
                 });
             }
@@ -436,6 +487,7 @@
 
 -(IBAction)textFieldChanged:(id)sender {
     login.enabled = (username.text.length > 0 && password.text.length > 0);
+    signup.enabled = (name.alpha == 0) || (username.text.length > 0 && password.text.length > 0 && name.text.length > 0);
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -447,7 +499,7 @@
 }
 
 -(NSUInteger)supportedInterfaceOrientations {
-    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
+    return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskPortrait:UIInterfaceOrientationMaskAll;
 }
 
 -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {

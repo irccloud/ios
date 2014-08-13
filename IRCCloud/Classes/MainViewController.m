@@ -1554,7 +1554,15 @@
                 if([type isEqualToString:@"killed"]) {
                     _serverStatus.text = [NSString stringWithFormat:@"Disconnected - Killed: %@", reason];
                 } else if([type isEqualToString:@"connecting_restricted"]) {
-                    _serverStatus.text = @"You can’t connect to this server with a free account.";
+                    if([reason isEqualToString:@"networks"])
+                        reason = @"You've exceeded the connection limit for free accounts.";
+                    else if([reason isEqualToString:@"passworded_servers"])
+                        reason = @"You can't connect to passworded servers with free accounts.";
+                    else if([reason isEqualToString:@"unverified"])
+                        reason = @"You can’t connect to external servers until you confirm your email address.";
+                    else
+                        reason = @"You can’t connect to this server with a free account.";
+                    _serverStatus.text = reason;
                 } else if([type isEqualToString:@"connection_blocked"]) {
                     _serverStatus.text = @"Disconnected - Connections to this server have been blocked";
                 } else {

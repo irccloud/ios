@@ -20,13 +20,17 @@
 
 @interface LoginSplashViewController : UIViewController<UITextFieldDelegate> {
     IBOutlet UIImageView *logo;
+    IBOutlet UILabel *IRC;
+    IBOutlet UILabel *Cloud;
     IBOutlet UILabel *version;
     
     IBOutlet UIView *loginView;
+    IBOutlet UITextField *name;
     IBOutlet UITextField *username;
     IBOutlet UITextField *password;
     IBOutlet UITextField *host;
     IBOutlet UIButton *login;
+    IBOutlet UIButton *signup;
     
     IBOutlet UIView *loadingView;
     IBOutlet UILabel *status;
@@ -35,8 +39,10 @@
     IBOutlet UIActivityIndicatorView *activity;
     
     NetworkConnection *_conn;
+    CGSize _kbSize;
 }
 -(void)flyaway;
 -(IBAction)loginButtonPressed:(id)sender;
+-(IBAction)signupButtonPressed:(id)sender;
 -(IBAction)textFieldChanged:(id)sender;
 @end

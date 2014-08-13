@@ -873,6 +873,35 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [[[SBJsonParser alloc] init] objectWithData:data];
 }
 
+-(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token {
+	NSData *data;
+	NSURLResponse *response = nil;
+	NSError *error = nil;
+    
+    CFStringRef realname_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)realname, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    CFStringRef email_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)email, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    CFStringRef password_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)password, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/signup", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    [request setValue:token forHTTPHeaderField:@"x-auth-formtoken"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[[NSString stringWithFormat:@"realname=%@&email=%@&password=%@&token=%@", realname_escaped, email_escaped, password_escaped, token] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    CFRelease(realname_escaped);
+    CFRelease(email_escaped);
+    CFRelease(password_escaped);
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
+    return [[[SBJsonParser alloc] init] objectWithData:data];
+}
+
 //From: http://stackoverflow.com/questions/1305225/best-way-to-serialize-a-nsdata-into-an-hexadeximal-string
 -(NSString *)dataToHex:(NSData *)data {
     /* Returns hexadecimal string of NSData. Empty string if data is empty.   */
