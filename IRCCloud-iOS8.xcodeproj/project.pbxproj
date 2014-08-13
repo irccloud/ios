@@ -28,30 +28,102 @@
 		2200DB4F18BCF9D100343583 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
 		2200DB5118BCFA0E00343583 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
 		22032A6F1884529700BE4A10 /* NickCompletionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22032A6E1884529700BE4A10 /* NickCompletionView.m */; };
+		221034ED197EFBAF00AB414F /* ShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221034EC197EFBAF00AB414F /* ShareViewController.m */; };
+		221034F2197EFBAF00AB414F /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 221034E7197EFBAF00AB414F /* ShareExtension.appex */; };
+		221034F9197EFC0500AB414F /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
+		221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
+		221034FB197EFC0500AB414F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
+		221034FC197EFC0500AB414F /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
+		221034FD197EFC0500AB414F /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
+		221034FE197EFC0500AB414F /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
+		221034FF197EFC0500AB414F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
+		22103500197EFC0500AB414F /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
+		22103501197EFC0500AB414F /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CD16D3DD310029769C /* libicucore.dylib */; };
+		22103502197EFC0500AB414F /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
+		22103503197EFC0500AB414F /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
+		22103504197EFC0500AB414F /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CB16D3DCE20029769C /* Security.framework */; };
+		22103505197EFC0500AB414F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
+		22103506197EFC0500AB414F /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
+		22103507197EFC0500AB414F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
+		22103508197EFC6200AB414F /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
+		22103509197EFC6200AB414F /* ChannelsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60116DBC021007BE535 /* ChannelsDataSource.m */; };
+		2210350A197EFC6200AB414F /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
+		2210350B197EFC6200AB414F /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
+		2210350C197EFC6200AB414F /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		2210350D197EFC6200AB414F /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
+		2210350E197EFC6200AB414F /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
+		2210350F197EFC6200AB414F /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
+		22103510197EFC6200AB414F /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6418CF770D0011DEAB /* NSObject+SBJson.m */; };
+		22103511197EFC6200AB414F /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6718CF770D0011DEAB /* SBJsonParser.m */; };
+		22103512197EFC6200AB414F /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6918CF770D0011DEAB /* SBJsonStreamParser.m */; };
+		22103513197EFC6200AB414F /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6B18CF770D0011DEAB /* SBJsonStreamParserAccumulator.m */; };
+		22103514197EFC6200AB414F /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6D18CF770D0011DEAB /* SBJsonStreamParserAdapter.m */; };
+		22103515197EFC6200AB414F /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6F18CF770D0011DEAB /* SBJsonStreamParserState.m */; };
+		22103516197EFC6200AB414F /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7118CF770D0011DEAB /* SBJsonStreamTokeniser.m */; };
+		22103517197EFC6200AB414F /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7318CF770D0011DEAB /* SBJsonStreamWriter.m */; };
+		22103518197EFC6200AB414F /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7518CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m */; };
+		22103519197EFC6200AB414F /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7718CF770D0011DEAB /* SBJsonStreamWriterState.m */; };
+		2210351A197EFC6200AB414F /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7918CF770D0011DEAB /* SBJsonTokeniser.m */; };
+		2210351B197EFC6200AB414F /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7B18CF770D0011DEAB /* SBJsonUTF8Stream.m */; };
+		2210351C197EFC6200AB414F /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
+		2210351D197EFC6200AB414F /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284C16D831A800498507 /* AsyncSocket.m */; };
+		2210351E197EFC6200AB414F /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
+		2210351F197EFC6200AB414F /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
+		22103520197EFC6200AB414F /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
+		22103521197EFC6200AB414F /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
+		22103522197EFC6200AB414F /* WebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285716D831A800498507 /* WebSocket.m */; };
+		22103523197EFC6200AB414F /* WebSocketConnectConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286116D831A800498507 /* WebSocketConnectConfig.m */; };
+		22103524197EFC6200AB414F /* WebSocketFragment.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286316D831A800498507 /* WebSocketFragment.m */; };
+		22103525197EFC6200AB414F /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
+		22103526197EFCCA00AB414F /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
+		22103527197EFCEB00AB414F /* Logo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */; };
+		22103528197EFCEE00AB414F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95018D0B117007D5022 /* Images.xcassets */; };
+		22103529197EFCF100AB414F /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95318D0B198007D5022 /* Icons.xcassets */; };
+		2210352A197EFE7800AB414F /* BuffersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60516DBCA85007BE535 /* BuffersTableView.m */; };
+		2210352B197EFEF600AB414F /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
+		2210352F197F1AD400AB414F /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
+		2212AF89175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
 		221F0BC5177368B40008EE04 /* CallerIDTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */; };
 		2223C6AA1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
+		2223C6AB1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
 		2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
+		2223C6AD1768D7150032544B /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
 		2223C6B01768F36F0032544B /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */; };
+		2223C6B11768F36F0032544B /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */; };
 		2223C6B61768F4500032544B /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
 		2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		2230F8E817162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
+		2230F8E917162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
 		22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
 		223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
+		2236F5FB16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
+		2236F5FF16DA8928007BE535 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
 		2236F60216DBC021007BE535 /* ChannelsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60116DBC021007BE535 /* ChannelsDataSource.m */; };
+		2236F60316DBC021007BE535 /* ChannelsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60116DBC021007BE535 /* ChannelsDataSource.m */; };
 		2236F60616DBCA85007BE535 /* BuffersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60516DBCA85007BE535 /* BuffersTableView.m */; };
+		2236F60716DBCA85007BE535 /* BuffersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60516DBCA85007BE535 /* BuffersTableView.m */; };
 		2236F60B16DBCBC6007BE535 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60916DBCBC6007BE535 /* MainViewController.m */; };
+		2236F60C16DBCBC6007BE535 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60916DBCBC6007BE535 /* MainViewController.m */; };
 		2236F61016DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */; };
+		2236F61116DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */; };
 		2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
+		2236F63D16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		2236F64216DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
+		2236F64316DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
 		2236F64616DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
+		2236F64716DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
+		2236F64B16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
 		2237E13D16E1214A00CA188F /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
+		2237E13E16E1214A00CA188F /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
 		223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
+		223DA90D16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		224027ED17020290008940B1 /* LoginSplashViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 224027EC1702028F008940B1 /* LoginSplashViewController_iPad.xib */; };
+		224027EE17020290008940B1 /* LoginSplashViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 224027EC1702028F008940B1 /* LoginSplashViewController_iPad.xib */; };
 		22462B5218906B03009EF986 /* ServerReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22462B5118906B03009EF986 /* ServerReorderViewController.m */; };
 		2248DF3916EE375D0086BB42 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
 		224FCF331787286000FC3879 /* licenses.txt in Resources */ = {isa = PBXBuildFile; fileRef = 224FCF321787286000FC3879 /* licenses.txt */; };
@@ -156,8 +228,22 @@
 		2264A30119659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
 		2264A30219659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
 		22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
+		22695F5616E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
+		2274F4A01756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
+		227EA7BE17F0BE9A001E5E53 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
+		227EA7BF17F0BE9A001E5E53 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
+		227EA7C017F0BE9A001E5E53 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
+		227EA7C117F0BE9A001E5E53 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
+		227EA7C217F0BE9A001E5E53 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
+		227EA7C317F0BE9A001E5E53 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CD16D3DD310029769C /* libicucore.dylib */; };
+		227EA7C417F0BE9A001E5E53 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
+		227EA7C517F0BE9A001E5E53 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
+		227EA7C617F0BE9A001E5E53 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CB16D3DCE20029769C /* Security.framework */; };
+		227EA7C717F0BE9A001E5E53 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
+		227EA7C817F0BE9A001E5E53 /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
 		227FF2A116FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
+		227FF2A216FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		227FF8231772063F00394114 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF8221772063F00394114 /* SettingsViewController.m */; };
 		2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
@@ -165,6 +251,10 @@
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
 		228A057A16D3DABA0029769C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 228A057816D3DABA0029769C /* InfoPlist.strings */; };
 		228A057C16D3DABA0029769C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A057B16D3DABA0029769C /* main.m */; };
+		228A059816D3DABB0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
+		228A059916D3DABB0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
+		228A05A116D3DABB0029769C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 228A059F16D3DABB0029769C /* InfoPlist.strings */; };
+		228A05A416D3DABB0029769C /* IRCCloudTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05A316D3DABB0029769C /* IRCCloudTests.m */; };
 		228A05B216D3DB7B0029769C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05AF16D3DB7B0029769C /* AppDelegate.m */; };
 		228A05CA16D3DCB60029769C /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
 		228A05CF16D3DD540029769C /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CD16D3DD310029769C /* libicucore.dylib */; };
@@ -174,30 +264,43 @@
 		228A05DE16D3E40F0029769C /* LoginSplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05DC16D3E40E0029769C /* LoginSplashViewController.m */; };
 		228A05DF16D3E40F0029769C /* LoginSplashViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */; };
 		228E2B7E18CF770D0011DEAB /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6418CF770D0011DEAB /* NSObject+SBJson.m */; };
+		228E2B7F18CF770D0011DEAB /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6418CF770D0011DEAB /* NSObject+SBJson.m */; };
 		228E2B8018CF770D0011DEAB /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6418CF770D0011DEAB /* NSObject+SBJson.m */; };
 		228E2B8118CF770D0011DEAB /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6718CF770D0011DEAB /* SBJsonParser.m */; };
+		228E2B8218CF770D0011DEAB /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6718CF770D0011DEAB /* SBJsonParser.m */; };
 		228E2B8318CF770D0011DEAB /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6718CF770D0011DEAB /* SBJsonParser.m */; };
 		228E2B8418CF770D0011DEAB /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6918CF770D0011DEAB /* SBJsonStreamParser.m */; };
+		228E2B8518CF770D0011DEAB /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6918CF770D0011DEAB /* SBJsonStreamParser.m */; };
 		228E2B8618CF770D0011DEAB /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6918CF770D0011DEAB /* SBJsonStreamParser.m */; };
 		228E2B8718CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6B18CF770D0011DEAB /* SBJsonStreamParserAccumulator.m */; };
+		228E2B8818CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6B18CF770D0011DEAB /* SBJsonStreamParserAccumulator.m */; };
 		228E2B8918CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6B18CF770D0011DEAB /* SBJsonStreamParserAccumulator.m */; };
 		228E2B8A18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6D18CF770D0011DEAB /* SBJsonStreamParserAdapter.m */; };
+		228E2B8B18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6D18CF770D0011DEAB /* SBJsonStreamParserAdapter.m */; };
 		228E2B8C18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6D18CF770D0011DEAB /* SBJsonStreamParserAdapter.m */; };
 		228E2B8D18CF770D0011DEAB /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6F18CF770D0011DEAB /* SBJsonStreamParserState.m */; };
+		228E2B8E18CF770D0011DEAB /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6F18CF770D0011DEAB /* SBJsonStreamParserState.m */; };
 		228E2B8F18CF770D0011DEAB /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6F18CF770D0011DEAB /* SBJsonStreamParserState.m */; };
 		228E2B9018CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7118CF770D0011DEAB /* SBJsonStreamTokeniser.m */; };
+		228E2B9118CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7118CF770D0011DEAB /* SBJsonStreamTokeniser.m */; };
 		228E2B9218CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7118CF770D0011DEAB /* SBJsonStreamTokeniser.m */; };
 		228E2B9318CF770D0011DEAB /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7318CF770D0011DEAB /* SBJsonStreamWriter.m */; };
+		228E2B9418CF770D0011DEAB /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7318CF770D0011DEAB /* SBJsonStreamWriter.m */; };
 		228E2B9518CF770D0011DEAB /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7318CF770D0011DEAB /* SBJsonStreamWriter.m */; };
 		228E2B9618CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7518CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m */; };
+		228E2B9718CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7518CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m */; };
 		228E2B9818CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7518CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m */; };
 		228E2B9918CF770D0011DEAB /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7718CF770D0011DEAB /* SBJsonStreamWriterState.m */; };
+		228E2B9A18CF770D0011DEAB /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7718CF770D0011DEAB /* SBJsonStreamWriterState.m */; };
 		228E2B9B18CF770D0011DEAB /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7718CF770D0011DEAB /* SBJsonStreamWriterState.m */; };
 		228E2B9C18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7918CF770D0011DEAB /* SBJsonTokeniser.m */; };
+		228E2B9D18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7918CF770D0011DEAB /* SBJsonTokeniser.m */; };
 		228E2B9E18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7918CF770D0011DEAB /* SBJsonTokeniser.m */; };
 		228E2B9F18CF770D0011DEAB /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7B18CF770D0011DEAB /* SBJsonUTF8Stream.m */; };
+		228E2BA018CF770D0011DEAB /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7B18CF770D0011DEAB /* SBJsonUTF8Stream.m */; };
 		228E2BA118CF770D0011DEAB /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7B18CF770D0011DEAB /* SBJsonUTF8Stream.m */; };
 		228E2BA218CF770D0011DEAB /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
+		228E2BA318CF770D0011DEAB /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
 		228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
 		228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */; };
 		2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
@@ -207,34 +310,136 @@
 		22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F28178A3F3500529CDA /* NamesListTableViewController.m */; };
 		22AD75ED1718567D00141257 /* BansTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* BansTableViewController.m */; };
 		22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
+		22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B15CFB17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF817301BAF0075EBA7 /* ECSlidingViewController.m */; };
+		22B15CFC17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF817301BAF0075EBA7 /* ECSlidingViewController.m */; };
 		22B15CFD17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */; };
+		22B15CFE17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */; };
 		22B4284816D7E36300498507 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
+		22B4284916D7E36300498507 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		22B4286616D831A800498507 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284C16D831A800498507 /* AsyncSocket.m */; };
+		22B4286716D831A800498507 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284C16D831A800498507 /* AsyncSocket.m */; };
 		22B4286816D831A800498507 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
+		22B4286916D831A800498507 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
+		22B4286B16D831A800498507 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		22B4286C16D831A800498507 /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
+		22B4286D16D831A800498507 /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
 		22B4286E16D831A800498507 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
+		22B4286F16D831A800498507 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
 		22B4287016D831A800498507 /* WebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285716D831A800498507 /* WebSocket.m */; };
+		22B4287116D831A800498507 /* WebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285716D831A800498507 /* WebSocket.m */; };
 		22B4287A16D831A800498507 /* WebSocketConnectConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286116D831A800498507 /* WebSocketConnectConfig.m */; };
+		22B4287B16D831A800498507 /* WebSocketConnectConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286116D831A800498507 /* WebSocketConnectConfig.m */; };
 		22B4287C16D831A800498507 /* WebSocketFragment.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286316D831A800498507 /* WebSocketFragment.m */; };
+		22B4287D16D831A800498507 /* WebSocketFragment.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286316D831A800498507 /* WebSocketFragment.m */; };
 		22B4287E16D831A800498507 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
+		22B4287F16D831A800498507 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
 		22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
+		22D430A1171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A31725AAEA003C0684 /* UIExpandingTextView.m */; };
+		22D430A71725AAEA003C0684 /* UIExpandingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A31725AAEA003C0684 /* UIExpandingTextView.m */; };
 		22D430A81725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A51725AAEA003C0684 /* UIExpandingTextViewInternal.m */; };
+		22D430A91725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A51725AAEA003C0684 /* UIExpandingTextViewInternal.m */; };
 		22D4F9121743F3790095EE8F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22D4F9101743F3790095EE8F /* Localizable.strings */; };
+		22D4F9131743F3790095EE8F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22D4F9101743F3790095EE8F /* Localizable.strings */; };
+		22DB24FC1982DF2B0008728E /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
+		22DB24FD1982DF2B0008728E /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
+		22DB24FE1982DF2B0008728E /* BuffersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60516DBCA85007BE535 /* BuffersTableView.m */; };
+		22DB24FF1982DF2B0008728E /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
+		22DB25001982DF2B0008728E /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
+		22DB25011982DF2B0008728E /* ChannelsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60116DBC021007BE535 /* ChannelsDataSource.m */; };
+		22DB25021982DF2B0008728E /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
+		22DB25031982DF2B0008728E /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
+		22DB25041982DF2B0008728E /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		22DB25051982DF2B0008728E /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
+		22DB25061982DF2B0008728E /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
+		22DB25071982DF2B0008728E /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
+		22DB25081982DF2B0008728E /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6418CF770D0011DEAB /* NSObject+SBJson.m */; };
+		22DB25091982DF2B0008728E /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6718CF770D0011DEAB /* SBJsonParser.m */; };
+		22DB250A1982DF2B0008728E /* SBJsonStreamParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6918CF770D0011DEAB /* SBJsonStreamParser.m */; };
+		22DB250B1982DF2B0008728E /* SBJsonStreamParserAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6B18CF770D0011DEAB /* SBJsonStreamParserAccumulator.m */; };
+		22DB250C1982DF2B0008728E /* SBJsonStreamParserAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6D18CF770D0011DEAB /* SBJsonStreamParserAdapter.m */; };
+		22DB250D1982DF2B0008728E /* SBJsonStreamParserState.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6F18CF770D0011DEAB /* SBJsonStreamParserState.m */; };
+		22DB250E1982DF2B0008728E /* SBJsonStreamTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7118CF770D0011DEAB /* SBJsonStreamTokeniser.m */; };
+		22DB250F1982DF2B0008728E /* SBJsonStreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7318CF770D0011DEAB /* SBJsonStreamWriter.m */; };
+		22DB25101982DF2B0008728E /* SBJsonStreamWriterAccumulator.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7518CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m */; };
+		22DB25111982DF2B0008728E /* SBJsonStreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7718CF770D0011DEAB /* SBJsonStreamWriterState.m */; };
+		22DB25121982DF2B0008728E /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7918CF770D0011DEAB /* SBJsonTokeniser.m */; };
+		22DB25131982DF2B0008728E /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7B18CF770D0011DEAB /* SBJsonUTF8Stream.m */; };
+		22DB25141982DF2B0008728E /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
+		22DB25151982DF2B0008728E /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284C16D831A800498507 /* AsyncSocket.m */; };
+		22DB25161982DF2B0008728E /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
+		22DB25171982DF2B0008728E /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
+		22DB25181982DF2B0008728E /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
+		22DB25191982DF2B0008728E /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
+		22DB251A1982DF2B0008728E /* WebSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285716D831A800498507 /* WebSocket.m */; };
+		22DB251B1982DF2B0008728E /* WebSocketConnectConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286116D831A800498507 /* WebSocketConnectConfig.m */; };
+		22DB251C1982DF2B0008728E /* WebSocketFragment.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286316D831A800498507 /* WebSocketFragment.m */; };
+		22DB251D1982DF2B0008728E /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
+		22DB251E1982DF2B0008728E /* ShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221034EC197EFBAF00AB414F /* ShareViewController.m */; };
+		22DB25201982DF2B0008728E /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
+		22DB25211982DF2B0008728E /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
+		22DB25221982DF2B0008728E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
+		22DB25231982DF2B0008728E /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
+		22DB25241982DF2B0008728E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
+		22DB25251982DF2B0008728E /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
+		22DB25261982DF2B0008728E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
+		22DB25271982DF2B0008728E /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
+		22DB25281982DF2B0008728E /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CD16D3DD310029769C /* libicucore.dylib */; };
+		22DB25291982DF2B0008728E /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
+		22DB252A1982DF2B0008728E /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
+		22DB252B1982DF2B0008728E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CB16D3DCE20029769C /* Security.framework */; };
+		22DB252C1982DF2B0008728E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
+		22DB252D1982DF2B0008728E /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
+		22DB252E1982DF2B0008728E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
+		22DB25301982DF2B0008728E /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95318D0B198007D5022 /* Icons.xcassets */; };
+		22DB25391982DFFB0008728E /* ShareExtension Enterprise.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 22DB25371982DF2B0008728E /* ShareExtension Enterprise.appex */; };
+		22DB253F1982E3100008728E /* EnterpriseLogo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */; };
+		22DB25401982E3130008728E /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */; };
 		22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
 		22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
 		22EEA94E18D0AC08007D5022 /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */; };
+		22EEA94F18D0AC4D007D5022 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
 		22EEA95118D0B117007D5022 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95018D0B117007D5022 /* Images.xcassets */; };
 		22EEA95418D0B198007D5022 /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95318D0B198007D5022 /* Icons.xcassets */; };
 		22EEA95518D0B198007D5022 /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95318D0B198007D5022 /* Icons.xcassets */; };
 		22F5C4BD1791F205005E09A9 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
 		22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
+		22F9EE1D16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		221034F0197EFBAF00AB414F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 221034E6197EFBAF00AB414F;
+			remoteInfo = ShareExtension;
+		};
+		221034F3197EFBAF00AB414F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 221034E6197EFBAF00AB414F;
+			remoteInfo = ShareExtension;
+		};
+		228A059A16D3DABB0029769C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 228A056B16D3DABA0029769C;
+			remoteInfo = IRCCloud;
+		};
+		22DB253A1982DFFB0008728E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22DB24FA1982DF2B0008728E;
+			remoteInfo = "ShareExtension Enterprise";
+		};
 		22DE05B618D8CA4800590FC3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 228A056416D3DABA0029769C /* Project object */;
@@ -258,6 +463,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				221034F2197EFBAF00AB414F /* ShareExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -268,6 +474,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				22DB25391982DFFB0008728E /* ShareExtension Enterprise.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -282,6 +489,10 @@
 		2200DB4D18B81BEB00343583 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		22032A6D1884529700BE4A10 /* NickCompletionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NickCompletionView.h; sourceTree = "<group>"; };
 		22032A6E1884529700BE4A10 /* NickCompletionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NickCompletionView.m; sourceTree = "<group>"; };
+		221034E7197EFBAF00AB414F /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		221034EA197EFBAF00AB414F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		221034EB197EFBAF00AB414F /* ShareViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShareViewController.h; sourceTree = "<group>"; };
+		221034EC197EFBAF00AB414F /* ShareViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShareViewController.m; sourceTree = "<group>"; };
 		2212AF86175F82F900D08C7F /* ChannelInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelInfoViewController.h; sourceTree = "<group>"; };
 		2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelInfoViewController.m; sourceTree = "<group>"; };
 		221F0BC3177368A20008EE04 /* CallerIDTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CallerIDTableViewController.h; sourceTree = "<group>"; };
@@ -364,6 +575,7 @@
 		228A057916D3DABA0029769C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		228A057B16D3DABA0029769C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		228A057D16D3DABA0029769C /* IRCCloud-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IRCCloud-Prefix.pch"; sourceTree = "<group>"; };
+		228A059516D3DABB0029769C /* IRCCloudTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IRCCloudTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A059E16D3DABB0029769C /* IRCCloudTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "IRCCloudTests-Info.plist"; sourceTree = "<group>"; };
 		228A05A016D3DABB0029769C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		228A05A216D3DABB0029769C /* IRCCloudTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IRCCloudTests.h; sourceTree = "<group>"; };
@@ -410,6 +622,7 @@
 		228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayOptionsViewController.m; sourceTree = "<group>"; };
 		2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURL+IDN.m"; path = "NSURL+IDN/NSURL+IDN.m"; sourceTree = SOURCE_ROOT; };
 		2293AF0017F9CCD10022BD06 /* NSURL+IDN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+IDN.h"; path = "NSURL+IDN/NSURL+IDN.h"; sourceTree = SOURCE_ROOT; };
+		2296E0B619805751002D59E3 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareExtension.entitlements; sourceTree = "<group>"; };
 		2296E0B719805767002D59E3 /* IRCCloud.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = IRCCloud.entitlements; sourceTree = "<group>"; };
 		22A19C5E178FCCAB00772C60 /* UINavigationController+iPadSux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+iPadSux.h"; sourceTree = "<group>"; };
 		22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+iPadSux.m"; sourceTree = "<group>"; };
@@ -450,6 +663,7 @@
 		22B4286516D831A800498507 /* WebSocketMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebSocketMessage.m; sourceTree = "<group>"; };
 		22B4288416D846BF00498507 /* IRCCloudJSONObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudJSONObject.h; sourceTree = "<group>"; };
 		22B4288516D846BF00498507 /* IRCCloudJSONObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudJSONObject.m; sourceTree = "<group>"; };
+		22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "ShareExtension Enterprise.entitlements"; sourceTree = "<group>"; };
 		22D4309E171C663A003C0684 /* IgnoresTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IgnoresTableViewController.h; sourceTree = "<group>"; };
 		22D4309F171C663A003C0684 /* IgnoresTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IgnoresTableViewController.m; sourceTree = "<group>"; };
 		22D430A21725AAE9003C0684 /* UIExpandingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIExpandingTextView.h; sourceTree = "<group>"; };
@@ -457,6 +671,8 @@
 		22D430A41725AAEA003C0684 /* UIExpandingTextViewInternal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIExpandingTextViewInternal.h; sourceTree = "<group>"; };
 		22D430A51725AAEA003C0684 /* UIExpandingTextViewInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIExpandingTextViewInternal.m; sourceTree = "<group>"; };
 		22D4F9111743F3790095EE8F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		22DB24F91982DF070008728E /* Info-Enterprise.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Enterprise.plist"; sourceTree = "<group>"; };
+		22DB25371982DF2B0008728E /* ShareExtension Enterprise.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "ShareExtension Enterprise.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22DB253D1982E2890008728E /* IRCEnterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = IRCEnterprise.entitlements; path = ../IRCEnterprise.entitlements; sourceTree = "<group>"; };
 		22E442A3192AB85B00A6C687 /* ImgurLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImgurLoginViewController.h; sourceTree = "<group>"; };
 		22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImgurLoginViewController.m; sourceTree = "<group>"; };
@@ -469,6 +685,28 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		221034E4197EFBAF00AB414F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				221034F9197EFC0500AB414F /* Crashlytics.framework in Frameworks */,
+				221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */,
+				221034FB197EFC0500AB414F /* AudioToolbox.framework in Frameworks */,
+				221034FC197EFC0500AB414F /* CFNetwork.framework in Frameworks */,
+				221034FD197EFC0500AB414F /* CoreGraphics.framework in Frameworks */,
+				221034FE197EFC0500AB414F /* CoreText.framework in Frameworks */,
+				221034FF197EFC0500AB414F /* Foundation.framework in Frameworks */,
+				22103500197EFC0500AB414F /* ImageIO.framework in Frameworks */,
+				22103501197EFC0500AB414F /* libicucore.dylib in Frameworks */,
+				22103502197EFC0500AB414F /* libz.dylib in Frameworks */,
+				22103503197EFC0500AB414F /* MobileCoreServices.framework in Frameworks */,
+				22103504197EFC0500AB414F /* Security.framework in Frameworks */,
+				22103505197EFC0500AB414F /* SystemConfiguration.framework in Frameworks */,
+				22103506197EFC0500AB414F /* Twitter.framework in Frameworks */,
+				22103507197EFC0500AB414F /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		225D977818AA995900065087 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -513,9 +751,72 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		228A059116D3DABB0029769C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22EEA94F18D0AC4D007D5022 /* Crashlytics.framework in Frameworks */,
+				227EA7BE17F0BE9A001E5E53 /* AudioToolbox.framework in Frameworks */,
+				227EA7BF17F0BE9A001E5E53 /* CFNetwork.framework in Frameworks */,
+				227EA7C017F0BE9A001E5E53 /* CoreGraphics.framework in Frameworks */,
+				227EA7C117F0BE9A001E5E53 /* CoreText.framework in Frameworks */,
+				227EA7C217F0BE9A001E5E53 /* ImageIO.framework in Frameworks */,
+				227EA7C317F0BE9A001E5E53 /* libicucore.dylib in Frameworks */,
+				227EA7C417F0BE9A001E5E53 /* libz.dylib in Frameworks */,
+				227EA7C517F0BE9A001E5E53 /* MobileCoreServices.framework in Frameworks */,
+				227EA7C617F0BE9A001E5E53 /* Security.framework in Frameworks */,
+				227EA7C717F0BE9A001E5E53 /* SystemConfiguration.framework in Frameworks */,
+				227EA7C817F0BE9A001E5E53 /* Twitter.framework in Frameworks */,
+				228A059816D3DABB0029769C /* UIKit.framework in Frameworks */,
+				228A059916D3DABB0029769C /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22DB251F1982DF2B0008728E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22DB25201982DF2B0008728E /* Crashlytics.framework in Frameworks */,
+				22DB25211982DF2B0008728E /* QuartzCore.framework in Frameworks */,
+				22DB25221982DF2B0008728E /* AudioToolbox.framework in Frameworks */,
+				22DB25231982DF2B0008728E /* CFNetwork.framework in Frameworks */,
+				22DB25241982DF2B0008728E /* CoreGraphics.framework in Frameworks */,
+				22DB25251982DF2B0008728E /* CoreText.framework in Frameworks */,
+				22DB25261982DF2B0008728E /* Foundation.framework in Frameworks */,
+				22DB25271982DF2B0008728E /* ImageIO.framework in Frameworks */,
+				22DB25281982DF2B0008728E /* libicucore.dylib in Frameworks */,
+				22DB25291982DF2B0008728E /* libz.dylib in Frameworks */,
+				22DB252A1982DF2B0008728E /* MobileCoreServices.framework in Frameworks */,
+				22DB252B1982DF2B0008728E /* Security.framework in Frameworks */,
+				22DB252C1982DF2B0008728E /* SystemConfiguration.framework in Frameworks */,
+				22DB252D1982DF2B0008728E /* Twitter.framework in Frameworks */,
+				22DB252E1982DF2B0008728E /* UIKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		221034E8197EFBAF00AB414F /* ShareExtension */ = {
+			isa = PBXGroup;
+			children = (
+				2296E0B619805751002D59E3 /* ShareExtension.entitlements */,
+				221034EB197EFBAF00AB414F /* ShareViewController.h */,
+				221034EC197EFBAF00AB414F /* ShareViewController.m */,
+				221034E9197EFBAF00AB414F /* Supporting Files */,
+			);
+			path = ShareExtension;
+			sourceTree = "<group>";
+		};
+		221034E9197EFBAF00AB414F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				22DB24F91982DF070008728E /* Info-Enterprise.plist */,
+				221034EA197EFBAF00AB414F /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		225017411783434800066E71 /* ARChromeActivity */ = {
 			isa = PBXGroup;
 			children = (
@@ -546,8 +847,10 @@
 		228A056316D3DABA0029769C = {
 			isa = PBXGroup;
 			children = (
+				22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */,
 				228A057516D3DABA0029769C /* IRCCloud */,
 				228A059C16D3DABB0029769C /* IRCCloudTests */,
+				221034E8197EFBAF00AB414F /* ShareExtension */,
 				228A056E16D3DABA0029769C /* Frameworks */,
 				228A056D16D3DABA0029769C /* Products */,
 			);
@@ -557,7 +860,10 @@
 			isa = PBXGroup;
 			children = (
 				228A056C16D3DABA0029769C /* IRCCloud.app */,
+				228A059516D3DABB0029769C /* IRCCloudTests.octest */,
 				225D979F18AA995900065087 /* IRCEnterprise.app */,
+				221034E7197EFBAF00AB414F /* ShareExtension.appex */,
+				22DB25371982DF2B0008728E /* ShareExtension Enterprise.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -828,6 +1134,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		221034E6197EFBAF00AB414F /* ShareExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 221034F5197EFBAF00AB414F /* Build configuration list for PBXNativeTarget "ShareExtension" */;
+			buildPhases = (
+				221034E3197EFBAF00AB414F /* Sources */,
+				221034E4197EFBAF00AB414F /* Frameworks */,
+				221034E5197EFBAF00AB414F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ShareExtension;
+			productName = ShareExtension;
+			productReference = 221034E7197EFBAF00AB414F /* ShareExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		225D973618AA995900065087 /* IRCCloud Enterprise */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 225D979C18AA995900065087 /* Build configuration list for PBXNativeTarget "IRCCloud Enterprise" */;
@@ -842,6 +1165,7 @@
 			);
 			dependencies = (
 				22DE05B918D8CA4F00590FC3 /* PBXTargetDependency */,
+				22DB253B1982DFFB0008728E /* PBXTargetDependency */,
 			);
 			name = "IRCCloud Enterprise";
 			productName = IRCCloud;
@@ -862,11 +1186,49 @@
 			);
 			dependencies = (
 				22DE05B718D8CA4800590FC3 /* PBXTargetDependency */,
+				221034F1197EFBAF00AB414F /* PBXTargetDependency */,
+				221034F4197EFBAF00AB414F /* PBXTargetDependency */,
 			);
 			name = IRCCloud;
 			productName = IRCCloud;
 			productReference = 228A056C16D3DABA0029769C /* IRCCloud.app */;
 			productType = "com.apple.product-type.application";
+		};
+		228A059416D3DABB0029769C /* IRCCloudTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 228A05AA16D3DABB0029769C /* Build configuration list for PBXNativeTarget "IRCCloudTests" */;
+			buildPhases = (
+				228A059016D3DABB0029769C /* Sources */,
+				228A059116D3DABB0029769C /* Frameworks */,
+				228A059216D3DABB0029769C /* Resources */,
+				228A059316D3DABB0029769C /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				228A059B16D3DABB0029769C /* PBXTargetDependency */,
+			);
+			name = IRCCloudTests;
+			productName = IRCCloudTests;
+			productReference = 228A059516D3DABB0029769C /* IRCCloudTests.octest */;
+			productType = "com.apple.product-type.bundle.ocunit-test";
+		};
+		22DB24FA1982DF2B0008728E /* ShareExtension Enterprise */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 22DB25331982DF2B0008728E /* Build configuration list for PBXNativeTarget "ShareExtension Enterprise" */;
+			buildPhases = (
+				22DB24FB1982DF2B0008728E /* Sources */,
+				22DB251F1982DF2B0008728E /* Frameworks */,
+				22DB252F1982DF2B0008728E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "ShareExtension Enterprise";
+			productName = ShareExtension;
+			productReference = 22DB25371982DF2B0008728E /* ShareExtension Enterprise.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -878,6 +1240,21 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "IRCCloud, Ltd.";
 				TargetAttributes = {
+					221034E6197EFBAF00AB414F = {
+						CreatedOnToolsVersion = 6.0;
+						DevelopmentTeam = GED45EQAGA;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+							com.apple.Keychain = {
+								enabled = 1;
+							};
+						};
+					};
 					225D973618AA995900065087 = {
 						DevelopmentTeam = GED45EQAGA;
 						SystemCapabilities = {
@@ -906,9 +1283,20 @@
 							};
 						};
 					};
+					22DB24FA1982DF2B0008728E = {
+						DevelopmentTeam = GED45EQAGA;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+							com.apple.Keychain = {
+								enabled = 1;
+							};
+						};
+					};
 				};
 			};
-			buildConfigurationList = 228A056716D3DABA0029769C /* Build configuration list for PBXProject "IRCCloud" */;
+			buildConfigurationList = 228A056716D3DABA0029769C /* Build configuration list for PBXProject "IRCCloud-iOS8" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -939,13 +1327,26 @@
 			projectRoot = "";
 			targets = (
 				228A056B16D3DABA0029769C /* IRCCloud */,
+				228A059416D3DABB0029769C /* IRCCloudTests */,
 				225D973618AA995900065087 /* IRCCloud Enterprise */,
 				22DE05B118D8CA0700590FC3 /* GitRevision */,
+				221034E6197EFBAF00AB414F /* ShareExtension */,
+				22DB24FA1982DF2B0008728E /* ShareExtension Enterprise */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		221034E5197EFBAF00AB414F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22103529197EFCF100AB414F /* Icons.xcassets in Resources */,
+				22103527197EFCEB00AB414F /* Logo.xcassets in Resources */,
+				22103528197EFCEE00AB414F /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		225D978718AA995900065087 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1001,6 +1402,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		228A059216D3DABB0029769C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				228A05A116D3DABB0029769C /* InfoPlist.strings in Resources */,
+				2236F61116DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */,
+				2236F64316DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */,
+				224027EE17020290008940B1 /* LoginSplashViewController_iPad.xib in Resources */,
+				22D4F9131743F3790095EE8F /* Localizable.strings in Resources */,
+				2223C6AD1768D7150032544B /* ImageViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22DB252F1982DF2B0008728E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22DB25301982DF2B0008728E /* Icons.xcassets in Resources */,
+				22DB25401982E3130008728E /* EnterpriseImages.xcassets in Resources */,
+				22DB253F1982E3100008728E /* EnterpriseLogo.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -1030,6 +1454,19 @@
 			shellPath = /bin/sh;
 			shellScript = "CRASHLYTICS_TOKEN=`grep CRASHLYTICS_TOKEN $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nCRASHLYTICS_SECRET=`grep CRASHLYTICS_SECRET $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nif [ -n \"$CRASHLYTICS_TOKEN\" ]; then ./Crashlytics.framework/run $CRASHLYTICS_TOKEN $CRASHLYTICS_SECRET; fi";
 		};
+		228A059316D3DABB0029769C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
 		22DE05B518D8CA2C00590FC3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1046,6 +1483,48 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		221034E3197EFBAF00AB414F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2210352F197F1AD400AB414F /* UIColor+IRCCloud.m in Sources */,
+				2210352B197EFEF600AB414F /* HighlightsCountView.m in Sources */,
+				2210352A197EFE7800AB414F /* BuffersTableView.m in Sources */,
+				22103526197EFCCA00AB414F /* Ignore.m in Sources */,
+				22103508197EFC6200AB414F /* BuffersDataSource.m in Sources */,
+				22103509197EFC6200AB414F /* ChannelsDataSource.m in Sources */,
+				2210350A197EFC6200AB414F /* EventsDataSource.m in Sources */,
+				2210350B197EFC6200AB414F /* ImageUploader.m in Sources */,
+				2210350C197EFC6200AB414F /* IRCCloudJSONObject.m in Sources */,
+				2210350D197EFC6200AB414F /* NetworkConnection.m in Sources */,
+				2210350E197EFC6200AB414F /* ServersDataSource.m in Sources */,
+				2210350F197EFC6200AB414F /* UsersDataSource.m in Sources */,
+				22103510197EFC6200AB414F /* NSObject+SBJson.m in Sources */,
+				22103511197EFC6200AB414F /* SBJsonParser.m in Sources */,
+				22103512197EFC6200AB414F /* SBJsonStreamParser.m in Sources */,
+				22103513197EFC6200AB414F /* SBJsonStreamParserAccumulator.m in Sources */,
+				22103514197EFC6200AB414F /* SBJsonStreamParserAdapter.m in Sources */,
+				22103515197EFC6200AB414F /* SBJsonStreamParserState.m in Sources */,
+				22103516197EFC6200AB414F /* SBJsonStreamTokeniser.m in Sources */,
+				22103517197EFC6200AB414F /* SBJsonStreamWriter.m in Sources */,
+				22103518197EFC6200AB414F /* SBJsonStreamWriterAccumulator.m in Sources */,
+				22103519197EFC6200AB414F /* SBJsonStreamWriterState.m in Sources */,
+				2210351A197EFC6200AB414F /* SBJsonTokeniser.m in Sources */,
+				2210351B197EFC6200AB414F /* SBJsonUTF8Stream.m in Sources */,
+				2210351C197EFC6200AB414F /* SBJsonWriter.m in Sources */,
+				2210351D197EFC6200AB414F /* AsyncSocket.m in Sources */,
+				2210351E197EFC6200AB414F /* GCDAsyncSocket.m in Sources */,
+				2210351F197EFC6200AB414F /* HandshakeHeader.m in Sources */,
+				22103520197EFC6200AB414F /* MutableQueue.m in Sources */,
+				22103521197EFC6200AB414F /* NSData+Base64.m in Sources */,
+				22103522197EFC6200AB414F /* WebSocket.m in Sources */,
+				22103523197EFC6200AB414F /* WebSocketConnectConfig.m in Sources */,
+				22103524197EFC6200AB414F /* WebSocketFragment.m in Sources */,
+				22103525197EFC6200AB414F /* WebSocketMessage.m in Sources */,
+				221034ED197EFBAF00AB414F /* ShareViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		225D973718AA995900065087 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1200,9 +1679,127 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		228A059016D3DABB0029769C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				228E2B8518CF770D0011DEAB /* SBJsonStreamParser.m in Sources */,
+				228A05A416D3DABB0029769C /* IRCCloudTests.m in Sources */,
+				22B4284916D7E36300498507 /* NetworkConnection.m in Sources */,
+				22B4286716D831A800498507 /* AsyncSocket.m in Sources */,
+				22B4286916D831A800498507 /* GCDAsyncSocket.m in Sources */,
+				22B4286B16D831A800498507 /* HandshakeHeader.m in Sources */,
+				22B4286D16D831A800498507 /* MutableQueue.m in Sources */,
+				22B4286F16D831A800498507 /* NSData+Base64.m in Sources */,
+				228E2B8218CF770D0011DEAB /* SBJsonParser.m in Sources */,
+				228E2B8E18CF770D0011DEAB /* SBJsonStreamParserState.m in Sources */,
+				22B4287116D831A800498507 /* WebSocket.m in Sources */,
+				228E2B9A18CF770D0011DEAB /* SBJsonStreamWriterState.m in Sources */,
+				228E2B8818CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */,
+				228E2B7F18CF770D0011DEAB /* NSObject+SBJson.m in Sources */,
+				22B4287B16D831A800498507 /* WebSocketConnectConfig.m in Sources */,
+				22B4287D16D831A800498507 /* WebSocketFragment.m in Sources */,
+				22B4287F16D831A800498507 /* WebSocketMessage.m in Sources */,
+				22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */,
+				2236F5FB16DA765C007BE535 /* ServersDataSource.m in Sources */,
+				2236F5FF16DA8928007BE535 /* BuffersDataSource.m in Sources */,
+				2236F60316DBC021007BE535 /* ChannelsDataSource.m in Sources */,
+				2236F60716DBCA85007BE535 /* BuffersTableView.m in Sources */,
+				2236F60C16DBCBC6007BE535 /* MainViewController.m in Sources */,
+				2236F63D16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */,
+				228E2B8B18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */,
+				2236F64716DD138C007BE535 /* UsersDataSource.m in Sources */,
+				2236F64B16DD30E5007BE535 /* UsersTableView.m in Sources */,
+				228E2B9718CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m in Sources */,
+				228E2BA318CF770D0011DEAB /* SBJsonWriter.m in Sources */,
+				22F9EE1D16DE6F21004615C0 /* EventsDataSource.m in Sources */,
+				223DA90D16DFC626006FF808 /* EventsTableView.m in Sources */,
+				2237E13E16E1214A00CA188F /* ColorFormatter.m in Sources */,
+				22695F5616E8FC9900E01DF8 /* CollapsedEvents.m in Sources */,
+				227FF2A216FA128B00DBE3C5 /* HighlightsCountView.m in Sources */,
+				228E2B9418CF770D0011DEAB /* SBJsonStreamWriter.m in Sources */,
+				2230F8E917162ACD007F7C98 /* Ignore.m in Sources */,
+				22D430A1171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
+				22D430A71725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
+				22D430A91725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
+				228E2B9D18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */,
+				22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
+				22B15CFC17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,
+				22B15CFE17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
+				2274F4A01756723F0039B4CB /* OpenInChromeController.m in Sources */,
+				2212AF89175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
+				2223C6AB1768D7150032544B /* ImageViewController.m in Sources */,
+				2223C6B11768F36F0032544B /* UIImage+animatedGIF.m in Sources */,
+				228E2B9118CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
+				228E2BA018CF770D0011DEAB /* SBJsonUTF8Stream.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		22DB24FB1982DF2B0008728E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				22DB24FC1982DF2B0008728E /* UIColor+IRCCloud.m in Sources */,
+				22DB24FD1982DF2B0008728E /* HighlightsCountView.m in Sources */,
+				22DB24FE1982DF2B0008728E /* BuffersTableView.m in Sources */,
+				22DB24FF1982DF2B0008728E /* Ignore.m in Sources */,
+				22DB25001982DF2B0008728E /* BuffersDataSource.m in Sources */,
+				22DB25011982DF2B0008728E /* ChannelsDataSource.m in Sources */,
+				22DB25021982DF2B0008728E /* EventsDataSource.m in Sources */,
+				22DB25031982DF2B0008728E /* ImageUploader.m in Sources */,
+				22DB25041982DF2B0008728E /* IRCCloudJSONObject.m in Sources */,
+				22DB25051982DF2B0008728E /* NetworkConnection.m in Sources */,
+				22DB25061982DF2B0008728E /* ServersDataSource.m in Sources */,
+				22DB25071982DF2B0008728E /* UsersDataSource.m in Sources */,
+				22DB25081982DF2B0008728E /* NSObject+SBJson.m in Sources */,
+				22DB25091982DF2B0008728E /* SBJsonParser.m in Sources */,
+				22DB250A1982DF2B0008728E /* SBJsonStreamParser.m in Sources */,
+				22DB250B1982DF2B0008728E /* SBJsonStreamParserAccumulator.m in Sources */,
+				22DB250C1982DF2B0008728E /* SBJsonStreamParserAdapter.m in Sources */,
+				22DB250D1982DF2B0008728E /* SBJsonStreamParserState.m in Sources */,
+				22DB250E1982DF2B0008728E /* SBJsonStreamTokeniser.m in Sources */,
+				22DB250F1982DF2B0008728E /* SBJsonStreamWriter.m in Sources */,
+				22DB25101982DF2B0008728E /* SBJsonStreamWriterAccumulator.m in Sources */,
+				22DB25111982DF2B0008728E /* SBJsonStreamWriterState.m in Sources */,
+				22DB25121982DF2B0008728E /* SBJsonTokeniser.m in Sources */,
+				22DB25131982DF2B0008728E /* SBJsonUTF8Stream.m in Sources */,
+				22DB25141982DF2B0008728E /* SBJsonWriter.m in Sources */,
+				22DB25151982DF2B0008728E /* AsyncSocket.m in Sources */,
+				22DB25161982DF2B0008728E /* GCDAsyncSocket.m in Sources */,
+				22DB25171982DF2B0008728E /* HandshakeHeader.m in Sources */,
+				22DB25181982DF2B0008728E /* MutableQueue.m in Sources */,
+				22DB25191982DF2B0008728E /* NSData+Base64.m in Sources */,
+				22DB251A1982DF2B0008728E /* WebSocket.m in Sources */,
+				22DB251B1982DF2B0008728E /* WebSocketConnectConfig.m in Sources */,
+				22DB251C1982DF2B0008728E /* WebSocketFragment.m in Sources */,
+				22DB251D1982DF2B0008728E /* WebSocketMessage.m in Sources */,
+				22DB251E1982DF2B0008728E /* ShareViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		221034F1197EFBAF00AB414F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 221034E6197EFBAF00AB414F /* ShareExtension */;
+			targetProxy = 221034F0197EFBAF00AB414F /* PBXContainerItemProxy */;
+		};
+		221034F4197EFBAF00AB414F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 221034E6197EFBAF00AB414F /* ShareExtension */;
+			targetProxy = 221034F3197EFBAF00AB414F /* PBXContainerItemProxy */;
+		};
+		228A059B16D3DABB0029769C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 228A056B16D3DABA0029769C /* IRCCloud */;
+			targetProxy = 228A059A16D3DABB0029769C /* PBXContainerItemProxy */;
+		};
+		22DB253B1982DFFB0008728E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22DB24FA1982DF2B0008728E /* ShareExtension Enterprise */;
+			targetProxy = 22DB253A1982DFFB0008728E /* PBXContainerItemProxy */;
+		};
 		22DE05B718D8CA4800590FC3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 22DE05B118D8CA0700590FC3 /* GitRevision */;
@@ -1251,6 +1848,127 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		221034F6197EFBAF00AB414F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_CFLAGS = "-DEXTENSION";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "EDD9EB28-A403-4907-8A51-092926B20EAC";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		221034F7197EFBAF00AB414F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = (
+					"-DNS_BLOCK_ASSERTIONS=1",
+					"-DEXTENSION",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "396C0802-4F9A-4BA2-859C-C69580EE1127";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		221034F8197EFBAF00AB414F /* AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = ShareExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = (
+					"-DNS_BLOCK_ASSERTIONS=1",
+					"-DAPPSTORE",
+					"-DEXTENSION",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				SKIP_INSTALL = YES;
+			};
+			name = AppStore;
+		};
 		225D979D18AA995900065087 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1425,6 +2143,178 @@
 			};
 			name = Release;
 		};
+		228A05AB16D3DABB0029769C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/IRCCloud.app/IRCCloud";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(PROJECT_DIR)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				INFOPLIST_FILE = "IRCCloudTests/IRCCloudTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/IRCCloud\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		228A05AC16D3DABB0029769C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/IRCCloud.app/IRCCloud";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(PROJECT_DIR)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				INFOPLIST_FILE = "IRCCloudTests/IRCCloudTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/IRCCloud\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+		22DB25341982DF2B0008728E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_ENTITLEMENTS = "ShareExtension Enterprise.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "ShareExtension/Info-Enterprise.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_CFLAGS = (
+					"-DEXTENSION",
+					"-DENTERPRISE",
+				);
+				PRODUCT_NAME = "ShareExtension Enterprise";
+				PROVISIONING_PROFILE = "";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		22DB25351982DF2B0008728E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_ENTITLEMENTS = "ShareExtension Enterprise.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "ShareExtension/Info-Enterprise.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = (
+					"-DNS_BLOCK_ASSERTIONS=1",
+					"-DEXTENSION",
+					"-DENTERPRISE",
+				);
+				PRODUCT_NAME = "ShareExtension Enterprise";
+				PROVISIONING_PROFILE = "";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		22DB25361982DF2B0008728E /* AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CODE_SIGN_ENTITLEMENTS = "ShareExtension Enterprise.entitlements";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "ShareExtension/Info-Enterprise.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CFLAGS = (
+					"-DNS_BLOCK_ASSERTIONS=1",
+					"-DAPPSTORE",
+					"-DEXTENSION",
+					"-DENTERPRISE",
+				);
+				PRODUCT_NAME = "ShareExtension Enterprise";
+				PROVISIONING_PROFILE = "";
+				SKIP_INSTALL = YES;
+			};
+			name = AppStore;
+		};
 		22DE05B318D8CA0800590FC3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1497,6 +2387,29 @@
 			};
 			name = AppStore;
 		};
+		22DE05C418DB52D700590FC3 /* AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/IRCCloud.app/IRCCloud";
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+					"$(PROJECT_DIR)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
+				INFOPLIST_FILE = "IRCCloudTests/IRCCloudTests-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/IRCCloud\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = AppStore;
+		};
 		22DE05C518DB52D700590FC3 /* AppStore */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1539,6 +2452,16 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		221034F5197EFBAF00AB414F /* Build configuration list for PBXNativeTarget "ShareExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				221034F6197EFBAF00AB414F /* Debug */,
+				221034F7197EFBAF00AB414F /* Release */,
+				221034F8197EFBAF00AB414F /* AppStore */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		225D979C18AA995900065087 /* Build configuration list for PBXNativeTarget "IRCCloud Enterprise" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1549,7 +2472,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		228A056716D3DABA0029769C /* Build configuration list for PBXProject "IRCCloud" */ = {
+		228A056716D3DABA0029769C /* Build configuration list for PBXProject "IRCCloud-iOS8" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				228A05A516D3DABB0029769C /* Debug */,
@@ -1565,6 +2488,26 @@
 				228A05A816D3DABB0029769C /* Debug */,
 				228A05A916D3DABB0029769C /* Release */,
 				22DE05C318DB52D700590FC3 /* AppStore */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		228A05AA16D3DABB0029769C /* Build configuration list for PBXNativeTarget "IRCCloudTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				228A05AB16D3DABB0029769C /* Debug */,
+				228A05AC16D3DABB0029769C /* Release */,
+				22DE05C418DB52D700590FC3 /* AppStore */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		22DB25331982DF2B0008728E /* Build configuration list for PBXNativeTarget "ShareExtension Enterprise" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				22DB25341982DF2B0008728E /* Debug */,
+				22DB25351982DF2B0008728E /* Release */,
+				22DB25361982DF2B0008728E /* AppStore */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

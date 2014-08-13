@@ -1,5 +1,5 @@
-IRCCloud.xcodeproj/project.xcworkspace
-IRCCloud.xcodeproj/xcuserdata
+*.xcodeproj/project.xcworkspace
+*.xcodeproj/xcuserdata
 build/
 IRCCloud/config.h
 IRCCloud/InfoPlist.h

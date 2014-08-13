@@ -119,7 +119,8 @@
     NSString *session = [NetworkConnection sharedInstance].session;
     if(session != nil && [session length] > 0) {
 #ifndef EXTENSION
-        [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+            [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
 #endif
         if(_conn.state != kIRCCloudStateConnected) {
             loginView.alpha = 0;

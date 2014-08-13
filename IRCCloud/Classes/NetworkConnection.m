@@ -391,7 +391,8 @@ NSLock *__parserLock = nil;
                        _userInfo = object.dictionary;
                        _prefs = nil;
 #ifndef EXTENSION
-                       [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
+                       if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                           [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];
                        [self postObject:object forEvent:kIRCEventUserInfo];
@@ -1566,7 +1567,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+        [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
 #endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/logout", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];

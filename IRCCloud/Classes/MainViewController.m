@@ -58,7 +58,9 @@
 }
 
 - (void)viewDidLoad {
+#ifdef __IPHONE_8_0
     _blur = nil;
+#endif
     [super viewDidLoad];
     [self addChildViewController:_eventsView];
     
@@ -871,6 +873,7 @@
     if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         self.navigationController.navigationBar.translucent = YES;
         self.edgesForExtendedLayout=UIRectEdgeNone;
+#ifdef __IPHONE_8_0
         if(!_blur) {
             UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
             _blur = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
@@ -879,6 +882,7 @@
             [_blur setFrame:frame];
             [self.view addSubview:_blur];
         }
+#endif
     }
     self.navigationController.navigationBar.clipsToBounds = YES;
     [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
@@ -1831,7 +1835,9 @@
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         frame = self.navigationController.navigationBar.bounds;
         frame.origin.y = -frame.size.height;
+#ifdef __IPHONE_8_0
         [_blur setFrame:frame];
+#endif
     }
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];
