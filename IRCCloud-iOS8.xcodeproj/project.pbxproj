@@ -337,6 +337,14 @@
 		22B4287F16D831A800498507 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
 		22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		22C89B5A19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
+		22C89B5B19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
+		22C89B5C19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
+		22C89B5D19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
+		22C89B5E19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
+		22C89B5F19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
+		22C89B6019ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
+		22C89B6119ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
 		22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A1171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A31725AAEA003C0684 /* UIExpandingTextView.m */; };
@@ -664,6 +672,8 @@
 		22B4288416D846BF00498507 /* IRCCloudJSONObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudJSONObject.h; sourceTree = "<group>"; };
 		22B4288516D846BF00498507 /* IRCCloudJSONObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudJSONObject.m; sourceTree = "<group>"; };
 		22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "ShareExtension Enterprise.entitlements"; sourceTree = "<group>"; };
+		22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
+		22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
 		22D4309E171C663A003C0684 /* IgnoresTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IgnoresTableViewController.h; sourceTree = "<group>"; };
 		22D4309F171C663A003C0684 /* IgnoresTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IgnoresTableViewController.m; sourceTree = "<group>"; };
 		22D430A21725AAE9003C0684 /* UIExpandingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIExpandingTextView.h; sourceTree = "<group>"; };
@@ -1039,6 +1049,8 @@
 		228A05B416D3DB930029769C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */,
+				22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */,
 				1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */,
 				22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */,
 				1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */,
@@ -1343,7 +1355,9 @@
 			files = (
 				22103529197EFCF100AB414F /* Icons.xcassets in Resources */,
 				22103527197EFCEB00AB414F /* Logo.xcassets in Resources */,
+				22C89B6019ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 				22103528197EFCEE00AB414F /* Images.xcassets in Resources */,
+				22C89B5C19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1364,6 +1378,7 @@
 				225D979218AA995900065087 /* ARChromeActivity@2x~ipad.png in Resources */,
 				225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */,
 				225D979418AA995900065087 /* Safari.png in Resources */,
+				22C89B5B19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
 				225D979518AA995900065087 /* Safari@2x.png in Resources */,
 				225D979618AA995900065087 /* Safari@2x~ipad.png in Resources */,
 				225D979718AA995900065087 /* Safari~ipad.png in Resources */,
@@ -1371,6 +1386,7 @@
 				225D979918AA995900065087 /* licenses.txt in Resources */,
 				225D979A18AA995900065087 /* a.caf in Resources */,
 				225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */,
+				22C89B5F19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1387,8 +1403,10 @@
 				2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */,
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
+				22C89B5E19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 				22EEA95418D0B198007D5022 /* Icons.xcassets in Resources */,
 				1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */,
+				22C89B5A19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
 				225017661783434900066E71 /* ARChromeActivity@2x~ipad.png in Resources */,
 				225017671783434900066E71 /* ARChromeActivity~ipad.png in Resources */,
 				225017691783434900066E71 /* Safari.png in Resources */,
@@ -1421,7 +1439,9 @@
 			files = (
 				22DB25301982DF2B0008728E /* Icons.xcassets in Resources */,
 				22DB25401982E3130008728E /* EnterpriseImages.xcassets in Resources */,
+				22C89B6119ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 				22DB253F1982E3100008728E /* EnterpriseLogo.xcassets in Resources */,
+				22C89B5D19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

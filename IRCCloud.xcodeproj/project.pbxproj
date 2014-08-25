@@ -232,6 +232,10 @@
 		22EEA95518D0B198007D5022 /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95318D0B198007D5022 /* Icons.xcassets */; };
 		22F5C4BD1791F205005E09A9 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
 		22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
+		22FB316B19ABB6D8000E0306 /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22FB316919ABB6D8000E0306 /* Lato-LightItalic.ttf */; };
+		22FB316C19ABB6D8000E0306 /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22FB316919ABB6D8000E0306 /* Lato-LightItalic.ttf */; };
+		22FB316D19ABB6D8000E0306 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22FB316A19ABB6D8000E0306 /* Lato-Regular.ttf */; };
+		22FB316E19ABB6D8000E0306 /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22FB316A19ABB6D8000E0306 /* Lato-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -466,6 +470,8 @@
 		22F5C4BC1791F205005E09A9 /* a.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = a.caf; sourceTree = "<group>"; };
 		22F9EE1A16DE6F21004615C0 /* EventsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsDataSource.h; sourceTree = "<group>"; };
 		22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsDataSource.m; sourceTree = "<group>"; };
+		22FB316919ABB6D8000E0306 /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
+		22FB316A19ABB6D8000E0306 /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -733,6 +739,8 @@
 		228A05B416D3DB930029769C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				22FB316919ABB6D8000E0306 /* Lato-LightItalic.ttf */,
+				22FB316A19ABB6D8000E0306 /* Lato-Regular.ttf */,
 				1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */,
 				22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */,
 				1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */,
@@ -963,6 +971,7 @@
 				225D979218AA995900065087 /* ARChromeActivity@2x~ipad.png in Resources */,
 				225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */,
 				225D979418AA995900065087 /* Safari.png in Resources */,
+				22FB316C19ABB6D8000E0306 /* Lato-LightItalic.ttf in Resources */,
 				225D979518AA995900065087 /* Safari@2x.png in Resources */,
 				225D979618AA995900065087 /* Safari@2x~ipad.png in Resources */,
 				225D979718AA995900065087 /* Safari~ipad.png in Resources */,
@@ -970,6 +979,7 @@
 				225D979918AA995900065087 /* licenses.txt in Resources */,
 				225D979A18AA995900065087 /* a.caf in Resources */,
 				225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */,
+				22FB316E19ABB6D8000E0306 /* Lato-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -986,8 +996,10 @@
 				2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */,
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
+				22FB316D19ABB6D8000E0306 /* Lato-Regular.ttf in Resources */,
 				22EEA95418D0B198007D5022 /* Icons.xcassets in Resources */,
 				1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */,
+				22FB316B19ABB6D8000E0306 /* Lato-LightItalic.ttf in Resources */,
 				225017661783434900066E71 /* ARChromeActivity@2x~ipad.png in Resources */,
 				225017671783434900066E71 /* ARChromeActivity~ipad.png in Resources */,
 				225017691783434900066E71 /* Safari.png in Resources */,

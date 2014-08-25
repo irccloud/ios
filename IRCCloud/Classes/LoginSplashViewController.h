@@ -38,6 +38,11 @@
     IBOutlet UIProgressView *progress;
     IBOutlet UIActivityIndicatorView *activity;
     
+    IBOutlet UIControl *signupHint;
+    IBOutlet UIControl *loginHint;
+    IBOutlet UIControl *forgotPasswordHint;
+    IBOutlet UIControl *TOSHint;
+    
     NetworkConnection *_conn;
     CGSize _kbSize;
 }
@@ -45,4 +50,8 @@
 -(IBAction)loginButtonPressed:(id)sender;
 -(IBAction)signupButtonPressed:(id)sender;
 -(IBAction)textFieldChanged:(id)sender;
+-(IBAction)loginHintPressed:(id)sender;
+-(IBAction)signupHintPressed:(id)sender;
+-(IBAction)forgotPasswordHintPressed:(id)sender;
+-(IBAction)TOSHintPressed:(id)sender;
 @end
