@@ -43,20 +43,28 @@
     for(UILabel *l in signupHint.subviews) {
         l.font = lato;
         [l sizeToFit];
+        lato = [UIFont fontWithName:@"Lato" size:18];
     }
+
+    lato = [UIFont fontWithName:@"Lato" size:16];
     for(UILabel *l in loginHint.subviews) {
         l.font = lato;
         [l sizeToFit];
+        lato = [UIFont fontWithName:@"Lato" size:18];
     }
     
     lato = [UIFont fontWithName:@"Lato" size:12];
     for(UILabel *l in forgotPasswordHint.subviews) {
         l.font = lato;
         [l sizeToFit];
+        lato = [UIFont fontWithName:@"Lato" size:14];
     }
+
+    lato = [UIFont fontWithName:@"Lato" size:12];
     for(UILabel *l in TOSHint.subviews) {
         l.font = lato;
         [l sizeToFit];
+        lato = [UIFont fontWithName:@"Lato" size:14];
     }
 
     lato = [UIFont fontWithName:@"Lato" size:17];
@@ -328,14 +336,14 @@
     float width = 0.0f;
     for(UIView *v in forgotPasswordHint.subviews) {
         v.frame = CGRectMake(width, 0, v.bounds.size.width, 32);
-        width += v.bounds.size.width + 2;
+        width += v.bounds.size.width + 4;
     }
     forgotPasswordHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, topoffset + ((offset + 3) * 38) + 24, width, 32);
     
     width = 0.0f;
     for(UIView *v in TOSHint.subviews) {
         v.frame = CGRectMake(width, 0, v.bounds.size.width, 32);
-        width += v.bounds.size.width + 2;
+        width += v.bounds.size.width + 4;
     }
     TOSHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, topoffset + ((offset + 3) * 38) + 24, width, 32);
 
