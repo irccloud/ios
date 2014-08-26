@@ -11,15 +11,19 @@
                 <outlet property="IRC" destination="HoY-b4-35C" id="oWW-wv-AkZ"/>
                 <outlet property="TOSHint" destination="YmC-aZ-dyy" id="Vec-Th-gNF"/>
                 <outlet property="activity" destination="324" id="325"/>
+                <outlet property="enterpriseHint" destination="dhF-J4-bp9" id="hth-nh-uL8"/>
+                <outlet property="enterpriseLearnMore" destination="Ny4-I9-kfx" id="LoB-y5-4ta"/>
                 <outlet property="error" destination="162" id="316"/>
                 <outlet property="forgotPasswordHint" destination="asF-oS-cGS" id="8Hv-Mq-8jf"/>
                 <outlet property="host" destination="jqA-ba-Tu0" id="rwP-9D-Y2i"/>
+                <outlet property="hostHint" destination="a0H-ly-beG" id="TUk-Qx-6mE"/>
                 <outlet property="loadingView" destination="112" id="317"/>
                 <outlet property="login" destination="40" id="328"/>
                 <outlet property="loginHint" destination="h5H-in-7fd" id="ZrC-vV-dVf"/>
                 <outlet property="loginView" destination="45" id="318"/>
                 <outlet property="logo" destination="4" id="323"/>
                 <outlet property="name" destination="gxw-la-FzH" id="ryw-h2-3Mm"/>
+                <outlet property="next" destination="b6e-F2-0mJ" id="U0V-pb-pSk"/>
                 <outlet property="password" destination="25" id="319"/>
                 <outlet property="progress" destination="154" id="320"/>
                 <outlet property="signup" destination="oca-Tc-vLq" id="lbU-xi-3fC"/>
@@ -53,19 +57,26 @@
                     <color key="textColor" red="0.26666666666666666" green="0.50196078431372548" blue="0.98039215686274506" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Enterprise Edition" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="dhF-J4-bp9">
+                    <rect key="frame" x="0.0" y="70" width="320" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                    <color key="textColor" red="0.61176470589999998" green="0.78039215689999997" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
                 <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="RDM-yr-ume" customClass="UIControl">
-                    <rect key="frame" x="50" y="80" width="220" height="32"/>
+                    <rect key="frame" x="50" y="70" width="220" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Need an account?" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="c4G-Vc-4bG">
-                            <rect key="frame" x="0.0" y="-5" width="150" height="32"/>
+                            <rect key="frame" x="0.0" y="0.0" width="150" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                             <color key="textColor" red="0.61176470588235299" green="0.7803921568627451" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign Up" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="rDv-fo-VAf">
-                            <rect key="frame" x="155" y="-5" width="65" height="32"/>
+                            <rect key="frame" x="155" y="0.0" width="65" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -78,18 +89,18 @@
                     </connections>
                 </view>
                 <view autoresizesSubviews="NO" contentMode="scaleToFill" id="h5H-in-7fd" customClass="UIControl">
-                    <rect key="frame" x="30" y="80" width="260" height="32"/>
+                    <rect key="frame" x="30" y="70" width="260" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Already have an account?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="52V-pZ-etv">
-                            <rect key="frame" x="0.0" y="-5" width="210" height="32"/>
+                            <rect key="frame" x="0.0" y="0.0" width="210" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                             <color key="textColor" red="0.61176470589999998" green="0.78039215689999997" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Login" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="aXR-gH-dNm">
-                            <rect key="frame" x="216" y="-5" width="65" height="32"/>
+                            <rect key="frame" x="216" y="0.0" width="65" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -123,7 +134,7 @@
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="color" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </activityIndicatorView>
-                        <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="162">
+                        <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="162">
                             <rect key="frame" x="0.0" y="76" width="320" height="93"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -201,6 +212,13 @@
                                 <outlet property="delegate" destination="-1" id="W04-gg-8sc"/>
                             </connections>
                         </textField>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="e.g. irccloud.yourcompany.com" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="a0H-ly-beG">
+                            <rect key="frame" x="0.0" y="100" width="320" height="32"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                            <color key="textColor" red="0.043137254899999998" green="0.18039215689999999" blue="0.37647058820000001" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                         <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="40">
                             <rect key="frame" x="17" y="133" width="288" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -223,6 +241,18 @@
                             </state>
                             <connections>
                                 <action selector="signupButtonPressed:" destination="-1" eventType="touchUpInside" id="qWv-q0-ZK4"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="b6e-F2-0mJ">
+                            <rect key="frame" x="16" y="133" width="288" height="40"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <state key="normal" title="Next" backgroundImage="login_button">
+                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="nextButtonPressed:" destination="-1" eventType="touchUpInside" id="gfc-Fx-eIQ"/>
                             </connections>
                         </button>
                         <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="asF-oS-cGS" customClass="UIControl">
@@ -271,6 +301,30 @@
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <connections>
                                 <action selector="TOSHintPressed:" destination="-1" eventType="touchUpInside" id="Z7F-s0-NEt"/>
+                            </connections>
+                        </view>
+                        <view autoresizesSubviews="NO" contentMode="scaleToFill" id="Ny4-I9-kfx" customClass="UIControl">
+                            <rect key="frame" x="39" y="163" width="241" height="32"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Not using the Enterprise Edition?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ldp-FM-EVK">
+                                    <rect key="frame" x="0.0" y="0.0" width="150" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                    <color key="textColor" red="0.61176470589999998" green="0.78039215689999997" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Learn More" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="IXO-6y-jFn">
+                                    <rect key="frame" x="154" y="0.0" width="85" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <connections>
+                                <action selector="enterpriseLearnMorePressed:" destination="-1" eventType="touchUpInside" id="PJJ-1A-wRr"/>
                             </connections>
                         </view>
                     </subviews>

@@ -40,6 +40,8 @@
     [Cloud sizeToFit];
     
     lato = [UIFont fontWithName:@"Lato" size:16];
+    enterpriseHint.font = lato;
+    
     for(UILabel *l in signupHint.subviews) {
         l.font = lato;
         [l sizeToFit];
@@ -64,6 +66,14 @@
         [l sizeToFit];
     }
 
+    for(UILabel *l in enterpriseLearnMore.subviews) {
+        l.font = lato;
+        [l sizeToFit];
+    }
+    
+    lato = [UIFont fontWithName:@"Lato-LightItalic" size:12];
+    hostHint.font = lato;
+    
     lato = [UIFont fontWithName:@"Lato" size:16];
     
     self.view.frame = [UIScreen mainScreen].applicationFrame;
@@ -95,6 +105,9 @@
     login.titleLabel.font = lato;
     login.enabled = NO;
     signup.titleLabel.font = lato;
+    signup.enabled = NO;
+    next.titleLabel.font = lato;
+    next.enabled = NO;
 #ifdef BRAND_NAME
     [version setText:[NSString stringWithFormat:@"Version %@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], @BRAND_NAME]];
 #else
@@ -125,7 +138,6 @@
 -(void)viewWillAppear:(BOOL)animated {
     logo.transform = CGAffineTransformIdentity;
     loadingView.transform = CGAffineTransformIdentity;
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateConnecting:)
@@ -172,7 +184,24 @@
         password.text = @"";
         loadingView.alpha = 0;
         loginView.alpha = 1;
+#ifdef ENTERPRISE
+        host.alpha = 1;
+        username.alpha = 0;
+        password.alpha = 0;
+        name.alpha = 0;
+        enterpriseHint.alpha = 1;
+        loginHint.alpha = 0;
+        signupHint.alpha = 0;
+        login.alpha = 0;
+        signup.alpha = 0;
+        next.alpha = 1;
+        TOSHint.alpha = 0;
+        forgotPasswordHint.alpha = 0;
+        enterpriseLearnMore.alpha = 1;
+        hostHint.alpha = 1;
+#endif
     }
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
@@ -303,25 +332,38 @@
     else
         username.background = [UIImage imageNamed:@"login_top_input"];
     
-    name.frame = CGRectMake(16, topoffset, loginView.bounds.size.width - 32, 39);
-    username.frame = CGRectMake(16, topoffset + (offset * 39), loginView.bounds.size.width - 32, 39);
-    password.frame = CGRectMake(16, topoffset + ((offset + 1) * 39), loginView.bounds.size.width - 32, 38);
+    if(host.alpha > 0) {
+        host.frame = CGRectMake(16, topoffset, loginView.bounds.size.width - 32, 39);
+        hostHint.frame = CGRectMake(16, topoffset + 39, loginView.bounds.size.width - 32, 32);
+        next.frame = CGRectMake(16, topoffset + 39 + 32, loginView.bounds.size.width - 32, 40);
+        
+        float width = 0.0f;
+        for(UIView *v in enterpriseLearnMore.subviews) {
+            v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
+            width += v.bounds.size.width + 2;
+        }
+        enterpriseLearnMore.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, next.frame.origin.y + next.frame.size.height + 3, width, 20);
+    } else {
+        name.frame = CGRectMake(16, topoffset, loginView.bounds.size.width - 32, 39);
+        username.frame = CGRectMake(16, topoffset + (offset * 39), loginView.bounds.size.width - 32, 39);
+        password.frame = CGRectMake(16, topoffset + ((offset + 1) * 39), loginView.bounds.size.width - 32, 38);
 
-    login.frame = signup.frame = CGRectMake(16, topoffset + ((offset + 2) * 39) + 15, loginView.bounds.size.width - 32, 40);
+        login.frame = signup.frame = CGRectMake(16, topoffset + ((offset + 2) * 39) + 15, loginView.bounds.size.width - 32, 40);
     
-    float width = 0.0f;
-    for(UIView *v in forgotPasswordHint.subviews) {
-        v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
-        width += v.bounds.size.width + 2;
+        float width = 0.0f;
+        for(UIView *v in forgotPasswordHint.subviews) {
+            v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
+            width += v.bounds.size.width + 2;
+        }
+        forgotPasswordHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 3, width, 20);
+        
+        width = 0.0f;
+        for(UIView *v in TOSHint.subviews) {
+            v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
+            width += v.bounds.size.width + 2;
+        }
+        TOSHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 3, width, 20);
     }
-    forgotPasswordHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 3, width, 20);
-    
-    width = 0.0f;
-    for(UIView *v in TOSHint.subviews) {
-        v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
-        width += v.bounds.size.width + 2;
-    }
-    TOSHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 3, width, 20);
 
     status.frame = CGRectMake(32, topoffset, loginView.bounds.size.width - 64, 21);
     progress.frame = CGRectMake(32, topoffset + 38, loginView.bounds.size.width - 64, 21);
@@ -363,14 +405,14 @@
                 v.frame = CGRectMake(width, 0, v.bounds.size.width, 32);
                 width += v.bounds.size.width + 8;
             }
-            signupHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, 74, width, 32);
+            signupHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, 70, width, 32);
             
             width = 0.0f;
             for(UIView *v in loginHint.subviews) {
                 v.frame = CGRectMake(width, 0, v.bounds.size.width, 32);
                 width += v.bounds.size.width + 8;
             }
-            loginHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, 74, width, 32);
+            loginHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, 70, width, 32);
             loginView.frame = CGRectMake(0, 119, 320, self.view.bounds.size.height - 119);
             loadingView.frame = CGRectMake(0, 74, 320, self.view.bounds.size.height - 74);
         } else {
@@ -459,6 +501,35 @@
 #endif
 }
 
+-(IBAction)nextButtonPressed:(id)sender {
+    IRCCLOUD_HOST = host.text;
+    if([IRCCLOUD_HOST hasPrefix:@"http://"])
+        IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:7];
+    if([IRCCLOUD_HOST hasPrefix:@"https://"])
+        IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:8];
+    if([IRCCLOUD_HOST hasSuffix:@"/"])
+        IRCCLOUD_HOST = [IRCCLOUD_HOST substringToIndex:IRCCLOUD_HOST.length - 1];
+    
+    [UIView beginAnimations:nil context:NULL];
+    enterpriseHint.alpha = 0;
+    host.alpha = 0;
+    hostHint.alpha = 0;
+    next.alpha = 0;
+    enterpriseLearnMore.alpha = 0;
+    
+    username.alpha = 1;
+    password.alpha = 1;
+    signupHint.alpha = 1;
+    login.alpha = 1;
+    forgotPasswordHint.alpha = 1;
+    [UIView commitAnimations];
+    
+    [host resignFirstResponder];
+}
+
+-(IBAction)enterpriseLearnMorePressed:(id)sender {
+    
+}
 
 -(IBAction)loginButtonPressed:(id)sender {
     [username resignFirstResponder];
@@ -478,15 +549,6 @@
     activity.hidden = NO;
     error.text = nil;
     error.hidden = YES;
-#ifdef ENTERPRISE
-    IRCCLOUD_HOST = host.text;
-    if([IRCCLOUD_HOST hasPrefix:@"http://"])
-        IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:7];
-    if([IRCCLOUD_HOST hasPrefix:@"https://"])
-        IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:8];
-    if([IRCCLOUD_HOST hasSuffix:@"/"])
-        IRCCLOUD_HOST = [IRCCLOUD_HOST substringToIndex:IRCCLOUD_HOST.length - 1];
-#endif
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
@@ -555,6 +617,7 @@
 -(IBAction)textFieldChanged:(id)sender {
     login.enabled = (username.text.length > 0 && password.text.length > 0);
     signup.enabled = (name.alpha == 0) || (username.text.length > 0 && password.text.length > 0 && name.text.length > 0);
+    next.enabled = (host.text.length > 0);
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {

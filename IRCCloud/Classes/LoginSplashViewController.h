@@ -31,6 +31,7 @@
     IBOutlet UITextField *host;
     IBOutlet UIButton *login;
     IBOutlet UIButton *signup;
+    IBOutlet UIButton *next;
     
     IBOutlet UIView *loadingView;
     IBOutlet UILabel *status;
@@ -42,6 +43,10 @@
     IBOutlet UIControl *loginHint;
     IBOutlet UIControl *forgotPasswordHint;
     IBOutlet UIControl *TOSHint;
+    IBOutlet UIControl *enterpriseLearnMore;
+    
+    IBOutlet UILabel *enterpriseHint;
+    IBOutlet UILabel *hostHint;
     
     NetworkConnection *_conn;
     CGSize _kbSize;
@@ -54,4 +59,6 @@
 -(IBAction)signupHintPressed:(id)sender;
 -(IBAction)forgotPasswordHintPressed:(id)sender;
 -(IBAction)TOSHintPressed:(id)sender;
+-(IBAction)nextButtonPressed:(id)sender;
+-(IBAction)enterpriseLearnMorePressed:(id)sender;
 @end
