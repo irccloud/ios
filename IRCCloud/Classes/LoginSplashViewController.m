@@ -67,27 +67,27 @@
     lato = [UIFont fontWithName:@"Lato" size:16];
     
     self.view.frame = [UIScreen mainScreen].applicationFrame;
-    username.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, username.frame.size.height)];
+    username.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, username.frame.size.height)];
     username.leftViewMode = UITextFieldViewModeAlways;
-    username.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, username.frame.size.height)];
+    username.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, username.frame.size.height)];
     username.rightViewMode = UITextFieldViewModeAlways;
     username.font = lato;
 #ifdef ENTERPRISE
     username.placeholder = @"Email or Username";
 #endif
-    password.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, password.frame.size.height)];
+    password.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, password.frame.size.height)];
     password.leftViewMode = UITextFieldViewModeAlways;
-    password.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, password.frame.size.height)];
+    password.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, password.frame.size.height)];
     password.rightViewMode = UITextFieldViewModeAlways;
     password.font = lato;
-    host.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, host.frame.size.height)];
+    host.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, host.frame.size.height)];
     host.leftViewMode = UITextFieldViewModeAlways;
-    host.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, host.frame.size.height)];
+    host.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, host.frame.size.height)];
     host.rightViewMode = UITextFieldViewModeAlways;
     host.font = lato;
-    name.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, name.frame.size.height)];
+    name.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, name.frame.size.height)];
     name.leftViewMode = UITextFieldViewModeAlways;
-    name.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, name.frame.size.height)];
+    name.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, name.frame.size.height)];
     name.rightViewMode = UITextFieldViewModeAlways;
     name.font = lato;
     
@@ -296,32 +296,32 @@
     if(name.alpha)
         offset = 1;
     
-    int topoffset = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone || UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))?20:280;
+    int topoffset = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone || UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))?16:280;
     
     if(name.alpha > 0)
         username.background = [UIImage imageNamed:@"login_mid_input"];
     else
         username.background = [UIImage imageNamed:@"login_top_input"];
     
-    name.frame = CGRectMake(16, topoffset, loginView.bounds.size.width - 32, 38);
-    username.frame = CGRectMake(16, topoffset + (offset * 38), loginView.bounds.size.width - 32, 38);
-    password.frame = CGRectMake(16, topoffset + ((offset + 1) * 38), loginView.bounds.size.width - 32, 38);
+    name.frame = CGRectMake(16, topoffset, loginView.bounds.size.width - 32, 39);
+    username.frame = CGRectMake(16, topoffset + (offset * 39), loginView.bounds.size.width - 32, 39);
+    password.frame = CGRectMake(16, topoffset + ((offset + 1) * 39), loginView.bounds.size.width - 32, 38);
 
-    login.frame = signup.frame = CGRectMake(16, topoffset + ((offset + 2) * 38) + 16, loginView.bounds.size.width - 32, 40);
+    login.frame = signup.frame = CGRectMake(16, topoffset + ((offset + 2) * 39) + 15, loginView.bounds.size.width - 32, 40);
     
     float width = 0.0f;
     for(UIView *v in forgotPasswordHint.subviews) {
         v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
         width += v.bounds.size.width + 2;
     }
-    forgotPasswordHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 6, width, 20);
+    forgotPasswordHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 3, width, 20);
     
     width = 0.0f;
     for(UIView *v in TOSHint.subviews) {
         v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
         width += v.bounds.size.width + 2;
     }
-    TOSHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 6, width, 20);
+    TOSHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 3, width, 20);
 
     status.frame = CGRectMake(32, topoffset, loginView.bounds.size.width - 64, 21);
     progress.frame = CGRectMake(32, topoffset + 38, loginView.bounds.size.width - 64, 21);
@@ -355,9 +355,9 @@
     } else {
         if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
             self.view.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
-            logo.frame = CGRectMake(48, 14, 48, 48);
-            IRC.frame = CGRectMake(110, 14, IRC.bounds.size.width, 48);
-            Cloud.frame = CGRectMake(110 + IRC.bounds.size.width, 14, Cloud.bounds.size.width, 48);
+            logo.frame = CGRectMake(48, 15, 48, 48);
+            IRC.frame = CGRectMake(110, 15, IRC.bounds.size.width, 48);
+            Cloud.frame = CGRectMake(110 + IRC.bounds.size.width, 15, Cloud.bounds.size.width, 48);
             float width = 0.0f;
             for(UIView *v in signupHint.subviews) {
                 v.frame = CGRectMake(width, 0, v.bounds.size.width, 32);
@@ -371,7 +371,7 @@
                 width += v.bounds.size.width + 8;
             }
             loginHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, 74, width, 32);
-            loginView.frame = CGRectMake(0, 118, 320, self.view.bounds.size.height - 118);
+            loginView.frame = CGRectMake(0, 119, 320, self.view.bounds.size.height - 119);
             loadingView.frame = CGRectMake(0, 74, 320, self.view.bounds.size.height - 74);
         } else {
             if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {

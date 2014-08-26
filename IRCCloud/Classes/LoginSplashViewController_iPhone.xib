@@ -50,10 +50,10 @@
                     <rect key="frame" x="171" y="14" width="120" height="48"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="41"/>
-                    <color key="textColor" red="0.41960784313725491" green="0.63529411764705879" blue="0.96862745098039216" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="textColor" red="0.26666666666666666" green="0.50196078431372548" blue="0.98039215686274506" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <view autoresizesSubviews="NO" contentMode="scaleToFill" id="RDM-yr-ume" customClass="UIControl">
+                <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="RDM-yr-ume" customClass="UIControl">
                     <rect key="frame" x="50" y="80" width="220" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
@@ -61,7 +61,7 @@
                             <rect key="frame" x="0.0" y="-5" width="150" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                            <color key="textColor" red="0.41960784309999999" green="0.63529411759999999" blue="0.96862745100000003" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="textColor" red="0.15686274509803921" green="0.3411764705882353" blue="0.67843137254901964" alpha="1" colorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign Up" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="rDv-fo-VAf">
@@ -77,7 +77,7 @@
                         <action selector="signupHintPressed:" destination="-1" eventType="touchUpInside" id="Hrt-m8-MuD"/>
                     </connections>
                 </view>
-                <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="h5H-in-7fd" customClass="UIControl">
+                <view autoresizesSubviews="NO" contentMode="scaleToFill" id="h5H-in-7fd" customClass="UIControl">
                     <rect key="frame" x="30" y="80" width="260" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
@@ -85,7 +85,7 @@
                             <rect key="frame" x="0.0" y="-5" width="210" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                            <color key="textColor" red="0.41960784309999999" green="0.63529411759999999" blue="0.96862745100000003" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="textColor" red="0.15686274510000001" green="0.3411764706" blue="0.67843137249999996" alpha="1" colorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Login" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="aXR-gH-dNm">
@@ -137,7 +137,7 @@
                     <rect key="frame" x="0.0" y="123" width="320" height="357"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" heightSizable="YES"/>
                     <subviews>
-                        <textField opaque="NO" clipsSubviews="YES" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name" minimumFontSize="17" background="login_top_input" id="gxw-la-FzH">
+                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name" minimumFontSize="17" background="login_top_input" id="gxw-la-FzH">
                             <rect key="frame" x="18" y="16" width="285" height="38"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -201,7 +201,7 @@
                                 <outlet property="delegate" destination="-1" id="W04-gg-8sc"/>
                             </connections>
                         </textField>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="40">
+                        <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="40">
                             <rect key="frame" x="17" y="133" width="288" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -213,7 +213,7 @@
                                 <action selector="loginButtonPressed:" destination="-1" eventType="touchUpInside" id="177"/>
                             </connections>
                         </button>
-                        <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="oca-Tc-vLq">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="oca-Tc-vLq">
                             <rect key="frame" x="17" y="133" width="288" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -225,7 +225,7 @@
                                 <action selector="signupButtonPressed:" destination="-1" eventType="touchUpInside" id="qWv-q0-ZK4"/>
                             </connections>
                         </button>
-                        <view autoresizesSubviews="NO" contentMode="scaleToFill" id="asF-oS-cGS" customClass="UIControl">
+                        <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="asF-oS-cGS" customClass="UIControl">
                             <rect key="frame" x="40" y="180" width="241" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
@@ -249,7 +249,7 @@
                                 <action selector="forgotPasswordHintPressed:" destination="-1" eventType="touchUpInside" id="cgw-9w-rR7"/>
                             </connections>
                         </view>
-                        <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="YmC-aZ-dyy" customClass="UIControl">
+                        <view autoresizesSubviews="NO" contentMode="scaleToFill" id="YmC-aZ-dyy" customClass="UIControl">
                             <rect key="frame" x="39" y="163" width="241" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
