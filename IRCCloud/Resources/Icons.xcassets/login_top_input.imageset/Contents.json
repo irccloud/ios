@@ -3,12 +3,12 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "splashlogo.png"
+      "filename" : "login_top_input.png"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "splashlogo@2x.png"
+      "filename" : "login_top_input@2x.png"
     }
   ],
   "info" : {

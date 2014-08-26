@@ -36,25 +36,25 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" image="login_logo" id="4">
-                    <rect key="frame" x="45" y="17" width="48" height="48"/>
+                    <rect key="frame" x="48" y="14" width="48" height="48"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 </imageView>
                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="IRC" textAlignment="right" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="HoY-b4-35C">
-                    <rect key="frame" x="101" y="17" width="70" height="48"/>
+                    <rect key="frame" x="101" y="14" width="70" height="48"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="41"/>
                     <color key="textColor" red="0.61176470588235299" green="0.7803921568627451" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cloud" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="qI4-ht-BRc">
-                    <rect key="frame" x="171" y="17" width="120" height="48"/>
+                    <rect key="frame" x="171" y="14" width="120" height="48"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="41"/>
                     <color key="textColor" red="0.41960784313725491" green="0.63529411764705879" blue="0.96862745098039216" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <view autoresizesSubviews="NO" contentMode="scaleToFill" id="RDM-yr-ume" customClass="UIControl">
-                    <rect key="frame" x="50" y="74" width="220" height="32"/>
+                    <rect key="frame" x="50" y="80" width="220" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Need an account?" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="c4G-Vc-4bG">
@@ -78,7 +78,7 @@
                     </connections>
                 </view>
                 <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="h5H-in-7fd" customClass="UIControl">
-                    <rect key="frame" x="30" y="74" width="260" height="32"/>
+                    <rect key="frame" x="30" y="80" width="260" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Already have an account?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="52V-pZ-etv">
@@ -137,7 +137,7 @@
                     <rect key="frame" x="0.0" y="123" width="320" height="357"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" heightSizable="YES"/>
                     <subviews>
-                        <textField opaque="NO" clipsSubviews="YES" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name" minimumFontSize="17" id="gxw-la-FzH">
+                        <textField opaque="NO" clipsSubviews="YES" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name" minimumFontSize="17" background="login_top_input" id="gxw-la-FzH">
                             <rect key="frame" x="18" y="16" width="285" height="38"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -153,7 +153,7 @@
                                 <outlet property="delegate" destination="-1" id="hbU-1O-rqF"/>
                             </connections>
                         </textField>
-                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Email" minimumFontSize="17" id="14">
+                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Email address" minimumFontSize="17" background="login_top_input" id="14">
                             <rect key="frame" x="18" y="16" width="285" height="38"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -169,7 +169,7 @@
                                 <outlet property="delegate" destination="-1" id="257"/>
                             </connections>
                         </textField>
-                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password" minimumFontSize="17" id="25">
+                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password" minimumFontSize="17" background="login_bottom_input" id="25">
                             <rect key="frame" x="18" y="54" width="285" height="38"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -185,7 +185,7 @@
                                 <outlet property="delegate" destination="-1" id="258"/>
                             </connections>
                         </textField>
-                        <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Host" minimumFontSize="17" id="jqA-ba-Tu0">
+                        <textField opaque="NO" clipsSubviews="YES" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Host" minimumFontSize="17" background="login_only_input" id="jqA-ba-Tu0">
                             <rect key="frame" x="18" y="92" width="285" height="38"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
@@ -202,12 +202,11 @@
                             </connections>
                         </textField>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" id="40">
-                            <rect key="frame" x="18" y="134" width="285" height="38"/>
+                            <rect key="frame" x="17" y="133" width="288" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <color key="backgroundColor" red="0.043137254899999998" green="0.18039215689999999" blue="0.37647058820000001" alpha="1" colorSpace="calibratedRGB"/>
                             <fontDescription key="fontDescription" type="boldSystem" size="button"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <state key="normal" title="Login">
+                            <state key="normal" title="Login" backgroundImage="login_button">
                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
@@ -216,12 +215,11 @@
                             </connections>
                         </button>
                         <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" reversesTitleShadowWhenHighlighted="YES" lineBreakMode="middleTruncation" id="oca-Tc-vLq">
-                            <rect key="frame" x="18" y="134" width="285" height="38"/>
+                            <rect key="frame" x="17" y="133" width="288" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <color key="backgroundColor" red="0.043137254899999998" green="0.18039215689999999" blue="0.37647058820000001" alpha="1" colorSpace="calibratedRGB"/>
                             <fontDescription key="fontDescription" type="boldSystem" size="button"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <state key="normal" title="Sign Up">
+                            <state key="normal" title="Sign Up" backgroundImage="login_button">
                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
@@ -233,14 +231,14 @@
                             <rect key="frame" x="40" y="180" width="241" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Forgotten your password?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="f5d-HA-Vac">
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Forgotten your password?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="f5d-HA-Vac">
                                     <rect key="frame" x="0.0" y="0.0" width="150" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                     <color key="textColor" red="0.61176470589999998" green="0.78039215689999997" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Get a reset link" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="vSh-sS-npC">
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Get an access link" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="vSh-sS-npC">
                                     <rect key="frame" x="154" y="0.0" width="85" height="32"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="12"/>
@@ -293,6 +291,10 @@
         </view>
     </objects>
     <resources>
+        <image name="login_bottom_input" width="288" height="38"/>
+        <image name="login_button" width="288" height="40"/>
         <image name="login_logo" width="48" height="48"/>
+        <image name="login_only_input" width="288" height="38"/>
+        <image name="login_top_input" width="288" height="39"/>
     </resources>
 </document>
