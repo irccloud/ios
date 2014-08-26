@@ -3,13 +3,31 @@
     {
       "size" : "29x29",
       "idiom" : "iphone",
-      "filename" : "Icon@2x.png",
+      "filename" : "iOS7-Settings.png",
+      "scale" : "1x"
+    },
+    {
+      "size" : "29x29",
+      "idiom" : "iphone",
+      "filename" : "iOS7-Settings@2x.png",
       "scale" : "2x"
     },
     {
       "size" : "40x40",
       "idiom" : "iphone",
-      "filename" : "Icon-Small-50@2x.png",
+      "filename" : "iOS7-Spotlight@2x-1.png",
+      "scale" : "2x"
+    },
+    {
+      "size" : "57x57",
+      "idiom" : "iphone",
+      "filename" : "Icon.png",
+      "scale" : "1x"
+    },
+    {
+      "size" : "57x57",
+      "idiom" : "iphone",
+      "filename" : "Icon@2x.png",
       "scale" : "2x"
     },
     {
@@ -21,13 +39,13 @@
     {
       "size" : "29x29",
       "idiom" : "ipad",
-      "filename" : "iOS7-Settings.png",
+      "filename" : "iOS7-Settings-1.png",
       "scale" : "1x"
     },
     {
       "size" : "29x29",
       "idiom" : "ipad",
-      "filename" : "iOS7-Settings@2x.png",
+      "filename" : "iOS7-Settings@2x-1.png",
       "scale" : "2x"
     },
     {
@@ -40,6 +58,30 @@
       "size" : "40x40",
       "idiom" : "ipad",
       "filename" : "iOS7-Spotlight@2x.png",
+      "scale" : "2x"
+    },
+    {
+      "size" : "50x50",
+      "idiom" : "ipad",
+      "filename" : "Icon-Small-50.png",
+      "scale" : "1x"
+    },
+    {
+      "size" : "50x50",
+      "idiom" : "ipad",
+      "filename" : "Icon-Small-50@2x.png",
+      "scale" : "2x"
+    },
+    {
+      "size" : "72x72",
+      "idiom" : "ipad",
+      "filename" : "Icon-72.png",
+      "scale" : "1x"
+    },
+    {
+      "size" : "72x72",
+      "idiom" : "ipad",
+      "filename" : "Icon-72@2x.png",
       "scale" : "2x"
     },
     {
@@ -58,5 +100,8 @@
   "info" : {
     "version" : 1,
     "author" : "xcode"
+  },
+  "properties" : {
+    "pre-rendered" : true
   }
 }
