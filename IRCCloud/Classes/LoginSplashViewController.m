@@ -454,7 +454,9 @@
 }
 
 -(IBAction)TOSHintPressed:(id)sender {
-    
+#ifndef EXTENSION
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.irccloud.com/terms"]];
+#endif
 }
 
 
