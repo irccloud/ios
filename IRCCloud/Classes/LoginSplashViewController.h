@@ -18,7 +18,7 @@
 #import <UIKit/UIKit.h>
 #import "NetworkConnection.h"
 
-@interface LoginSplashViewController : UIViewController<UITextFieldDelegate> {
+@interface LoginSplashViewController : UIViewController<UITextFieldDelegate, UIGestureRecognizerDelegate> {
     IBOutlet UIImageView *logo;
     IBOutlet UILabel *IRC;
     IBOutlet UILabel *Cloud;

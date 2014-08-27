@@ -30,12 +30,17 @@
     return self;
 }
 
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return ![touch.view isKindOfClass:[UIControl class]];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
                                    initWithTarget:self
                                    action:@selector(hideKeyboard:)];
+    tap.delegate = self;
     tap.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:tap];
     
@@ -143,6 +148,8 @@
 -(void)flyaway {
     if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
         logo.transform = CGAffineTransformMakeTranslation(0, -(logo.frame.origin.y + logo.frame.size.height));
+        IRC.transform = CGAffineTransformMakeTranslation(0, -(IRC.frame.origin.y + IRC.frame.size.height));
+        Cloud.transform = CGAffineTransformMakeTranslation(0, -(Cloud.frame.origin.y + Cloud.frame.size.height));
         loadingView.transform = CGAffineTransformMakeTranslation(0, self.view.frame.size.height - loadingView.frame.origin.y);
     } else {
         logo.transform = CGAffineTransformMakeTranslation(-(logo.frame.origin.x + logo.frame.size.width), 0);
@@ -154,6 +161,8 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     logo.transform = CGAffineTransformIdentity;
+    IRC.transform = CGAffineTransformIdentity;
+    Cloud.transform = CGAffineTransformIdentity;
     loadingView.transform = CGAffineTransformIdentity;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -201,7 +210,19 @@
         password.text = @"";
         loadingView.alpha = 0;
         loginView.alpha = 1;
-        enterpriseLearnMore.alpha = 0;
+        if(username.text.length) {
+            loginHint.alpha = 0;
+            signupHint.alpha = 1;
+            signup.alpha = 0;
+            login.alpha = 1;
+            name.alpha = 0;
+        } else {
+            loginHint.alpha = 1;
+            signupHint.alpha = 0;
+            signup.alpha = 1;
+            login.alpha = 0;
+            name.alpha = 1;
+        }
 #ifdef ENTERPRISE
         host.alpha = 1;
         username.alpha = 0;
@@ -332,6 +353,12 @@
     activity.hidden = YES;
     progress.progress = 0;
     progress.hidden = NO;
+    
+    loginHint.alpha = 0;
+    signupHint.alpha = 0;
+    enterpriseHint.alpha = 0;
+    forgotPasswordLogin.alpha = 0;
+    forgotPasswordSignup.alpha = 0;
 }
 
 -(void)backlogProgress:(NSNotification *)notification {
@@ -447,7 +474,7 @@
             }
             loginHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, 70, width, 32);
             loginView.frame = CGRectMake(0, 119, 320, self.view.bounds.size.height - 119);
-            loadingView.frame = CGRectMake(0, 74, 320, self.view.bounds.size.height - 74);
+            loadingView.frame = CGRectMake(0, 78, 320, self.view.bounds.size.height - 78);
         } else {
             if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
                 logo.frame = CGRectMake(256, 72, 256, 256);

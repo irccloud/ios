@@ -382,7 +382,7 @@
                                 <action selector="TOSHintPressed:" destination="-1" eventType="touchUpInside" id="Z7F-s0-NEt"/>
                             </connections>
                         </view>
-                        <view autoresizesSubviews="NO" contentMode="scaleToFill" id="Ny4-I9-kfx" customClass="UIControl">
+                        <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="Ny4-I9-kfx" customClass="UIControl">
                             <rect key="frame" x="39" y="163" width="241" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
