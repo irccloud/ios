@@ -728,7 +728,7 @@
 }
 
 -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
-    return YES;
+    return [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPhone;
 }
 
 @end
