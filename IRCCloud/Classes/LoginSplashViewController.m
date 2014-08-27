@@ -75,7 +75,7 @@
     lato = [UIFont fontWithName:@"Lato" size:13];
     enterEmailAddressHint.font = lato;
     
-    lato = [UIFont fontWithName:@"Lato" size:12];
+    lato = [UIFont fontWithName:@"Lato" size:14];
     for(UILabel *l in forgotPasswordHint.subviews) {
         l.font = lato;
         [l sizeToFit];
@@ -91,7 +91,7 @@
         [l sizeToFit];
     }
     
-    lato = [UIFont fontWithName:@"Lato-LightItalic" size:12];
+    lato = [UIFont fontWithName:@"Lato-LightItalic" size:13];
     hostHint.font = lato;
     
     lato = [UIFont fontWithName:@"Lato" size:16];
@@ -389,7 +389,7 @@
             v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
             width += v.bounds.size.width + 2;
         }
-        enterpriseLearnMore.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, next.frame.origin.y + next.frame.size.height + 3, width, 20);
+        enterpriseLearnMore.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, next.frame.origin.y + next.frame.size.height + 5, width, 20);
     } else if(sendAccessLink.alpha) {
         float width = 0.0f;
         for(UIView *v in notAProblem.subviews) {
@@ -415,14 +415,14 @@
             v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
             width += v.bounds.size.width + 2;
         }
-        forgotPasswordHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 3, width, 20);
+        forgotPasswordHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 5, width, 20);
         
         width = 0.0f;
         for(UIView *v in TOSHint.subviews) {
             v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
             width += v.bounds.size.width + 2;
         }
-        TOSHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 3, width, 20);
+        TOSHint.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, login.frame.origin.y + login.frame.size.height + 5, width, 20);
     }
 
     status.frame = CGRectMake(32, topoffset, loginView.bounds.size.width - 64, 21);
