@@ -235,7 +235,7 @@
                             <rect key="frame" x="17" y="133" width="288" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <state key="normal" title="Sign Up" backgroundImage="login_button">
+                            <state key="normal" title="Sign up for an account" backgroundImage="signup_button">
                                 <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
@@ -348,5 +348,6 @@
         <image name="login_logo" width="48" height="48"/>
         <image name="login_only_input" width="288" height="38"/>
         <image name="login_top_input" width="288" height="39"/>
+        <image name="signup_button" width="288" height="40"/>
     </resources>
 </document>
