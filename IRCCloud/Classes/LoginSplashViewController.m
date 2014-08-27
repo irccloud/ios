@@ -33,6 +33,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
+                                   initWithTarget:self
+                                   action:@selector(hideKeyboard:)];
+    tap.cancelsTouchesInView = NO;
+    [self.view addGestureRecognizer:tap];
+    
     UIFont *lato = [UIFont fontWithName:@"Lato" size:38];
     IRC.font = lato;
     [IRC sizeToFit];
@@ -54,6 +60,15 @@
         [l sizeToFit];
         lato = [UIFont fontWithName:@"Lato" size:18];
     }
+    
+    ((UILabel *)(forgotPasswordLogin.subviews.firstObject)).font = lato;
+    ((UILabel *)(forgotPasswordSignup.subviews.firstObject)).font = lato;
+    lato = [UIFont fontWithName:@"Lato" size:15];
+    ((UILabel *)(notAProblem.subviews.firstObject)).font = lato;
+    lato = [UIFont fontWithName:@"Lato-LightItalic" size:15];
+    ((UILabel *)(notAProblem.subviews.lastObject)).font = lato;
+    lato = [UIFont fontWithName:@"Lato" size:13];
+    enterEmailAddressHint.font = lato;
     
     lato = [UIFont fontWithName:@"Lato" size:12];
     for(UILabel *l in forgotPasswordHint.subviews) {
@@ -108,6 +123,8 @@
     signup.enabled = NO;
     next.titleLabel.font = lato;
     next.enabled = NO;
+    sendAccessLink.titleLabel.font = lato;
+    sendAccessLink.enabled = NO;
 #ifdef BRAND_NAME
     [version setText:[NSString stringWithFormat:@"Version %@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], @BRAND_NAME]];
 #else
@@ -330,6 +347,8 @@
     
     if(name.alpha > 0)
         username.background = [UIImage imageNamed:@"login_mid_input"];
+    else if(sendAccessLink.alpha > 0)
+        username.background = [UIImage imageNamed:@"login_only_input"];
     else
         username.background = [UIImage imageNamed:@"login_top_input"];
     
@@ -344,6 +363,19 @@
             width += v.bounds.size.width + 2;
         }
         enterpriseLearnMore.frame = CGRectMake(self.view.bounds.size.width / 2.0f - width / 2.0f, next.frame.origin.y + next.frame.size.height + 3, width, 20);
+    } else if(sendAccessLink.alpha) {
+        float width = 0.0f;
+        for(UIView *v in notAProblem.subviews) {
+            [v sizeToFit];
+            v.frame = CGRectMake(width, 0, v.bounds.size.width, 20);
+            width += v.bounds.size.width + 2;
+        }
+        notAProblem.frame = CGRectMake(16, topoffset - 5, width, 20);
+
+        username.frame = CGRectMake(16, topoffset + 26, loginView.bounds.size.width - 32, 39);
+        
+        sendAccessLink.frame = CGRectMake(16, topoffset + 81, loginView.bounds.size.width - 32, 40);
+        enterEmailAddressHint.frame = CGRectMake(16, topoffset + 80 + 50, loginView.bounds.size.width - 32, 40);
     } else {
         name.frame = CGRectMake(16, topoffset, loginView.bounds.size.width - 32, 39);
         username.frame = CGRectMake(16, topoffset + (offset * 39), loginView.bounds.size.width - 32, 39);
@@ -468,11 +500,17 @@
     [UIView beginAnimations:nil context:NULL];
     name.alpha = 0;
     login.alpha = 1;
+    password.alpha = 1;
     signup.alpha = 0;
     loginHint.alpha = 0;
     signupHint.alpha = 1;
     forgotPasswordHint.alpha = 1;
     TOSHint.alpha = 0;
+    forgotPasswordLogin.alpha = 0;
+    forgotPasswordSignup.alpha = 0;
+    notAProblem.alpha = 0;
+    sendAccessLink.alpha = 0;
+    enterEmailAddressHint.alpha = 0;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [UIView commitAnimations];
     [self textFieldChanged:name];
@@ -481,20 +519,43 @@
 -(IBAction)signupHintPressed:(id)sender {
     [UIView beginAnimations:nil context:NULL];
     name.alpha = 1;
+    password.alpha = 1;
     login.alpha = 0;
     signup.alpha = 1;
     loginHint.alpha = 1;
     signupHint.alpha = 0;
     forgotPasswordHint.alpha = 0;
     TOSHint.alpha = 1;
+    forgotPasswordLogin.alpha = 0;
+    forgotPasswordSignup.alpha = 0;
+    notAProblem.alpha = 0;
+    sendAccessLink.alpha = 0;
+    enterEmailAddressHint.alpha = 0;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [UIView commitAnimations];
     [self textFieldChanged:username];
 }
 
 -(IBAction)forgotPasswordHintPressed:(id)sender {
+    [UIView beginAnimations:nil context:NULL];
+    login.alpha = 0;
+    password.alpha = 0;
+    signupHint.alpha = 0;
+    forgotPasswordHint.alpha = 0;
+    
+    forgotPasswordLogin.alpha = 1;
+    forgotPasswordSignup.alpha = 1;
+    notAProblem.alpha = 1;
+    sendAccessLink.alpha = 1;
+    enterEmailAddressHint.alpha = 1;
+    [self _updateFieldPositions];
+    [UIView commitAnimations];
+}
+
+-(IBAction)sendAccessLinkButtonPressed:(id)sender {
     
 }
+
 
 -(IBAction)TOSHintPressed:(id)sender {
 #ifndef EXTENSION
@@ -531,6 +592,11 @@
 -(IBAction)enterpriseLearnMorePressed:(id)sender {
     
 }
+
+-(IBAction)hideKeyboard:(id)sender {
+    [self.view endEditing:YES];
+}
+
 
 -(IBAction)loginButtonPressed:(id)sender {
     [username resignFirstResponder];
@@ -619,6 +685,7 @@
     login.enabled = (username.text.length > 0 && password.text.length > 0);
     signup.enabled = (name.alpha == 0) || (username.text.length > 0 && password.text.length > 0 && name.text.length > 0);
     next.enabled = (host.text.length > 0);
+    sendAccessLink.enabled = (username.text.length > 0);
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {

@@ -11,10 +11,13 @@
                 <outlet property="IRC" destination="HoY-b4-35C" id="oWW-wv-AkZ"/>
                 <outlet property="TOSHint" destination="YmC-aZ-dyy" id="Vec-Th-gNF"/>
                 <outlet property="activity" destination="324" id="325"/>
+                <outlet property="enterEmailAddressHint" destination="ayV-SQ-egK" id="kUC-s2-rgW"/>
                 <outlet property="enterpriseHint" destination="dhF-J4-bp9" id="hth-nh-uL8"/>
                 <outlet property="enterpriseLearnMore" destination="Ny4-I9-kfx" id="LoB-y5-4ta"/>
                 <outlet property="error" destination="162" id="316"/>
                 <outlet property="forgotPasswordHint" destination="asF-oS-cGS" id="8Hv-Mq-8jf"/>
+                <outlet property="forgotPasswordLogin" destination="MFp-Fr-rTZ" id="3mm-Y9-xVg"/>
+                <outlet property="forgotPasswordSignup" destination="RDM-yr-ume" id="7D5-7h-R3H"/>
                 <outlet property="host" destination="jqA-ba-Tu0" id="rwP-9D-Y2i"/>
                 <outlet property="hostHint" destination="a0H-ly-beG" id="TUk-Qx-6mE"/>
                 <outlet property="loadingView" destination="112" id="317"/>
@@ -24,10 +27,12 @@
                 <outlet property="logo" destination="4" id="323"/>
                 <outlet property="name" destination="gxw-la-FzH" id="ryw-h2-3Mm"/>
                 <outlet property="next" destination="b6e-F2-0mJ" id="U0V-pb-pSk"/>
+                <outlet property="notAProblem" destination="MND-ER-vK2" id="J0y-EF-Bgr"/>
                 <outlet property="password" destination="25" id="319"/>
                 <outlet property="progress" destination="154" id="320"/>
+                <outlet property="sendAccessLink" destination="hXk-Rv-Dzw" id="And-fV-Wxn"/>
                 <outlet property="signup" destination="oca-Tc-vLq" id="lbU-xi-3fC"/>
-                <outlet property="signupHint" destination="RDM-yr-ume" id="qpz-2O-ksc"/>
+                <outlet property="signupHint" destination="Ax6-mw-liJ" id="EH1-XX-pSS"/>
                 <outlet property="status" destination="145" id="321"/>
                 <outlet property="username" destination="14" id="322"/>
                 <outlet property="version" destination="326" id="327"/>
@@ -64,18 +69,52 @@
                     <color key="textColor" red="0.61176470589999998" green="0.78039215689999997" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="MFp-Fr-rTZ" customClass="UIControl">
+                    <rect key="frame" x="68" y="70" width="65" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Login" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="rRf-aU-uAS">
+                            <rect key="frame" x="0.0" y="0.0" width="65" height="32"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <connections>
+                        <action selector="loginHintPressed:" destination="-1" eventType="touchUpInside" id="Jc9-fU-eHN"/>
+                    </connections>
+                </view>
                 <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="RDM-yr-ume" customClass="UIControl">
+                    <rect key="frame" x="188" y="70" width="65" height="32"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign Up" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="rDv-fo-VAf">
+                            <rect key="frame" x="0.0" y="0.0" width="65" height="32"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <connections>
+                        <action selector="signupHintPressed:" destination="-1" eventType="touchUpInside" id="HeH-Hl-XeX"/>
+                    </connections>
+                </view>
+                <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="Ax6-mw-liJ" customClass="UIControl">
                     <rect key="frame" x="50" y="70" width="220" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Need an account?" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="c4G-Vc-4bG">
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Need an account?" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="k2T-HD-tLg">
                             <rect key="frame" x="0.0" y="0.0" width="150" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
-                            <color key="textColor" red="0.61176470588235299" green="0.7803921568627451" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <color key="textColor" red="0.61176470589999998" green="0.78039215689999997" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign Up" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="rDv-fo-VAf">
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign Up" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="6m6-ic-gyc">
                             <rect key="frame" x="155" y="0.0" width="65" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="18"/>
@@ -85,7 +124,7 @@
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <connections>
-                        <action selector="signupHintPressed:" destination="-1" eventType="touchUpInside" id="Hrt-m8-MuD"/>
+                        <action selector="signupHintPressed:" destination="-1" eventType="touchUpInside" id="zje-Dw-mbE"/>
                     </connections>
                 </view>
                 <view autoresizesSubviews="NO" contentMode="scaleToFill" id="h5H-in-7fd" customClass="UIControl">
@@ -219,6 +258,13 @@
                             <color key="textColor" red="0.043137254899999998" green="0.18039215689999999" blue="0.37647058820000001" alpha="1" colorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Just enter the email address yous igned up with and we'll send you a link to log straight in." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" adjustsFontSizeToFit="NO" id="ayV-SQ-egK">
+                            <rect key="frame" x="16" y="110" width="288" height="40"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <color key="textColor" red="0.043137254899999998" green="0.18039215689999999" blue="0.37647058820000001" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                         <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="40">
                             <rect key="frame" x="17" y="133" width="288" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -255,6 +301,18 @@
                                 <action selector="nextButtonPressed:" destination="-1" eventType="touchUpInside" id="gfc-Fx-eIQ"/>
                             </connections>
                         </button>
+                        <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="hXk-Rv-Dzw">
+                            <rect key="frame" x="16" y="101" width="288" height="40"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <state key="normal" title="Send an access link" backgroundImage="login_button">
+                                <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="sendAccessLinkButtonPressed:" destination="-1" eventType="touchUpInside" id="UcR-hD-xcj"/>
+                            </connections>
+                        </button>
                         <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="asF-oS-cGS" customClass="UIControl">
                             <rect key="frame" x="40" y="180" width="241" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -278,6 +336,27 @@
                             <connections>
                                 <action selector="forgotPasswordHintPressed:" destination="-1" eventType="touchUpInside" id="cgw-9w-rR7"/>
                             </connections>
+                        </view>
+                        <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="MND-ER-vK2">
+                            <rect key="frame" x="16" y="11" width="241" height="20"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <subviews>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Forgotten your password?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="0Pv-XZ-qvS">
+                                    <rect key="frame" x="0.0" y="0.0" width="150" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                    <color key="textColor" red="0.043137254899999998" green="0.18039215689999999" blue="0.37647058820000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Not a problem." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="4WA-dc-vjg">
+                                    <rect key="frame" x="154" y="0.0" width="85" height="32"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                    <color key="textColor" red="0.043137254899999998" green="0.18039215689999999" blue="0.37647058820000001" alpha="1" colorSpace="calibratedRGB"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         </view>
                         <view autoresizesSubviews="NO" contentMode="scaleToFill" id="YmC-aZ-dyy" customClass="UIControl">
                             <rect key="frame" x="39" y="163" width="241" height="32"/>
@@ -340,6 +419,9 @@
             </subviews>
             <color key="backgroundColor" red="0.043137254901960784" green="0.1803921568627451" blue="0.37647058823529411" alpha="1" colorSpace="calibratedRGB"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <action selector="hideKeyboard:" destination="-1" eventType="touchUpInside" id="gZy-rH-lCt"/>
+            </connections>
         </view>
     </objects>
     <resources>

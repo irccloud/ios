@@ -32,6 +32,7 @@
     IBOutlet UIButton *login;
     IBOutlet UIButton *signup;
     IBOutlet UIButton *next;
+    IBOutlet UIButton *sendAccessLink;
     
     IBOutlet UIView *loadingView;
     IBOutlet UILabel *status;
@@ -44,9 +45,13 @@
     IBOutlet UIControl *forgotPasswordHint;
     IBOutlet UIControl *TOSHint;
     IBOutlet UIControl *enterpriseLearnMore;
+    IBOutlet UIControl *forgotPasswordLogin;
+    IBOutlet UIControl *forgotPasswordSignup;
     
     IBOutlet UILabel *enterpriseHint;
     IBOutlet UILabel *hostHint;
+    IBOutlet UILabel *enterEmailAddressHint;
+    IBOutlet UIView *notAProblem;
     
     NetworkConnection *_conn;
     CGSize _kbSize;
@@ -61,4 +66,6 @@
 -(IBAction)TOSHintPressed:(id)sender;
 -(IBAction)nextButtonPressed:(id)sender;
 -(IBAction)enterpriseLearnMorePressed:(id)sender;
+-(IBAction)sendAccessLinkButtonPressed:(id)sender;
+-(IBAction)hideKeyboard:(id)sender;
 @end
