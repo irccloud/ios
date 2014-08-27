@@ -87,7 +87,7 @@
                     </connections>
                 </view>
                 <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="RDM-yr-ume" customClass="UIControl">
-                    <rect key="frame" x="188" y="70" width="65" height="32"/>
+                    <rect key="frame" x="189" y="70" width="65" height="32"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign Up" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" id="rDv-fo-VAf">
@@ -258,7 +258,7 @@
                             <color key="textColor" red="0.043137254899999998" green="0.18039215689999999" blue="0.37647058820000001" alpha="1" colorSpace="calibratedRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Just enter the email address yous igned up with and we'll send you a link to log straight in." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" adjustsFontSizeToFit="NO" id="ayV-SQ-egK">
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Just enter the email address you signed up with and we'll send you a link to log straight in." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" adjustsFontSizeToFit="NO" id="ayV-SQ-egK">
                             <rect key="frame" x="16" y="110" width="288" height="40"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="13"/>
