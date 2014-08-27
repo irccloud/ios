@@ -184,6 +184,7 @@
         password.text = @"";
         loadingView.alpha = 0;
         loginView.alpha = 1;
+        enterpriseLearnMore.alpha = 0;
 #ifdef ENTERPRISE
         host.alpha = 1;
         username.alpha = 0;
