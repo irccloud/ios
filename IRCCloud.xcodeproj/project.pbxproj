@@ -51,7 +51,6 @@
 		2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
 		2237E13D16E1214A00CA188F /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
 		223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
-		224027ED17020290008940B1 /* LoginSplashViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 224027EC1702028F008940B1 /* LoginSplashViewController_iPad.xib */; };
 		22462B5218906B03009EF986 /* ServerReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22462B5118906B03009EF986 /* ServerReorderViewController.m */; };
 		2248DF3916EE375D0086BB42 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
 		224FCF331787286000FC3879 /* licenses.txt in Resources */ = {isa = PBXBuildFile; fileRef = 224FCF321787286000FC3879 /* licenses.txt */; };
@@ -136,10 +135,9 @@
 		225D978318AA995900065087 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
 		225D978418AA995900065087 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		225D978518AA995900065087 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
-		225D978918AA995900065087 /* LoginSplashViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */; };
+		225D978918AA995900065087 /* LoginSplashViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 228A05DD16D3E40F0029769C /* LoginSplashViewController.xib */; };
 		225D978A18AA995900065087 /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */; };
 		225D978B18AA995900065087 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
-		225D978C18AA995900065087 /* LoginSplashViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 224027EC1702028F008940B1 /* LoginSplashViewController_iPad.xib */; };
 		225D978D18AA995900065087 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22D4F9101743F3790095EE8F /* Localizable.strings */; };
 		225D978F18AA995900065087 /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
 		225D979018AA995900065087 /* ARChromeActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017441783434800066E71 /* ARChromeActivity.png */; };
@@ -172,7 +170,7 @@
 		228A05D416D3DFB80029769C /* TTTAttributedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05D316D3DFB80029769C /* TTTAttributedLabel.m */; };
 		228A05D716D3DFDA0029769C /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
 		228A05DE16D3E40F0029769C /* LoginSplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05DC16D3E40E0029769C /* LoginSplashViewController.m */; };
-		228A05DF16D3E40F0029769C /* LoginSplashViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */; };
+		228A05DF16D3E40F0029769C /* LoginSplashViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 228A05DD16D3E40F0029769C /* LoginSplashViewController.xib */; };
 		228E2B7E18CF770D0011DEAB /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6418CF770D0011DEAB /* NSObject+SBJson.m */; };
 		228E2B8018CF770D0011DEAB /* NSObject+SBJson.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6418CF770D0011DEAB /* NSObject+SBJson.m */; };
 		228E2B8118CF770D0011DEAB /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B6718CF770D0011DEAB /* SBJsonParser.m */; };
@@ -324,7 +322,6 @@
 		2237E13C16E1214A00CA188F /* ColorFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorFormatter.m; sourceTree = "<group>"; };
 		223DA90A16DFC626006FF808 /* EventsTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsTableView.h; sourceTree = "<group>"; };
 		223DA90B16DFC626006FF808 /* EventsTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsTableView.m; sourceTree = "<group>"; };
-		224027EC1702028F008940B1 /* LoginSplashViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LoginSplashViewController_iPad.xib; path = Classes/LoginSplashViewController_iPad.xib; sourceTree = "<group>"; };
 		22462B5018906B03009EF986 /* ServerReorderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerReorderViewController.h; sourceTree = "<group>"; };
 		22462B5118906B03009EF986 /* ServerReorderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerReorderViewController.m; sourceTree = "<group>"; };
 		2248DF3816EE375D0086BB42 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
@@ -382,7 +379,7 @@
 		228A05D516D3DFD00029769C /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		228A05DB16D3E40E0029769C /* LoginSplashViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginSplashViewController.h; sourceTree = "<group>"; };
 		228A05DC16D3E40E0029769C /* LoginSplashViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginSplashViewController.m; sourceTree = "<group>"; };
-		228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LoginSplashViewController_iPhone.xib; path = Classes/LoginSplashViewController_iPhone.xib; sourceTree = "<group>"; };
+		228A05DD16D3E40F0029769C /* LoginSplashViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LoginSplashViewController.xib; path = Classes/LoginSplashViewController.xib; sourceTree = "<group>"; };
 		228E2B6318CF770D0011DEAB /* NSObject+SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+SBJson.h"; sourceTree = "<group>"; };
 		228E2B6418CF770D0011DEAB /* NSObject+SBJson.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SBJson.m"; sourceTree = "<group>"; };
 		228E2B6518CF770D0011DEAB /* SBJson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJson.h; sourceTree = "<group>"; };
@@ -596,8 +593,7 @@
 				22DB253D1982E2890008728E /* IRCEnterprise.entitlements */,
 				2296E0B719805767002D59E3 /* IRCCloud.entitlements */,
 				2223C6A91768D7150032544B /* ImageViewController.xib */,
-				228A05DD16D3E40F0029769C /* LoginSplashViewController_iPhone.xib */,
-				224027EC1702028F008940B1 /* LoginSplashViewController_iPad.xib */,
+				228A05DD16D3E40F0029769C /* LoginSplashViewController.xib */,
 				2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */,
 				2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */,
 				228A05AD16D3DB7B0029769C /* Classes */,
@@ -958,11 +954,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				225D978918AA995900065087 /* LoginSplashViewController_iPhone.xib in Resources */,
+				225D978918AA995900065087 /* LoginSplashViewController.xib in Resources */,
 				22EEA94E18D0AC08007D5022 /* EnterpriseImages.xcassets in Resources */,
 				225D978A18AA995900065087 /* MainViewController_iPhone.xib in Resources */,
 				225D978B18AA995900065087 /* MainViewController_iPad.xib in Resources */,
-				225D978C18AA995900065087 /* LoginSplashViewController_iPad.xib in Resources */,
 				1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */,
 				225D978D18AA995900065087 /* Localizable.strings in Resources */,
 				225D978F18AA995900065087 /* ImageViewController.xib in Resources */,
@@ -988,10 +983,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				228A057A16D3DABA0029769C /* InfoPlist.strings in Resources */,
-				228A05DF16D3E40F0029769C /* LoginSplashViewController_iPhone.xib in Resources */,
+				228A05DF16D3E40F0029769C /* LoginSplashViewController.xib in Resources */,
 				2236F61016DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */,
 				2236F64216DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */,
-				224027ED17020290008940B1 /* LoginSplashViewController_iPad.xib in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
 				2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */,
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,

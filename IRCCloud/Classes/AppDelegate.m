@@ -110,8 +110,8 @@
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
+    self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController" bundle:nil];
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPhone" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPhone" bundle:nil];
         self.slideViewController = [[ECSlidingViewController alloc] init];
         self.slideViewController.view.backgroundColor = [UIColor blackColor];
@@ -119,7 +119,6 @@
         [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
         self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
     } else {
-        self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController_iPad" bundle:nil];
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPad" bundle:nil];
         self.slideViewController = [[ECSlidingViewController alloc] init];
         self.slideViewController.view.backgroundColor = [UIColor blackColor];
