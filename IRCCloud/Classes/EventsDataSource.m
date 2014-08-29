@@ -118,6 +118,13 @@
             _bgColor = [UIColor newMsgsBackgroundColor];
         else
             decodeObject(_bgColor);
+        
+        if(_pending) {
+            _height = 0;
+            _pending = NO;
+            _rowType = ROW_FAILED;
+            _bgColor = [UIColor errorBackgroundColor];
+        }
     }
     return self;
 }
@@ -207,6 +214,7 @@
             }
             [_events_sorted setObject:events_sorted forKey:bid];
         }
+        [self clearPendingAndFailed];
     } else {
         _events = [[NSMutableDictionary alloc] init];
     }
@@ -918,6 +926,26 @@
             NSArray *events = [_events objectForKey:bid];
             for(Event *e in events)
                 e.formatted = nil;
+        }
+    }
+}
+
+-(void)clearPendingAndFailed {
+    @synchronized(_events) {
+        NSMutableArray *eventsToRemove = [[NSMutableArray alloc] init];
+        for(NSNumber *bid in _events) {
+            NSArray *events = [[_events objectForKey:bid] copy];
+            for(Event *e in events) {
+                if((e.pending || e.rowType == ROW_FAILED) && e.reqId != -1)
+                    [eventsToRemove addObject:e];
+            }
+        }
+        for(Event *e in eventsToRemove) {
+            [[_events objectForKey:@(e.bid)] removeObject:e];
+            [[_events_sorted objectForKey:@(e.bid)] removeObjectForKey:@(e.eid)];
+            if(e.expirationTimer && [e.expirationTimer isValid])
+                [e.expirationTimer invalidate];
+            e.expirationTimer = nil;
         }
     }
 }

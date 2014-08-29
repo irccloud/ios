@@ -849,6 +849,7 @@
             [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
         }
     }
+    [[EventsDataSource sharedInstance] clearPendingAndFailed];
     if(!_buffer || ![[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
         int bid = [BuffersDataSource sharedInstance].firstBid;
         if(_buffer && _buffer.lastBuffer)
