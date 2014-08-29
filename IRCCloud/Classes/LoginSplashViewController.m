@@ -561,7 +561,47 @@
 }
 
 -(IBAction)sendAccessLinkButtonPressed:(id)sender {
-    
+    [username resignFirstResponder];
+    [UIView beginAnimations:nil context:nil];
+    loginView.alpha = 0;
+    loadingView.alpha = 1;
+    [UIView commitAnimations];
+    [status setText:@"Requesting Password Reset"];
+    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
+    progress.hidden = YES;
+    progress.progress = 0;
+    [activity startAnimating];
+    activity.hidden = NO;
+    error.text = nil;
+    error.hidden = YES;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
+        if([[result objectForKey:@"success"] intValue] == 1) {
+            result = [[NetworkConnection sharedInstance] requestPassword:[username text] token:[result objectForKey:@"token"]];
+            if([[result objectForKey:@"success"] intValue] == 1) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [UIView beginAnimations:nil context:nil];
+                    loginView.alpha = 1;
+                    loadingView.alpha = 0;
+                    [UIView commitAnimations];
+                    [activity stopAnimating];
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Password Reset" message:@"We've sent you a password reset link.  Check your email and follow the instructions to sign in." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                    [self loginHintPressed:nil];
+                });
+                return;
+            }
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [UIView beginAnimations:nil context:nil];
+            loginView.alpha = 1;
+            loadingView.alpha = 0;
+            [UIView commitAnimations];
+            [activity stopAnimating];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Password Reset Failed" message:@"Unable to request a password reset.  Please try again later." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [alert show];
+        });
+    });
 }
 
 

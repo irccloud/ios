@@ -902,6 +902,31 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [[[SBJsonParser alloc] init] objectWithData:data];
 }
 
+-(NSDictionary *)requestPassword:(NSString *)email token:(NSString *)token {
+	NSData *data;
+	NSURLResponse *response = nil;
+	NSError *error = nil;
+    
+    CFStringRef email_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)email, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/request-password-reset", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    [request setValue:token forHTTPHeaderField:@"x-auth-formtoken"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[[NSString stringWithFormat:@"email=%@&token=%@", email_escaped, token] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    CFRelease(email_escaped);
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
+    return [[[SBJsonParser alloc] init] objectWithData:data];
+}
+
 //From: http://stackoverflow.com/questions/1305225/best-way-to-serialize-a-nsdata-into-an-hexadeximal-string
 -(NSString *)dataToHex:(NSData *)data {
     /* Returns hexadecimal string of NSData. Empty string if data is empty.   */
