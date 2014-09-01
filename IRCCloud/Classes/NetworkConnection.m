@@ -873,6 +873,25 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [[[SBJsonParser alloc] init] objectWithData:data];
 }
 
+-(NSDictionary *)login:(NSURL *)accessLink {
+	NSData *data;
+	NSURLResponse *response = nil;
+	NSError *error = nil;
+    
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:accessLink cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
+    return [[[SBJsonParser alloc] init] objectWithData:data];
+}
+
 -(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token {
 	NSData *data;
 	NSURLResponse *response = nil;
@@ -911,12 +930,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/request-password-reset", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/request-access-link", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:token forHTTPHeaderField:@"x-auth-formtoken"];
     [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[NSString stringWithFormat:@"email=%@&token=%@", email_escaped, token] dataUsingEncoding:NSUTF8StringEncoding]];
+    [request setHTTPBody:[[NSString stringWithFormat:@"email=%@&token=%@&mobile=1", email_escaped, token] dataUsingEncoding:NSUTF8StringEncoding]];
     
     CFRelease(email_escaped);
     

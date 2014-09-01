@@ -239,12 +239,59 @@
         enterpriseLearnMore.alpha = 1;
         hostHint.alpha = 1;
 #endif
+        if(_accessLink) {
+            loginView.alpha = 0;
+            loadingView.alpha = 1;
+            [status setText:@"Signing in"];
+            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
+            progress.hidden = YES;
+            progress.progress = 0;
+            [activity startAnimating];
+            activity.hidden = NO;
+            error.text = nil;
+            error.hidden = YES;
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                NSDictionary *result = [[NetworkConnection sharedInstance] login:_accessLink];
+                _accessLink = nil;
+                if([[result objectForKey:@"success"] intValue] == 1) {
+                    if([result objectForKey:@"websocket_host"])
+                        IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
+                    if([result objectForKey:@"websocket_path"])
+                        IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
+                    [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
+                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+#ifdef ENTERPRISE
+                        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+                        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+                        [d setObject:IRCCLOUD_HOST forKey:@"host"];
+                        [d setObject:IRCCLOUD_PATH forKey:@"path"];
+                        [d synchronize];
+                    }
+                    [status setText:@"Connecting"];
+                    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
+                    [_conn connect];
+                } else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [UIView beginAnimations:nil context:nil];
+                        loginView.alpha = 1;
+                        loadingView.alpha = 0;
+                        [UIView commitAnimations];
+                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:@"Invalid access link" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                        [alert show];
+                    });
+                }
+            });
+        }
     }
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
-    self.view.frame = [UIScreen mainScreen].applicationFrame;
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
 -(void)handleEvent:(NSNotification *)notification {

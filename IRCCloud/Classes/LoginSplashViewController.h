@@ -55,7 +55,9 @@
     
     NetworkConnection *_conn;
     CGSize _kbSize;
+    NSURL *_accessLink;
 }
+@property NSURL *accessLink;
 -(void)flyaway;
 -(IBAction)loginButtonPressed:(id)sender;
 -(IBAction)signupButtonPressed:(id)sender;

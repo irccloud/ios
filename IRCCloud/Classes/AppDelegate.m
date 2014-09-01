@@ -137,8 +137,23 @@
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
-    if(![url.scheme hasPrefix:@"irccloud"])
+    if([url.scheme hasPrefix:@"irccloud"]) {
+        if([url.host isEqualToString:@"chat"] && [url.path isEqualToString:@"/access-link"]) {
+            [_conn logout];
+            _conn.background = NO;
+            self.loginSplashViewController.accessLink = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/%@%@?%@&format=json", IRCCLOUD_HOST, url.host, url.path, url.query]];
+            self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
+            [[NSNotificationCenter defaultCenter] removeObserver:self];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
+            self.loginSplashViewController.view.alpha = 1;
+            if(self.window.rootViewController == self.loginSplashViewController)
+                [self.loginSplashViewController viewWillAppear:YES];
+            else
+                self.window.rootViewController = self.loginSplashViewController;
+        }
+    } else {
         [self launchURL:url];
+    }
     return YES;
 }
 
