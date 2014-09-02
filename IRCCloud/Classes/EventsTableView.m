@@ -262,7 +262,7 @@ int __timestampWidth;
                 NSLog(@"Table was scrolled up, adjusting scroll offset");
                 [_lock lock];
                 int row = 0;
-                int toprow = [self.tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
+                NSInteger toprow = [self.tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
                 if(self.tableView.tableHeaderView != nil)
                     row++;
                 for(Event *event in _data) {
@@ -914,7 +914,7 @@ int __timestampWidth;
         NSLog(@"Table was scrolled up, adjusting scroll offset");
         [_lock lock];
         int row = 0;
-        int toprow = [self.tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
+        NSInteger toprow = [self.tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
         if(self.tableView.tableHeaderView != nil)
             row++;
         for(Event *event in _data) {

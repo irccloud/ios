@@ -130,8 +130,14 @@
         self.mainViewController.bidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:1] intValue];
         self.mainViewController.eidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:2] doubleValue];
     }
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
-    self.window.rootViewController = self.loginSplashViewController;
+    if([ServersDataSource sharedInstance].count) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+            self.window.backgroundColor = [UIColor whiteColor];
+        self.window.rootViewController = self.slideViewController;
+    } else {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
+        self.window.rootViewController = self.loginSplashViewController;
+    }
     [self.window makeKeyAndVisible];
     return YES;
 }
