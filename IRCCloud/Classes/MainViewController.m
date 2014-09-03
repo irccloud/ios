@@ -746,6 +746,16 @@
 }
 
 -(void)backlogCompleted:(NSNotification *)notification {
+#ifdef DEBUG
+    NSLog(@"This is a debug build, skipping APNs registration");
+#else
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+    } else {
+        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+    }
+#endif
     if([ServersDataSource sharedInstance].count < 1) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
         return;

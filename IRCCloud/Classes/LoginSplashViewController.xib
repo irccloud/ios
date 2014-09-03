@@ -408,9 +408,6 @@
                 <size key="portraitSize" width="320" height="480"/>
                 <size key="landscapeSize" width="480" height="320"/>
             </simulatedScreenMetrics>
-            <connections>
-                <action selector="hideKeyboard:" destination="-1" eventType="touchUpInside" id="gZy-rH-lCt"/>
-            </connections>
         </view>
     </objects>
     <resources>
