@@ -670,8 +670,11 @@
             [events setObject:[[_events objectForKey:bid] mutableCopy] forKey:bid];
         }
     }
-    [NSKeyedArchiver archiveRootObject:events toFile:cacheFile];
-    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    
+    @synchronized(self) {
+        [NSKeyedArchiver archiveRootObject:events toFile:cacheFile];
+        [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    }
 }
 
 -(void)clear {

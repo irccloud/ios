@@ -141,9 +141,12 @@
     @synchronized(_buffers) {
         buffers = [_buffers copy];
     }
-    [NSKeyedArchiver archiveRootObject:buffers toFile:cacheFile];
     
-    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    @synchronized(self) {
+        [NSKeyedArchiver archiveRootObject:buffers toFile:cacheFile];
+        
+        [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    }
 }
 
 -(void)clear {

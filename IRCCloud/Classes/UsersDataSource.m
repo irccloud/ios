@@ -93,8 +93,11 @@
             [users setObject:[[_users objectForKey:bid] mutableCopy] forKey:bid];
         }
     }
-    [NSKeyedArchiver archiveRootObject:users toFile:cacheFile];
-    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    
+    @synchronized(self) {
+        [NSKeyedArchiver archiveRootObject:users toFile:cacheFile];
+        [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    }
 }
 
 -(void)clear {

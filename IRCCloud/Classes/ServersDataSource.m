@@ -136,8 +136,10 @@
         servers = [_servers copy];
     }
     
-    [NSKeyedArchiver archiveRootObject:servers toFile:cacheFile];
-    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    @synchronized(self) {
+        [NSKeyedArchiver archiveRootObject:servers toFile:cacheFile];
+        [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    }
 }
 
 -(void)clear {

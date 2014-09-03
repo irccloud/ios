@@ -118,8 +118,11 @@
     @synchronized(_channels) {
         channels = [_channels copy];
     }
-    [NSKeyedArchiver archiveRootObject:channels toFile:cacheFile];
-    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    
+    @synchronized(self) {
+        [NSKeyedArchiver archiveRootObject:channels toFile:cacheFile];
+        [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    }
 }
 
 -(void)clear {
