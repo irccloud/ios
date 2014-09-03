@@ -38,12 +38,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]
-                                   initWithTarget:self
-                                   action:@selector(hideKeyboard:)];
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard:)];
     tap.delegate = self;
     tap.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:tap];
+    
+    UISwipeGestureRecognizer *swipe =[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard:)];
+    swipe.direction = UISwipeGestureRecognizerDirectionDown;
+    [self.view addGestureRecognizer:swipe];
     
     UIFont *lato = [UIFont fontWithName:@"Lato" size:38];
     IRC.font = lato;
