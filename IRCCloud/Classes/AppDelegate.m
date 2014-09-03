@@ -255,46 +255,52 @@
 }
 
 -(void)showMainView:(BOOL)animated {
+    if(animated) {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [UIApplication sharedApplication].statusBarHidden = NO;
         self.slideViewController.view.alpha = 1;
-        if(animated) {
-            if(self.window.rootViewController == self.loginSplashViewController) {
-                self.window.rootViewController = self.slideViewController;
-                [self.window insertSubview:self.loginSplashViewController.view aboveSubview:self.slideViewController.view];
-                [self.loginSplashViewController hideLoginView];
-                CGAffineTransform transform = self.slideViewController.view.transform;
-                self.slideViewController.view.transform = CGAffineTransformScale(transform, 0.01, 0.01);
-                [UIView animateWithDuration:0.5f animations:^{
-                    self.loginSplashViewController.view.alpha = 0;
-                    [self.loginSplashViewController flyaway];
-                    self.slideViewController.view.transform = transform;
-                } completion:^(BOOL finished){
-                    [self.loginSplashViewController.view removeFromSuperview];
-#ifdef __IPHONE_7_0
-                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                        self.window.backgroundColor = [UIColor whiteColor];
-#endif
-                }];
-            } else if(self.window.rootViewController != self.slideViewController) {
-                UIView *v = self.window.rootViewController.view;
-                self.window.rootViewController = self.slideViewController;
-                [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
-                [UIView animateWithDuration:0.5f animations:^{
-                    v.alpha = 0;
-                } completion:^(BOOL finished){
-                    [v removeFromSuperview];
-#ifdef __IPHONE_7_0
-                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                        self.window.backgroundColor = [UIColor whiteColor];
-#endif
-                }];
-            }
-        } else if(self.window.rootViewController != self.slideViewController) {
-            [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+        if(self.window.rootViewController == self.loginSplashViewController) {
             self.window.rootViewController = self.slideViewController;
+            [self.window insertSubview:self.loginSplashViewController.view aboveSubview:self.slideViewController.view];
+            [self.loginSplashViewController hideLoginView];
+            CGAffineTransform transform = self.slideViewController.view.transform;
+            self.slideViewController.view.transform = CGAffineTransformScale(transform, 0.01, 0.01);
+            [UIView animateWithDuration:0.5f animations:^{
+                self.loginSplashViewController.view.alpha = 0;
+                [self.loginSplashViewController flyaway];
+                self.slideViewController.view.transform = transform;
+            } completion:^(BOOL finished){
+                [self.loginSplashViewController.view removeFromSuperview];
+#ifdef __IPHONE_7_0
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                    self.window.backgroundColor = [UIColor whiteColor];
+#endif
+            }];
+        } else if(self.window.rootViewController != self.slideViewController) {
+            UIView *v = self.window.rootViewController.view;
+            self.window.rootViewController = self.slideViewController;
+            [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
+            [UIView animateWithDuration:0.5f animations:^{
+                v.alpha = 0;
+            } completion:^(BOOL finished){
+                [v removeFromSuperview];
+#ifdef __IPHONE_7_0
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                    self.window.backgroundColor = [UIColor whiteColor];
+#endif
+            }];
         }
     }];
+    } else if(self.window.rootViewController != self.slideViewController) {
+        [UIApplication sharedApplication].statusBarHidden = NO;
+        self.slideViewController.view.alpha = 1;
+        [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+        self.window.rootViewController = self.slideViewController;
+#ifdef __IPHONE_7_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+            self.window.backgroundColor = [UIColor whiteColor];
+#endif
+    }
 }
 
 -(void)showConnectionView {
@@ -335,6 +341,10 @@
         [application endBackgroundTask: background_task];
         background_task = UIBackgroundTaskInvalid;
     });
+    if(self.window.rootViewController != _slideViewController && [ServersDataSource sharedInstance].count) {
+        [self showMainView:NO];
+        self.window.backgroundColor = [UIColor blackColor];
+    }
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {

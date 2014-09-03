@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="4514" systemVersion="13B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6185.11" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
     <dependencies>
-        <deployment version="1280" defaultVersion="1280" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
+        <deployment version="1280" defaultVersion="1296" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6190.4"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="MainViewController">
@@ -50,8 +50,10 @@
                 </activityIndicatorView>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
         </view>
-        <view contentMode="scaleToFill" id="1">
+        <view autoresizesSubviews="NO" contentMode="scaleToFill" id="1">
             <rect key="frame" x="0.0" y="64" width="320" height="504"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
@@ -105,7 +107,6 @@
                         </button>
                     </subviews>
                     <color key="backgroundColor" red="0.32156863810000003" green="0.49019610879999997" blue="1" alpha="1" colorSpace="deviceRGB"/>
-                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                     <connections>
                         <action selector="topUnreadBarClicked:" destination="26" eventType="touchUpInside" id="76"/>
                     </connections>
@@ -131,7 +132,6 @@
                         </label>
                     </subviews>
                     <color key="backgroundColor" red="0.32156863810000003" green="0.49019610879999997" blue="1" alpha="1" colorSpace="deviceRGB"/>
-                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                     <connections>
                         <action selector="bottomUnreadBarClicked:" destination="26" eventType="touchUpInside" id="83"/>
                     </connections>
@@ -149,7 +149,6 @@
                         </label>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                     <connections>
                         <action selector="serverStatusBarPressed:" destination="-1" eventType="touchUpInside" id="122"/>
                     </connections>
@@ -192,17 +191,10 @@
                 </imageView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
-            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
         </view>
         <tableViewController id="26" customClass="EventsTableView">
             <extendedEdge key="edgesForExtendedLayout"/>
-            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
-            <nil key="simulatedTopBarMetrics"/>
-            <nil key="simulatedBottomBarMetrics"/>
-            <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
-            <nil key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="_backlogFailedButton" destination="146" id="148"/>
                 <outlet property="_backlogFailedView" destination="144" id="149"/>
@@ -227,6 +219,8 @@
                 </activityIndicatorView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
         </view>
         <view contentMode="scaleToFill" id="144" userLabel="Backlog Failed View">
             <rect key="frame" x="0.0" y="0.0" width="320" height="60"/>
@@ -256,6 +250,8 @@
                 </label>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
         </view>
         <view opaque="NO" contentMode="scaleToFill" id="125" userLabel="Title View" customClass="UIControl">
             <rect key="frame" x="0.0" y="0.0" width="210" height="40"/>
@@ -283,6 +279,8 @@
                 </imageView>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <action selector="titleAreaPressed:" destination="-1" eventType="touchUpInside" id="133"/>
             </connections>
@@ -293,4 +291,12 @@
         <image name="lock.png" width="16" height="16"/>
         <image name="sendbg_active.png" width="52" height="28"/>
     </resources>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4">
+            <size key="portraitSize" width="320" height="568"/>
+            <size key="landscapeSize" width="568" height="320"/>
+        </simulatedScreenMetrics>
+    </simulatedMetricsContainer>
 </document>

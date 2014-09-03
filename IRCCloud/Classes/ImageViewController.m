@@ -157,7 +157,6 @@
 }
 
 -(void)fail {
-    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
     if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
                                                                                   withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
@@ -263,9 +262,9 @@
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
     
-    [connection start];
+    [_connection start];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
@@ -299,15 +298,21 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    NSLog(@"Couldn't download image. Error code %li: %@", (long)error.code, error.localizedDescription);
-    [self fail];
+    if(connection == _connection) {
+        NSLog(@"Couldn't download image. Error code %li: %@", (long)error.code, error.localizedDescription);
+        [self fail];
+        _connection = nil;
+    }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    if(_imageData) {
-        [self performSelectorInBackground:@selector(_parseImageData:) withObject:_imageData];
-    } else {
-        [self fail];
+    if(connection == _connection) {
+        if(_imageData) {
+            [self performSelectorInBackground:@selector(_parseImageData:) withObject:_imageData];
+        } else {
+            [self fail];
+        }
+        _connection = nil;
     }
 }
 
@@ -414,6 +419,8 @@
 
 -(IBAction)doneButtonPressed:(id)sender {
     [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
+    [_connection cancel];
+    _connection = nil;
 }
 
 - (void)didReceiveMemoryWarning {

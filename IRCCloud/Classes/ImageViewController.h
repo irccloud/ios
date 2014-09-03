@@ -27,6 +27,7 @@
     NSTimer *_hideTimer;
     OpenInChromeController *_chrome;
     float _progressScale;
+    NSURLConnection *_connection;
 }
 -(id)initWithURL:(NSURL *)url;
 -(IBAction)viewTapped:(id)sender;
