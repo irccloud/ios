@@ -643,6 +643,8 @@
             if(o.bid == _buffer.bid) {
                 if(_buffer && _buffer.lastBuffer && [[BuffersDataSource sharedInstance] getBuffer:_buffer.lastBuffer.bid])
                     [self bufferSelected:_buffer.lastBuffer.bid];
+                else if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+                    [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
                 else
                     [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
             }
@@ -653,6 +655,8 @@
             if(o.cid == _buffer.cid) {
                 if(_buffer && _buffer.lastBuffer) {
                     [self bufferSelected:_buffer.lastBuffer.bid];
+                } else if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]]) {
+                    [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
                 } else if([[ServersDataSource sharedInstance] count]) {
                     [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
                 } else {
@@ -2539,7 +2543,10 @@
             if([_selectedBuffer.type isEqualToString:@"console"]) {
                 [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
             } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
-                [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+                if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+                    [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
+                else
+                    [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
             } else {
                 [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
             }
