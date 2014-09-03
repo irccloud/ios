@@ -1437,6 +1437,10 @@
         lastBuffer.draft = _message.text;
     }
     if(_buffer) {
+        _bidToOpen = -1;
+        _eidToOpen = -1;
+        _urlToOpen = nil;
+        _bufferToOpen = nil;
         CLS_LOG(@"BID selected: cid%i bid%i", _buffer.cid, bid);
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         for(Event *event in events) {
