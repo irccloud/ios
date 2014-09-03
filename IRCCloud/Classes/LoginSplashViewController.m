@@ -18,6 +18,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "LoginSplashViewController.h"
 #import "UIColor+IRCCloud.h"
+#import "AppDelegate.h"
 
 @implementation LoginSplashViewController
 
@@ -145,6 +146,12 @@
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
+-(void)hideLoginView {
+    loginView.alpha = 0;
+    loadingView.alpha = 1;
+}
+
+
 -(void)flyaway {
     if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
         logo.transform = CGAffineTransformMakeTranslation(0, -(logo.frame.origin.y + logo.frame.size.height));
@@ -166,14 +173,6 @@
     loadingView.transform = CGAffineTransformIdentity;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updateConnecting:)
-                                                 name:kIRCCloudConnectivityNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(handleEvent:)
-                                                 name:kIRCCloudEventNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
                                                  name:UIKeyboardWillShowNotification object:nil];
     
@@ -181,198 +180,86 @@
                                              selector:@selector(keyboardWillBeHidden:)
                                                  name:UIKeyboardWillHideNotification object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(backlogStarted:)
-                                                 name:kIRCCloudBacklogStartedNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(backlogProgress:)
-                                                 name:kIRCCloudBacklogProgressNotification object:nil];
-
-    
-    NSString *session = [NetworkConnection sharedInstance].session;
-    if(session != nil && [session length] > 0) {
-#ifndef EXTENSION
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-            [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
-#endif
-        if(_conn.state != kIRCCloudStateConnected) {
-            loginView.alpha = 0;
-            loadingView.alpha = 1;
-            progress.hidden = YES;
-            progress.progress = 0;
-            [activity startAnimating];
-            activity.hidden = NO;
-            [status setText:@"Connecting"];
-            [_conn connect];
-        }
-    } else {
-        password.text = @"";
-        loadingView.alpha = 0;
-        loginView.alpha = 1;
-        if(username.text.length) {
-            loginHint.alpha = 0;
-            signupHint.alpha = 1;
-            signup.alpha = 0;
-            login.alpha = 1;
-            name.alpha = 0;
-        } else {
-            loginHint.alpha = 1;
-            signupHint.alpha = 0;
-            signup.alpha = 1;
-            login.alpha = 0;
-            name.alpha = 1;
-        }
-#ifdef ENTERPRISE
-        host.alpha = 1;
-        username.alpha = 0;
-        password.alpha = 0;
-        name.alpha = 0;
-        enterpriseHint.alpha = 1;
+    password.text = @"";
+    loadingView.alpha = 0;
+    loginView.alpha = 1;
+    if(username.text.length) {
         loginHint.alpha = 0;
-        signupHint.alpha = 0;
-        login.alpha = 0;
+        signupHint.alpha = 1;
         signup.alpha = 0;
-        next.alpha = 1;
-        TOSHint.alpha = 0;
-        forgotPasswordHint.alpha = 0;
-        enterpriseLearnMore.alpha = 1;
-        hostHint.alpha = 1;
-#endif
-        if(_accessLink) {
-            loginView.alpha = 0;
-            loadingView.alpha = 1;
-            [status setText:@"Signing in"];
-            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
-            progress.hidden = YES;
-            progress.progress = 0;
-            [activity startAnimating];
-            activity.hidden = NO;
-            error.text = nil;
-            error.hidden = YES;
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                NSDictionary *result = [[NetworkConnection sharedInstance] login:_accessLink];
-                _accessLink = nil;
-                if([[result objectForKey:@"success"] intValue] == 1) {
-                    if([result objectForKey:@"websocket_host"])
-                        IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
-                    if([result objectForKey:@"websocket_path"])
-                        IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
-                    [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
-                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
-                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
-                    [[NSUserDefaults standardUserDefaults] synchronize];
-                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        login.alpha = 1;
+        name.alpha = 0;
+    } else {
+        loginHint.alpha = 1;
+        signupHint.alpha = 0;
+        signup.alpha = 1;
+        login.alpha = 0;
+        name.alpha = 1;
+    }
 #ifdef ENTERPRISE
-                        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
-#else
-                        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+    host.alpha = 1;
+    username.alpha = 0;
+    password.alpha = 0;
+    name.alpha = 0;
+    enterpriseHint.alpha = 1;
+    loginHint.alpha = 0;
+    signupHint.alpha = 0;
+    login.alpha = 0;
+    signup.alpha = 0;
+    next.alpha = 1;
+    TOSHint.alpha = 0;
+    forgotPasswordHint.alpha = 0;
+    enterpriseLearnMore.alpha = 1;
+    hostHint.alpha = 1;
 #endif
-                        [d setObject:IRCCLOUD_HOST forKey:@"host"];
-                        [d setObject:IRCCLOUD_PATH forKey:@"path"];
-                        [d synchronize];
-                    }
-                    [status setText:@"Connecting"];
-                    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
-                    [_conn connect];
-                } else {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [UIView beginAnimations:nil context:nil];
-                        loginView.alpha = 1;
-                        loadingView.alpha = 0;
-                        [UIView commitAnimations];
-                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:@"Invalid access link" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                        [alert show];
-                    });
+    if(_accessLink) {
+        loginView.alpha = 0;
+        loadingView.alpha = 1;
+        [status setText:@"Signing in"];
+        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
+        [activity startAnimating];
+        activity.hidden = NO;
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            NSDictionary *result = [[NetworkConnection sharedInstance] login:_accessLink];
+            _accessLink = nil;
+            if([[result objectForKey:@"success"] intValue] == 1) {
+                if([result objectForKey:@"websocket_host"])
+                    IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
+                if([result objectForKey:@"websocket_path"])
+                    IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
+                [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
+                [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+                [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+#ifdef ENTERPRISE
+                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+                    [d setObject:IRCCLOUD_HOST forKey:@"host"];
+                    [d setObject:IRCCLOUD_PATH forKey:@"path"];
+                    [d synchronize];
                 }
-            });
-        }
+                [status setText:@"Connecting"];
+                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
+                [_conn connect];
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [UIView beginAnimations:nil context:nil];
+                    loginView.alpha = 1;
+                    loadingView.alpha = 0;
+                    [UIView commitAnimations];
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:@"Invalid access link" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                });
+            }
+        });
     }
 }
 
 -(void)viewDidAppear:(BOOL)animated {
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
-}
-
--(void)handleEvent:(NSNotification *)notification {
-    kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-    IRCCloudJSONObject *o = nil;
-    
-    switch(event) {
-        case kIRCEventFailureMsg:
-            o = notification.object;
-            if([[o objectForKey:@"message"] isEqualToString:@"auth"]) {
-                [_conn disconnect];
-                [_conn performSelectorOnMainThread:@selector(logout) withObject:nil waitUntilDone:YES];
-                [activity stopAnimating];
-                loginView.alpha = 1;
-                loadingView.alpha = 0;
-            } else if([[o objectForKey:@"message"] isEqualToString:@"set_shard"]) {
-                [NetworkConnection sharedInstance].session = [o objectForKey:@"cookie"];
-                progress.hidden = YES;
-                progress.progress = 0;
-                [activity startAnimating];
-                activity.hidden = NO;
-                [status setText:@"Connecting"];
-                [_conn connect];
-            } else if([[o objectForKey:@"message"] isEqualToString:@"temp_unavailable"]) {
-                error.text = @"Your account is temporarily unavailable";
-                error.hidden = NO;
-                CGRect frame = error.frame;
-                frame.size.height = [error.text sizeWithFont:error.font constrainedToSize:CGSizeMake(frame.size.width,INT_MAX) lineBreakMode:error.lineBreakMode].height;
-                error.frame = frame;
-                [_conn disconnect];
-                _conn.idleInterval = 30;
-                [self updateConnecting:nil];
-                [_conn performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
-            } else {
-                error.text = [o objectForKey:@"message"];
-                error.hidden = NO;
-                CGRect frame = error.frame;
-                frame.size.height = [error.text sizeWithFont:error.font constrainedToSize:CGSizeMake(frame.size.width,INT_MAX) lineBreakMode:error.lineBreakMode].height;
-                error.frame = frame;
-                [_conn disconnect];
-                [_conn fail];
-                [self updateConnecting:nil];
-                [_conn performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
-            }
-            break;
-        default:
-            break;
-    }
-}
-
--(void)updateConnecting:(NSNotification *)notification {
-    if(_conn.state == kIRCCloudStateConnecting || [_conn reachable] == kIRCCloudUnknown) {
-        if(loadingView.alpha > 0)
-            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
-        [status setText:@"Connecting"];
-        activity.hidden = NO;
-        [activity startAnimating];
-        progress.progress = 0;
-        progress.hidden = YES;
-        error.text = nil;
-    } else if(_conn.state == kIRCCloudStateDisconnected) {
-        if(_conn.reconnectTimestamp > 0) {
-            int seconds = (int)(_conn.reconnectTimestamp - [[NSDate date] timeIntervalSince1970]) + 1;
-            [status setText:[NSString stringWithFormat:@"Reconnecting in %i second%@", seconds, (seconds == 1)?@"":@"s"]];
-            activity.hidden = NO;
-            [activity startAnimating];
-            progress.progress = 0;
-            progress.hidden = YES;
-            [self performSelector:@selector(updateConnecting:) withObject:nil afterDelay:1];
-        } else {
-            if(loadingView.alpha > 0)
-                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Disconnected");
-            if([_conn reachable])
-                [status setText:@"Disconnected"];
-            else
-                [status setText:@"Offline"];
-            activity.hidden = YES;
-            progress.progress = 0;
-            progress.hidden = YES;
-        }
-    }
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -383,33 +270,6 @@
 
 -(void)viewDidDisappear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
--(void)backlogStarted:(NSNotification *)notification {
-#ifdef DEBUG
-    NSLog(@"This is a debug build, skipping APNs registration");
-#else
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
-    } else {
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
-    }
-#endif
-    [status setText:@"Loading"];
-    activity.hidden = YES;
-    progress.progress = 0;
-    progress.hidden = NO;
-    
-    loginHint.alpha = 0;
-    signupHint.alpha = 0;
-    enterpriseHint.alpha = 0;
-    forgotPasswordLogin.alpha = 0;
-    forgotPasswordSignup.alpha = 0;
-}
-
--(void)backlogProgress:(NSNotification *)notification {
-    [progress setProgress:[notification.object floatValue] animated:YES];
 }
 
 -(void)_updateFieldPositions {
@@ -438,9 +298,10 @@
     next.frame = CGRectMake(left, 16 + 39 + 32, 288, 40);
     login.frame = signup.frame = CGRectMake(left, 16 + ((offset + 2) * 39) + 15, 288, 40);
     status.frame = CGRectMake(left + 16, 16, loginView.bounds.size.width - left*2 - 32, 21);
-    progress.frame = CGRectMake(left + 16, 16 + 38, loginView.bounds.size.width - left*2 - 32, 21);
-    activity.center = progress.center;
-    error.frame = CGRectMake(left + 16, 16 + 76, loginView.bounds.size.width - left*2 - 32, 100);
+    activity.center = status.center;
+    CGRect frame = activity.frame;
+    frame.origin.y += 24;
+    activity.frame = frame;
     sendAccessLink.frame = CGRectMake(left, 16 + 81, 288, 40);
     enterEmailAddressHint.frame = CGRectMake(left, 16 + 80 + 50, 288, 40);
     
@@ -615,12 +476,8 @@
     [UIView commitAnimations];
     [status setText:@"Requesting Password Reset"];
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
-    progress.hidden = YES;
-    progress.progress = 0;
     [activity startAnimating];
     activity.hidden = NO;
-    error.text = nil;
-    error.hidden = YES;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
@@ -705,12 +562,8 @@
     else
         [status setText:@"Signing in"];
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
-    progress.hidden = YES;
-    progress.progress = 0;
     [activity startAnimating];
     activity.hidden = NO;
-    error.text = nil;
-    error.hidden = YES;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
@@ -737,9 +590,12 @@
                     [d setObject:IRCCLOUD_PATH forKey:@"path"];
                     [d synchronize];
                 }
-                [status setText:@"Connecting"];
-                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
-                [_conn connect];
+                loginHint.alpha = 0;
+                signupHint.alpha = 0;
+                enterpriseHint.alpha = 0;
+                forgotPasswordLogin.alpha = 0;
+                forgotPasswordSignup.alpha = 0;
+                [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [UIView beginAnimations:nil context:nil];
@@ -796,7 +652,7 @@
 }
 
 -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
-    return [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPhone;
+    return orientation == UIInterfaceOrientationPortrait || [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPhone;
 }
 
 @end

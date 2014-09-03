@@ -837,7 +837,7 @@
     if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor whiteColor];
 #endif
-    if([ServersDataSource sharedInstance].count < 1) {
+    if([NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [ServersDataSource sharedInstance].count < 1) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
         return;
     }

@@ -1677,6 +1677,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [_events clear];
     SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, nil]);
     [self serialize];
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] unregisterForRemoteNotifications];
+#endif
 }
 
 -(NSString *)session {

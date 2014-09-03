@@ -130,12 +130,24 @@
         self.mainViewController.bidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:1] intValue];
         self.mainViewController.eidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:2] doubleValue];
     }
-    if([ServersDataSource sharedInstance].count) {
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+    NSString *session = [NetworkConnection sharedInstance].session;
+    if(session != nil && [session length] > 0) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+            [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
             self.window.backgroundColor = [UIColor whiteColor];
+        }
+#ifdef DEBUG
+        NSLog(@"This is a debug build, skipping APNs registration");
+#else
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
+            [[UIApplication sharedApplication] registerForRemoteNotifications];
+        } else {
+            [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+        }
+#endif
         self.window.rootViewController = self.slideViewController;
     } else {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
         self.window.rootViewController = self.loginSplashViewController;
     }
     [self.window makeKeyAndVisible];
@@ -149,8 +161,6 @@
             _conn.background = NO;
             self.loginSplashViewController.accessLink = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/%@%@?%@&format=json", IRCCLOUD_HOST, url.host, url.path, url.query]];
             self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
-            [[NSNotificationCenter defaultCenter] removeObserver:self];
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
             self.loginSplashViewController.view.alpha = 1;
             if(self.window.rootViewController == self.loginSplashViewController)
                 [self.loginSplashViewController viewWillAppear:YES];
@@ -235,7 +245,6 @@
 -(void)showLoginView {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showMainView) name:kIRCCloudBacklogCompletedNotification object:nil];
         self.loginSplashViewController.view.alpha = 1;
         self.window.rootViewController = self.loginSplashViewController;
     }];
@@ -248,46 +257,42 @@
 -(void)showMainView:(BOOL)animated {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [UIApplication sharedApplication].statusBarHidden = NO;
-        if([[ServersDataSource sharedInstance] count]) {
-            [[NSNotificationCenter defaultCenter] removeObserver:self name:kIRCCloudBacklogCompletedNotification object:nil];
-            self.slideViewController.view.alpha = 1;
-            if(animated) {
-                if(self.window.rootViewController == self.loginSplashViewController) {
-                    self.window.rootViewController = self.slideViewController;
-                    [self.window insertSubview:self.loginSplashViewController.view aboveSubview:self.slideViewController.view];
-                    CGAffineTransform transform = self.slideViewController.view.transform;
-                    self.slideViewController.view.transform = CGAffineTransformScale(transform, 0.01, 0.01);
-                    [UIView animateWithDuration:0.5f animations:^{
-                        self.loginSplashViewController.view.alpha = 0;
-                        [self.loginSplashViewController flyaway];
-                        self.slideViewController.view.transform = transform;
-                    } completion:^(BOOL finished){
-                        [self.loginSplashViewController.view removeFromSuperview];
-#ifdef __IPHONE_7_0
-                        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                            self.window.backgroundColor = [UIColor whiteColor];
-#endif
-                    }];
-                } else if(self.window.rootViewController != self.slideViewController) {
-                    UIView *v = self.window.rootViewController.view;
-                    self.window.rootViewController = self.slideViewController;
-                    [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
-                    [UIView animateWithDuration:0.5f animations:^{
-                        v.alpha = 0;
-                    } completion:^(BOOL finished){
-                        [v removeFromSuperview];
-#ifdef __IPHONE_7_0
-                        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                            self.window.backgroundColor = [UIColor whiteColor];
-#endif
-                    }];
-                }
-            } else if(self.window.rootViewController != self.slideViewController) {
-                [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+        self.slideViewController.view.alpha = 1;
+        if(animated) {
+            if(self.window.rootViewController == self.loginSplashViewController) {
                 self.window.rootViewController = self.slideViewController;
+                [self.window insertSubview:self.loginSplashViewController.view aboveSubview:self.slideViewController.view];
+                [self.loginSplashViewController hideLoginView];
+                CGAffineTransform transform = self.slideViewController.view.transform;
+                self.slideViewController.view.transform = CGAffineTransformScale(transform, 0.01, 0.01);
+                [UIView animateWithDuration:0.5f animations:^{
+                    self.loginSplashViewController.view.alpha = 0;
+                    [self.loginSplashViewController flyaway];
+                    self.slideViewController.view.transform = transform;
+                } completion:^(BOOL finished){
+                    [self.loginSplashViewController.view removeFromSuperview];
+#ifdef __IPHONE_7_0
+                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                        self.window.backgroundColor = [UIColor whiteColor];
+#endif
+                }];
+            } else if(self.window.rootViewController != self.slideViewController) {
+                UIView *v = self.window.rootViewController.view;
+                self.window.rootViewController = self.slideViewController;
+                [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
+                [UIView animateWithDuration:0.5f animations:^{
+                    v.alpha = 0;
+                } completion:^(BOOL finished){
+                    [v removeFromSuperview];
+#ifdef __IPHONE_7_0
+                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                        self.window.backgroundColor = [UIColor whiteColor];
+#endif
+                }];
             }
-        } else {
-            [self showConnectionView];
+        } else if(self.window.rootViewController != self.slideViewController) {
+            [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+            self.window.rootViewController = self.slideViewController;
         }
     }];
 }

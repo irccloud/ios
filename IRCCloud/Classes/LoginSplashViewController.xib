@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6185.11" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
     <dependencies>
         <deployment version="1280" defaultVersion="1296" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6190.4"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="LoginSplashViewController">
@@ -14,7 +14,6 @@
                 <outlet property="enterEmailAddressHint" destination="ayV-SQ-egK" id="kUC-s2-rgW"/>
                 <outlet property="enterpriseHint" destination="dhF-J4-bp9" id="hth-nh-uL8"/>
                 <outlet property="enterpriseLearnMore" destination="Ny4-I9-kfx" id="LoB-y5-4ta"/>
-                <outlet property="error" destination="162" id="316"/>
                 <outlet property="forgotPasswordHint" destination="asF-oS-cGS" id="8Hv-Mq-8jf"/>
                 <outlet property="forgotPasswordLogin" destination="MFp-Fr-rTZ" id="3mm-Y9-xVg"/>
                 <outlet property="forgotPasswordSignup" destination="RDM-yr-ume" id="7D5-7h-R3H"/>
@@ -29,7 +28,6 @@
                 <outlet property="next" destination="b6e-F2-0mJ" id="U0V-pb-pSk"/>
                 <outlet property="notAProblem" destination="MND-ER-vK2" id="J0y-EF-Bgr"/>
                 <outlet property="password" destination="25" id="319"/>
-                <outlet property="progress" destination="154" id="320"/>
                 <outlet property="sendAccessLink" destination="hXk-Rv-Dzw" id="And-fV-Wxn"/>
                 <outlet property="signup" destination="oca-Tc-vLq" id="lbU-xi-3fC"/>
                 <outlet property="signupHint" destination="Ax6-mw-liJ" id="EH1-XX-pSS"/>
@@ -162,24 +160,11 @@
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <progressView hidden="YES" opaque="NO" contentMode="scaleToFill" id="154">
-                            <rect key="frame" x="10" y="59" width="300" height="2"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <color key="progressTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <color key="trackTintColor" red="0.043137254899999998" green="0.18039215689999999" blue="0.37647058820000001" alpha="1" colorSpace="calibratedRGB"/>
-                        </progressView>
                         <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" hidesWhenStopped="YES" style="gray" id="324">
                             <rect key="frame" x="151" y="54" width="20" height="20"/>
                             <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="color" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         </activityIndicatorView>
-                        <label hidden="YES" opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="162">
-                            <rect key="frame" x="0.0" y="76" width="320" height="93"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                            <nil key="highlightedColor"/>
-                        </label>
                     </subviews>
                     <color key="backgroundColor" red="0.26666666666666666" green="0.50196078431372548" blue="0.98039215686274506" alpha="1" colorSpace="calibratedRGB"/>
                 </view>
@@ -418,7 +403,11 @@
                 </label>
             </subviews>
             <color key="backgroundColor" red="0.043137254901960784" green="0.1803921568627451" blue="0.37647058823529411" alpha="1" colorSpace="calibratedRGB"/>
-            <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
+            <nil key="simulatedStatusBarMetrics"/>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics">
+                <size key="portraitSize" width="320" height="480"/>
+                <size key="landscapeSize" width="480" height="320"/>
+            </simulatedScreenMetrics>
             <connections>
                 <action selector="hideKeyboard:" destination="-1" eventType="touchUpInside" id="gZy-rH-lCt"/>
             </connections>
@@ -432,4 +421,12 @@
         <image name="login_top_input" width="288" height="39"/>
         <image name="signup_button" width="288" height="40"/>
     </resources>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4">
+            <size key="portraitSize" width="320" height="568"/>
+            <size key="landscapeSize" width="568" height="320"/>
+        </simulatedScreenMetrics>
+    </simulatedMetricsContainer>
 </document>

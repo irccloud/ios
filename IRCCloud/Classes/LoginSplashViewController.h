@@ -36,8 +36,6 @@
     
     IBOutlet UIView *loadingView;
     IBOutlet UILabel *status;
-    IBOutlet UILabel *error;
-    IBOutlet UIProgressView *progress;
     IBOutlet UIActivityIndicatorView *activity;
     
     IBOutlet UIControl *signupHint;
@@ -70,4 +68,5 @@
 -(IBAction)enterpriseLearnMorePressed:(id)sender;
 -(IBAction)sendAccessLinkButtonPressed:(id)sender;
 -(IBAction)hideKeyboard:(id)sender;
+-(void)hideLoginView;
 @end
