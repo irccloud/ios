@@ -1326,6 +1326,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     else
         _idleInterval = 30;
     _reconnectTimestamp = -1;
+    _streamId = nil;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
 }
 
@@ -1611,15 +1612,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
     [_oobQueue removeObject:notification.object];
-    if([_servers count] < 1) {
+    if([(OOBFetcher *)notification.userInfo bid] > 0) {
+        CLS_LOG(@"Backlog download failed, rescheduling timed out buffers");
+        [self _scheduleTimedoutBuffers];
+    } else {
         CLS_LOG(@"Initial backlog download failed");
         [self disconnect];
         _state = kIRCCloudStateDisconnected;
         [self fail];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-    } else {
-        CLS_LOG(@"Backlog download failed, rescheduling timed out buffers");
-        [self _scheduleTimedoutBuffers];
     }
 }
 
