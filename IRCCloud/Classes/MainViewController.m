@@ -555,29 +555,6 @@
                         u.lastMention = e.eid;
                     }
                 }
-                if([[e.from lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
-                    for(Event *e in [_pendingEvents copy]) {
-                        if(e.bid == _buffer.bid) {
-                            if(e.expirationTimer && [e.expirationTimer isValid])
-                                [e.expirationTimer invalidate];
-                            e.expirationTimer = nil;
-                            [_pendingEvents removeObject:e];
-                            [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
-                        }
-                    }
-                } else {
-                    int reqid = e.reqId;
-                    for(Event *e in _pendingEvents) {
-                        if(e.reqId == reqid) {
-                            if(e.expirationTimer && [e.expirationTimer isValid])
-                                [e.expirationTimer invalidate];
-                            e.expirationTimer = nil;
-                            [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
-                            [_pendingEvents removeObject:e];
-                            break;
-                        }
-                    }
-                }
                 if(!e.isSelf && !_buffer.scrolledUp) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         if(e.from.length)
@@ -614,6 +591,29 @@
                         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
                         [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
                         _menuBtn.accessibilityValue = @"Unread messages";
+                    }
+                }
+            }
+            if([[e.from lowercaseString] isEqualToString:[[[BuffersDataSource sharedInstance] getBuffer:e.bid].name lowercaseString]]) {
+                for(Event *ev in [_pendingEvents copy]) {
+                    if(ev.bid == e.bid) {
+                        if(ev.expirationTimer && [ev.expirationTimer isValid])
+                            [ev.expirationTimer invalidate];
+                        ev.expirationTimer = nil;
+                        [_pendingEvents removeObject:ev];
+                        [[EventsDataSource sharedInstance] removeEvent:ev.eid buffer:ev.bid];
+                    }
+                }
+            } else {
+                int reqid = e.reqId;
+                for(Event *e in _pendingEvents) {
+                    if(e.reqId == reqid) {
+                        if(e.expirationTimer && [e.expirationTimer isValid])
+                            [e.expirationTimer invalidate];
+                        e.expirationTimer = nil;
+                        [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                        [_pendingEvents removeObject:e];
+                        break;
                     }
                 }
             }
