@@ -321,28 +321,27 @@
     
     w = 0.0f;
     for(UIView *v in forgotPasswordHint.subviews) {
-        v.frame = CGRectMake(w, 0, v.bounds.size.width, 20);
+        v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
         w += v.bounds.size.width + 2;
     }
     w -= 2;
-    forgotPasswordHint.frame = CGRectMake(loginView.bounds.size.width / 2.0f - w / 2.0f, login.frame.origin.y + login.frame.size.height + 5, w, 20);
+    forgotPasswordHint.frame = CGRectMake(loginView.bounds.size.width / 2.0f - w / 2.0f, login.frame.origin.y + login.frame.size.height + 2, w, 32);
     
     w = 0.0f;
     for(UIView *v in TOSHint.subviews) {
-        v.frame = CGRectMake(w, 0, v.bounds.size.width, 20);
+        v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
         w += v.bounds.size.width + 2;
     }
     w -= 2;
-    TOSHint.frame = CGRectMake(loginView.bounds.size.width / 2.0f - w / 2.0f, login.frame.origin.y + login.frame.size.height + 5, w, 20);
+    TOSHint.frame = CGRectMake(loginView.bounds.size.width / 2.0f - w / 2.0f, login.frame.origin.y + login.frame.size.height + 2, w, 32);
     
     w = 0.0f;
     for(UIView *v in enterpriseLearnMore.subviews) {
-        v.frame = CGRectMake(w, 0, v.bounds.size.width, 20);
+        v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
         w += v.bounds.size.width + 2;
     }
     w -= 2;
-    enterpriseLearnMore.frame = CGRectMake(loginView.bounds.size.width / 2.0f - w / 2.0f, next.frame.origin.y + next.frame.size.height + 5, w, 20);
-
+    enterpriseLearnMore.frame = CGRectMake(loginView.bounds.size.width / 2.0f - w / 2.0f, next.frame.origin.y + next.frame.size.height + 2, w, 32);
 }
 
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
