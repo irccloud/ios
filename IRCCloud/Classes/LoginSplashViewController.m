@@ -243,9 +243,12 @@
                     [d setObject:IRCCLOUD_PATH forKey:@"path"];
                     [d synchronize];
                 }
-                [status setText:@"Connecting"];
-                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
-                [_conn connect];
+                loginHint.alpha = 0;
+                signupHint.alpha = 0;
+                enterpriseHint.alpha = 0;
+                forgotPasswordLogin.alpha = 0;
+                forgotPasswordSignup.alpha = 0;
+                [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [UIView beginAnimations:nil context:nil];
