@@ -478,7 +478,7 @@
     loginView.alpha = 0;
     loadingView.alpha = 1;
     [UIView commitAnimations];
-    [status setText:@"Requesting Password Reset"];
+    [status setText:@"Requesting Access Link"];
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
     [activity startAnimating];
     activity.hidden = NO;
@@ -493,7 +493,7 @@
                     loadingView.alpha = 0;
                     [UIView commitAnimations];
                     [activity stopAnimating];
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Password Reset" message:@"We've sent you a password reset link.  Check your email and follow the instructions to sign in." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Email Sent" message:@"We've sent you an access link.  Check your email and follow the instructions to sign in." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [alert show];
                     [self loginHintPressed:nil];
                 });
