@@ -988,14 +988,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #endif
 }
 
--(NSDictionary *)unregisterAPNs:(NSData *)token {
+-(NSDictionary *)unregisterAPNs:(NSData *)token session:(NSString *)session {
 #if defined(DEBUG) || defined(EXTENSION)
     return nil;
 #else
 	NSData *data;
 	NSURLResponse *response = nil;
 	NSError *error = nil;
-    NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], self.session];
+    NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], session];
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-unregister", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
@@ -1638,8 +1638,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
--(void)logout {
-    NSLog(@"Unregister result: %@", [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]]);
+-(void)_logout:(NSString *)session {
+    NSLog(@"Unregister result: %@", [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] session:session]);
     //TODO: check the above result, and retry if it fails
 	NSURLResponse *response = nil;
 	NSError *error = nil;
@@ -1653,11 +1653,18 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/logout", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
+    [request setValue:[NSString stringWithFormat:@"session=%@", session] forHTTPHeaderField:@"Cookie"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
     
     [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
+}
+
+-(void)logout {
+    [self performSelectorInBackground:@selector(_logout:) withObject:self.session];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"host"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"path"];
@@ -1681,7 +1688,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, nil]);
     [self serialize];
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [[UIApplication sharedApplication] unregisterForRemoteNotifications];
 #endif
 }

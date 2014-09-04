@@ -191,7 +191,7 @@ typedef enum {
 -(int)reconnect:(int)cid;
 -(int)reorderConnections:(NSString *)cids;
 -(NSDictionary *)registerAPNs:(NSData *)token;
--(NSDictionary *)unregisterAPNs:(NSData *)token;
+-(NSDictionary *)unregisterAPNs:(NSData *)token session:(NSString *)session;
 -(void)logout;
 -(void)fail;
 -(void)updateBadgeCount;
