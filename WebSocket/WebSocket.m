@@ -225,14 +225,22 @@ WebSocketWaitingState waitingState;
 
 - (void)sendMessage:(NSData *)aMessage messageWithOpCode:(MessageOpCode)aOpCode {
     if (!isClosing) {
-        if(_deflate)
-            aMessage = [self deflate:aMessage];
+        BOOL isRSV1 = _deflate;
+        if(_deflate) {
+            NSData *deflated = [self deflate:aMessage];
+            if(deflated) {
+                aMessage = deflated;
+            } else {
+                isRSV1 = NO;
+                NSLog(@"An error occured while compressing fragment, sending uncompressed");
+            }
+        }
         NSUInteger messageLength = [aMessage length];
         if (messageLength <= self.config.maxPayloadSize) {
             //create and send fragment
             WebSocketFragment *fragment = [WebSocketFragment fragmentWithOpCode:aOpCode isFinal:YES payload:aMessage];
             if(_deflate)
-                fragment.isRSV1 = YES;
+                fragment.isRSV1 = isRSV1;
             [fragment buildFragment];
             [self sendMessage:fragment];
         }
@@ -361,72 +369,80 @@ WebSocketWaitingState waitingState;
 //Based on http://stackoverflow.com/a/11389847
 - (NSData *)inflate:(NSData*)d
 {
-    if([d length] == 0)
-        return d;
+    @synchronized(zlibLock) {
+        if([d length] == 0)
+            return d;
 
-    //Append 0x00 0x00 0xFF 0xFF
-    unsigned char tail[4] = {0,0,255,255};
-    NSMutableData *data = [d mutableCopy];
-    [data appendBytes:tail length:4];
-    
-    NSUInteger full_length = [data length];
-    NSUInteger half_length = [data length] / 2;
-    
-    NSMutableData *decompressed = [NSMutableData dataWithLength: full_length + half_length];
-    BOOL done = NO;
-    int status;
-    
-    zstrm_in.next_in = (Bytef *)[data bytes];
-    zstrm_in.avail_in = (unsigned int)[data length];
-    zstrm_in.total_out = 0;
-    
-    while (!done) {
-        // Make sure we have enough room and reset the lengths.
-        if (zstrm_in.total_out >= [decompressed length])
-            [decompressed increaseLengthBy: half_length];
-        zstrm_in.next_out = [decompressed mutableBytes] + zstrm_in.total_out;
-        zstrm_in.avail_out = (unsigned int)([decompressed length] - zstrm_in.total_out);
+        //Append 0x00 0x00 0xFF 0xFF
+        unsigned char tail[4] = {0,0,255,255};
+        NSMutableData *data = [d mutableCopy];
+        [data appendBytes:tail length:4];
         
-        // Inflate another chunk.
-        status = inflate(&zstrm_in, Z_FULL_FLUSH);
-        if(zstrm_in.avail_in == 0)
-            done = YES;
-        else if (status != Z_OK && status != Z_BUF_ERROR)
-            break;
+        NSUInteger full_length = [data length];
+        NSUInteger half_length = [data length] / 2;
+        
+        NSMutableData *decompressed = [NSMutableData dataWithLength: full_length + half_length];
+        BOOL done = NO;
+        int status;
+        
+        zstrm_in.next_in = (Bytef *)[data bytes];
+        zstrm_in.avail_in = (unsigned int)[data length];
+        zstrm_in.total_out = 0;
+        
+        while (!done) {
+            // Make sure we have enough room and reset the lengths.
+            if (zstrm_in.total_out >= [decompressed length])
+                [decompressed increaseLengthBy: half_length];
+            zstrm_in.next_out = [decompressed mutableBytes] + zstrm_in.total_out;
+            zstrm_in.avail_out = (unsigned int)([decompressed length] - zstrm_in.total_out);
+            
+            // Inflate another chunk.
+            status = inflate(&zstrm_in, Z_FULL_FLUSH);
+            if(zstrm_in.avail_in == 0)
+                done = YES;
+            else if (status != Z_OK && status != Z_BUF_ERROR)
+                break;
+        }
+        
+        // Set real length.
+        if (done) {
+            [decompressed setLength: zstrm_in.total_out];
+            return [NSData dataWithData: decompressed];
+        } else
+            return nil;
     }
-    
-    // Set real length.
-    if (done) {
-        [decompressed setLength: zstrm_in.total_out];
-        return [NSData dataWithData: decompressed];
-    } else
-        return nil;
 }
 
 - (NSData *)deflate:(NSData*)data
 {
-    if ([data length] == 0) return data;
-    
-    zstrm_out.next_in=(Bytef *)[data bytes];
-    zstrm_out.avail_in = (unsigned int)[data length];
-    zstrm_out.total_out = 0;
-    
-    NSMutableData *compressed = [NSMutableData dataWithLength:16384];  // 16K chunks for expansion
-    
-    do {
-        if (zstrm_out.total_out >= [compressed length])
-            [compressed increaseLengthBy: 16384];
+    @synchronized(zlibLock) {
+        if ([data length] == 0)
+            return nil;
         
-        zstrm_out.next_out = [compressed mutableBytes] + zstrm_out.total_out;
-        zstrm_out.avail_out = (unsigned int)([compressed length] - zstrm_out.total_out);
+        zstrm_out.next_in=(Bytef *)[data bytes];
+        zstrm_out.avail_in = (unsigned int)[data length];
+        zstrm_out.total_out = 0;
         
-        deflate(&zstrm_out, Z_FULL_FLUSH);
+        NSMutableData *compressed = [NSMutableData dataWithLength:16384];  // 16K chunks for expansion
         
-    } while (zstrm_out.avail_out == 0);
-    
-    //Chop off the 0x00 0x00 0xFF 0xFF from the tail
-    [compressed setLength: zstrm_out.total_out - 4];
-    return [NSData dataWithData:compressed];
+        do {
+            if (zstrm_out.total_out >= [compressed length])
+                [compressed increaseLengthBy: 16384];
+            
+            zstrm_out.next_out = [compressed mutableBytes] + zstrm_out.total_out;
+            zstrm_out.avail_out = (unsigned int)([compressed length] - zstrm_out.total_out);
+            
+            deflate(&zstrm_out, Z_FULL_FLUSH);
+            
+        } while (zstrm_out.avail_out == 0);
+        
+        //Chop off the 0x00 0x00 0xFF 0xFF from the tail
+        if(zstrm_out.total_out)
+            [compressed setLength: zstrm_out.total_out - 4];
+        else
+            return nil;
+        return [NSData dataWithData:compressed];
+    }
 }
 
 - (void)handleCompleteFragments {
@@ -1260,6 +1276,7 @@ WebSocketWaitingState waitingState;
         pendingFragments = [[MutableQueue alloc] init];
         isClosing = NO;
         isInContinuation = NO;
+        zlibLock = [[NSObject alloc] init];
     }
     return self;
 }

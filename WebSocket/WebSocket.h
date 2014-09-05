@@ -137,6 +137,7 @@ typedef NSUInteger WebSocketReadyState;
     BOOL _deflate;
     z_stream zstrm_in;
     z_stream zstrm_out;
+    NSObject *zlibLock;
 }
 
 
