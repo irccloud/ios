@@ -257,11 +257,15 @@
 -(void)updateIsupport:(NSDictionary *)isupport server:(int)cid {
     Server *server = [self getServer:cid];
     if(server) {
-        if(server.isupport && [server.isupport isKindOfClass:[NSDictionary class]])
-            [server.isupport setValuesForKeysWithDictionary:isupport];
-        else
-            server.isupport = isupport.mutableCopy;
-        
+        if([isupport isKindOfClass:[NSDictionary class]]) {
+            if(server.isupport)
+                [server.isupport setValuesForKeysWithDictionary:isupport];
+            else
+                server.isupport = isupport.mutableCopy;
+        } else {
+            server.isupport = [[NSMutableDictionary alloc] init];
+        }
+
         if([[server.isupport objectForKey:@"PREFIX"] isKindOfClass:[NSDictionary class]])
             server.PREFIX = [server.isupport objectForKey:@"PREFIX"];
         else

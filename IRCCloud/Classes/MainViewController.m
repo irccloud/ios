@@ -952,9 +952,9 @@
                                              selector:@selector(viewWillLayoutSubviews)
                                                  name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
     
+    [NetworkConnection sharedInstance].background = NO;
     NSString *session = [NetworkConnection sharedInstance].session;
     if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
-        [NetworkConnection sharedInstance].background = NO;
         [[NetworkConnection sharedInstance] connect];
     }
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
