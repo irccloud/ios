@@ -1208,76 +1208,78 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)connect {
-    if(self.session.length < 1) {
-        CLS_LOG(@"Not connecting, no session");
-        return;
-    }
-    
-    if(_state == kIRCCloudStateConnecting) {
-        CLS_LOG(@"Ignoring duplicate connection request");
-        return;
-    }
-    
-    if(_socket) {
-        CLS_LOG(@"Discarding previous socket");
-        WebSocket *s = _socket;
-        _socket = nil;
-        s.delegate = nil;
-        [s close];
-    }
-    
-    kIRCCloudReachability reachability = [self reachable];
-    if(reachability != kIRCCloudReachable) {
-        CLS_LOG(@"IRCCloud is unreachable");
-        _reconnectTimestamp = -1;
-        _state = kIRCCloudStateDisconnected;
-        if(reachability == kIRCCloudUnreachable)
-            [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-        return;
-    }
-    
-    if(_oobQueue.count) {
-        NSLog(@"Cancelling pending OOB requests");
-        for(OOBFetcher *fetcher in _oobQueue) {
-            [fetcher cancel];
+    @synchronized(self) {
+        if(self.session.length < 1) {
+            CLS_LOG(@"Not connecting, no session");
+            return;
         }
-        [_oobQueue removeAllObjects];
-    }
-    
-    NSString *url = [NSString stringWithFormat:@"wss://%@%@",IRCCLOUD_HOST,IRCCLOUD_PATH];
-    if(_events.highestEid > 0) {
-        url = [url stringByAppendingFormat:@"?since_id=%.0lf", _events.highestEid];
-        if(_streamId)
-            url = [url stringByAppendingFormat:@"&stream_id=%@", _streamId];
-    }
-    if(_background) {
-        if([url rangeOfString:@"?"].location == NSNotFound)
-            url = [url stringByAppendingFormat:@"?notifier=1"];
-        else
-            url = [url stringByAppendingFormat:@"&notifier=1"];
-    }
-    CLS_LOG(@"Connecting: %@", url);
-    _state = kIRCCloudStateConnecting;
-    _idleInterval = 20;
-    _accrued = 0;
-    _currentCount = 0;
-    _totalCount = 0;
-    _reconnectTimestamp = -1;
-    _resuming = NO;
-    [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-    WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
-                                                                     tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
-                                                                                    (NSString *)kCFStreamSSLLevel: (NSString *)kCFStreamSocketSecurityLevelSSLv3,
+        
+        if(_state == kIRCCloudStateConnecting) {
+            CLS_LOG(@"Ignoring duplicate connection request");
+            return;
+        }
+        
+        if(_socket) {
+            CLS_LOG(@"Discarding previous socket");
+            WebSocket *s = _socket;
+            _socket = nil;
+            s.delegate = nil;
+            [s close];
+        }
+        
+        kIRCCloudReachability reachability = [self reachable];
+        if(reachability != kIRCCloudReachable) {
+            CLS_LOG(@"IRCCloud is unreachable");
+            _reconnectTimestamp = -1;
+            _state = kIRCCloudStateDisconnected;
+            if(reachability == kIRCCloudUnreachable)
+                [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+            return;
+        }
+        
+        if(_oobQueue.count) {
+            NSLog(@"Cancelling pending OOB requests");
+            for(OOBFetcher *fetcher in _oobQueue) {
+                [fetcher cancel];
+            }
+            [_oobQueue removeAllObjects];
+        }
+        
+        NSString *url = [NSString stringWithFormat:@"wss://%@%@",IRCCLOUD_HOST,IRCCLOUD_PATH];
+        if(_events.highestEid > 0) {
+            url = [url stringByAppendingFormat:@"?since_id=%.0lf", _events.highestEid];
+            if(_streamId)
+                url = [url stringByAppendingFormat:@"&stream_id=%@", _streamId];
+        }
+        if(_background) {
+            if([url rangeOfString:@"?"].location == NSNotFound)
+                url = [url stringByAppendingFormat:@"?notifier=1"];
+            else
+                url = [url stringByAppendingFormat:@"&notifier=1"];
+        }
+        CLS_LOG(@"Connecting: %@", url);
+        _state = kIRCCloudStateConnecting;
+        _idleInterval = 20;
+        _accrued = 0;
+        _currentCount = 0;
+        _totalCount = 0;
+        _reconnectTimestamp = -1;
+        _resuming = NO;
+        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+        WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
+                                                                         tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
+                                                                                        (NSString *)kCFStreamSSLLevel: (NSString *)kCFStreamSocketSecurityLevelSSLv3,
 #ifndef ENTERPRISE
-                                                                                    @"fingerprint":@"8D:3B:E1:98:3F:75:F4:A4:54:6F:42:F5:EC:18:9B:C6:5A:9D:3A:42"
+                                                                                        @"fingerprint":@"8D:3B:E1:98:3F:75:F4:A4:54:6F:42:F5:EC:18:9B:C6:5A:9D:3A:42"
 #endif
-                                                                                    } mutableCopy]
-                                                                         headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"],
-                                                                                    [HandshakeHeader headerWithValue:[NSString stringWithFormat:@"session=%@",self.session] forKey:@"Cookie"]] mutableCopy]
-                                                               verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
-    _socket = [WebSocket webSocketWithConfig:config delegate:self];
-    
-    [_socket open];
+                                                                                        } mutableCopy]
+                                                                             headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"],
+                                                                                        [HandshakeHeader headerWithValue:[NSString stringWithFormat:@"session=%@",self.session] forKey:@"Cookie"]] mutableCopy]
+                                                                   verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
+        _socket = [WebSocket webSocketWithConfig:config delegate:self];
+        
+        [_socket open];
+    }
 }
 
 -(void)disconnect {
@@ -1335,7 +1337,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     else
         _idleInterval = 30;
     _reconnectTimestamp = -1;
-    _streamId = nil;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
 }
 
@@ -1630,6 +1631,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         CLS_LOG(@"Initial backlog download failed");
         [self disconnect];
         _state = kIRCCloudStateDisconnected;
+        _streamId = nil;
         [self fail];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }
