@@ -370,11 +370,6 @@ NSLock *__parserLock = nil;
                            }];
                        }
                        _resuming = [[object objectForKey:@"resumed"] boolValue];
-                       if(!_resuming) {
-                           CLS_LOG(@"Socket was not resumed, invalidating BIDs");
-                           [_buffers invalidate];
-                           [_channels invalidate];
-                       }
                    },
                    @"global_system_message": ^(IRCCloudJSONObject *object) {
                        if([object objectForKey:@"system_message_type"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"eval"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"refresh"]) {
@@ -385,6 +380,9 @@ NSLock *__parserLock = nil;
                    @"oob_include": ^(IRCCloudJSONObject *object) {
                        _awayOverride = [[NSMutableDictionary alloc] init];
                        _reconnectTimestamp = 0;
+                       CLS_LOG(@"oob_include, invalidating BIDs");
+                       [_buffers invalidate];
+                       [_channels invalidate];
                        [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object) {
@@ -430,6 +428,7 @@ NSLock *__parserLock = nil;
                        buffer.deferred = [[object objectForKey:@"deferred"] intValue];
                        buffer.timeout = [[object objectForKey:@"timeout"] intValue];
                        buffer.valid = YES;
+                       CLS_LOG(@"bid%i is now valid", buffer.bid);
                        if(!backlog)
                            [self postObject:buffer forEvent:kIRCEventMakeBuffer];
                        if(_numBuffers > 0) {
@@ -1555,12 +1554,16 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
     OOBFetcher *fetcher = notification.object;
+    CLS_LOG(@"Backlog finished for bid: %i", fetcher.bid);
     if(fetcher.bid > 0) {
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     } else {
         CLS_LOG(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
-        [_buffers purgeInvalidBIDs];
-        [_channels purgeInvalidChannels];
+        if(fetcher.bid == -1) {
+            [_buffers purgeInvalidBIDs];
+            [_channels purgeInvalidChannels];
+            CLS_LOG(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
+        }
         for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
             if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
