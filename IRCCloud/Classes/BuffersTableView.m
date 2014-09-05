@@ -362,8 +362,8 @@
 #endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if(data.count <= 1) {
-                NSLog(@"The buffer list doesn't have any buffers: %@", data);
-                NSLog(@"I should have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
+                CLS_LOG(@"The buffer list doesn't have any buffers: %@", data);
+                CLS_LOG(@"I should have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
             }
             _data = data;
             _selectedRow = selectedRow;

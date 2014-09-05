@@ -288,7 +288,7 @@ NSLock *__parserLock = nil;
                 }
             }
         } else {
-            NSLog(@"Event recieved for invalid BID, reconnecting!");
+            CLS_LOG(@"Event recieved for invalid BID, reconnecting!");
             _streamId = nil;
             [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
             _state = kIRCCloudStateDisconnected;
@@ -399,10 +399,10 @@ NSLock *__parserLock = nil;
                    },
                    @"backlog_starts": ^(IRCCloudJSONObject *object) {
                        if([object objectForKey:@"numbuffers"]) {
-                           NSLog(@"I currently have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
+                           CLS_LOG(@"I currently have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
                            _numBuffers = [[object objectForKey:@"numbuffers"] intValue];
                            _totalBuffers = 0;
-                           NSLog(@"OOB includes has %i buffers", _numBuffers);
+                           CLS_LOG(@"OOB includes has %i buffers", _numBuffers);
                        }
                        backlog = YES;
                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -1041,6 +1041,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [_socket sendText:[_writer stringWithObject:dict]];
             return _lastReqId;
         } else {
+            CLS_LOG(@"Discarding request '%@' on disconnected socket", method);
             return -1;
         }
     }
@@ -1207,10 +1208,18 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)connect {
-    if(self.session.length < 1)
+    if(self.session.length < 1) {
+        CLS_LOG(@"Not connecting, no session");
         return;
+    }
+    
+    if(_state == kIRCCloudStateConnecting) {
+        CLS_LOG(@"Ignoring duplicate connection request");
+        return;
+    }
     
     if(_socket) {
+        CLS_LOG(@"Discarding previous socket");
         WebSocket *s = _socket;
         _socket = nil;
         s.delegate = nil;
@@ -1340,6 +1349,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [self fail];
         } else {
             [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
+            [self serialize];
         }
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         if([aError.domain isEqualToString:@"kCFStreamErrorDomainSSL"] || aStatusCode == WebSocketCloseStatusTlsHandshakeError) {
@@ -1456,6 +1466,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)cancelIdleTimer {
     if(![NSThread currentThread].isMainThread)
         CLS_LOG(@"WARNING: cancel idle timer called outside of main thread");
+    
     [_idleTimer invalidate];
     _idleTimer = nil;
 }
@@ -1546,7 +1557,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(fetcher.bid > 0) {
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     } else {
-        NSLog(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
+        CLS_LOG(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
         [_buffers purgeInvalidBIDs];
         [_channels purgeInvalidChannels];
         for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
@@ -1555,7 +1566,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         }
         _numBuffers = 0;
     }
-    NSLog(@"I downloaded %i events", _totalCount);
+    CLS_LOG(@"I downloaded %i events", _totalCount);
     [_oobQueue removeObject:fetcher];
     if([_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
@@ -1664,6 +1675,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)logout {
+    CLS_LOG(@"Logging out");
     [self performSelectorInBackground:@selector(_logout:) withObject:self.session];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"host"];

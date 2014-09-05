@@ -199,7 +199,7 @@
             }
             
             if(events.count > 1000) {
-                NSLog(@"Cleaning up excessive backlog in BID: %@", bid);
+                CLS_LOG(@"Cleaning up excessive backlog in BID: bid%@", bid);
                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid.intValue];
                 if(b) {
                     b.scrolledUp = NO;

@@ -279,19 +279,19 @@
 }
 
 -(void)purgeInvalidBIDs {
-    NSLog(@"Cleaning up invalid BIDs");
+    CLS_LOG(@"Cleaning up invalid BIDs");
     NSArray *copy;
     @synchronized(_buffers) {
         copy = _buffers.allValues;
     }
     for(Buffer *buffer in copy) {
         if(!buffer.valid) {
-            NSLog(@"Removing buffer: %@", buffer);
+            CLS_LOG(@"Removing buffer: bid%i", buffer.bid);
             [[ChannelsDataSource sharedInstance] removeChannelForBuffer:buffer.bid];
             [[EventsDataSource sharedInstance] removeEventsForBuffer:buffer.bid];
             [[UsersDataSource sharedInstance] removeUsersForBuffer:buffer.bid];
             if([buffer.type isEqualToString:@"console"]) {
-                NSLog(@"Removing CID: %i", buffer.cid);
+                CLS_LOG(@"Removing CID: cid%i", buffer.cid);
                 [[ServersDataSource sharedInstance] removeServer:buffer.cid];
             }
             [self removeBuffer:buffer.bid];

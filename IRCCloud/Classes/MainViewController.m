@@ -538,6 +538,7 @@
                     [NetworkConnection sharedInstance].session = [o objectForKey:@"cookie"];
                     [[NetworkConnection sharedInstance] connect];
                 } else {
+                    CLS_LOG(@"Got an error, reconnecting: %@", o);
                     [[NetworkConnection sharedInstance] disconnect];
                     [[NetworkConnection sharedInstance] fail];
                     [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
@@ -952,8 +953,10 @@
                                                  name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
     
     NSString *session = [NetworkConnection sharedInstance].session;
-    if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable && session != nil && [session length] > 0)
+    if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
+        [NetworkConnection sharedInstance].background = NO;
         [[NetworkConnection sharedInstance] connect];
+    }
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
         _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
     } else {
@@ -1029,6 +1032,8 @@
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 [self presentViewController:nc animated:YES completion:nil];
                 return;
+            } else if([_message.text isEqualToString:@"/crash"]) {
+                [[Crashlytics sharedInstance] crash];
             }
             
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
