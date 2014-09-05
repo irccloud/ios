@@ -62,8 +62,21 @@
 
     if(output.attachments.count) {
         NSItemProvider *i = output.attachments.firstObject;
-        if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
-            [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:^(NSURL *item, NSError *error) {
+
+        NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
+            NSLog(@"Uploading image");
+            _uploader.bid = _buffer.bid;
+            _uploader.msg = self.contentText;
+            [_uploader upload:item];
+            /*[[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+            }];*/
+        };
+        
+        NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
+            if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
+                [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+            } else {
                 if(self.contentText.length)
                     [_conn say:[NSString stringWithFormat:@"%@ [%@]",self.contentText,item.absoluteString] to:_buffer.name cid:_buffer.cid];
                 else
@@ -72,17 +85,13 @@
                     [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
                     AudioServicesPlaySystemSound(1001);
                 }];
-           }];
+            }
+        };
+        
+        if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
+            [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:urlHandler];
         } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
-            [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:^(UIImage *item, NSError *error) {
-                NSLog(@"Uploading image");
-                _uploader.bid = _buffer.bid;
-                _uploader.msg = self.contentText;
-                [_uploader upload:item];
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
-                }];
-            }];
+            [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
         }
     } else {
         [_conn say:self.contentText to:_buffer.name cid:_buffer.cid];
@@ -137,10 +146,12 @@
 
 -(void)imageUploadDidFail {
     NSLog(@"Image upload failed");
+    [self.extensionContext completeRequestReturningItems:@[self.extensionContext.inputItems.firstObject] completionHandler:nil];
 }
 
 -(void)imageUploadNotAuthorized {
     NSLog(@"Image upload not authorized");
+    [self.extensionContext completeRequestReturningItems:@[self.extensionContext.inputItems.firstObject] completionHandler:nil];
 }
 
 -(void)imageUploadDidFinish:(NSDictionary *)d bid:(int)bid {
@@ -156,6 +167,7 @@
     }
     [_conn disconnect];
     AudioServicesPlaySystemSound(1001);
+    [self.extensionContext completeRequestReturningItems:@[self.extensionContext.inputItems.firstObject] completionHandler:nil];
 }
 
 @end
