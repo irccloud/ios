@@ -157,6 +157,10 @@
 }
 
 -(void)fail {
+    if(self.view.window.rootViewController != self) {
+        NSLog(@"Not launching fallback URL as we're no longer the root view controller");
+        return;
+    }
     if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
                                                                                   withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
@@ -418,9 +422,9 @@
 }
 
 -(IBAction)doneButtonPressed:(id)sender {
-    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
     [_connection cancel];
     _connection = nil;
+    [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
 }
 
 - (void)didReceiveMemoryWarning {
