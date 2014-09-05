@@ -257,7 +257,7 @@
 -(void)updateIsupport:(NSDictionary *)isupport server:(int)cid {
     Server *server = [self getServer:cid];
     if(server) {
-        if(server.isupport)
+        if(server.isupport && [server.isupport isKindOfClass:[NSDictionary class]])
             [server.isupport setValuesForKeysWithDictionary:isupport];
         else
             server.isupport = isupport.mutableCopy;

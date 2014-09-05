@@ -1088,39 +1088,45 @@
 }
 
 -(IBAction)topUnreadIndicatorClicked:(id)sender {
-    NSInteger first = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] objectAtIndex:0] row] - 1;
-    NSInteger pos = 0;
-    
-    for(NSInteger i = first; i >= 0; i--) {
-        NSDictionary *d = [_data objectAtIndex:i];
-        if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
-            pos = i - 1;
-            break;
+    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
+    if(rows.count) {
+        NSInteger first = [[rows objectAtIndex:0] row] - 1;
+        NSInteger pos = 0;
+        
+        for(NSInteger i = first; i >= 0; i--) {
+            NSDictionary *d = [_data objectAtIndex:i];
+            if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
+                pos = i - 1;
+                break;
+            }
         }
-    }
 
-    if(pos < 0)
-        pos = 0;
-    
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        if(pos < 0)
+            pos = 0;
+        
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    }
 }
 
 -(IBAction)bottomUnreadIndicatorClicked:(id)sender {
-    NSInteger last = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row] + 1;
-    NSInteger pos = _data.count - 1;
-    
-    for(NSInteger i = last; i  < _data.count; i++) {
-        NSDictionary *d = [_data objectAtIndex:i];
-        if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
-            pos = i + 1;
-            break;
+    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
+    if(rows.count) {
+        NSInteger last = [[rows lastObject] row] + 1;
+        NSInteger pos = _data.count - 1;
+        
+        for(NSInteger i = last; i  < _data.count; i++) {
+            NSDictionary *d = [_data objectAtIndex:i];
+            if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
+                pos = i + 1;
+                break;
+            }
         }
-    }
 
-    if(pos > _data.count - 1)
-        pos = _data.count - 1;
-    
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+        if(pos > _data.count - 1)
+            pos = _data.count - 1;
+        
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    }
 }
 
 -(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {

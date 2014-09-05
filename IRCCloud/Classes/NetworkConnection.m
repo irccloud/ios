@@ -739,7 +739,10 @@ NSLock *__parserLock = nil;
                    },
                    @"isupport_params": ^(IRCCloudJSONObject *object) {
                        [_servers updateUserModes:[object objectForKey:@"usermodes"] server:object.cid];
-                       [_servers updateIsupport:[object objectForKey:@"params"] server:object.cid];
+                       if([[object objectForKey:@"params"] isKindOfClass:[NSDictionary class]])
+                           [_servers updateIsupport:[object objectForKey:@"params"] server:object.cid];
+                       else
+                           CLS_LOG(@"Unexpected isupport params: %@", [object objectForKey:@"params"]);
                    },
                    @"set_ignores": ^(IRCCloudJSONObject *object) {
                        [_servers updateIgnores:[object objectForKey:@"masks"] server:object.cid];

@@ -1163,6 +1163,9 @@ NSDictionary *quotes;
 }
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
+    if(!color)
+        color = [UIColor blackColor];
+    
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;
     CTFontRef font, boldFont, italicFont, boldItalicFont;
