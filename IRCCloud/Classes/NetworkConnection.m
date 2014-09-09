@@ -29,8 +29,10 @@ NSString *kIRCCloudBacklogCompletedNotification = @"com.irccloud.notification.ba
 NSString *kIRCCloudBacklogProgressNotification = @"com.irccloud.notification.backlog.progress";
 NSString *kIRCCloudEventKey = @"com.irccloud.event";
 
-#ifdef BRAND_HOST
+#if defined(BRAND_HOST)
 NSString *IRCCLOUD_HOST = @BRAND_HOST
+#elif defined(ENTERPRISE)
+NSString *IRCCLOUD_HOST = @"";
 #else
 NSString *IRCCLOUD_HOST = @"api.irccloud.com";
 #endif
@@ -221,9 +223,7 @@ NSLock *__parserLock = nil;
     _background = NO;
     _writer = [[SBJsonWriter alloc] init];
     _reachabilityValid = NO;
-    _reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
-    SCNetworkReachabilityScheduleWithRunLoop(_reachability, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-    SCNetworkReachabilitySetCallback(_reachability, ReachabilityCallback, NULL);
+    _reachability = nil;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogStarted:) name:kIRCCloudBacklogStartedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
@@ -1208,6 +1208,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)connect {
     @synchronized(self) {
+        if(IRCCLOUD_HOST.length < 1) {
+            CLS_LOG(@"Not connecting, no host");
+            return;
+        }
+        
         if(self.session.length < 1) {
             CLS_LOG(@"Not connecting, no session");
             return;
@@ -1224,6 +1229,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             _socket = nil;
             s.delegate = nil;
             [s close];
+        }
+        
+        if(!_reachability) {
+            _reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
+            SCNetworkReachabilityScheduleWithRunLoop(_reachability, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+            SCNetworkReachabilitySetCallback(_reachability, ReachabilityCallback, NULL);
         }
         
         kIRCCloudReachability reachability = [self reachable];

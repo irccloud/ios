@@ -67,7 +67,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":@"api.irccloud.com", @"saveToCameraRoll":@(YES), @"photoSize":@(1024)}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024)}];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"www.irccloud.com"]) {
         CLS_LOG(@"Migrating host");
         [[NSUserDefaults standardUserDefaults] setObject:@"api.irccloud.com" forKey:@"host"];
@@ -149,7 +149,7 @@
         if([url.host isEqualToString:@"chat"] && [url.path isEqualToString:@"/access-link"]) {
             [_conn logout];
             _conn.background = NO;
-            self.loginSplashViewController.accessLink = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/%@%@?%@&format=json", IRCCLOUD_HOST, url.host, url.path, url.query]];
+            self.loginSplashViewController.accessLink = url;
             self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
             self.loginSplashViewController.view.alpha = 1;
             if(self.window.rootViewController == self.loginSplashViewController)

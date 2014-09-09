@@ -214,53 +214,60 @@
     enterpriseLearnMore.alpha = 1;
     hostHint.alpha = 1;
 #endif
-    if(_accessLink) {
-        loginView.alpha = 0;
-        loadingView.alpha = 1;
-        [status setText:@"Signing in"];
-        UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
-        [activity startAnimating];
-        activity.hidden = NO;
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSDictionary *result = [[NetworkConnection sharedInstance] login:_accessLink];
-            _accessLink = nil;
-            if([[result objectForKey:@"success"] intValue] == 1) {
-                if([result objectForKey:@"websocket_host"])
-                    IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
-                if([result objectForKey:@"websocket_path"])
-                    IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
-                [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
-                [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
-                [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-#ifdef ENTERPRISE
-                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
-#else
-                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
-#endif
-                    [d setObject:IRCCLOUD_HOST forKey:@"host"];
-                    [d setObject:IRCCLOUD_PATH forKey:@"path"];
-                    [d synchronize];
-                }
-                loginHint.alpha = 0;
-                signupHint.alpha = 0;
-                enterpriseHint.alpha = 0;
-                forgotPasswordLogin.alpha = 0;
-                forgotPasswordSignup.alpha = 0;
-                [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
-            } else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [UIView beginAnimations:nil context:nil];
-                    loginView.alpha = 1;
-                    loadingView.alpha = 0;
-                    [UIView commitAnimations];
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:@"Invalid access link" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
-                });
-            }
-        });
+    if(_accessLink && IRCCLOUD_HOST.length) {
+        [self _loginWithAccessLink];
     }
+}
+
+-(void)_loginWithAccessLink {
+    if([_accessLink.scheme hasPrefix:@"irccloud"] && [_accessLink.host isEqualToString:@"chat"] && [_accessLink.path isEqualToString:@"/access-link"])
+                _accessLink = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/%@%@?%@&format=json", IRCCLOUD_HOST, _accessLink.host, _accessLink.path, _accessLink.query]];
+
+    loginView.alpha = 0;
+    loadingView.alpha = 1;
+    [status setText:@"Signing in"];
+    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
+    [activity startAnimating];
+    activity.hidden = NO;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSDictionary *result = [[NetworkConnection sharedInstance] login:_accessLink];
+        _accessLink = nil;
+        if([[result objectForKey:@"success"] intValue] == 1) {
+            if([result objectForKey:@"websocket_host"])
+                IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
+            if([result objectForKey:@"websocket_path"])
+                IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
+            [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
+            [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+            [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+#ifdef ENTERPRISE
+                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+                [d setObject:IRCCLOUD_HOST forKey:@"host"];
+                [d setObject:IRCCLOUD_PATH forKey:@"path"];
+                [d synchronize];
+            }
+            loginHint.alpha = 0;
+            signupHint.alpha = 0;
+            enterpriseHint.alpha = 0;
+            forgotPasswordLogin.alpha = 0;
+            forgotPasswordSignup.alpha = 0;
+            [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [UIView beginAnimations:nil context:nil];
+                loginView.alpha = 1;
+                loadingView.alpha = 0;
+                [UIView commitAnimations];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:@"Invalid access link" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            });
+        }
+    });
 }
 
 -(void)viewDidAppear:(BOOL)animated {
@@ -528,7 +535,12 @@
     if([IRCCLOUD_HOST hasSuffix:@"/"])
         IRCCLOUD_HOST = [IRCCLOUD_HOST substringToIndex:IRCCLOUD_HOST.length - 1];
     
-    [UIView beginAnimations:nil context:NULL];
+    if(_accessLink) {
+        [self _loginWithAccessLink];
+    } else {
+        [UIView beginAnimations:nil context:NULL];
+    }
+
     enterpriseHint.alpha = 0;
     host.alpha = 0;
     hostHint.alpha = 0;
@@ -540,9 +552,12 @@
     signupHint.alpha = 1;
     login.alpha = 1;
     forgotPasswordHint.alpha = 1;
-    [UIView commitAnimations];
     
-    [host resignFirstResponder];
+    if(!_accessLink) {
+        [UIView commitAnimations];
+        
+        [host resignFirstResponder];
+    }
 }
 
 -(IBAction)enterpriseLearnMorePressed:(id)sender {
