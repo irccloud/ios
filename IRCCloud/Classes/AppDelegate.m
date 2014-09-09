@@ -67,6 +67,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024)}];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"www.irccloud.com"]) {
         CLS_LOG(@"Migrating host");
@@ -145,6 +146,7 @@
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     if([url.scheme hasPrefix:@"irccloud"]) {
         if([url.host isEqualToString:@"chat"] && [url.path isEqualToString:@"/access-link"]) {
             [_conn logout];
@@ -200,26 +202,24 @@
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
     NSTimeInterval highestEid = [EventsDataSource sharedInstance].highestEid;
-    if(_conn.state != kIRCCloudStateConnected) {
-        CLSLog(@"Fetching backlog in the background");
+    if(_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting) {
+        CLS_LOG(@"Fetching backlog in the background");
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
         _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-            CLSLog(@"Backlog complete");
+            CLS_LOG(@"Backlog complete");
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
             [self.mainViewController refresh];
             
-            if(_conn.background)
-                [_conn disconnect];
-            
             if(highestEid < [EventsDataSource sharedInstance].highestEid) {
-                CLSLog(@"Got new events");
+                CLS_LOG(@"Got new events");
                 completionHandler(UIBackgroundFetchResultNewData);
             } else {
-                CLSLog(@"No new events");
+                CLS_LOG(@"No new events");
                 completionHandler(UIBackgroundFetchResultNoData);
             }
         }];
         _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-            CLSLog(@"Backlog failed");
+            CLS_LOG(@"Backlog failed");
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
             [_conn disconnect];
             completionHandler(UIBackgroundFetchResultFailed);
@@ -227,7 +227,7 @@
         _conn.background = YES;
         [_conn connect];
     } else {
-        CLSLog(@"Background fetch requested but we're still connected");
+        CLS_LOG(@"Background fetch requested but we're still connected");
         completionHandler(UIBackgroundFetchResultNoData);
     }
 }
@@ -305,8 +305,6 @@
     _conn.reconnectTimestamp = -1;
     if(_conn.state == kIRCCloudStateDisconnected)
         [_conn cancelIdleTimer];
-    [_disconnectTimer invalidate];
-    _disconnectTimer = [NSTimer scheduledTimerWithTimeInterval:[[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] target:_conn selector:@selector(disconnect) userInfo:nil repeats:NO];
     if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
         ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
         [evc.topViewController viewWillDisappear:NO];
@@ -315,9 +313,8 @@
     }
     __block UIBackgroundTaskIdentifier background_task;
     background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
-        [_disconnectTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
         [_conn disconnect];
-        [NSThread sleepForTimeInterval:5];
+        [_conn serialize];
         [application endBackgroundTask: background_task];
         background_task = UIBackgroundTaskInvalid;
     }];
@@ -327,7 +324,9 @@
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
         }
         [_conn serialize];
-        [NSThread sleepForTimeInterval:[[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] + 5];
+        [NSThread sleepForTimeInterval:[UIApplication sharedApplication].backgroundTimeRemaining - 5];
+        [_conn disconnect];
+        [_conn serialize];
         [application endBackgroundTask: background_task];
         background_task = UIBackgroundTaskInvalid;
     });
@@ -338,6 +337,7 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     if(_conn.background) {
         _conn.background = NO;
         [ColorFormatter clearFontCache];
@@ -351,8 +351,6 @@
         } else {
             [_conn updateBadgeCount];
         }
-        [_disconnectTimer invalidate];
-        _disconnectTimer = nil;
         if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
             ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
             [evc.topViewController viewWillAppear:NO];

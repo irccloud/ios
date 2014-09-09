@@ -24,7 +24,6 @@
 @class ViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate> {
-    NSTimer *_disconnectTimer;
     NetworkConnection *_conn;
     URLHandler *_urlHandler;
     id _backlogCompletedObserver;

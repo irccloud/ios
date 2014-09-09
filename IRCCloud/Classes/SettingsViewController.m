@@ -22,90 +22,6 @@
 #import "OpenInChromeController.h"
 #import "ImgurLoginViewController.h"
 
-@interface BGTimeoutViewController : UITableViewController
-@end
-
-@implementation BGTimeoutViewController
-
--(id)init {
-    self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) {
-        self.navigationItem.title = @"Background Timeout";
-    }
-    return self;
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-#pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 4;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"timeoutcell"];
-    if(!cell)
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"timeoutcell"];
-    
-    cell.accessoryType = UITableViewCellAccessoryNone;
-    
-    switch(indexPath.row) {
-        case 0:
-            cell.textLabel.text = @"30 seconds";
-            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] == 30)
-                cell.accessoryType = UITableViewCellAccessoryCheckmark;
-            break;
-        case 1:
-            cell.textLabel.text = @"1 minute";
-            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] == 60)
-                cell.accessoryType = UITableViewCellAccessoryCheckmark;
-            break;
-        case 2:
-            cell.textLabel.text = @"5 minutes";
-            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] == 300)
-                cell.accessoryType = UITableViewCellAccessoryCheckmark;
-            break;
-        case 3:
-            cell.textLabel.text = @"10 minutes";
-            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue] == 600)
-                cell.accessoryType = UITableViewCellAccessoryCheckmark;
-            break;
-    }
-    
-    return cell;
-}
-
-#pragma mark - Table view delegate
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    switch(indexPath.row) {
-        case 0:
-            [[NSUserDefaults standardUserDefaults] setObject:@(30) forKey:@"bgTimeout"];
-            break;
-        case 1:
-            [[NSUserDefaults standardUserDefaults] setObject:@(60) forKey:@"bgTimeout"];
-            break;
-        case 2:
-            [[NSUserDefaults standardUserDefaults] setObject:@(300) forKey:@"bgTimeout"];
-            break;
-        case 3:
-            [[NSUserDefaults standardUserDefaults] setObject:@(600) forKey:@"bgTimeout"];
-            break;
-    }
-    [tableView reloadData];
-    [self.navigationController popViewControllerAnimated:YES];
-}
-
-@end
-
 @interface PhotoSizeViewController : UITableViewController
 @end
 
@@ -509,7 +425,7 @@
         case 2:
             return 5;
         case 3:
-            return (_chromeInstalled)?4:3;
+            return (_chromeInstalled)?3:2;
         case 4:
             return 3;
         case 5:
@@ -603,19 +519,10 @@
                     cell.accessoryView = _screen;
                     break;
                 case 1:
-                    cell.textLabel.text = @"Background Disconnect Timer";
-                    int seconds = [[[NSUserDefaults standardUserDefaults] objectForKey:@"bgTimeout"] intValue];
-                    if(seconds < 60)
-                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%is", seconds];
-                    else
-                        cell.detailTextLabel.text = [NSString stringWithFormat:@"%im", seconds/60];
-                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    break;
-                case 2:
                     cell.textLabel.text = @"Auto-capitalization";
                     cell.accessoryView = _autoCaps;
                     break;
-                case 3:
+                case 2:
                     cell.textLabel.text = @"Open URLs in Chrome";
                     cell.accessoryView = _chrome;
                     break;
@@ -679,9 +586,6 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
-    if(indexPath.section == 3 && indexPath.row == 1) {
-        [self.navigationController pushViewController:[[BGTimeoutViewController alloc] init] animated:YES];
-    }
     if(indexPath.section == 4 && indexPath.row == 0) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
