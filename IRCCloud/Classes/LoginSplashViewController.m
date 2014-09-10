@@ -157,26 +157,7 @@
     loadingView.alpha = 1;
 }
 
-
--(void)flyaway {
-    if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-        logo.transform = CGAffineTransformMakeTranslation(0, -(logo.frame.origin.y + logo.frame.size.height));
-        IRC.transform = CGAffineTransformMakeTranslation(0, -(IRC.frame.origin.y + IRC.frame.size.height));
-        Cloud.transform = CGAffineTransformMakeTranslation(0, -(Cloud.frame.origin.y + Cloud.frame.size.height));
-        loadingView.transform = CGAffineTransformMakeTranslation(0, self.view.frame.size.height - loadingView.frame.origin.y);
-    } else {
-        logo.transform = CGAffineTransformMakeTranslation(-(logo.frame.origin.x + logo.frame.size.width), 0);
-        loadingView.transform = CGAffineTransformMakeTranslation(self.view.frame.size.width - loadingView.frame.origin.x, 0);
-    }
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    activity.hidden = YES;
-}
-
 -(void)viewWillAppear:(BOOL)animated {
-    logo.transform = CGAffineTransformIdentity;
-    IRC.transform = CGAffineTransformIdentity;
-    Cloud.transform = CGAffineTransformIdentity;
-    loadingView.transform = CGAffineTransformIdentity;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)

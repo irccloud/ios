@@ -56,7 +56,6 @@
     NSURL *_accessLink;
 }
 @property NSURL *accessLink;
--(void)flyaway;
 -(IBAction)loginButtonPressed:(id)sender;
 -(IBAction)signupButtonPressed:(id)sender;
 -(IBAction)textFieldChanged:(id)sender;
