@@ -1680,7 +1680,10 @@
         } else {
             CLS_LOG(@"Unhandled server status: %@", s.status);
         }
-        CGRect frame = _serverStatus.frame;
+        CGRect frame = _serverStatusBar.frame;
+        frame.size.width = _eventsView.tableView.frame.size.width;
+        _serverStatusBar.frame = frame;
+        frame = _serverStatus.frame;
         frame.origin.x = 8;
         frame.origin.y = 4;
         frame.size.width = _serverStatusBar.frame.size.width - 16;
