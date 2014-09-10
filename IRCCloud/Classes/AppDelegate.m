@@ -142,6 +142,42 @@
         self.window.rootViewController = self.loginSplashViewController;
     }
     [self.window makeKeyAndVisible];
+    
+    UIView *animationView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
+    animationView.backgroundColor = [UIColor colorWithRed:0.043 green:0.18 blue:0.376 alpha:1];
+    
+    UIImageView *logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"login_logo"]];
+    [logo sizeToFit];
+    logo.center = CGPointMake(animationView.center.x, 39);
+    [animationView addSubview:logo];
+    [self.window addSubview:animationView];
+
+    if([NetworkConnection sharedInstance].session.length) {
+        [UIView animateWithDuration:0.25 animations:^{
+            logo.center = CGPointMake(animationView.center.x - 8, 39);
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.5 animations:^{
+                logo.center = CGPointMake(animationView.bounds.size.width + 48, 39);
+                animationView.backgroundColor = [UIColor clearColor];
+            } completion:^(BOOL finished) {
+                [animationView removeFromSuperview];
+            }];
+        }];
+    } else {
+        self.loginSplashViewController.logo.hidden = YES;
+        [UIView animateWithDuration:0.25 animations:^{
+            logo.center = CGPointMake(animationView.center.x + 8, 39);
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.5 animations:^{
+                logo.center = self.loginSplashViewController.logo.center;
+                animationView.backgroundColor = [UIColor clearColor];
+            } completion:^(BOOL finished) {
+                self.loginSplashViewController.logo.hidden = NO;
+                [animationView removeFromSuperview];
+            }];
+        }];
+    }
+    
     return YES;
 }
 
