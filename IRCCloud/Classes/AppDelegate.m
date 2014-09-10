@@ -166,10 +166,10 @@
         }];
     } else {
         self.loginSplashViewController.logo.hidden = YES;
-        [UIView animateWithDuration:0.25 animations:^{
-            logo.center = CGPointMake(animationView.center.x + 8, 39);
+        [UIView animateWithDuration:0.5 animations:^{
+            logo.center = CGPointMake(self.loginSplashViewController.logo.center.x - 8, 39);
         } completion:^(BOOL finished) {
-            [UIView animateWithDuration:0.5 animations:^{
+            [UIView animateWithDuration:0.25 animations:^{
                 logo.center = self.loginSplashViewController.logo.center;
                 animationView.backgroundColor = [UIColor clearColor];
             } completion:^(BOOL finished) {
