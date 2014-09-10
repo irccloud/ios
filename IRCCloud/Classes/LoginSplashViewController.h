@@ -55,7 +55,6 @@
     CGSize _kbSize;
     NSURL *_accessLink;
 }
-@property UIImageView *logo;
 @property NSURL *accessLink;
 -(void)flyaway;
 -(IBAction)loginButtonPressed:(id)sender;
@@ -70,4 +69,5 @@
 -(IBAction)sendAccessLinkButtonPressed:(id)sender;
 -(IBAction)hideKeyboard:(id)sender;
 -(void)hideLoginView;
+-(UIImageView *)logo;
 @end

@@ -158,6 +158,7 @@
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:0.5 animations:^{
                 logo.center = CGPointMake(animationView.bounds.size.width + 48, 39);
+                logo.alpha = 0;
                 animationView.backgroundColor = [UIColor clearColor];
             } completion:^(BOOL finished) {
                 [animationView removeFromSuperview];

@@ -355,11 +355,15 @@
     enterpriseLearnMore.frame = CGRectMake(loginView.bounds.size.width / 2.0f - w / 2.0f, next.frame.origin.y + next.frame.size.height + 2, w, 32);
 }
 
+-(UIImageView *)logo {
+    return logo;
+}
+
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     self.view.frame = [UIScreen mainScreen].applicationFrame;
     float width = self.view.frame.size.width;
     float height = self.view.frame.size.height;
-    if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
+    if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         width = self.view.frame.size.height;
         height = self.view.frame.size.width;
     }
@@ -370,7 +374,7 @@
     } else {
         self.view.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
         logo.frame = CGRectMake(width / 2 - 112, 15, 48, 48);
-        IRC.frame = CGRectMake(width / 2 - 112 + 48 + 14, 15, IRC.bounds.size.width, 48);
+        IRC.frame = CGRectMake(logo.frame.origin.x + 48 + 14, 15, IRC.bounds.size.width, 48);
         Cloud.frame = CGRectMake(IRC.frame.origin.x + IRC.bounds.size.width, 15, Cloud.bounds.size.width, 48);
         float w = 0.0f;
         for(UIView *v in signupHint.subviews) {
