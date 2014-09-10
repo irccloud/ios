@@ -1685,13 +1685,15 @@
         frame.origin.y = 4;
         frame.size.width = _serverStatusBar.frame.size.width - 16;
         frame.size.height = [_serverStatus.text sizeWithFont:_serverStatus.font constrainedToSize:CGSizeMake(frame.size.width, INT_MAX) lineBreakMode:_serverStatus.lineBreakMode].height;
+        if(frame.size.height < 24)
+            frame.size.height = 24;
         _serverStatus.frame = frame;
         frame = _serverStatusBar.frame;
         frame.size.height = _serverStatus.frame.size.height + 8;
         frame.origin.y = _bottomBar.frame.origin.y - frame.size.height;
         _serverStatusBar.frame = frame;
         frame = _eventsView.view.frame;
-        frame.size.height = _serverStatusBar.frame.origin.y;
+        frame.size.height = _serverStatusBar.frame.origin.y + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height);
         _eventsView.view.frame = frame;
         frame = _eventsView.bottomUnreadView.frame;
         frame.origin.y = _serverStatusBar.frame.origin.y - frame.size.height;
