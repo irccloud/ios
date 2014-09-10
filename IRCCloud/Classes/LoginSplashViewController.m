@@ -218,6 +218,7 @@
     enterpriseLearnMore.alpha = 1;
     hostHint.alpha = 1;
 #endif
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     if(_accessLink && IRCCLOUD_HOST.length) {
         [self _loginWithAccessLink];
     }
@@ -391,6 +392,8 @@
         }
         w -= 8;
         loginHint.frame = CGRectMake(width / 2.0f - w / 2.0f, 70, w, 32);
+
+        enterpriseHint.frame = CGRectMake(0, 70, width, 32);
         
         loginView.frame = CGRectMake(0, 119, width, height - 119);
         loadingView.frame = CGRectMake(0, 78, width, height - 78);
