@@ -145,16 +145,29 @@
     
     UIView *animationView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
     animationView.backgroundColor = [UIColor colorWithRed:0.043 green:0.18 blue:0.376 alpha:1];
+    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+        animationView.transform = self.window.rootViewController.view.transform;
+        if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
+            animationView.frame = CGRectMake(20,0,animationView.frame.size.height,animationView.frame.size.width);
+        else
+            animationView.frame = CGRectMake(0,0,animationView.frame.size.height,animationView.frame.size.width);
+    }
     
     UIImageView *logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"login_logo"]];
     [logo sizeToFit];
-    logo.center = CGPointMake(animationView.center.x, 39);
+    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
+        logo.center = CGPointMake(self.window.center.y, 39);
+    else
+        logo.center = CGPointMake(self.window.center.x, 39);
     [animationView addSubview:logo];
     [self.window addSubview:animationView];
 
     if([NetworkConnection sharedInstance].session.length) {
         [UIView animateWithDuration:0.25 animations:^{
-            logo.center = CGPointMake(animationView.center.x - 8, 39);
+            if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
+                logo.center = CGPointMake(animationView.center.y - 8, 39);
+            else
+                logo.center = CGPointMake(animationView.center.x - 8, 39);
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:0.5 animations:^{
                 logo.center = CGPointMake(animationView.bounds.size.width + 48, 39);
