@@ -163,32 +163,37 @@
     [self.window addSubview:animationView];
 
     if([NetworkConnection sharedInstance].session.length) {
-        [UIView animateWithDuration:0.1 animations:^{
-            if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
-                logo.center = CGPointMake(animationView.center.y - 8, 39);
-            else
-                logo.center = CGPointMake(animationView.center.x - 8, 39);
+        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
+        [animation setFromValue:@(logo.layer.position.x)];
+        [animation setToValue:@(animationView.bounds.size.width)];
+        [animation setDuration:0.5];
+        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.2 :-.5 :.2 :1]];
+        animation.removedOnCompletion = NO;
+        animation.fillMode = kCAFillModeForwards;
+        [logo.layer addAnimation:animation forKey:nil];
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            animationView.alpha = 0;
         } completion:^(BOOL finished) {
-            [UIView animateWithDuration:0.4 animations:^{
-                logo.center = CGPointMake(animationView.bounds.size.width + 48, 39);
-                logo.alpha = 0;
-                animationView.backgroundColor = [UIColor clearColor];
-            } completion:^(BOOL finished) {
-                [animationView removeFromSuperview];
-            }];
+            [animationView removeFromSuperview];
         }];
     } else {
         self.loginSplashViewController.logo.hidden = YES;
-        [UIView animateWithDuration:0.4 animations:^{
-            logo.center = CGPointMake(self.loginSplashViewController.logo.center.x - 8, 39);
+        
+        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
+        [animation setFromValue:@(logo.layer.position.x)];
+        [animation setToValue:@(self.loginSplashViewController.logo.layer.position.x)];
+        [animation setDuration:0.5];
+        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.8 :1.4 :1 :1]];
+        animation.removedOnCompletion = NO;
+        animation.fillMode = kCAFillModeForwards;
+        [logo.layer addAnimation:animation forKey:nil];
+        
+        [UIView animateWithDuration:0.5 animations:^{
+            animationView.backgroundColor = [UIColor clearColor];
         } completion:^(BOOL finished) {
-            [UIView animateWithDuration:0.1 animations:^{
-                logo.center = self.loginSplashViewController.logo.center;
-                animationView.backgroundColor = [UIColor clearColor];
-            } completion:^(BOOL finished) {
-                self.loginSplashViewController.logo.hidden = NO;
-                [animationView removeFromSuperview];
-            }];
+            self.loginSplashViewController.logo.hidden = NO;
+            [animationView removeFromSuperview];
         }];
     }
     
