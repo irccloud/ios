@@ -32,7 +32,7 @@
       "idiom" : "iphone",
       "extent" : "full-screen",
       "minimum-system-version" : "7.0",
-      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @2x@2x.png",
+      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @2x@2x-1.png",
       "scale" : "2x"
     },
     {
@@ -49,7 +49,7 @@
       "idiom" : "ipad",
       "extent" : "full-screen",
       "minimum-system-version" : "7.0",
-      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @1x @2x-3.png",
+      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @1x @2x-2.png",
       "scale" : "1x"
     },
     {
@@ -65,7 +65,7 @@
       "idiom" : "ipad",
       "extent" : "full-screen",
       "minimum-system-version" : "7.0",
-      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @1x @2x@2x-3.png",
+      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @1x @2x@2x-2.png",
       "scale" : "2x"
     },
     {
@@ -87,7 +87,7 @@
       "orientation" : "portrait",
       "idiom" : "iphone",
       "extent" : "full-screen",
-      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @2x@2x-1.png",
+      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @2x@2x.png",
       "scale" : "2x"
     },
     {
@@ -109,7 +109,7 @@
       "orientation" : "portrait",
       "idiom" : "ipad",
       "extent" : "full-screen",
-      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @1x @2x-2.png",
+      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @1x @2x-3.png",
       "scale" : "1x"
     },
     {
@@ -137,7 +137,7 @@
       "orientation" : "portrait",
       "idiom" : "ipad",
       "extent" : "full-screen",
-      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @1x @2x@2x-2.png",
+      "filename" : "iOS 5,6 @1x @2x + iOS 7,8 @1x @2x@2x-3.png",
       "scale" : "2x"
     },
     {
