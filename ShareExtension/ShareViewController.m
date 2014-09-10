@@ -16,6 +16,16 @@
 
 @implementation ShareViewController
 
+- (void)presentationAnimationDidFinish {
+    if(!_conn.session.length) {
+        UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Not Logged in" message:@"Please login to the IRCCloud app before sharing." preferredStyle:UIAlertControllerStyleAlert];
+        [c addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+            [self cancel];
+        }]];
+        [self presentViewController:c animated:YES completion:nil];
+    }
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -32,10 +42,12 @@
     _uploader.delegate = self;
     [NetworkConnection sync];
     _conn = [NetworkConnection sharedInstance];
-    if([BuffersDataSource sharedInstance].count && _conn.userInfo) {
-        _buffer = [[BuffersDataSource sharedInstance] getBuffer:[[_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
+    if(_conn.session.length) {
+        if([BuffersDataSource sharedInstance].count && _conn.userInfo) {
+            _buffer = [[BuffersDataSource sharedInstance] getBuffer:[[_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
+        }
+        [_conn connect];
     }
-    [_conn connect];
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.title = @"IRCCloud";
     AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &_sound);
@@ -53,7 +65,7 @@
 }
 
 - (BOOL)isContentValid {
-    return _buffer != nil && ![_buffer.type isEqualToString:@"console"];
+    return _conn.session.length && _buffer != nil && ![_buffer.type isEqualToString:@"console"];
 }
 
 - (void)didSelectPost {
@@ -102,25 +114,29 @@
 }
 
 - (NSArray *)configurationItems {
-    SLComposeSheetConfigurationItem *bufferConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
-    bufferConfigItem.title = @"Conversation";
-    if(_buffer) {
-        if(![_buffer.type isEqualToString:@"console"])
-            bufferConfigItem.value = _buffer.name;
-        else
-            bufferConfigItem.value = nil;
+    if(_conn.session.length) {
+        SLComposeSheetConfigurationItem *bufferConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
+        bufferConfigItem.title = @"Conversation";
+        if(_buffer) {
+            if(![_buffer.type isEqualToString:@"console"])
+                bufferConfigItem.value = _buffer.name;
+            else
+                bufferConfigItem.value = nil;
+        } else {
+            bufferConfigItem.valuePending = YES;
+        }
+        
+        bufferConfigItem.tapHandler = ^() {
+            BuffersTableView *b = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
+            [b setPreferredContentSize:CGSizeMake(self.navigationController.preferredContentSize.width, [BuffersDataSource sharedInstance].count * 42)];
+            b.navigationItem.title = @"Conversations";
+            b.delegate = self;
+            [self pushConfigurationViewController:b];
+        };
+        return @[bufferConfigItem];
     } else {
-        bufferConfigItem.valuePending = YES;
+        return nil;
     }
-    
-    bufferConfigItem.tapHandler = ^() {
-        BuffersTableView *b = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
-        [b setPreferredContentSize:CGSizeMake(self.navigationController.preferredContentSize.width, [BuffersDataSource sharedInstance].count * 42)];
-        b.navigationItem.title = @"Conversations";
-        b.delegate = self;
-        [self pushConfigurationViewController:b];
-    };
-    return @[bufferConfigItem];
 }
 
 -(void)bufferSelected:(int)bid {
