@@ -52,6 +52,10 @@
     [IRC sizeToFit];
     Cloud.font = lato;
     [Cloud sizeToFit];
+#ifdef ENTERPRISE
+    Cloud.textColor = IRC.textColor;
+    IRC.textColor = [UIColor whiteColor];
+#endif
     
     lato = [UIFont fontWithName:@"Lato" size:16];
     enterpriseHint.font = lato;
