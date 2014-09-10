@@ -38,6 +38,7 @@
     [_conn connect];
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.title = @"IRCCloud";
+    AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &_sound);
 }
 
 - (void)backlogComplete:(NSNotification *)n {
@@ -68,9 +69,9 @@
             _uploader.bid = _buffer.bid;
             _uploader.msg = self.contentText;
             [_uploader upload:item];
-            /*[[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
-            }];*/
+            }];
         };
         
         NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
@@ -83,7 +84,7 @@
                     [_conn say:item.absoluteString to:_buffer.name cid:_buffer.cid];
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
-                    AudioServicesPlaySystemSound(1001);
+                    AudioServicesPlaySystemSound(_sound);
                 }];
             }
         };
@@ -96,7 +97,7 @@
     } else {
         [_conn say:self.contentText to:_buffer.name cid:_buffer.cid];
         [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
-        AudioServicesPlaySystemSound(1001);
+        AudioServicesPlaySystemSound(_sound);
     }
 }
 
@@ -141,17 +142,14 @@
 }
 
 -(void)imageUploadProgress:(float)progress {
-    NSLog(@"Progress: %f", progress);
 }
 
 -(void)imageUploadDidFail {
     NSLog(@"Image upload failed");
-    [self.extensionContext completeRequestReturningItems:@[self.extensionContext.inputItems.firstObject] completionHandler:nil];
 }
 
 -(void)imageUploadNotAuthorized {
     NSLog(@"Image upload not authorized");
-    [self.extensionContext completeRequestReturningItems:@[self.extensionContext.inputItems.firstObject] completionHandler:nil];
 }
 
 -(void)imageUploadDidFinish:(NSDictionary *)d bid:(int)bid {
@@ -166,8 +164,7 @@
         NSLog(@"Image upload failed");
     }
     [_conn disconnect];
-    AudioServicesPlaySystemSound(1001);
-    [self.extensionContext completeRequestReturningItems:@[self.extensionContext.inputItems.firstObject] completionHandler:nil];
+    AudioServicesPlaySystemSound(_sound);
 }
 
 @end

@@ -18,5 +18,6 @@
     UIViewController *_splash;
     Buffer *_buffer;
     ImageUploader *_uploader;
+    SystemSoundID _sound;
 }
 @end

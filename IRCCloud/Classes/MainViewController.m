@@ -751,15 +751,15 @@
 }
 
 -(void)backlogCompleted:(NSNotification *)notification {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
 #ifdef DEBUG
     NSLog(@"This is a debug build, skipping APNs registration");
 #else
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         [[UIApplication sharedApplication] registerForRemoteNotifications];
-    } else {
+    else
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
-    }
 #endif
     if([ServersDataSource sharedInstance].count < 1) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
@@ -2477,6 +2477,7 @@
 -(void)imageUploadDidFinish:(NSDictionary *)d bid:(int)bid {
     if([[d objectForKey:@"success"] intValue] == 1) {
         NSString *link = [[[d objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
+        Buffer *b = _buffer;
         if(bid == _buffer.bid) {
             if(_message.text.length == 0) {
                 _message.text = link;
@@ -2486,7 +2487,7 @@
                 _message.text = [_message.text stringByAppendingString:link];
             }
         } else {
-            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
+            b = [[BuffersDataSource sharedInstance] getBuffer:bid];
             if(b) {
                 if(b.draft.length == 0) {
                     b.draft = link;
@@ -2497,6 +2498,12 @@
                 }
             }
         }
+        UILocalNotification *alert = [[UILocalNotification alloc] init];
+        alert.fireDate = [NSDate date];
+        alert.alertBody = @"Your image has been uploaded and is ready to send";
+        alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
+        alert.soundName = @"a.caf";
+        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
     } else {
         CLS_LOG(@"imgur upload failed: %@", d);
         [self imageUploadDidFail];

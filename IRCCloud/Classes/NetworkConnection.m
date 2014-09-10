@@ -830,6 +830,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
         [NetworkConnection sharedInstance].reconnectTimestamp = -1;
         state = kIRCCloudStateDisconnected;
+        [[NetworkConnection sharedInstance] performSelectorInBackground:@selector(serialize) withObject:nil];
     }
     
     lastType = type;
@@ -841,6 +842,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         CLS_LOG(@"IRCCloud server became unreachable, disconnecting");
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
         [NetworkConnection sharedInstance].reconnectTimestamp = -1;
+        [[NetworkConnection sharedInstance] performSelectorInBackground:@selector(serialize) withObject:nil];
     }
     [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
 }
@@ -1308,7 +1310,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
             [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
     }
-    [self performSelectorInBackground:@selector(serialize) withObject:nil];
 }
 
 -(void)clearPrefs {

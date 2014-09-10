@@ -23,11 +23,12 @@
 
 @class ViewController;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate> {
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate, NSURLSessionDataDelegate> {
     NetworkConnection *_conn;
     URLHandler *_urlHandler;
     id _backlogCompletedObserver;
     id _backlogFailedObserver;
+    void (^imageUploadCompletionHandler)();
 }
 
 @property (strong, nonatomic) UIWindow *window;
