@@ -102,7 +102,7 @@
 -(void)removeEventsForBuffer:(int)bid;
 -(void)pruneEventsForBuffer:(int)bid maxSize:(int)size;
 -(NSArray *)eventsForBuffer:(int)bid;
--(int)sizeOfBuffer:(int)bid;
+-(NSUInteger)sizeOfBuffer:(int)bid;
 -(void)removeEventsBefore:(NSTimeInterval)min_eid buffer:(int)bid;
 -(int)unreadStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type;
 -(int)highlightCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type;

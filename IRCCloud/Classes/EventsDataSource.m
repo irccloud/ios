@@ -822,7 +822,7 @@
     }
 }
 
--(int)sizeOfBuffer:(int)bid {
+-(NSUInteger)sizeOfBuffer:(int)bid {
     @synchronized(_events) {
         return [[_events objectForKey:@(bid)] count];
     }
