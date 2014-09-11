@@ -266,7 +266,6 @@
             CLS_LOG(@"Backlog complete");
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
             [self.mainViewController refresh];
-            [self showMainView:NO];
             if(highestEid < [EventsDataSource sharedInstance].highestEid) {
                 CLS_LOG(@"Got new events");
                 completionHandler(UIBackgroundFetchResultNewData);
@@ -281,7 +280,7 @@
             [_conn disconnect];
             completionHandler(UIBackgroundFetchResultFailed);
         }];
-        _conn.background = YES;
+        _conn.background = [UIApplication sharedApplication].applicationState != UIApplicationStateActive;
         [_conn connect];
     } else {
         CLS_LOG(@"Background fetch requested but we're still connected");
