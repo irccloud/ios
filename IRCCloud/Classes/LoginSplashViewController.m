@@ -553,7 +553,8 @@
 }
 
 -(IBAction)enterpriseLearnMorePressed:(id)sender {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"itms://itunes.apple.com/app/irccloud/id672699103"]];
+    if(![[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"irccloud://"]])
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"itms://itunes.apple.com/app/irccloud/id672699103"]];
 }
 
 -(IBAction)hideKeyboard:(id)sender {
