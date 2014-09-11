@@ -266,7 +266,10 @@
                     e.fromMode = event.targetMode;
                 } else if(event.type == e.type) {
                 } else if(event.type == kCollapsedEventJoin) {
-                    e.type = kCollapsedEventPopOut;
+                    if(e.type == kCollapsedEventPopIn)
+                        e.type = kCollapsedEventJoin;
+                    else
+                        e.type = kCollapsedEventPopOut;
                     e.fromMode = event.fromMode;
                 } else if(e.type == kCollapsedEventPopOut) {
                     e.type = event.type;
