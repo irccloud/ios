@@ -428,7 +428,6 @@ NSLock *__parserLock = nil;
                        buffer.deferred = [[object objectForKey:@"deferred"] intValue];
                        buffer.timeout = [[object objectForKey:@"timeout"] intValue];
                        buffer.valid = YES;
-                       CLS_LOG(@"bid%i is now valid", buffer.bid);
                        if(!backlog)
                            [self postObject:buffer forEvent:kIRCEventMakeBuffer];
                        if(_numBuffers > 0) {

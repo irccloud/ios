@@ -173,7 +173,7 @@
     else
         maximumHeight             = internalTextView.intrinsicContentSize.height;
     maximumNumberOfLines      = n;
-    internalTextView.scrollEnabled = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?oldScrollEnabled:YES;
+    internalTextView.scrollEnabled = oldScrollEnabled;
     internalTextView.text     = saveText;
     internalTextView.hidden   = NO;
     internalTextView.selectedRange = saveSelection;
@@ -203,7 +203,7 @@
         minimumHeight             = internalTextView.contentSize.height;
     else
         minimumHeight             = internalTextView.intrinsicContentSize.height;
-    internalTextView.scrollEnabled = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?oldScrollEnabled:YES;
+    internalTextView.scrollEnabled = oldScrollEnabled;
     internalTextView.text     = saveText;
     internalTextView.hidden   = NO;
     internalTextView.selectedRange = saveSelection;
@@ -216,6 +216,7 @@
 {
     if(textView.text.length == 0) {
         internalTextView.contentOffset = CGPointMake(0,0);
+        internalTextView.contentInset = UIEdgeInsetsMake(-1,0,-1,0);
         placeholderLabel.alpha = 1;
     } else {
         placeholderLabel.alpha = 0;
@@ -271,21 +272,17 @@
             [delegate expandingTextView:self didChangeHeight:(newHeight+ kTextInsetBottom)];
         }
 		
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
-            if (newHeight >= maximumHeight)
+        if (newHeight >= maximumHeight)
+        {
+            if(!internalTextView.scrollEnabled)
             {
-                if(!internalTextView.scrollEnabled)
-                {
-                    internalTextView.scrollEnabled = YES;
-                    [internalTextView flashScrollIndicators];
-                }
-            } 
-            else 
-            {
-                internalTextView.scrollEnabled = NO;
+                internalTextView.scrollEnabled = YES;
+                [internalTextView flashScrollIndicators];
             }
-        } else {
-            internalTextView.scrollEnabled = YES;
+        } 
+        else 
+        {
+            internalTextView.scrollEnabled = NO;
         }
 	}
 	

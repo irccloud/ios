@@ -1248,6 +1248,9 @@
         _sendBtn.alpha = 0;
         _settingsBtn.enabled = YES;
         _settingsBtn.alpha = 1;
+        _message.delegate = nil;
+        [_message clearText];
+        _message.delegate = self;
     }
 }
 

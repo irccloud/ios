@@ -48,7 +48,11 @@
                 self.contentInset = UIEdgeInsetsMake(kTopContentInset, 0, 4, 0);
 		}
 	}
-	[super setContentOffset:s];
+    if(self.scrollEnabled)
+        [super setContentOffset:s];
+    else {
+        [super setContentOffset:CGPointMake(0,4)];
+    }
 }
 
 -(void)setContentInset:(UIEdgeInsets)s
