@@ -228,7 +228,10 @@
         NSURLSession *session;
         NSURLSessionConfiguration *config;
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
             config = [NSURLSessionConfiguration backgroundSessionConfiguration:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+#pragma GCC diagnostic pop
         } else {
             config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
 #ifdef ENTERPRISE

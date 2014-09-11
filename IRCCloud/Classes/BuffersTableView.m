@@ -117,7 +117,10 @@
         _joinBtn.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y, frame.size.height, frame.size.height);
     }
     if(!_highlights.hidden) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
         CGSize size = [_highlights.count sizeWithFont:_highlights.font];
+#pragma GCC diagnostic pop
         size.width += 0;
         size.height = frame.size.height - 16;
         if(size.width < size.height)

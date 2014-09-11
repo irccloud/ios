@@ -55,9 +55,12 @@
     CGContextRestoreGState(ctx);
     CGContextSaveGState(ctx);
     [[UIColor whiteColor] set];
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
     CGSize size = [_count sizeWithFont:_font forWidth:rect.size.width lineBreakMode:NSLineBreakByClipping];
     [_count drawInRect:CGRectMake(rect.origin.x + ((rect.size.width - size.width) / 2), rect.origin.y + ((rect.size.height - size.height) / 2), size.width, size.height)
               withFont:_font];
+#pragma GCC diagnostic pop
     CGContextRestoreGState(ctx);
 }
 
