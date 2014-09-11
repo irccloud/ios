@@ -183,9 +183,11 @@
 
 -(id)init {
     self = [super init];
+#ifndef EXTENSION
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
     
     _events = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+#endif
     _events_sorted = [[NSMutableDictionary alloc] init];
     _highestEid = 0;
     if(_events) {
@@ -662,6 +664,7 @@
 }
 
 -(void)serialize {
+#ifndef EXTENSION
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
     
     NSMutableDictionary *events = [[NSMutableDictionary alloc] init];
@@ -675,6 +678,7 @@
         [NSKeyedArchiver archiveRootObject:events toFile:cacheFile];
         [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
     }
+#endif
 }
 
 -(void)clear {

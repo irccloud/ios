@@ -184,9 +184,9 @@
             NSDictionary *dict = [parser objectWithData:data];
             if([[dict objectForKey:@"type"] isEqualToString:@"photo"]) {
                 NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"url"]]];
-                NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
                 
-                [connection start];
+                [_connection start];
             } else {
                 NSLog(@"Invalid type from oembed");
                 [self fail];
@@ -229,9 +229,9 @@
                 NSDictionary *dict = [parser objectWithData:data];
                 if([[dict objectForKey:@"item_type"] isEqualToString:@"image"]) {
                     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"content_url"]]];
-                    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
                     
-                    [connection start];
+                    [_connection start];
                 } else {
                     NSLog(@"Invalid type from cl.ly");
                     [self fail];
@@ -253,9 +253,9 @@
                 NSDictionary *page = [[[[dict objectForKey:@"query"] objectForKey:@"pages"] allValues] objectAtIndex:0];
                 if(page && [page objectForKey:@"imageinfo"]) {
                     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]]];
-                    NSURLConnection *connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
                     
-                    [connection start];
+                    [_connection start];
                 } else {
                     NSLog(@"Invalid data from MediaWiki");
                     [self fail];
