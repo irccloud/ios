@@ -587,7 +587,7 @@ NSLock *__parserLock = nil;
                        channel.type = [object objectForKey:@"channel_type"];
                        channel.timestamp = [[object objectForKey:@"timestamp"] doubleValue];
                        channel.topic_text = [[object objectForKey:@"topic"] objectForKey:@"text"];
-                       channel.topic_author = [[object objectForKey:@"topic"] objectForKey:@"nick"];
+                       channel.topic_author = [[[object objectForKey:@"topic"] objectForKey:@"nick"] length]?[[object objectForKey:@"topic"] objectForKey:@"nick"]:[[object objectForKey:@"topic"] objectForKey:@"server"];
                        channel.topic_time = [[[object objectForKey:@"topic"] objectForKey:@"time"] doubleValue];
                        channel.mode = @"";
                        channel.modes = [[NSMutableArray alloc] init];
@@ -611,7 +611,7 @@ NSLock *__parserLock = nil;
                    @"channel_topic": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
                        if(!backlog || _resuming) {
-                           [_channels updateTopic:[object objectForKey:@"topic"] time:object.eid/1000000 author:[object objectForKey:@"author"] buffer:object.bid];
+                           [_channels updateTopic:[object objectForKey:@"topic"] time:object.eid/1000000 author:[[object objectForKey:@"author"] length]?[object objectForKey:@"author"]:[object objectForKey:@"server"] buffer:object.bid];
                            if(!backlog)
                                [self postObject:object forEvent:kIRCEventChannelTopic];
                        }
