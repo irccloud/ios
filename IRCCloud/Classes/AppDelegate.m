@@ -108,6 +108,7 @@
     [Crashlytics startWithAPIKey:@CRASHLYTICS_TOKEN];
 #endif
     _conn = [NetworkConnection sharedInstance];
+    _conn.background = NO;
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
@@ -167,7 +168,7 @@
         [animation setFromValue:@(logo.layer.position.x)];
         [animation setToValue:@(animationView.bounds.size.width)];
         [animation setDuration:0.5];
-        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.2 :-.5 :.2 :1]];
+        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.6 :-.28 :.73 :.05]];
         animation.removedOnCompletion = NO;
         animation.fillMode = kCAFillModeForwards;
         [logo.layer addAnimation:animation forKey:nil];
@@ -184,7 +185,7 @@
         [animation setFromValue:@(logo.layer.position.x)];
         [animation setToValue:@(self.loginSplashViewController.logo.layer.position.x)];
         [animation setDuration:0.5];
-        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.8 :1.4 :1 :1]];
+        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.17 :.89 :.32 :1.28]];
         animation.removedOnCompletion = NO;
         animation.fillMode = kCAFillModeForwards;
         [logo.layer addAnimation:animation forKey:nil];
@@ -196,7 +197,6 @@
             [animationView removeFromSuperview];
         }];
     }
-    
     return YES;
 }
 
