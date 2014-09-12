@@ -1032,6 +1032,25 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [[[SBJsonParser alloc] init] objectWithData:data];
 }
 
+-(NSDictionary *)requestConfiguration {
+    NSData *data;
+    NSURLResponse *response = nil;
+    NSError *error = nil;
+    
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
+    return [[[SBJsonParser alloc] init] objectWithData:data];
+}
+
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args {
     @synchronized(_writer) {
         if([self reachable] && _state == kIRCCloudStateConnected) {

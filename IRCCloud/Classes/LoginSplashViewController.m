@@ -355,33 +355,37 @@
         loadingView.frame = loginView.frame = CGRectMake(0, 0, 320, self.view.bounds.size.height);
     } else {
         self.view.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
-        logo.frame = CGRectMake(width / 2 - 112, 15, 48, 48);
-        IRC.frame = CGRectMake(logo.frame.origin.x + 48 + 14, 15, IRC.bounds.size.width, 48);
-        Cloud.frame = CGRectMake(IRC.frame.origin.x + IRC.bounds.size.width, 15, Cloud.bounds.size.width, 48);
-        float w = 0.0f;
-        for(UIView *v in signupHint.subviews) {
-            v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
-            w += v.bounds.size.width + 8;
-        }
-        w -= 8;
-        signupHint.frame = CGRectMake(width / 2.0f - w / 2.0f, 70, w, 32);
-        
-        w = 0.0f;
-        for(UIView *v in loginHint.subviews) {
-            v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
-            w += v.bounds.size.width + 8;
-        }
-        w -= 8;
-        loginHint.frame = CGRectMake(width / 2.0f - w / 2.0f, 70, w, 32);
-
-        enterpriseHint.frame = CGRectMake(0, 70, width, 32);
-        
         loginView.frame = CGRectMake(0, 119, width, height - 119);
         loadingView.frame = CGRectMake(0, 78, width, height - 78);
         version.frame = CGRectMake(0, height - 20 - _kbSize.height, width, 20);
-        
+    }
+
+    logo.frame = CGRectMake(width / 2 - 112, 15, 48, 48);
+    IRC.frame = CGRectMake(logo.frame.origin.x + 48 + 14, 15, IRC.bounds.size.width, 48);
+    Cloud.frame = CGRectMake(IRC.frame.origin.x + IRC.bounds.size.width, 15, Cloud.bounds.size.width, 48);
+    float w = 0.0f;
+    for(UIView *v in signupHint.subviews) {
+        v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
+        w += v.bounds.size.width + 8;
+    }
+    w -= 8;
+    signupHint.frame = CGRectMake(width / 2.0f - w / 2.0f, 70, w, 32);
+    
+    w = 0.0f;
+    for(UIView *v in loginHint.subviews) {
+        v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
+        w += v.bounds.size.width + 8;
+    }
+    w -= 8;
+    loginHint.frame = CGRectMake(width / 2.0f - w / 2.0f, 70, w, 32);
+
+    enterpriseHint.frame = CGRectMake(0, 70, width, 32);
+    
+    if(signupHint.enabled) {
         forgotPasswordLogin.frame = CGRectMake(logo.frame.origin.x + 17, 70, 65, 32);
         forgotPasswordSignup.frame = CGRectMake(logo.frame.origin.x + 141, 70, 65, 32);
+    } else {
+        forgotPasswordLogin.center = CGPointMake(width / 2, forgotPasswordLogin.center.y);
     }
     [self _updateFieldPositions];
 }
@@ -422,7 +426,10 @@
     password.alpha = 1;
     signup.alpha = 0;
     loginHint.alpha = 0;
-    signupHint.alpha = 1;
+    if(signupHint.enabled)
+        signupHint.alpha = 1;
+    else
+        enterpriseHint.alpha = 1;
     forgotPasswordHint.alpha = 1;
     TOSHint.alpha = 0;
     forgotPasswordLogin.alpha = 0;
@@ -461,14 +468,16 @@
     password.alpha = 0;
     signupHint.alpha = 0;
     forgotPasswordHint.alpha = 0;
+    enterpriseHint.alpha = 0;
     
     forgotPasswordLogin.alpha = 1;
-    forgotPasswordSignup.alpha = 1;
+    if(signupHint.enabled)
+        forgotPasswordSignup.alpha = 1;
     notAProblem.alpha = 1;
     sendAccessLink.alpha = 1;
     enterEmailAddressHint.alpha = 1;
-    [self _updateFieldPositions];
     [UIView commitAnimations];
+    [self _updateFieldPositions];
 }
 
 -(IBAction)sendAccessLinkButtonPressed:(id)sender {
@@ -518,38 +527,76 @@
 #endif
 }
 
--(IBAction)nextButtonPressed:(id)sender {
-    IRCCLOUD_HOST = host.text;
+-(void)_stripIRCCloudHost {
     if([IRCCLOUD_HOST hasPrefix:@"http://"])
         IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:7];
     if([IRCCLOUD_HOST hasPrefix:@"https://"])
         IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:8];
     if([IRCCLOUD_HOST hasSuffix:@"/"])
         IRCCLOUD_HOST = [IRCCLOUD_HOST substringToIndex:IRCCLOUD_HOST.length - 1];
-    
-    if(_accessLink) {
-        [self _loginWithAccessLink];
-    } else {
-        [UIView beginAnimations:nil context:NULL];
-    }
+}
 
-    enterpriseHint.alpha = 0;
-    host.alpha = 0;
-    hostHint.alpha = 0;
-    next.alpha = 0;
-    enterpriseLearnMore.alpha = 0;
+-(IBAction)nextButtonPressed:(id)sender {
+    IRCCLOUD_HOST = host.text;
+    [self _stripIRCCloudHost];
     
-    username.alpha = 1;
-    password.alpha = 1;
-    signupHint.alpha = 1;
-    login.alpha = 1;
-    forgotPasswordHint.alpha = 1;
+    status.text = @"Connecting";
+    [activity startAnimating];
     
-    if(!_accessLink) {
-        [UIView commitAnimations];
+    [host resignFirstResponder];
+    [UIView beginAnimations:nil context:nil];
+    loadingView.alpha = 1;
+    loginView.alpha = 0;
+    [UIView commitAnimations];
+    
+    activity.hidden = NO;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSDictionary *result = [[NetworkConnection sharedInstance] requestConfiguration];
+#ifdef DEBUG
+        if(result) {
+#else
+        if(result && [[result objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]]) {
+#endif
+            if([[result objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
+                enterpriseHint.text = [[result objectForKey:@"enterprise"] objectForKey:@"fullname"];
+            if(![[result objectForKey:@"auth_mechanism"] isEqualToString:@"internal"])
+                signupHint.enabled = NO;
+        } else {
+            IRCCLOUD_HOST = nil;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Failed" message:@"Please check your host and try again shortly, or contact your system administrator for assistance."  delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            });
+        }
         
-        [host resignFirstResponder];
-    }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if(_accessLink && IRCCLOUD_HOST.length) {
+                [self _loginWithAccessLink];
+            } else {
+                if(IRCCLOUD_HOST.length) {
+                    enterpriseHint.alpha = 0;
+                    host.alpha = 0;
+                    hostHint.alpha = 0;
+                    next.alpha = 0;
+                    enterpriseLearnMore.alpha = 0;
+                    
+                    username.alpha = 1;
+                    password.alpha = 1;
+                    if(signupHint.enabled)
+                        signupHint.alpha = 1;
+                    else
+                        enterpriseHint.alpha = 1;
+                    login.alpha = 1;
+                    forgotPasswordHint.alpha = 1;
+                    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+                }
+                [UIView beginAnimations:nil context:nil];
+                loginView.alpha = 1;
+                loadingView.alpha = 0;
+                [UIView commitAnimations];
+            }
+        });
+    });
 }
 
 -(IBAction)enterpriseLearnMorePressed:(id)sender {
@@ -560,7 +607,6 @@
 -(IBAction)hideKeyboard:(id)sender {
     [self.view endEditing:YES];
 }
-
 
 -(IBAction)loginButtonPressed:(id)sender {
     [username resignFirstResponder];
@@ -577,7 +623,14 @@
     [activity startAnimating];
     activity.hidden = NO;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
+#ifndef ENTERPRISE
+        IRCCLOUD_HOST = @"www.irccloud.com";
+#endif
+        NSDictionary *result = [[NetworkConnection sharedInstance] requestConfiguration];
+        IRCCLOUD_HOST = [result objectForKey:@"api_host"];
+        [self _stripIRCCloudHost];
+        
+        result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
             if(name.alpha)
                 result = [[NetworkConnection sharedInstance] signup:[username text] password:[password text] realname:[name text] token:[result objectForKey:@"token"]];

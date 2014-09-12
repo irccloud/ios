@@ -153,6 +153,7 @@ typedef enum {
 +(void)sync:(NSURL *)file1 with:(NSURL *)file2;
 -(void)serialize;
 -(NSDictionary *)requestAuthToken;
+-(NSDictionary *)requestConfiguration;
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password token:(NSString *)token;
 -(NSDictionary *)login:(NSURL *)accessLink;
 -(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token;
