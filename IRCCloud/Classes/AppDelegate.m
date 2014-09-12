@@ -356,8 +356,10 @@
     __block UIBackgroundTaskIdentifier background_task;
     background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
         if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+            CLS_LOG(@"Background task finished, disconnecting websocket");
             [_conn disconnect];
             [_conn serialize];
+            [NetworkConnection sync];
         }
         [application endBackgroundTask: background_task];
         background_task = UIBackgroundTaskInvalid;
@@ -384,8 +386,7 @@
         _conn.background = NO;
         [ColorFormatter clearFontCache];
         [[EventsDataSource sharedInstance] clearFormattingCache];
-        if(_conn.reconnectTimestamp == 0)
-            _conn.reconnectTimestamp = -1;
+        _conn.reconnectTimestamp = -1;
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
             [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
             [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
