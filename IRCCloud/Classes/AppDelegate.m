@@ -355,8 +355,10 @@
     }
     __block UIBackgroundTaskIdentifier background_task;
     background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
-        [_conn disconnect];
-        [_conn serialize];
+        if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+            [_conn disconnect];
+            [_conn serialize];
+        }
         [application endBackgroundTask: background_task];
         background_task = UIBackgroundTaskInvalid;
     }];
