@@ -84,7 +84,7 @@ NSLock *__parserLock = nil;
     if(_cancelled || _running)
         return;
     
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
@@ -220,7 +220,7 @@ NSLock *__parserLock = nil;
     _idleInterval = 20;
     _reconnectTimestamp = -1;
     _failCount = 0;
-    _background = NO;
+    _notifier = NO;
     _writer = [[SBJsonWriter alloc] init];
     _reachabilityValid = NO;
     _reachability = nil;
@@ -811,6 +811,7 @@ NSLock *__parserLock = nil;
 }
 
 static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) {
+    static BOOL firstTime = YES;
     static int lastType = TYPE_UNKNOWN;
     int type = TYPE_UNKNOWN;
     [NetworkConnection sharedInstance].reachabilityValid = YES;
@@ -824,8 +825,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         type = TYPE_WIFI;
     else
         type = TYPE_UNKNOWN;
-    
-    if(type != lastType && state != kIRCCloudStateDisconnected) {
+
+    if(!firstTime && type != lastType && state != kIRCCloudStateDisconnected) {
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
         [NetworkConnection sharedInstance].reconnectTimestamp = -1;
         state = kIRCCloudStateDisconnected;
@@ -833,10 +834,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
     
     lastType = type;
+    firstTime = NO;
     
     if(reachable == kIRCCloudReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0 && [[NetworkConnection sharedInstance].session length]) {
         CLS_LOG(@"IRCCloud server became reachable, connecting");
-        [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(connect) withObject:nil waitUntilDone:YES];
+        [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(_connect) withObject:nil waitUntilDone:YES];
     } else if(reachable == kIRCCloudUnreachable && state == kIRCCloudStateConnected) {
         CLS_LOG(@"IRCCloud server became unreachable, disconnecting");
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
@@ -844,6 +846,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [[NetworkConnection sharedInstance] performSelectorInBackground:@selector(serialize) withObject:nil];
     }
     [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+}
+
+-(void)_connect {
+    [self connect:_notifier];
 }
 
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password token:(NSString *)token {
@@ -856,7 +862,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/login", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/login", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:token forHTTPHeaderField:@"x-auth-formtoken"];
@@ -881,7 +887,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:accessLink cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:accessLink cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     
@@ -903,7 +909,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/signup", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/signup", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:token forHTTPHeaderField:@"x-auth-formtoken"];
@@ -930,7 +936,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/request-access-link", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/request-access-link", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:token forHTTPHeaderField:@"x-auth-formtoken"];
@@ -974,7 +980,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], self.session];
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-register", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-register", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
@@ -998,7 +1004,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], session];
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-unregister", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-unregister", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
@@ -1020,7 +1026,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/auth-formtoken", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/auth-formtoken", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setHTTPMethod:@"POST"];
@@ -1040,7 +1046,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     
@@ -1226,7 +1232,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"reorder-connections" args:@{@"cids":cids}];
 }
 
--(void)connect {
+-(void)connect:(BOOL)notifier {
     @synchronized(self) {
         if(IRCCLOUD_HOST.length < 1) {
             CLS_LOG(@"Not connecting, no host");
@@ -1255,16 +1261,16 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             _reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
             SCNetworkReachabilityScheduleWithRunLoop(_reachability, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
             SCNetworkReachabilitySetCallback(_reachability, ReachabilityCallback, NULL);
-        }
-        
-        kIRCCloudReachability reachability = [self reachable];
-        if(reachability != kIRCCloudReachable) {
-            CLS_LOG(@"IRCCloud is unreachable");
-            _reconnectTimestamp = -1;
-            _state = kIRCCloudStateDisconnected;
-            if(reachability == kIRCCloudUnreachable)
-                [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-            return;
+        } else {
+            kIRCCloudReachability reachability = [self reachable];
+            if(reachability != kIRCCloudReachable) {
+                CLS_LOG(@"IRCCloud is unreachable");
+                _reconnectTimestamp = -1;
+                _state = kIRCCloudStateDisconnected;
+                if(reachability == kIRCCloudUnreachable)
+                    [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+                return;
+            }
         }
         
         if(_oobQueue.count) {
@@ -1281,13 +1287,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             if(_streamId)
                 url = [url stringByAppendingFormat:@"&stream_id=%@", _streamId];
         }
-        if(_background) {
+        if(notifier) {
             if([url rangeOfString:@"?"].location == NSNotFound)
                 url = [url stringByAppendingFormat:@"?notifier=1"];
             else
                 url = [url stringByAppendingFormat:@"&notifier=1"];
         }
         CLS_LOG(@"Connecting: %@", url);
+        _notifier = notifier;
         _state = kIRCCloudStateConnecting;
         _idleInterval = 20;
         _accrued = 0;
@@ -1517,10 +1524,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _reconnectTimestamp = 0;
     _idleTimer = nil;
     [_socket close];
-    if(!_background) {
-        CLS_LOG(@"Websocket idle time exceeded, reconnecting...");
-        [self connect];
-    }
+    CLS_LOG(@"Websocket idle time exceeded, reconnecting...");
+    [self connect:_notifier];
 }
 
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid {
@@ -1696,7 +1701,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/logout", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/logout", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:[NSString stringWithFormat:@"session=%@", session] forHTTPHeaderField:@"Cookie"];
@@ -1767,13 +1772,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #endif
 }
 
--(BOOL)background {
-    return _background;
+-(BOOL)notifier {
+    return _notifier;
 }
 
--(void)setBackground:(BOOL)background {
-    _background = background;
-    if(_state == kIRCCloudStateConnected && !background) {
+-(void)setNotifier:(BOOL)notifier {
+    _notifier = notifier;
+    if(_state == kIRCCloudStateConnected && !notifier) {
         CLS_LOG(@"Upgrading websocket");
         [self _sendRequest:@"upgrade_notifier" args:nil];
     }

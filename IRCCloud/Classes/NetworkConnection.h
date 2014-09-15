@@ -120,7 +120,7 @@ typedef enum {
     int _currentBid;
     int _failCount;
     BOOL _resuming;
-    BOOL _background;
+    BOOL _notifier;
     BOOL backlog;
     NSTimeInterval _firstEID;
     NSString *_streamId;
@@ -142,7 +142,7 @@ typedef enum {
 @property (readonly) NSTimeInterval clockOffset;
 @property NSTimeInterval idleInterval;
 @property NSTimeInterval reconnectTimestamp;
-@property BOOL background, reachabilityValid;
+@property BOOL notifier, reachabilityValid;
 @property (readonly) kIRCCloudReachability reachable;
 @property NSString *globalMsg;
 @property int failCount;
@@ -158,7 +158,7 @@ typedef enum {
 -(NSDictionary *)login:(NSURL *)accessLink;
 -(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token;
 -(NSDictionary *)prefs;
--(void)connect;
+-(void)connect:(BOOL)notifier;
 -(void)disconnect;
 -(void)clearPrefs;
 -(void)scheduleIdleTimer;

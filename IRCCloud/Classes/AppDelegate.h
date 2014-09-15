@@ -29,6 +29,8 @@
     id _backlogCompletedObserver;
     id _backlogFailedObserver;
     void (^imageUploadCompletionHandler)();
+    BOOL _movedToBackground;
+    __block UIBackgroundTaskIdentifier _background_task;
 }
 
 @property (strong, nonatomic) UIWindow *window;

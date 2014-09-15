@@ -46,7 +46,7 @@
         if([BuffersDataSource sharedInstance].count && _conn.userInfo) {
             _buffer = [[BuffersDataSource sharedInstance] getBuffer:[[_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
         }
-        [_conn connect];
+        [_conn connect:YES];
     }
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.title = @"IRCCloud";

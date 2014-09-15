@@ -61,6 +61,53 @@
 #ifdef __IPHONE_8_0
     _blur = nil;
 #endif
+    NSLog(@"MainViewController did load");
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogStarted:)
+                                                 name:kIRCCloudBacklogStartedNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogProgress:)
+                                                 name:kIRCCloudBacklogProgressNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backlogCompleted:)
+                                                 name:kIRCCloudBacklogCompletedNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(connectivityChanged:)
+                                                 name:kIRCCloudConnectivityNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardWillShowNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillBeHidden:)
+                                                 name:UIKeyboardWillHideNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didSwipe:)
+                                                 name:ECSlidingViewUnderLeftWillAppear object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didSwipe:)
+                                                 name:ECSlidingViewUnderRightWillAppear object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didSwipe:)
+                                                 name:ECSlidingViewUnderLeftWillDisappear object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didSwipe:)
+                                                 name:ECSlidingViewUnderRightWillDisappear object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(viewWillLayoutSubviews)
+                                                 name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
     [super viewDidLoad];
     [self addChildViewController:_eventsView];
     
@@ -204,6 +251,7 @@
 - (void)viewDidUnload {
     [super viewDidUnload];
     AudioServicesDisposeSystemSoundID(alertSound);
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)_updateUnreadIndicator {
@@ -536,7 +584,7 @@
                     [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
                 } else if([[o objectForKey:@"message"] isEqualToString:@"set_shard"]) {
                     [NetworkConnection sharedInstance].session = [o objectForKey:@"cookie"];
-                    [[NetworkConnection sharedInstance] connect];
+                    [[NetworkConnection sharedInstance] connect:NO];
                 } else {
                     CLS_LOG(@"Got an error, reconnecting: %@", o);
                     [[NetworkConnection sharedInstance] disconnect];
@@ -848,6 +896,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    NSLog(@"MainViewController will appear");
 #ifdef __IPHONE_7_0
     if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor whiteColor];
@@ -902,56 +951,13 @@
     [self.slidingViewController resetTopView];
     self.navigationItem.titleView = _titleView;
     [self connectivityChanged:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(backlogStarted:)
-                                                 name:kIRCCloudBacklogStartedNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(backlogProgress:)
-                                                 name:kIRCCloudBacklogProgressNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(backlogCompleted:)
-                                                 name:kIRCCloudBacklogCompletedNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(connectivityChanged:)
-                                                 name:kIRCCloudConnectivityNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillShow:)
-                                                 name:UIKeyboardWillShowNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillBeHidden:)
-                                                 name:UIKeyboardWillHideNotification object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(didSwipe:)
-                                                 name:ECSlidingViewUnderLeftWillAppear object:nil];
-
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(didSwipe:)
-                                                 name:ECSlidingViewUnderRightWillAppear object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(didSwipe:)
-                                                 name:ECSlidingViewUnderLeftWillDisappear object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(didSwipe:)
-                                                 name:ECSlidingViewUnderRightWillDisappear object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(viewWillLayoutSubviews)
-                                                 name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
     
     NSString *session = [NetworkConnection sharedInstance].session;
     if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
-        [[NetworkConnection sharedInstance] connect];
+        [[NetworkConnection sharedInstance] connect:NO];
     }
+    if([NetworkConnection sharedInstance].notifier)
+        [NetworkConnection sharedInstance].notifier = NO;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
         _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
     } else {
@@ -966,7 +972,6 @@
 #endif
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [_doubleTapTimer invalidate];
     _doubleTapTimer = nil;
     _eidToOpen = -1;

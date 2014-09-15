@@ -293,28 +293,30 @@ int __timestampWidth;
 }
 
 - (void)_sendHeartbeat {
-    NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
-    NSTimeInterval eid = _buffer.scrolledUpFrom;
-    if(eid <= 0) {
-        Event *last;
-        for(NSInteger i = events.count - 1; i >= 0; i--) {
-            last = [events objectAtIndex:i];
-            if(!last.pending && last.rowType != ROW_LASTSEENEID)
-                break;
+    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+        NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
+        NSTimeInterval eid = _buffer.scrolledUpFrom;
+        if(eid <= 0) {
+            Event *last;
+            for(NSInteger i = events.count - 1; i >= 0; i--) {
+                last = [events objectAtIndex:i];
+                if(!last.pending && last.rowType != ROW_LASTSEENEID)
+                    break;
+            }
+            if(!last.pending) {
+                eid = last.eid;
+            }
         }
-        if(!last.pending) {
-            eid = last.eid;
+        if(eid >= 0 && eid > _buffer.last_seen_eid && _conn.state == kIRCCloudStateConnected) {
+            [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
+            _buffer.last_seen_eid = eid;
         }
-    }
-    if(eid >= 0 && eid > _buffer.last_seen_eid && _conn.state == kIRCCloudStateConnected) {
-        [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
-        _buffer.last_seen_eid = eid;
     }
     _heartbeatTimer = nil;
 }
 
 - (void)sendHeartbeat {
-    if(!_heartbeatTimer)
+    if(!_heartbeatTimer && [UIApplication sharedApplication].applicationState == UIApplicationStateActive)
         _heartbeatTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(_sendHeartbeat) userInfo:nil repeats:NO];
 }
 
@@ -959,7 +961,7 @@ int __timestampWidth;
     _buffer.scrolledUpFrom = -1;
     if(_data.count) {
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
-        if(!_conn.background)
+        if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
             [self scrollViewDidScroll:self.tableView];
     }
     [_lock unlock];
