@@ -173,7 +173,7 @@
         [animation setFromValue:@(logo.layer.position.x)];
         [animation setToValue:@(animationView.bounds.size.width)];
         [animation setDuration:0.5];
-        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.6 :-.28 :.73 :.05]];
+        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:1 :-0.3 :1 :-0.3]];
         animation.removedOnCompletion = NO;
         animation.fillMode = kCAFillModeForwards;
         [logo.layer addAnimation:animation forKey:nil];
