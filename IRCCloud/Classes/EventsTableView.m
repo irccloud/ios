@@ -1305,7 +1305,7 @@ int __timestampWidth;
         cell.timestamp.text = e.timestamp;
     if(e.rowType == ROW_TIMESTAMP) {
         cell.timestamp.textColor = [UIColor blackColor];
-    } else if(e.isHighlight) {
+    } else if(e.isHighlight && !e.isSelf) {
         cell.timestamp.textColor = [UIColor highlightTimestampColor];
     } else {
         cell.timestamp.textColor = [UIColor timestampColor];
