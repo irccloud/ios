@@ -1373,6 +1373,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     else
         _idleInterval = 30;
     _reconnectTimestamp = -1;
+    CLS_LOG(@"Fail cont: %i will reconnect in %f seconds", _failCount, _idleInterval);
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
 }
 
@@ -1385,17 +1386,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if([self reachable] == kIRCCloudReachable && _reconnectTimestamp != 0) {
             [self fail];
         } else {
+            CLS_LOG(@"IRCCloud is unreacahable or reconnecting is disabled");
             [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
             [self serialize];
         }
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-        if([aError.domain isEqualToString:@"kCFStreamErrorDomainSSL"] || aStatusCode == WebSocketCloseStatusTlsHandshakeError) {
-            IRCCloudJSONObject *o = [[IRCCloudJSONObject alloc] initWithDictionary:@{@"success":@0,@"message":@"Unable to establish a secure connection"}];
-            [self postObject:o forEvent:kIRCEventFailureMsg];
-        } else if([aError localizedDescription]) {
-            IRCCloudJSONObject *o = [[IRCCloudJSONObject alloc] initWithDictionary:@{@"success":@0,@"message":@"Unable to connect to IRCCloud"}];
-            [self postObject:o forEvent:kIRCEventFailureMsg];
-        }
     }
 }
 

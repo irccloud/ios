@@ -67,7 +67,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    NSLog(@"Application finished launching: %@", launchOptions);
+    CLS_LOG(@"Application finished launching: %@", launchOptions);
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024)}];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"www.irccloud.com"]) {
@@ -147,7 +147,7 @@
     }
     [self.window makeKeyAndVisible];
     
-    NSLog(@"Animating from default.png");
+    CLS_LOG(@"Animating from default.png");
     
     UIView *animationView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
     animationView.backgroundColor = [UIColor colorWithRed:0.043 green:0.18 blue:0.376 alpha:1];
@@ -203,12 +203,12 @@
         }];
     }
     
-    NSLog(@"Launch complete");
+    CLS_LOG(@"Launch complete");
     return YES;
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
-    NSLog(@"Incoming URL: %@", url);
+    CLS_LOG(@"Incoming URL: %@", url);
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if([url.scheme hasPrefix:@"irccloud"]) {
         if([url.host isEqualToString:@"chat"] && [url.path isEqualToString:@"/access-link"]) {
@@ -266,7 +266,7 @@
 }
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
-    NSLog(@"Perform background fetch");
+    CLS_LOG(@"Perform background fetch");
     NSTimeInterval highestEid = [EventsDataSource sharedInstance].highestEid;
     if(_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting) {
         CLS_LOG(@"Fetching backlog in the background");
@@ -274,6 +274,7 @@
         _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
             CLS_LOG(@"Backlog complete");
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+            [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
             [self.mainViewController refresh];
             if(highestEid < [EventsDataSource sharedInstance].highestEid) {
                 CLS_LOG(@"Got new events");
@@ -283,15 +284,17 @@
                 completionHandler(UIBackgroundFetchResultNoData);
             }
             
-            if(application.applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+            if(application.applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid && _conn.notifier)
                 [_conn disconnect];
             else
                 _conn.notifier = NO;
         }];
         _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
             CLS_LOG(@"Backlog failed");
+            [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-            [_conn disconnect];
+            if(_conn.notifier)
+                [_conn disconnect];
             completionHandler(UIBackgroundFetchResultFailed);
         }];
         [_conn connect:YES];
@@ -302,7 +305,7 @@
 }
 
 -(void)showLoginView {
-    NSLog(@"Show Login View");
+    CLS_LOG(@"Show Login View");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
         self.loginSplashViewController.view.alpha = 1;
@@ -316,7 +319,7 @@
 
 -(void)showMainView:(BOOL)animated {
     if(animated) {
-        NSLog(@"Show main view with fade animation");
+        CLS_LOG(@"Show main view with fade animation");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [UIApplication sharedApplication].statusBarHidden = NO;
         self.slideViewController.view.alpha = 1;
@@ -339,7 +342,7 @@
         }
     }];
     } else if(self.window.rootViewController != self.slideViewController) {
-        NSLog(@"Show main view without animation");
+        CLS_LOG(@"Show main view without animation");
         [UIApplication sharedApplication].statusBarHidden = NO;
         self.slideViewController.view.alpha = 1;
         [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
@@ -352,7 +355,7 @@
 }
 
 -(void)showConnectionView {
-    NSLog(@"Show edit connection view");
+    CLS_LOG(@"Show edit connection view");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped]];
     }];
@@ -380,7 +383,7 @@
             }
             _background_task = UIBackgroundTaskInvalid;
         } else {
-            NSLog(@"Stale background task expired");
+            CLS_LOG(@"Stale background task expired");
         }
     }];
     _background_task = background_task;
@@ -390,9 +393,9 @@
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
         }
         [_conn serialize];
-        NSLog(@"Sleeping for %f", [UIApplication sharedApplication].backgroundTimeRemaining - 30);
+        CLS_LOG(@"Sleeping for %f", [UIApplication sharedApplication].backgroundTimeRemaining - 30);
         [NSThread sleepForTimeInterval:[UIApplication sharedApplication].backgroundTimeRemaining - 30];
-        NSLog(@"Finished sleeping");
+        CLS_LOG(@"Finished sleeping");
         if(background_task == _background_task) {
             _background_task = UIBackgroundTaskInvalid;
             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
@@ -403,7 +406,7 @@
             }
             [application endBackgroundTask: background_task];
         } else {
-            NSLog(@"Stale background task finished");
+            CLS_LOG(@"Stale background task finished");
         }
     });
     if(self.window.rootViewController != _slideViewController && [ServersDataSource sharedInstance].count) {
@@ -413,6 +416,7 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    CLS_LOG(@"Application became active");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if(_movedToBackground) {
         _movedToBackground = NO;
@@ -433,7 +437,7 @@
             [self.window.rootViewController viewWillAppear:NO];
         }
         if(_background_task != UIBackgroundTaskInvalid) {
-            NSLog(@"App resumed, cancelling background task");
+            CLS_LOG(@"App resumed, cancelling background task");
             [application endBackgroundTask:_background_task];
             _background_task = UIBackgroundTaskInvalid;
         }
@@ -441,6 +445,7 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    CLS_LOG(@"Application terminating");
     [_conn disconnect];
     [_conn serialize];
 }
@@ -463,7 +468,7 @@
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
-    NSLog(@"Downloaded to: %@", location);
+    CLS_LOG(@"Downloaded to: %@", location);
     NSData *response = [NSData dataWithContentsOfURL:location];
     if(session.configuration.identifier && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
@@ -473,14 +478,14 @@
 #endif
         NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
         NSDictionary *dict = [uploadtasks objectForKey:session.configuration.identifier];
-        NSLog(@"Upload completed in the background: %@", dict);
+        CLS_LOG(@"Upload completed in the background: %@", dict);
         [uploadtasks removeObjectForKey:session.configuration.identifier];
         [d setObject:uploadtasks forKey:@"uploadtasks"];
         [d synchronize];
         
         NSDictionary *r = [[[SBJsonParser alloc] init] objectWithData:response];
         if(!r) {
-            NSLog(@"IMGUR: Invalid JSON response: %@", [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding]);
+            CLS_LOG(@"IMGUR: Invalid JSON response: %@", [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding]);
         } else if([[r objectForKey:@"success"] intValue] == 1) {
             NSString *link = [[[r objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
             
@@ -552,7 +557,7 @@
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     if(error) {
-        NSLog(@"Download error: %@", error);
+        CLS_LOG(@"Download error: %@", error);
         UILocalNotification *alert = [[UILocalNotification alloc] init];
         alert.fireDate = [NSDate date];
         alert.alertBody = @"Unable to share image. Please try again shortly.";
