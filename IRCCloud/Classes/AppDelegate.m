@@ -171,14 +171,14 @@
     if([NetworkConnection sharedInstance].session.length) {
         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
         [animation setFromValue:@(logo.layer.position.x)];
-        [animation setToValue:@(animationView.bounds.size.width)];
-        [animation setDuration:0.5];
+        [animation setToValue:@(animationView.bounds.size.width + logo.bounds.size.width)];
+        [animation setDuration:1.5];
         [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:1 :-0.3 :1 :-0.3]];
         animation.removedOnCompletion = NO;
         animation.fillMode = kCAFillModeForwards;
         [logo.layer addAnimation:animation forKey:nil];
         
-        [UIView animateWithDuration:0.5 animations:^{
+        [UIView animateWithDuration:1.5 delay:1 options:0 animations:^{
             animationView.alpha = 0;
         } completion:^(BOOL finished) {
             [animationView removeFromSuperview];

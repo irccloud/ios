@@ -1373,7 +1373,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     else
         _idleInterval = 30;
     _reconnectTimestamp = -1;
-    CLS_LOG(@"Fail cont: %i will reconnect in %f seconds", _failCount, _idleInterval);
+    CLS_LOG(@"Fail count: %i will reconnect in %f seconds", _failCount, _idleInterval);
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
 }
 
