@@ -126,6 +126,8 @@
         _mentionTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
     
     self.navigationItem.titleView = _titleView;
+    _connectingProgress.hidden = YES;
+    _connectingProgress.progress = 0;
 
     _cameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     _cameraBtn.contentMode = UIViewContentModeCenter;
@@ -727,6 +729,7 @@
 -(void)_hideConnectingView {
     self.navigationItem.titleView = _titleView;
     _connectingProgress.hidden = YES;
+    _connectingProgress.progress = 0;
 }
 
 -(void)connectivityChanged:(NSNotification *)notification {
@@ -795,7 +798,9 @@
 }
 
 -(void)backlogProgress:(NSNotification *)notification {
-    [_connectingProgress setProgress:[notification.object floatValue] animated:YES];
+    if(!_connectingView.hidden) {
+        [_connectingProgress setProgress:[notification.object floatValue] animated:YES];
+    }
 }
 
 -(void)backlogCompleted:(NSNotification *)notification {
@@ -950,6 +955,8 @@
     [self _updateUnreadIndicator];
     [self.slidingViewController resetTopView];
     self.navigationItem.titleView = _titleView;
+    _connectingProgress.hidden = YES;
+    _connectingProgress.progress = 0;
     [self connectivityChanged:nil];
     
     NSString *session = [NetworkConnection sharedInstance].session;

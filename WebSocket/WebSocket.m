@@ -122,7 +122,7 @@ WebSocketWaitingState waitingState;
     NSError *error = nil;
     BOOL successful = false;
     @try {
-        successful = [socket connectToHost:self.config.url.host onPort:port error:&error];
+        successful = [socket connectToHost:self.config.url.host onPort:port withTimeout:30 error:&error];
         if (self.config.version == WebSocketVersion07) {
             closeStatusCode = WebSocketCloseStatusNormal;
         }
