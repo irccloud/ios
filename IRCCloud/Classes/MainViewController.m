@@ -2437,6 +2437,7 @@
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     } else {
         _popover = [[UIPopoverController alloc] initWithContentViewController:picker];
+        _popover.delegate = self;
         [_popover presentPopoverFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
     }
 }
@@ -2451,7 +2452,10 @@
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    [self.slidingViewController dismissModalViewControllerAnimated:YES];
+    if(_popover)
+        [_popover dismissPopoverAnimated:YES];
+    else
+        [self.slidingViewController dismissModalViewControllerAnimated:YES];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
 
     UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
