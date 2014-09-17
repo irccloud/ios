@@ -231,6 +231,9 @@
         event.bgColor = [UIColor noticeBackgroundColor];
         event.chan = [object objectForKey:@"target"];
         event.monospace = YES;
+        if([[object objectForKey:@"op_only"] intValue] == 1)
+            event.msg = [NSString stringWithFormat:@"%c(Ops)%c %@", BOLD, BOLD, event.msg];
+        event.isHighlight = NO;
     };
     
     void (^status)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {

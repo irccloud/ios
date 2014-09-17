@@ -2723,8 +2723,5 @@
             [_alertView show];
         }
     }
-    _selectedUser = nil;
-    _selectedEvent = nil;
-    _selectedURL = nil;
 }
 @end
