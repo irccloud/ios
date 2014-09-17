@@ -1741,9 +1741,13 @@
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
--(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) { [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:context.transitionDuration]; } completion:^(id<UIViewControllerTransitionCoordinatorContext> context){[self didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];}];
-}
+/*-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self willAnimateRotationToInterfaceOrientation:(size.width < size.height)?UIInterfaceOrientationPortrait:UIInterfaceOrientationLandscapeLeft duration:context.transitionDuration];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context){
+        [self didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
+    }];
+}*/
 
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     if(duration > 0)
