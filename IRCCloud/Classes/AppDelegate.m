@@ -313,7 +313,7 @@
 
 -(void)showMainView:(BOOL)animated {
     if(animated) {
-        if([NetworkConnection sharedInstance].session.length)
+        if([NetworkConnection sharedInstance].session.length && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected)
             [[NetworkConnection sharedInstance] connect:NO];
 
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
