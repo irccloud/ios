@@ -362,6 +362,7 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
+    CLS_LOG(@"Application moved to background");
     _movedToBackground = YES;
     _conn.failCount = 0;
     _conn.reconnectTimestamp = 0;
@@ -418,6 +419,14 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     CLS_LOG(@"Application became active");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    if(_conn.reconnectTimestamp == 0)
+        _conn.reconnectTimestamp = -1;
+    
+    if(_conn.session.length && _conn.state != kIRCCloudStateConnected)
+        [_conn connect:NO];
+    else if(_conn.notifier)
+        _conn.notifier = NO;
+    
     if(_movedToBackground) {
         _movedToBackground = NO;
         [ColorFormatter clearFontCache];

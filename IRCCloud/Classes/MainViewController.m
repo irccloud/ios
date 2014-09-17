@@ -755,10 +755,15 @@
                 [self performSelector:@selector(connectivityChanged:) withObject:nil afterDelay:1];
             } else {
                 UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Disconnected");
-                if([[NetworkConnection sharedInstance] reachable])
+                if([[NetworkConnection sharedInstance] reachable]) {
                     _connectingStatus.text = @"Disconnected";
-                else
+                    if([NetworkConnection sharedInstance].session.length && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                        CLS_LOG(@"I'm disconnected but IRCCloud is reachable, reconnecting");
+                        [[NetworkConnection sharedInstance] connect:NO];
+                    }
+                } else {
                     _connectingStatus.text = @"Offline";
+                }
                 _connectingActivity.hidden = YES;
                 _connectingProgress.progress = 0;
                 _connectingProgress.hidden = YES;
@@ -959,12 +964,6 @@
     _connectingProgress.progress = 0;
     [self connectivityChanged:nil];
     
-    NSString *session = [NetworkConnection sharedInstance].session;
-    if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
-        [[NetworkConnection sharedInstance] connect:NO];
-    }
-    if([NetworkConnection sharedInstance].notifier)
-        [NetworkConnection sharedInstance].notifier = NO;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
         _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
     } else {
@@ -2330,11 +2329,15 @@
 }
 
 -(IBAction)titleAreaPressed:(id)sender {
-    if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-        ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
-        nc.modalPresentationStyle = UIModalPresentationFormSheet;
-        [self presentViewController:nc animated:YES completion:nil];
+    if([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected) {
+        [[NetworkConnection sharedInstance] connect:NO];
+    } else {
+        if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
+            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            [self presentViewController:nc animated:YES completion:nil];
+        }
     }
 }
 

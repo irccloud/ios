@@ -379,7 +379,7 @@ NSLock *__parserLock = nil;
                    },
                    @"oob_include": ^(IRCCloudJSONObject *object) {
                        _awayOverride = [[NSMutableDictionary alloc] init];
-                       _reconnectTimestamp = 0;
+                       _reconnectTimestamp = -1;
                        CLS_LOG(@"oob_include, invalidating BIDs");
                        [_buffers invalidate];
                        [_channels invalidate];
@@ -1358,7 +1358,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(socket == _socket) {
         CLS_LOG(@"Socket connected");
         _idleInterval = 20;
-        _reconnectTimestamp = 0;
+        _reconnectTimestamp = -1;
         _state = kIRCCloudStateConnected;
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }

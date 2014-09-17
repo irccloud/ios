@@ -239,7 +239,7 @@
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
             <simulatedOrientationMetrics key="simulatedOrientationMetrics" orientation="landscapeRight"/>
         </view>
-        <view opaque="NO" contentMode="scaleToFill" id="83" userLabel="Loading View">
+        <view opaque="NO" contentMode="scaleToFill" id="83" userLabel="Loading View" customClass="UIControl">
             <rect key="frame" x="0.0" y="0.0" width="584" height="40"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
@@ -263,6 +263,9 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <action selector="titleAreaPressed:" destination="-1" eventType="touchUpInside" id="wfX-HT-Fz1"/>
+            </connections>
         </view>
         <view opaque="NO" contentMode="scaleToFill" id="99" userLabel="Title View" customClass="UIControl">
             <rect key="frame" x="0.0" y="0.0" width="500" height="40"/>
