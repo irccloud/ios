@@ -335,6 +335,8 @@
         {
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[WhoisViewController alloc] initWithJSONObject:notification.object]];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         }
             break;
@@ -469,6 +471,8 @@
                 btv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:btv];
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -480,6 +484,8 @@
                 ctv.navigationItem.title = @"Channel List";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ctv];
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -492,6 +498,8 @@
                 citv.navigationItem.title = @"Accept List";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:citv];
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -503,6 +511,8 @@
                 wtv.navigationItem.title = [NSString stringWithFormat:@"WHO For %@", [o objectForKey:@"subject"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:wtv];
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -514,6 +524,8 @@
                 ntv.navigationItem.title = [NSString stringWithFormat:@"NAMES For %@", [o objectForKey:@"chan"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ntv];
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -2509,6 +2521,8 @@
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
     [nc pushViewController:[[ImgurLoginViewController alloc] init] animated:NO];
     nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    if(self.presentedViewController)
+        [self dismissModalViewControllerAnimated:NO];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -2621,6 +2635,8 @@
             itv.navigationItem.title = @"Ignore List";
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Mention"]) {
             [self showMentionTip];
@@ -2630,11 +2646,15 @@
             [ecv setServer:_selectedBuffer.cid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Settings"]) {
             SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Display Options"]) {
             DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
@@ -2642,11 +2662,15 @@
             dvc.navigationItem.title = _titleLabel.text;
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:dvc];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Add Network"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Take a Photo"]) {
             [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
