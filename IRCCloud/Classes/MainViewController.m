@@ -1969,23 +1969,24 @@
                     self.slidingViewController.underRightViewController = nil;
                 }
                 CGRect frame = _eventsView.view.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+                int width = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].bounds.size.height:[UIScreen mainScreen].bounds.size.width;
+                frame.size.width = width - _buffersView.view.bounds.size.width;
                 _eventsView.view.frame = frame;
                 frame = _bottomBar.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+                frame.size.width = width - _buffersView.view.bounds.size.width;
                 _bottomBar.frame = frame;
                 frame = _serverStatusBar.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+                frame.size.width = width - _buffersView.view.bounds.size.width;
                 _serverStatusBar.frame = frame;
                 _usersView.view.hidden = YES;
                 frame = _borders.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width + 2;
+                frame.size.width = width - _buffersView.view.bounds.size.width + 2;
                 _borders.frame = frame;
                 frame = _eventsView.topUnreadView.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+                frame.size.width = width - _buffersView.view.bounds.size.width;
                 _eventsView.topUnreadView.frame = frame;
                 frame = _eventsView.bottomUnreadView.frame;
-                frame.size.width = [UIScreen mainScreen].bounds.size.height - _buffersView.view.bounds.size.width;
+                frame.size.width = width - _buffersView.view.bounds.size.width;
                 _eventsView.bottomUnreadView.frame = frame;
             }
             [self _updateMessageWidth];
