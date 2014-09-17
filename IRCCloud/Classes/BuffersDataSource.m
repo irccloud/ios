@@ -24,6 +24,12 @@
 @implementation Buffer
 -(NSComparisonResult)compare:(Buffer *)aBuffer {
     int joinedLeft = 1, joinedRight = 1;
+    if([_type isEqualToString:@"console"])
+        return NSOrderedAscending;
+    if([aBuffer.type isEqualToString:@"console"])
+        return NSOrderedDescending;
+    if(_bid == aBuffer.bid)
+        return NSOrderedSame;
     if([_type isEqualToString:@"channel"])
         joinedLeft = [[ChannelsDataSource sharedInstance] channelForBuffer:_bid] != nil;
     if([[aBuffer type] isEqualToString:@"channel"])
@@ -48,7 +54,11 @@
         NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
         NSString *nameLeft = _name?[r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""]:nil;
         NSString *nameRight = aBuffer.name?[r stringByReplacingMatchesInString:[aBuffer.name lowercaseString] options:0 range:NSMakeRange(0, aBuffer.name.length) withTemplate:@""]:nil;
-        return [nameLeft compare:nameRight];
+        
+        if([nameLeft compare:nameRight] == NSOrderedSame)
+            return (_bid < aBuffer.bid)?NSOrderedAscending:NSOrderedDescending;
+        else
+            return [nameLeft compare:nameRight];
     }
 }
 -(NSString *)description {

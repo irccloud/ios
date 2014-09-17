@@ -2243,7 +2243,7 @@
 					"-DENTERPRISE",
 				);
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "c5a4413f-1887-444f-a670-f20002f50be8";
+				PROVISIONING_PROFILE = "f7a17d03-c31d-4a90-bc9c-44a48137e3e8";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
