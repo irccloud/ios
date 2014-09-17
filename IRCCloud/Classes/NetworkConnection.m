@@ -1721,8 +1721,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [self disconnect];
-    [self cancelIdleTimer];
     _reconnectTimestamp = 0;
     _streamId = nil;
     _userInfo = @{};
@@ -1738,6 +1736,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [[UIApplication sharedApplication] unregisterForRemoteNotifications];
 #endif
+    [self disconnect];
+    [self cancelIdleTimer];
 }
 
 -(NSString *)session {

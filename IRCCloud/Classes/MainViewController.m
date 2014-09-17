@@ -964,6 +964,11 @@
     _connectingProgress.progress = 0;
     [self connectivityChanged:nil];
     
+    NSString *session = [NetworkConnection sharedInstance].session;
+    if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
+        [[NetworkConnection sharedInstance] connect:NO];
+    }
+    
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
         _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
     } else {
