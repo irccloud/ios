@@ -1043,8 +1043,8 @@
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 [self presentViewController:nc animated:YES completion:nil];
                 return;
-            } else if([_message.text isEqualToString:@"/crash"]) {
-                [[Crashlytics sharedInstance] crash];
+/*            } else if([_message.text isEqualToString:@"/crash"]) {
+                [[Crashlytics sharedInstance] crash];*/
             }
             
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];

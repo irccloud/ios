@@ -31,6 +31,7 @@
     void (^imageUploadCompletionHandler)();
     BOOL _movedToBackground;
     __block UIBackgroundTaskIdentifier _background_task;
+    UIView *_animationView;
 }
 
 @property (strong, nonatomic) UIWindow *window;

@@ -372,7 +372,7 @@ NSLock *__parserLock = nil;
                        _resuming = [[object objectForKey:@"resumed"] boolValue];
                    },
                    @"global_system_message": ^(IRCCloudJSONObject *object) {
-                       if([object objectForKey:@"system_message_type"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"eval"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"refresh"]) {
+                       if(!_resuming && !backlog && [object objectForKey:@"system_message_type"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"eval"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"refresh"]) {
                            _globalMsg = [object objectForKey:@"msg"];
                            [self postObject:object forEvent:kIRCEventGlobalMsg];
                        }

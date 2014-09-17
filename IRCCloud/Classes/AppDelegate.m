@@ -67,7 +67,6 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    CLS_LOG(@"Application finished launching: %@", launchOptions);
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024)}];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"www.irccloud.com"]) {
@@ -136,7 +135,6 @@
     if(session != nil && [session length] > 0) {
         [self.mainViewController loadView];
         [self.mainViewController viewDidLoad];
-        [[NetworkConnection sharedInstance] connect:NO];
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
             [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
             self.window.backgroundColor = [UIColor whiteColor];
@@ -147,17 +145,8 @@
     }
     [self.window makeKeyAndVisible];
     
-    CLS_LOG(@"Animating from default.png");
-    
-    UIView *animationView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
-    animationView.backgroundColor = [UIColor colorWithRed:0.043 green:0.18 blue:0.376 alpha:1];
-    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        animationView.transform = self.window.rootViewController.view.transform;
-        if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
-            animationView.frame = CGRectMake(20,0,animationView.frame.size.height,animationView.frame.size.width);
-        else
-            animationView.frame = CGRectMake(0,0,animationView.frame.size.height,animationView.frame.size.width);
-    }
+    _animationView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
+    _animationView.backgroundColor = [UIColor colorWithRed:0.043 green:0.18 blue:0.376 alpha:1];
     
     UIImageView *logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"login_logo"]];
     [logo sizeToFit];
@@ -165,50 +154,63 @@
         logo.center = CGPointMake(self.window.center.y, 39);
     else
         logo.center = CGPointMake(self.window.center.x, 39);
-    [animationView addSubview:logo];
-    [self.window addSubview:animationView];
+
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+            _animationView.transform = self.window.rootViewController.view.transform;
+            if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
+                _animationView.frame = CGRectMake(20,0,_animationView.frame.size.height,_animationView.frame.size.width);
+            else
+                _animationView.frame = CGRectMake(0,0,_animationView.frame.size.height,_animationView.frame.size.width);
+        }
+    }
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        CGRect frame = _animationView.frame;
+        frame.origin.y -= [UIApplication sharedApplication].statusBarFrame.size.height;
+        frame.size.height += [UIApplication sharedApplication].statusBarFrame.size.height;
+        _animationView.frame = frame;
+        
+        frame = logo.frame;
+        frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
+        logo.frame = frame;
+    }
+
+    [_animationView addSubview:logo];
+    [self.window addSubview:_animationView];
 
     if([NetworkConnection sharedInstance].session.length) {
         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
         [animation setFromValue:@(logo.layer.position.x)];
-        [animation setToValue:@(animationView.bounds.size.width + logo.bounds.size.width)];
-        [animation setDuration:1.5];
-        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:1 :-0.3 :1 :-0.3]];
+        [animation setToValue:@(_animationView.bounds.size.width + logo.bounds.size.width)];
+        [animation setDuration:0.4];
+        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.8 :-.3 :.8 :-.3]];
         animation.removedOnCompletion = NO;
         animation.fillMode = kCAFillModeForwards;
         [logo.layer addAnimation:animation forKey:nil];
-        
-        [UIView animateWithDuration:1.5 delay:1 options:0 animations:^{
-            animationView.alpha = 0;
-        } completion:^(BOOL finished) {
-            [animationView removeFromSuperview];
-        }];
     } else {
         self.loginSplashViewController.logo.hidden = YES;
         
         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
         [animation setFromValue:@(logo.layer.position.x)];
         [animation setToValue:@(self.loginSplashViewController.logo.layer.position.x)];
-        [animation setDuration:0.5];
+        [animation setDuration:0.4];
         [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.17 :.89 :.32 :1.28]];
         animation.removedOnCompletion = NO;
         animation.fillMode = kCAFillModeForwards;
         [logo.layer addAnimation:animation forKey:nil];
-        
-        [UIView animateWithDuration:0.5 animations:^{
-            animationView.backgroundColor = [UIColor clearColor];
-        } completion:^(BOOL finished) {
-            self.loginSplashViewController.logo.hidden = NO;
-            [animationView removeFromSuperview];
-        }];
     }
     
-    CLS_LOG(@"Launch complete");
+    [UIView animateWithDuration:0.25 delay:0.25 options:0 animations:^{
+        _animationView.backgroundColor = [UIColor clearColor];
+    } completion:^(BOOL finished) {
+        self.loginSplashViewController.logo.hidden = NO;
+        [_animationView removeFromSuperview];
+        _animationView = nil;
+    }];
     return YES;
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
-    CLS_LOG(@"Incoming URL: %@", url);
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if([url.scheme hasPrefix:@"irccloud"]) {
         if([url.host isEqualToString:@"chat"] && [url.path isEqualToString:@"/access-link"]) {
@@ -266,21 +268,16 @@
 }
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
-    CLS_LOG(@"Perform background fetch");
     NSTimeInterval highestEid = [EventsDataSource sharedInstance].highestEid;
     if(_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting) {
-        CLS_LOG(@"Fetching backlog in the background");
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-            CLS_LOG(@"Backlog complete");
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
             [self.mainViewController refresh];
             if(highestEid < [EventsDataSource sharedInstance].highestEid) {
-                CLS_LOG(@"Got new events");
                 completionHandler(UIBackgroundFetchResultNewData);
             } else {
-                CLS_LOG(@"No new events");
                 completionHandler(UIBackgroundFetchResultNoData);
             }
             
@@ -290,7 +287,6 @@
                 _conn.notifier = NO;
         }];
         _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-            CLS_LOG(@"Backlog failed");
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
             if(_conn.notifier)
@@ -299,13 +295,11 @@
         }];
         [_conn connect:YES];
     } else {
-        CLS_LOG(@"Background fetch requested but we're still connected");
         completionHandler(UIBackgroundFetchResultNoData);
     }
 }
 
 -(void)showLoginView {
-    CLS_LOG(@"Show Login View");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
         self.loginSplashViewController.view.alpha = 1;
@@ -319,7 +313,9 @@
 
 -(void)showMainView:(BOOL)animated {
     if(animated) {
-        CLS_LOG(@"Show main view with fade animation");
+        if([NetworkConnection sharedInstance].session.length)
+            [[NetworkConnection sharedInstance] connect:NO];
+
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [UIApplication sharedApplication].statusBarHidden = NO;
         self.slideViewController.view.alpha = 1;
@@ -342,7 +338,6 @@
         }
     }];
     } else if(self.window.rootViewController != self.slideViewController) {
-        CLS_LOG(@"Show main view without animation");
         [UIApplication sharedApplication].statusBarHidden = NO;
         self.slideViewController.view.alpha = 1;
         [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
@@ -355,14 +350,12 @@
 }
 
 -(void)showConnectionView {
-    CLS_LOG(@"Show edit connection view");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:[[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped]];
     }];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    CLS_LOG(@"Application moved to background");
     _movedToBackground = YES;
     _conn.failCount = 0;
     _conn.reconnectTimestamp = 0;
@@ -377,14 +370,11 @@
     __block UIBackgroundTaskIdentifier background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
         if(background_task == _background_task) {
             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
-                CLS_LOG(@"Background task expired, disconnecting websocket");
                 [_conn performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
                 [_conn serialize];
                 [NetworkConnection sync];
             }
             _background_task = UIBackgroundTaskInvalid;
-        } else {
-            CLS_LOG(@"Stale background task expired");
         }
     }];
     _background_task = background_task;
@@ -394,20 +384,15 @@
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
         }
         [_conn serialize];
-        CLS_LOG(@"Sleeping for %f", [UIApplication sharedApplication].backgroundTimeRemaining - 30);
         [NSThread sleepForTimeInterval:[UIApplication sharedApplication].backgroundTimeRemaining - 30];
-        CLS_LOG(@"Finished sleeping");
         if(background_task == _background_task) {
             _background_task = UIBackgroundTaskInvalid;
             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
-                CLS_LOG(@"Background task finished, disconnecting websocket");
                 [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
                 [[NetworkConnection sharedInstance] serialize];
                 [NetworkConnection sync];
             }
             [application endBackgroundTask: background_task];
-        } else {
-            CLS_LOG(@"Stale background task finished");
         }
     });
     if(self.window.rootViewController != _slideViewController && [ServersDataSource sharedInstance].count) {
@@ -417,12 +402,11 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    CLS_LOG(@"Application became active");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if(_conn.reconnectTimestamp == 0)
         _conn.reconnectTimestamp = -1;
     
-    if(_conn.session.length && _conn.state != kIRCCloudStateConnected)
+    if(_conn.session.length && _conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting)
         [_conn connect:NO];
     else if(_conn.notifier)
         _conn.notifier = NO;
@@ -446,7 +430,6 @@
             [self.window.rootViewController viewWillAppear:NO];
         }
         if(_background_task != UIBackgroundTaskInvalid) {
-            CLS_LOG(@"App resumed, cancelling background task");
             [application endBackgroundTask:_background_task];
             _background_task = UIBackgroundTaskInvalid;
         }
@@ -454,7 +437,6 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    CLS_LOG(@"Application terminating");
     [_conn disconnect];
     [_conn serialize];
 }
@@ -477,7 +459,6 @@
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
-    CLS_LOG(@"Downloaded to: %@", location);
     NSData *response = [NSData dataWithContentsOfURL:location];
     if(session.configuration.identifier && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
@@ -487,7 +468,6 @@
 #endif
         NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
         NSDictionary *dict = [uploadtasks objectForKey:session.configuration.identifier];
-        CLS_LOG(@"Upload completed in the background: %@", dict);
         [uploadtasks removeObjectForKey:session.configuration.identifier];
         [d setObject:uploadtasks forKey:@"uploadtasks"];
         [d synchronize];
@@ -500,14 +480,11 @@
             
             if([dict objectForKey:@"msg"]) {
                 if(_conn.state != kIRCCloudStateConnected) {
-                    CLS_LOG(@"Sending message in the background");
                     [[NSNotificationCenter defaultCenter] removeObserver:self];
                     _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-                        CLS_LOG(@"Backlog complete");
                         [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
                         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
                         [_conn say:[NSString stringWithFormat:@"%@ %@",[dict objectForKey:@"msg"],link] to:b.name cid:b.cid];
-                        CLS_LOG(@"Message sent");
                         UILocalNotification *alert = [[UILocalNotification alloc] init];
                         alert.fireDate = [NSDate date];
                         alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
@@ -518,7 +495,6 @@
                             [_conn disconnect];
                     }];
                     _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-                        CLS_LOG(@"Backlog failed");
                         [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
                         [_conn disconnect];
                         UILocalNotification *alert = [[UILocalNotification alloc] init];
@@ -532,10 +508,8 @@
                     }];
                     [_conn connect:YES];
                 } else {
-                    CLS_LOG(@"Sending message");
                     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
                     [_conn say:[NSString stringWithFormat:@"%@ %@",[dict objectForKey:@"msg"],link] to:b.name cid:b.cid];
-                    CLS_LOG(@"Message sent");
                     UILocalNotification *alert = [[UILocalNotification alloc] init];
                     alert.fireDate = [NSDate date];
                     alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
@@ -544,7 +518,6 @@
                     imageUploadCompletionHandler();
                 }
             } else {
-                CLS_LOG(@"Setting link as draft");
                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
                 if(b) {
                     if(b.draft.length)
