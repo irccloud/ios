@@ -1741,6 +1741,10 @@
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
+-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) { [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:context.transitionDuration]; } completion:^(id<UIViewControllerTransitionCoordinatorContext> context){[self didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];}];
+}
+
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     if(duration > 0)
         [self.slidingViewController resetTopView];
@@ -1855,6 +1859,7 @@
     }
     if(duration > 0) {
         _eventsView.view.hidden = YES;
+        _eventActivity.center = _eventsView.tableView.center;
         _eventActivity.alpha = 1;
         [_eventActivity startAnimating];
     }
