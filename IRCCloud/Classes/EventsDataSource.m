@@ -297,7 +297,8 @@
             event.msg = @"Acknowledged: ";
         else if([event.type isEqualToString:@"cap_raw"])
             event.msg = [object objectForKey:@"line"];
-        event.msg = [event.msg stringByAppendingString:[[object objectForKey:@"caps"] componentsJoinedByString:@" | "]];
+        if([object objectForKey:@"caps"])
+            event.msg = [event.msg stringByAppendingString:[[object objectForKey:@"caps"] componentsJoinedByString:@" | "]];
         event.monospace = YES;
     };
     
