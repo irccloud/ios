@@ -43,10 +43,6 @@
 				<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
 				<integer>1</integer>
 			</dict>
-			<key>NSExtensionPointName</key>
-			<string>com.apple.share-services</string>
-			<key>NSExtensionPointVersion</key>
-			<string>1.0</string>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
