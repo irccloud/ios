@@ -1519,6 +1519,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _reconnectTimestamp = 0;
     _idleTimer = nil;
     [_socket close];
+    _state = kIRCCloudStateDisconnected;
     CLS_LOG(@"Websocket idle time exceeded, reconnecting...");
     [self connect:_notifier];
 }
