@@ -1953,7 +1953,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: IRCCloud Ltd. (GED45EQAGA)";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1977,7 +1977,7 @@
 					"-DEXTENSION",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "fa596e92-3b59-45af-a25f-784990f6cd7e";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -2291,7 +2291,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "ShareExtension Enterprise.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: IRCCloud Ltd. (GED45EQAGA)";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2316,7 +2316,7 @@
 					"-DENTERPRISE",
 				);
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "5331390f-7149-4ce6-ab4d-ace8d5fae5c2";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -2387,7 +2387,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4A53F363-A86C-4A2D-9F80-0B9652FD596B";
+				PROVISIONING_PROFILE = "a5e68e51-ca4a-4732-b998-fbbaca01d693";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
@@ -2421,7 +2421,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: IRCCloud Ltd. (GED45EQAGA)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -2441,7 +2441,7 @@
 					"-DENTERPRISE",
 				);
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "fbf2ec4e-755b-48a4-ba04-1061c865e9d7";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
