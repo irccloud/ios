@@ -266,6 +266,8 @@
         event.hostmask = [object objectForKey:@"kicker_hostmask"];
         event.color = [UIColor timestampColor];
         event.linkify = NO;
+        if(event.isSelf)
+            event.rowType = ROW_SOCKETCLOSED;
     };
     
     void (^motd)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
@@ -773,7 +775,7 @@
     if(event.isHighlight)
         event.bgColor = [UIColor highlightBackgroundColor];
 
-    if(event.isSelf)
+    if(event.isSelf && event.rowType != ROW_SOCKETCLOSED)
         event.bgColor = [UIColor selfBackgroundColor];
     
     if(event.eid > _highestEid)

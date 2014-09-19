@@ -1898,7 +1898,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-DEXTENSION";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "32c8cc82-9631-4a75-aed1-de1b1d0f6623";
+				PROVISIONING_PROFILE = "251477a8-9322-4492-837e-8dbfee6d6a19";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2004,7 +2004,7 @@
 				);
 				OTHER_CFLAGS = "-DENTERPRISE";
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "20d16fc3-1edd-4f4e-ab4a-fe986fe51907";
+				PROVISIONING_PROFILE = "f2a6ac49-8882-4c7b-ae55-b561094310e3";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2122,7 +2122,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "0717184b-b688-48fd-9de4-f937aa1d1814";
+				PROVISIONING_PROFILE = "c909a5ed-6655-437d-893e-c2ed5faf6dd5";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2235,7 +2235,7 @@
 					"-DENTERPRISE",
 				);
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "f7a17d03-c31d-4a90-bc9c-44a48137e3e8";
+				PROVISIONING_PROFILE = "f98be2f0-0ac1-4c1e-8a93-7add5e5d2c3b";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
