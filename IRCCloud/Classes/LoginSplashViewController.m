@@ -305,7 +305,7 @@
     sendAccessLink.frame = CGRectMake(left, 16 + 81, 288, 40);
     enterEmailAddressHint.frame = CGRectMake(left, 16 + 80 + 50, 288, 40);
     
-    OnePassword.hidden = (login.alpha != 1) || ![[OnePasswordExtension sharedExtension] isAppExtensionAvailable];
+    OnePassword.hidden = (login.alpha != 1 && signup.alpha != 1) || ![[OnePasswordExtension sharedExtension] isAppExtensionAvailable];
     
     float w = 0.0f;
     for(UIView *v in notAProblem.subviews) {
@@ -525,19 +525,48 @@
 }
 
 -(IBAction)onePasswordButtonPressed:(id)sender {
-    [[OnePasswordExtension sharedExtension] findLoginForURLString:@"https://www.irccloud.com" forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
-        if (!loginDict) {
-            if (error.code != AppExtensionErrorCodeCancelledByUser) {
-                NSLog(@"Error invoking 1Password App Extension for find login: %@", error);
+    if(login.alpha) {
+        [[OnePasswordExtension sharedExtension] findLoginForURLString:@"https://www.irccloud.com" forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
+            if (!loginDict) {
+                if (error.code != AppExtensionErrorCodeCancelledByUser) {
+                    NSLog(@"Error invoking 1Password App Extension for find login: %@", error);
+                }
+                return;
             }
-            return;
-        }
+            
+            if([loginDict[AppExtensionUsernameKey] length])
+                username.text = loginDict[AppExtensionUsernameKey];
+            password.text = loginDict[AppExtensionPasswordKey];
+            [self loginHintPressed:nil];
+        }];
+    } else {
+        NSDictionary *newLoginDetails = @{
+                                          AppExtensionTitleKey: @"IRCCloud",
+                                          AppExtensionUsernameKey: username.text ? : @"",
+                                          AppExtensionPasswordKey: password.text ? : @"",
+                                          AppExtensionSectionTitleKey: @"IRCCloud",
+                                          AppExtensionFieldsKey: @{
+                                                  @"Name" : name.text ? : @""
+                                                  }
+                                          };
         
-        if([loginDict[AppExtensionUsernameKey] length])
-            username.text = loginDict[AppExtensionUsernameKey];
-        password.text = loginDict[AppExtensionPasswordKey];
-        [self loginHintPressed:nil];
-    }];
+        [[OnePasswordExtension sharedExtension] storeLoginForURLString:@"https://www.irccloud.com" loginDetails:newLoginDetails passwordGenerationOptions:nil forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
+            
+            if (!loginDict) {
+                if (error.code != AppExtensionErrorCodeCancelledByUser) {
+                    NSLog(@"Failed to use 1Password App Extension to save a new Login: %@", error);
+                }
+                return;
+            }
+            if([loginDict[AppExtensionReturnedFieldsKey][@"Name"] length])
+                name.text = loginDict[AppExtensionReturnedFieldsKey][@"Name"];
+            if([loginDict[AppExtensionUsernameKey] length])
+                username.text = loginDict[AppExtensionUsernameKey];
+            password.text = loginDict[AppExtensionPasswordKey] ? : @"";
+            
+            [self signupHintPressed:nil];
+        }];
+    }
 }
 
 -(IBAction)TOSHintPressed:(id)sender {
