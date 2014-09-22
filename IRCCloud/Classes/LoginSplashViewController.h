@@ -51,6 +51,8 @@
     IBOutlet UILabel *enterEmailAddressHint;
     IBOutlet UIView *notAProblem;
     
+    IBOutlet UIButton *OnePassword;
+    
     NetworkConnection *_conn;
     CGSize _kbSize;
     NSURL *_accessLink;
@@ -69,4 +71,5 @@
 -(IBAction)hideKeyboard:(id)sender;
 -(void)hideLoginView;
 -(UIImageView *)logo;
+-(IBAction)onePasswordButtonPressed:(id)sender;
 @end

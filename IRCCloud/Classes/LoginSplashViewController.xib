@@ -9,6 +9,7 @@
             <connections>
                 <outlet property="Cloud" destination="qI4-ht-BRc" id="mIH-iB-Ct8"/>
                 <outlet property="IRC" destination="HoY-b4-35C" id="oWW-wv-AkZ"/>
+                <outlet property="OnePassword" destination="bvb-XT-jna" id="d5Y-CE-NX4"/>
                 <outlet property="TOSHint" destination="YmC-aZ-dyy" id="Vec-Th-gNF"/>
                 <outlet property="activity" destination="324" id="325"/>
                 <outlet property="enterEmailAddressHint" destination="ayV-SQ-egK" id="kUC-s2-rgW"/>
@@ -298,6 +299,16 @@
                                 <action selector="sendAccessLinkButtonPressed:" destination="-1" eventType="touchUpInside" id="UcR-hD-xcj"/>
                             </connections>
                         </button>
+                        <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="bvb-XT-jna">
+                            <rect key="frame" x="147" y="165" width="27" height="27"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" image="onepassword-button">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="onePasswordButtonPressed:" destination="-1" eventType="touchUpInside" id="dyJ-oI-O2U"/>
+                            </connections>
+                        </button>
                         <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" id="asF-oS-cGS" customClass="UIControl">
                             <rect key="frame" x="40" y="180" width="241" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -413,6 +424,7 @@
         <image name="login_logo" width="48" height="48"/>
         <image name="login_only_input" width="288" height="38"/>
         <image name="login_top_input" width="288" height="39"/>
+        <image name="onepassword-button" width="27" height="27"/>
         <image name="signup_button" width="288" height="40"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

@@ -307,6 +307,10 @@
 		22A1D0271778A86900F8A89C /* WhoisViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A1D0261778A86900F8A89C /* WhoisViewController.m */; };
 		22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F25178A317100529CDA /* WhoListTableViewController.m */; };
 		22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F28178A3F3500529CDA /* NamesListTableViewController.m */; };
+		22A363B219D0884D00500478 /* 1Password.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22A363AF19D0884D00500478 /* 1Password.xcassets */; };
+		22A363B319D0884D00500478 /* 1Password.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22A363AF19D0884D00500478 /* 1Password.xcassets */; };
+		22A363B419D0884D00500478 /* OnePasswordExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363B119D0884D00500478 /* OnePasswordExtension.m */; };
+		22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363B119D0884D00500478 /* OnePasswordExtension.m */; };
 		22AD75ED1718567D00141257 /* BansTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* BansTableViewController.m */; };
 		22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
@@ -638,6 +642,9 @@
 		22A35F25178A317100529CDA /* WhoListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoListTableViewController.m; sourceTree = "<group>"; };
 		22A35F27178A3F2B00529CDA /* NamesListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NamesListTableViewController.h; sourceTree = "<group>"; };
 		22A35F28178A3F3500529CDA /* NamesListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NamesListTableViewController.m; sourceTree = "<group>"; };
+		22A363AF19D0884D00500478 /* 1Password.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = 1Password.xcassets; sourceTree = "<group>"; };
+		22A363B019D0884D00500478 /* OnePasswordExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnePasswordExtension.h; sourceTree = "<group>"; };
+		22A363B119D0884D00500478 /* OnePasswordExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnePasswordExtension.m; sourceTree = "<group>"; };
 		22AD75EB1718567D00141257 /* BansTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BansTableViewController.h; sourceTree = "<group>"; };
 		22AD75EC1718567D00141257 /* BansTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BansTableViewController.m; sourceTree = "<group>"; };
 		22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditConnectionViewController.h; sourceTree = "<group>"; };
@@ -917,6 +924,9 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22A363AF19D0884D00500478 /* 1Password.xcassets */,
+				22A363B019D0884D00500478 /* OnePasswordExtension.h */,
+				22A363B119D0884D00500478 /* OnePasswordExtension.m */,
 				2200DB4D18B81BEB00343583 /* config.h */,
 				225017411783434800066E71 /* ARChromeActivity */,
 				22B15CF617301BAE0075EBA7 /* ECSlidingViewController */,
@@ -1373,6 +1383,7 @@
 				225D979018AA995900065087 /* ARChromeActivity.png in Resources */,
 				225D979118AA995900065087 /* ARChromeActivity@2x.png in Resources */,
 				225D979218AA995900065087 /* ARChromeActivity@2x~ipad.png in Resources */,
+				22A363B319D0884D00500478 /* 1Password.xcassets in Resources */,
 				225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */,
 				225D979418AA995900065087 /* Safari.png in Resources */,
 				22C89B5B19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
@@ -1401,6 +1412,7 @@
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
 				22C89B5E19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 				22EEA95418D0B198007D5022 /* Icons.xcassets in Resources */,
+				22A363B219D0884D00500478 /* 1Password.xcassets in Resources */,
 				1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */,
 				22C89B5A19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
 				225017661783434900066E71 /* ARChromeActivity@2x~ipad.png in Resources */,
@@ -1594,6 +1606,7 @@
 				225D976418AA995900065087 /* UIExpandingTextView.m in Sources */,
 				223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				225D976518AA995900065087 /* UIExpandingTextViewInternal.m in Sources */,
+				22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */,
 				225D976618AA995900065087 /* EditConnectionViewController.m in Sources */,
 				228E2B8918CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */,
 				225D976718AA995900065087 /* ECSlidingViewController.m in Sources */,
@@ -1671,6 +1684,7 @@
 				22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
 				223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				22D430A81725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
+				22A363B419D0884D00500478 /* OnePasswordExtension.m in Sources */,
 				22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
 				228E2B8718CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */,
 				22B15CFB17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,

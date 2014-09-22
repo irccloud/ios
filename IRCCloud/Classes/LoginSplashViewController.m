@@ -19,6 +19,7 @@
 #import "LoginSplashViewController.h"
 #import "UIColor+IRCCloud.h"
 #import "AppDelegate.h"
+#import "OnePasswordExtension.h"
 
 @implementation LoginSplashViewController
 
@@ -292,6 +293,7 @@
     name.frame = CGRectMake(left, 16, 288, 39);
     host.frame = CGRectMake(left, 16, 288, 39);
     password.frame = CGRectMake(left, 16 + ((offset + 1) * 39), 288, 38);
+    OnePassword.frame = CGRectMake(password.frame.origin.x + password.frame.size.width - 32, password.frame.origin.y, 27, password.frame.size.height);
     hostHint.frame = CGRectMake(left, 16 + 39, 288, 32);
     next.frame = CGRectMake(left, 16 + 39 + 32, 288, 40);
     login.frame = signup.frame = CGRectMake(left, 16 + ((offset + 2) * 39) + 15, 288, 40);
@@ -302,6 +304,8 @@
     activity.frame = frame;
     sendAccessLink.frame = CGRectMake(left, 16 + 81, 288, 40);
     enterEmailAddressHint.frame = CGRectMake(left, 16 + 80 + 50, 288, 40);
+    
+    OnePassword.hidden = (login.alpha != 1) || ![[OnePasswordExtension sharedExtension] isAppExtensionAvailable];
     
     float w = 0.0f;
     for(UIView *v in notAProblem.subviews) {
@@ -520,6 +524,20 @@
     });
 }
 
+-(IBAction)onePasswordButtonPressed:(id)sender {
+    [[OnePasswordExtension sharedExtension] findLoginForURLString:@"https://www.irccloud.com" forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
+        if (!loginDict) {
+            if (error.code != AppExtensionErrorCodeCancelledByUser) {
+                NSLog(@"Error invoking 1Password App Extension for find login: %@", error);
+            }
+            return;
+        }
+        
+        username.text = loginDict[AppExtensionUsernameKey];
+        password.text = loginDict[AppExtensionPasswordKey];
+        [self loginHintPressed:nil];
+    }];
+}
 
 -(IBAction)TOSHintPressed:(id)sender {
 #ifndef EXTENSION
