@@ -50,7 +50,7 @@
     }
 #endif
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         offset = 40;
     } else {
         offset = 80;

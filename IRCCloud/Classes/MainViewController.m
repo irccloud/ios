@@ -212,7 +212,7 @@
     [_mentionTip removeFromSuperview];
     [self.slidingViewController.view addSubview:_mentionTip];
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(44,8,0,36)];
         _landscapeView = [[UIView alloc] initWithFrame:CGRectZero];
     } else {
@@ -335,7 +335,8 @@
         case kIRCEventWhois:
         {
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[WhoisViewController alloc] initWithJSONObject:notification.object]];
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
@@ -471,7 +472,8 @@
                 btv.bid = _buffer.bid;
                 btv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:btv];
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 if(self.presentedViewController)
                     [self dismissModalViewControllerAnimated:NO];
                 [self presentViewController:nc animated:YES completion:nil];
@@ -484,7 +486,8 @@
                 ctv.event = o;
                 ctv.navigationItem.title = @"Channel List";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ctv];
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 if(self.presentedViewController)
                     [self dismissModalViewControllerAnimated:NO];
                 [self presentViewController:nc animated:YES completion:nil];
@@ -498,7 +501,8 @@
                 citv.nicks = [o objectForKey:@"nicks"];
                 citv.navigationItem.title = @"Accept List";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:citv];
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 if(self.presentedViewController)
                     [self dismissModalViewControllerAnimated:NO];
                 [self presentViewController:nc animated:YES completion:nil];
@@ -511,7 +515,8 @@
                 wtv.event = o;
                 wtv.navigationItem.title = [NSString stringWithFormat:@"WHO For %@", [o objectForKey:@"subject"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:wtv];
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 if(self.presentedViewController)
                     [self dismissModalViewControllerAnimated:NO];
                 [self presentViewController:nc animated:YES completion:nil];
@@ -524,7 +529,8 @@
                 ntv.event = o;
                 ntv.navigationItem.title = [NSString stringWithFormat:@"NAMES For %@", [o objectForKey:@"chan"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ntv];
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 if(self.presentedViewController)
                     [self dismissModalViewControllerAnimated:NO];
                 [self presentViewController:nc animated:YES completion:nil];
@@ -1053,7 +1059,8 @@
                 itv.cid = s.cid;
                 itv.navigationItem.title = @"Ignore List";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                if(![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 [self presentViewController:nc animated:YES completion:nil];
                 return;
 /*            } else if([_message.text isEqualToString:@"/crash"]) {
@@ -1880,7 +1887,7 @@
         _eventActivity.alpha = 1;
         [_eventActivity startAnimating];
     }
-    _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;
+    _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;
     if(duration > 0)
         _message.text = _message.text;
     frame = _eventsView.view.frame;
@@ -2265,7 +2272,7 @@
         }
         [sheet addButtonWithTitle:@"Copy Hostmask"];
     }
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
         [self.view.window addSubview:_landscapeView];
         [sheet showInView:_landscapeView];
@@ -2363,7 +2370,8 @@
         if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
             [self presentViewController:nc animated:YES completion:nil];
         }
     }
@@ -2521,7 +2529,8 @@
     SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
     [nc pushViewController:[[ImgurLoginViewController alloc] init] animated:NO];
-    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    if(![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
     if(self.presentedViewController)
         [self dismissModalViewControllerAnimated:NO];
     [self presentViewController:nc animated:YES completion:nil];
@@ -2635,7 +2644,8 @@
             itv.cid = s.cid;
             itv.navigationItem.title = @"Ignore List";
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
@@ -2646,14 +2656,16 @@
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [ecv setServer:_selectedBuffer.cid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Settings"]) {
             SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
@@ -2662,14 +2674,16 @@
             dvc.buffer = _buffer;
             dvc.navigationItem.title = _titleLabel.text;
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:dvc];
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Add Network"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            if(![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];

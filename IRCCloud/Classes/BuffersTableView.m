@@ -23,6 +23,7 @@
 #import "ECSlidingViewController.h"
 #import "EditConnectionViewController.h"
 #import "ServerReorderViewController.h"
+#import "UIDevice+UIDevice_iPhone6Hax.h"
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
@@ -1035,7 +1036,8 @@
         EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
         [self.slidingViewController resetTopView];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        if(![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
         [self presentViewController:nc animated:YES completion:nil];
 #endif
     } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_REORDER) {
@@ -1043,7 +1045,8 @@
         ServerReorderViewController *svc = [[ServerReorderViewController alloc] initWithStyle:UITableViewStylePlain];
         [self.slidingViewController resetTopView];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        if(![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
         [self presentViewController:nc animated:YES completion:nil];
 #endif
     } else {
