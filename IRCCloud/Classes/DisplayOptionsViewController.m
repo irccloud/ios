@@ -18,6 +18,7 @@
 #import "DisplayOptionsViewController.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
+#import "UIDevice+UIDevice_iPhone6Hax.h"
 
 @implementation DisplayOptionsViewController
 
@@ -289,7 +290,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if([_buffer.type isEqualToString:@"channel"])
-        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?4:5;
+        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone])?4:5;
     else if([_buffer.type isEqualToString:@"console"])
         return 2;
     else
@@ -307,7 +308,7 @@
     
     if(![_buffer.type isEqualToString:@"channel"] && row > 0)
         row+=2;
-    else if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && row > 0)
+    else if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone] && row > 0)
         row++;
     
     switch(row) {

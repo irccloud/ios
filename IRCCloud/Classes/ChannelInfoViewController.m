@@ -19,6 +19,7 @@
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
 #import "AppDelegate.h"
+#import "UIDevice+UIDevice_iPhone6Hax.h"
 
 @implementation ChannelInfoViewController
 
@@ -49,7 +50,7 @@
     }
 #endif
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         offset = 40;
     } else {
         offset = 80;

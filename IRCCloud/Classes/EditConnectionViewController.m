@@ -20,6 +20,7 @@
 #import "AppDelegate.h"
 #import "UIColor+IRCCloud.h"
 #import "SBJson.h"
+#import "UIDevice+UIDevice_iPhone6Hax.h"
 
 @interface NetworkListViewController : UITableViewController {
     id<NetworkListDelegate> _delegate;
@@ -484,7 +485,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
     int width;
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone]) {
         if(self.presentingViewController) {
             if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
                 width = [UIScreen mainScreen].applicationFrame.size.width - 300;
@@ -503,7 +504,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
         }
     }
 #ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
         width += 50;
     }
 #endif
@@ -524,7 +525,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     NSString *name = [userInfo objectForKey:@"name"];
     int padding = 80;
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone])
         padding = 26;
         
 #ifdef __IPHONE_7_0
@@ -627,7 +628,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 
     int width;
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone]) {
         if(self.presentingViewController) {
             if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
                 width = [UIScreen mainScreen].applicationFrame.size.width - 300;
@@ -646,7 +647,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
         }
     }
 #ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
         width += 50;
     }
 #endif

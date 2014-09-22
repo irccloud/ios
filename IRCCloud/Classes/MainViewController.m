@@ -36,6 +36,7 @@
 #import "ImgurLoginViewController.h"
 #import <objc/message.h>
 #import "config.h"
+#import "UIDevice+UIDevice_iPhone6Hax.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -211,7 +212,7 @@
     [_mentionTip removeFromSuperview];
     [self.slidingViewController.view addSubview:_mentionTip];
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(44,8,0,36)];
         _landscapeView = [[UIView alloc] initWithFrame:CGRectZero];
     } else {
@@ -1803,7 +1804,7 @@
         height -= UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
 #endif
 
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         _eventsView.tableView.scrollIndicatorInsets = _eventsView.tableView.contentInset = UIEdgeInsetsMake((([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),0,0,0);
         _eventsView.view.frame = CGRectMake(0, -(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height), width, height - _bottomBar.frame.size.height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
@@ -1828,12 +1829,12 @@
             self.slidingViewController.underRightViewController = nil;
             [self addChildViewController:_buffersView];
             [self addChildViewController:_usersView];
-            _buffersView.view.frame = CGRectMake(0,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),220,height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
-            _eventsView.view.frame = CGRectMake(220,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),width - 440,height - _bottomBar.frame.size.height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
-            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),220,height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
+            _buffersView.view.frame = CGRectMake(0,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),[[UIDevice currentDevice] isBigPhone]?180:220,height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
+            _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
+            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),120,height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
             _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = _eventsView.tableView.contentInset;
-            _bottomBar.frame = CGRectMake(220,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
-            _borders.frame = CGRectMake(219,0,_eventsView.view.frame.size.width + 2,height);
+            _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
+            _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
             [_buffersView willMoveToParentViewController:self];
             [_buffersView viewWillAppear:NO];
             _buffersView.view.hidden = NO;
@@ -1879,7 +1880,7 @@
         _eventActivity.alpha = 1;
         [_eventActivity startAnimating];
     }
-    _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;
+    _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;
     if(duration > 0)
         _message.text = _message.text;
     frame = _eventsView.view.frame;
@@ -1938,7 +1939,7 @@
         [self performSelectorOnMainThread:@selector(_updateUserListVisibility) withObject:nil waitUntilDone:YES];
         return;
     }
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             self.navigationItem.rightBarButtonItem = _usersButtonItem;
             if(self.slidingViewController.underRightViewController == nil)
@@ -2264,7 +2265,7 @@
         }
         [sheet addButtonWithTitle:@"Copy Hostmask"];
     }
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
         [self.view.window addSubview:_landscapeView];
         [sheet showInView:_landscapeView];
@@ -2444,7 +2445,7 @@
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [picker.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     }
-    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && sourceType == UIImagePickerControllerSourceTypeCamera)) {
         [self presentViewController:picker animated:YES completion:nil];
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];

@@ -311,6 +311,8 @@
 		22A363B319D0884D00500478 /* 1Password.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22A363AF19D0884D00500478 /* 1Password.xcassets */; };
 		22A363B419D0884D00500478 /* OnePasswordExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363B119D0884D00500478 /* OnePasswordExtension.m */; };
 		22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363B119D0884D00500478 /* OnePasswordExtension.m */; };
+		22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */; };
+		22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */; };
 		22AD75ED1718567D00141257 /* BansTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* BansTableViewController.m */; };
 		22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
@@ -645,6 +647,8 @@
 		22A363AF19D0884D00500478 /* 1Password.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = 1Password.xcassets; sourceTree = "<group>"; };
 		22A363B019D0884D00500478 /* OnePasswordExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnePasswordExtension.h; sourceTree = "<group>"; };
 		22A363B119D0884D00500478 /* OnePasswordExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnePasswordExtension.m; sourceTree = "<group>"; };
+		22A363BA19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+UIDevice_iPhone6Hax.h"; sourceTree = "<group>"; };
+		22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+UIDevice_iPhone6Hax.m"; sourceTree = "<group>"; };
 		22AD75EB1718567D00141257 /* BansTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BansTableViewController.h; sourceTree = "<group>"; };
 		22AD75EC1718567D00141257 /* BansTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BansTableViewController.m; sourceTree = "<group>"; };
 		22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditConnectionViewController.h; sourceTree = "<group>"; };
@@ -1049,6 +1053,8 @@
 				22A1D0261778A86900F8A89C /* WhoisViewController.m */,
 				22A35F24178A316300529CDA /* WhoListTableViewController.h */,
 				22A35F25178A317100529CDA /* WhoListTableViewController.m */,
+				22A363BA19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.h */,
+				22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1622,6 +1628,7 @@
 				225D977118AA995900065087 /* DisplayOptionsViewController.m in Sources */,
 				225D977218AA995900065087 /* ARChromeActivity.m in Sources */,
 				228E2BA118CF770D0011DEAB /* SBJsonUTF8Stream.m in Sources */,
+				22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				225D977318AA995900065087 /* TUSafariActivity.m in Sources */,
 				225D977418AA995900065087 /* LicenseViewController.m in Sources */,
 				225D977518AA995900065087 /* WhoListTableViewController.m in Sources */,
@@ -1700,6 +1707,7 @@
 				228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */,
 				225017631783434900066E71 /* ARChromeActivity.m in Sources */,
 				228E2B9F18CF770D0011DEAB /* SBJsonUTF8Stream.m in Sources */,
+				22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				2250176D1783434900066E71 /* TUSafariActivity.m in Sources */,
 				224FCF361787288400FC3879 /* LicenseViewController.m in Sources */,
 				22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */,

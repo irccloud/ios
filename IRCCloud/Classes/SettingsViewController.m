@@ -21,6 +21,7 @@
 #import "UIColor+IRCCloud.h"
 #import "OpenInChromeController.h"
 #import "ImgurLoginViewController.h"
+#import "UIDevice+UIDevice_iPhone6Hax.h"
 
 @interface PhotoSizeViewController : UITableViewController
 @end
@@ -179,7 +180,7 @@
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
     int width;
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone]) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
             width = [UIScreen mainScreen].applicationFrame.size.width - 300;
         else
@@ -191,7 +192,7 @@
             width = [UIScreen mainScreen].applicationFrame.size.height - 26;
     }
 #ifdef __IPHONE_7_0
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || ![[UIDevice currentDevice] isBigPhone])) {
         width += 50;
     }
 #endif

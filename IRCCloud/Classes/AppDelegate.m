@@ -22,6 +22,7 @@
 #import "ColorFormatter.h"
 #import "config.h"
 #import "URLHandler.h"
+#import "UIDevice+UIDevice_iPhone6Hax.h"
 
 //From: http://stackoverflow.com/a/19313559
 @interface NavBarHax : UINavigationBar
@@ -112,7 +113,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
     self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController" bundle:nil];
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPhone" bundle:nil];
         self.slideViewController = [[ECSlidingViewController alloc] init];
         self.slideViewController.view.backgroundColor = [UIColor blackColor];

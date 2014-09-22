@@ -128,7 +128,7 @@
         frame.size.width -= size.width + 12;
         _highlights.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 6, size.width, size.height);
     }
-    _label.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.height + 6, frame.origin.y, frame.size.width - 6 - _icon.frame.size.height - 8, frame.size.height);
+    _label.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.height + 6, frame.origin.y, frame.size.width - 6 - _icon.frame.size.height - 16, frame.size.height);
 }
 
 -(void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {

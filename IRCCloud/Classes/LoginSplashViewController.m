@@ -20,6 +20,7 @@
 #import "UIColor+IRCCloud.h"
 #import "AppDelegate.h"
 #import "OnePasswordExtension.h"
+#import "UIDevice+UIDevice_iPhone6Hax.h"
 
 @implementation LoginSplashViewController
 
@@ -354,7 +355,7 @@
         height = self.view.frame.size.width;
     }
     
-    if(_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+    if(_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         self.view.window.backgroundColor = [UIColor colorWithRed:68.0/255.0 green:128.0/255.0 blue:250.0/255.0 alpha:1];
         loadingView.frame = loginView.frame = CGRectMake(0, 0, width, self.view.bounds.size.height);
     } else {
