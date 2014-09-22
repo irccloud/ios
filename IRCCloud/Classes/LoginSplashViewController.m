@@ -533,7 +533,8 @@
             return;
         }
         
-        username.text = loginDict[AppExtensionUsernameKey];
+        if([loginDict[AppExtensionUsernameKey] length])
+            username.text = loginDict[AppExtensionUsernameKey];
         password.text = loginDict[AppExtensionPasswordKey];
         [self loginHintPressed:nil];
     }];
