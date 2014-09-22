@@ -2673,8 +2673,12 @@
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Take a Photo"]) {
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
             [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
         } else if([action isEqualToString:@"Choose Existing"]) {
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
             [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
         } else if([action isEqualToString:@"Mark All As Read"]) {
             NSMutableArray *cids = [[NSMutableArray alloc] init];
