@@ -352,7 +352,7 @@
     
     if(_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         self.view.window.backgroundColor = [UIColor colorWithRed:68.0/255.0 green:128.0/255.0 blue:250.0/255.0 alpha:1];
-        loadingView.frame = loginView.frame = CGRectMake(0, 0, 320, self.view.bounds.size.height);
+        loadingView.frame = loginView.frame = CGRectMake(0, 0, width, self.view.bounds.size.height);
     } else {
         self.view.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
         loginView.frame = CGRectMake(0, 119, width, height - 119);
