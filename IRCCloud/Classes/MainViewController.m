@@ -1957,7 +1957,7 @@
         }
     } else {
         if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-            if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+            if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone]) {
                 self.navigationItem.rightBarButtonItem = nil;
                 CGRect frame = _eventsView.view.frame;
                 int width = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].bounds.size.height:[UIScreen mainScreen].bounds.size.width;
@@ -1982,8 +1982,14 @@
             } else {
                 if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
                     self.navigationItem.rightBarButtonItem = _usersButtonItem;
-                    if(self.slidingViewController.underRightViewController == nil)
+                    if(self.slidingViewController.underRightViewController == nil) {
+                        CGRect frame = _usersView.view.frame;
+                        frame.origin.x = 0;
+                        frame.size.width = 220;
+                        _usersView.view.frame = frame;
+                        _usersView.tableView.contentInset = UIEdgeInsetsZero;
                         self.slidingViewController.underRightViewController = _usersView;
+                    }
                 } else {
                     self.navigationItem.rightBarButtonItem = nil;
                     self.slidingViewController.underRightViewController = nil;
