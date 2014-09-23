@@ -2246,7 +2246,7 @@
 -(void)_showUserPopupInRect:(CGRect)rect {
     NSString *title = @"";;
     if(_selectedUser) {
-        if([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length)
+        if([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad))
             title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,_selectedUser.hostmask];
         else
             title = _selectedUser.nick;
