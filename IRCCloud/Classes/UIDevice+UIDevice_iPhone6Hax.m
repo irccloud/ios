@@ -10,6 +10,6 @@
 
 @implementation UIDevice (UIDevice_iPhone6Hax)
 -(BOOL)isBigPhone {
-    return [self userInterfaceIdiom] == UIUserInterfaceIdiomPhone && [[UIScreen mainScreen] nativeScale] == 3.0f;
+    return [self userInterfaceIdiom] == UIUserInterfaceIdiomPhone && [[UIScreen mainScreen] nativeScale] > 2.0f;
 }
 @end
