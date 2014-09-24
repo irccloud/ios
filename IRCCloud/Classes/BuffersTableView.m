@@ -450,6 +450,7 @@
     [_alertView textFieldAtIndex:0].placeholder = @"#example";
     [_alertView textFieldAtIndex:0].delegate = self;
     [_alertView show];
+    [_delegate dismissKeyboard];
 #endif
 }
 

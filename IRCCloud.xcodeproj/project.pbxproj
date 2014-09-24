@@ -1920,7 +1920,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-DEXTENSION";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "7bb4e327-39e3-4f0a-8c7b-ad666220fd03";
+				PROVISIONING_PROFILE = "880dc150-fe31-4741-9bf3-099f30bfec17";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -1959,7 +1959,7 @@
 					"-DEXTENSION",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "81a35a2a-fa81-4d22-ab2d-0b38c371ff90";
+				PROVISIONING_PROFILE = "2f4d3e11-bf7e-48b3-8d0d-8ce2b6a1a617";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2144,7 +2144,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "17104f3a-0daa-477f-902e-cb7bc0d1f314";
+				PROVISIONING_PROFILE = "f6a64e8f-eb9d-46ae-b48a-8592399c3111";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2169,7 +2169,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "ae356935-17d7-4173-8998-6ae2997bcdba";
+				PROVISIONING_PROFILE = "3d44705a-cd09-47a9-8ca7-8cc55153c7bd";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
