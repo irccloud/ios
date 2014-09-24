@@ -357,6 +357,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(void)saveButtonPressed:(id)sender {
+    UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [spinny startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
     if(_cid == -1) {
         _reqid = [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text];
     } else {
@@ -655,12 +658,22 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _commands = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
     _commands.text = @"";
     _commands.backgroundColor = [UIColor clearColor];
+    _commands.delegate = self;
     
     _channels = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
     _channels.text = @"";
     _channels.backgroundColor = [UIColor clearColor];
+    _channels.delegate = self;
     
     [self refresh];
+}
+
+- (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
+    if(textView == _channels || (textView == _commands && _cid != -1))
+        _activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:3];
+    else if(textView == _commands)
+        _activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:4];
+    return YES;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -713,6 +726,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
                 }
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
             }
             break;
         case kIRCEventSuccess:
