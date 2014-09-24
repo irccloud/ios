@@ -1094,6 +1094,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         NSMutableDictionary *d = _userInfo.mutableCopy;
         [d setObject:@(selectedBuffer) forKey:@"last_selected_bid"];
         _userInfo = d;
+        CLS_LOG(@"Send heartbeat: %@", [_writer stringWithObject:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids}]);
         return [self _sendRequest:@"heartbeat" args:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids}];
     }
 }
@@ -1486,6 +1487,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         }
     } else {
         if([object objectForKey:@"success"] && ![[object objectForKey:@"success"] boolValue] && [object objectForKey:@"message"]) {
+            CLS_LOG(@"Failure: %@", object);
             [self postObject:object forEvent:kIRCEventFailureMsg];
         } else if([object objectForKey:@"success"]) {
             [self postObject:object forEvent:kIRCEventSuccess];
