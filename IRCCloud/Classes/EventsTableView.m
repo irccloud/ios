@@ -449,12 +449,14 @@ int __timestampWidth;
             }
             
             if(hiddenMap && [[hiddenMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) {
+                [_lock lock];
                 for(Event *e in _data) {
                     if(e.eid == event.eid) {
                         [_data removeObject:e];
                         break;
                     }
                 }
+                [_lock unlock];
                 if(!backlog)
                     [self.tableView reloadData];
                 return;
@@ -1208,6 +1210,11 @@ int __timestampWidth;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     [_lock lock];
+    if(indexPath.row >= _data.count) {
+        CLS_LOG(@"Requested height for out of bounds row, refreshing");
+        [self refresh];
+        return 0;
+    }
     Event *e = [_data objectAtIndex:indexPath.row];
     [_lock unlock];
     if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
@@ -1237,11 +1244,13 @@ int __timestampWidth;
         cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"eventscell"];
     [_lock lock];
     if([indexPath row] >= _data.count) {
+        CLS_LOG(@"Requested out of bounds row, refreshing");
         cell.type = ROW_MESSAGE;
         cell.message.text = @"";
         cell.timestamp.text = @"";
         cell.accessory.hidden = YES;
         [_lock unlock];
+        [self refresh];
         return cell;
     }
     Event *e = [_data objectAtIndex:[indexPath row]];
@@ -1515,6 +1524,7 @@ int __timestampWidth;
 }
 
 -(void)clearLastSeenMarker {
+    [_lock lock];
     for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
         if(event.rowType == ROW_LASTSEENEID) {
             [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
@@ -1527,6 +1537,7 @@ int __timestampWidth;
             break;
         }
     }
+    [_lock unlock];
     [self.tableView reloadData];
 }
 
