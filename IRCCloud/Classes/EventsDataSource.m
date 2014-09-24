@@ -813,11 +813,12 @@
 
 -(void)pruneEventsForBuffer:(int)bid maxSize:(int)size {
     @synchronized(_events) {
-        NSMutableArray *events = [_events objectForKey:@(bid)];
+        NSMutableArray *events = [self eventsForBuffer:bid].mutableCopy;
         while(events.count > size) {
             Event *e = [events objectAtIndex:0];
-            [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(e.eid)];
             [events removeObject:e];
+            [[_events objectForKey:@(bid)] removeObject:e];
+            [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(e.eid)];
         }
     }
 }
