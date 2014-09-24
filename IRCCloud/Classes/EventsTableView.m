@@ -1212,6 +1212,7 @@ int __timestampWidth;
     [_lock lock];
     if(indexPath.row >= _data.count) {
         CLS_LOG(@"Requested height for out of bounds row, refreshing");
+        [_lock unlock];
         [self refresh];
         return 0;
     }
