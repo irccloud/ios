@@ -875,7 +875,9 @@
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+    
     NSArray *rows = [_eventsView.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_eventsView.tableView.bounds, _eventsView.tableView.contentInset)];
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     if(size.height != _kbSize.height) {
@@ -896,7 +898,9 @@
         [UIView commitAnimations];
         [self expandingTextViewDidChange:_message];
     }
-    [self performSelector:@selector(_observeKeyboard) withObject:nil afterDelay:0.01];
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
+        [self performSelector:@selector(_observeKeyboard) withObject:nil afterDelay:0.01];
 }
 
 -(void)_observeKeyboard {
@@ -1838,7 +1842,7 @@
             [self addChildViewController:_usersView];
             _buffersView.view.frame = CGRectMake(0,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),[[UIDevice currentDevice] isBigPhone]?180:220,height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
             _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
-            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),120,height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
+            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),220,height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
             _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = _eventsView.tableView.contentInset;
             _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
