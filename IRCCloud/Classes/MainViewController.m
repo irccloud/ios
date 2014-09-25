@@ -2481,7 +2481,7 @@
     }
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && sourceType == UIImagePickerControllerSourceTypeCamera)) {
         picker.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self presentViewController:picker animated:YES completion:nil];
+        [self.slidingViewController presentViewController:picker animated:YES completion:nil];
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     } else {
