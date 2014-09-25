@@ -39,6 +39,9 @@
 }
 
 -(void)saveButtonPressed:(id)sender {
+    UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [spinny startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
     NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[[NetworkConnection sharedInstance] prefs]];
     NSMutableDictionary *disableTrackUnread = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *notifyAll = [[NSMutableDictionary alloc] init];
@@ -186,6 +189,7 @@
             if(reqid == _reqid) {
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
             }
             break;
         case kIRCEventSuccess:
