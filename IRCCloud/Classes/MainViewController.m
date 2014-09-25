@@ -2711,7 +2711,7 @@
             NSMutableArray *eids = [[NSMutableArray alloc] init];
             
             for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
-                if([[EventsDataSource sharedInstance] lastEidForBuffer:b.bid]) {
+                if([[EventsDataSource sharedInstance] unreadStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] && [[EventsDataSource sharedInstance] lastEidForBuffer:b.bid]) {
                     [cids addObject:@(b.cid)];
                     [bids addObject:@(b.bid)];
                     [eids addObject:@([[EventsDataSource sharedInstance] lastEidForBuffer:b.bid])];
