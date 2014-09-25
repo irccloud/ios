@@ -1037,8 +1037,10 @@
         EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
         [self.slidingViewController resetTopView];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-        if(![[UIDevice currentDevice] isBigPhone])
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentViewController:nc animated:YES completion:nil];
 #endif
     } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_REORDER) {
@@ -1046,8 +1048,10 @@
         ServerReorderViewController *svc = [[ServerReorderViewController alloc] initWithStyle:UITableViewStylePlain];
         [self.slidingViewController resetTopView];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-        if(![[UIDevice currentDevice] isBigPhone])
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentViewController:nc animated:YES completion:nil];
 #endif
     } else {
