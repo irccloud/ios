@@ -1094,7 +1094,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         NSMutableDictionary *d = _userInfo.mutableCopy;
         [d setObject:@(selectedBuffer) forKey:@"last_selected_bid"];
         _userInfo = d;
-        CLS_LOG(@"Send heartbeat: %@", [_writer stringWithObject:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids}]);
         return [self _sendRequest:@"heartbeat" args:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids}];
     }
 }

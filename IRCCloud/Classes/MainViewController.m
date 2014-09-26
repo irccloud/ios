@@ -610,7 +610,7 @@
                         break;
                     }
                 }
-            } else {
+            } else if(![NetworkConnection sharedInstance].notifier) {
                 if([[o objectForKey:@"message"] isEqualToString:@"auth"]) {
                     [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(logout) withObject:nil waitUntilDone:YES];
                     [self bufferSelected:-1];
@@ -1326,7 +1326,7 @@
 
 -(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {
     if(expandingTextView.frame.size.height != height) {
-        NSArray *rows = [_eventsView.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_eventsView.tableView.bounds, _eventsView.tableView.contentInset)];
+        CGFloat diff = height - expandingTextView.frame.size.height;
         CGRect frame = _eventsView.tableView.frame;
         frame.size.height = self.view.frame.size.height - height - 8;
         if(!_serverStatusBar.hidden)
@@ -1338,8 +1338,8 @@
         frame = _eventsView.bottomUnreadView.frame;
         frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
         _eventsView.bottomUnreadView.frame = frame;
-        [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
         _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
+        _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
     }
 }
 

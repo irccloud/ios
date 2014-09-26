@@ -24,6 +24,10 @@
 @implementation Buffer
 -(NSComparisonResult)compare:(Buffer *)aBuffer {
     int joinedLeft = 1, joinedRight = 1;
+    if(_cid < aBuffer.cid)
+        return NSOrderedAscending;
+    if(_cid > aBuffer.cid)
+        return NSOrderedDescending;
     if([_type isEqualToString:@"console"])
         return NSOrderedAscending;
     if([aBuffer.type isEqualToString:@"console"])

@@ -293,7 +293,7 @@ int __timestampWidth;
 }
 
 - (void)_sendHeartbeat {
-    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier) {
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         NSTimeInterval eid = _buffer.scrolledUpFrom;
         if(eid <= 0) {
