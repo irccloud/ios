@@ -505,6 +505,10 @@ NSLock *__parserLock = nil;
                        if(!backlog)
                            [self postObject:object forEvent:kIRCEventListResponse];
                    },
+                   @"map_list": ^(IRCCloudJSONObject *object) {
+                       if(!backlog)
+                           [self postObject:object forEvent:kIRCEventServerMap];
+                   },
                    @"connection_deleted": ^(IRCCloudJSONObject *object) {
                        [_servers removeAllDataForServer:object.cid];
                        if(!backlog)

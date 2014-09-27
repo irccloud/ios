@@ -718,6 +718,7 @@
         case kIRCEventGlobalMsg:
         case kIRCEventAcceptList:
         case kIRCEventChannelTopicIs:
+        case kIRCEventServerMap:
         case kIRCEventFailureMsg:
         case kIRCEventSuccess:
         case kIRCEventAlert:

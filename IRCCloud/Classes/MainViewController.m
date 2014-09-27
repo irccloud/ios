@@ -37,6 +37,7 @@
 #import <objc/message.h>
 #import "config.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "ServerMapTableViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -324,6 +325,7 @@
     CallerIDTableViewController *citv = nil;
     WhoListTableViewController *wtv = nil;
     NamesListTableViewController *ntv = nil;
+    ServerMapTableViewController *smtv = nil;
     Event *e = nil;
     Server *s = nil;
     NSString *msg = nil;
@@ -539,6 +541,22 @@
                 ntv.event = o;
                 ntv.navigationItem.title = [NSString stringWithFormat:@"NAMES For %@", [o objectForKey:@"chan"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ntv];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventServerMap:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                smtv = [[ServerMapTableViewController alloc] initWithStyle:UITableViewStylePlain];
+                smtv.event = o;
+                smtv.navigationItem.title = @"Server Map";
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:smtv];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else

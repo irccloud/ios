@@ -300,6 +300,8 @@
 		228E2BA318CF770D0011DEAB /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
 		228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
 		228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */; };
+		2293907B19D754D600A73946 /* ServerMapTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293907A19D754D600A73946 /* ServerMapTableViewController.m */; };
+		2293907C19D754D600A73946 /* ServerMapTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293907A19D754D600A73946 /* ServerMapTableViewController.m */; };
 		2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
 		22988AAB19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */; };
 		22988AAC19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */; };
@@ -631,6 +633,8 @@
 		228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonWriter.m; sourceTree = "<group>"; };
 		228EFBC6177B4F6000B83A4C /* DisplayOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayOptionsViewController.h; sourceTree = "<group>"; };
 		228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayOptionsViewController.m; sourceTree = "<group>"; };
+		2293907919D754D600A73946 /* ServerMapTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerMapTableViewController.h; sourceTree = "<group>"; };
+		2293907A19D754D600A73946 /* ServerMapTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerMapTableViewController.m; sourceTree = "<group>"; };
 		2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURL+IDN.m"; path = "NSURL+IDN/NSURL+IDN.m"; sourceTree = SOURCE_ROOT; };
 		2293AF0017F9CCD10022BD06 /* NSURL+IDN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+IDN.h"; path = "NSURL+IDN/NSURL+IDN.h"; sourceTree = SOURCE_ROOT; };
 		2296E0B619805751002D59E3 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareExtension.entitlements; sourceTree = "<group>"; };
@@ -1033,6 +1037,8 @@
 				22032A6E1884529700BE4A10 /* NickCompletionView.m */,
 				22B4284616D7E36300498507 /* NetworkConnection.h */,
 				22B4284716D7E36300498507 /* NetworkConnection.m */,
+				2293907919D754D600A73946 /* ServerMapTableViewController.h */,
+				2293907A19D754D600A73946 /* ServerMapTableViewController.m */,
 				22462B5018906B03009EF986 /* ServerReorderViewController.h */,
 				22462B5118906B03009EF986 /* ServerReorderViewController.m */,
 				2236F5F816DA765C007BE535 /* ServersDataSource.h */,
@@ -1619,6 +1625,7 @@
 				225D976818AA995900065087 /* UIImage+ImageWithUIView.m in Sources */,
 				225D976918AA995900065087 /* OpenInChromeController.m in Sources */,
 				225D976A18AA995900065087 /* ChannelInfoViewController.m in Sources */,
+				2293907C19D754D600A73946 /* ServerMapTableViewController.m in Sources */,
 				225D976B18AA995900065087 /* ImageViewController.m in Sources */,
 				225D976C18AA995900065087 /* UIImage+animatedGIF.m in Sources */,
 				225D976D18AA995900065087 /* ChannelListTableViewController.m in Sources */,
@@ -1698,6 +1705,7 @@
 				22B15CFD17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
 				2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */,
 				2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
+				2293907B19D754D600A73946 /* ServerMapTableViewController.m in Sources */,
 				2223C6AA1768D7150032544B /* ImageViewController.m in Sources */,
 				2223C6B01768F36F0032544B /* UIImage+animatedGIF.m in Sources */,
 				2253BA251770CD7200CCA77F /* ChannelListTableViewController.m in Sources */,
