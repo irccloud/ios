@@ -38,16 +38,12 @@ NSDictionary *quotes;
 
 +(UIFont *)timestampFont {
     if(!timestampFont) {
-#ifdef __IPHONE_7_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-#endif
             timestampFont = [UIFont systemFontOfSize:FONT_SIZE];
-#ifdef __IPHONE_7_0
         else {
             timestampFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
             timestampFont = [UIFont fontWithName:timestampFont.fontName size:timestampFont.pointSize * 0.8];
         }
-#endif
     }
     return timestampFont;
 }
@@ -1173,9 +1169,7 @@ NSDictionary *quotes;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
     
     if(!Courier) {
-#ifdef __IPHONE_7_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
-#endif
             arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL);
             Courier = CTFontCreateWithName((CFStringRef)@"Courier", FONT_SIZE, NULL);
             CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL);
@@ -1185,7 +1179,6 @@ NSDictionary *quotes;
             HelveticaBold = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
             HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
             HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
-#ifdef __IPHONE_7_0
         } else {
             UIFontDescriptor *bodyFontDesciptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
             UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
@@ -1201,7 +1194,6 @@ NSDictionary *quotes;
             HelveticaOblique = CTFontCreateWithName((CFStringRef)[italicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], italicBodyFontDescriptor.pointSize * 0.8, NULL);
             HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)[boldItalicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldItalicBodyFontDescriptor.pointSize * 0.8, NULL);
         }
-#endif
     }
     
     if(mono) {

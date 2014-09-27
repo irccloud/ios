@@ -21,7 +21,6 @@
 @interface NamesListTableViewController : UITableViewController<UIAlertViewDelegate,UITextFieldDelegate> {
     IRCCloudJSONObject *_event;
     NSArray *_data;
-    UIAlertView *_alertView;
 }
 @property (strong, nonatomic) IRCCloudJSONObject *event;
 -(void)refresh;

@@ -60,10 +60,7 @@
 }
 
 - (void)viewDidLoad {
-#ifdef __IPHONE_8_0
     _blur = nil;
-#endif
-    NSLog(@"MainViewController did load");
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     
@@ -196,14 +193,10 @@
     _menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
     [_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
         _menuBtn.frame = CGRectMake(0,0,32,32);
     else
         _menuBtn.frame = CGRectMake(0,0,20,18);
-#else
-    _menuBtn.frame = CGRectMake(0,0,32,32);
-#endif
     _menuBtn.accessibilityLabel = @"Channels list";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
     
@@ -230,25 +223,19 @@
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[UIImage imageNamed:@"users"] forState:UIControlStateNormal];
     [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
         users.frame = CGRectMake(0,0,40,40);
     else
         users.frame = CGRectMake(0,0,24,22);
-#else
-    users.frame = CGRectMake(0,0,40,40);
-#endif
     users.accessibilityLabel = @"Channel members list";
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
 
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar addSubview:_connectingProgress];
         [_connectingProgress sizeToFit];
         [_connectingActivity removeFromSuperview];
         _connectingStatus.font = [UIFont boldSystemFontOfSize:20];
     }
-#endif
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
@@ -959,11 +946,8 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    NSLog(@"MainViewController will appear");
-#ifdef __IPHONE_7_0
     if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor whiteColor];
-#endif
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     for(Event *e in [_pendingEvents copy]) {
@@ -1030,10 +1014,8 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         self.view.window.backgroundColor = [UIColor blackColor];
-#endif
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
     [_doubleTapTimer invalidate];
@@ -1840,12 +1822,10 @@
     self.slidingViewController.view.frame = frame;
     
     height -= self.navigationController.navigationBar.frame.size.height;
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         height -= [UIApplication sharedApplication].statusBarFrame.size.height;
     else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
         height -= UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
-#endif
 
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         _eventsView.tableView.scrollIndicatorInsets = _eventsView.tableView.contentInset = UIEdgeInsetsMake((([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),0,0,0);
@@ -1935,7 +1915,7 @@
     float h = [@" " sizeWithFont:_nickCompletionView.font].height + 12;
     _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
     _nickCompletionView.layer.cornerRadius = 5;
-#ifdef __IPHONE_7_0
+    
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         frame = _connectingProgress.frame;
         frame.origin.x = 0;
@@ -1947,13 +1927,11 @@
         frame.size.height = _connectingView.frame.size.height;
         _connectingStatus.frame = frame;
     }
-#endif
+
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         frame = self.navigationController.navigationBar.bounds;
         frame.origin.y = -frame.size.height;
-#ifdef __IPHONE_8_0
         [_blur setFrame:frame];
-#endif
     }
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];

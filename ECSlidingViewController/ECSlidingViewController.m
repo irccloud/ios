@@ -575,23 +575,22 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 
 - (void)updateUnderLeftLayout
 {
-  if (self.underLeftWidthLayout == ECFullWidth) {
-    [self.underLeftView setAutoresizingMask:self.autoResizeToFillScreen];
-    [self.underLeftView setFrame:self.view.bounds];
-  } else if (self.underLeftWidthLayout == ECVariableRevealWidth && !self.topViewIsOffScreen) {
-    CGRect frame = self.view.bounds;
-    
-    frame.size.width = frame.size.width - self.anchorRightPeekAmount;
-    self.underLeftView.frame = frame;
-  } else if (self.underLeftWidthLayout == ECFixedRevealWidth) {
-    CGRect frame = self.view.bounds;
-    
-    frame.size.width = self.anchorRightRevealAmount;
-    self.underLeftView.frame = frame;
-  } else {
-    [NSException raise:@"Invalid Width Layout" format:@"underLeftWidthLayout must be a valid ECViewWidthLayout"];
-  }
-#ifdef __IPHONE_7_0
+    if (self.underLeftWidthLayout == ECFullWidth) {
+        [self.underLeftView setAutoresizingMask:self.autoResizeToFillScreen];
+        [self.underLeftView setFrame:self.view.bounds];
+    } else if (self.underLeftWidthLayout == ECVariableRevealWidth && !self.topViewIsOffScreen) {
+        CGRect frame = self.view.bounds;
+
+        frame.size.width = frame.size.width - self.anchorRightPeekAmount;
+        self.underLeftView.frame = frame;
+    } else if (self.underLeftWidthLayout == ECFixedRevealWidth) {
+        CGRect frame = self.view.bounds;
+
+        frame.size.width = self.anchorRightRevealAmount;
+        self.underLeftView.frame = frame;
+    } else {
+        [NSException raise:@"Invalid Width Layout" format:@"underLeftWidthLayout must be a valid ECViewWidthLayout"];
+    }
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
         int sbwidth = [UIApplication sharedApplication].statusBarFrame.size.width;
@@ -605,45 +604,43 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
         }
         self.underLeftView.frame = frame;
     }
-#endif
 }
 
 - (void)updateUnderRightLayout
 {
-  if (self.underRightWidthLayout == ECFullWidth) {
-    [self.underRightViewController.view setAutoresizingMask:self.autoResizeToFillScreen];
-    self.underRightView.frame = self.view.bounds;
-  } else if (self.underRightWidthLayout == ECVariableRevealWidth) {
-    CGRect frame = self.view.bounds;
-    
-    CGFloat newLeftEdge;
-    CGFloat newWidth = frame.size.width;
-    
-    if (self.topViewIsOffScreen) {
-      newLeftEdge = 0;
+    if (self.underRightWidthLayout == ECFullWidth) {
+        [self.underRightViewController.view setAutoresizingMask:self.autoResizeToFillScreen];
+        self.underRightView.frame = self.view.bounds;
+    } else if (self.underRightWidthLayout == ECVariableRevealWidth) {
+        CGRect frame = self.view.bounds;
+
+        CGFloat newLeftEdge;
+        CGFloat newWidth = frame.size.width;
+
+        if (self.topViewIsOffScreen) {
+          newLeftEdge = 0;
+        } else {
+          newLeftEdge = self.anchorLeftPeekAmount;
+          newWidth   -= self.anchorLeftPeekAmount;
+        }
+
+        frame.origin.x   = newLeftEdge;
+        frame.size.width = newWidth;
+
+        self.underRightView.frame = frame;
+    } else if (self.underRightWidthLayout == ECFixedRevealWidth) {
+        CGRect frame = self.view.bounds;
+
+        CGFloat newLeftEdge = frame.size.width - self.anchorLeftRevealAmount;
+        CGFloat newWidth = self.anchorLeftRevealAmount;
+
+        frame.origin.x   = newLeftEdge;
+        frame.size.width = newWidth;
+
+        self.underRightView.frame = frame;
     } else {
-      newLeftEdge = self.anchorLeftPeekAmount;
-      newWidth   -= self.anchorLeftPeekAmount;
+        [NSException raise:@"Invalid Width Layout" format:@"underRightWidthLayout must be a valid ECViewWidthLayout"];
     }
-    
-    frame.origin.x   = newLeftEdge;
-    frame.size.width = newWidth;
-    
-    self.underRightView.frame = frame;
-  } else if (self.underRightWidthLayout == ECFixedRevealWidth) {
-    CGRect frame = self.view.bounds;
-    
-    CGFloat newLeftEdge = frame.size.width - self.anchorLeftRevealAmount;
-    CGFloat newWidth = self.anchorLeftRevealAmount;
-    
-    frame.origin.x   = newLeftEdge;
-    frame.size.width = newWidth;
-    
-    self.underRightView.frame = frame;
-  } else {
-    [NSException raise:@"Invalid Width Layout" format:@"underRightWidthLayout must be a valid ECViewWidthLayout"];
-  }
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
         int sbwidth = [UIApplication sharedApplication].statusBarFrame.size.width;
@@ -661,7 +658,6 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
         }
         self.underRightView.frame = frame;
     }
-#endif
 }
 
 @end

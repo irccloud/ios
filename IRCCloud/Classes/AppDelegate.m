@@ -331,10 +331,8 @@
                 v.alpha = 0;
             } completion:^(BOOL finished){
                 [v removeFromSuperview];
-#ifdef __IPHONE_7_0
                 if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
                     self.window.backgroundColor = [UIColor whiteColor];
-#endif
             }];
         }
     }];
@@ -343,10 +341,8 @@
         self.slideViewController.view.alpha = 1;
         [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
         self.window.rootViewController = self.slideViewController;
-#ifdef __IPHONE_7_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
             self.window.backgroundColor = [UIColor whiteColor];
-#endif
     }
 }
 

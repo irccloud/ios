@@ -75,7 +75,6 @@
 -(id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        //_addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
@@ -98,13 +97,10 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
-#endif
-    //self.navigationItem.leftBarButtonItem = _addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
 }
 
@@ -177,9 +173,6 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
--(void)addButtonPressed {
-}
-
 -(void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
 }
@@ -209,10 +202,6 @@
     return cell;
 }
 
--(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
-}
-
 #pragma mark - Table view delegate
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -220,23 +209,6 @@
     NSDictionary *row = [_data objectAtIndex:indexPath.row];
     [[NetworkConnection sharedInstance] join:[row objectForKey:@"name"] key:nil cid:_event.cid];
     [self dismissViewControllerAnimated:YES completion:nil];
-}
-
--(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
-    [self alertView:_alertView clickedButtonAtIndex:1];
-    return NO;
-}
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    _alertView = nil;
-}
-
--(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
-    if(alertView.alertViewStyle == UIAlertViewStylePlainTextInput && [alertView textFieldAtIndex:0].text.length == 0)
-        return NO;
-    else
-        return YES;
 }
 
 @end

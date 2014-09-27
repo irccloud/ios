@@ -87,10 +87,8 @@
             appDelegate.slideViewController.view.alpha = 0;
         } completion:^(BOOL finished){
             [appDelegate.slideViewController.view removeFromSuperview];
-#ifdef __IPHONE_7_0
             if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
                 [UIApplication sharedApplication].statusBarHidden = YES;
-#endif
         }];
     }];
 }

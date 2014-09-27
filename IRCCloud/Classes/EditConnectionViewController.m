@@ -506,11 +506,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
             width = [UIScreen mainScreen].applicationFrame.size.height - 26;
         }
     }
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         width += 50;
     }
-#endif
     
     _commands.frame = CGRectMake(0, 0, width, 70);
     _channels.frame = CGRectMake(0, 0, width, 70);
@@ -531,13 +529,11 @@ static NSString * const ServerHasSSLKey = @"ssl";
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
         padding = 26;
         
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
         self.navigationController.navigationBar.clipsToBounds = YES;
         padding = 0;
     }
-#endif
 
     _network = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
     _network.placeholder = @"Network";
@@ -649,11 +645,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
             width = [UIScreen mainScreen].applicationFrame.size.height - 26;
         }
     }
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
         width += 50;
     }
-#endif
 
     _commands = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
     _commands.text = @"";

@@ -315,22 +315,18 @@
     cell.count.textColor = [row objectForKey:@"countColor"];
     if(cell.type == TYPE_HEADING) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-#ifdef __IPHONE_7_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
             cell.label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
             cell.label.font = [UIFont fontWithName:cell.label.font.fontName size:cell.label.font.pointSize * 0.8];
             cell.count.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
             cell.count.font = [UIFont fontWithName:cell.count.font.fontName size:cell.count.font.pointSize * 0.8];
         }
-#endif
     } else {
         cell.selectionStyle = UITableViewCellSelectionStyleBlue;
-#ifdef __IPHONE_7_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
             cell.label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
             cell.label.font = [UIFont fontWithName:cell.label.font.fontName size:cell.label.font.pointSize * 0.8];
         }
-#endif
     }
     if(cell.type == TYPE_HEADING || [[row objectForKey:@"first"] intValue]) {
         cell.border.hidden = YES;

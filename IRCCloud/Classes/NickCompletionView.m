@@ -30,11 +30,9 @@
     _scrollView.frame = CGRectMake(1, 1, frame.size.width - 2, frame.size.height - 3);
     _scrollView.layer.masksToBounds = YES;
     _scrollView.layer.cornerRadius = 4;
-#ifdef __IPHONE_7_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     else
-#endif
         _font = [UIFont fontWithName:@"Helvetica" size:FONT_SIZE + 4];
 }
 

@@ -822,29 +822,21 @@
         else
             cell.unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
         cell.unreadIndicator.hidden = NO;
-#ifdef __IPHONE_7_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
             UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
             cell.label.font = [UIFont fontWithDescriptor:d size:d.pointSize];
         } else {
-#endif
-        cell.label.font = [UIFont boldSystemFontOfSize:16.0f];
-#ifdef __IPHONE_7_0
+            cell.label.font = [UIFont boldSystemFontOfSize:16.0f];
         }
-#endif
         cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", unread"];
     } else {
         cell.unreadIndicator.hidden = YES;
-#ifdef __IPHONE_7_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
             UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
             cell.label.font = [UIFont fontWithDescriptor:d size:d.pointSize];
         } else {
-#endif
-        cell.label.font = [UIFont systemFontOfSize:16.0f];
-#ifdef __IPHONE_7_0
+            cell.label.font = [UIFont systemFontOfSize:16.0f];
         }
-#endif
     }
     if([[row objectForKey:@"highlights"] intValue]) {
         cell.highlights.hidden = NO;
