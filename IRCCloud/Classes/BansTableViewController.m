@@ -105,7 +105,7 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    _placeholder.frame = self.tableView.frame;
+    _placeholder.frame = CGRectInset(self.tableView.frame, 12, 0);
     if(_bans.count)
         [_placeholder removeFromSuperview];
     else
