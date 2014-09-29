@@ -95,6 +95,7 @@
         [d setObject:IRCCLOUD_HOST forKey:@"host"];
         [d setObject:IRCCLOUD_PATH forKey:@"path"];
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
         if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
             [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] forKey:@"imgur_access_token"];
         else

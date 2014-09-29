@@ -469,6 +469,20 @@
 			remoteGlobalIDString = 22DE05B118D8CA0700590FC3;
 			remoteInfo = GitRevision;
 		};
+		22E7140F19D9D18200E11D96 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22DE05B118D8CA0700590FC3;
+			remoteInfo = GitRevision;
+		};
+		22E7141119D9D18700E11D96 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22DE05B118D8CA0700590FC3;
+			remoteInfo = GitRevision;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1176,6 +1190,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				22E7141019D9D18200E11D96 /* PBXTargetDependency */,
 			);
 			name = ShareExtension;
 			productName = ShareExtension;
@@ -1255,6 +1270,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				22E7141219D9D18700E11D96 /* PBXTargetDependency */,
 			);
 			name = "ShareExtension Enterprise";
 			productName = ShareExtension;
@@ -1518,7 +1534,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ $CONFIGURATION == \"AppStore\" ]; then\n    bN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" $PROJECT_DIR/IRCCloud/IRCCloud-Info.plist)\nelse\n    bN=$(/usr/bin/git rev-parse --short HEAD)\nfi\necho -n \"#define GIT_VERSION \" > $PROJECT_DIR/IRCCloud/InfoPlist.h\necho $bN >> $PROJECT_DIR/IRCCloud/InfoPlist.h\ntouch $PROJECT_DIR/IRCCloud/IRCCloud-Info.plist\ntouch $PROJECT_DIR/IRCCloud/IRCCloud-Enterprise-Info.plist";
+			shellScript = "if [ $CONFIGURATION == \"AppStore\" ]; then\n    bN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" $PROJECT_DIR/IRCCloud/IRCCloud-Info.plist)\nelse\n    bN=$(/usr/bin/git rev-parse --short HEAD)\nfi\necho -n \"#define GIT_VERSION \" > $PROJECT_DIR/IRCCloud/InfoPlist.h\necho $bN >> $PROJECT_DIR/IRCCloud/InfoPlist.h\ntouch $PROJECT_DIR/IRCCloud/IRCCloud-Info.plist\ntouch $PROJECT_DIR/IRCCloud/IRCCloud-Enterprise-Info.plist\ntouch $PROJECT_DIR/ShareExtension/Info.plist\ntouch $PROJECT_DIR/ShareExtension/Info-Enterprise.plist";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1855,6 +1871,16 @@
 			isa = PBXTargetDependency;
 			target = 22DE05B118D8CA0700590FC3 /* GitRevision */;
 			targetProxy = 22DE05B818D8CA4F00590FC3 /* PBXContainerItemProxy */;
+		};
+		22E7141019D9D18200E11D96 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22DE05B118D8CA0700590FC3 /* GitRevision */;
+			targetProxy = 22E7140F19D9D18200E11D96 /* PBXContainerItemProxy */;
+		};
+		22E7141219D9D18700E11D96 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22DE05B118D8CA0700590FC3 /* GitRevision */;
+			targetProxy = 22E7141119D9D18700E11D96 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 

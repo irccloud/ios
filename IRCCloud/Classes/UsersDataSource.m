@@ -76,9 +76,11 @@
 
 -(id)init {
     self = [super init];
-    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"users"];
-    
-    _users = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
+        NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"users"];
+        
+        _users = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+    }
     if(!_users)
         _users = [[NSMutableDictionary alloc] init];
     return self;
