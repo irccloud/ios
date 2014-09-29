@@ -307,7 +307,7 @@ int __timestampWidth;
                 eid = last.eid;
             }
         }
-        if(eid >= 0 && eid > _buffer.last_seen_eid && _conn.state == kIRCCloudStateConnected) {
+        if(eid >= 0 && eid >= _buffer.last_seen_eid && _conn.state == kIRCCloudStateConnected) {
             [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
             _buffer.last_seen_eid = eid;
         }
@@ -655,13 +655,8 @@ int __timestampWidth;
     if(!backlog) {
         [self.tableView reloadData];
         if(!_buffer.scrolledUp) {
-            if(_topUnreadView.alpha == 0 && _data.count > 200) {
-                [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid maxSize:100];
-                [self refresh];
-            } else {
-                [self scrollToBottom];
-                [self _scrollToBottom];
-            }
+            [self scrollToBottom];
+            [self _scrollToBottom];
         } else if(!event.isSelf && [event isImportant:_buffer.type]) {
             _newMsgs++;
             if(event.isHighlight)
@@ -1075,7 +1070,7 @@ int __timestampWidth;
             event = [i nextObject];
             _lastSeenEidPos--;
         }
-        if(_lastSeenEidPos != _data.count - 1) {
+        if(_lastSeenEidPos != _data.count - 1 && !event.isSelf && !event.pending) {
             if(_lastSeenEidPos > 0 && [[_data objectAtIndex:_lastSeenEidPos - 1] rowType] == ROW_TIMESTAMP)
                 _lastSeenEidPos--;
             if(_lastSeenEidPos > 0) {
