@@ -704,6 +704,15 @@
                     }
                 }
             }
+            b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
+            if(b && !b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0 && [[EventsDataSource sharedInstance] sizeOfBuffer:b.bid] > 200) {
+                [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:50];
+                if(b.bid == _buffer.bid) {
+                    if(b.last_seen_eid < e.eid)
+                        b.last_seen_eid = e.eid;
+                    [_eventsView refresh];
+                }
+            }
             break;
         case kIRCEventHeartbeatEcho:
         {
@@ -1521,6 +1530,11 @@
                     u.lastMention = event.eid;
                 }
             }
+        }
+        NSMutableDictionary *u = [NetworkConnection sharedInstance].userInfo.mutableCopy;
+        if(u) {
+            [u setObject:@(bid) forKey:@"last_selected_bid"];
+            [NetworkConnection sharedInstance].userInfo = [NSDictionary dictionaryWithDictionary:u];
         }
     } else {
         CLS_LOG(@"BID selected but not found: bid%i", bid);

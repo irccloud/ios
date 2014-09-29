@@ -139,7 +139,7 @@ typedef enum {
     NSString *_globalMsg;
 }
 @property (readonly) kIRCCloudState state;
-@property (readonly) NSDictionary *userInfo;
+@property NSDictionary *userInfo;
 @property (readonly) NSTimeInterval clockOffset;
 @property NSTimeInterval idleInterval;
 @property NSTimeInterval reconnectTimestamp;
