@@ -293,8 +293,8 @@ NSLock *__parserLock = nil;
         if(b) {
             Event *event = [_events addJSONObject:object];
             if(!backlog || _resuming) {
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"]))
-                    [self updateBadgeCount];
+                //if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"]))
+                    //[self updateBadgeCount];
 
                 if(!backlog) {
                     [self postObject:event forEvent:kIRCEventBufferMsg];
@@ -776,7 +776,7 @@ NSLock *__parserLock = nil;
                            }
                        }
                        [self postObject:object forEvent:kIRCEventHeartbeatEcho];
-                       [self updateBadgeCount];
+                       //[self updateBadgeCount];
                    },
                    @"reorder_connections": ^(IRCCloudJSONObject *object) {
                        NSArray *order = [object objectForKey:@"order"];
