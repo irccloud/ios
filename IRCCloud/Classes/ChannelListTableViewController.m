@@ -80,6 +80,7 @@
         _placeholder.font = [UIFont systemFontOfSize:18];
         _placeholder.numberOfLines = 0;
         _placeholder.textAlignment = NSTextAlignmentCenter;
+        _placeholder.textColor = [UIColor selectedBlueColor];
         _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         _activity.hidesWhenStopped = YES;
         [_placeholder addSubview:_activity];
