@@ -1030,6 +1030,7 @@
     [_doubleTapTimer invalidate];
     _doubleTapTimer = nil;
     _eidToOpen = -1;
+    [self.slidingViewController resetTopView];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
