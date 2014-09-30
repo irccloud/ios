@@ -1292,7 +1292,9 @@ int __timestampWidth;
                     NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
                     if(![url hasPrefix:@"irc"])
                         url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url];
-                    [cell.message addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
+                    NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
+                    if(u)
+                        [cell.message addLinkToURL:u withRange:result.range];
                 }
             }
         }
