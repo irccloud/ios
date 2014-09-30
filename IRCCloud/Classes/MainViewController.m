@@ -952,6 +952,8 @@
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
     _nickCompletionView.alpha = 0;
     [UIView commitAnimations];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -1037,6 +1039,8 @@
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -2536,11 +2540,16 @@
         u.bid = _buffer.bid;
         [u upload:img];
     }
+    
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
 }
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [self.slidingViewController dismissModalViewControllerAnimated:YES];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
 }
 
 -(void)imageUploadProgress:(float)progress {

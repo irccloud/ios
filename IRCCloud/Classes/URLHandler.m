@@ -56,6 +56,7 @@
 
 - (void)launchURL:(NSURL *)url
 {
+    NSLog(@"Launch: %@", url);
     UIApplication *app = [UIApplication sharedApplication];
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
     MainViewController *mainViewController = [appDelegate mainViewController];
