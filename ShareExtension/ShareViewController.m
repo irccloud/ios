@@ -40,6 +40,7 @@
     IRCCLOUD_PATH = [d objectForKey:@"path"];
     _uploader = [[ImageUploader alloc] init];
     _uploader.delegate = self;
+    [[NSUserDefaults standardUserDefaults] setObject:[d objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
     [NetworkConnection sync];
     _conn = [NetworkConnection sharedInstance];
     if(_conn.session.length) {
