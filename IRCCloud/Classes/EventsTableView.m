@@ -1287,7 +1287,8 @@ int __timestampWidth;
         @try {
             for(NSTextCheckingResult *result in e.links) {
                 if(result.resultType == NSTextCheckingTypeLink) {
-                    [cell.message addLinkWithTextCheckingResult:result];
+                    if(result.URL)
+                        [cell.message addLinkWithTextCheckingResult:result];
                 } else {
                     NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
                     if(![url hasPrefix:@"irc"])

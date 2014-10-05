@@ -66,7 +66,6 @@
 		2210351A197EFC6200AB414F /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7918CF770D0011DEAB /* SBJsonTokeniser.m */; };
 		2210351B197EFC6200AB414F /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7B18CF770D0011DEAB /* SBJsonUTF8Stream.m */; };
 		2210351C197EFC6200AB414F /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
-		2210351D197EFC6200AB414F /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284C16D831A800498507 /* AsyncSocket.m */; };
 		2210351E197EFC6200AB414F /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		2210351F197EFC6200AB414F /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		22103520197EFC6200AB414F /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
@@ -147,7 +146,6 @@
 		225D973B18AA995900065087 /* TTTAttributedLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05D316D3DFB80029769C /* TTTAttributedLabel.m */; };
 		225D973C18AA995900065087 /* LoginSplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05DC16D3E40E0029769C /* LoginSplashViewController.m */; };
 		225D974718AA995900065087 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
-		225D974818AA995900065087 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284C16D831A800498507 /* AsyncSocket.m */; };
 		225D974918AA995900065087 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		225D974A18AA995900065087 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		225D974B18AA995900065087 /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
@@ -324,8 +322,6 @@
 		22B15CFE17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */; };
 		22B4284816D7E36300498507 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		22B4284916D7E36300498507 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
-		22B4286616D831A800498507 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284C16D831A800498507 /* AsyncSocket.m */; };
-		22B4286716D831A800498507 /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284C16D831A800498507 /* AsyncSocket.m */; };
 		22B4286816D831A800498507 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		22B4286916D831A800498507 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
@@ -385,7 +381,6 @@
 		22DB25121982DF2B0008728E /* SBJsonTokeniser.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7918CF770D0011DEAB /* SBJsonTokeniser.m */; };
 		22DB25131982DF2B0008728E /* SBJsonUTF8Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7B18CF770D0011DEAB /* SBJsonUTF8Stream.m */; };
 		22DB25141982DF2B0008728E /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
-		22DB25151982DF2B0008728E /* AsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284C16D831A800498507 /* AsyncSocket.m */; };
 		22DB25161982DF2B0008728E /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		22DB25171982DF2B0008728E /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		22DB25181982DF2B0008728E /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
@@ -677,8 +672,6 @@
 		22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageWithUIView.m"; sourceTree = "<group>"; };
 		22B4284616D7E36300498507 /* NetworkConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkConnection.h; sourceTree = "<group>"; };
 		22B4284716D7E36300498507 /* NetworkConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkConnection.m; sourceTree = "<group>"; };
-		22B4284B16D831A800498507 /* AsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsyncSocket.h; sourceTree = "<group>"; };
-		22B4284C16D831A800498507 /* AsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AsyncSocket.m; sourceTree = "<group>"; };
 		22B4284D16D831A800498507 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		22B4284E16D831A800498507 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		22B4284F16D831A800498507 /* HandshakeHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandshakeHeader.h; sourceTree = "<group>"; };
@@ -1153,8 +1146,6 @@
 		22B4284A16D831A800498507 /* WebSocket */ = {
 			isa = PBXGroup;
 			children = (
-				22B4284B16D831A800498507 /* AsyncSocket.h */,
-				22B4284C16D831A800498507 /* AsyncSocket.m */,
 				22B4284D16D831A800498507 /* GCDAsyncSocket.h */,
 				22B4284E16D831A800498507 /* GCDAsyncSocket.m */,
 				22B4284F16D831A800498507 /* HandshakeHeader.h */,
@@ -1568,7 +1559,6 @@
 				2210351A197EFC6200AB414F /* SBJsonTokeniser.m in Sources */,
 				2210351B197EFC6200AB414F /* SBJsonUTF8Stream.m in Sources */,
 				2210351C197EFC6200AB414F /* SBJsonWriter.m in Sources */,
-				2210351D197EFC6200AB414F /* AsyncSocket.m in Sources */,
 				2210351E197EFC6200AB414F /* GCDAsyncSocket.m in Sources */,
 				2210351F197EFC6200AB414F /* HandshakeHeader.m in Sources */,
 				22103520197EFC6200AB414F /* MutableQueue.m in Sources */,
@@ -1592,7 +1582,6 @@
 				2264A30219659BB100DCFDDD /* URLHandler.m in Sources */,
 				225D973C18AA995900065087 /* LoginSplashViewController.m in Sources */,
 				225D974718AA995900065087 /* NetworkConnection.m in Sources */,
-				225D974818AA995900065087 /* AsyncSocket.m in Sources */,
 				225D974918AA995900065087 /* GCDAsyncSocket.m in Sources */,
 				225D974A18AA995900065087 /* HandshakeHeader.m in Sources */,
 				228E2B9218CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
@@ -1672,7 +1661,6 @@
 				2264A30119659BB100DCFDDD /* URLHandler.m in Sources */,
 				228A05DE16D3E40F0029769C /* LoginSplashViewController.m in Sources */,
 				22B4284816D7E36300498507 /* NetworkConnection.m in Sources */,
-				22B4286616D831A800498507 /* AsyncSocket.m in Sources */,
 				22B4286816D831A800498507 /* GCDAsyncSocket.m in Sources */,
 				22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */,
 				228E2B9018CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
@@ -1748,7 +1736,6 @@
 				228E2B8518CF770D0011DEAB /* SBJsonStreamParser.m in Sources */,
 				228A05A416D3DABB0029769C /* IRCCloudTests.m in Sources */,
 				22B4284916D7E36300498507 /* NetworkConnection.m in Sources */,
-				22B4286716D831A800498507 /* AsyncSocket.m in Sources */,
 				22B4286916D831A800498507 /* GCDAsyncSocket.m in Sources */,
 				22B4286B16D831A800498507 /* HandshakeHeader.m in Sources */,
 				22B4286D16D831A800498507 /* MutableQueue.m in Sources */,
@@ -1826,7 +1813,6 @@
 				22DB25121982DF2B0008728E /* SBJsonTokeniser.m in Sources */,
 				22DB25131982DF2B0008728E /* SBJsonUTF8Stream.m in Sources */,
 				22DB25141982DF2B0008728E /* SBJsonWriter.m in Sources */,
-				22DB25151982DF2B0008728E /* AsyncSocket.m in Sources */,
 				22DB25161982DF2B0008728E /* GCDAsyncSocket.m in Sources */,
 				22DB25171982DF2B0008728E /* HandshakeHeader.m in Sources */,
 				22DB25181982DF2B0008728E /* MutableQueue.m in Sources */,

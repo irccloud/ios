@@ -1322,7 +1322,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
                                                                          tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
-                                                                                        (NSString *)kCFStreamSSLLevel: (NSString *)kCFStreamSocketSecurityLevelSSLv3,
+                                                                                        (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kSSLProtocol3),
 #ifndef ENTERPRISE
                                                                                         @"fingerprint":@"8D:3B:E1:98:3F:75:F4:A4:54:6F:42:F5:EC:18:9B:C6:5A:9D:3A:42"
 #endif
