@@ -1023,20 +1023,8 @@
         _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     }
     
-    if([[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-        CGRect frame = self.navigationController.navigationBar.frame;
-        frame.origin.x = _buffersView.tableView.frame.size.width + 1;
-        frame.size.width = [UIScreen mainScreen].applicationFrame.size.width - _buffersView.tableView.frame.size.width - 1;
-        self.navigationController.navigationBar.frame = frame;
-        _buffersView.tableView.contentInset = UIEdgeInsetsZero;
-        _borders.frame = CGRectMake(_buffersView.tableView.frame.size.width - 1, -self.navigationController.navigationBar.frame.size.height, _eventsView.tableView.frame.size.width + 2, [UIScreen mainScreen].applicationFrame.size.height + self.navigationController.navigationBar.frame.size.height);
-    }
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        CGRect frame = self.navigationController.navigationBar.frame;
-        frame.origin.y = -frame.size.height;
-        [_blur setFrame:frame];
-    }
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -1810,7 +1798,8 @@
 }
 
 -(void)viewWillLayoutSubviews {
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
+        [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
 /*-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
