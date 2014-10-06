@@ -440,8 +440,14 @@
 }
 
 - (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)())completionHandler {
-    NSURLSessionConfiguration *config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:identifier];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+    NSURLSessionConfiguration *config;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+        config = [NSURLSessionConfiguration backgroundSessionConfiguration:identifier];
+#pragma GCC diagnostic pop
+    } else {
+        config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:identifier];
 #ifdef ENTERPRISE
         config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
 #else

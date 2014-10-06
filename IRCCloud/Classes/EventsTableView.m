@@ -355,7 +355,8 @@ int __timestampWidth;
             o = notification.object;
             if(o.bid == _buffer.bid) {
                 e = [[EventsDataSource sharedInstance] event:o.eid buffer:o.bid];
-                [self insertEvent:e backlog:NO nextIsGrouped:NO];
+                if(e)
+                    [self insertEvent:e backlog:NO nextIsGrouped:NO];
             }
             break;
         case kIRCEventBufferMsg:
@@ -957,7 +958,10 @@ int __timestampWidth;
     _buffer.scrolledUp = NO;
     _buffer.scrolledUpFrom = -1;
     if(_data.count) {
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: NO];
+        if(self.tableView.contentSize.height > (self.tableView.frame.size.height - self.tableView.contentInset.top))
+            [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentSize.height - self.tableView.frame.size.height)];
+        else
+            [self.tableView setContentOffset:CGPointMake(0, -self.tableView.contentInset.top)];
         if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
             [self scrollViewDidScroll:self.tableView];
     }
@@ -1138,8 +1142,8 @@ int __timestampWidth;
     if(_data.count && rows.count) {
         NSInteger firstRow = [[rows objectAtIndex:0] row];
         NSInteger lastRow = [[rows lastObject] row];
-        Event *e = [_data objectAtIndex:_lastSeenEidPos+1];
-        if(_lastSeenEidPos >= 0 && firstRow > _lastSeenEidPos && e.eid > _buffer.last_seen_eid) {
+        Event *e = ((_lastSeenEidPos+1) < _data.count)?[_data objectAtIndex:_lastSeenEidPos+1]:nil;
+        if(e && _lastSeenEidPos >= 0 && firstRow > _lastSeenEidPos && e.eid > _buffer.last_seen_eid) {
             if(_topUnreadView.alpha == 0) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
@@ -1406,7 +1410,7 @@ int __timestampWidth;
         _bottomUnreadView.alpha = 0;
         [UIView commitAnimations];
         if(_data.count)
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count-1 inSection:0] atScrollPosition: UITableViewScrollPositionBottom animated: YES];
+            [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentSize.height - self.tableView.frame.size.height) animated:YES];
         _buffer.scrolledUp = NO;
         _buffer.scrolledUpFrom = -1;
     }

@@ -31,11 +31,16 @@
 }
 
 -(void)_authorize {
+    NSUserDefaults *d;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+        d = [NSUserDefaults standardUserDefaults];
+    } else {
 #ifdef ENTERPRISE
-    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
+    }
     NSUserDefaults *d2 = [NSUserDefaults standardUserDefaults];
 
 #ifdef IMGUR_KEY

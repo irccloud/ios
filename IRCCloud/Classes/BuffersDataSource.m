@@ -160,9 +160,13 @@
     }
     
     @synchronized(self) {
-        [NSKeyedArchiver archiveRootObject:buffers toFile:cacheFile];
-        
-        [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+        @try {
+            [NSKeyedArchiver archiveRootObject:buffers toFile:cacheFile];
+            [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+        }
+        @catch (NSException *exception) {
+            [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
+        }
     }
 }
 

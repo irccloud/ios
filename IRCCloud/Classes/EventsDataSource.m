@@ -147,7 +147,13 @@
     encodeBool(_isSelf);
     encodeBool(_toChan);
     encodeBool(_toBuffer);
-    encodeObject(_color);
+    @try {
+        encodeObject(_color);
+    }
+    @catch (NSException *exception) {
+        _color = [UIColor blackColor];
+        encodeObject(_color);
+    }
     encodeObject(_ops);
     encodeDouble(_groupEid);
     encodeInt(_rowType);
@@ -692,8 +698,13 @@
     }
     
     @synchronized(self) {
-        [NSKeyedArchiver archiveRootObject:events toFile:cacheFile];
-        [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+        @try {
+            [NSKeyedArchiver archiveRootObject:events toFile:cacheFile];
+            [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+        }
+        @catch (NSException *exception) {
+            [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
+        }
     }
 #endif
 }
