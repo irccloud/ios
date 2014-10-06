@@ -1022,6 +1022,21 @@
     } else {
         _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     }
+    
+    if([[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        CGRect frame = self.navigationController.navigationBar.frame;
+        frame.origin.x = _buffersView.tableView.frame.size.width + 1;
+        frame.size.width = [UIScreen mainScreen].applicationFrame.size.width - _buffersView.tableView.frame.size.width - 1;
+        self.navigationController.navigationBar.frame = frame;
+        _buffersView.tableView.contentInset = UIEdgeInsetsZero;
+        _borders.frame = CGRectMake(_buffersView.tableView.frame.size.width - 1, -self.navigationController.navigationBar.frame.size.height, _eventsView.tableView.frame.size.width + 2, [UIScreen mainScreen].applicationFrame.size.height + self.navigationController.navigationBar.frame.size.height);
+    }
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        CGRect frame = self.navigationController.navigationBar.frame;
+        frame.origin.y = -frame.size.height;
+        [_blur setFrame:frame];
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -1947,8 +1962,17 @@
         _connectingStatus.frame = frame;
     }
 
+    if([[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
+        frame = self.navigationController.navigationBar.frame;
+        frame.origin.x = _buffersView.tableView.frame.size.width + 1;
+        frame.size.width = width - _buffersView.tableView.frame.size.width - 1;
+        self.navigationController.navigationBar.frame = frame;
+        _buffersView.tableView.contentInset = UIEdgeInsetsZero;
+        _borders.frame = CGRectMake(_buffersView.tableView.frame.size.width - 1, -self.navigationController.navigationBar.frame.size.height, _eventsView.tableView.frame.size.width + 2, height + self.navigationController.navigationBar.frame.size.height);
+    }
+
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        frame = self.navigationController.navigationBar.bounds;
+        frame = self.navigationController.navigationBar.frame;
         frame.origin.y = -frame.size.height;
         [_blur setFrame:frame];
     }
