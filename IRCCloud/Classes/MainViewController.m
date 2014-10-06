@@ -659,7 +659,7 @@
                     if(e.ignoreMask && [ignore match:e.ignoreMask])
                         break;
                     if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
-                        if(_lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
+                        if([[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
                             _lastNotificationTime = [NSDate date].timeIntervalSince1970;
                             AudioServicesPlaySystemSound(alertSound);
                             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);

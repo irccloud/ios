@@ -145,6 +145,7 @@
     [[NSUserDefaults standardUserDefaults] setBool:_chrome.on forKey:@"useChrome"];
     [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
     [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
+    [[NSUserDefaults standardUserDefaults] setBool:_notificationSound.on forKey:@"notificationSound"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
@@ -298,6 +299,7 @@
     _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
+    _notificationSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"];
 }
 
 - (void)viewDidLoad {
@@ -347,6 +349,7 @@
     _autoCaps = [[UISwitch alloc] init];
     _emocodes = [[UISwitch alloc] init];
     _saveToCameraRoll = [[UISwitch alloc] init];
+    _notificationSound = [[UISwitch alloc] init];
 
     int width;
     
@@ -426,7 +429,7 @@
         case 2:
             return 5;
         case 3:
-            return (_chromeInstalled)?3:2;
+            return (_chromeInstalled)?4:3;
         case 4:
             return 3;
         case 5:
@@ -524,6 +527,10 @@
                     cell.accessoryView = _autoCaps;
                     break;
                 case 2:
+                    cell.textLabel.text = @"Play Alert Sounds";
+                    cell.accessoryView = _notificationSound;
+                    break;
+                case 3:
                     cell.textLabel.text = @"Open URLs in Chrome";
                     cell.accessoryView = _chrome;
                     break;

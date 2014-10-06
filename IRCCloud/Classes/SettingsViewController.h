@@ -31,6 +31,7 @@
     UISwitch *_autoCaps;
     UISwitch *_emocodes;
     UISwitch *_saveToCameraRoll;
+    UISwitch *_notificationSound;
     NSString *_version;
     int _userinforeqid;
     int _prefsreqid;
