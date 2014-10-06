@@ -279,6 +279,8 @@ NSLock *__parserLock = nil;
         server.join_commands = [object objectForKey:@"join_commands"];
         server.fail_info = [object objectForKey:@"fail_info"];
         server.away = (backlog && [_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
+        if(_notifier && [server.away isEqualToString:@"Auto-away"])
+            server.away = @"";
         server.ignores = [object objectForKey:@"ignores"];
         if([[object objectForKey:@"order"] isKindOfClass:[NSNumber class]])
             server.order = [[object objectForKey:@"order"] intValue];
