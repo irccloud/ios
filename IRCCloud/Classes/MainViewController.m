@@ -1798,8 +1798,7 @@
 }
 
 -(void)viewWillLayoutSubviews {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8 || ([[UIDevice currentDevice] isBigPhone] && _buffersView.view.frame.size.height == [UIScreen mainScreen].applicationFrame.size.height))
-        [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
 /*-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
