@@ -1798,7 +1798,7 @@
 }
 
 -(void)viewWillLayoutSubviews {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
+    if(self.view.frame.origin.y != 0)
         [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
@@ -1844,7 +1844,12 @@
     }
     self.slidingViewController.view.frame = frame;
     
-    height -= self.navigationController.navigationBar.frame.size.height;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+        height -= self.navigationController.navigationBar.frame.size.height;
+    } else {
+        self.view.autoresizingMask = UIViewAutoresizingNone;
+        self.view.frame = CGRectMake(0, /*[UIApplication sharedApplication].statusBarFrame.size.height*/0, width, height - [UIApplication sharedApplication].statusBarFrame.size.height);
+    }
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         height -= [UIApplication sharedApplication].statusBarFrame.size.height;
     else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
@@ -1852,7 +1857,7 @@
 
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         _eventsView.tableView.scrollIndicatorInsets = _eventsView.tableView.contentInset = UIEdgeInsetsMake((([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),0,0,0);
-        _eventsView.view.frame = CGRectMake(0, -(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height), width, height - _bottomBar.frame.size.height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
+        _eventsView.view.frame = CGRectMake(0, 0, width, height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
         CGRect frame = _titleView.frame;
         frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:204;
@@ -1875,9 +1880,9 @@
             self.slidingViewController.underRightViewController = nil;
             [self addChildViewController:_buffersView];
             [self addChildViewController:_usersView];
-            _buffersView.view.frame = CGRectMake(0,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),[[UIDevice currentDevice] isBigPhone]?180:220,height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
-            _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
-            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),220,height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
+            _buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,height);
+            _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height);
+            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,0,220,height);
             _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = _eventsView.tableView.contentInset;
             _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
@@ -1909,7 +1914,7 @@
             _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
             [self.slidingViewController updateUnderLeftLayout];
             [self.slidingViewController updateUnderRightLayout];
-            _eventsView.view.frame = CGRectMake(0,-(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width), height - _bottomBar.frame.size.height + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height));
+            _eventsView.view.frame = CGRectMake(0,0,width, height - _bottomBar.frame.size.height);
             _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             CGRect frame = _titleView.frame;
             frame.size.width = 500;
@@ -1930,10 +1935,10 @@
     if(duration > 0)
         _message.text = _message.text;
     frame = _eventsView.view.frame;
-    frame.origin.y = 0;
+    frame.origin.y = _eventsView.tableView.contentInset.top;
     frame.size.height = 32;
     _eventsView.topUnreadView.frame = frame;
-    frame.origin.y += _eventsView.view.frame.size.height - 32 -(([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height);
+    frame.origin.y = _eventsView.tableView.frame.size.height - 32;
     _eventsView.bottomUnreadView.frame = frame;
     float h = [@" " sizeWithFont:_nickCompletionView.font].height + 12;
     _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
@@ -1962,7 +1967,7 @@
 
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         frame = self.navigationController.navigationBar.frame;
-        frame.origin.y = -frame.size.height;
+        frame.origin.y = 0;
         [_blur setFrame:frame];
     }
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
