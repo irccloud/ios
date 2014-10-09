@@ -1848,7 +1848,7 @@
         height -= self.navigationController.navigationBar.frame.size.height;
     } else {
         self.view.autoresizingMask = UIViewAutoresizingNone;
-        self.view.frame = CGRectMake(0, /*[UIApplication sharedApplication].statusBarFrame.size.height*/0, width, height - [UIApplication sharedApplication].statusBarFrame.size.height);
+        self.view.frame = CGRectMake(0, [UIApplication sharedApplication].statusBarFrame.size.height, width, height - [UIApplication sharedApplication].statusBarFrame.size.height);
     }
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         height -= [UIApplication sharedApplication].statusBarFrame.size.height;
