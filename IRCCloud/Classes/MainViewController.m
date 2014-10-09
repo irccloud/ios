@@ -1798,7 +1798,7 @@
 }
 
 -(void)viewWillLayoutSubviews {
-    if(self.view.frame.origin.y != 0)
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8 || ([[UIDevice currentDevice] isBigPhone] && _buffersView.view.frame.size.height == [UIScreen mainScreen].applicationFrame.size.height))
         [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
@@ -1896,7 +1896,7 @@
             [self.view insertSubview:_usersView.view atIndex:1];
             _borders.hidden = NO;
             CGRect frame = _titleView.frame;
-            frame.size.width = 800;
+            frame.size.width = [[UIDevice currentDevice] isBigPhone]?450:800;
             _titleView.frame = frame;
             frame = _serverStatusBar.frame;
             frame.origin.x = _buffersView.view.frame.size.width;
@@ -1917,7 +1917,7 @@
             _eventsView.view.frame = CGRectMake(0,0,width, height - _bottomBar.frame.size.height);
             _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             CGRect frame = _titleView.frame;
-            frame.size.width = 500;
+            frame.size.width = [[UIDevice currentDevice] isBigPhone]?318:500;
             _titleView.frame = frame;
             frame = _serverStatusBar.frame;
             frame.origin.x = 0;
