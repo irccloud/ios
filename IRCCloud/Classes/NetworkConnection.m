@@ -279,7 +279,7 @@ NSLock *__parserLock = nil;
         server.join_commands = [object objectForKey:@"join_commands"];
         server.fail_info = [object objectForKey:@"fail_info"];
         server.away = (backlog && [_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
-        if(_notifier && [server.away isEqualToString:@"Auto-away"])
+        if([[_userInfo objectForKey:@"autoaway"] intValue] && [server.away isEqualToString:@"Auto-away"])
             server.away = @"";
         server.ignores = [object objectForKey:@"ignores"];
         if([[object objectForKey:@"order"] isKindOfClass:[NSNumber class]])
@@ -728,10 +728,12 @@ NSLock *__parserLock = nil;
                            [self postObject:object forEvent:kIRCEventAway];
                    },
                    @"self_away": ^(IRCCloudJSONObject *object) {
-                       [_users updateAway:1 msg:[object objectForKey:@"away_msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
-                       [_servers updateAway:[object objectForKey:@"away_msg"] server:object.cid];
-                       if(!backlog)
-                           [self postObject:object forEvent:kIRCEventAway];
+                       if(!_resuming) {
+                           [_users updateAway:1 msg:[object objectForKey:@"away_msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                           [_servers updateAway:[object objectForKey:@"away_msg"] server:object.cid];
+                           if(!backlog)
+                               [self postObject:object forEvent:kIRCEventAway];
+                       }
                    },
                    @"self_back": ^(IRCCloudJSONObject *object) {
                        [_awayOverride setObject:@YES forKey:@(object.cid)];
