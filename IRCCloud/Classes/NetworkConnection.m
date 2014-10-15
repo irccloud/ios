@@ -1238,6 +1238,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"back" args:@{@"cid":@(cid)}];
 }
 
+-(int)resendVerifyEmail {
+    return [self _sendRequest:@"resend-verify-email" args:nil];
+}
+
 -(int)disconnect:(int)cid msg:(NSString *)msg {
     if(msg.length)
         return [self _sendRequest:@"disconnect" args:@{@"cid":@(cid), @"msg":msg}];
