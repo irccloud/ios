@@ -146,6 +146,7 @@
     [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
     [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
     [[NSUserDefaults standardUserDefaults] setBool:_notificationSound.on forKey:@"notificationSound"];
+    [[NSUserDefaults standardUserDefaults] setBool:_tabletMode.on forKey:@"tabletMode"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
@@ -300,6 +301,7 @@
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
     _notificationSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"];
+    _tabletMode.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"];
 }
 
 - (void)viewDidLoad {
@@ -350,6 +352,7 @@
     _emocodes = [[UISwitch alloc] init];
     _saveToCameraRoll = [[UISwitch alloc] init];
     _notificationSound = [[UISwitch alloc] init];
+    _tabletMode = [[UISwitch alloc] init];
 
     int width;
     
@@ -429,7 +432,7 @@
         case 2:
             return 5;
         case 3:
-            return (_chromeInstalled)?4:3;
+            return ((_chromeInstalled)?4:3) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
         case 4:
             return 3;
         case 5:
@@ -531,6 +534,12 @@
                     cell.accessoryView = _notificationSound;
                     break;
                 case 3:
+                    if([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+                        cell.textLabel.text = @"Show Sidebars In Landscape";
+                        cell.accessoryView = _tabletMode;
+                        break;
+                    }
+                case 4:
                     cell.textLabel.text = @"Open URLs in Chrome";
                     cell.accessoryView = _chrome;
                     break;

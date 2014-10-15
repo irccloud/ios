@@ -1855,7 +1855,7 @@
         height -= UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
 
     _eventsView.tableView.scrollIndicatorInsets = _eventsView.tableView.contentInset = UIEdgeInsetsMake((([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),0,0,0);
-    if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
@@ -1890,9 +1890,7 @@
             self.slidingViewController.underLeftViewController = _buffersView;
         if(!self.navigationItem.leftBarButtonItem)
             self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
-        _buffersView.view.frame = CGRectMake(0,0,220,height);
         _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsZero;
-        _usersView.view.frame = CGRectMake(0,0,220,height);
         _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
         _eventsView.view.frame = CGRectMake(0,0,width, height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
@@ -2000,7 +1998,7 @@
             self.slidingViewController.underRightViewController = nil;
         }
     } else {
-        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"]) {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone]) {
                 self.navigationItem.rightBarButtonItem = nil;
                 CGRect frame = _eventsView.view.frame;
