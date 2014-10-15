@@ -1944,7 +1944,7 @@
         _connectingStatus.frame = frame;
     }
 
-    if([[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
         frame = self.navigationController.navigationBar.frame;
         frame.origin.x = _buffersView.tableView.frame.size.width + 1;
         frame.size.width = width - _buffersView.tableView.frame.size.width - 1;
