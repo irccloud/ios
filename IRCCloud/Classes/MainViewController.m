@@ -1854,75 +1854,69 @@
     else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
         height -= UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
 
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
-        _eventsView.tableView.scrollIndicatorInsets = _eventsView.tableView.contentInset = UIEdgeInsetsMake((([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),0,0,0);
-        _eventsView.view.frame = CGRectMake(0, 0, width, height - _bottomBar.frame.size.height);
+    _eventsView.tableView.scrollIndicatorInsets = _eventsView.tableView.contentInset = UIEdgeInsetsMake((([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),0,0,0);
+    if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
+        self.navigationItem.leftBarButtonItem = nil;
+        self.navigationItem.rightBarButtonItem = nil;
+        self.slidingViewController.underLeftViewController = nil;
+        self.slidingViewController.underRightViewController = nil;
+        [self addChildViewController:_buffersView];
+        [self addChildViewController:_usersView];
+        _buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,height);
+        _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height);
+        _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,0,220,height);
+        _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = _eventsView.tableView.contentInset;
+        _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
+        _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
+        [_buffersView willMoveToParentViewController:self];
+        [_buffersView viewWillAppear:NO];
+        _buffersView.view.hidden = NO;
+        [self.view insertSubview:_buffersView.view atIndex:1];
+        [_usersView willMoveToParentViewController:self];
+        [_usersView viewWillAppear:NO];
+        _usersView.view.hidden = NO;
+        [self.view insertSubview:_usersView.view atIndex:1];
+        _borders.hidden = NO;
+        CGRect frame = _titleView.frame;
+        frame.size.width = [[UIDevice currentDevice] isBigPhone]?450:800;
+        _titleView.frame = frame;
+        frame = _serverStatusBar.frame;
+        frame.origin.x = _buffersView.view.frame.size.width;
+        frame.size.width = _eventsView.view.frame.size.width;
+        _serverStatusBar.frame = frame;
+    } else {
+        _borders.hidden = YES;
+        if(!self.slidingViewController.underLeftViewController)
+            self.slidingViewController.underLeftViewController = _buffersView;
+        if(!self.navigationItem.leftBarButtonItem)
+            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
+        _buffersView.view.frame = CGRectMake(0,0,220,height);
+        _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsZero;
+        _usersView.view.frame = CGRectMake(0,0,220,height);
+        _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
+        _eventsView.view.frame = CGRectMake(0,0,width, height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
         CGRect frame = _titleView.frame;
-        frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:204;
-        frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
+        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
+            frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:204;
+            frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
+            _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
+        } else {
+            frame.size.width = [[UIDevice currentDevice] isBigPhone]?318:500;
+        }
         _titleView.frame = frame;
         if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
             _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
         else
             _landscapeView.transform = CGAffineTransformIdentity;
         _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
-        _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
+        frame = _serverStatusBar.frame;
+        frame.origin.x = 0;
+        frame.size.width = _eventsView.view.frame.size.width;
+
+        _serverStatusBar.frame = frame;
         [self.slidingViewController updateUnderLeftLayout];
         [self.slidingViewController updateUnderRightLayout];
-    } else {
-        _eventsView.tableView.scrollIndicatorInsets = _eventsView.tableView.contentInset = UIEdgeInsetsMake((([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),0,0,0);
-        if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-            self.navigationItem.leftBarButtonItem = nil;
-            self.navigationItem.rightBarButtonItem = nil;
-            self.slidingViewController.underLeftViewController = nil;
-            self.slidingViewController.underRightViewController = nil;
-            [self addChildViewController:_buffersView];
-            [self addChildViewController:_usersView];
-            _buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,height);
-            _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height);
-            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,0,220,height);
-            _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = _eventsView.tableView.contentInset;
-            _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
-            _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
-            [_buffersView willMoveToParentViewController:self];
-            [_buffersView viewWillAppear:NO];
-            _buffersView.view.hidden = NO;
-            [self.view insertSubview:_buffersView.view atIndex:1];
-            [_usersView willMoveToParentViewController:self];
-            [_usersView viewWillAppear:NO];
-            _usersView.view.hidden = NO;
-            [self.view insertSubview:_usersView.view atIndex:1];
-            _borders.hidden = NO;
-            CGRect frame = _titleView.frame;
-            frame.size.width = [[UIDevice currentDevice] isBigPhone]?450:800;
-            _titleView.frame = frame;
-            frame = _serverStatusBar.frame;
-            frame.origin.x = _buffersView.view.frame.size.width;
-            frame.size.width = _eventsView.view.frame.size.width;
-            _serverStatusBar.frame = frame;
-        } else {
-            _borders.hidden = YES;
-            if(!self.slidingViewController.underLeftViewController)
-                self.slidingViewController.underLeftViewController = _buffersView;
-            if(!self.navigationItem.leftBarButtonItem)
-                self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
-            _buffersView.view.frame = CGRectMake(0,0,220,height);
-            _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsZero;
-            _usersView.view.frame = CGRectMake(0,0,220,height);
-            _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
-            [self.slidingViewController updateUnderLeftLayout];
-            [self.slidingViewController updateUnderRightLayout];
-            _eventsView.view.frame = CGRectMake(0,0,width, height - _bottomBar.frame.size.height);
-            _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
-            CGRect frame = _titleView.frame;
-            frame.size.width = [[UIDevice currentDevice] isBigPhone]?318:500;
-            _titleView.frame = frame;
-            frame = _serverStatusBar.frame;
-            frame.origin.x = 0;
-            frame.size.width = _eventsView.view.frame.size.width;
-            _serverStatusBar.frame = frame;
-        }
     }
     if(duration > 0) {
         _eventsView.view.hidden = YES;

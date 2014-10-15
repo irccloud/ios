@@ -114,21 +114,12 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
     self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController" bundle:nil];
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
-        self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPhone" bundle:nil];
-        self.slideViewController = [[ECSlidingViewController alloc] init];
-        self.slideViewController.view.backgroundColor = [UIColor blackColor];
-        self.slideViewController.topViewController = [[UINavigationController alloc] initWithNavigationBarClass:[NavBarHax class] toolbarClass:nil];
-        [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
-        self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
-    } else {
-        self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController_iPad" bundle:nil];
-        self.slideViewController = [[ECSlidingViewController alloc] init];
-        self.slideViewController.view.backgroundColor = [UIColor blackColor];
-        self.slideViewController.topViewController = [[UINavigationController alloc] initWithNavigationBarClass:[NavBarHax class] toolbarClass:nil];
-        [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
-        self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
-    }
+    self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
+    self.slideViewController = [[ECSlidingViewController alloc] init];
+    self.slideViewController.view.backgroundColor = [UIColor blackColor];
+    self.slideViewController.topViewController = [[UINavigationController alloc] initWithNavigationBarClass:[NavBarHax class] toolbarClass:nil];
+    [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
+    self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
     if(launchOptions && [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]) {
         self.mainViewController.bidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:1] intValue];
         self.mainViewController.eidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:2] doubleValue];

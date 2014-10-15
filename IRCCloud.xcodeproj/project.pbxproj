@@ -107,12 +107,10 @@
 		2236F60716DBCA85007BE535 /* BuffersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60516DBCA85007BE535 /* BuffersTableView.m */; };
 		2236F60B16DBCBC6007BE535 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60916DBCBC6007BE535 /* MainViewController.m */; };
 		2236F60C16DBCBC6007BE535 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60916DBCBC6007BE535 /* MainViewController.m */; };
-		2236F61016DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */; };
-		2236F61116DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */; };
 		2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		2236F63D16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
-		2236F64216DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
-		2236F64316DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
+		2236F64216DC2EF6007BE535 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController.xib */; };
+		2236F64316DC2EF6007BE535 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController.xib */; };
 		2236F64616DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		2236F64716DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
@@ -206,8 +204,7 @@
 		225D978318AA995900065087 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
 		225D978418AA995900065087 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		225D978518AA995900065087 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
-		225D978A18AA995900065087 /* MainViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */; };
-		225D978B18AA995900065087 /* MainViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */; };
+		225D978B18AA995900065087 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController.xib */; };
 		225D978D18AA995900065087 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22D4F9101743F3790095EE8F /* Localizable.strings */; };
 		225D978F18AA995900065087 /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
 		225D979018AA995900065087 /* ARChromeActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017441783434800066E71 /* ARChromeActivity.png */; };
@@ -543,10 +540,9 @@
 		2236F60516DBCA85007BE535 /* BuffersTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BuffersTableView.m; sourceTree = "<group>"; };
 		2236F60816DBCBC6007BE535 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
 		2236F60916DBCBC6007BE535 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
-		2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainViewController_iPhone.xib; path = Classes/MainViewController_iPhone.xib; sourceTree = "<group>"; };
 		2236F63A16DBF3CA007BE535 /* UIColor+IRCCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+IRCCloud.h"; sourceTree = "<group>"; };
 		2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+IRCCloud.m"; sourceTree = "<group>"; };
-		2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainViewController_iPad.xib; path = Classes/MainViewController_iPad.xib; sourceTree = "<group>"; };
+		2236F64116DC2EF5007BE535 /* MainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainViewController.xib; path = Classes/MainViewController.xib; sourceTree = "<group>"; };
 		2236F64416DD138A007BE535 /* UsersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersDataSource.h; sourceTree = "<group>"; };
 		2236F64516DD138B007BE535 /* UsersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersDataSource.m; sourceTree = "<group>"; };
 		2236F64816DD30E0007BE535 /* UsersTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersTableView.h; sourceTree = "<group>"; };
@@ -927,8 +923,7 @@
 				2296E0B719805767002D59E3 /* IRCCloud.entitlements */,
 				2223C6A91768D7150032544B /* ImageViewController.xib */,
 				22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */,
-				2236F60F16DBCD2B007BE535 /* MainViewController_iPhone.xib */,
-				2236F64116DC2EF5007BE535 /* MainViewController_iPad.xib */,
+				2236F64116DC2EF5007BE535 /* MainViewController.xib */,
 				228A05AD16D3DB7B0029769C /* Classes */,
 				228A05B416D3DB930029769C /* Resources */,
 				228A057616D3DABA0029769C /* Supporting Files */,
@@ -1393,8 +1388,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22EEA94E18D0AC08007D5022 /* EnterpriseImages.xcassets in Resources */,
-				225D978A18AA995900065087 /* MainViewController_iPhone.xib in Resources */,
-				225D978B18AA995900065087 /* MainViewController_iPad.xib in Resources */,
+				225D978B18AA995900065087 /* MainViewController.xib in Resources */,
 				22988AAC19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */,
 				1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */,
 				225D978D18AA995900065087 /* Localizable.strings in Resources */,
@@ -1423,8 +1417,7 @@
 			files = (
 				228A057A16D3DABA0029769C /* InfoPlist.strings in Resources */,
 				22988AAB19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */,
-				2236F61016DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */,
-				2236F64216DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */,
+				2236F64216DC2EF6007BE535 /* MainViewController.xib in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
 				2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */,
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,
@@ -1452,8 +1445,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				228A05A116D3DABB0029769C /* InfoPlist.strings in Resources */,
-				2236F61116DBCD2B007BE535 /* MainViewController_iPhone.xib in Resources */,
-				2236F64316DC2EF6007BE535 /* MainViewController_iPad.xib in Resources */,
+				2236F64316DC2EF6007BE535 /* MainViewController.xib in Resources */,
 				22D4F9131743F3790095EE8F /* Localizable.strings in Resources */,
 				2223C6AD1768D7150032544B /* ImageViewController.xib in Resources */,
 			);
