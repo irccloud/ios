@@ -198,4 +198,5 @@ typedef enum {
 -(void)fail;
 -(void)updateBadgeCount;
 -(NSDictionary *)requestPassword:(NSString *)email token:(NSString *)token;
+-(int)resendVerifyEmail;
 @end

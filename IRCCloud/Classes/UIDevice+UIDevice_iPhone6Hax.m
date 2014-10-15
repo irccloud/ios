@@ -8,11 +8,20 @@
 
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 
+BOOL __isBigPhone = NO;
+BOOL __isBigPhone_set = NO;
+
 @implementation UIDevice (UIDevice_iPhone6Hax)
 -(BOOL)isBigPhone {
+    if(__isBigPhone_set)
+        return __isBigPhone;
+    
     if(![[UIScreen mainScreen] respondsToSelector:@selector(nativeScale)])
-        return NO;
+        __isBigPhone = NO;
     else
-        return [self userInterfaceIdiom] == UIUserInterfaceIdiomPhone && [[UIScreen mainScreen] nativeScale] > 2.0f;
+        __isBigPhone = [self userInterfaceIdiom] == UIUserInterfaceIdiomPhone && [[UIScreen mainScreen] nativeScale] > 2.0f;
+    
+    __isBigPhone_set = YES;
+    return __isBigPhone;
 }
 @end

@@ -357,16 +357,29 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(void)saveButtonPressed:(id)sender {
-    UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [spinny startAnimating];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
-    if(_cid == -1) {
-        _reqid = [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text];
+    if([[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] || [_server.text isEqualToString:@"irc.irccloud.com"]) {
+        UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [spinny startAnimating];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+        if(_cid == -1) {
+            _reqid = [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text];
+        } else {
+            _netname = _network.text;
+            if([_netname.lowercaseString isEqualToString:_server.text.lowercaseString])
+                _netname = nil;
+            _reqid = [[NetworkConnection sharedInstance] editServer:_cid hostname:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text];
+        }
     } else {
-        _netname = _network.text;
-        if([_netname.lowercaseString isEqualToString:_server.text.lowercaseString])
-            _netname = nil;
-        _reqid = [[NetworkConnection sharedInstance] editServer:_cid hostname:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text];
+        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Confirm Your Email" message:@"You can't connect to external servers until you confirm your email address.\n\nIf you're still waiting for the email, you can send yourself another confirmation." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send Again", nil];
+        
+        [av show];
+    }
+}
+
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send Again"]) {
+        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+        [av show];
     }
 }
 
