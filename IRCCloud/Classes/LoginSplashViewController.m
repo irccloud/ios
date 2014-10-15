@@ -601,11 +601,7 @@
     activity.hidden = NO;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] requestConfiguration];
-#ifdef DEBUG
         if(result) {
-#else
-        if(result && [[result objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]]) {
-#endif
             if([[result objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
                 enterpriseHint.text = [[result objectForKey:@"enterprise"] objectForKey:@"fullname"];
             if(![[result objectForKey:@"auth_mechanism"] isEqualToString:@"internal"])
