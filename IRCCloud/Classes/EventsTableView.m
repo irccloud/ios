@@ -1426,15 +1426,16 @@ int __timestampWidth;
     if(!_ready || !_buffer)
         return;
 
+    UITableView *tableView = self.tableView;
     NSInteger firstRow = -1;
     NSInteger lastRow = -1;
-    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
+    NSArray *rows = [tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(tableView.bounds, tableView.contentInset)];
     if(rows.count) {
         firstRow = [[rows objectAtIndex:0] row];
         lastRow = [[rows lastObject] row];
     }
     
-    if(self.tableView.tableHeaderView == _headerView && _minEid > 0 && _buffer && _buffer.bid != -1 && (_buffer.scrolledUp || (_data.count && firstRow == 0 && lastRow == _data.count - 1))) {
+    if(tableView.tableHeaderView == _headerView && _minEid > 0 && _buffer && _buffer.bid != -1 && (_buffer.scrolledUp || (_data.count && firstRow == 0 && lastRow == _data.count - 1))) {
         if(!_requestingBacklog && _conn.state == kIRCCloudStateConnected && scrollView.contentOffset.y < _headerView.frame.size.height) {
             NSLog(@"The table scrolled and the loading header became visible, requesting more backlog");
             _requestingBacklog = YES;
@@ -1446,9 +1447,9 @@ int __timestampWidth;
     if(rows.count) {
         if(_data.count) {
             if(lastRow < _data.count)
-                _buffer.savedScrollOffset = self.tableView.contentOffset.y - self.tableView.tableHeaderView.bounds.size.height;
+                _buffer.savedScrollOffset = tableView.contentOffset.y - tableView.tableHeaderView.bounds.size.height;
             
-            if(self.tableView.contentOffset.y >= (self.tableView.contentSize.height - self.tableView.bounds.size.height)) {
+            if(tableView.contentOffset.y >= (tableView.contentSize.height - tableView.bounds.size.height)) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
                 _bottomUnreadView.alpha = 0;
@@ -1458,7 +1459,7 @@ int __timestampWidth;
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
                 _buffer.savedScrollOffset = -1;
-                if(_topUnreadView.alpha == 0)
+                if(_topUnreadView.alpha == 0 && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type])
                     [self _sendHeartbeat];
             } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
                 _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
@@ -1477,8 +1478,8 @@ int __timestampWidth;
                 }
             }
             
-            if(self.tableView.tableHeaderView != _headerView && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && firstRow > 0 && lastRow < _data.count && _conn.state == kIRCCloudStateConnected)
-                self.tableView.tableHeaderView = _headerView;
+            if(tableView.tableHeaderView != _headerView && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && firstRow > 0 && lastRow < _data.count && _conn.state == kIRCCloudStateConnected)
+                tableView.tableHeaderView = _headerView;
         }
     }
 }
