@@ -1801,14 +1801,6 @@
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
-/*-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        [self willAnimateRotationToInterfaceOrientation:(size.width < size.height)?UIInterfaceOrientationPortrait:UIInterfaceOrientationLandscapeLeft duration:context.transitionDuration];
-    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context){
-        [self didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
-    }];
-}*/
-
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     if(duration > 0)
         [self.slidingViewController resetTopView];
@@ -1841,13 +1833,16 @@
         frame.size.width = width;
         frame.size.height = height;
     }
-    self.slidingViewController.view.frame = frame;
+    
+    if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width)
+        self.slidingViewController.view.frame = frame;
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         height -= self.navigationController.navigationBar.frame.size.height;
     } else {
         self.view.autoresizingMask = UIViewAutoresizingNone;
         self.view.frame = CGRectMake(0, [UIApplication sharedApplication].statusBarFrame.size.height, width, height - [UIApplication sharedApplication].statusBarFrame.size.height);
+        self.view.superview.frame = self.view.bounds;
     }
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         height -= [UIApplication sharedApplication].statusBarFrame.size.height;
@@ -1913,8 +1908,10 @@
         frame.size.width = _eventsView.view.frame.size.width;
 
         _serverStatusBar.frame = frame;
-        [self.slidingViewController updateUnderLeftLayout];
-        [self.slidingViewController updateUnderRightLayout];
+        if(_buffersView.view.frame.size.width != 240.0f)
+            [self.slidingViewController updateUnderLeftLayout];
+        if(_usersView.view.frame.size.width != 240.0f)
+            [self.slidingViewController updateUnderRightLayout];
     }
     if(duration > 0) {
         _eventsView.view.hidden = YES;
