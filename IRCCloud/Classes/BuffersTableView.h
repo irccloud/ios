@@ -49,6 +49,9 @@
     UIAlertView *_alertView;
     ServersDataSource *_servers;
     BuffersDataSource *_buffers;
+    
+    UIFont *_boldFont;
+    UIFont *_normalFont;
 }
 @property UIViewController<BuffersTableViewDelegate> *delegate;
 -(void)setBuffer:(Buffer *)buffer;

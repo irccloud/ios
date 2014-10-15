@@ -184,6 +184,21 @@
 }
 
 - (void)refresh {
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+        _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
+    } else {
+        _boldFont = [UIFont boldSystemFontOfSize:16.0f];
+    }
+
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+        _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
+    } else {
+        _normalFont = [UIFont systemFontOfSize:16.0f];
+    }
+
     @synchronized(_data) {
         NSMutableArray *data = [[NSMutableArray alloc] init];
         NSInteger archiveCount = 0;
@@ -822,21 +837,11 @@
         else
             cell.unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
         cell.unreadIndicator.hidden = NO;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-            UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
-            cell.label.font = [UIFont fontWithDescriptor:d size:d.pointSize];
-        } else {
-            cell.label.font = [UIFont boldSystemFontOfSize:16.0f];
-        }
+        cell.label.font = _boldFont;
         cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", unread"];
     } else {
         cell.unreadIndicator.hidden = YES;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-            UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
-            cell.label.font = [UIFont fontWithDescriptor:d size:d.pointSize];
-        } else {
-            cell.label.font = [UIFont systemFontOfSize:16.0f];
-        }
+        cell.label.font = _normalFont;
     }
     if([[row objectForKey:@"highlights"] intValue]) {
         cell.highlights.hidden = NO;

@@ -217,6 +217,15 @@
     if(sectionSizes.count == 0)
         [sectionSizes addObject:@(data.count)];
     
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        _headingFont = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
+        _headingFont = [UIFont fontWithName:_headingFont.fontName size:_headingFont.pointSize * 0.8];
+        _countFont = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
+        _countFont = [UIFont fontWithName:_countFont.fontName size:_countFont.pointSize * 0.8];
+        _userFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        _userFont = [UIFont fontWithName:_userFont.fontName size:_userFont.pointSize * 0.8];
+    }
+    
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         _refreshTimer = nil;
         _data = data;
@@ -315,18 +324,16 @@
     cell.count.textColor = [row objectForKey:@"countColor"];
     if(cell.type == TYPE_HEADING) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-            cell.label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-            cell.label.font = [UIFont fontWithName:cell.label.font.fontName size:cell.label.font.pointSize * 0.8];
-            cell.count.font = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-            cell.count.font = [UIFont fontWithName:cell.count.font.fontName size:cell.count.font.pointSize * 0.8];
-        }
+        if(_headingFont)
+            cell.label.font = _headingFont;
+        
+        if(_countFont)
+            cell.count.font = _countFont;
     } else {
         cell.selectionStyle = UITableViewCellSelectionStyleBlue;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-            cell.label.font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-            cell.label.font = [UIFont fontWithName:cell.label.font.fontName size:cell.label.font.pointSize * 0.8];
-        }
+        
+        if(_userFont)
+            cell.label.font = _userFont;
     }
     if(cell.type == TYPE_HEADING || [[row objectForKey:@"first"] intValue]) {
         cell.border.hidden = YES;
