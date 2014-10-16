@@ -124,10 +124,10 @@
         self.mainViewController.bidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:1] intValue];
         self.mainViewController.eidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:2] doubleValue];
     }
+    [self.mainViewController loadView];
+    [self.mainViewController viewDidLoad];
     NSString *session = [NetworkConnection sharedInstance].session;
     if(session != nil && [session length] > 0) {
-        [self.mainViewController loadView];
-        [self.mainViewController viewDidLoad];
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
             [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
             self.window.backgroundColor = [UIColor whiteColor];
