@@ -1841,6 +1841,9 @@
     if(sbheight)
         height -= sbheight - 20;
     
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7 && sbheight > 20)
+        height += 20;
+    
     if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         frame.size.width = height;
         frame.size.height = width;
