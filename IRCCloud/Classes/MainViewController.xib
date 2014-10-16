@@ -267,9 +267,9 @@
                 <action selector="titleAreaPressed:" destination="-1" eventType="touchUpInside" id="wfX-HT-Fz1"/>
             </connections>
         </view>
-        <view opaque="NO" contentMode="scaleToFill" id="99" userLabel="Title View" customClass="UIControl">
+        <view autoresizesSubviews="NO" opaque="NO" contentMode="scaleToFill" id="99" userLabel="Title View" customClass="UIControl">
             <rect key="frame" x="0.0" y="0.0" width="500" height="40"/>
-            <autoresizingMask key="autoresizingMask"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <imageView hidden="YES" userInteractionEnabled="NO" contentMode="center" image="lock.png" id="108">
                     <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>

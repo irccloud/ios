@@ -1023,6 +1023,8 @@
         _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     }
     
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+        self.slidingViewController.view.autoresizesSubviews = NO;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
 }
@@ -1035,6 +1037,9 @@
     [_doubleTapTimer invalidate];
     _doubleTapTimer = nil;
     _eidToOpen = -1;
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+        self.slidingViewController.view.autoresizesSubviews = YES;
     [self.slidingViewController resetTopView];
 }
 
@@ -1044,6 +1049,9 @@
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+        self.slidingViewController.view.autoresizesSubviews = NO;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -1826,6 +1834,7 @@
         frame.origin.x = 0;
         frame.origin.y = 0;
     }
+    
     if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         frame.size.width = height;
         frame.size.height = width;
@@ -1834,15 +1843,15 @@
         frame.size.height = height;
     }
     
-    if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width)
+    if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width) {
         self.slidingViewController.view.frame = frame;
-    
+        self.navigationController.view.frame = self.slidingViewController.view.bounds;
+    }
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         height -= self.navigationController.navigationBar.frame.size.height;
     } else {
-        self.view.autoresizingMask = UIViewAutoresizingNone;
         self.view.frame = CGRectMake(0, [UIApplication sharedApplication].statusBarFrame.size.height, width, height - [UIApplication sharedApplication].statusBarFrame.size.height);
-        self.view.superview.frame = self.view.bounds;
+        self.view.superview.frame = frame;
     }
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         height -= [UIApplication sharedApplication].statusBarFrame.size.height;
@@ -1958,6 +1967,7 @@
         frame.origin.y = 0;
         [_blur setFrame:frame];
     }
+    
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];
     [self _updateServerStatus];
