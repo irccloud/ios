@@ -1832,8 +1832,14 @@
             frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
     } else {
         frame.origin.x = 0;
-        frame.origin.y = 0;
+        if([UIApplication sharedApplication].statusBarFrame.size.height > 20)
+            frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
     }
+
+    int sbheight = (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8 &&UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height);
+    
+    if(sbheight)
+        height -= sbheight - 20;
     
     if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         frame.size.width = height;
@@ -1847,17 +1853,20 @@
         self.slidingViewController.view.frame = frame;
         self.navigationController.view.frame = self.slidingViewController.view.bounds;
     }
+    
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         height -= self.navigationController.navigationBar.frame.size.height;
     } else {
-        self.view.frame = CGRectMake(0, [UIApplication sharedApplication].statusBarFrame.size.height, width, height - [UIApplication sharedApplication].statusBarFrame.size.height);
+        if([UIApplication sharedApplication].statusBarFrame.size.height > 20)
+            self.view.frame = CGRectMake(0, 0, width, height);
+        else
+            self.view.frame = CGRectMake(0, [UIApplication sharedApplication].statusBarFrame.size.height, width, height);
         self.view.superview.frame = frame;
     }
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-        height -= [UIApplication sharedApplication].statusBarFrame.size.height;
-    else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
-        height -= UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
 
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && sbheight)
+        height -= 20;
+    
     _eventsView.tableView.scrollIndicatorInsets = _eventsView.tableView.contentInset = UIEdgeInsetsMake((([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),0,0,0);
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
         self.navigationItem.leftBarButtonItem = nil;
@@ -1917,10 +1926,8 @@
         frame.size.width = _eventsView.view.frame.size.width;
 
         _serverStatusBar.frame = frame;
-        if(_buffersView.view.frame.size.width != 240.0f)
-            [self.slidingViewController updateUnderLeftLayout];
-        if(_usersView.view.frame.size.width != 240.0f)
-            [self.slidingViewController updateUnderRightLayout];
+        [self.slidingViewController updateUnderLeftLayout];
+        [self.slidingViewController updateUnderRightLayout];
     }
     if(duration > 0) {
         _eventsView.view.hidden = YES;
