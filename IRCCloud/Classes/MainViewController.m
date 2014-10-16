@@ -1895,7 +1895,7 @@
         _borders.hidden = NO;
         CGRect frame = _titleView.frame;
         frame.size.width = [[UIDevice currentDevice] isBigPhone]?450:800;
-        _titleView.frame = frame;
+        _connectingView.frame = _titleView.frame = frame;
         frame = _serverStatusBar.frame;
         frame.origin.x = _buffersView.view.frame.size.width;
         frame.size.width = _eventsView.view.frame.size.width;
@@ -1918,7 +1918,7 @@
         } else {
             frame.size.width = [[UIDevice currentDevice] isBigPhone]?318:500;
         }
-        _titleView.frame = frame;
+        _connectingView.frame = _titleView.frame = frame;
         if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
             _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
         else
