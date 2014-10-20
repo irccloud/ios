@@ -463,6 +463,7 @@
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     _alertView.tag = sender.tag;
     [_alertView textFieldAtIndex:0].placeholder = @"#example";
+    [_alertView textFieldAtIndex:0].text = @"#";
     [_alertView textFieldAtIndex:0].delegate = self;
     [_alertView show];
     [_delegate dismissKeyboard];
