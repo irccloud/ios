@@ -159,7 +159,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     NSDictionary *row = [_networks objectAtIndex:indexPath.row];
     [[cell.textLabel subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     cell.textLabel.clipsToBounds = NO;
-    UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(-2,3,16,16)];
+    UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(1,2.4,16,16)];
     if([[row objectForKey:@"SSL"] boolValue])
         icon.image = [UIImage imageNamed:@"world_shield"];
     else
@@ -172,7 +172,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
      }
 */
     [cell.textLabel addSubview:icon];
-    cell.textLabel.text = [NSString stringWithFormat:@"   %@",[row objectForKey:@"network"]];
+    cell.textLabel.text = [NSString stringWithFormat:@"    %@",[row objectForKey:@"network"]];
     cell.detailTextLabel.text = [row objectForKey:@"host"];
     
     if([_selection isEqualToString:cell.textLabel.text])
