@@ -370,6 +370,10 @@
     }
 }
 
+-(void)popoverPresentationControllerDidDismissPopover:(UIPopoverPresentationController *)popoverPresentationController {
+    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+}
+
 -(IBAction)shareButtonPressed:(id)sender {
     if(NSClassFromString(@"UIActivityViewController")) {
         UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:_imageView.image?@[_url,_imageView.image]:@[_url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
@@ -379,7 +383,13 @@
                                                                                                                                                                                                                                                                                                                                          @"irccloud://"
 #endif
                                                                                                                                                                                                                                                                                                                                          ]]:[[TUSafariActivity alloc] init]]];
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+            activityController.popoverPresentationController.delegate = self;
+            activityController.popoverPresentationController.barButtonItem = sender;
+        }
         [self presentViewController:activityController animated:YES completion:nil];
+        [_hideTimer invalidate];
+        _hideTimer = nil;
     } else {
         UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Copy To Clipboard", @"Share on Twitter", ([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?@"Open In Chrome":@"Open In Safari",nil];
         [sheet showFromToolbar:_toolbar];
