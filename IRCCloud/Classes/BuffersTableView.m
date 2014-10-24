@@ -184,21 +184,6 @@
 }
 
 - (void)refresh {
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
-        _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
-    } else {
-        _boldFont = [UIFont boldSystemFontOfSize:16.0f];
-    }
-
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
-        _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
-    } else {
-        _normalFont = [UIFont systemFontOfSize:16.0f];
-    }
-
     @synchronized(_data) {
         NSMutableArray *data = [[NSMutableArray alloc] init];
         NSInteger archiveCount = 0;
@@ -380,6 +365,19 @@
           }];
 #endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+                UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+                _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
+            } else {
+                _boldFont = [UIFont boldSystemFontOfSize:16.0f];
+            }
+            
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+                UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+                _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
+            } else {
+                _normalFont = [UIFont systemFontOfSize:16.0f];
+            }
             if(data.count <= 1) {
                 CLS_LOG(@"The buffer list doesn't have any buffers: %@", data);
                 CLS_LOG(@"I should have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
@@ -499,6 +497,20 @@
     [super viewDidLoad];
     self.tableView.scrollsToTop = YES;
 
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+        _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
+    } else {
+        _boldFont = [UIFont boldSystemFontOfSize:16.0f];
+    }
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+        _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
+    } else {
+        _normalFont = [UIFont systemFontOfSize:16.0f];
+    }
+    
     UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
