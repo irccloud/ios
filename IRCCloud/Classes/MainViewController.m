@@ -1893,9 +1893,6 @@
         _usersView.view.hidden = NO;
         [self.view insertSubview:_usersView.view atIndex:1];
         _borders.hidden = NO;
-        CGRect frame = _titleView.frame;
-        frame.size.width = [[UIDevice currentDevice] isBigPhone]?450:800;
-        _connectingView.frame = _titleView.frame = frame;
         frame = _serverStatusBar.frame;
         frame.origin.x = _buffersView.view.frame.size.width;
         frame.size.width = _eventsView.view.frame.size.width;
@@ -1910,15 +1907,6 @@
         _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
         _eventsView.view.frame = CGRectMake(0,0,width, height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
-        CGRect frame = _titleView.frame;
-        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
-            frame.size.width = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?364:204;
-            frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
-            _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
-        } else {
-            frame.size.width = [[UIDevice currentDevice] isBigPhone]?318:500;
-        }
-        _connectingView.frame = _titleView.frame = frame;
         if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
             _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
         else
@@ -1977,6 +1965,16 @@
         frame.origin.y = 0;
         [_blur setFrame:frame];
     }
+    
+    frame = _titleView.frame;
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
+        frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
+        _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
+    }
+    frame.size.width = width - 128;
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
+        frame.size.width -= _buffersView.tableView.frame.size.width;
+    _connectingView.frame = _titleView.frame = frame;
     
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];
