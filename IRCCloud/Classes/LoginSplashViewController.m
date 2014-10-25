@@ -294,7 +294,7 @@
     name.frame = CGRectMake(left, 16, 288, 39);
     host.frame = CGRectMake(left, 16, 288, 39);
     password.frame = CGRectMake(left, 16 + ((offset + 1) * 39), 288, 38);
-    OnePassword.frame = CGRectMake(password.frame.origin.x + password.frame.size.width - 32, password.frame.origin.y, 27, password.frame.size.height);
+    OnePassword.frame = CGRectMake(password.frame.origin.x + password.frame.size.width - 48, password.frame.origin.y, 48, password.frame.size.height);
     hostHint.frame = CGRectMake(left, 16 + 39, 288, 32);
     next.frame = CGRectMake(left, 16 + 39 + 32, 288, 40);
     login.frame = signup.frame = CGRectMake(left, 16 + ((offset + 2) * 39) + 15, 288, 40);
