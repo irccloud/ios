@@ -1364,7 +1364,12 @@
         frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
         _eventsView.bottomUnreadView.frame = frame;
         _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
-        _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
+        if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top)) {
+            if(diff > 0 || _buffer.scrolledUp)
+                _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
+            else if([[UIDevice currentDevice].systemVersion isEqualToString:@"8.1"]) //The last line seems to get eaten when the table is fully scrolled down on iOS 8.1
+                _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + abs(diff));
+        }
     }
 }
 
