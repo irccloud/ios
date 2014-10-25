@@ -403,6 +403,7 @@ NSLock *__parserLock = nil;
                    @"stat_user": ^(IRCCloudJSONObject *object) {
                        _userInfo = object.dictionary;
                        _prefs = nil;
+                       [[EventsDataSource sharedInstance] clearFormattingCache];
 #ifndef EXTENSION
                        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
                            [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
@@ -859,7 +860,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     if(reachable == kIRCCloudReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0 && [[NetworkConnection sharedInstance].session length]) {
         CLS_LOG(@"IRCCloud server became reachable, connecting");
-        state = kIRCCloudStateDisconnected;
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(_connect) withObject:nil waitUntilDone:YES];
     } else if(reachable == kIRCCloudUnreachable && state == kIRCCloudStateConnected) {
         CLS_LOG(@"IRCCloud server became unreachable, disconnecting");
@@ -1267,11 +1267,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         
         if(self.session.length < 1) {
             CLS_LOG(@"Not connecting, no session");
-            return;
-        }
-        
-        if(_state == kIRCCloudStateConnecting) {
-            CLS_LOG(@"Ignoring duplicate connection request");
             return;
         }
         
