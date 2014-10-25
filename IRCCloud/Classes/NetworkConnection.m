@@ -859,6 +859,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     if(reachable == kIRCCloudReachable && state == kIRCCloudStateDisconnected && [NetworkConnection sharedInstance].reconnectTimestamp != 0 && [[NetworkConnection sharedInstance].session length]) {
         CLS_LOG(@"IRCCloud server became reachable, connecting");
+        state = kIRCCloudStateDisconnected;
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(_connect) withObject:nil waitUntilDone:YES];
     } else if(reachable == kIRCCloudUnreachable && state == kIRCCloudStateConnected) {
         CLS_LOG(@"IRCCloud server became unreachable, disconnecting");

@@ -402,8 +402,10 @@
     
     if(_movedToBackground) {
         _movedToBackground = NO;
-        [ColorFormatter clearFontCache];
-        [[EventsDataSource sharedInstance] clearFormattingCache];
+        if([ColorFormatter shouldClearFontCache]) {
+            [ColorFormatter clearFontCache];
+            [[EventsDataSource sharedInstance] clearFormattingCache];
+        }
         _conn.reconnectTimestamp = -1;
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
             [UIApplication sharedApplication].applicationIconBadgeNumber = 1;

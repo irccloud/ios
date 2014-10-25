@@ -28,11 +28,31 @@ CTFontRef arrowFont;
 UIFont *timestampFont;
 NSDictionary *emojiMap;
 NSDictionary *quotes;
+float ColorFormatterCachedFontSize = 0.0f;
 
 @implementation ColorFormatter
 
++(BOOL)shouldClearFontCache {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
+        return NO;
+    } else {
+        UIFontDescriptor *bodyFontDesciptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
+        return ColorFormatterCachedFontSize != bodyFontDesciptor.pointSize;
+    }
+}
+
 +(void)clearFontCache {
-    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = nil;
+    CLS_LOG(@"Clearing font cache");
+    CFRelease(Courier);
+    CFRelease(CourierBold);
+    CFRelease(CourierBoldOblique);
+    CFRelease(CourierOblique);
+    CFRelease(Helvetica);
+    CFRelease(HelveticaBold);
+    CFRelease(HelveticaBoldOblique);
+    CFRelease(HelveticaOblique);
+    CFRelease(arrowFont);
+    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = arrowFont = nil;
     timestampFont = nil;
 }
 
@@ -1193,6 +1213,7 @@ NSDictionary *quotes;
             HelveticaBold = CTFontCreateWithName((CFStringRef)[boldBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldBodyFontDescriptor.pointSize * 0.8, NULL);
             HelveticaOblique = CTFontCreateWithName((CFStringRef)[italicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], italicBodyFontDescriptor.pointSize * 0.8, NULL);
             HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)[boldItalicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldItalicBodyFontDescriptor.pointSize * 0.8, NULL);
+            ColorFormatterCachedFontSize = bodyFontDesciptor.pointSize;
         }
     }
     
