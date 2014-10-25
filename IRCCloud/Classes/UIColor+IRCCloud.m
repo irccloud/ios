@@ -22,91 +22,178 @@ UIImage *__newMsgsBackgroundImage;
 
 @implementation UIColor (IRCCloud)
 +(UIColor *)backgroundBlueColor {
-    return [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
+    return c;
 }
 +(UIColor *)selectedBlueColor {
-    return [UIColor colorWithRed:0.322 green:0.49 blue:1 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.322 green:0.49 blue:1 alpha:1];
+    return c;
 }
 +(UIColor *)blueBorderColor {
-    return [UIColor colorWithRed:0.753 green:0.824 blue:1 alpha:1]; /*#c0d2ff*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.753 green:0.824 blue:1 alpha:1]; /*#c0d2ff*/
+    return c;
 }
 +(UIColor *)ownersGroupColor {
-    return [UIColor colorWithRed:1 green:1 blue:0.82 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:1 green:1 blue:0.82 alpha:1];
+    return c;
 }
 +(UIColor *)adminsGroupColor {
-    return [UIColor colorWithRed:0.929 green:0.8 blue:1 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.929 green:0.8 blue:1 alpha:1];
+    return c;
 }
 +(UIColor *)opsGroupColor {
-    return [UIColor colorWithRed:0.996 green:0.949 blue:0.949 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.996 green:0.949 blue:0.949 alpha:1];
+    return c;
 }
 +(UIColor *)halfopsGroupColor {
-    return [UIColor colorWithRed:0.996 green:0.929 blue:0.855 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.996 green:0.929 blue:0.855 alpha:1];
+    return c;
 }
 +(UIColor *)voicedGroupColor {
-    return [UIColor colorWithRed:0.957 green:1 blue:0.929 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.957 green:1 blue:0.929 alpha:1];
+    return c;
 }
 +(UIColor *)ownersHeadingColor {
-    return [UIColor colorWithRed:0.906 green:0.667 blue:0 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.906 green:0.667 blue:0 alpha:1];
+    return c;
 }
 +(UIColor *)adminsHeadingColor {
-    return [UIColor colorWithRed:0.396 green:0 blue:0.647 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.396 green:0 blue:0.647 alpha:1];
+    return c;
 }
 +(UIColor *)opsHeadingColor {
-    return [UIColor colorWithRed:0.729 green:0.09 blue:0.098 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.729 green:0.09 blue:0.098 alpha:1];
+    return c;
 }
 +(UIColor *)halfopsHeadingColor {
-    return [UIColor colorWithRed:0.71 green:0.349 blue:0 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.71 green:0.349 blue:0 alpha:1];
+    return c;
 }
 +(UIColor *)voicedHeadingColor {
-    return [UIColor colorWithRed:0.145 green:0.694 blue:0 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.145 green:0.694 blue:0 alpha:1];
+    return c;
 }
 +(UIColor *)membersHeadingColor {
-    return [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+    return c;
 }
 +(UIColor *)ownersBorderColor {
-    return [UIColor colorWithRed:0.996 green:0.89 blue:0.455 alpha:1]; /*#fee374*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.996 green:0.89 blue:0.455 alpha:1]; /*#fee374*/
+    return c;
 }
 +(UIColor *)ownersLightColor {
-    return [UIColor colorWithRed:0.996 green:0.847 blue:0.361 alpha:1]; /*#fed85c*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.996 green:0.847 blue:0.361 alpha:1]; /*#fed85c*/
+    return c;
 }
 +(UIColor *)adminsBorderColor {
-    return [UIColor colorWithRed:0.776 green:0.616 blue:1 alpha:1]; /*#c69dff*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.776 green:0.616 blue:1 alpha:1]; /*#c69dff*/
+    return c;
 }
 +(UIColor *)adminsLightColor {
-    return [UIColor colorWithRed:0.71 green:0.502 blue:1 alpha:1]; /*#b580ff*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.71 green:0.502 blue:1 alpha:1]; /*#b580ff*/
+    return c;
 }
 +(UIColor *)opsBorderColor {
-    return [UIColor colorWithRed:0.98 green:0.788 blue:0.796 alpha:1]; /*#fac9cb*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.98 green:0.788 blue:0.796 alpha:1]; /*#fac9cb*/
+    return c;
 }
 +(UIColor *)opsLightColor {
-    return [UIColor colorWithRed:0.988 green:0.678 blue:0.686 alpha:1]; /*#fcadaf*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.988 green:0.678 blue:0.686 alpha:1]; /*#fcadaf*/
+    return c;
 }
 +(UIColor *)halfopsBorderColor {
-    return [UIColor colorWithRed:0.969 green:0.843 blue:0.671 alpha:1]; /*#f7d7ab*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.969 green:0.843 blue:0.671 alpha:1]; /*#f7d7ab*/
+    return c;
 }
 +(UIColor *)halfopsLightColor {
-    return [UIColor colorWithRed:0.992 green:0.8 blue:0.604 alpha:1]; /*#fdcc9a*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.992 green:0.8 blue:0.604 alpha:1]; /*#fdcc9a*/
+    return c;
 }
 +(UIColor *)voicedBorderColor {
-    return [UIColor colorWithRed:0.557 green:0.992 blue:0.537 alpha:1]; /*#8efd89*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.557 green:0.992 blue:0.537 alpha:1]; /*#8efd89*/
+    return c;
 }
 +(UIColor *)voicedLightColor {
-    return [UIColor colorWithRed:0.62 green:0.922 blue:0.29 alpha:1]; /*#9eeb4a*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.62 green:0.922 blue:0.29 alpha:1]; /*#9eeb4a*/
+    return c;
 }
 +(UIColor *)timestampColor {
-    return [UIColor colorWithRed:0.667 green:0.667 blue:0.667 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.667 green:0.667 blue:0.667 alpha:1];
+    return c;
 }
 +(UIColor *)darkBlueColor {
-    return [UIColor colorWithRed:0.094 green:0.247 blue:0.553 alpha:1.0]; /*#183f8d*/
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.094 green:0.247 blue:0.553 alpha:1.0]; /*#183f8d*/
+    return c;
 }
 +(UIColor *)networkErrorBackgroundColor {
-    return [UIColor colorWithRed:0.973 green:0.875 blue:0.149 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.973 green:0.875 blue:0.149 alpha:1];
+    return c;
 }
 +(UIColor *)networkErrorColor {
-    return [UIColor colorWithRed:0.388 green:0.157 blue:0 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.388 green:0.157 blue:0 alpha:1];
+    return c;
 }
 +(UIColor *)bufferBlueColor {
-    return [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+    return c;
 }
 +(UIColor *) colorFromHexString:(NSString *)hexString {
     //From: http://stackoverflow.com/a/3805354
@@ -170,22 +257,40 @@ UIImage *__newMsgsBackgroundImage;
     return nil;
 }
 +(UIColor *)errorBackgroundColor {
-    return [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
+    return c;
 }
 +(UIColor *)highlightBackgroundColor {
-    return [UIColor colorWithRed:0.753 green:0.859 blue:1 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.753 green:0.859 blue:1 alpha:1];
+    return c;
 }
 +(UIColor *)statusBackgroundColor {
-    return [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
+    return c;
 }
 +(UIColor *)selfBackgroundColor {
-    return [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
+    return c;
 }
 +(UIColor *)noticeBackgroundColor {
-    return [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
+    return c;
 }
 +(UIColor *)highlightTimestampColor {
-    return [UIColor colorWithRed:0.376 green:0 blue:0 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.376 green:0 blue:0 alpha:1];
+    return c;
 }
 +(UIColor *)timestampBackgroundColor {
     if(!__timestampBackgroundImage) {
@@ -233,24 +338,45 @@ UIImage *__newMsgsBackgroundImage;
     return [UIColor colorWithPatternImage:__newMsgsBackgroundImage];
 }
 +(UIColor *)collapsedRowBackgroundColor {
-    return [UIColor colorWithRed:0.961 green:0.961 blue:0.961 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.961 green:0.961 blue:0.961 alpha:1];
+    return c;
 }
 +(UIColor *)collapsedHeadingBackgroundColor {
-    return [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
+    return c;
 }
 +(UIColor *)navBarColor {
-    return [UIColor colorWithRed:242.0/255.0 green:247.0/255.0 blue:252.0/255.0 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:242.0/255.0 green:247.0/255.0 blue:252.0/255.0 alpha:1];
+    return c;
 }
 +(UIColor *)lightLinkColor {
-    return [UIColor colorWithRed:0.612 green:0.78 blue:1 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.612 green:0.78 blue:1 alpha:1];
+    return c;
 }
 +(UIColor *)unreadBorderColor {
-    return [UIColor colorWithRed:0.071 green:0.243 blue:0.573 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.071 green:0.243 blue:0.573 alpha:1];
+    return c;
 }
 +(UIColor *)highlightBorderColor {
-    return [UIColor colorWithRed:0.824 green:0 blue:0.016 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.824 green:0 blue:0.016 alpha:1];
+    return c;
 }
 +(UIColor *)networkErrorBorderColor{
-    return [UIColor colorWithRed:0.859 green:0.702 blue:0 alpha:1];
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.859 green:0.702 blue:0 alpha:1];
+    return c;
 }
 @end
