@@ -1106,8 +1106,10 @@
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 [self presentViewController:nc animated:YES completion:nil];
                 return;
+#ifndef APPSTORE
             } else if([_message.text isEqualToString:@"/crash"]) {
                 [[Crashlytics sharedInstance] crash];
+#endif
             }
             
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
