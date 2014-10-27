@@ -1944,18 +1944,6 @@
     _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
     _nickCompletionView.layer.cornerRadius = 5;
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        frame = _connectingProgress.frame;
-        frame.origin.x = 0;
-        frame.origin.y = self.navigationController.navigationBar.frame.size.height - frame.size.height;
-        frame.size.width = self.navigationController.navigationBar.frame.size.width;
-        _connectingProgress.frame = frame;
-        frame = _connectingStatus.frame;
-        frame.origin.y = 0;
-        frame.size.height = _connectingView.frame.size.height;
-        _connectingStatus.frame = frame;
-    }
-
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
         frame = self.navigationController.navigationBar.frame;
         frame.origin.x = _buffersView.tableView.frame.size.width + 1;
@@ -1980,6 +1968,17 @@
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
         frame.size.width -= _buffersView.tableView.frame.size.width;
     _connectingView.frame = _titleView.frame = frame;
+    _connectingView.center = _titleView.center = CGPointMake(self.navigationController.navigationBar.center.x, _titleView.center.y);
+
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        frame = _connectingProgress.frame;
+        frame.origin.x = 0;
+        frame.origin.y = self.navigationController.navigationBar.frame.size.height - frame.size.height;
+        frame.size.width = self.navigationController.navigationBar.frame.size.width;
+        _connectingProgress.frame = frame;
+        _connectingStatus.frame = _connectingView.bounds;
+    }
+    
     
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];
