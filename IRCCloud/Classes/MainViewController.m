@@ -621,7 +621,14 @@
                     [self bufferSelected:-1];
                     [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
                 } else if([[o objectForKey:@"message"] isEqualToString:@"set_shard"]) {
+                    if([o objectForKey:@"websocket_host"])
+                        IRCCLOUD_HOST = [o objectForKey:@"websocket_host"];
+                    if([o objectForKey:@"websocket_path"])
+                        IRCCLOUD_PATH = [o objectForKey:@"websocket_path"];
                     [NetworkConnection sharedInstance].session = [o objectForKey:@"cookie"];
+                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
                     [[NetworkConnection sharedInstance] connect:NO];
                 } else {
                     CLS_LOG(@"Got an error, reconnecting: %@", o);
