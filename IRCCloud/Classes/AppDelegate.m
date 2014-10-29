@@ -515,19 +515,21 @@
                     imageUploadCompletionHandler();
                 }
             } else {
-                Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
-                if(b) {
-                    if(b.draft.length)
-                        b.draft = [b.draft stringByAppendingFormat:@" %@",link];
-                    else
-                        b.draft = link;
+                if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+                    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
+                    if(b) {
+                        if(b.draft.length)
+                            b.draft = [b.draft stringByAppendingFormat:@" %@",link];
+                        else
+                            b.draft = link;
+                    }
+                    UILocalNotification *alert = [[UILocalNotification alloc] init];
+                    alert.fireDate = [NSDate date];
+                    alert.alertBody = @"Your image has been uploaded and is ready to send";
+                    alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
+                    alert.soundName = @"a.caf";
+                    [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                 }
-                UILocalNotification *alert = [[UILocalNotification alloc] init];
-                alert.fireDate = [NSDate date];
-                alert.alertBody = @"Your image has been uploaded and is ready to send";
-                alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                alert.soundName = @"a.caf";
-                [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                 imageUploadCompletionHandler();
             }
         }

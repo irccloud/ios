@@ -2639,12 +2639,14 @@
                 }
             }
         }
-        UILocalNotification *alert = [[UILocalNotification alloc] init];
-        alert.fireDate = [NSDate date];
-        alert.alertBody = @"Your image has been uploaded and is ready to send";
-        alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-        alert.soundName = @"a.caf";
-        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+        if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+            UILocalNotification *alert = [[UILocalNotification alloc] init];
+            alert.fireDate = [NSDate date];
+            alert.alertBody = @"Your image has been uploaded and is ready to send";
+            alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
+            alert.soundName = @"a.caf";
+            [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+        }
     } else {
         CLS_LOG(@"imgur upload failed: %@", d);
         [self imageUploadDidFail];

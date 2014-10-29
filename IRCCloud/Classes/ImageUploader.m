@@ -338,8 +338,12 @@
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
-    if(error)
+    if(error) {
         CLS_LOG(@"Upload error: %@", error);
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [_delegate imageUploadDidFail];
+        }];
+    }
     [session finishTasksAndInvalidate];
 }
 @end
