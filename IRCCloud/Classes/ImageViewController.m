@@ -347,6 +347,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
+    [doubleTap setNumberOfTapsRequired:2];
+    [_scrollView addGestureRecognizer:doubleTap];
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
@@ -354,6 +358,23 @@
 
 -(void)viewDidUnload {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+//From: http://stackoverflow.com/a/19146512
+- (void)doubleTap:(UITapGestureRecognizer*)recognizer {
+    if (_scrollView.zoomScale > _scrollView.minimumZoomScale) {
+        [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:YES];
+    } else {
+        CGPoint touch = [recognizer locationInView:_imageView];
+        
+        CGFloat w = _scrollView.bounds.size.width;
+        CGFloat h = _scrollView.bounds.size.height;
+        CGFloat x = touch.x-(w/2.0);
+        CGFloat y = touch.y-(h/2.0);
+        
+        CGRect rectTozoom=CGRectMake(x, y, w, h);
+        [_scrollView zoomToRect:rectTozoom animated:YES];
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
