@@ -357,29 +357,16 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(void)saveButtonPressed:(id)sender {
-    if([NetworkConnection sharedInstance].userInfo == nil || [[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] == nil || [[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] || [_server.text isEqualToString:@"irc.irccloud.com"]) {
-        UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        [spinny startAnimating];
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
-        if(_cid == -1) {
-            _reqid = [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text];
-        } else {
-            _netname = _network.text;
-            if([_netname.lowercaseString isEqualToString:_server.text.lowercaseString])
-                _netname = nil;
-            _reqid = [[NetworkConnection sharedInstance] editServer:_cid hostname:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text];
-        }
+    UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [spinny startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+    if(_cid == -1) {
+        _reqid = [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text];
     } else {
-        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Confirm Your Email" message:@"You can't connect to external servers until you confirm your email address.\n\nIf you're still waiting for the email, you can send yourself another confirmation." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Send Again", nil];
-        
-        [av show];
-    }
-}
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    if([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Send Again"]) {
-        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-        [av show];
+        _netname = _network.text;
+        if([_netname.lowercaseString isEqualToString:_server.text.lowercaseString])
+            _netname = nil;
+        _reqid = [[NetworkConnection sharedInstance] editServer:_cid hostname:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text];
     }
 }
 
@@ -529,6 +516,11 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if(touch.view.tag == 1) {
+        [[NetworkConnection sharedInstance] resendVerifyEmail];
+        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+        [av show];
+    }
     return ![touch.view isKindOfClass:[UIControl class]];
 }
 
@@ -685,6 +677,20 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _channels.text = @"";
     _channels.backgroundColor = [UIColor clearColor];
     _channels.delegate = self;
+    
+    if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] == 0) {
+        UILabel *unverified = [[UILabel alloc] init];
+        unverified.textAlignment = UITextAlignmentCenter;
+        unverified.numberOfLines = 0;
+        unverified.textColor = [UIColor grayColor];
+        unverified.text = @"You can't connect to external servers until you confirm your email address.\n\nIf you're still waiting for the email, you can tap here to send yourself another confirmation.";
+        unverified.tag = 1;
+        unverified.userInteractionEnabled = YES;
+        CGSize size = [unverified sizeThatFits:self.tableView.bounds.size];
+        unverified.frame = CGRectMake(0,0,self.tableView.bounds.size.width,size.height + 12);
+
+        self.tableView.tableHeaderView = unverified;
+    }
     
     [self refresh];
 }
