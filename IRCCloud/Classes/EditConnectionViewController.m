@@ -357,7 +357,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(void)saveButtonPressed:(id)sender {
-    if([[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] || [_server.text isEqualToString:@"irc.irccloud.com"]) {
+    if([NetworkConnection sharedInstance].userInfo == nil || [[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] == nil || [[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] || [_server.text isEqualToString:@"irc.irccloud.com"]) {
         UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         [spinny startAnimating];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
