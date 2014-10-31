@@ -189,6 +189,9 @@ int __timestampWidth;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogFailed:)
                                                  name:kIRCCloudBacklogFailedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(drawerClosed:)
+                                                 name:ECSlidingViewTopDidReset object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -200,6 +203,10 @@ int __timestampWidth;
     } else {
         _bottomRow = -1;
     }
+}
+
+-(void)drawerClosed:(NSNotification *)n {
+    [self scrollViewDidScroll:self.tableView];
 }
 
 -(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
@@ -293,7 +300,7 @@ int __timestampWidth;
 }
 
 - (void)_sendHeartbeat {
-    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier) {
+    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus]) {
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         NSTimeInterval eid = _buffer.scrolledUpFrom;
         if(eid <= 0) {

@@ -218,6 +218,7 @@ typedef enum {
 
 -(void)updateUnderLeftLayout;
 -(void)updateUnderRightLayout;
+-(BOOL)topViewHasFocus;
 @end
 
 /** UIViewController extension */
