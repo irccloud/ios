@@ -680,6 +680,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] == 0) {
         UILabel *unverified = [[UILabel alloc] init];
+        unverified.backgroundColor = [UIColor clearColor];
         unverified.textAlignment = UITextAlignmentCenter;
         unverified.numberOfLines = 0;
         unverified.textColor = [UIColor grayColor];
