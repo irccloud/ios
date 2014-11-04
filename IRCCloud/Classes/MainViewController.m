@@ -1779,6 +1779,7 @@
         }
         CGRect frame = _serverStatusBar.frame;
         frame.size.width = _eventsView.tableView.frame.size.width;
+        _serverStatus.numberOfLines = 0;
         _serverStatusBar.frame = frame;
         frame = _serverStatus.frame;
         frame.origin.x = 8;
