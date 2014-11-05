@@ -371,6 +371,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(void)cancelButtonPressed:(id)sender {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self.tableView endEditing:YES];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -693,7 +694,15 @@ static NSString * const ServerHasSSLKey = @"ssl";
         self.tableView.tableHeaderView = unverified;
     }
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    
     [self refresh];
+}
+
+-(void)finalize {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
@@ -714,16 +723,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
     // Dispose of any resources that can be recreated.
 }
 
--(void)viewWillAppear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-}
-
--(void)viewWillDisappear:(BOOL)animated {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
 -(void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     IRCCloudJSONObject *o;
@@ -732,7 +731,13 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     switch(event) {
         case kIRCEventUserInfo:
-            [self refresh];
+            if(self.presentingViewController) {
+                [self.tableView endEditing:YES];
+                [self dismissViewControllerAnimated:YES completion:nil];
+                [[NSNotificationCenter defaultCenter] removeObserver:self];
+            } else {
+                [self refresh];
+            }
             break;
         case kIRCEventFailureMsg:
             o = notification.object;
@@ -764,6 +769,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
                 if(self.presentingViewController) {
                     [self.tableView endEditing:YES];
                     [self dismissViewControllerAnimated:YES completion:nil];
+                    [[NSNotificationCenter defaultCenter] removeObserver:self];
                 } else {
                     _cid = [[o objectForKey:@"cid"] intValue];
                 }
@@ -771,8 +777,10 @@ static NSString * const ServerHasSSLKey = @"ssl";
             break;
         case kIRCEventMakeServer:
             s = notification.object;
-            if(s.cid == _cid)
+            if(s.cid == _cid) {
                 [(AppDelegate *)([UIApplication sharedApplication].delegate) showMainView:YES];
+                [[NSNotificationCenter defaultCenter] removeObserver:self];
+            }
             break;
         default:
             break;
