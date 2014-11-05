@@ -121,42 +121,72 @@
     return self;
 }
 
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
+
+    if([title isEqualToString:@"Confirm"]) {
+        UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [spinny startAnimating];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+        
+        _emailreqid = [[NetworkConnection sharedInstance] changeEmail:_email.text password:[alertView textFieldAtIndex:0].text];
+    }
+    
+    _alertView = nil;
+}
+
+-(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
+    if(alertView.alertViewStyle == UIAlertViewStyleSecureTextInput && [alertView textFieldAtIndex:0].text.length == 0)
+        return NO;
+    else
+        return YES;
+}
+
 -(void)saveButtonPressed:(id)sender {
-    UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [spinny startAnimating];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
-    NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[[NetworkConnection sharedInstance] prefs]];
+    [self.tableView endEditing:YES];
     
-    [prefs setObject:@(_24hour.isOn) forKey:@"time-24hr"];
-    [prefs setObject:@(_seconds.isOn) forKey:@"time-seconds"];
-    [prefs setObject:@(_symbols.isOn) forKey:@"mode-showsymbol"];
-    [prefs setObject:@(_colors.isOn) forKey:@"nick-colors"];
-    [prefs setObject:@(!_emocodes.isOn) forKey:@"emoji-disableconvert"];
+    if(sender && [NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"email"] && ![_email.text isEqualToString:[[NetworkConnection sharedInstance].userInfo objectForKey:@"email"]]) {
+        _alertView = [[UIAlertView alloc] initWithTitle:@"Change Your Email Address" message:@"Please enter your current password to confirm this change" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
+        _alertView.alertViewStyle = UIAlertViewStyleSecureTextInput;
+        [_alertView textFieldAtIndex:0].delegate = self;
+        [_alertView show];
+    } else {
+        UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [spinny startAnimating];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+        NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[[NetworkConnection sharedInstance] prefs]];
+        
+        [prefs setObject:@(_24hour.isOn) forKey:@"time-24hr"];
+        [prefs setObject:@(_seconds.isOn) forKey:@"time-seconds"];
+        [prefs setObject:@(_symbols.isOn) forKey:@"mode-showsymbol"];
+        [prefs setObject:@(_colors.isOn) forKey:@"nick-colors"];
+        [prefs setObject:@(!_emocodes.isOn) forKey:@"emoji-disableconvert"];
+        
+        SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+        NSString *json = [writer stringWithObject:prefs];
+        
+        _userinfosaved = NO;
+        _prefssaved = NO;
+        _userinforeqid = [[NetworkConnection sharedInstance] setRealname:_name.text highlights:_highlights.text autoaway:_autoaway.isOn];
+        _prefsreqid = [[NetworkConnection sharedInstance] setPrefs:json];
+        
+        [[NSUserDefaults standardUserDefaults] setBool:_screen.on forKey:@"keepScreenOn"];
+        [[NSUserDefaults standardUserDefaults] setBool:_chrome.on forKey:@"useChrome"];
+        [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
+        [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
+        [[NSUserDefaults standardUserDefaults] setBool:_notificationSound.on forKey:@"notificationSound"];
+        [[NSUserDefaults standardUserDefaults] setBool:_tabletMode.on forKey:@"tabletMode"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     
-    SBJsonWriter *writer = [[SBJsonWriter alloc] init];
-    NSString *json = [writer stringWithObject:prefs];
-    
-    _userinfosaved = NO;
-    _prefssaved = NO;
-    _userinforeqid = [[NetworkConnection sharedInstance] setEmail:_email.text realname:_name.text highlights:_highlights.text autoaway:_autoaway.isOn];
-    _prefsreqid = [[NetworkConnection sharedInstance] setPrefs:json];
-    
-    [[NSUserDefaults standardUserDefaults] setBool:_screen.on forKey:@"keepScreenOn"];
-    [[NSUserDefaults standardUserDefaults] setBool:_chrome.on forKey:@"useChrome"];
-    [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
-    [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
-    [[NSUserDefaults standardUserDefaults] setBool:_notificationSound.on forKey:@"notificationSound"];
-    [[NSUserDefaults standardUserDefaults] setBool:_tabletMode.on forKey:@"tabletMode"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
-        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
-        [d synchronize];
+            [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
+            [d synchronize];
+        }
     }
 }
 
@@ -212,21 +242,30 @@
     
     switch(event) {
         case kIRCEventUserInfo:
-            if(_userinforeqid == 0 && _prefsreqid == 0)
+            if(_userinforeqid == 0 && _prefsreqid == 0 && _emailreqid == 0)
                 [self refresh];
             break;
         case kIRCEventFailureMsg:
             o = notification.object;
             reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _userinforeqid || reqid == _prefsreqid) {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
+            if(reqid == _userinforeqid || reqid == _prefsreqid || reqid == _emailreqid) {
+                if([[o objectForKey:@"message"] isEqualToString:@"oldpassword"]) {
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Incorrect password, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                } else {
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                }
                 self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
             }
             break;
         case kIRCEventSuccess:
             o = notification.object;
             reqid = [[o objectForKey:@"_reqid"] intValue];
+            if(reqid == _emailreqid) {
+                _emailreqid = 0;
+                [self saveButtonPressed:nil];
+            }
             if(reqid == _userinforeqid)
                 _userinfosaved = YES;
             if(reqid == _prefsreqid)
@@ -401,6 +440,10 @@
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    if(_alertView) {
+        [_alertView dismissWithClickedButtonIndex:1 animated:YES];
+        [self alertView:_alertView clickedButtonAtIndex:1];
+    }
     [self.tableView endEditing:YES];
     return NO;
 }

@@ -183,7 +183,7 @@ typedef enum {
 -(int)ignore:(NSString *)mask cid:(int)cid;
 -(int)unignore:(NSString *)mask cid:(int)cid;
 -(int)setPrefs:(NSString *)prefs;
--(int)setEmail:(NSString *)email realname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway;
+-(int)setRealname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway;
 -(int)ns_help_register:(int)cid;
 -(int)setNickservPass:(NSString *)nspass cid:(int)cid;
 -(int)whois:(NSString *)nick server:(NSString *)server cid:(int)cid;
@@ -199,4 +199,5 @@ typedef enum {
 -(void)updateBadgeCount;
 -(NSDictionary *)requestPassword:(NSString *)email token:(NSString *)token;
 -(int)resendVerifyEmail;
+-(int)changeEmail:(NSString *)email password:(NSString *)password;
 @end

@@ -36,8 +36,10 @@
     NSString *_version;
     int _userinforeqid;
     int _prefsreqid;
+    int _emailreqid;
     BOOL _userinfosaved;
     BOOL _prefssaved;
     BOOL _chromeInstalled;
+    UIAlertView *_alertView;
 }
 @end

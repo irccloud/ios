@@ -1207,12 +1207,17 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"set-prefs" args:@{@"prefs":prefs}];
 }
 
--(int)setEmail:(NSString *)email realname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway {
+-(int)setRealname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway {
     return [self _sendRequest:@"user-settings" args:@{
-                                                      @"email":email,
                                                       @"realname":realname,
                                                       @"hwords":highlights,
                                                       @"autoaway":autoaway?@"1":@"0"}];
+}
+
+-(int)changeEmail:(NSString *)email password:(NSString *)password {
+    return [self _sendRequest:@"change-password" args:@{
+                                                      @"email":email,
+                                                      @"password":password}];
 }
 
 -(int)ns_help_register:(int)cid {
