@@ -318,6 +318,10 @@
     NSString *msg = nil;
     NSString *type = nil;
     switch(event) {
+        case kIRCEventSessionDeleted:
+            [self bufferSelected:-1];
+            [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+            break;
         case kIRCEventGlobalMsg:
             [self _updateGlobalMsg];
             break;

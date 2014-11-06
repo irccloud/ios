@@ -297,6 +297,9 @@
         self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
         self.loginSplashViewController.view.alpha = 1;
         self.window.rootViewController = self.loginSplashViewController;
+#ifndef ENTERPRISE
+        [self.loginSplashViewController loginHintPressed:nil];
+#endif
     }];
 }
 

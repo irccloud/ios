@@ -82,6 +82,7 @@ typedef enum {
     kIRCEventReorderConnections,
     kIRCEventChannelTopicIs,
     kIRCEventServerMap,
+    kIRCEventSessionDeleted,
     kIRCEventFailureMsg,
     kIRCEventSuccess,
     kIRCEventAlert

@@ -791,6 +791,10 @@ NSLock *__parserLock = nil;
                            s.order = i + 1;
                        }
                        [self postObject:object forEvent:kIRCEventReorderConnections];
+                   },
+                   @"session_deleted": ^(IRCCloudJSONObject *object) {
+                       [self logout];
+                       [self postObject:object forEvent:kIRCEventSessionDeleted];
                    }
                };
 
@@ -1749,6 +1753,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)logout {
     CLS_LOG(@"Logging out");
+    _reconnectTimestamp = 0;
+    _streamId = nil;
+    _userInfo = @{};
+    [self disconnect];
     [self performSelectorInBackground:@selector(_logout:) withObject:self.session];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"host"];
@@ -1759,9 +1767,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    _reconnectTimestamp = 0;
-    _streamId = nil;
-    _userInfo = @{};
     [self clearPrefs];
     [_servers clear];
     [_buffers clear];
@@ -1774,7 +1779,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [[UIApplication sharedApplication] unregisterForRemoteNotifications];
 #endif
-    [self disconnect];
     [self cancelIdleTimer];
 }
 
