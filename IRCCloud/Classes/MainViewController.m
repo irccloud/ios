@@ -1797,7 +1797,7 @@
         frame.origin.y = _bottomBar.frame.origin.y - frame.size.height;
         _serverStatusBar.frame = frame;
         frame = _eventsView.view.frame;
-        frame.size.height = _serverStatusBar.frame.origin.y + (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height);
+        frame.size.height = _serverStatusBar.frame.origin.y;
         _eventsView.view.frame = frame;
         frame = _eventsView.bottomUnreadView.frame;
         frame.origin.y = _serverStatusBar.frame.origin.y - frame.size.height;
