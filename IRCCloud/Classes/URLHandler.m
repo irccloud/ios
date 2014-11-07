@@ -70,6 +70,10 @@
     } else if([url.scheme isEqualToString:@"spotify"]) {
         if(![[UIApplication sharedApplication] openURL:url])
             [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://open.spotify.com/%@",[[url.absoluteString substringFromIndex:8] stringByReplacingOccurrencesOfString:@":" withString:@"/"]]]];
+    } else if([url.scheme isEqualToString:@"facetime"]) {
+        [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"facetime-prompt%@",[url.absoluteString substringFromIndex:8]]]];
+    } else if([url.scheme isEqualToString:@"tel"]) {
+        [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"telprompt%@",[url.absoluteString substringFromIndex:3]]]];
     } else if([[self class] isImageURL:url]) {
         [self showImage:url];
     } else {

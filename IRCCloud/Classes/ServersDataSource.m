@@ -53,8 +53,6 @@
     encodeObject(_status);
     encodeInt(_ssl);
     encodeObject(_realname);
-    encodeObject(_server_pass);
-    encodeObject(_nickserv_pass);
     encodeObject(_join_commands);
     encodeObject(_fail_info);
     encodeObject(_away);
@@ -82,8 +80,6 @@
         decodeObject(_status);
         decodeInt(_ssl);
         decodeObject(_realname);
-        decodeObject(_server_pass);
-        decodeObject(_nickserv_pass);
         decodeObject(_join_commands);
         decodeObject(_fail_info);
         decodeObject(_away);
