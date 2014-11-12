@@ -318,6 +318,47 @@
     NSString *msg = nil;
     NSString *type = nil;
     switch(event) {
+        case kIRCEventSuccess:
+            o = notification.object;
+            if(_uploadReqid && [[o objectForKey:@"_reqid"] intValue] == _uploadReqid) {
+                if([[o objectForKey:@"success"] intValue]) {
+                    NSString *link = [[o objectForKey:@"file"] objectForKey:@"url"];
+                    Buffer *b = _buffer;
+                    if(_uploadReqBid == _buffer.bid) {
+                        if(_message.text.length == 0) {
+                            _message.text = link;
+                        } else {
+                            if(![_message.text hasSuffix:@" "])
+                                _message.text = [_message.text stringByAppendingString:@" "];
+                            _message.text = [_message.text stringByAppendingString:link];
+                        }
+                    } else {
+                        b = [[BuffersDataSource sharedInstance] getBuffer:_uploadReqBid];
+                        if(b) {
+                            if(b.draft.length == 0) {
+                                b.draft = link;
+                            } else {
+                                if(![b.draft hasSuffix:@" "])
+                                    b.draft = [b.draft stringByAppendingString:@" "];
+                                b.draft = [b.draft stringByAppendingString:link];
+                            }
+                        }
+                    }
+                    if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+                        UILocalNotification *alert = [[UILocalNotification alloc] init];
+                        alert.fireDate = [NSDate date];
+                        alert.alertBody = @"Your image has been uploaded and is ready to send";
+                        alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
+                        alert.soundName = @"a.caf";
+                        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                    }
+                } else {
+                    //TODO: Show an alert
+                }
+                _uploadReqid = -1;
+                [self _hideConnectingView];
+            }
+            break;
         case kIRCEventSessionDeleted:
             [self bufferSelected:-1];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
@@ -2547,6 +2588,21 @@
     }
 }
 
+-(void)_chooseFile {
+    UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[@"public.data"]
+                                                                                                            inMode:UIDocumentPickerModeImport];
+    documentPicker.delegate = self;
+    documentPicker.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self presentViewController:documentPicker animated:YES completion:nil];
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url {
+    FileUploader *u = [[FileUploader alloc] init];
+    u.delegate = self;
+    u.bid = _buffer.bid;
+    [u uploadFile:url];
+}
+
 -(void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
     _popover = nil;
 }
@@ -2576,10 +2632,14 @@
         _connectingActivity.hidden = NO;
         _connectingProgress.progress = 0;
         _connectingProgress.hidden = YES;
-        ImageUploader *u = [[ImageUploader alloc] init];
+        /*ImageUploader *u = [[ImageUploader alloc] init];
         u.delegate = self;
         u.bid = _buffer.bid;
-        [u upload:img];
+        [u upload:img];*/
+        FileUploader *u = [[FileUploader alloc] init];
+        u.delegate = self;
+        u.bid = _buffer.bid;
+        [u uploadImage:img];
     }
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
@@ -2591,6 +2651,30 @@
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
+}
+
+-(void)fileUploadProgress:(float)progress {
+    [_connectingActivity stopAnimating];
+    _connectingActivity.hidden = YES;
+    _connectingProgress.hidden = NO;
+    [_connectingProgress setProgress:progress animated:YES];
+}
+
+-(void)fileUploadDidFail {
+    _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the file. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+    [_alertView show];
+    [self _hideConnectingView];
+}
+
+-(void)fileUploadDidFinish:(NSDictionary *)d bid:(int)bid filename:(NSString *)filename {
+    NSLog(@"Upload finished: %@", d);
+    if([[d objectForKey:@"success"] intValue] == 1) {
+        _uploadReqBid = bid;
+        _uploadReqid = [[NetworkConnection sharedInstance] finalizeUpload:[d objectForKey:@"id"] filename:filename originalFilename:filename];
+    } else {
+        //TODO: Show an alert
+        [self _hideConnectingView];
+    }
 }
 
 -(void)imageUploadProgress:(float)progress {
@@ -2668,7 +2752,7 @@
 
 -(void)cameraButtonPressed:(id)sender {
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Existing", nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Existing", @"Document", nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -2797,6 +2881,10 @@
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+        } else if([action isEqualToString:@"Document"]) {
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
+            [self _chooseFile];
         } else if([action isEqualToString:@"Mark All As Read"]) {
             NSMutableArray *cids = [[NSMutableArray alloc] init];
             NSMutableArray *bids = [[NSMutableArray alloc] init];

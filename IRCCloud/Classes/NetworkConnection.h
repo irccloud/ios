@@ -201,4 +201,5 @@ typedef enum {
 -(NSDictionary *)requestPassword:(NSString *)email token:(NSString *)token;
 -(int)resendVerifyEmail;
 -(int)changeEmail:(NSString *)email password:(NSString *)password;
+-(int)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename;
 @end

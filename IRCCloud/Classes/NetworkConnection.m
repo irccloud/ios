@@ -1267,6 +1267,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"reorder-connections" args:@{@"cids":cids}];
 }
 
+-(int)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename {
+    return [self _sendRequest:@"upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename}];
+}
+
 -(void)connect:(BOOL)notifier {
     @synchronized(self) {
         if(IRCCLOUD_HOST.length < 1) {
