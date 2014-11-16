@@ -239,7 +239,7 @@
 		227FF2A216FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		227FF8231772063F00394114 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF8221772063F00394114 /* SettingsViewController.m */; };
 		2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
-		228876921A113B8A00A7E86C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228876911A113B8A00A7E86C /* CloudKit.framework */; };
+		228876921A113B8A00A7E86C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228876911A113B8A00A7E86C /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -338,6 +338,9 @@
 		22B4287F16D831A800498507 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
 		22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		22C2075C1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
+		22C2075D1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
+		22C2075E1A191BD800EDACA4 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228876911A113B8A00A7E86C /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22C89B5A19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
 		22C89B5B19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
 		22C89B5C19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
@@ -694,6 +697,8 @@
 		22B4288416D846BF00498507 /* IRCCloudJSONObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudJSONObject.h; sourceTree = "<group>"; };
 		22B4288516D846BF00498507 /* IRCCloudJSONObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudJSONObject.m; sourceTree = "<group>"; };
 		22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "ShareExtension Enterprise.entitlements"; sourceTree = "<group>"; };
+		22C2075A1A19125700EDACA4 /* FileMetadataViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileMetadataViewController.h; sourceTree = "<group>"; };
+		22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMetadataViewController.m; sourceTree = "<group>"; };
 		22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
 		22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
 		22D4309E171C663A003C0684 /* IgnoresTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IgnoresTableViewController.h; sourceTree = "<group>"; };
@@ -745,6 +750,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22C2075E1A191BD800EDACA4 /* CloudKit.framework in Frameworks */,
 				2200DB5118BCFA0E00343583 /* QuartzCore.framework in Frameworks */,
 				225D977918AA995900065087 /* AudioToolbox.framework in Frameworks */,
 				225D977A18AA995900065087 /* Twitter.framework in Frameworks */,
@@ -1023,6 +1029,8 @@
 				22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */,
 				223DA90A16DFC626006FF808 /* EventsTableView.h */,
 				223DA90B16DFC626006FF808 /* EventsTableView.m */,
+				22C2075A1A19125700EDACA4 /* FileMetadataViewController.h */,
+				22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */,
 				22D46C651A13A9A900B142F7 /* FileUploader.h */,
 				22D46C661A13A9A900B142F7 /* FileUploader.m */,
 				227FF29F16FA128A00DBE3C5 /* HighlightsCountView.h */,
@@ -1633,6 +1641,7 @@
 				223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				225D976518AA995900065087 /* UIExpandingTextViewInternal.m in Sources */,
 				22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */,
+				22C2075D1A19125700EDACA4 /* FileMetadataViewController.m in Sources */,
 				225D976618AA995900065087 /* EditConnectionViewController.m in Sources */,
 				228E2B8918CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */,
 				225D976718AA995900065087 /* ECSlidingViewController.m in Sources */,
@@ -1713,6 +1722,7 @@
 				223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				22D430A81725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
 				22A363B419D0884D00500478 /* OnePasswordExtension.m in Sources */,
+				22C2075C1A19125700EDACA4 /* FileMetadataViewController.m in Sources */,
 				22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
 				228E2B8718CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */,
 				22B15CFB17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,

@@ -1,10 +1,18 @@
 //
-//  FileUploader.m
-//  IRCCloud
+//  FileUplaoder.m
 //
-//  Created by Sam Steele on 11/10/14.
-//  Copyright (c) 2014 IRCCloud, Ltd. All rights reserved.
+//  Copyright (C) 2014 IRCCloud, Ltd.
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 
 #import "FileUploader.h"
 #import "SBJson.h"
@@ -15,13 +23,64 @@
 
 @implementation FileUploader
 
+-(void)setFilename:(NSString *)filename message:(NSString *)message {
+    _filename = filename;
+    _msg = message;
+    _filenameSet = YES;
+    if(_finished && _id.length) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+        _reqid = [[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename originalFilename:_originalFilename];
+    }
+}
+
+-(void)cancel {
+    _bid = -1;
+    _msg = _filename = _originalFilename = _mimeType = nil;
+    [_connection cancel];
+}
+
+- (void)handleEvent:(NSNotification *)notification {
+    Buffer *b = nil;
+    IRCCloudJSONObject *o = nil;
+    kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
+    switch(event) {
+        case kIRCEventSuccess:
+            o = notification.object;
+            if(_reqid && [[o objectForKey:@"_reqid"] intValue] == _reqid) {
+                b = [[BuffersDataSource sharedInstance] getBuffer:_bid];
+                if(b) {
+                    if(_msg.length)
+                        _msg = [_msg stringByAppendingString:@" "];
+                    else
+                        _msg = @"";
+                    _msg = [_msg stringByAppendingFormat:@"%@", [[o objectForKey:@"file"] objectForKey:@"url"]];
+                    [[NetworkConnection sharedInstance] say:_msg to:b.name cid:b.cid];
+                    [_delegate fileUploadDidFinish];
+                }
+                [[NSNotificationCenter defaultCenter] removeObserver:self];
+            }
+            break;
+        case kIRCEventFailureMsg:
+            o = notification.object;
+            if(_reqid && [[o objectForKey:@"_reqid"] intValue] == _reqid) {
+                [_delegate fileUploadDidFail];
+                [[NSNotificationCenter defaultCenter] removeObserver:self];
+            }
+            break;
+        default:
+            break;
+    }
+}
+
 -(void)uploadFile:(NSURL *)file {
     CFStringRef extension = (__bridge CFStringRef)[file pathExtension];
     CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, extension, NULL);
     _mimeType = CFBridgingRelease(UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType));
+    if(!_mimeType)
+        _mimeType = @"application/octet-stream";
     CFRelease(UTI);
     
-    _filename = [file.pathComponents lastObject];
+    _originalFilename = [file.pathComponents lastObject];
     
     NSData *data = [NSData dataWithContentsOfURL:file];
     [self performSelectorInBackground:@selector(_upload:) withObject:data];
@@ -29,7 +88,7 @@
 
 -(void)uploadImage:(UIImage *)img {
     _mimeType = @"image/jpeg";
-    _filename = [NSString stringWithFormat:@"%li.jpg", time(NULL)];
+    _originalFilename = [NSString stringWithFormat:@"%li.jpg", time(NULL)];
     [self performSelectorInBackground:@selector(_uploadImage:) withObject:img];
 }
 
@@ -194,7 +253,7 @@
     _body = [[NSMutableData alloc] init];
     
     [_body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [_body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"file\"; filename=\"%@\"\r\n", _filename] dataUsingEncoding:NSUTF8StringEncoding]];
+    [_body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"file\"; filename=\"%@\"\r\n", _originalFilename] dataUsingEncoding:NSUTF8StringEncoding]];
     [_body appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n", _mimeType] dataUsingEncoding:NSUTF8StringEncoding]];
     [_body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [_body appendData:file];
@@ -211,6 +270,9 @@
     [request setValue:[NetworkConnection sharedInstance].session forHTTPHeaderField:@"x-irccloud-session"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:_body];
+    
+    if(_metadatadelegate)
+        [_metadatadelegate fileUploadWillUpload:file.length mimeType:_mimeType];
 
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7 || true) {
 
@@ -284,10 +346,22 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
     NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:_response];
-    if(!d) {
+    if(d) {
+        NSLog(@"Upload finished: %@", d);
+        if([[d objectForKey:@"success"] intValue] == 1) {
+            _id = [d objectForKey:@"id"];
+            _finished = YES;
+            if(_filenameSet) {
+                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+                _reqid = [[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename originalFilename:_originalFilename];
+            }
+        } else {
+            [_delegate fileUploadDidFail];
+        }
+    } else {
         NSLog(@"UPLOAD: Invalid JSON response: %@", [[NSString alloc] initWithData:_response encoding:NSUTF8StringEncoding]);
+        [_delegate fileUploadDidFail];
     }
-    [_delegate fileUploadDidFinish:d bid:_bid filename:_filename];
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend {

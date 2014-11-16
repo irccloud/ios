@@ -38,6 +38,7 @@
 #import "config.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "ServerMapTableViewController.h"
+#import "FileMetadataViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -124,10 +125,6 @@
     if(_mentionTip)
         _mentionTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
     
-    self.navigationItem.titleView = _titleView;
-    _connectingProgress.hidden = YES;
-    _connectingProgress.progress = 0;
-
     _cameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     _cameraBtn.contentMode = UIViewContentModeCenter;
     _cameraBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
@@ -236,6 +233,10 @@
         [_connectingActivity removeFromSuperview];
         _connectingStatus.font = [UIFont boldSystemFontOfSize:20];
     }
+    self.navigationItem.titleView = _titleView;
+    _connectingProgress.hidden = YES;
+    _connectingProgress.progress = 0;
+    [self connectivityChanged:nil];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
@@ -318,47 +319,6 @@
     NSString *msg = nil;
     NSString *type = nil;
     switch(event) {
-        case kIRCEventSuccess:
-            o = notification.object;
-            if(_uploadReqid && [[o objectForKey:@"_reqid"] intValue] == _uploadReqid) {
-                if([[o objectForKey:@"success"] intValue]) {
-                    NSString *link = [[o objectForKey:@"file"] objectForKey:@"url"];
-                    Buffer *b = _buffer;
-                    if(_uploadReqBid == _buffer.bid) {
-                        if(_message.text.length == 0) {
-                            _message.text = link;
-                        } else {
-                            if(![_message.text hasSuffix:@" "])
-                                _message.text = [_message.text stringByAppendingString:@" "];
-                            _message.text = [_message.text stringByAppendingString:link];
-                        }
-                    } else {
-                        b = [[BuffersDataSource sharedInstance] getBuffer:_uploadReqBid];
-                        if(b) {
-                            if(b.draft.length == 0) {
-                                b.draft = link;
-                            } else {
-                                if(![b.draft hasSuffix:@" "])
-                                    b.draft = [b.draft stringByAppendingString:@" "];
-                                b.draft = [b.draft stringByAppendingString:link];
-                            }
-                        }
-                    }
-                    if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
-                        UILocalNotification *alert = [[UILocalNotification alloc] init];
-                        alert.fireDate = [NSDate date];
-                        alert.alertBody = @"Your image has been uploaded and is ready to send";
-                        alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                        alert.soundName = @"a.caf";
-                        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                    }
-                } else {
-                    //TODO: Show an alert
-                }
-                _uploadReqid = -1;
-                [self _hideConnectingView];
-            }
-            break;
         case kIRCEventSessionDeleted:
             [self bufferSelected:-1];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
@@ -1059,10 +1019,6 @@
     [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
     [self _updateUnreadIndicator];
     [self.slidingViewController resetTopView];
-    self.navigationItem.titleView = _titleView;
-    _connectingProgress.hidden = YES;
-    _connectingProgress.progress = 0;
-    [self connectivityChanged:nil];
     
     NSString *session = [NetworkConnection sharedInstance].session;
     if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
@@ -2592,15 +2548,38 @@
     UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[@"public.data"]
                                                                                                             inMode:UIDocumentPickerModeImport];
     documentPicker.delegate = self;
-    documentPicker.modalPresentationStyle = UIModalPresentationCurrentContext;
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        documentPicker.modalPresentationStyle = UIModalPresentationFormSheet;
+    else {
+        documentPicker.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+    }
     [self presentViewController:documentPicker animated:YES completion:nil];
 }
 
+-(void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
+    [self _resetStatusBar];
+}
+
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url {
+    [self _showConnectingView];
+    _connectingStatus.text = @"Uploading";
+    [_connectingActivity startAnimating];
+    _connectingActivity.hidden = NO;
+    _connectingProgress.progress = 0;
+    _connectingProgress.hidden = YES;
     FileUploader *u = [[FileUploader alloc] init];
     u.delegate = self;
     u.bid = _buffer.bid;
     [u uploadFile:url];
+    FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self.slidingViewController presentViewController:nc animated:YES completion:nil];
+    [self _resetStatusBar];
 }
 
 -(void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
@@ -2613,12 +2592,7 @@
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    if(_popover)
-        [_popover dismissPopoverAnimated:YES];
-    else
-        [self.slidingViewController dismissModalViewControllerAnimated:YES];
-    [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
-
+    UINavigationController *nc = nil;
     UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
     if(!img)
         img = [info objectForKey:UIImagePickerControllerOriginalImage];
@@ -2633,15 +2607,32 @@
         _connectingProgress.progress = 0;
         _connectingProgress.hidden = YES;
         /*ImageUploader *u = [[ImageUploader alloc] init];
-        u.delegate = self;
-        u.bid = _buffer.bid;
-        [u upload:img];*/
+         u.delegate = self;
+         u.bid = _buffer.bid;
+         [u upload:img];*/
         FileUploader *u = [[FileUploader alloc] init];
         u.delegate = self;
         u.bid = _buffer.bid;
         [u uploadImage:img];
+        FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+        nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     }
     
+    if(_popover) {
+        [_popover dismissPopoverAnimated:YES];
+        if(nc)
+            [self.slidingViewController presentViewController:nc animated:YES completion:nil];
+    } else {
+        [self.slidingViewController dismissViewControllerAnimated:YES completion:^{
+            if(nc)
+                [self.slidingViewController presentViewController:nc animated:YES completion:nil];
+            [self _resetStatusBar];
+        }];
+    }
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
 }
@@ -2666,15 +2657,8 @@
     [self _hideConnectingView];
 }
 
--(void)fileUploadDidFinish:(NSDictionary *)d bid:(int)bid filename:(NSString *)filename {
-    NSLog(@"Upload finished: %@", d);
-    if([[d objectForKey:@"success"] intValue] == 1) {
-        _uploadReqBid = bid;
-        _uploadReqid = [[NetworkConnection sharedInstance] finalizeUpload:[d objectForKey:@"id"] filename:filename originalFilename:filename];
-    } else {
-        //TODO: Show an alert
-        [self _hideConnectingView];
-    }
+-(void)fileUploadDidFinish {
+    [self _hideConnectingView];
 }
 
 -(void)imageUploadProgress:(float)progress {
@@ -2752,7 +2736,15 @@
 
 -(void)cameraButtonPressed:(id)sender {
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Existing", @"Document", nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)?@"Choose Document":nil, nil];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+            [self.view.window addSubview:_landscapeView];
+            [sheet showInView:_landscapeView];
+        } else {
+            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view animated:YES];
+        }
+    } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"Choose Document", nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -2877,11 +2869,11 @@
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
-        } else if([action isEqualToString:@"Choose Existing"]) {
+        } else if([action isEqualToString:@"Choose Photo"]) {
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
-        } else if([action isEqualToString:@"Document"]) {
+        } else if([action isEqualToString:@"Choose Document"]) {
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self _chooseFile];

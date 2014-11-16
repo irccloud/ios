@@ -74,8 +74,6 @@
     UIPopoverController *_popover;
     UIVisualEffectView *_blur;
     NSTimeInterval _lastNotificationTime;
-    int _uploadReqid;
-    int _uploadReqBid;
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;
