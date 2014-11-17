@@ -259,9 +259,9 @@
                 tasks = [[NSMutableDictionary alloc] init];
             
             if(_msg)
-                [tasks setObject:@{@"bid":@(_bid), @"msg":_msg} forKey:session.configuration.identifier];
+                [tasks setObject:@{@"service":@"imgur", @"bid":@(_bid), @"msg":_msg} forKey:session.configuration.identifier];
             else
-                [tasks setObject:@{@"bid":@(_bid)} forKey:session.configuration.identifier];
+                [tasks setObject:@{@"service":@"imgur", @"bid":@(_bid)} forKey:session.configuration.identifier];
 
             [d setObject:tasks forKey:@"uploadtasks"];
             [d synchronize];

@@ -474,15 +474,114 @@
         
         NSDictionary *r = [[[SBJsonParser alloc] init] objectWithData:response];
         if(!r) {
-            CLS_LOG(@"IMGUR: Invalid JSON response: %@", [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding]);
+            CLS_LOG(@"Invalid JSON response: %@", [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding]);
         } else if([[r objectForKey:@"success"] intValue] == 1) {
-            NSString *link = [[[r objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
-            
-            if([dict objectForKey:@"msg"]) {
+            if([[dict objectForKey:@"service"] isEqualToString:@"irccloud"]) {
+                _IRCEventObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudEventNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
+                    Buffer *b = nil;
+                    IRCCloudJSONObject *o = nil;
+                    kIRCEvent event = [[n.userInfo objectForKey:kIRCCloudEventKey] intValue];
+                    switch(event) {
+                        case kIRCEventSuccess:
+                            o = n.object;
+                            if(_finalizeUploadReqid && [[o objectForKey:@"_reqid"] intValue] == _finalizeUploadReqid) {
+                                NSLog(@"IRCCloud upload successful");
+                                b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
+                                if(b) {
+                                    NSString *msg = [dict objectForKey:@"msg"];
+                                    if(msg.length)
+                                        msg = [msg stringByAppendingString:@" "];
+                                    else
+                                        msg = @"";
+                                    msg = [msg stringByAppendingFormat:@"%@", [[o objectForKey:@"file"] objectForKey:@"url"]];
+                                    [[NetworkConnection sharedInstance] say:msg to:b.name cid:b.cid];
+                                    [self.mainViewController fileUploadDidFinish];
+                                    [[NSNotificationCenter defaultCenter] removeObserver:_IRCEventObserver];
+                                    UILocalNotification *alert = [[UILocalNotification alloc] init];
+                                    alert.fireDate = [NSDate date];
+                                    alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
+                                    alert.soundName = @"a.caf";
+                                    [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                                    imageUploadCompletionHandler();
+                                    if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+                                        [_conn disconnect];
+                                }
+                            }
+                            break;
+                        case kIRCEventFailureMsg:
+                            o = n.object;
+                            if(_finalizeUploadReqid && [[o objectForKey:@"_reqid"] intValue] == _finalizeUploadReqid) {
+                                NSLog(@"IRCCloud upload failed");
+                                [self.mainViewController fileUploadDidFail];
+                                [[NSNotificationCenter defaultCenter] removeObserver:_IRCEventObserver];
+                                UILocalNotification *alert = [[UILocalNotification alloc] init];
+                                alert.fireDate = [NSDate date];
+                                alert.alertBody = @"Unable to share image. Please try again shortly.";
+                                alert.soundName = @"a.caf";
+                                [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                                imageUploadCompletionHandler();
+                                if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+                                    [_conn disconnect];
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }];
+                
                 if(_conn.state != kIRCCloudStateConnected) {
                     [[NSNotificationCenter defaultCenter] removeObserver:self];
                     _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
                         [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+                        NSLog(@"Finalizing IRCCloud upload");
+                        _finalizeUploadReqid = [[NetworkConnection sharedInstance] finalizeUpload:[r objectForKey:@"id"] filename:[dict objectForKey:@"filename"] originalFilename:[dict objectForKey:@"original_filename"]];
+                    }];
+                    _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
+                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+                        if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+                            [_conn disconnect];
+                    }];
+                    NSLog(@"Connecting websocket");
+                    [_conn connect:YES];
+                } else {
+                    NSLog(@"Finalizing IRCCloud upload");
+                    _finalizeUploadReqid = [[NetworkConnection sharedInstance] finalizeUpload:[r objectForKey:@"id"] filename:[dict objectForKey:@"filename"] originalFilename:[dict objectForKey:@"original_filename"]];
+                }
+            } else if([[dict objectForKey:@"service"] isEqualToString:@"imgur"]) {
+                NSString *link = [[[r objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
+                
+                if([dict objectForKey:@"msg"]) {
+                    if(_conn.state != kIRCCloudStateConnected) {
+                        [[NSNotificationCenter defaultCenter] removeObserver:self];
+                        _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
+                            [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+                            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
+                            [_conn say:[NSString stringWithFormat:@"%@ %@",[dict objectForKey:@"msg"],link] to:b.name cid:b.cid];
+                            UILocalNotification *alert = [[UILocalNotification alloc] init];
+                            alert.fireDate = [NSDate date];
+                            alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
+                            alert.soundName = @"a.caf";
+                            [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                            imageUploadCompletionHandler();
+                            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+                                [_conn disconnect];
+                        }];
+                        _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
+                            [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+                            [_conn disconnect];
+                            UILocalNotification *alert = [[UILocalNotification alloc] init];
+                            alert.fireDate = [NSDate date];
+                            alert.alertBody = @"Unable to share image. Please try again shortly.";
+                            alert.soundName = @"a.caf";
+                            [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                            imageUploadCompletionHandler();
+                            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+                                [_conn disconnect];
+                        }];
+                        [_conn connect:YES];
+                    } else {
                         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
                         [_conn say:[NSString stringWithFormat:@"%@ %@",[dict objectForKey:@"msg"],link] to:b.name cid:b.cid];
                         UILocalNotification *alert = [[UILocalNotification alloc] init];
@@ -491,49 +590,25 @@
                         alert.soundName = @"a.caf";
                         [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                         imageUploadCompletionHandler();
-                        if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
-                            [_conn disconnect];
-                    }];
-                    _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-                        [_conn disconnect];
+                    }
+                } else {
+                    if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+                        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
+                        if(b) {
+                            if(b.draft.length)
+                                b.draft = [b.draft stringByAppendingFormat:@" %@",link];
+                            else
+                                b.draft = link;
+                        }
                         UILocalNotification *alert = [[UILocalNotification alloc] init];
                         alert.fireDate = [NSDate date];
-                        alert.alertBody = @"Unable to share image. Please try again shortly.";
+                        alert.alertBody = @"Your image has been uploaded and is ready to send";
+                        alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
                         alert.soundName = @"a.caf";
                         [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                        imageUploadCompletionHandler();
-                        if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
-                            [_conn disconnect];
-                    }];
-                    [_conn connect:YES];
-                } else {
-                    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
-                    [_conn say:[NSString stringWithFormat:@"%@ %@",[dict objectForKey:@"msg"],link] to:b.name cid:b.cid];
-                    UILocalNotification *alert = [[UILocalNotification alloc] init];
-                    alert.fireDate = [NSDate date];
-                    alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                    alert.soundName = @"a.caf";
-                    [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                    }
                     imageUploadCompletionHandler();
                 }
-            } else {
-                if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
-                    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
-                    if(b) {
-                        if(b.draft.length)
-                            b.draft = [b.draft stringByAppendingFormat:@" %@",link];
-                        else
-                            b.draft = link;
-                    }
-                    UILocalNotification *alert = [[UILocalNotification alloc] init];
-                    alert.fireDate = [NSDate date];
-                    alert.alertBody = @"Your image has been uploaded and is ready to send";
-                    alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                    alert.soundName = @"a.caf";
-                    [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                }
-                imageUploadCompletionHandler();
             }
         }
     }

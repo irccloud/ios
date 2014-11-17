@@ -10,14 +10,42 @@
 #import "ShareViewController.h"
 #import "BuffersTableView.h"
 
-@interface ShareViewController ()
-
-@end
-
 @implementation ShareViewController
 
 - (void)presentationAnimationDidFinish {
-    if(!_conn.session.length) {
+    if(_conn.session.length) {
+        NSExtensionItem *input = self.extensionContext.inputItems.firstObject;
+        NSExtensionItem *output = [input copy];
+        output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
+        
+        if(output.attachments.count) {
+            NSItemProvider *i = output.attachments.firstObject;
+            
+            NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
+                NSLog(@"Uploading image to IRCCloud");
+                _item = item;
+                [_fileUploader uploadImage:item];
+                if(!_filename)
+                    _filename = _fileUploader.originalFilename;
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self reloadConfigurationItems];
+                    [self validateContent];
+                }];
+            };
+            
+            NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
+                if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
+                    [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                }
+            };
+            
+            if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
+                [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:urlHandler];
+            } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
+                [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+            }
+        }
+    } else {
         UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Not Logged in" message:@"Please login to the IRCCloud app before sharing." preferredStyle:UIAlertControllerStyleAlert];
         [c addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
             [self cancel];
@@ -40,6 +68,8 @@
     IRCCLOUD_PATH = [d objectForKey:@"path"];
     _uploader = [[ImageUploader alloc] init];
     _uploader.delegate = self;
+    _fileUploader = [[FileUploader alloc] init];
+    _fileUploader.delegate = self;
     [[NSUserDefaults standardUserDefaults] setObject:[d objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
     [NetworkConnection sync];
     _conn = [NetworkConnection sharedInstance];
@@ -75,37 +105,46 @@
     output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
 
     if(output.attachments.count) {
-        NSItemProvider *i = output.attachments.firstObject;
-
-        NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
-            NSLog(@"Uploading image");
-            _uploader.bid = _buffer.bid;
-            _uploader.msg = self.contentText;
-            [_uploader upload:item];
+        if(_fileUploader.originalFilename) {
+            NSLog(@"Setting filename, bid, and message for IRCCloud upload");
+            _fileUploader.bid = _buffer.bid;
+            [_fileUploader setFilename:_filename message:self.contentText];
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
             }];
-        };
-        
-        NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
-            if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
-            } else {
-                if(self.contentText.length)
-                    [_conn say:[NSString stringWithFormat:@"%@ [%@]",self.contentText,item.absoluteString] to:_buffer.name cid:_buffer.cid];
-                else
-                    [_conn say:item.absoluteString to:_buffer.name cid:_buffer.cid];
+        } else {
+            NSItemProvider *i = output.attachments.firstObject;
+
+            NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
+                NSLog(@"Uploading image to imgur");
+                _uploader.bid = _buffer.bid;
+                _uploader.msg = self.contentText;
+                [_uploader upload:item];
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
-                    AudioServicesPlaySystemSound(_sound);
                 }];
+            };
+            
+            NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
+                if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
+                    [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                } else {
+                    if(self.contentText.length)
+                        [_conn say:[NSString stringWithFormat:@"%@ [%@]",self.contentText,item.absoluteString] to:_buffer.name cid:_buffer.cid];
+                    else
+                        [_conn say:item.absoluteString to:_buffer.name cid:_buffer.cid];
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+                        AudioServicesPlaySystemSound(_sound);
+                    }];
+                }
+            };
+            
+            if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
+                [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:urlHandler];
+            } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
+                [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
             }
-        };
-        
-        if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
-            [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:urlHandler];
-        } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
-            [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
         }
     } else {
         [_conn say:self.contentText to:_buffer.name cid:_buffer.cid];
@@ -134,7 +173,36 @@
             b.delegate = self;
             [self pushConfigurationViewController:b];
         };
-        return @[bufferConfigItem];
+
+        NSExtensionItem *input = self.extensionContext.inputItems.firstObject;
+        NSExtensionItem *output = [input copy];
+        output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
+        
+        if(output.attachments.count && [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.image"]) {
+            SLComposeSheetConfigurationItem *filenameConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
+            filenameConfigItem.title = @"Filename";
+            if(_filename)
+                filenameConfigItem.value = _filename;
+            else
+                filenameConfigItem.valuePending = YES;
+            
+            filenameConfigItem.tapHandler = ^() {
+                UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Enter a Filename" message:nil preferredStyle:UIAlertControllerStyleAlert];
+                [c addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                    textField.text = _filename;
+                    textField.placeholder = @"Filename";
+                }];
+                [c addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                    _filename = [[c.textFields objectAtIndex:0] text];
+                    [self reloadConfigurationItems];
+                }]];
+                
+                [self presentViewController:c animated:YES completion:nil];
+            };
+            return @[filenameConfigItem, bufferConfigItem];
+        } else {
+            return @[bufferConfigItem];
+        }
     } else {
         return nil;
     }
@@ -156,6 +224,17 @@
 
 -(void)dismissKeyboard {
     
+}
+
+-(void)fileUploadProgress:(float)progress {
+}
+
+-(void)fileUploadDidFail {
+    NSLog(@"File upload failed");
+}
+
+-(void)fileUploadDidFinish {
+    NSLog(@"File upload successful");
 }
 
 -(void)imageUploadProgress:(float)progress {

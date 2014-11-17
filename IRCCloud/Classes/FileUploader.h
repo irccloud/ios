@@ -41,6 +41,7 @@
     NSString *_originalFilename;
     NSString *_filename;
     NSString *_mimeType;
+    NSString *_backgroundID;
 }
 @property NSObject<FileUploaderDelegate> *delegate;
 @property NSObject<FileUploaderMetadataDelegate> *metadatadelegate;

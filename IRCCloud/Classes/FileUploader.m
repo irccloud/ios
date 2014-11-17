@@ -30,6 +30,8 @@
     if(_finished && _id.length) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
         _reqid = [[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename originalFilename:_originalFilename];
+    } else {
+        [self _updateBackgroundUploadMetadata];
     }
 }
 
@@ -237,17 +239,6 @@
 }
 
 -(void)_upload:(NSData *)file {
-    NSUserDefaults *d;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        d = [NSUserDefaults standardUserDefaults];
-    } else {
-#ifdef ENTERPRISE
-        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
-#else
-        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
-#endif
-    }
-
     NSString *boundary = [self boundaryString];
     _response = [[NSMutableData alloc] init];
     _body = [[NSMutableData alloc] init];
@@ -274,7 +265,7 @@
     if(_metadatadelegate)
         [_metadatadelegate fileUploadWillUpload:file.length mimeType:_mimeType];
 
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7 || true) {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
 
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             _connection = [NSURLConnection connectionWithRequest:request delegate:self];
@@ -289,7 +280,7 @@
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-            config = [NSURLSessionConfiguration backgroundSessionConfiguration:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+            config = [NSURLSessionConfiguration backgroundSessionConfiguration:[NSString stringWithFormat:@"com.irccloud.share.file.%li", time(NULL)]];
 #pragma GCC diagnostic pop
         } else {
             config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
@@ -307,21 +298,33 @@
         NSURLSessionTask *task = [session downloadTaskWithRequest:request];
         
         if(session.configuration.identifier) {
-            NSMutableDictionary *tasks = [[d dictionaryForKey:@"fileuploadtasks"] mutableCopy];
-            if(!tasks)
-                tasks = [[NSMutableDictionary alloc] init];
-            
-            if(_msg)
-                [tasks setObject:@{@"bid":@(_bid), @"msg":_msg} forKey:session.configuration.identifier];
-            else
-                [tasks setObject:@{@"bid":@(_bid)} forKey:session.configuration.identifier];
-
-            [d setObject:tasks forKey:@"fileuploadtasks"];
-            [d synchronize];
+            _backgroundID = session.configuration.identifier;
+            [self _updateBackgroundUploadMetadata];
         }
 
         [task resume];
     }
+}
+
+-(void)_updateBackgroundUploadMetadata {
+    NSUserDefaults *d;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+        d = [NSUserDefaults standardUserDefaults];
+    } else {
+#ifdef ENTERPRISE
+        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+    }
+    NSMutableDictionary *tasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
+    if(!tasks)
+        tasks = [[NSMutableDictionary alloc] init];
+    
+    [tasks setObject:@{@"service":@"irccloud", @"bid":@(_bid), @"original_filename":_originalFilename, @"msg":_msg?_msg:@"", @"filename":_filename?_filename:@""} forKey:_backgroundID];
+    
+    [d setObject:tasks forKey:@"uploadtasks"];
+    [d synchronize];
 }
 
 -(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
@@ -382,9 +385,9 @@
         d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
     }
-    NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"fileuploadtasks"] mutableCopy];
+    NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
     [uploadtasks removeObjectForKey:session.configuration.identifier];
-    [d setObject:uploadtasks forKey:@"fileuploadtasks"];
+    [d setObject:uploadtasks forKey:@"uploadtasks"];
     [d synchronize];
 }
 
