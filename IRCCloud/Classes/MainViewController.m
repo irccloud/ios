@@ -633,6 +633,8 @@
                     [NetworkConnection sharedInstance].session = [o objectForKey:@"cookie"];
                     [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                     [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+                    if([IRCCLOUD_PATH isEqualToString:@"/websocket/5"])
+                        [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:@"uploadsAvailable"];
                     [[NSUserDefaults standardUserDefaults] synchronize];
                     [[NetworkConnection sharedInstance] connect:NO];
                 } else {
