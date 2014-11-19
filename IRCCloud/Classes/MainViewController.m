@@ -2606,20 +2606,23 @@
         _connectingActivity.hidden = NO;
         _connectingProgress.progress = 0;
         _connectingProgress.hidden = YES;
-        /*ImageUploader *u = [[ImageUploader alloc] init];
-         u.delegate = self;
-         u.bid = _buffer.bid;
-         [u upload:img];*/
-        FileUploader *u = [[FileUploader alloc] init];
-        u.delegate = self;
-        u.bid = _buffer.bid;
-        [u uploadImage:img];
-        FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
-        nc = [[UINavigationController alloc] initWithRootViewController:fvc];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+            FileUploader *u = [[FileUploader alloc] init];
+            u.delegate = self;
+            u.bid = _buffer.bid;
+            [u uploadImage:img];
+            FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+            nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        } else {
+            ImageUploader *u = [[ImageUploader alloc] init];
+            u.delegate = self;
+            u.bid = _buffer.bid;
+            [u upload:img];
+        }
     }
     
     if(_popover) {
@@ -2736,14 +2739,14 @@
 
 -(void)cameraButtonPressed:(id)sender {
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)?@"Choose Document":nil, nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
         } else {
             [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view animated:YES];
         }
-    } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+    } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
         UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"Choose Document", nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];

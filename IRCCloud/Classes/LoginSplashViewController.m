@@ -686,6 +686,8 @@
                     IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
                 if([result objectForKey:@"websocket_path"])
                     IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
+                if([IRCCLOUD_PATH isEqualToString:@"/websocket/5"])
+                    [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:@"uploadsAvailable"];
                 [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
@@ -698,6 +700,7 @@
 #endif
                     [d setObject:IRCCLOUD_HOST forKey:@"host"];
                     [d setObject:IRCCLOUD_PATH forKey:@"path"];
+                    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
                     [d synchronize];
                 }
                 loginHint.alpha = 0;

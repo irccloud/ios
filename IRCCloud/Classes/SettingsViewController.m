@@ -23,6 +23,75 @@
 #import "ImgurLoginViewController.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 
+@interface ImageServiceViewController : UITableViewController
+@end
+
+@implementation ImageServiceViewController
+
+-(id)init {
+    self = [super initWithStyle:UITableViewStyleGrouped];
+    if (self) {
+        self.navigationItem.title = @"Image Service";
+    }
+    return self;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Table view data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return 2;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"imageservicecell"];
+    if(!cell)
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"imageservicecell"];
+    
+    cell.accessoryType = UITableViewCellAccessoryNone;
+    
+    switch(indexPath.row) {
+        case 0:
+            cell.textLabel.text = @"IRCCloud";
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"])
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+        case 1:
+            cell.textLabel.text = @"imgur";
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"])
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            break;
+    }
+    
+    return cell;
+}
+
+#pragma mark - Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    switch(indexPath.row) {
+        case 0:
+            [[NSUserDefaults standardUserDefaults] setObject:@"IRCCloud" forKey:@"imageService"];
+            break;
+        case 1:
+            [[NSUserDefaults standardUserDefaults] setObject:@"imgur" forKey:@"imageService"];
+            break;
+    }
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [tableView reloadData];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+@end
+
 @interface PhotoSizeViewController : UITableViewController
 @end
 
@@ -101,6 +170,7 @@
             [[NSUserDefaults standardUserDefaults] setObject:@(-1) forKey:@"photoSize"];
             break;
     }
+    [[NSUserDefaults standardUserDefaults] synchronize];
     [tableView reloadData];
     [self.navigationController popViewControllerAnimated:YES];
 }
@@ -185,6 +255,8 @@
             NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
             [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
+            [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
+            [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] forKey:@"imageService"];
             [d synchronize];
         }
     }
@@ -192,6 +264,17 @@
 
 -(void)cancelButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+#ifdef ENTERPRISE
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] forKey:@"imageService"];
+        [d synchronize];
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -477,7 +560,11 @@
         case 3:
             return ((_chromeInstalled)?4:3) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
         case 4:
-            return 3;
+            if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+                return [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"]?4:3;
+            } else {
+                return 3;
+            }
         case 5:
             return 4;
     }
@@ -589,17 +676,28 @@
             }
             break;
         case 4:
+            if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+                if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"] && row > 0)
+                    row++;
+            } else {
+                row++;
+            }
             switch (row) {
                 case 0:
+                    cell.textLabel.text = @"Image Service";
+                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"];
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    break;
+                case 1:
                     cell.textLabel.text = @"Imgur.com Account";
                     cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"];
                     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
                     break;
-                case 1:
+                case 2:
                     cell.textLabel.text = @"Save to Camera Roll";
                     cell.accessoryView = _saveToCameraRoll;
                     break;
-                case 2:
+                case 3:
                     cell.textLabel.text = @"Image Size";
                     int size = [[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue];
                     switch(size) {
@@ -646,17 +744,30 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
-    if(indexPath.section == 4 && indexPath.row == 0) {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
-    }
-    if(indexPath.section == 4 && indexPath.row == 2) {
-        [self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];
+    if(indexPath.section == 4) {
+        int row = indexPath.row;
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+            if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"] && row > 0)
+                row++;
+        } else {
+            row++;
+        }
+
+        if(row == 0) {
+            [self.navigationController pushViewController:[[ImageServiceViewController alloc] init] animated:YES];
+        }
+        if(row == 1) {
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
+        }
+        if(row == 3) {
+            [self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];
+        }
     }
     if(indexPath.section == 5 && indexPath.row == 0) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];

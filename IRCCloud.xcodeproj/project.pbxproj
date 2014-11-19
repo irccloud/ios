@@ -2000,7 +2000,7 @@
 					"-DEXTENSION",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "ace695b0-b187-41c8-9ac6-a23f712dfa63";
+				PROVISIONING_PROFILE = "8e07b15b-6910-42f3-9f0d-e80ef48d61ae";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2212,7 +2212,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "0921f7c3-c7fc-4218-929a-66da0ebd1651";
+				PROVISIONING_PROFILE = "7ed78807-cb21-4679-a162-20156ea9eaa8";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

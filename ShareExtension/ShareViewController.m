@@ -14,35 +14,42 @@
 
 - (void)presentationAnimationDidFinish {
     if(_conn.session.length) {
-        NSExtensionItem *input = self.extensionContext.inputItems.firstObject;
-        NSExtensionItem *output = [input copy];
-        output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
-        
-        if(output.attachments.count) {
-            NSItemProvider *i = output.attachments.firstObject;
+#ifdef ENTERPRISE
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+        if([d boolForKey:@"uploadsAvailable"] && [[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
+            NSExtensionItem *input = self.extensionContext.inputItems.firstObject;
+            NSExtensionItem *output = [input copy];
+            output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
             
-            NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
-                NSLog(@"Uploading image to IRCCloud");
-                _item = item;
-                [_fileUploader uploadImage:item];
-                if(!_filename)
-                    _filename = _fileUploader.originalFilename;
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self reloadConfigurationItems];
-                    [self validateContent];
-                }];
-            };
-            
-            NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
-                if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
+            if(output.attachments.count) {
+                NSItemProvider *i = output.attachments.firstObject;
+                
+                NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
+                    NSLog(@"Uploading image to IRCCloud");
+                    _item = item;
+                    [_fileUploader uploadImage:item];
+                    if(!_filename)
+                        _filename = _fileUploader.originalFilename;
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [self reloadConfigurationItems];
+                        [self validateContent];
+                    }];
+                };
+                
+                NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
+                    if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
+                        [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                    }
+                };
+                
+                if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
+                    [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:urlHandler];
+                } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
                     [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
                 }
-            };
-            
-            if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
-                [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:urlHandler];
-            } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
             }
         }
     } else {
@@ -174,32 +181,41 @@
             [self pushConfigurationViewController:b];
         };
 
-        NSExtensionItem *input = self.extensionContext.inputItems.firstObject;
-        NSExtensionItem *output = [input copy];
-        output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
-        
-        if(output.attachments.count && [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.image"]) {
-            SLComposeSheetConfigurationItem *filenameConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
-            filenameConfigItem.title = @"Filename";
-            if(_filename)
-                filenameConfigItem.value = _filename;
-            else
-                filenameConfigItem.valuePending = YES;
+#ifdef ENTERPRISE
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+        if([d boolForKey:@"uploadsAvailable"] && [[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
+            NSExtensionItem *input = self.extensionContext.inputItems.firstObject;
+            NSExtensionItem *output = [input copy];
+            output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
             
-            filenameConfigItem.tapHandler = ^() {
-                UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Enter a Filename" message:nil preferredStyle:UIAlertControllerStyleAlert];
-                [c addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                    textField.text = _filename;
-                    textField.placeholder = @"Filename";
-                }];
-                [c addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                    _filename = [[c.textFields objectAtIndex:0] text];
-                    [self reloadConfigurationItems];
-                }]];
+            if(output.attachments.count && [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.image"]) {
+                SLComposeSheetConfigurationItem *filenameConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
+                filenameConfigItem.title = @"Filename";
+                if(_filename)
+                    filenameConfigItem.value = _filename;
+                else
+                    filenameConfigItem.valuePending = YES;
                 
-                [self presentViewController:c animated:YES completion:nil];
-            };
-            return @[filenameConfigItem, bufferConfigItem];
+                filenameConfigItem.tapHandler = ^() {
+                    UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Enter a Filename" message:nil preferredStyle:UIAlertControllerStyleAlert];
+                    [c addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                        textField.text = _filename;
+                        textField.placeholder = @"Filename";
+                    }];
+                    [c addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                        _filename = [[c.textFields objectAtIndex:0] text];
+                        [self reloadConfigurationItems];
+                    }]];
+                    
+                    [self presentViewController:c animated:YES completion:nil];
+                };
+                return @[filenameConfigItem, bufferConfigItem];
+            } else {
+                return @[bufferConfigItem];
+            }
         } else {
             return @[bufferConfigItem];
         }
@@ -235,6 +251,8 @@
 
 -(void)fileUploadDidFinish {
     NSLog(@"File upload successful");
+    [_conn disconnect];
+    AudioServicesPlaySystemSound(_sound);
 }
 
 -(void)imageUploadProgress:(float)progress {

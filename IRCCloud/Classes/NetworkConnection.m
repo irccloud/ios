@@ -1770,6 +1770,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"uploadsAvailable"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [self clearPrefs];
     [_servers clear];

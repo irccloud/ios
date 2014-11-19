@@ -69,7 +69,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES)}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO)}];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"www.irccloud.com"]) {
         CLS_LOG(@"Migrating host");
         [[NSUserDefaults standardUserDefaults] setObject:@"api.irccloud.com" forKey:@"host"];
@@ -77,6 +77,8 @@
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"path"]) {
         IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
         IRCCLOUD_PATH = [[NSUserDefaults standardUserDefaults] objectForKey:@"path"];
+        if([IRCCLOUD_PATH isEqualToString:@"/websocket/5"])
+            [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:@"uploadsAvailable"];
     } else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"api.irccloud.com"]) {
         NSString *session = [NetworkConnection sharedInstance].session;
         if(session.length) {
@@ -96,6 +98,8 @@
         [d setObject:IRCCLOUD_PATH forKey:@"path"];
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] forKey:@"imageService"];
         if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
             [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] forKey:@"imgur_access_token"];
         else

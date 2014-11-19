@@ -47,10 +47,15 @@
     [self.view addSubview:_webView];
 }
 
+-(void)viewWillDisappear:(BOOL)animated {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+}
+
 -(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     if([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102)
         return;
     NSLog(@"Error: %@", error);
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [_activity stopAnimating];
 }
 
