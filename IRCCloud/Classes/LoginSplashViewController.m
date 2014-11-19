@@ -526,48 +526,50 @@
 }
 
 -(IBAction)onePasswordButtonPressed:(id)sender {
-    if(login.alpha) {
-        [[OnePasswordExtension sharedExtension] findLoginForURLString:@"https://www.irccloud.com" forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
-            if (!loginDict) {
-                if (error.code != AppExtensionErrorCodeCancelledByUser) {
-                    NSLog(@"Error invoking 1Password App Extension for find login: %@", error);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if(login.alpha) {
+            [[OnePasswordExtension sharedExtension] findLoginForURLString:@"https://www.irccloud.com" forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
+                if (!loginDict) {
+                    if (error.code != AppExtensionErrorCodeCancelledByUser) {
+                        NSLog(@"Error invoking 1Password App Extension for find login: %@", error);
+                    }
+                    return;
                 }
-                return;
-            }
+                
+                if([loginDict[AppExtensionUsernameKey] length])
+                    username.text = loginDict[AppExtensionUsernameKey];
+                password.text = loginDict[AppExtensionPasswordKey];
+                [self loginHintPressed:nil];
+            }];
+        } else {
+            NSDictionary *newLoginDetails = @{
+                                              AppExtensionTitleKey: @"IRCCloud",
+                                              AppExtensionUsernameKey: username.text ? : @"",
+                                              AppExtensionPasswordKey: password.text ? : @"",
+                                              AppExtensionSectionTitleKey: @"IRCCloud",
+                                              AppExtensionFieldsKey: @{
+                                                      @"Name" : name.text ? : @""
+                                                      }
+                                              };
             
-            if([loginDict[AppExtensionUsernameKey] length])
-                username.text = loginDict[AppExtensionUsernameKey];
-            password.text = loginDict[AppExtensionPasswordKey];
-            [self loginHintPressed:nil];
-        }];
-    } else {
-        NSDictionary *newLoginDetails = @{
-                                          AppExtensionTitleKey: @"IRCCloud",
-                                          AppExtensionUsernameKey: username.text ? : @"",
-                                          AppExtensionPasswordKey: password.text ? : @"",
-                                          AppExtensionSectionTitleKey: @"IRCCloud",
-                                          AppExtensionFieldsKey: @{
-                                                  @"Name" : name.text ? : @""
-                                                  }
-                                          };
-        
-        [[OnePasswordExtension sharedExtension] storeLoginForURLString:@"https://www.irccloud.com" loginDetails:newLoginDetails passwordGenerationOptions:nil forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
-            
-            if (!loginDict) {
-                if (error.code != AppExtensionErrorCodeCancelledByUser) {
-                    NSLog(@"Failed to use 1Password App Extension to save a new Login: %@", error);
+            [[OnePasswordExtension sharedExtension] storeLoginForURLString:@"https://www.irccloud.com" loginDetails:newLoginDetails passwordGenerationOptions:nil forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
+                
+                if (!loginDict) {
+                    if (error.code != AppExtensionErrorCodeCancelledByUser) {
+                        NSLog(@"Failed to use 1Password App Extension to save a new Login: %@", error);
+                    }
+                    return;
                 }
-                return;
-            }
-            if([loginDict[AppExtensionReturnedFieldsKey][@"Name"] length])
-                name.text = loginDict[AppExtensionReturnedFieldsKey][@"Name"];
-            if([loginDict[AppExtensionUsernameKey] length])
-                username.text = loginDict[AppExtensionUsernameKey];
-            password.text = loginDict[AppExtensionPasswordKey] ? : @"";
-            
-            [self signupHintPressed:nil];
-        }];
-    }
+                if([loginDict[AppExtensionReturnedFieldsKey][@"Name"] length])
+                    name.text = loginDict[AppExtensionReturnedFieldsKey][@"Name"];
+                if([loginDict[AppExtensionUsernameKey] length])
+                    username.text = loginDict[AppExtensionUsernameKey];
+                password.text = loginDict[AppExtensionPasswordKey] ? : @"";
+                
+                [self signupHintPressed:nil];
+            }];
+        }
+    });
 }
 
 -(IBAction)TOSHintPressed:(id)sender {

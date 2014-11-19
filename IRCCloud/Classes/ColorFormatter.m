@@ -22,7 +22,7 @@
 #import "NSURL+IDN.h"
 #import "NetworkConnection.h"
 
-CTFontRef Courier, CourierBold, CourierOblique,CourierBoldOblique;
+CTFontRef Courier = nil, CourierBold, CourierOblique,CourierBoldOblique;
 CTFontRef Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
 CTFontRef arrowFont;
 UIFont *timestampFont;
@@ -43,15 +43,17 @@ float ColorFormatterCachedFontSize = 0.0f;
 
 +(void)clearFontCache {
     CLS_LOG(@"Clearing font cache");
-    CFRelease(Courier);
-    CFRelease(CourierBold);
-    CFRelease(CourierBoldOblique);
-    CFRelease(CourierOblique);
-    CFRelease(Helvetica);
-    CFRelease(HelveticaBold);
-    CFRelease(HelveticaBoldOblique);
-    CFRelease(HelveticaOblique);
-    CFRelease(arrowFont);
+    if(Courier) {
+        CFRelease(Courier);
+        CFRelease(CourierBold);
+        CFRelease(CourierBoldOblique);
+        CFRelease(CourierOblique);
+        CFRelease(Helvetica);
+        CFRelease(HelveticaBold);
+        CFRelease(HelveticaBoldOblique);
+        CFRelease(HelveticaOblique);
+        CFRelease(arrowFont);
+    }
     Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = arrowFont = nil;
     timestampFont = nil;
 }
