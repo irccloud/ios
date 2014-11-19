@@ -12,23 +12,18 @@
     },
     {
       "idiom" : "iphone",
-      "subtype" : "retina4",
-      "scale" : "2x"
-    },
-    {
-      "idiom" : "iphone",
       "scale" : "3x",
       "filename" : "onepassword-extension@3x~compact.png"
     },
     {
       "idiom" : "ipad",
       "scale" : "1x",
-      "filename" : "onepassword-extension~compact-1.png"
+      "filename" : "onepassword-extension~regular.png"
     },
     {
       "idiom" : "ipad",
       "scale" : "2x",
-      "filename" : "onepassword-extension@2x~compact-1.png"
+      "filename" : "onepassword-extension@2x~regular.png"
     }
   ],
   "info" : {
