@@ -745,7 +745,7 @@
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
     if(indexPath.section == 4) {
-        int row = indexPath.row;
+        NSInteger row = indexPath.row;
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
             if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"] && row > 0)
                 row++;

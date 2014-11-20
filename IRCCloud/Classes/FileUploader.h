@@ -23,7 +23,7 @@
 @end
 
 @protocol FileUploaderMetadataDelegate<NSObject>
--(void)fileUploadWillUpload:(int)bytes mimeType:(NSString *)mimeType;
+-(void)fileUploadWillUpload:(NSUInteger)bytes mimeType:(NSString *)mimeType;
 @end
 
 @interface FileUploader : NSObject<NSURLConnectionDelegate,NSURLConnectionDataDelegate,NSURLSessionDataDelegate,NSURLSessionDownloadDelegate> {

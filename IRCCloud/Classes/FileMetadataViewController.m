@@ -30,7 +30,7 @@
     return self;
 }
 
--(void)fileUploadWillUpload:(int)bytes mimeType:(NSString *)mimeType {
+-(void)fileUploadWillUpload:(NSUInteger)bytes mimeType:(NSString *)mimeType {
     if(bytes < 1024) {
         _metadata = [NSString stringWithFormat:@"%i B • %@", bytes, mimeType];
     } else {
