@@ -1254,7 +1254,6 @@
                 NSString *nick = user.nick.lowercaseString;
                 if([nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location > 0) {
                     nick = [nick substringFromIndex:[nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location];
-                    NSLog(@"Nick: %@", nick);
                 }
                 if([nick hasPrefix:text] && ![suggestions_set containsObject:user.nick.lowercaseString]) {
                     [suggestions_set addObject:user.nick.lowercaseString];

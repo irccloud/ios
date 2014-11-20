@@ -271,6 +271,7 @@
                     else
                         e.type = kCollapsedEventPopOut;
                     e.fromMode = event.fromMode;
+                    e.msg = nil;
                 } else if(e.type == kCollapsedEventPopOut) {
                     e.type = event.type;
                 } else {
@@ -278,6 +279,8 @@
                 }
                 e.eid = event.eid;
                 e.netsplit = event.netsplit;
+                if(event.type == kCollapsedEventPart || event.type == kCollapsedEventQuit)
+                    e.msg = event.msg;
                 [event copyModes:e];
             } else {
                 [_data addObject:event];
