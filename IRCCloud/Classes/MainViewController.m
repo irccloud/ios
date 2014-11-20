@@ -1223,6 +1223,7 @@
 }
 
 -(void)updateSuggestions:(BOOL)force {
+    NSMutableSet *suggestions_set = [[NSMutableSet alloc] init];
     NSMutableArray *suggestions = [[NSMutableArray alloc] init];
     
     if(_message.text.length > 0) {
@@ -1238,15 +1239,25 @@
         if([text hasSuffix:@":"])
             text = [text substringToIndex:text.length - 1];
         if(text.length > 1 || force) {
-            if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text])
+            if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text]) {
+                [suggestions_set addObject:_buffer.name.lowercaseString];
                 [suggestions addObject:_buffer.name];
+            }
             for(Channel *channel in _sortedChannels) {
-                if(text.length > 0 && channel.name.length > 0 && [channel.name characterAtIndex:0] == [text characterAtIndex:0] && channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text])
+                if(text.length > 0 && channel.name.length > 0 && [channel.name characterAtIndex:0] == [text characterAtIndex:0] && channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text] && ![suggestions_set containsObject:channel.name.lowercaseString]) {
+                    [suggestions_set addObject:channel.name.lowercaseString];
                     [suggestions addObject:channel.name];
+                }
             }
             
             for(User *user in _sortedUsers) {
-                if([[user.nick lowercaseString] hasPrefix:text]) {
+                NSString *nick = user.nick.lowercaseString;
+                if([nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location > 0) {
+                    nick = [nick substringFromIndex:[nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location];
+                    NSLog(@"Nick: %@", nick);
+                }
+                if([nick hasPrefix:text] && ![suggestions_set containsObject:user.nick.lowercaseString]) {
+                    [suggestions_set addObject:user.nick.lowercaseString];
                     [suggestions addObject:user.nick];
                 }
             }
