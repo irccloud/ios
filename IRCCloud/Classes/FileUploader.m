@@ -39,6 +39,8 @@
     _bid = -1;
     _msg = _filename = _originalFilename = _mimeType = nil;
     [_connection cancel];
+    if(_delegate)
+        [_delegate fileUploadWasCancelled];
 }
 
 - (void)handleEvent:(NSNotification *)notification {

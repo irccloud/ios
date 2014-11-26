@@ -1252,7 +1252,7 @@
             
             for(User *user in _sortedUsers) {
                 NSString *nick = user.nick.lowercaseString;
-                if([nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location > 0) {
+                if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 && [nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location > 0) {
                     nick = [nick substringFromIndex:[nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location];
                 }
                 if([nick hasPrefix:text] && ![suggestions_set containsObject:user.nick.lowercaseString]) {
@@ -2684,6 +2684,10 @@
 }
 
 -(void)fileUploadDidFinish {
+    [self _hideConnectingView];
+}
+
+-(void)fileUploadWasCancelled {
     [self _hideConnectingView];
 }
 

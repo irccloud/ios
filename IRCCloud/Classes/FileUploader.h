@@ -20,6 +20,7 @@
 -(void)fileUploadProgress:(float)progress;
 -(void)fileUploadDidFail;
 -(void)fileUploadDidFinish;
+-(void)fileUploadWasCancelled;
 @end
 
 @protocol FileUploaderMetadataDelegate<NSObject>

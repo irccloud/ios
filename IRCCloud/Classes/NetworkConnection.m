@@ -402,6 +402,21 @@ NSLock *__parserLock = nil;
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object) {
                        _userInfo = object.dictionary;
+                       if([[_userInfo objectForKey:@"uploads_disabled"] intValue] == 1 && [[_userInfo objectForKey:@"id"] intValue] != 11694)
+                           [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"uploadsAvailable"];
+                       else
+                           [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"uploadsAvailable"];
+                       [[NSUserDefaults standardUserDefaults] synchronize];
+                       if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+#ifdef ENTERPRISE
+                           NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+                           NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+                           [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
+                           [d synchronize];
+                       }
+
                        _prefs = nil;
                        [[EventsDataSource sharedInstance] clearFormattingCache];
 #ifndef EXTENSION

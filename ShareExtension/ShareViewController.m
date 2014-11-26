@@ -255,6 +255,9 @@
     AudioServicesPlaySystemSound(_sound);
 }
 
+-(void)fileUploadWasCancelled {
+}
+
 -(void)imageUploadProgress:(float)progress {
 }
 
