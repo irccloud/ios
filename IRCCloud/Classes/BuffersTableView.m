@@ -747,6 +747,9 @@
         case kIRCEventAcceptList:
         case kIRCEventChannelTopicIs:
         case kIRCEventServerMap:
+        case kIRCEventQuietList:
+        case kIRCEventBanExceptionList:
+        case kIRCEventInviteList:
         case kIRCEventFailureMsg:
         case kIRCEventSuccess:
         case kIRCEventAlert:

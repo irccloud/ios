@@ -507,6 +507,18 @@ NSLock *__parserLock = nil;
                        if(!backlog)
                            [self postObject:object forEvent:kIRCEventAcceptList];
                    },
+                   @"quiet_list": ^(IRCCloudJSONObject *object) {
+                       if(!backlog)
+                           [self postObject:object forEvent:kIRCEventQuietList];
+                   },
+                   @"ban_exception_list": ^(IRCCloudJSONObject *object) {
+                       if(!backlog)
+                           [self postObject:object forEvent:kIRCEventBanExceptionList];
+                   },
+                   @"invite_list": ^(IRCCloudJSONObject *object) {
+                       if(!backlog)
+                           [self postObject:object forEvent:kIRCEventInviteList];
+                   },
                    @"who_response": ^(IRCCloudJSONObject *object) {
                        if(!backlog) {
                            for(NSDictionary *user in [object objectForKey:@"users"]) {

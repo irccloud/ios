@@ -19,7 +19,7 @@
 #import "MainViewController.h"
 #import "NetworkConnection.h"
 #import "ColorFormatter.h"
-#import "BansTableViewController.h"
+#import "ChannelModeListTableViewController.h"
 #import "AppDelegate.h"
 #import "IgnoresTableViewController.h"
 #import "EditConnectionViewController.h"
@@ -308,7 +308,7 @@
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     Buffer *b = nil;
     IRCCloudJSONObject *o = nil;
-    BansTableViewController *btv = nil;
+    ChannelModeListTableViewController *cmltv = nil;
     ChannelListTableViewController *ctv = nil;
     CallerIDTableViewController *citv = nil;
     WhoListTableViewController *wtv = nil;
@@ -461,13 +461,64 @@
             break;
         case kIRCEventBanList:
             o = notification.object;
-            if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name]) {
-                btv = [[BansTableViewController alloc] initWithStyle:UITableViewStylePlain];
-                btv.event = o;
-                btv.bans = [o objectForKey:@"bans"];
-                btv.bid = _buffer.bid;
-                btv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
-                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:btv];
+            if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name] && ![self.presentedViewController isKindOfClass:[UINavigationController class]] && ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]]) {
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"b" param:@"bans" placeholder:@"No bans in effect.\n\nYou can ban someone by tapping their nickname in the user list, long-pressing a message, or by using /ban." bid:_buffer.bid];
+                cmltv.event = o;
+                cmltv.data = [o objectForKey:@"bans"];
+                cmltv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventQuietList:
+            o = notification.object;
+            if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name] && ![self.presentedViewController isKindOfClass:[UINavigationController class]] && ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]]) {
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"q" param:@"list" placeholder:@"Empty quiet list." bid:_buffer.bid];
+                cmltv.event = o;
+                cmltv.data = [o objectForKey:@"list"];
+                cmltv.navigationItem.title = [NSString stringWithFormat:@"Quiet list for %@", [o objectForKey:@"channel"]];
+                cmltv.mask = @"quiet_mask";
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventInviteList:
+            o = notification.object;
+            if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name] && ![self.presentedViewController isKindOfClass:[UINavigationController class]] && ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]]) {
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"I" param:@"list" placeholder:@"Empty invite list." bid:_buffer.bid];
+                cmltv.event = o;
+                cmltv.data = [o objectForKey:@"list"];
+                cmltv.navigationItem.title = [NSString stringWithFormat:@"Invite list for %@", [o objectForKey:@"channel"]];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventBanExceptionList:
+            o = notification.object;
+            if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name] && ![self.presentedViewController isKindOfClass:[UINavigationController class]] && ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]]) {
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"e" param:@"exceptions" placeholder:@"Empty exception list." bid:_buffer.bid];
+                cmltv.event = o;
+                cmltv.data = [o objectForKey:@"exceptions"];
+                cmltv.navigationItem.title = [NSString stringWithFormat:@"Exception list for %@", [o objectForKey:@"channel"]];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -495,7 +546,7 @@
             break;
         case kIRCEventAcceptList:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == _buffer.cid && ![self.presentedViewController isKindOfClass:[UINavigationController class]] && ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[CallerIDTableViewController class]]) {
                 citv = [[CallerIDTableViewController alloc] initWithStyle:UITableViewStylePlain];
                 citv.event = o;
                 citv.nicks = [o objectForKey:@"nicks"];

@@ -513,30 +513,50 @@
                               NSArray *add = [ops objectForKey:@"add"];
                               if(add.count > 0) {
                                   NSDictionary *op = [add objectAtIndex:0];
-                                  if([[[op objectForKey:@"mode"] lowercaseString] isEqualToString:@"b"]) {
+                                  if([[op objectForKey:@"mode"] isEqualToString:@"b"]) {
                                       event.nick = event.from;
                                       event.from = @"";
-                                      event.msg = [NSString stringWithFormat:@"Channel ban set for %c%@%c (+b)", BOLD, [op objectForKey:@"param"], BOLD];
+                                      event.msg = [NSString stringWithFormat:@"banned %c%@%c (%c14+b%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
                                       unknown = NO;
-                                  } else if([[[op objectForKey:@"mode"] lowercaseString] isEqualToString:@"e"]) {
+                                  } else if([[op objectForKey:@"mode"] isEqualToString:@"e"]) {
                                       event.nick = event.from;
                                       event.from = @"";
-                                      event.msg = [NSString stringWithFormat:@"Channel ban exception set for %c%@%c (+e)", BOLD, [op objectForKey:@"param"], BOLD];
+                                      event.msg = [NSString stringWithFormat:@"exempted %c%@%c from bans (%c14+e%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                      unknown = NO;
+                                  } else if([[op objectForKey:@"mode"] isEqualToString:@"q"]) {
+                                      event.nick = event.from;
+                                      event.from = @"";
+                                      event.msg = [NSString stringWithFormat:@"quieted %c%@%c (%c14+q%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                      unknown = NO;
+                                  } else if([[op objectForKey:@"mode"] isEqualToString:@"I"]) {
+                                      event.nick = event.from;
+                                      event.from = @"";
+                                      event.msg = [NSString stringWithFormat:@"added %c%@%c to the invite list (%c14+I%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
                                       unknown = NO;
                                   }
                               }
                               NSArray *remove = [ops objectForKey:@"remove"];
                               if(remove.count > 0) {
                                   NSDictionary *op = [remove objectAtIndex:0];
-                                  if([[[op objectForKey:@"mode"] lowercaseString] isEqualToString:@"b"]) {
+                                  if([[op objectForKey:@"mode"] isEqualToString:@"b"]) {
                                       event.nick = event.from;
                                       event.from = @"";
-                                      event.msg = [NSString stringWithFormat:@"Channel ban removed for %c%@%c (-b)", BOLD, [op objectForKey:@"param"], BOLD];
+                                      event.msg = [NSString stringWithFormat:@"un-banned %c%@%c (%c14-b%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
                                       unknown = NO;
-                                  } else if([[[op objectForKey:@"mode"] lowercaseString] isEqualToString:@"e"]) {
+                                  } else if([[op objectForKey:@"mode"] isEqualToString:@"e"]) {
                                       event.nick = event.from;
                                       event.from = @"";
-                                      event.msg = [NSString stringWithFormat:@"Channel ban exception removed for %c%@%c (+e)", BOLD, [op objectForKey:@"param"], BOLD];
+                                      event.msg = [NSString stringWithFormat:@"un-exempted %c%@%c from bans (%c14-e%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                      unknown = NO;
+                                  } else if([[op objectForKey:@"mode"] isEqualToString:@"q"]) {
+                                      event.nick = event.from;
+                                      event.from = @"";
+                                      event.msg = [NSString stringWithFormat:@"un-quieted %c%@%c (%c14-q%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                      unknown = NO;
+                                  } else if([[op objectForKey:@"mode"] isEqualToString:@"I"]) {
+                                      event.nick = event.from;
+                                      event.from = @"";
+                                      event.msg = [NSString stringWithFormat:@"removed %c%@%c from the invite list (%c14-I%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
                                       unknown = NO;
                                   }
                               }
@@ -544,8 +564,9 @@
                           if(unknown) {
                               event.nick = event.from;
                               event.from = @"";
-                              event.msg = [NSString stringWithFormat:@"Channel mode set to %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
+                              event.msg = [NSString stringWithFormat:@"set channel mode %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
                           }
+                          event.isSelf = NO;
                           event.bgColor = [UIColor statusBackgroundColor];
                           event.linkify = NO;
                       },

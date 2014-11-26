@@ -1,7 +1,7 @@
 //
-//  BansTableViewController.m
+//  ChannelModeListTableViewController.m
 //
-//  Copyright (C) 2013 IRCCloud, Ltd.
+//  Copyright (C) 2014 IRCCloud, Ltd.
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
@@ -15,18 +15,18 @@
 //  limitations under the License.
 
 
-#import "BansTableViewController.h"
+#import "ChannelModeListTableViewController.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
 
-@interface BansTableCell : UITableViewCell {
+@interface MaskTableCell : UITableViewCell {
     UILabel *_mask;
     UILabel *_setBy;
 }
 @property (readonly) UILabel *mask,*setBy;
 @end
 
-@implementation BansTableCell
+@implementation MaskTableCell
 
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -53,12 +53,12 @@
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
-    frame.origin.x = 6;
+    frame.origin.x = frame.origin.y = 6;
     frame.size.width -= 12;
     
     float maskHeight = [_mask.text sizeWithFont:_mask.font constrainedToSize:CGSizeMake(frame.size.width,INT_MAX) lineBreakMode:_mask.lineBreakMode].height;
     _mask.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, maskHeight);
-    _setBy.frame = CGRectMake(frame.origin.x, frame.origin.y + maskHeight, frame.size.width, frame.size.height - maskHeight);
+    _setBy.frame = CGRectMake(frame.origin.x, frame.origin.y + maskHeight, frame.size.width, frame.size.height - maskHeight - 12);
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -67,19 +67,24 @@
 
 @end
 
-@implementation BansTableViewController
+@implementation ChannelModeListTableViewController
 
--(id)initWithStyle:(UITableViewStyle)style {
-    self = [super initWithStyle:style];
+-(id)initWithList:(int)list mode:(NSString *)mode param:(NSString *)param placeholder:(NSString *)placeholder bid:(int)bid {
+    self = [super initWithStyle:UITableViewStylePlain];
     if (self) {
         _addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
-        _placeholder.text = @"No bans in effect.\n\nYou can ban someone by tapping their nickname in the user list, long-pressing a message, or by using /ban.";
+        _placeholder.text = placeholder;
         _placeholder.numberOfLines = 0;
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
         _placeholder.textAlignment = NSTextAlignmentCenter;
         _placeholder.textColor = [UIColor selectedBlueColor];
+        _list = list;
+        _bid = bid;
+        _mode = mode;
+        _param = param;
+        _mask = @"mask";
     }
     return self;
 }
@@ -105,7 +110,7 @@
 -(void)viewWillAppear:(BOOL)animated {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     _placeholder.frame = CGRectInset(self.tableView.frame, 12, 0);
-    if(_bans.count)
+    if(_data.count)
         [_placeholder removeFromSuperview];
     else
         [self.tableView.superview addSubview:_placeholder];
@@ -119,28 +124,23 @@
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     IRCCloudJSONObject *o = nil;
     Event *e = nil;
-    
-    switch(event) {
-        case kIRCEventBanList:
-            o = notification.object;
-            if(o.cid == _event.cid && [[o objectForKey:@"channel"] isEqualToString:[_event objectForKey:@"channel"]]) {
-                _event = o;
-                _bans = [o objectForKey:@"bans"];
-                if(_bans.count)
-                    [_placeholder removeFromSuperview];
-                else
-                    [self.tableView.superview addSubview:_placeholder];
-                [self.tableView reloadData];
-            }
-            break;
-        case kIRCEventBufferMsg:
-            e = notification.object;
-            if(e.cid == _event.cid && e.bid == _bid) {
-                [[NetworkConnection sharedInstance] mode:@"b" chan:[_event objectForKey:@"channel"] cid:_event.cid];
-            }
-            break;
-        default:
-            break;
+
+    if(event == _list) {
+        o = notification.object;
+        if(o.cid == _event.cid && [[o objectForKey:@"channel"] isEqualToString:[_event objectForKey:@"channel"]]) {
+            _event = o;
+            _data = [o objectForKey:_param];
+            if(_data.count)
+                [_placeholder removeFromSuperview];
+            else
+                [self.tableView.superview addSubview:_placeholder];
+            [self.tableView reloadData];
+        }
+    } else if(event == kIRCEventBufferMsg) {
+        e = notification.object;
+        if(e.cid == _event.cid && e.bid == _bid) {
+            [[NetworkConnection sharedInstance] mode:_mode chan:[_event objectForKey:@"channel"] cid:_event.cid];
+        }
     }
 }
 
@@ -150,7 +150,7 @@
 
 -(void)addButtonPressed {
     Server *s = [[ServersDataSource sharedInstance] getServer:_event.cid];
-    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ban this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
+    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Add", nil];
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     [_alertView textFieldAtIndex:0].delegate = self;
     [_alertView show];
@@ -205,8 +205,8 @@
 #pragma mark - Table view data source
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSDictionary *row = [_bans objectAtIndex:[indexPath row]];
-    return [[row objectForKey:@"mask"] sizeWithFont:[UIFont boldSystemFontOfSize:16] constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) lineBreakMode:NSLineBreakByCharWrapping].height + [[self setByTextForRow:row] sizeWithFont:[UIFont systemFontOfSize:14] constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) lineBreakMode:NSLineBreakByCharWrapping].height;
+    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    return [[row objectForKey:_mask] sizeWithFont:[UIFont boldSystemFontOfSize:16] constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) lineBreakMode:NSLineBreakByCharWrapping].height + [[self setByTextForRow:row] sizeWithFont:[UIFont systemFontOfSize:14] constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) lineBreakMode:NSLineBreakByCharWrapping].height;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -214,18 +214,18 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    @synchronized(_bans) {
-        return [_bans count];
+    @synchronized(_data) {
+        return [_data count];
     }
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_bans) {
-        BansTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"banscell"];
+    @synchronized(_data) {
+        MaskTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"maskcell"];
         if(!cell)
-            cell = [[BansTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"banscell"];
-        NSDictionary *row = [_bans objectAtIndex:[indexPath row]];
-        cell.mask.text = [row objectForKey:@"mask"];
+            cell = [[MaskTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"maskcell"];
+        NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+        cell.mask.text = [row objectForKey:_mask];
         cell.setBy.text = [self setByTextForRow:row];
         return cell;
     }
@@ -236,9 +236,9 @@
 }
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete && indexPath.row < _bans.count) {
-        NSDictionary *row = [_bans objectAtIndex:indexPath.row];
-        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-b %@", [row objectForKey:@"mask"]] chan:[_event objectForKey:@"channel"] cid:_event.cid];
+    if (editingStyle == UITableViewCellEditingStyleDelete && indexPath.row < _data.count) {
+        NSDictionary *row = [_data objectAtIndex:indexPath.row];
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@", _mode, [row objectForKey:_mask]] chan:[_event objectForKey:@"channel"] cid:_event.cid];
     }
 }
 
@@ -251,8 +251,8 @@
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
-    if([title isEqualToString:@"Ban"]) {
-        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", [alertView textFieldAtIndex:0].text] chan:[_event objectForKey:@"channel"] cid:_event.cid];
+    if([title isEqualToString:@"Add"]) {
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@", _mode, [alertView textFieldAtIndex:0].text] chan:[_event objectForKey:@"channel"] cid:_event.cid];
     }
     
     _alertView = nil;

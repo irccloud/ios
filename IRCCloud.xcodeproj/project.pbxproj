@@ -169,7 +169,7 @@
 		225D975F18AA995900065087 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		225D976018AA995900065087 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		225D976118AA995900065087 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
-		225D976218AA995900065087 /* BansTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* BansTableViewController.m */; };
+		225D976218AA995900065087 /* ChannelModeListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* ChannelModeListTableViewController.m */; };
 		225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		225D976418AA995900065087 /* UIExpandingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A31725AAEA003C0684 /* UIExpandingTextView.m */; };
 		225D976518AA995900065087 /* UIExpandingTextViewInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A51725AAEA003C0684 /* UIExpandingTextViewInternal.m */; };
@@ -311,7 +311,7 @@
 		22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363B119D0884D00500478 /* OnePasswordExtension.m */; };
 		22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */; };
 		22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */; };
-		22AD75ED1718567D00141257 /* BansTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* BansTableViewController.m */; };
+		22AD75ED1718567D00141257 /* ChannelModeListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* ChannelModeListTableViewController.m */; };
 		22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B15CFB17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF817301BAF0075EBA7 /* ECSlidingViewController.m */; };
@@ -667,8 +667,8 @@
 		22A363B119D0884D00500478 /* OnePasswordExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnePasswordExtension.m; sourceTree = "<group>"; };
 		22A363BA19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+UIDevice_iPhone6Hax.h"; sourceTree = "<group>"; };
 		22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+UIDevice_iPhone6Hax.m"; sourceTree = "<group>"; };
-		22AD75EB1718567D00141257 /* BansTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BansTableViewController.h; sourceTree = "<group>"; };
-		22AD75EC1718567D00141257 /* BansTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BansTableViewController.m; sourceTree = "<group>"; };
+		22AD75EB1718567D00141257 /* ChannelModeListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelModeListTableViewController.h; sourceTree = "<group>"; };
+		22AD75EC1718567D00141257 /* ChannelModeListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelModeListTableViewController.m; sourceTree = "<group>"; };
 		22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditConnectionViewController.h; sourceTree = "<group>"; };
 		22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EditConnectionViewController.m; sourceTree = "<group>"; };
 		22B15CF717301BAF0075EBA7 /* ECSlidingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ECSlidingViewController.h; sourceTree = "<group>"; };
@@ -1003,8 +1003,6 @@
 			children = (
 				228A05AE16D3DB7B0029769C /* AppDelegate.h */,
 				228A05AF16D3DB7B0029769C /* AppDelegate.m */,
-				22AD75EB1718567D00141257 /* BansTableViewController.h */,
-				22AD75EC1718567D00141257 /* BansTableViewController.m */,
 				2236F5FC16DA8928007BE535 /* BuffersDataSource.h */,
 				2236F5FD16DA8928007BE535 /* BuffersDataSource.m */,
 				2236F60416DBCA85007BE535 /* BuffersTableView.h */,
@@ -1015,6 +1013,8 @@
 				2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */,
 				2253BA261770CDC500CCA77F /* ChannelListTableViewController.h */,
 				2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */,
+				22AD75EB1718567D00141257 /* ChannelModeListTableViewController.h */,
+				22AD75EC1718567D00141257 /* ChannelModeListTableViewController.m */,
 				2236F60016DBC020007BE535 /* ChannelsDataSource.h */,
 				2236F60116DBC021007BE535 /* ChannelsDataSource.m */,
 				22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */,
@@ -1633,7 +1633,7 @@
 				228E2B8F18CF770D0011DEAB /* SBJsonStreamParserState.m in Sources */,
 				225D976018AA995900065087 /* HighlightsCountView.m in Sources */,
 				225D976118AA995900065087 /* Ignore.m in Sources */,
-				225D976218AA995900065087 /* BansTableViewController.m in Sources */,
+				225D976218AA995900065087 /* ChannelModeListTableViewController.m in Sources */,
 				228E2B9E18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */,
 				225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */,
 				228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */,
@@ -1714,7 +1714,7 @@
 				228E2B8D18CF770D0011DEAB /* SBJsonStreamParserState.m in Sources */,
 				227FF2A116FA128B00DBE3C5 /* HighlightsCountView.m in Sources */,
 				2230F8E817162ACD007F7C98 /* Ignore.m in Sources */,
-				22AD75ED1718567D00141257 /* BansTableViewController.m in Sources */,
+				22AD75ED1718567D00141257 /* ChannelModeListTableViewController.m in Sources */,
 				228E2B9C18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */,
 				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
 				228E2BA218CF770D0011DEAB /* SBJsonWriter.m in Sources */,

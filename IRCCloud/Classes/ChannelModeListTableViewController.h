@@ -1,7 +1,7 @@
 //
-//  BansTableViewController.h
+//  ChannelModeListTableViewController.h
 //
-//  Copyright (C) 2013 IRCCloud, Ltd.
+//  Copyright (C) 2014 IRCCloud, Ltd.
 //  Licensed under the Apache License, Version 2.0 (the "License");
 //  you may not use this file except in compliance with the License.
 //  You may obtain a copy of the License at
@@ -18,15 +18,21 @@
 #import <UIKit/UIKit.h>
 #import "IRCCloudJSONObject.h"
 
-@interface BansTableViewController : UITableViewController<UIAlertViewDelegate,UITextFieldDelegate> {
-    NSArray *_bans;
+@interface ChannelModeListTableViewController : UITableViewController<UIAlertViewDelegate,UITextFieldDelegate> {
+    NSArray *_data;
     IRCCloudJSONObject *_event;
     UIBarButtonItem *_addButton;
     int _bid;
+    int _list;
     UILabel *_placeholder;
     UIAlertView *_alertView;
+    NSString *_mode;
+    NSString *_param;
+    NSString *_mask;
 }
-@property (strong, nonatomic) NSArray *bans;
+@property (strong, nonatomic) NSArray *data;
 @property (strong, nonatomic) IRCCloudJSONObject *event;
-@property int bid;
+@property NSString *mask;
+
+-(id)initWithList:(int)list mode:(NSString *)mode param:(NSString *)param placeholder:(NSString *)placeholder bid:(int)bid;
 @end
