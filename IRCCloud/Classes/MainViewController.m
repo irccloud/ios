@@ -2847,7 +2847,7 @@
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
             if(_selectedEvent.groupMsg.length) {
                 [pb setValue:[NSString stringWithFormat:@"%@ %@", _selectedEvent.timestamp, [[ColorFormatter format:([_selectedEvent.groupMsg hasPrefix:@"   "])?[_selectedEvent.groupMsg substringFromIndex:3]:_selectedEvent.groupMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-            } else if(_selectedEvent.from.length) {
+            } else if(_selectedEvent.from.length || [_selectedEvent.type isEqualToString:@"buffer_me_msg"]) {
                 NSString *plaintext = [_selectedEvent.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ — %@ %@", _selectedEvent.timestamp,_selectedEvent.nick,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]]:[NSString stringWithFormat:@"%@ <%@> %@", _selectedEvent.timestamp,_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
                 [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
             } else {
