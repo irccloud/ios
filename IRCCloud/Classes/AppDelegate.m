@@ -316,32 +316,34 @@
         if([NetworkConnection sharedInstance].session.length && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected)
             [[NetworkConnection sharedInstance] connect:NO];
 
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [UIApplication sharedApplication].statusBarHidden = NO;
-        self.slideViewController.view.alpha = 1;
-        if(self.window.rootViewController != self.slideViewController) {
-            BOOL fromLoginView = (self.window.rootViewController == self.loginSplashViewController);
-            UIView *v = self.window.rootViewController.view;
-            self.window.rootViewController = self.slideViewController;
-            [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
-            if(fromLoginView)
-                [self.loginSplashViewController hideLoginView];
-            [UIView animateWithDuration:0.5f animations:^{
-                v.alpha = 0;
-            } completion:^(BOOL finished){
-                [v removeFromSuperview];
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                    self.window.backgroundColor = [UIColor whiteColor];
-            }];
-        }
-    }];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [UIApplication sharedApplication].statusBarHidden = NO;
+            self.slideViewController.view.alpha = 1;
+            if(self.window.rootViewController != self.slideViewController) {
+                BOOL fromLoginView = (self.window.rootViewController == self.loginSplashViewController);
+                UIView *v = self.window.rootViewController.view;
+                self.window.rootViewController = self.slideViewController;
+                [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
+                if(fromLoginView)
+                    [self.loginSplashViewController hideLoginView];
+                [UIView animateWithDuration:0.5f animations:^{
+                    v.alpha = 0;
+                } completion:^(BOOL finished){
+                    [v removeFromSuperview];
+                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                        self.window.backgroundColor = [UIColor whiteColor];
+                }];
+            }
+        }];
     } else if(self.window.rootViewController != self.slideViewController) {
-        [UIApplication sharedApplication].statusBarHidden = NO;
-        self.slideViewController.view.alpha = 1;
-        [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-        self.window.rootViewController = self.slideViewController;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-            self.window.backgroundColor = [UIColor whiteColor];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [UIApplication sharedApplication].statusBarHidden = NO;
+            self.slideViewController.view.alpha = 1;
+            [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+            self.window.rootViewController = self.slideViewController;
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                self.window.backgroundColor = [UIColor whiteColor];
+        }];
     }
 }
 
