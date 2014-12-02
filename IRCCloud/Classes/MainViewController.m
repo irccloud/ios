@@ -1904,6 +1904,7 @@
 
     int height = ((UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - _kbSize.height;
     int width = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
+    
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         height += [UIApplication sharedApplication].statusBarFrame.size.height;
     else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
@@ -1941,7 +1942,7 @@
         frame.size.height = height;
     }
     
-    if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width) {
+    if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width || self.view.frame.size.width != width || self.view.frame.size.height != height) {
         self.slidingViewController.view.frame = frame;
         self.navigationController.view.frame = self.slidingViewController.view.bounds;
     }

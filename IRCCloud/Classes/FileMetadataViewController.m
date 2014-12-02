@@ -32,7 +32,7 @@
 
 -(void)fileUploadWillUpload:(NSUInteger)bytes mimeType:(NSString *)mimeType {
     if(bytes < 1024) {
-        _metadata = [NSString stringWithFormat:@"%i B • %@", bytes, mimeType];
+        _metadata = [NSString stringWithFormat:@"%lu B • %@", (unsigned long)bytes, mimeType];
     } else {
         int exp = (int)(log(bytes) / log(1024));
         _metadata = [NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], mimeType];
