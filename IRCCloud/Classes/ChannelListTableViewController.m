@@ -129,7 +129,7 @@
     
     for(NSDictionary *channel in _channels) {
         NSMutableDictionary *c = [[NSMutableDictionary alloc] initWithDictionary:channel];
-        NSAttributedString *topic = [ColorFormatter format:[c objectForKey:@"topic"] defaultColor:[UIColor lightGrayColor] mono:NO linkify:NO server:nil links:nil];
+        NSAttributedString *topic = [ColorFormatter format:[c objectForKey:@"topic"] defaultColor:[UIColor lightGrayColor] mono:NO linkify:NO server:nil links:nil query:nil];
         [c setObject:topic forKey:@"formatted_topic"];
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(topic));
         CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.bounds.size.width - 6 - 12,CGFLOAT_MAX), NULL);
@@ -198,7 +198,7 @@
     if(!cell)
         cell = [[ChannelTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"channelcell"];
     NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-    cell.channel.attributedText = [ColorFormatter format:[NSString stringWithFormat:@"%c%@%c (%i member%@)",BOLD,[row objectForKey:@"name"],CLEAR, [[row objectForKey:@"num_members"] intValue],[[row objectForKey:@"num_members"] intValue]==1?@"":@"s"] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil];
+    cell.channel.attributedText = [ColorFormatter format:[NSString stringWithFormat:@"%c%@%c (%i member%@)",BOLD,[row objectForKey:@"name"],CLEAR, [[row objectForKey:@"num_members"] intValue],[[row objectForKey:@"num_members"] intValue]==1?@"":@"s"] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil];
     cell.topic.attributedText = [row objectForKey:@"formatted_topic"];
     return cell;
 }

@@ -90,7 +90,7 @@
             name = [NSString stringWithFormat:@"%c1%c%@%c (+%@)", COLOR_MIRC, BOLD, [user objectForKey:@"nick"], CLEAR, [user objectForKey:@"mode"]];
         else
             name = [NSString stringWithFormat:@"%c1%c%@", COLOR_MIRC, BOLD, [user objectForKey:@"nick"]];
-        NSAttributedString *formatted = [ColorFormatter format:[NSString stringWithFormat:@"%@%c%@%c%@",name,CLEAR,[[user objectForKey:@"away"] intValue]?@" [away]\n":@"\n", ITALICS, [user objectForKey:@"usermask"]] defaultColor:[UIColor lightGrayColor] mono:NO linkify:NO server:nil links:nil];
+        NSAttributedString *formatted = [ColorFormatter format:[NSString stringWithFormat:@"%@%c%@%c%@",name,CLEAR,[[user objectForKey:@"away"] intValue]?@" [away]\n":@"\n", ITALICS, [user objectForKey:@"usermask"]] defaultColor:[UIColor lightGrayColor] mono:NO linkify:NO server:nil links:nil query:nil];
         [u setObject:formatted forKey:@"formatted"];
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(formatted));
         CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.bounds.size.width - 6 - 12,CGFLOAT_MAX), NULL);

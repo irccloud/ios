@@ -1180,7 +1180,7 @@ float ColorFormatterCachedFontSize = 0.0f;
     return [quotes objectForKey:lastChar] && [input componentsSeparatedByString:lastChar].count != [input componentsSeparatedByString:[quotes objectForKey:lastChar]].count;
 }
 
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links query:(NSString *)query {
     if(!color)
         color = [UIColor blackColor];
     
@@ -1562,6 +1562,21 @@ float ColorFormatterCachedFontSize = 0.0f;
     }
     if(links)
         *links = [NSArray arrayWithArray:matches];
+    
+    if(query) {
+        NSRange searchRange = NSMakeRange(0,output.length);
+        NSRange foundRange;
+        while (searchRange.location < output.length) {
+            searchRange.length = output.length-searchRange.location;
+            foundRange = [output.string rangeOfString:query options:NSCaseInsensitiveSearch range:searchRange];
+            if (foundRange.location != NSNotFound) {
+                [output addAttribute:kTTTBackgroundFillColorAttributeName value:(__bridge id)[[UIColor yellowColor] CGColor] range:foundRange];
+                searchRange.location = foundRange.location+foundRange.length;
+            } else {
+                break;
+            }
+        }
+    }
     return output;
 }
 @end

@@ -28,6 +28,8 @@ NSString *kIRCCloudBacklogFailedNotification = @"com.irccloud.notification.backl
 NSString *kIRCCloudBacklogCompletedNotification = @"com.irccloud.notification.backlog.completed";
 NSString *kIRCCloudBacklogProgressNotification = @"com.irccloud.notification.backlog.progress";
 NSString *kIRCCloudEventKey = @"com.irccloud.event";
+NSString *kIRCCloudSearchFailedNotification = @"com.irccloud.notification.search.failed";
+NSString *kIRCCloudSearchCompletedNotification = @"com.irccloud.notification.search.completed";
 
 #if defined(BRAND_HOST)
 NSString *IRCCLOUD_HOST = @BRAND_HOST
@@ -142,6 +144,126 @@ NSLock *__parserLock = nil;
     if(!_cancelled) {
         [_parser parse:data];
     }
+}
+
+@end
+
+@interface SearchFetcher : NSObject<NSURLConnectionDelegate,SBJsonStreamParserAdapterDelegate> {
+    SBJsonStreamParser *_parser;
+    SBJsonStreamParserAdapter *_adapter;
+    NSString *_url;
+    BOOL _cancelled;
+    BOOL _running;
+    NSURLConnection *_connection;
+}
+-(id)initWithURL:(NSString *)URL;
+-(void)cancel;
+-(void)start;
+@end
+
+@implementation SearchFetcher
+
+-(id)initWithURL:(NSString *)URL {
+    self = [super init];
+    _url = URL;
+    _adapter = [[SBJsonStreamParserAdapter alloc] init];
+    _adapter.delegate = self;
+    _parser = [[SBJsonStreamParser alloc] init];
+    _parser.delegate = _adapter;
+    _cancelled = NO;
+    _running = NO;
+    return self;
+}
+-(void)cancel {
+    _cancelled = YES;
+    [_connection cancel];
+}
+-(void)start {
+    if(_cancelled || _running)
+        return;
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
+    
+    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+    if(_connection) {
+        [__parserLock lock];
+        _running = YES;
+        NSRunLoop *loop = [NSRunLoop currentRunLoop];
+        while(!_cancelled && _running && [loop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
+        [__parserLock unlock];
+    } else {
+        CLS_LOG(@"Failed to create NSURLConnection");
+        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudSearchFailedNotification object:self];
+    }
+}
+- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    if(_cancelled)
+        return;
+    CLS_LOG(@"Request failed: %@", error);
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudSearchFailedNotification object:self];
+    }];
+    _running = NO;
+    _cancelled = YES;
+}
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+    if(_cancelled)
+        return;
+    CLS_LOG(@"Search download completed");
+    _running = NO;
+}
+- (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
+    if(_cancelled)
+        return nil;
+    CLS_LOG(@"Fetching: %@", [request URL]);
+    return request;
+}
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
+    if([response statusCode] != 200) {
+        CLS_LOG(@"HTTP status code: %li", (long)[response statusCode]);
+        CLS_LOG(@"HTTP headers: %@", [response allHeaderFields]);
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudSearchFailedNotification object:self];
+        }];
+        _cancelled = YES;
+    }
+}
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+    if(!_cancelled) {
+        [_parser parse:data];
+    }
+}
+
+-(void)parser:(SBJsonStreamParser *)parser foundArray:(NSArray *)array {
+}
+
+-(void)parser:(SBJsonStreamParser *)parser foundObject:(NSDictionary *)dict {
+    [[EventsDataSource sharedInstance] clearSearch];
+    int matchCount = 0;
+    for(NSDictionary *match in [[[dict objectForKey:@"results"] objectForKey:@"matches"] reverseObjectEnumerator]) {
+        int firstMatch = 0, lastMatch = 0, i = 0;
+        for(NSDictionary *o in [match objectForKey:@"lines"]) {
+            if([[o objectForKey:@"match"] intValue]) {
+                if(firstMatch == 0)
+                    firstMatch = i;
+                lastMatch = i;
+                matchCount++;
+            }
+            i++;
+        }
+        for(i=firstMatch; i<=(lastMatch + 1) && i < [[match objectForKey:@"lines"] count]; i++) {
+            [[EventsDataSource sharedInstance] addSearchResult:[[IRCCloudJSONObject alloc] initWithDictionary:[[match objectForKey:@"lines"] objectAtIndex:i]]];
+        }
+    }
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudSearchCompletedNotification object:@{@"query":[dict objectForKey:@"query"], @"count":@(matchCount)}];
+    }];
+}
+
+-(void)parser:(SBJsonStreamParser *)parser foundObjectInArray:(NSDictionary *)dict {
 }
 
 @end
@@ -1600,6 +1722,19 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     fetcher.bid = bid;
 }
 
+-(void)search:(NSString *)query {
+    CFStringRef query_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)query, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    NSString *URL = [NSString stringWithFormat:@"https://%@/chat/search?query=%@", IRCCLOUD_HOST, query_escaped];
+    CFRelease(query_escaped);
+    
+    if(_search)
+        [_search cancel];
+    
+    _search = [[SearchFetcher alloc] initWithURL:URL];
+    [_queue addOperationWithBlock:^{
+        [(SearchFetcher *)_search start];
+    }];
+}
 
 -(OOBFetcher *)fetchOOB:(NSString *)url {
     for(OOBFetcher *fetcher in _oobQueue) {

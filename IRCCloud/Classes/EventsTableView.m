@@ -49,6 +49,7 @@ int __timestampWidth;
         _timestamp = [[UILabel alloc] init];
         _timestamp.backgroundColor = [UIColor clearColor];
         _timestamp.textColor = [UIColor timestampColor];
+        _timestamp.numberOfLines = 0;
         [self.contentView addSubview:_timestamp];
 
         _message = [[TTTAttributedLabel alloc] init];
@@ -99,6 +100,12 @@ int __timestampWidth;
         _timestamp.hidden = NO;
         _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
         _message.hidden = NO;
+    } else if(_type == ROW_SEARCHHEADER) {
+        _timestamp.frame = CGRectInset(frame, 6, 6);
+        _timestamp.hidden = NO;
+        _timestamp.textAlignment = NSTextAlignmentCenter;
+        _message.hidden = YES;
+        _socketClosedBar.hidden = YES;
     } else {
         if(_type == ROW_BACKLOG) {
             frame.origin.y = frame.size.height / 2;
@@ -192,6 +199,9 @@ int __timestampWidth;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(drawerClosed:)
                                                  name:ECSlidingViewTopDidReset object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(searchCompleted:)
+                                                 name:kIRCCloudSearchCompletedNotification object:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -297,6 +307,12 @@ int __timestampWidth;
             [self refresh];
         }];
     }
+}
+
+- (void)searchCompleted:(NSNotification *)notification {
+    _searchMode = YES;
+    _query = [notification.object objectForKey:@"query"];
+    [self refresh];
 }
 
 - (void)_sendHeartbeat {
@@ -425,7 +441,7 @@ int __timestampWidth;
 }
 
 - (void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped {
-    BOOL shouldExpand = NO;
+    BOOL shouldExpand = _searchMode;
     BOOL colors = NO;
     if(!event.isSelf && [_conn prefs] && [[[_conn prefs] objectForKey:@"nick-colors"] intValue] > 0)
         colors = YES;
@@ -789,6 +805,7 @@ int __timestampWidth;
     [_lock lock];
     NSInteger insertPos = -1;
     NSString *lastDay = nil;
+    int lastBid = -1;
     NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
     if(!e.timestamp) {
         if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]) {
@@ -814,10 +831,11 @@ int __timestampWidth;
     }
     e.groupEid = _currentCollapsedEid;
     
-    if(eid > _maxEid || _data.count == 0 || (eid == e.eid && [e compare:[_data objectAtIndex:_data.count - 1]] == NSOrderedDescending)) {
+    if(_searchMode || eid > _maxEid || _data.count == 0 || (eid == e.eid && [e compare:[_data objectAtIndex:_data.count - 1]] == NSOrderedDescending)) {
         //Message at bottom
         if(_data.count) {
             lastDay = ((Event *)[_data objectAtIndex:_data.count - 1]).day;
+            lastBid = ((Event *)[_data objectAtIndex:_data.count - 1]).bid;
         }
         _maxEid = eid;
         [_data addObject:e];
@@ -893,8 +911,29 @@ int __timestampWidth;
     
     if(eid < _minEid || _minEid == 0)
         _minEid = eid;
-    
-    if(![lastDay isEqualToString:e.day]) {
+
+    if(_searchMode && lastBid != e.bid) {
+        [_formatter setDateFormat:@"EEEE, MMMM dd, yyyy"];
+        Event *d = [[Event alloc] init];
+        d.bid = e.bid;
+        d.type = TYPE_SEARCHHEADER;
+        d.rowType = ROW_SEARCHHEADER;
+        d.eid = eid;
+        d.groupEid = -1;
+        d.timestamp = [_formatter stringFromDate:date];
+        d.bgColor = [UIColor whiteColor];
+        d.day = e.day;
+        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
+        if([b.type isEqualToString:@"console"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
+            d.timestamp = [NSString stringWithFormat:@"%@\n%@",s.name, d.timestamp];
+        } else if([b.type isEqualToString:@"conversation"]) {
+            d.timestamp = [NSString stringWithFormat:@"Conversation with %@\n%@",b.name, d.timestamp];
+        } else {
+            d.timestamp = [NSString stringWithFormat:@"%@\n%@",b.name, d.timestamp];
+        }
+        [_data insertObject:d atIndex:insertPos];
+    } else if(!_searchMode && ![lastDay isEqualToString:e.day]) {
         [_formatter setDateFormat:@"EEEE, MMMM dd, yyyy"];
         Event *d = [[Event alloc] init];
         d.type = TYPE_TIMESTMP;
@@ -911,6 +950,8 @@ int __timestampWidth;
 }
 
 -(void)setBuffer:(Buffer *)buffer {
+    _searchMode = NO;
+    _query = nil;
     _ready = NO;
     [_heartbeatTimer invalidate];
     _heartbeatTimer = nil;
@@ -1000,7 +1041,7 @@ int __timestampWidth;
     _collapsedEvents.server = _server;
     [_unseenHighlightPositions removeAllObjects];
     
-    if(!_buffer) {
+    if(!_buffer && !_searchMode) {
         [_lock unlock];
         self.tableView.tableHeaderView = nil;
         [self.tableView reloadData];
@@ -1025,7 +1066,7 @@ int __timestampWidth;
             __timestampWidth += [@" AM" sizeWithFont:f].width;
     }
     
-    NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
+    NSArray *events = _searchMode?[[EventsDataSource sharedInstance] search]:[[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
     if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
         if(_buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
             self.tableView.tableHeaderView = _headerView;
@@ -1035,12 +1076,17 @@ int __timestampWidth;
             self.tableView.tableHeaderView = nil;
         }
     } else if(events.count) {
-        [_ignore setIgnores:_server.ignores];
-        _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
-        if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
-            self.tableView.tableHeaderView = _headerView;
-        } else {
+        if(_searchMode) {
             self.tableView.tableHeaderView = nil;
+            _lastSeenEidPos = -1;
+        } else {
+            [_ignore setIgnores:_server.ignores];
+            _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
+            if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
+                self.tableView.tableHeaderView = _headerView;
+            } else {
+                self.tableView.tableHeaderView = nil;
+            }
         }
         for(Event *e in events) {
             [self insertEvent:e backlog:true nextIsGrouped:false];
@@ -1062,7 +1108,7 @@ int __timestampWidth;
     
     if(_minEid > 0 && _buffer.last_seen_eid > 0 && _minEid >= _buffer.last_seen_eid) {
         _lastSeenEidPos = 0;
-    } else {
+    } else if(!_searchMode) {
         Event *e = [[Event alloc] init];
         e.cid = _buffer.cid;
         e.bid = _buffer.bid;
@@ -1181,7 +1227,7 @@ int __timestampWidth;
     _ready = YES;
     [_lock unlock];
     
-    if(_conn.state == kIRCCloudStateConnected) {
+    if(_conn.state == kIRCCloudStateConnected && !_searchMode) {
         if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
             _requestingBacklog = YES;
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
@@ -1225,7 +1271,7 @@ int __timestampWidth;
             return e.height;
         } else if(e.formatted == nil && e.formattedMsg.length > 0) {
             NSArray *links;
-            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links];
+            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links query:_query];
             e.links = links;
         } else if(e.formattedMsg.length == 0) {
             //CLS_LOG(@"No formatted message: %@", e);
@@ -1236,6 +1282,8 @@ int __timestampWidth;
          e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
          CFRelease(framesetter);
         return e.height;
+    } else if(e.rowType == ROW_SEARCHHEADER) {
+        return 48;
     } else {
         return 26;
     }
@@ -1266,10 +1314,10 @@ int __timestampWidth;
     cell.message.text = e.formatted;
     if(e.from.length && e.msg.length) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];
-        cell.accessibilityValue = [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+        cell.accessibilityValue = [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil] string];
     } else if([e.type isEqualToString:@"buffer_me_msg"]) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Action at %@", e.timestamp];
-        cell.accessibilityValue = [NSString stringWithFormat:@"%@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
+        cell.accessibilityValue = [NSString stringWithFormat:@"%@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil] string]];
     }
     if((e.rowType == ROW_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
         if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
@@ -1329,6 +1377,9 @@ int __timestampWidth;
         cell.timestamp.backgroundColor = [UIColor selectedBlueColor];
     } else if(e.rowType == ROW_LASTSEENEID) {
         cell.timestamp.backgroundColor = [UIColor whiteColor];
+    } else if(e.rowType == ROW_SEARCHHEADER) {
+        cell.timestamp.textColor = [UIColor darkBlueColor];
+        cell.timestamp.backgroundColor = [UIColor backgroundBlueColor];
     } else {
         cell.timestamp.backgroundColor = [UIColor clearColor];
     }

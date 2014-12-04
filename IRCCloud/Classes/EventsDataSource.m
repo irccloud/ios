@@ -172,6 +172,53 @@
     if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
         encodeObject(_bgColor);
 }
+-(void)setFromObject:(IRCCloudJSONObject *)object {
+    _cid = object.cid;
+    _bid = object.bid;
+    _eid = object.eid;
+    _type = object.type;
+    _msg = [object objectForKey:@"msg"];
+    _hostmask = [object objectForKey:@"hostmask"];
+    _from = [object objectForKey:@"from"];
+    _fromMode = [object objectForKey:@"from_mode"];
+    if([object objectForKey:@"newnick"])
+        _nick = [object objectForKey:@"newnick"];
+    else
+        _nick = [object objectForKey:@"nick"];
+    _oldNick = [object objectForKey:@"oldnick"];
+    _server = [object objectForKey:@"server"];
+    _diff = [object objectForKey:@"diff"];
+    _isHighlight = [[object objectForKey:@"highlight"] boolValue];
+    _isSelf = [[object objectForKey:@"self"] boolValue];
+    _toChan = [[object objectForKey:@"to_chan"] boolValue];
+    _toBuffer = [[object objectForKey:@"to_buffer"] boolValue];
+    _ops = [object objectForKey:@"ops"];
+    _chan = [object objectForKey:@"chan"];
+    if([object objectForKey:@"reqid"])
+        _reqId = [[object objectForKey:@"reqid"] intValue];
+    else
+        _reqId = -1;
+    _color = [UIColor blackColor];
+    _bgColor = [UIColor whiteColor];
+    _rowType = 0;
+    _formatted = nil;
+    _formattedMsg = nil;
+    _groupMsg = nil;
+    _linkify = YES;
+    _targetMode = nil;
+    _pending = NO;
+    _monospace = NO;
+    
+    if([object objectForKey:@"value"] && ![_type hasPrefix:@"cap_"]) {
+        _msg = [NSString stringWithFormat:@"%@ %@", [object objectForKey:@"value"], _msg];
+    }
+    
+    if(_isHighlight)
+        _bgColor = [UIColor highlightBackgroundColor];
+    
+    if(_isSelf && _rowType != ROW_SOCKETCLOSED)
+        _bgColor = [UIColor selfBackgroundColor];
+}
 @end
 
 @implementation EventsDataSource
@@ -196,6 +243,7 @@
         _events = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
     }
 #endif
+    _search = [[NSMutableArray alloc] init];
     _events_sorted = [[NSMutableDictionary alloc] init];
     _highestEid = 0;
     if(_events) {
@@ -771,61 +819,37 @@
     }
     _dirty = YES;
     
-    event.cid = object.cid;
-    event.bid = object.bid;
-    event.eid = object.eid;
-    event.type = object.type;
-    event.msg = [object objectForKey:@"msg"];
-    event.hostmask = [object objectForKey:@"hostmask"];
-    event.from = [object objectForKey:@"from"];
-    event.fromMode = [object objectForKey:@"from_mode"];
-    if([object objectForKey:@"newnick"])
-        event.nick = [object objectForKey:@"newnick"];
-    else
-        event.nick = [object objectForKey:@"nick"];
-    event.oldNick = [object objectForKey:@"oldnick"];
-    event.server = [object objectForKey:@"server"];
-    event.diff = [object objectForKey:@"diff"];
-    event.isHighlight = [[object objectForKey:@"highlight"] boolValue];
-    event.isSelf = [[object objectForKey:@"self"] boolValue];
-    event.toChan = [[object objectForKey:@"to_chan"] boolValue];
-    event.toBuffer = [[object objectForKey:@"to_buffer"] boolValue];
-    event.ops = [object objectForKey:@"ops"];
-    event.chan = [object objectForKey:@"chan"];
-    if([object objectForKey:@"reqid"])
-        event.reqId = [[object objectForKey:@"reqid"] intValue];
-    else
-        event.reqId = -1;
-    event.color = [UIColor blackColor];
-    event.bgColor = [UIColor whiteColor];
-    event.rowType = 0;
-    event.formatted = nil;
-    event.formattedMsg = nil;
-    event.groupMsg = nil;
-    event.linkify = YES;
-    event.targetMode = nil;
-    event.pending = NO;
-    event.monospace = NO;
+    [event setFromObject:object];
     
     void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:object.type];
     if(formatter)
         formatter(event, object);
-        
-    if([object objectForKey:@"value"] && ![event.type hasPrefix:@"cap_"]) {
-        event.msg = [NSString stringWithFormat:@"%@ %@", [object objectForKey:@"value"], event.msg];
-    }
-
-    if(event.isHighlight)
-        event.bgColor = [UIColor highlightBackgroundColor];
-
-    if(event.isSelf && event.rowType != ROW_SOCKETCLOSED)
-        event.bgColor = [UIColor selfBackgroundColor];
     
     if(event.eid > _highestEid)
         _highestEid = event.eid;
-    
+
     return event;
 #endif
+}
+
+-(void)addSearchResult:(IRCCloudJSONObject *)object {
+#ifndef EXTENSION
+    Event *event = [[Event alloc] init];
+    [event setFromObject:object];
+    [_search addObject:event];
+    
+    void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:object.type];
+    if(formatter)
+        formatter(event, object);
+#endif
+}
+
+-(NSArray *)search {
+    return _search;
+}
+
+-(void)clearSearch {
+    [_search removeAllObjects];
 }
 
 -(Event *)event:(NSTimeInterval)eid buffer:(int)bid {

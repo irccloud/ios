@@ -123,7 +123,7 @@
     Server *server = [[ServersDataSource sharedInstance] getServer:_channel.cid];
     if([_channel.topic_text isKindOfClass:[NSString class]] && _channel.topic_text.length) {
         NSArray *links;
-        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
+        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links query:nil];
         _topicLabel.text = _topic;
         CGFloat lineSpacing = 6;
         CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
@@ -165,7 +165,7 @@
             _topicSetBy = nil;
         }
     } else {
-        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor grayColor] mono:NO linkify:NO server:nil links:nil];
+        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor grayColor] mono:NO linkify:NO server:nil links:nil query:nil];
         _topicLabel.text = _topic;
         _topicEdit.text = @"";
         _topicSetBy = nil;

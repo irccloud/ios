@@ -24,9 +24,11 @@
 #define ROW_LASTSEENEID 3
 #define ROW_SOCKETCLOSED 4
 #define ROW_FAILED 5
+#define ROW_SEARCHHEADER 6
 #define TYPE_TIMESTMP @"__timestamp__"
 #define TYPE_BACKLOG @"__backlog__"
 #define TYPE_LASTSEENEID @"__lastseeneid"
+#define TYPE_SEARCHHEADER @"__search__"
 
 @interface Event : NSObject<NSCoding> {
     int _cid;
@@ -86,6 +88,7 @@
 @interface EventsDataSource : NSObject {
     NSMutableDictionary *_events;
     NSMutableDictionary *_events_sorted;
+    NSMutableArray *_search;
     NSTimeInterval _highestEid;
     BOOL _dirty;
     NSDictionary *_formatterMap;
@@ -109,4 +112,7 @@
 -(int)highlightStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type;
 -(NSTimeInterval)lastEidForBuffer:(int)bid;
 -(void)clearPendingAndFailed;
+-(void)addSearchResult:(IRCCloudJSONObject *)object;
+-(NSArray *)search;
+-(void)clearSearch;
 @end

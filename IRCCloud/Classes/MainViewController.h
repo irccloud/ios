@@ -74,6 +74,8 @@
     UIPopoverController *_popover;
     UIVisualEffectView *_blur;
     NSTimeInterval _lastNotificationTime;
+    BOOL _searchMode;
+    NSString *_searchSubtitle;
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;

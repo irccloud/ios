@@ -34,6 +34,8 @@ extern NSString *kIRCCloudBacklogStartedNotification;
 extern NSString *kIRCCloudBacklogFailedNotification;
 extern NSString *kIRCCloudBacklogCompletedNotification;
 extern NSString *kIRCCloudBacklogProgressNotification;
+extern NSString *kIRCCloudSearchFailedNotification;
+extern NSString *kIRCCloudSearchCompletedNotification;
 
 extern NSString *kIRCCloudEventKey;
 
@@ -130,6 +132,7 @@ typedef enum {
     NSTimeInterval _firstEID;
     NSString *_streamId;
     int _accrued;
+    id _search;
     
     kIRCCloudState _state;
     NSDictionary *_userInfo;
@@ -205,4 +208,5 @@ typedef enum {
 -(int)resendVerifyEmail;
 -(int)changeEmail:(NSString *)email password:(NSString *)password;
 -(int)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename;
+-(void)search:(NSString *)query;
 @end

@@ -108,6 +108,10 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(viewWillLayoutSubviews)
                                                  name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(searchCompleted:)
+                                                 name:kIRCCloudSearchCompletedNotification object:nil];
     [super viewDidLoad];
     [self addChildViewController:_eventsView];
     
@@ -143,10 +147,11 @@
     _sendBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     _sendBtn.contentMode = UIViewContentModeCenter;
     _sendBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
-    [_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
+    [_sendBtn setTitle:@"Search" forState:UIControlStateNormal];
     [_sendBtn setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
     [_sendBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
     [_sendBtn sizeToFit];
+    [_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
         _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,12,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
     else
@@ -721,9 +726,9 @@
                 if(!e.isSelf && !_buffer.scrolledUp) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         if(e.from.length)
-                            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"New message from %@: %@", e.from, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]]);
+                            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"New message from %@: %@", e.from, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil] string]]);
                         else if([e.type isEqualToString:@"buffer_me_msg"])
-                            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"New action: %@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]]);
+                            UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"New action: %@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil] string]]);
                     }];
                 }
             } else {
@@ -976,6 +981,47 @@
     }
 }
 
+-(void)searchCompleted:(NSNotification *)notification {
+    _searchSubtitle = [NSString stringWithFormat:@"%@ results for '%@'", [notification.object objectForKey:@"count"], [notification.object objectForKey:@"query"]];
+    [self _updateTitleArea];
+    _sendBtn.enabled = YES;
+    [self _updateUserListVisibility];
+}
+
+-(void)endSearch {
+    _searchMode = NO;
+    _sendBtn.enabled = YES;
+    _searchSubtitle = nil;
+    [_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
+    [_sendBtn sizeToFit];
+    _cameraBtn.hidden = NO;
+    _message.returnKeyType = UIReturnKeySend;
+    CGRect frame = _message.frame;
+    frame.origin.x = 44;
+    _message.frame = frame;
+    [self _updateMessageWidth];
+    _bottomBar.backgroundColor = [UIColor whiteColor];
+    if(!_buffer)
+        [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
+}
+
+-(void)search {
+    [self bufferSelected:-1];
+    _searchMode = YES;
+    [_sendBtn setTitle:@"Search" forState:UIControlStateNormal];
+    [_sendBtn sizeToFit];
+    _cameraBtn.hidden = YES;
+    _message.returnKeyType = UIReturnKeySearch;
+    CGRect frame = _message.frame;
+    frame.origin.x = 12;
+    _message.frame = frame;
+    [self _updateMessageWidth];
+    _bottomBar.backgroundColor = [UIColor navBarColor];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^() {
+        [_message becomeFirstResponder];
+    }];
+}
+
 -(void)keyboardWillShow:(NSNotification*)notification {
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
@@ -1161,6 +1207,17 @@
 
         if(_message.text.length > 1 && [_message.text hasSuffix:@" "])
             _message.text = [_message.text substringToIndex:_message.text.length - 1];
+        
+        if(_searchMode) {
+            UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+            [spinny startAnimating];
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+            [[NetworkConnection sharedInstance] search:_message.text];
+            [_message clearText];
+            [_eventsView setBuffer:nil];
+            _sendBtn.enabled = NO;
+            return;
+        }
         
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s) {
@@ -1395,7 +1452,7 @@
 }
 
 -(void)_updateMessageWidth {
-    if(_message.text.length > 0) {
+    if(_message.text.length > 0 || _searchMode) {
         CGRect frame = _message.frame;
         frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
         _message.frame = frame;
@@ -1459,7 +1516,21 @@
 
 -(void)_updateTitleArea {
     _lock.hidden = YES;
-    if([_buffer.type isEqualToString:@"console"]) {
+    if(_searchMode) {
+        self.navigationItem.title = _titleLabel.text = @"Search";
+        if(_searchSubtitle) {
+            _topicLabel.hidden = NO;
+            _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
+            _titleLabel.font = [UIFont boldSystemFontOfSize:18];
+            _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
+            _topicLabel.text = _searchSubtitle;
+        } else {
+            _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
+            _titleLabel.font = [UIFont boldSystemFontOfSize:20];
+            _titleLabel.accessibilityValue = @"Search";
+            _topicLabel.hidden = YES;
+        }
+    } else if([_buffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s.name.length)
             _titleLabel.text = s.name;
@@ -1480,7 +1551,7 @@
         else
             _lock.image = [UIImage imageNamed:@"world"];
     } else {
-        self.navigationItem.title = _buffer.name = _titleLabel.text = _buffer.name;
+        self.navigationItem.title = _titleLabel.text = _buffer.name;
         _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
         _titleLabel.font = [UIFont boldSystemFontOfSize:20];
         _titleLabel.accessibilityValue = _buffer.accessibilityValue;
@@ -1498,7 +1569,7 @@
                     _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
                     _titleLabel.font = [UIFont boldSystemFontOfSize:18];
                     _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
-                    _topicLabel.text = [[ColorFormatter format:channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+                    _topicLabel.text = [[ColorFormatter format:channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil] string];
                     _topicLabel.accessibilityLabel = @"Topic";
                     _topicLabel.accessibilityValue = _topicLabel.text;
                     _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,_titleLabel.bounds.size.height-4);
@@ -1621,6 +1692,8 @@
         _buffer.lastBuffer = lastBuffer;
         lastBuffer.draft = _message.text;
     }
+    if(!lastBuffer && bid != -1)
+        [self endSearch];
     if(_buffer) {
         _bidToOpen = -1;
         _eidToOpen = -1;
@@ -1693,7 +1766,7 @@
         msg = [msg stringByReplacingOccurrencesOfString:@"<br>" withString:@"\n"];
         msg = [msg stringByReplacingOccurrencesOfString:@"<br/>" withString:@"\n"];
         
-        NSMutableAttributedString *s = (NSMutableAttributedString *)[ColorFormatter format:msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil];
+        NSMutableAttributedString *s = (NSMutableAttributedString *)[ColorFormatter format:msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil];
         
         CTTextAlignment alignment = kCTCenterTextAlignment;
         CTParagraphStyleSetting paragraphStyle;
@@ -1942,7 +2015,7 @@
         frame.size.height = height;
     }
     
-    if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width || self.view.frame.size.width != width || self.view.frame.size.height != height) {
+    if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width || self.view.frame.size.width != width) {
         self.slidingViewController.view.frame = frame;
         self.navigationController.view.frame = self.slidingViewController.view.bounds;
     }
@@ -2092,6 +2165,10 @@
         [self performSelectorOnMainThread:@selector(_updateUserListVisibility) withObject:nil waitUntilDone:YES];
         return;
     }
+    if(_searchMode) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(endSearch)];
+        return;
+    }
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             self.navigationItem.rightBarButtonItem = _usersButtonItem;
@@ -2233,6 +2310,8 @@
     _selectedBuffer = _buffer;
     User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    if([[[NetworkConnection sharedInstance].userInfo objectForKey:@"admin"] intValue])
+        [sheet addButtonWithTitle:@"Search"];
     if([_buffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if([s.status isEqualToString:@"disconnected"]) {
@@ -2402,7 +2481,7 @@
         [sheet addButtonWithTitle:@"Copy URL"];
     if(_selectedEvent)
         [sheet addButtonWithTitle:@"Copy Message"];
-    if(_selectedUser) {
+    if(_selectedUser && !_searchMode) {
         [sheet addButtonWithTitle:@"Whois"];
         [sheet addButtonWithTitle:@"Send a message"];
         [sheet addButtonWithTitle:@"Mention"];
@@ -2847,13 +2926,15 @@
         if([action isEqualToString:@"Copy Message"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
             if(_selectedEvent.groupMsg.length) {
-                [pb setValue:[NSString stringWithFormat:@"%@ %@", _selectedEvent.timestamp, [[ColorFormatter format:([_selectedEvent.groupMsg hasPrefix:@"   "])?[_selectedEvent.groupMsg substringFromIndex:3]:_selectedEvent.groupMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                [pb setValue:[NSString stringWithFormat:@"%@ %@", _selectedEvent.timestamp, [[ColorFormatter format:([_selectedEvent.groupMsg hasPrefix:@"   "])?[_selectedEvent.groupMsg substringFromIndex:3]:_selectedEvent.groupMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil] string]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
             } else if(_selectedEvent.from.length || [_selectedEvent.type isEqualToString:@"buffer_me_msg"]) {
-                NSString *plaintext = [_selectedEvent.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ — %@ %@", _selectedEvent.timestamp,_selectedEvent.nick,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]]:[NSString stringWithFormat:@"%@ <%@> %@", _selectedEvent.timestamp,_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
+                NSString *plaintext = [_selectedEvent.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ — %@ %@", _selectedEvent.timestamp,_selectedEvent.nick,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil] string]]:[NSString stringWithFormat:@"%@ <%@> %@", _selectedEvent.timestamp,_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil] string]];
                 [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
             } else {
-                [pb setValue:[NSString stringWithFormat:@"%@ %@", _selectedEvent.timestamp, [[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                [pb setValue:[NSString stringWithFormat:@"%@ %@", _selectedEvent.timestamp, [[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil query:nil] string]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
             }
+        } else if([action isEqualToString:@"Search"]) {
+            [self search];
         } else if([action isEqualToString:@"Copy URL"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
             [pb setValue:_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
