@@ -1384,7 +1384,7 @@ int __timestampWidth;
         [UIView setAnimationDuration:0.1];
         _topUnreadView.alpha = 0;
         [UIView commitAnimations];
-        [self sendHeartbeat];
+        [self _sendHeartbeat];
     }
 }
 
