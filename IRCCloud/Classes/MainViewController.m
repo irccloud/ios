@@ -1303,8 +1303,9 @@
             
             for(User *user in _sortedUsers) {
                 NSString *nick = user.nick.lowercaseString;
-                if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 && [nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location > 0) {
-                    nick = [nick substringFromIndex:[nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location];
+                NSUInteger location = [nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location;
+                if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 &&  location != NSNotFound && location > 0) {
+                    nick = [nick substringFromIndex:location];
                 }
                 if([nick hasPrefix:text] && ![suggestions_set containsObject:user.nick.lowercaseString]) {
                     [suggestions_set addObject:user.nick.lowercaseString];
@@ -1480,7 +1481,7 @@
         else
             _lock.image = [UIImage imageNamed:@"world"];
     } else {
-        self.navigationItem.title = _buffer.name = _titleLabel.text = _buffer.name;
+        self.navigationItem.title = _titleLabel.text = _buffer.name;
         _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
         _titleLabel.font = [UIFont boldSystemFontOfSize:20];
         _titleLabel.accessibilityValue = _buffer.accessibilityValue;
@@ -1942,7 +1943,7 @@
         frame.size.height = height;
     }
     
-    if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width || self.view.frame.size.width != width || self.view.frame.size.height != height) {
+    if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width || self.view.frame.size.width != width) {
         self.slidingViewController.view.frame = frame;
         self.navigationController.view.frame = self.slidingViewController.view.bounds;
     }
