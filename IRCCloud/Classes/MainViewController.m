@@ -1304,7 +1304,7 @@
             for(User *user in _sortedUsers) {
                 NSString *nick = user.nick.lowercaseString;
                 NSUInteger location = [nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location;
-                if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 &&  location != NSNotFound && location > 0) {
+                if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 && location != NSNotFound && location > 0) {
                     nick = [nick substringFromIndex:location];
                 }
                 if([nick hasPrefix:text] && ![suggestions_set containsObject:user.nick.lowercaseString]) {
@@ -2337,11 +2337,10 @@
             start--;
         if(start < 0)
             start = 0;
-        NSInteger match = [text rangeOfString:from options:0 range:NSMakeRange(start, text.length - start)].location;
-        NSInteger end = oldPosition + from.length;
-        if(end > text.length - 1)
-            end = text.length - 1;
-        if(match >= 0 && match < end) {
+        NSRange range = [text rangeOfString:from options:0 range:NSMakeRange(start, text.length - start)];
+        NSInteger match = range.location;
+        char nextChar = (range.location != NSNotFound && range.location + range.length < text.length)?[text characterAtIndex:range.location + range.length]:0;
+        if(match != NSNotFound && (nextChar == 0 || nextChar == ' ' || nextChar == ':')) {
             NSMutableString *newtext = [[NSMutableString alloc] init];
             if(match > 1 && [text characterAtIndex:match - 1] == ' ')
                 [newtext appendString:[text substringWithRange:NSMakeRange(0, match - 1)]];
