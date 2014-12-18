@@ -25,7 +25,23 @@
             output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
             
             if(output.attachments.count) {
-                NSItemProvider *i = output.attachments.firstObject;
+                NSItemProvider *i = nil;
+                for(NSItemProvider *p in output.attachments) {
+                    if([p hasItemConformingToTypeIdentifier:@"public.url"] && ![p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                        i = p;
+                        break;
+                    }
+                }
+                if(!i) {
+                    for(NSItemProvider *p in output.attachments) {
+                        if([p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                            i = p;
+                            break;
+                        }
+                    }
+                }
+                if(!i)
+                    i = output.attachments.firstObject;
                 
                 NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
                     NSLog(@"Uploading image to IRCCloud");
@@ -120,7 +136,23 @@
                 [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
             }];
         } else {
-            NSItemProvider *i = output.attachments.firstObject;
+            NSItemProvider *i = nil;
+            for(NSItemProvider *p in output.attachments) {
+                if([p hasItemConformingToTypeIdentifier:@"public.url"] && ![p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                    i = p;
+                    break;
+                }
+            }
+            if(!i) {
+                for(NSItemProvider *p in output.attachments) {
+                    if([p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                        i = p;
+                        break;
+                    }
+                }
+            }
+            if(!i)
+                i = output.attachments.firstObject;
 
             NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
                 NSLog(@"Uploading image to imgur");
@@ -128,7 +160,7 @@
                 _uploader.msg = self.contentText;
                 [_uploader upload:item];
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+                    [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
                 }];
             };
             
@@ -141,7 +173,7 @@
                     else
                         [_conn say:item.absoluteString to:_buffer.name cid:_buffer.cid];
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+                        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
                         AudioServicesPlaySystemSound(_sound);
                     }];
                 }
@@ -155,7 +187,7 @@
         }
     } else {
         [_conn say:self.contentText to:_buffer.name cid:_buffer.cid];
-        [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
         AudioServicesPlaySystemSound(_sound);
     }
 }
