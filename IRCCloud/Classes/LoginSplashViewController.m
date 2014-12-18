@@ -726,6 +726,16 @@
                         message = @"This email address is already in use, please sign in or try another.";
                     if([[result objectForKey:@"message"] isEqualToString:@"rate_limited"])
                         message = @"Rate limited, please try again in a few minutes.";
+                    if([[result objectForKey:@"message"] isEqualToString:@"password_error"])
+                        message = @"Invalid password, please try again.";
+                    if([[result objectForKey:@"message"] isEqualToString:@"banned"] || [[result objectForKey:@"message"] isEqualToString:@"ip_banned"])
+                        message = @"Signup server unavailable, please try again later.";
+                    if([[result objectForKey:@"message"] isEqualToString:@"bad_email"])
+                        message = @"No signups allowed from that domain.";
+                    if([[result objectForKey:@"message"] isEqualToString:@"tor_blocked"])
+                        message = @"No signups allowed from TOR exit nodes";
+                    if([[result objectForKey:@"message"] isEqualToString:@"signup_ip_blocked"])
+                        message = @"Your IP address has been blacklisted.";
                     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:name.alpha?@"Sign Up Failed":@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [alert show];
                 });
