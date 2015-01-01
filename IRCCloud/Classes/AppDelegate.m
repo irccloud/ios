@@ -208,6 +208,7 @@
 }
 
 -(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *))restorationHandler {
+    CLS_LOG(@"Continuing activity type: %@", userActivity.activityType);
 #ifdef ENTERPRISE
     if([userActivity.activityType isEqualToString:@"com.irccloud.enterprise.buffer"]) {
 #else
@@ -215,7 +216,7 @@
 #endif
         self.mainViewController.bidToOpen = [[userActivity.userInfo objectForKey:@"bid"] intValue];
         self.mainViewController.eidToOpen = 0;
-        NSLog(@"Opening BID from handoff: %i", self.mainViewController.bidToOpen);
+        CLS_LOG(@"Opening BID from handoff: %i", self.mainViewController.bidToOpen);
         [self.mainViewController bufferSelected:[[userActivity.userInfo objectForKey:@"bid"] intValue]];
         return YES;
     }
@@ -274,7 +275,7 @@
         if([userInfo objectForKey:@"d"]) {
             self.mainViewController.bidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
             self.mainViewController.eidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
-            NSLog(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
+            CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
             [self.mainViewController bufferSelected:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
         }
     }

@@ -962,6 +962,7 @@
                 bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
         }
         if(_bidToOpen != -1) {
+            CLS_LOG(@"backlog complete: BID to open: %i", _bidToOpen);
             bid = _bidToOpen;
             _bidToOpen = -1;
         } else if(_eidToOpen > 0) {
@@ -1053,8 +1054,8 @@
                 bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
         }
         if(_bidToOpen != -1) {
+            CLS_LOG(@"viewwillappear: BID to open: %i", _bidToOpen);
             bid = _bidToOpen;
-            _bidToOpen = -1;
         }
         [self bufferSelected:bid];
         if(_urlToOpen) {
@@ -1645,26 +1646,15 @@
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
             NSUserActivity *activity = [self userActivity];
             if(![activity.activityType hasSuffix:@".buffer"]) {
-                [[self userActivity] invalidate];
+                [activity invalidate];
 #ifdef ENTERPRISE
                 activity = [[NSUserActivity alloc] initWithActivityType: @"com.irccloud.enterprise.buffer"];
 #else
                 activity = [[NSUserActivity alloc] initWithActivityType: @"com.irccloud.buffer"];
 #endif
-                activity.title = @"IRCCloud";
+                activity.delegate = self;
                 [self setUserActivity:activity];
             }
-#ifndef ENTERPRISE
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            if([_buffer.type isEqualToString:@"console"]) {
-                activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@:%i", s.hostname, s.port]];
-                activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", s.hostname];
-            } else {
-                activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@:%i/%@", s.hostname, s.port, [_buffer.name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-                activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", _buffer.name];
-            }
-#endif
-            activity.userInfo = @{@"bid":@(_buffer.bid), @"cid":@(_buffer.cid)};
             [activity setNeedsSave:YES];
             [activity becomeCurrent];
         }
@@ -1702,6 +1692,20 @@
     [self.slidingViewController resetTopView];
     [self _updateUnreadIndicator];
     [self updateSuggestions:NO];
+}
+
+-(void)userActivityWillSave:(NSUserActivity *)activity {
+#ifndef ENTERPRISE
+    Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+    if([_buffer.type isEqualToString:@"console"]) {
+        activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@:%i", s.hostname, s.port]];
+        activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", s.hostname];
+    } else {
+        activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@:%i/%@", s.hostname, s.port, [_buffer.name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", _buffer.name];
+    }
+#endif
+    [activity addUserInfoEntriesFromDictionary:@{@"bid":@(_buffer.bid), @"cid":@(_buffer.cid)}];
 }
 
 -(void)_updateGlobalMsg {

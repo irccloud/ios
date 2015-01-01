@@ -1334,6 +1334,9 @@
 							com.apple.Keychain = {
 								enabled = 1;
 							};
+							com.apple.SafariKeychain = {
+								enabled = 1;
+							};
 							com.apple.iCloud = {
 								enabled = 1;
 							};
@@ -1961,7 +1964,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-DEXTENSION";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2dc91918-beac-4a97-82bf-4d2d838badbc";
+				PROVISIONING_PROFILE = "f07ba8dd-0d9f-4356-a3f8-0bb9fb10c5cb";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2186,7 +2189,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "18b220f9-f226-42b7-83cc-8778747f7b99";
+				PROVISIONING_PROFILE = "f4fa3e7b-6435-462b-b73b-9e4ea6b0103f";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2212,7 +2215,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "7c1b62a7-8158-47a2-9e61-96ad6eecbcd2";
+				PROVISIONING_PROFILE = "946e3a63-ee75-4ef4-a30d-4adc74d879e3";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
