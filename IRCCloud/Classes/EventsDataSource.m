@@ -373,6 +373,7 @@
                       @"user_channel_mode":^(Event *event, IRCCloudJSONObject *object) {
                           event.targetMode = [object objectForKey:@"newmode"];
                           event.chan = [object objectForKey:@"channel"];
+                          event.isSelf = NO;
                       },
                       @"buffer_me_msg":^(Event *event, IRCCloudJSONObject *object) {
                           event.nick = event.from;
@@ -497,6 +498,7 @@
                               event.msg = [NSString stringWithFormat:@"Channel mode set to: %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
                           event.linkify = NO;
                           event.bgColor = [UIColor statusBackgroundColor];
+                          event.isSelf = NO;
                       },
                       @"channel_mode_is":^(Event *event, IRCCloudJSONObject *object) {
                           event.from = @"";
