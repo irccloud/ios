@@ -97,5 +97,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>com.irccloud.enterprise.buffer</string>
+	</array>
 </dict>
 </plist>

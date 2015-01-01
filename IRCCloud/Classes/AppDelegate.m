@@ -208,7 +208,11 @@
 }
 
 -(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *))restorationHandler {
+#ifdef ENTERPRISE
+    if([userActivity.activityType isEqualToString:@"com.irccloud.enterprise.buffer"]) {
+#else
     if([userActivity.activityType isEqualToString:@"com.irccloud.buffer"]) {
+#endif
         self.mainViewController.bidToOpen = [[userActivity.userInfo objectForKey:@"bid"] intValue];
         self.mainViewController.eidToOpen = 0;
         NSLog(@"Opening BID from handoff: %i", self.mainViewController.bidToOpen);
