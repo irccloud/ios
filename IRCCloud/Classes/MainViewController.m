@@ -1642,6 +1642,32 @@
             [u setObject:@(bid) forKey:@"last_selected_bid"];
             [NetworkConnection sharedInstance].userInfo = [NSDictionary dictionaryWithDictionary:u];
         }
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+            NSUserActivity *activity = [self userActivity];
+            if(![activity.activityType hasSuffix:@".buffer"]) {
+                [[self userActivity] invalidate];
+#ifdef ENTERPRISE
+                activity = [[NSUserActivity alloc] initWithActivityType: @"com.irccloud.enterprise.buffer"];
+#else
+                activity = [[NSUserActivity alloc] initWithActivityType: @"com.irccloud.buffer"];
+#endif
+                activity.title = @"IRCCloud";
+                [self setUserActivity:activity];
+            }
+#ifndef ENTERPRISE
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            if([_buffer.type isEqualToString:@"console"]) {
+                activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@:%i", s.hostname, s.port]];
+                activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", s.hostname];
+            } else {
+                activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@:%i/%@", s.hostname, s.port, [_buffer.name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+                activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", _buffer.name];
+            }
+#endif
+            activity.userInfo = @{@"bid":@(_buffer.bid), @"cid":@(_buffer.cid)};
+            [activity setNeedsSave:YES];
+            [activity becomeCurrent];
+        }
     } else {
         CLS_LOG(@"BID selected but not found: bid%i", bid);
     }

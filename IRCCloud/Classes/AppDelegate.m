@@ -207,6 +207,18 @@
     return YES;
 }
 
+-(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *))restorationHandler {
+    if([userActivity.activityType isEqualToString:@"com.irccloud.buffer"]) {
+        self.mainViewController.bidToOpen = [[userActivity.userInfo objectForKey:@"bid"] intValue];
+        self.mainViewController.eidToOpen = 0;
+        NSLog(@"Opening BID from handoff: %i", self.mainViewController.bidToOpen);
+        [self.mainViewController bufferSelected:[[userActivity.userInfo objectForKey:@"bid"] intValue]];
+        return YES;
+    }
+    
+    return NO;
+}
+
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if([url.scheme hasPrefix:@"irccloud"]) {

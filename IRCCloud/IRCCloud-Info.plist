@@ -63,6 +63,10 @@
 	<string>GIT_VERSION</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>com.irccloud.buffer</string>
+	</array>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Lato-Regular.ttf</string>
