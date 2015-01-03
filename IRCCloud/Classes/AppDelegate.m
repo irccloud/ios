@@ -214,10 +214,16 @@
 #else
     if([userActivity.activityType isEqualToString:@"com.irccloud.buffer"]) {
 #endif
-        self.mainViewController.bidToOpen = [[userActivity.userInfo objectForKey:@"bid"] intValue];
-        self.mainViewController.eidToOpen = 0;
-        CLS_LOG(@"Opening BID from handoff: %i", self.mainViewController.bidToOpen);
-        [self.mainViewController bufferSelected:[[userActivity.userInfo objectForKey:@"bid"] intValue]];
+        if([userActivity.userInfo objectForKey:@"bid"]) {
+            self.mainViewController.bidToOpen = [[userActivity.userInfo objectForKey:@"bid"] intValue];
+            self.mainViewController.eidToOpen = 0;
+            CLS_LOG(@"Opening BID from handoff: %i", self.mainViewController.bidToOpen);
+            [self.mainViewController bufferSelected:[[userActivity.userInfo objectForKey:@"bid"] intValue]];
+        } else {
+            NSURL *url = [NSURL URLWithString:[userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/#!/" withString:@"irc://"]];
+            CLS_LOG(@"Opening URL from handoff: %@", url.absoluteString);
+            [self.mainViewController launchURL:url];
+        }
         return YES;
     }
     
