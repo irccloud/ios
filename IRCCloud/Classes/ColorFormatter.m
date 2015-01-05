@@ -1064,7 +1064,8 @@ float ColorFormatterCachedFontSize = 0.0f;
                      @"'(":@"😢",
                      @"_(":@"😭",
                      @";)":@"😉",
-                     @";p":@"😜"};
+                     @";p":@"😜",
+                     @"simple_smile":@":)"};
     
     static NSRegularExpression *_pattern;
     if(!_pattern) {
