@@ -1430,6 +1430,8 @@
     }
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         [[self userActivity] setNeedsSave:YES];
+    if(_buffer)
+        _buffer.draft = expandingTextView.text;
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
@@ -1622,6 +1624,7 @@
     Buffer *lastBuffer = _buffer;
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if(lastBuffer && changed) {
+        NSLog(@"Saving draft: %@", _message.text);
         _buffer.lastBuffer = lastBuffer;
         lastBuffer.draft = _message.text;
     }
@@ -1682,7 +1685,9 @@
             _eventsView.bottomUnreadView.alpha = 0;
             _eventActivity.alpha = 1;
             [_eventActivity startAnimating];
+            NSString *draft = _buffer.draft;
             [_message clearText];
+            _buffer.draft = draft;
         } completion:^(BOOL finished){
             [_eventsView setBuffer:_buffer];
             [UIView animateWithDuration:0.1 animations:^{
