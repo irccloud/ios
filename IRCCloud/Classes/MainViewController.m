@@ -1428,6 +1428,8 @@
     } else {
         [self performSelectorOnMainThread:@selector(scheduleSuggestionsTimer) withObject:nil waitUntilDone:NO];
     }
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+        [[self userActivity] setNeedsSave:YES];
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
@@ -1624,8 +1626,12 @@
         lastBuffer.draft = _message.text;
     }
     if(_buffer) {
-        if(_bidToOpen == _buffer.bid && _incomingDraft) {
-            _buffer.draft = _incomingDraft;
+        if(_incomingDraft) {
+            if(changed) {
+                _buffer.draft = _incomingDraft;
+            } else {
+                [_message setText:_incomingDraft];
+            }
             _incomingDraft = nil;
         }
         _bidToOpen = -1;
