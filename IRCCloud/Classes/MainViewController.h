@@ -58,6 +58,7 @@
     int _cidToOpen;
     NSString *_bufferToOpen;
     NSURL *_urlToOpen;
+    NSString *_incomingDraft;
     NSTimer *_doubleTapTimer;
     NSMutableArray *_pendingEvents;
     int _bidToOpen;
@@ -77,6 +78,7 @@
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;
+@property (nonatomic) NSString *incomingDraft;
 -(void)bufferSelected:(int)bid;
 -(void)sendButtonPressed:(id)sender;
 -(void)usersButtonPressed:(id)sender;

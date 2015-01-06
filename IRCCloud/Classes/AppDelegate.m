@@ -217,6 +217,7 @@
         if([userActivity.userInfo objectForKey:@"bid"]) {
             self.mainViewController.bidToOpen = [[userActivity.userInfo objectForKey:@"bid"] intValue];
             self.mainViewController.eidToOpen = 0;
+            self.mainViewController.incomingDraft = [userActivity.userInfo objectForKey:@"draft"];
             CLS_LOG(@"Opening BID from handoff: %i", self.mainViewController.bidToOpen);
             [self.mainViewController bufferSelected:[[userActivity.userInfo objectForKey:@"bid"] intValue]];
             return YES;

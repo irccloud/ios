@@ -1624,6 +1624,10 @@
         lastBuffer.draft = _message.text;
     }
     if(_buffer) {
+        if(_bidToOpen == _buffer.bid && _incomingDraft) {
+            _buffer.draft = _incomingDraft;
+            _incomingDraft = nil;
+        }
         _bidToOpen = -1;
         _eidToOpen = -1;
         _urlToOpen = nil;
@@ -1705,7 +1709,7 @@
         activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", _buffer.name];
     }
 #endif
-    [activity addUserInfoEntriesFromDictionary:@{@"bid":@(_buffer.bid), @"cid":@(_buffer.cid)}];
+    [activity addUserInfoEntriesFromDictionary:@{@"bid":@(_buffer.bid), @"cid":@(_buffer.cid), @"draft":(_message.text?_message.text:@"")}];
 }
 
 -(void)_updateGlobalMsg {
