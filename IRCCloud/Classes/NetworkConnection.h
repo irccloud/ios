@@ -141,6 +141,9 @@ typedef enum {
     BOOL _reachabilityValid;
     NSDictionary *_parserMap;
     NSString *_globalMsg;
+    NSString *_session;
+    
+    int _keychainFailCount;
 }
 @property (readonly) kIRCCloudState state;
 @property NSDictionary *userInfo;

@@ -1787,6 +1787,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _reconnectTimestamp = 0;
     _streamId = nil;
     _userInfo = @{};
+    _session = nil;
     [self disconnect];
     [self performSelectorInBackground:@selector(_logout:) withObject:self.session];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
@@ -1815,6 +1816,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSString *)session {
+    if(_session) {
+        _keychainFailCount = 0;
+        return _session;
+    }
+    
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"session"]) {
         self.session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
@@ -1828,9 +1834,23 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     OSStatus err = SecItemCopyMatching((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, kCFBooleanTrue, kSecReturnData, nil], (CFTypeRef*)&data);
 #endif
     if(!err) {
-        return [[NSString alloc] initWithData:CFBridgingRelease(data) encoding:NSUTF8StringEncoding];
+        _keychainFailCount = 0;
+        _session = [[NSString alloc] initWithData:CFBridgingRelease(data) encoding:NSUTF8StringEncoding];
+        return _session;
+    } else {
+        _keychainFailCount++;
+        if(_keychainFailCount < 10 && err != errSecItemNotFound) {
+            CLS_LOG(@"Error fetching session: %i, trying again", (int)err);
+            return self.session;
+        } else {
+            if(err == errSecItemNotFound)
+                CLS_LOG(@"Session key not found");
+            else
+                CLS_LOG(@"Error fetching session: %i", (int)err);
+            _keychainFailCount = 0;
+            return nil;
+        }
     }
-    return nil;
 }
 
 -(void)setSession:(NSString *)session {
@@ -1841,6 +1861,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, nil]);
     SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, nil], NULL);
 #endif
+    _session = session;
 }
 
 -(BOOL)notifier {
