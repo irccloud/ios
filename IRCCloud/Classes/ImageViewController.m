@@ -380,6 +380,16 @@
 - (void)viewDidAppear:(BOOL)animated {
     [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        NSUserActivity *activity = [self userActivity];
+        if(![activity.activityType hasSuffix:@".buffer"]) {
+            [activity invalidate];
+            activity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
+            activity.webpageURL = _url;
+            [self setUserActivity:activity];
+        }
+        [activity becomeCurrent];
+    }
 }
 
 -(IBAction)viewTapped:(id)sender {
