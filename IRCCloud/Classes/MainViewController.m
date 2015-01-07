@@ -1428,8 +1428,10 @@
     } else {
         [self performSelectorOnMainThread:@selector(scheduleSuggestionsTimer) withObject:nil waitUntilDone:NO];
     }
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         [[self userActivity] setNeedsSave:YES];
+        [self userActivityWillSave:[self userActivity]];
+    }
     if(_buffer)
         _buffer.draft = expandingTextView.text;
 }
@@ -1707,6 +1709,12 @@
     [self.slidingViewController resetTopView];
     [self _updateUnreadIndicator];
     [self updateSuggestions:NO];
+}
+
+-(void)userActivityWasContinued:(NSUserActivity *)userActivity {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [_message clearText];
+    }];
 }
 
 -(void)userActivityWillSave:(NSUserActivity *)activity {
