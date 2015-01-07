@@ -43,6 +43,7 @@
     }
 
 #ifdef IMGUR_KEY
+    NSUserDefaults *d2 = [NSUserDefaults standardUserDefaults];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.imgur.com/oauth2/token"]];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[[NSString stringWithFormat:@"refresh_token=%@&client_id=%@&client_secret=%@&grant_type=refresh_token", [d objectForKey:@"imgur_refresh_token"], @IMGUR_KEY, @IMGUR_SECRET] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -288,7 +289,14 @@
 }
 
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection {
-#ifndef EXTENSION
+#ifdef EXTENSION
+#ifdef ENTERPRISE
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+#else
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
     
