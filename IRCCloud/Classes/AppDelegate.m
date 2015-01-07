@@ -224,9 +224,11 @@
         }
     } else if([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]) {
         if([userActivity.webpageURL.host isEqualToString:@"www.irccloud.com"]) {
-            NSURL *url = [NSURL URLWithString:[userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/#!/" withString:@"irc://"]];
-            CLS_LOG(@"Opening URL from handoff: %@", url.absoluteString);
-            [self.mainViewController launchURL:url];
+            NSString *url = [userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/#!/" withString:@"irc://"];
+            if([url hasPrefix:@"irc://ircs://"])
+                url = [url substringFromIndex:6];
+            CLS_LOG(@"Opening URL from handoff: %@", url);
+            [self.mainViewController launchURL:[NSURL URLWithString:url]];
             return YES;
         }
     }
