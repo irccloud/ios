@@ -1720,6 +1720,7 @@
         activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#?/text=%@&url=%@:%i/%@", draft_escaped, s.hostname, s.port, [_buffer.name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
         activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", _buffer.name];
     }
+    CFRelease(draft_escaped);
 #endif
     [activity addUserInfoEntriesFromDictionary:@{@"bid":@(_buffer.bid), @"cid":@(_buffer.cid), @"draft":(_message.text?_message.text:@"")}];
 }
