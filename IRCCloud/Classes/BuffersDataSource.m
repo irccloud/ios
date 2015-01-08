@@ -100,6 +100,7 @@
         decodeDouble(_scrolledUpFrom);
         decodeFloat(_savedScrollOffset);
         decodeObject(_lastBuffer);
+        decodeObject(_nextBuffer);
     }
     return self;
 }
@@ -121,6 +122,7 @@
     encodeDouble(_scrolledUpFrom);
     encodeFloat(_savedScrollOffset);
     encodeObject(_lastBuffer);
+    encodeObject(_nextBuffer);
 }
 @end
 
