@@ -183,6 +183,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   self.resetTapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resetTopView)];
   _panGesture          = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(updateTopViewHorizontalCenterWithRecognizer:)];
   _panGesture.delegate = self;
+    _panGesture.maximumNumberOfTouches = 1;
   self.resetTapGesture.enabled = NO;
   self.resetStrategy = ECTapping | ECPanning;
   

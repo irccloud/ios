@@ -271,6 +271,8 @@
         for(Buffer *buffer in copy) {
             if(buffer.lastBuffer.bid == bid)
                 buffer.lastBuffer = buffer.lastBuffer.lastBuffer;
+            if(buffer.nextBuffer.bid == bid)
+                buffer.nextBuffer = buffer.nextBuffer.nextBuffer;
         }
         [_buffers removeObjectForKey:@(bid)];
     }

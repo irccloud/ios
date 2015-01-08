@@ -238,6 +238,39 @@
     _connectingProgress.progress = 0;
     [self connectivityChanged:nil];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    
+    UISwipeGestureRecognizer *swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeBack:)];
+    swipe.numberOfTouchesRequired = 2;
+    swipe.direction = UISwipeGestureRecognizerDirectionRight;
+    [self.view addGestureRecognizer:swipe];
+    
+    swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeForward:)];
+    swipe.numberOfTouchesRequired = 2;
+    swipe.direction = UISwipeGestureRecognizerDirectionLeft;
+    [self.view addGestureRecognizer:swipe];
+}
+
+- (void)swipeBack:(UISwipeGestureRecognizer *)sender {
+    if(_buffer.lastBuffer) {
+        Buffer *b = _buffer;
+        Buffer *last = _buffer.lastBuffer.lastBuffer;
+        [self bufferSelected:b.lastBuffer.bid];
+        _buffer.lastBuffer = last;
+        _buffer.nextBuffer = b;
+    }
+}
+
+- (void)swipeForward:(UISwipeGestureRecognizer *)sender {
+    if(_buffer.nextBuffer) {
+        Buffer *b = _buffer;
+        Buffer *last = _buffer.lastBuffer;
+        Buffer *next = _buffer.nextBuffer;
+        Buffer *nextnext = _buffer.nextBuffer.nextBuffer;
+        [self bufferSelected:next.bid];
+        _buffer.nextBuffer = nextnext;
+        b.nextBuffer = next;
+        b.lastBuffer = last;
+    }
 }
 
 - (void)viewDidUnload {
@@ -1627,6 +1660,7 @@
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if(lastBuffer && changed) {
         _buffer.lastBuffer = lastBuffer;
+        _buffer.nextBuffer = nil;
         lastBuffer.draft = _message.text;
     }
     if(_buffer) {

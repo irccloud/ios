@@ -35,6 +35,7 @@
     NSTimeInterval _scrolledUpFrom;
     CGFloat _savedScrollOffset;
     Buffer *_lastBuffer;
+    Buffer *_nextBuffer;
 }
 @property int bid, cid, archived, deferred, timeout;
 @property NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom;
@@ -42,7 +43,7 @@
 @property NSString *name, *type, *away_msg, *chantypes;
 @property BOOL valid, scrolledUp;
 @property (copy) NSString *draft;
-@property Buffer *lastBuffer;
+@property Buffer *lastBuffer, *nextBuffer;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;
 -(NSString *)accessibilityValue;
 @end
