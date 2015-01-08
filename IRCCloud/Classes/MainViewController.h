@@ -44,6 +44,7 @@
     IBOutlet UIImageView *_lock;
     IBOutlet UIView *_borders;
     IBOutlet UIView *_swipeTip;
+    IBOutlet UIView *_2swipeTip;
     IBOutlet UIView *_mentionTip;
     IBOutlet UIView *_globalMsgContainer;
     IBOutlet TTTAttributedLabel *_globalMsg;

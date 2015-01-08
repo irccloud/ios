@@ -122,6 +122,9 @@
     if(_swipeTip)
         _swipeTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
     
+    if(_2swipeTip)
+        _2swipeTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
+    
     if(_mentionTip)
         _mentionTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
     
@@ -200,6 +203,9 @@
     [_swipeTip removeFromSuperview];
     [self.slidingViewController.view addSubview:_swipeTip];
 
+    [_2swipeTip removeFromSuperview];
+    [self.slidingViewController.view addSubview:_2swipeTip];
+    
     [_mentionTip removeFromSuperview];
     [self.slidingViewController.view addSubview:_mentionTip];
     
@@ -1662,6 +1668,7 @@
         _buffer.lastBuffer = lastBuffer;
         _buffer.nextBuffer = nil;
         lastBuffer.draft = _message.text;
+        [self showTwoSwipeTip];
     }
     if(_buffer) {
         if(_incomingDraft) {
@@ -2272,6 +2279,11 @@
 }
 
 -(void)showMentionTip {
+    _mentionTip.center = self.slidingViewController.view.center;
+    CGRect frame = _mentionTip.frame;
+    frame.origin.y = [UIScreen mainScreen].applicationFrame.size.height - frame.size.height - 40;
+    _mentionTip.frame = frame;
+
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"mentionTip"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"mentionTip"];
         [UIView animateWithDuration:0.5 animations:^{
@@ -2299,6 +2311,11 @@
 }
 
 -(void)showSwipeTip {
+    _swipeTip.center = self.slidingViewController.view.center;
+    CGRect frame = _swipeTip.frame;
+    frame.origin.y = [UIScreen mainScreen].applicationFrame.size.height - frame.size.height - 40;
+    _swipeTip.frame = frame;
+
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"swipeTip"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"swipeTip"];
         [UIView animateWithDuration:0.5 animations:^{
@@ -2312,6 +2329,28 @@
 -(void)hideSwipeTip {
     [UIView animateWithDuration:0.5 animations:^{
         _swipeTip.alpha = 0;
+    } completion:nil];
+}
+
+-(void)showTwoSwipeTip {
+    _2swipeTip.center = self.slidingViewController.view.center;
+    CGRect frame = _2swipeTip.frame;
+    frame.origin.y = [UIScreen mainScreen].applicationFrame.size.height - frame.size.height - 40;
+    _2swipeTip.frame = frame;
+    
+    if(![[NSUserDefaults standardUserDefaults] boolForKey:@"twoSwipeTip"]) {
+        [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"twoSwipeTip"];
+        [UIView animateWithDuration:0.5 animations:^{
+            _2swipeTip.alpha = 1;
+        } completion:^(BOOL finished){
+            [self performSelector:@selector(hideTwoSwipeTip) withObject:nil afterDelay:2];
+        }];
+    }
+}
+
+-(void)hideTwoSwipeTip {
+    [UIView animateWithDuration:0.5 animations:^{
+        _2swipeTip.alpha = 0;
     } completion:nil];
 }
 
