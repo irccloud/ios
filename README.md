@@ -21,8 +21,8 @@ Screenshots
 
 Requirements
 ------
-* XCode 4 or 5
-* iOS 6 or 7 SDK
+* XCode 6
+* iOS 8.1 SDK
 * An iPhone, iPad, or iPod Touch running iOS 5.0 or newer
 
 _A code signing key from Apple is required to deploy apps to a device.
@@ -30,7 +30,7 @@ Without a developer key, the app can only be installed on the iPhone/iPad Simula
 
 License
 ------
-Copyright (C) 2013 IRCCloud, Ltd.
+Copyright (C) 2015 IRCCloud, Ltd.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
