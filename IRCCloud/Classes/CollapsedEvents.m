@@ -64,6 +64,7 @@
     } else {
         return NO;
     }
+
     if([self modeCount] == 0)
         return [self addMode:mode server:server];
     return YES;
@@ -281,7 +282,7 @@
                 e.netsplit = event.netsplit;
                 if(event.type == kCollapsedEventPart || event.type == kCollapsedEventQuit)
                     e.msg = event.msg;
-                [event copyModes:e];
+                [e copyModes:event];
             } else {
                 [_data addObject:event];
             }

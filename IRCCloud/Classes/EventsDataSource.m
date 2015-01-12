@@ -526,9 +526,13 @@
                                       event.msg = [NSString stringWithFormat:@"exempted %c%@%c from bans (%c14+e%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
                                       unknown = NO;
                                   } else if([[op objectForKey:@"mode"] isEqualToString:@"q"]) {
-                                      event.nick = event.from;
-                                      event.from = @"";
-                                      event.msg = [NSString stringWithFormat:@"quieted %c%@%c (%c14+q%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                      if([[op objectForKey:@"param"] rangeOfString:@"@"].location == NSNotFound) {
+                                          event.type = @"user_channel_mode";
+                                      } else {
+                                          event.nick = event.from;
+                                          event.from = @"";
+                                          event.msg = [NSString stringWithFormat:@"quieted %c%@%c (%c14+q%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                      }
                                       unknown = NO;
                                   } else if([[op objectForKey:@"mode"] isEqualToString:@"I"]) {
                                       event.nick = event.from;
@@ -551,9 +555,13 @@
                                       event.msg = [NSString stringWithFormat:@"un-exempted %c%@%c from bans (%c14-e%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
                                       unknown = NO;
                                   } else if([[op objectForKey:@"mode"] isEqualToString:@"q"]) {
-                                      event.nick = event.from;
-                                      event.from = @"";
-                                      event.msg = [NSString stringWithFormat:@"un-quieted %c%@%c (%c14-q%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                      if([[op objectForKey:@"param"] rangeOfString:@"@"].location == NSNotFound) {
+                                          event.type = @"user_channel_mode";
+                                      } else {
+                                          event.nick = event.from;
+                                          event.from = @"";
+                                          event.msg = [NSString stringWithFormat:@"un-quieted %c%@%c (%c14-q%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                      }
                                       unknown = NO;
                                   } else if([[op objectForKey:@"mode"] isEqualToString:@"I"]) {
                                       event.nick = event.from;
