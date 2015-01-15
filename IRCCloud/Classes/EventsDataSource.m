@@ -526,7 +526,7 @@
                                       event.msg = [NSString stringWithFormat:@"exempted %c%@%c from bans (%c14+e%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
                                       unknown = NO;
                                   } else if([[op objectForKey:@"mode"] isEqualToString:@"q"]) {
-                                      if([[op objectForKey:@"param"] rangeOfString:@"@"].location == NSNotFound) {
+                                      if([[op objectForKey:@"param"] rangeOfString:@"@"].location == NSNotFound && [[op objectForKey:@"param"] rangeOfString:@"$"].location == NSNotFound) {
                                           event.type = @"user_channel_mode";
                                       } else {
                                           event.nick = event.from;
@@ -555,7 +555,7 @@
                                       event.msg = [NSString stringWithFormat:@"un-exempted %c%@%c from bans (%c14-e%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
                                       unknown = NO;
                                   } else if([[op objectForKey:@"mode"] isEqualToString:@"q"]) {
-                                      if([[op objectForKey:@"param"] rangeOfString:@"@"].location == NSNotFound) {
+                                      if([[op objectForKey:@"param"] rangeOfString:@"@"].location == NSNotFound && [[op objectForKey:@"param"] rangeOfString:@"$"].location == NSNotFound) {
                                           event.type = @"user_channel_mode";
                                       } else {
                                           event.nick = event.from;
