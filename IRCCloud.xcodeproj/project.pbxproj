@@ -696,7 +696,7 @@
 		22B4286516D831A800498507 /* WebSocketMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebSocketMessage.m; sourceTree = "<group>"; };
 		22B4288416D846BF00498507 /* IRCCloudJSONObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudJSONObject.h; sourceTree = "<group>"; };
 		22B4288516D846BF00498507 /* IRCCloudJSONObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudJSONObject.m; sourceTree = "<group>"; };
-		22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "ShareExtension Enterprise.entitlements"; sourceTree = "<group>"; };
+		22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "ShareExtension Enterprise.entitlements"; path = "../ShareExtension Enterprise.entitlements"; sourceTree = "<group>"; };
 		22C2075A1A19125700EDACA4 /* FileMetadataViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileMetadataViewController.h; sourceTree = "<group>"; };
 		22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMetadataViewController.m; sourceTree = "<group>"; };
 		22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
@@ -888,7 +888,6 @@
 		228A056316D3DABA0029769C = {
 			isa = PBXGroup;
 			children = (
-				22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */,
 				228A057516D3DABA0029769C /* IRCCloud */,
 				228A059C16D3DABB0029769C /* IRCCloudTests */,
 				221034E8197EFBAF00AB414F /* ShareExtension */,
@@ -935,6 +934,7 @@
 		228A057516D3DABA0029769C /* IRCCloud */ = {
 			isa = PBXGroup;
 			children = (
+				22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */,
 				22DB253D1982E2890008728E /* IRCEnterprise.entitlements */,
 				2296E0B719805767002D59E3 /* IRCCloud.entitlements */,
 				2223C6A91768D7150032544B /* ImageViewController.xib */,
@@ -1964,7 +1964,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-DEXTENSION";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "bd317472-bc6f-409c-b061-a85b82d119f8";
+				PROVISIONING_PROFILE = "942f56e5-5748-4fa1-8d75-72dc4e958700";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2003,7 +2003,7 @@
 					"-DEXTENSION",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "69b694af-79d6-4283-b234-132f85913638";
+				PROVISIONING_PROFILE = "f4cbb22b-1c5b-4477-b170-75e34dcf29e3";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2189,7 +2189,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "89778d06-14de-4b9b-ae1e-5d85e2ba4b6b";
+				PROVISIONING_PROFILE = "8b976de8-ab31-4315-b527-0d3e2d79586c";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2215,7 +2215,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "ddb17808-5933-43d1-991b-59dfc5d0ed68";
+				PROVISIONING_PROFILE = "ad3a5d29-5ea0-4268-b3ee-094242b70886";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

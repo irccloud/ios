@@ -1535,8 +1535,12 @@ float ColorFormatterCachedFontSize = 0.0f;
             }
             if(!overlap) {
                 NSString *url = [NSURL IDNEncodedURL:[[output string] substringWithRange:result.range]];
-                if([url rangeOfString:@"://"].location == NSNotFound)
-                    url = [NSString stringWithFormat:@"http://%@", url];
+                if([url rangeOfString:@"://"].location == NSNotFound) {
+                    if([url hasPrefix:@"irc."])
+                        url = [NSString stringWithFormat:@"irc://%@", url];
+                    else
+                        url = [NSString stringWithFormat:@"http://%@", url];
+                }
                 if([self unbalanced:url]) {
                     [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:NSMakeRange(result.range.location, result.range.length - 1) URL:[NSURL URLWithString:[url substringToIndex:url.length - 1]]]];
                 } else {
