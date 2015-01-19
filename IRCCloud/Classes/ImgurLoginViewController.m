@@ -38,7 +38,7 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_activity];
     self.view.backgroundColor = [UIColor blackColor];
     _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height)];
-    _webView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+    _webView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     _webView.backgroundColor = [UIColor blackColor];
     _webView.delegate = self;
 #ifdef IMGUR_KEY
