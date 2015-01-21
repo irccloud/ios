@@ -1812,7 +1812,7 @@
         
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(_globalMsg.attributedText));
         CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_bottomBar.frame.size.width,CGFLOAT_MAX), NULL);
-        _globalMsgContainer.frame = CGRectMake(_bottomBar.frame.origin.x, 0, _bottomBar.frame.size.width, suggestedSize.height + 4);
+        _globalMsgContainer.frame = CGRectMake(_bottomBar.frame.origin.x, _eventsView.tableView.contentInset.top, _bottomBar.frame.size.width, suggestedSize.height + 4);
         CFRelease(framesetter);
     } else {
         _globalMsgContainer.hidden = YES;
