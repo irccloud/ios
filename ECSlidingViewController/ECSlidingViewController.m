@@ -470,7 +470,10 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     [self underLeftWillAppear];
   } else if (center.x >= self.resettedCenter && newHorizontalCenter < self.resettedCenter) {
     [self underRightWillAppear];
-  }  
+  }
+    
+    [self.view sendSubviewToBack:self.underLeftView];
+    [self.view sendSubviewToBack:self.underRightView];
 }
 
 - (void)topViewHorizontalCenterDidChange:(CGFloat)newHorizontalCenter
