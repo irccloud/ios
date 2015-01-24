@@ -21,6 +21,10 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		1A5703431A73FB1200D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
+		1A5703441A73FB1200D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
+		1A5703451A73FC7600D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
+		1A5703461A73FC7600D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
 		1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */; };
 		1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */; };
 		2200DB4718B7EDF100343583 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
@@ -511,6 +515,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1A5703421A73FB1200D58225 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = EnterpriseLogo.xcassets; sourceTree = "<group>"; };
 		1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Logo.xcassets; sourceTree = "<group>"; };
 		2200DB4618B7EDF100343583 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -731,6 +736,7 @@
 				221034F9197EFC0500AB414F /* Crashlytics.framework in Frameworks */,
 				221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */,
 				221034FB197EFC0500AB414F /* AudioToolbox.framework in Frameworks */,
+				1A5703451A73FC7600D58225 /* Fabric.framework in Frameworks */,
 				221034FC197EFC0500AB414F /* CFNetwork.framework in Frameworks */,
 				221034FD197EFC0500AB414F /* CoreGraphics.framework in Frameworks */,
 				221034FE197EFC0500AB414F /* CoreText.framework in Frameworks */,
@@ -765,6 +771,7 @@
 				225D978318AA995900065087 /* CFNetwork.framework in Frameworks */,
 				225D978418AA995900065087 /* Foundation.framework in Frameworks */,
 				225D978518AA995900065087 /* CoreGraphics.framework in Frameworks */,
+				1A5703441A73FB1200D58225 /* Fabric.framework in Frameworks */,
 				2200DB4F18BCF9D100343583 /* Crashlytics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -788,6 +795,7 @@
 				228A05CA16D3DCB60029769C /* CFNetwork.framework in Frameworks */,
 				228876921A113B8A00A7E86C /* CloudKit.framework in Frameworks */,
 				228A057216D3DABA0029769C /* Foundation.framework in Frameworks */,
+				1A5703431A73FB1200D58225 /* Fabric.framework in Frameworks */,
 				228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -820,6 +828,7 @@
 				22DB25201982DF2B0008728E /* Crashlytics.framework in Frameworks */,
 				22DB25211982DF2B0008728E /* QuartzCore.framework in Frameworks */,
 				22DB25221982DF2B0008728E /* AudioToolbox.framework in Frameworks */,
+				1A5703461A73FC7600D58225 /* Fabric.framework in Frameworks */,
 				22DB25231982DF2B0008728E /* CFNetwork.framework in Frameworks */,
 				22DB25241982DF2B0008728E /* CoreGraphics.framework in Frameworks */,
 				22DB25251982DF2B0008728E /* CoreText.framework in Frameworks */,
@@ -911,6 +920,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1A5703421A73FB1200D58225 /* Fabric.framework */,
 				228876911A113B8A00A7E86C /* CloudKit.framework */,
 				2200DB4B18B7F1FD00343583 /* Crashlytics.framework */,
 				2200DB4618B7EDF100343583 /* QuartzCore.framework */,
@@ -1504,7 +1514,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "CRASHLYTICS_TOKEN=`grep CRASHLYTICS_TOKEN $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nCRASHLYTICS_SECRET=`grep CRASHLYTICS_SECRET $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nif [ -n \"$CRASHLYTICS_TOKEN\" ]; then ./Crashlytics.framework/run $CRASHLYTICS_TOKEN $CRASHLYTICS_SECRET; fi";
+			shellScript = "CRASHLYTICS_TOKEN=`grep CRASHLYTICS_TOKEN $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nCRASHLYTICS_SECRET=`grep CRASHLYTICS_SECRET $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nif [ -n \"$CRASHLYTICS_TOKEN\" ]; then ./Fabric.framework/run $CRASHLYTICS_TOKEN $CRASHLYTICS_SECRET; fi";
 		};
 		2200DB4E18BCF97B00343583 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1517,7 +1527,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "CRASHLYTICS_TOKEN=`grep CRASHLYTICS_TOKEN $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nCRASHLYTICS_SECRET=`grep CRASHLYTICS_SECRET $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nif [ -n \"$CRASHLYTICS_TOKEN\" ]; then ./Crashlytics.framework/run $CRASHLYTICS_TOKEN $CRASHLYTICS_SECRET; fi";
+			shellScript = "CRASHLYTICS_TOKEN=`grep CRASHLYTICS_TOKEN $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nCRASHLYTICS_SECRET=`grep CRASHLYTICS_SECRET $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nif [ -n \"$CRASHLYTICS_TOKEN\" ]; then ./Fabric.framework/run $CRASHLYTICS_TOKEN $CRASHLYTICS_SECRET; fi";
 		};
 		228A059316D3DABB0029769C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

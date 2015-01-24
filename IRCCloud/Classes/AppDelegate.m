@@ -14,6 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
@@ -111,7 +112,7 @@
         [d synchronize];
     }
 #ifdef CRASHLYTICS_TOKEN
-    [Crashlytics startWithAPIKey:@CRASHLYTICS_TOKEN];
+    [Fabric with:@[CrashlyticsKit]];
 #endif
     _conn = [NetworkConnection sharedInstance];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
