@@ -153,6 +153,13 @@
     return YES;
 }
 
+-(void)textFieldDidBeginEditing:(UITextField *)textField {
+    if(textField.text.length) {
+        textField.selectedTextRange = [textField textRangeFromPosition:textField.beginningOfDocument
+                                                            toPosition:([textField.text rangeOfString:@"."].location != NSNotFound)?[textField positionFromPosition:textField.beginningOfDocument offset:[textField.text rangeOfString:@"." options:NSBackwardsSearch].location]:textField.endOfDocument];
+    }
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
     [self.tableView endEditing:YES];
     return NO;

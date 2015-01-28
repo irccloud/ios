@@ -13,7 +13,7 @@
 #import "ImageUploader.h"
 #import "FileUploader.h"
 
-@interface ShareViewController : SLComposeServiceViewController<BuffersTableViewDelegate,ImageUploaderDelegate,FileUploaderDelegate> {
+@interface ShareViewController : SLComposeServiceViewController<BuffersTableViewDelegate,ImageUploaderDelegate,FileUploaderDelegate,UITextFieldDelegate> {
     NetworkConnection *_conn;
     BuffersTableView *_buffersView;
     UIViewController *_splash;

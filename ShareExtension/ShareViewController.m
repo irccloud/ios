@@ -235,6 +235,7 @@
                     UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Enter a Filename" message:nil preferredStyle:UIAlertControllerStyleAlert];
                     [c addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                         textField.text = _filename;
+                        textField.delegate = self;
                         textField.placeholder = @"Filename";
                     }];
                     [c addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
@@ -253,6 +254,13 @@
         }
     } else {
         return nil;
+    }
+}
+
+-(void)textFieldDidBeginEditing:(UITextField *)textField {
+    if(textField.text.length) {
+        textField.selectedTextRange = [textField textRangeFromPosition:textField.beginningOfDocument
+                                                            toPosition:([textField.text rangeOfString:@"."].location != NSNotFound)?[textField positionFromPosition:textField.beginningOfDocument offset:[textField.text rangeOfString:@"." options:NSBackwardsSearch].location]:textField.endOfDocument];
     }
 }
 
