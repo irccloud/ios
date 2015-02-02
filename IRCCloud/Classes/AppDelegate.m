@@ -16,6 +16,7 @@
 
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
+#import <AdSupport/AdSupport.h>
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
 #import "EditConnectionViewController.h"
@@ -211,10 +212,11 @@
 -(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *))restorationHandler {
     CLS_LOG(@"Continuing activity type: %@", userActivity.activityType);
 #ifdef ENTERPRISE
-    if([userActivity.activityType isEqualToString:@"com.irccloud.enterprise.buffer"]) {
+    if([userActivity.activityType isEqualToString:@"com.irccloud.enterprise.buffer"])
 #else
-    if([userActivity.activityType isEqualToString:@"com.irccloud.buffer"]) {
+    if([userActivity.activityType isEqualToString:@"com.irccloud.buffer"])
 #endif
+    {
         if([userActivity.userInfo objectForKey:@"bid"]) {
             self.mainViewController.bidToOpen = [[userActivity.userInfo objectForKey:@"bid"] intValue];
             self.mainViewController.eidToOpen = 0;
@@ -239,6 +241,7 @@
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+
     if([url.scheme hasPrefix:@"irccloud"]) {
         if([url.host isEqualToString:@"chat"] && [url.path isEqualToString:@"/access-link"]) {
             [_conn logout];
@@ -249,6 +252,12 @@
                 [self.loginSplashViewController viewWillAppear:YES];
             else
                 self.window.rootViewController = self.loginSplashViewController;
+        } else if([url.host isEqualToString:@"referral"]) {
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 6) {
+                [self performSelectorInBackground:@selector(_sendImpression:) withObject:url];
+            }
+        } else {
+            return NO;
         }
     } else {
         [self launchURL:url];
@@ -256,6 +265,13 @@
     return YES;
 }
 
+-(void)_sendImpression:(NSURL *)url {
+    NSDictionary *d = [[NetworkConnection sharedInstance] impression:[[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString] referrer:[url.absoluteString substringFromIndex:url.scheme.length + url.host.length + 4]];
+    if([[d objectForKey:@"success"] intValue]) {
+        self.loginSplashViewController.impression = [d objectForKey:@"id"];
+    }
+}
+    
 - (void)launchURL:(NSURL *)url {
     if (!_urlHandler) {
         _urlHandler = [[URLHandler alloc] init];

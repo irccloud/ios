@@ -951,7 +951,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [[[SBJsonParser alloc] init] objectWithData:data];
 }
 
--(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token {
+-(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token impression:(NSString *)impression {
 	NSData *data;
 	NSURLResponse *response = nil;
 	NSError *error = nil;
@@ -967,7 +967,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:token forHTTPHeaderField:@"x-auth-formtoken"];
     [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[NSString stringWithFormat:@"realname=%@&email=%@&password=%@&token=%@", realname_escaped, email_escaped, password_escaped, token] dataUsingEncoding:NSUTF8StringEncoding]];
+    [request setHTTPBody:[[NSString stringWithFormat:@"realname=%@&email=%@&password=%@&token=%@&ios_impression=%@", realname_escaped, email_escaped, password_escaped, token,(impression!=nil)?impression:@""] dataUsingEncoding:NSUTF8StringEncoding]];
     
     CFRelease(realname_escaped);
     CFRelease(email_escaped);
@@ -1061,6 +1061,39 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    
+    return [[[SBJsonParser alloc] init] objectWithData:data];
+#endif
+}
+
+-(NSDictionary *)impression:(NSString *)idfa referrer:(NSString *)referrer {
+#ifdef EXTENSION
+    return nil;
+#else
+    CFStringRef idfa_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)idfa, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    CFStringRef referrer_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)referrer, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    
+    NSData *data;
+    NSURLResponse *response = nil;
+    NSError *error = nil;
+    NSString *body = [NSString stringWithFormat:@"idfa=%@&referrer=%@", idfa_escaped, referrer_escaped];
+    if(self.session.length)
+        body = [body stringByAppendingFormat:@"&session=%@", self.session];
+
+    CFRelease(idfa_escaped);
+    CFRelease(referrer_escaped);
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/ios-impressions", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    if(self.session.length)
+        [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
     
@@ -1787,9 +1820,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _reconnectTimestamp = 0;
     _streamId = nil;
     _userInfo = @{};
+    NSString *s = self.session;
+    SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, nil]);
     _session = nil;
     [self disconnect];
-    [self performSelectorInBackground:@selector(_logout:) withObject:self.session];
+    [self performSelectorInBackground:@selector(_logout:) withObject:s];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"host"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"path"];
@@ -1806,7 +1841,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [_users clear];
     [_channels clear];
     [_events clear];
-    SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, nil]);
     [self serialize];
     [NetworkConnection sync];
 #ifndef EXTENSION

@@ -25,7 +25,7 @@
 		1A5703441A73FB1200D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
 		1A5703451A73FC7600D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
 		1A5703461A73FC7600D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
-		1A5703481A74145400D58225 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; };
+		1A5703481A74145400D58225 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		1A5703491A74145B00D58225 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; };
 		1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */; };
 		1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */; };
@@ -245,7 +245,6 @@
 		227FF2A216FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		227FF8231772063F00394114 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF8221772063F00394114 /* SettingsViewController.m */; };
 		2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
-		228876921A113B8A00A7E86C /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228876911A113B8A00A7E86C /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -346,7 +345,6 @@
 		22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22C2075C1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
 		22C2075D1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
-		22C2075E1A191BD800EDACA4 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228876911A113B8A00A7E86C /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22C89B5A19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
 		22C89B5B19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
 		22C89B5C19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
@@ -355,6 +353,7 @@
 		22C89B5F19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
 		22C89B6019ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
 		22C89B6119ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
+		22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A1171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A31725AAEA003C0684 /* UIExpandingTextView.m */; };
@@ -602,7 +601,6 @@
 		227FF8211772062E00394114 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		227FF8221772063F00394114 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		2283322F17944E2B00ED22EA /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		228876911A113B8A00A7E86C /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A056F16D3DABA0029769C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -760,7 +758,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22C2075E1A191BD800EDACA4 /* CloudKit.framework in Frameworks */,
+				22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */,
 				2200DB5118BCFA0E00343583 /* QuartzCore.framework in Frameworks */,
 				225D977918AA995900065087 /* AudioToolbox.framework in Frameworks */,
 				225D977A18AA995900065087 /* Twitter.framework in Frameworks */,
@@ -798,7 +796,6 @@
 				228A05D016D3DD570029769C /* Security.framework in Frameworks */,
 				228A057016D3DABA0029769C /* UIKit.framework in Frameworks */,
 				228A05CA16D3DCB60029769C /* CFNetwork.framework in Frameworks */,
-				228876921A113B8A00A7E86C /* CloudKit.framework in Frameworks */,
 				228A057216D3DABA0029769C /* Foundation.framework in Frameworks */,
 				1A5703431A73FB1200D58225 /* Fabric.framework in Frameworks */,
 				228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */,
@@ -927,7 +924,6 @@
 			children = (
 				1A5703471A74145400D58225 /* AdSupport.framework */,
 				1A5703421A73FB1200D58225 /* Fabric.framework */,
-				228876911A113B8A00A7E86C /* CloudKit.framework */,
 				2200DB4B18B7F1FD00343583 /* Crashlytics.framework */,
 				2200DB4618B7EDF100343583 /* QuartzCore.framework */,
 				2283322F17944E2B00ED22EA /* AudioToolbox.framework */,
@@ -1980,7 +1976,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-DEXTENSION";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "07bacbeb-dd2f-4334-82e6-4333841aedd3";
+				PROVISIONING_PROFILE = "4454c442-0f2d-4b5f-8a91-b0191a3b4a7b";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2071,6 +2067,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -2086,7 +2083,7 @@
 				);
 				OTHER_CFLAGS = "-DENTERPRISE";
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "1fb400bb-0eac-441f-ab74-9fac5997b83c";
+				PROVISIONING_PROFILE = "1f5e310d-2d28-4a41-8140-a5b38bf749b1";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2098,6 +2095,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -2205,7 +2203,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4220a8b2-3ecf-4444-bf01-3976d54b0793";
+				PROVISIONING_PROFILE = "c5d3f8b1-3d53-4fa1-8462-3b28dc4bc303";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2294,6 +2292,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "ShareExtension Enterprise.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2319,7 +2318,7 @@
 					"-DENTERPRISE",
 				);
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "90080723-15c4-47ce-8638-55c966a46f49";
+				PROVISIONING_PROFILE = "b550c402-16bd-40f7-970d-0af24b2fc7d2";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2336,6 +2335,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "ShareExtension Enterprise.entitlements";
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2375,7 +2375,8 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "ShareExtension Enterprise.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution: IRCCloud Ltd. (GED45EQAGA)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2506,7 +2507,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: IRCCloud Ltd. (GED45EQAGA)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",

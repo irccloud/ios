@@ -528,7 +528,12 @@
 -(IBAction)onePasswordButtonPressed:(id)sender {
     dispatch_async(dispatch_get_main_queue(), ^{
         if(login.alpha) {
-            [[OnePasswordExtension sharedExtension] findLoginForURLString:@"https://www.irccloud.com" forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
+#ifdef ENTERPRISE
+            NSString *url = [NSString stringWithFormat:@"https://%@", host.text];
+#else
+            NSString *url = @"https://www.irccloud.com";
+#endif
+            [[OnePasswordExtension sharedExtension] findLoginForURLString:url forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
                 if (!loginDict) {
                     if (error.code != AppExtensionErrorCodeCancelledByUser) {
                         NSLog(@"Error invoking 1Password App Extension for find login: %@", error);
@@ -539,9 +544,20 @@
                 if([loginDict[AppExtensionUsernameKey] length])
                     username.text = loginDict[AppExtensionUsernameKey];
                 password.text = loginDict[AppExtensionPasswordKey];
+                enterpriseHint.alpha = 0;
+                host.alpha = 0;
+                hostHint.alpha = 0;
+                next.alpha = 0;
+                enterpriseLearnMore.alpha = 0;
+                username.alpha = 1;
                 [self loginHintPressed:nil];
             }];
         } else {
+#ifdef ENTERPRISE
+            NSString *url = [NSString stringWithFormat:@"https://%@", host.text];
+#else
+            NSString *url = @"https://www.irccloud.com";
+#endif
             NSDictionary *newLoginDetails = @{
                                               AppExtensionTitleKey: @"IRCCloud",
                                               AppExtensionUsernameKey: username.text ? : @"",
@@ -552,7 +568,7 @@
                                                       }
                                               };
             
-            [[OnePasswordExtension sharedExtension] storeLoginForURLString:@"https://www.irccloud.com" loginDetails:newLoginDetails passwordGenerationOptions:nil forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
+            [[OnePasswordExtension sharedExtension] storeLoginForURLString:url loginDetails:newLoginDetails passwordGenerationOptions:nil forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
                 
                 if (!loginDict) {
                     if (error.code != AppExtensionErrorCodeCancelledByUser) {
@@ -566,6 +582,12 @@
                     username.text = loginDict[AppExtensionUsernameKey];
                 password.text = loginDict[AppExtensionPasswordKey] ? : @"";
                 
+                enterpriseHint.alpha = 0;
+                host.alpha = 0;
+                hostHint.alpha = 0;
+                next.alpha = 0;
+                enterpriseLearnMore.alpha = 0;
+                username.alpha = 1;
                 [self signupHintPressed:nil];
             }];
         }
@@ -680,7 +702,7 @@
         result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
             if(name.alpha)
-                result = [[NetworkConnection sharedInstance] signup:[username text] password:[password text] realname:[name text] token:[result objectForKey:@"token"]];
+                result = [[NetworkConnection sharedInstance] signup:[username text] password:[password text] realname:[name text] token:[result objectForKey:@"token"] impression:_impression];
             else
                 result = [[NetworkConnection sharedInstance] login:[username text] password:[password text] token:[result objectForKey:@"token"]];
             if([[result objectForKey:@"success"] intValue] == 1) {

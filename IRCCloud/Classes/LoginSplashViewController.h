@@ -56,8 +56,10 @@
     NetworkConnection *_conn;
     CGSize _kbSize;
     NSURL *_accessLink;
+    NSString *_impression;
 }
 @property NSURL *accessLink;
+@property (nonatomic) NSString *impression;
 -(IBAction)loginButtonPressed:(id)sender;
 -(IBAction)signupButtonPressed:(id)sender;
 -(IBAction)textFieldChanged:(id)sender;

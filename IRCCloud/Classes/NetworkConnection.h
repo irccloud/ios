@@ -164,8 +164,9 @@ typedef enum {
 -(NSDictionary *)requestConfiguration;
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password token:(NSString *)token;
 -(NSDictionary *)login:(NSURL *)accessLink;
--(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token;
+-(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token impression:(NSString *)impression;
 -(NSDictionary *)prefs;
+-(NSDictionary *)impression:(NSString *)idfa referrer:(NSString *)referrer;
 -(void)connect:(BOOL)notifier;
 -(void)disconnect;
 -(void)clearPrefs;
