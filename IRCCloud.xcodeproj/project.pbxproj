@@ -354,6 +354,8 @@
 		22C89B6019ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
 		22C89B6119ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
 		22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		22C8DCF31A801A4500199371 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8DCF21A801A4500199371 /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		22C8DCF41A801A6300199371 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8DCF21A801A4500199371 /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A1171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A31725AAEA003C0684 /* UIExpandingTextView.m */; };
@@ -707,6 +709,7 @@
 		22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMetadataViewController.m; sourceTree = "<group>"; };
 		22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
 		22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
+		22C8DCF21A801A4500199371 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		22D4309E171C663A003C0684 /* IgnoresTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IgnoresTableViewController.h; sourceTree = "<group>"; };
 		22D4309F171C663A003C0684 /* IgnoresTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IgnoresTableViewController.m; sourceTree = "<group>"; };
 		22D430A21725AAE9003C0684 /* UIExpandingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIExpandingTextView.h; sourceTree = "<group>"; };
@@ -761,6 +764,7 @@
 				22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */,
 				2200DB5118BCFA0E00343583 /* QuartzCore.framework in Frameworks */,
 				225D977918AA995900065087 /* AudioToolbox.framework in Frameworks */,
+				22C8DCF31A801A4500199371 /* CloudKit.framework in Frameworks */,
 				225D977A18AA995900065087 /* Twitter.framework in Frameworks */,
 				225D977B18AA995900065087 /* SystemConfiguration.framework in Frameworks */,
 				225D977C18AA995900065087 /* ImageIO.framework in Frameworks */,
@@ -783,6 +787,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A5703481A74145400D58225 /* AdSupport.framework in Frameworks */,
+				22C8DCF41A801A6300199371 /* CloudKit.framework in Frameworks */,
 				2200DB4718B7EDF100343583 /* QuartzCore.framework in Frameworks */,
 				2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */,
 				22501740178340AB00066E71 /* Twitter.framework in Frameworks */,
@@ -922,6 +927,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22C8DCF21A801A4500199371 /* CloudKit.framework */,
 				1A5703471A74145400D58225 /* AdSupport.framework */,
 				1A5703421A73FB1200D58225 /* Fabric.framework */,
 				2200DB4B18B7F1FD00343583 /* Crashlytics.framework */,
@@ -1330,6 +1336,9 @@
 								enabled = 1;
 							};
 							com.apple.Keychain = {
+								enabled = 1;
+							};
+							com.apple.iCloud = {
 								enabled = 1;
 							};
 						};
@@ -2083,7 +2092,7 @@
 				);
 				OTHER_CFLAGS = "-DENTERPRISE";
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "1f5e310d-2d28-4a41-8140-a5b38bf749b1";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2114,7 +2123,7 @@
 					"-DENTERPRISE",
 				);
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "8267cf25-c056-4729-9ddc-1f11d54e925a";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2528,7 +2537,7 @@
 					"-DENTERPRISE",
 				);
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "fbf2ec4e-755b-48a4-ba04-1061c865e9d7";
+				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
