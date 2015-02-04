@@ -38,8 +38,6 @@ NSString *IRCCLOUD_HOST = @"api.irccloud.com";
 #endif
 NSString *IRCCLOUD_PATH = @"/";
 
-#define BACKLOG_BUFFER_MAX 99
-
 #define TYPE_UNKNOWN 0
 #define TYPE_WIFI 1
 #define TYPE_WWAN 2
@@ -1567,7 +1565,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(backlog) {
             if(_numBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
                 if(object.bid != _currentBid) {
-                    if(_currentBid != -1 && _currentCount >= BACKLOG_BUFFER_MAX) {
+                    if(_currentBid != -1) {
                         [_events removeEventsBefore:_firstEID buffer:_currentBid];
                     }
                     _currentBid = object.bid;
