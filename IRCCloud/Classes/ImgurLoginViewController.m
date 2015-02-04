@@ -48,6 +48,7 @@
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
+    [self.view endEditing:YES];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
