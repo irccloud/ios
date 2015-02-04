@@ -91,7 +91,6 @@
         decodeObject(_type);
         decodeInt(_archived);
         decodeInt(_deferred);
-        decodeInt(_timeout);
         decodeObject(_away_msg);
         decodeBool(_valid);
         decodeObject(_draft);
@@ -113,7 +112,6 @@
     encodeObject(_type);
     encodeInt(_archived);
     encodeInt(_deferred);
-    encodeInt(_timeout);
     encodeObject(_away_msg);
     encodeBool(_valid);
     encodeObject(_draft);
