@@ -316,6 +316,14 @@
 		22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363B119D0884D00500478 /* OnePasswordExtension.m */; };
 		22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */; };
 		22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */; };
+		22A897BF1A82DEAF00FBC1DE /* Grab.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897BE1A82DEAF00FBC1DE /* Grab.framework */; };
+		22A897C01A82DEAF00FBC1DE /* Grab.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897BE1A82DEAF00FBC1DE /* Grab.framework */; };
+		22A897C11A82DEAF00FBC1DE /* Grab.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897BE1A82DEAF00FBC1DE /* Grab.framework */; };
+		22A897C21A82DEAF00FBC1DE /* Grab.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897BE1A82DEAF00FBC1DE /* Grab.framework */; };
+		22A897C41A82E0A900FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		22A897C51A82E0B800FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		22A897C61A82E0C400FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		22A897C71A82E0FB00FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22AD75ED1718567D00141257 /* ChannelModeListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* ChannelModeListTableViewController.m */; };
 		22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
@@ -675,6 +683,8 @@
 		22A363B119D0884D00500478 /* OnePasswordExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnePasswordExtension.m; sourceTree = "<group>"; };
 		22A363BA19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+UIDevice_iPhone6Hax.h"; sourceTree = "<group>"; };
 		22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+UIDevice_iPhone6Hax.m"; sourceTree = "<group>"; };
+		22A897BE1A82DEAF00FBC1DE /* Grab.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Grab.framework; sourceTree = "<group>"; };
+		22A897C31A82E0A900FBC1DE /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		22AD75EB1718567D00141257 /* ChannelModeListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelModeListTableViewController.h; sourceTree = "<group>"; };
 		22AD75EC1718567D00141257 /* ChannelModeListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelModeListTableViewController.m; sourceTree = "<group>"; };
 		22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditConnectionViewController.h; sourceTree = "<group>"; };
@@ -737,6 +747,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22A897C61A82E0C400FBC1DE /* StoreKit.framework in Frameworks */,
 				221034F9197EFC0500AB414F /* Crashlytics.framework in Frameworks */,
 				221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */,
 				221034FB197EFC0500AB414F /* AudioToolbox.framework in Frameworks */,
@@ -751,6 +762,7 @@
 				22103503197EFC0500AB414F /* MobileCoreServices.framework in Frameworks */,
 				22103504197EFC0500AB414F /* Security.framework in Frameworks */,
 				22103505197EFC0500AB414F /* SystemConfiguration.framework in Frameworks */,
+				22A897C11A82DEAF00FBC1DE /* Grab.framework in Frameworks */,
 				1A5703491A74145B00D58225 /* AdSupport.framework in Frameworks */,
 				22103506197EFC0500AB414F /* Twitter.framework in Frameworks */,
 				22103507197EFC0500AB414F /* UIKit.framework in Frameworks */,
@@ -761,12 +773,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22A897C51A82E0B800FBC1DE /* StoreKit.framework in Frameworks */,
 				22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */,
 				2200DB5118BCFA0E00343583 /* QuartzCore.framework in Frameworks */,
 				225D977918AA995900065087 /* AudioToolbox.framework in Frameworks */,
 				22C8DCF31A801A4500199371 /* CloudKit.framework in Frameworks */,
 				225D977A18AA995900065087 /* Twitter.framework in Frameworks */,
 				225D977B18AA995900065087 /* SystemConfiguration.framework in Frameworks */,
+				22A897C01A82DEAF00FBC1DE /* Grab.framework in Frameworks */,
 				225D977C18AA995900065087 /* ImageIO.framework in Frameworks */,
 				225D977D18AA995900065087 /* MobileCoreServices.framework in Frameworks */,
 				225D977E18AA995900065087 /* libz.dylib in Frameworks */,
@@ -786,12 +800,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22A897C41A82E0A900FBC1DE /* StoreKit.framework in Frameworks */,
 				1A5703481A74145400D58225 /* AdSupport.framework in Frameworks */,
 				22C8DCF41A801A6300199371 /* CloudKit.framework in Frameworks */,
 				2200DB4718B7EDF100343583 /* QuartzCore.framework in Frameworks */,
 				2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */,
 				22501740178340AB00066E71 /* Twitter.framework in Frameworks */,
 				22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */,
+				22A897BF1A82DEAF00FBC1DE /* Grab.framework in Frameworks */,
 				2223C6B61768F4500032544B /* ImageIO.framework in Frameworks */,
 				2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */,
 				2248DF3916EE375D0086BB42 /* libz.dylib in Frameworks */,
@@ -832,12 +848,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22A897C71A82E0FB00FBC1DE /* StoreKit.framework in Frameworks */,
 				22DB25201982DF2B0008728E /* Crashlytics.framework in Frameworks */,
 				22DB25211982DF2B0008728E /* QuartzCore.framework in Frameworks */,
 				22DB25221982DF2B0008728E /* AudioToolbox.framework in Frameworks */,
 				1A5703461A73FC7600D58225 /* Fabric.framework in Frameworks */,
 				22DB25231982DF2B0008728E /* CFNetwork.framework in Frameworks */,
 				22DB25241982DF2B0008728E /* CoreGraphics.framework in Frameworks */,
+				22A897C21A82DEAF00FBC1DE /* Grab.framework in Frameworks */,
 				22DB25251982DF2B0008728E /* CoreText.framework in Frameworks */,
 				22DB25261982DF2B0008728E /* Foundation.framework in Frameworks */,
 				22DB25271982DF2B0008728E /* ImageIO.framework in Frameworks */,
@@ -927,6 +945,8 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22A897C31A82E0A900FBC1DE /* StoreKit.framework */,
+				22A897BE1A82DEAF00FBC1DE /* Grab.framework */,
 				22C8DCF21A801A4500199371 /* CloudKit.framework */,
 				1A5703471A74145400D58225 /* AdSupport.framework */,
 				1A5703421A73FB1200D58225 /* Fabric.framework */,
@@ -1984,6 +2004,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-DEXTENSION";
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "4454c442-0f2d-4b5f-8a91-b0191a3b4a7b";
 				SKIP_INSTALL = YES;
@@ -2023,6 +2044,7 @@
 					"-DNS_BLOCK_ASSERTIONS=1",
 					"-DEXTENSION",
 				);
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "f41141e6-6e6e-4a46-878b-5d444851f23e";
 				SKIP_INSTALL = YES;
@@ -2063,6 +2085,7 @@
 					"-DAPPSTORE",
 					"-DEXTENSION",
 				);
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "fa596e92-3b59-45af-a25f-784990f6cd7e";
 				SKIP_INSTALL = YES;
@@ -2091,6 +2114,7 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				OTHER_CFLAGS = "-DENTERPRISE";
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = IRCEnterprise;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -2122,6 +2146,7 @@
 					"-DNS_BLOCK_ASSERTIONS=1",
 					"-DENTERPRISE",
 				);
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = IRCEnterprise;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;
@@ -2211,6 +2236,7 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "c5d3f8b1-3d53-4fa1-8462-3b28dc4bc303";
 				WRAPPER_EXTENSION = app;
@@ -2237,6 +2263,7 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "f62e4ef9-7de1-4c98-b583-8b09408ba6fa";
 				WRAPPER_EXTENSION = app;
@@ -2326,6 +2353,7 @@
 					"-DEXTENSION",
 					"-DENTERPRISE",
 				);
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "ShareExtension Enterprise";
 				PROVISIONING_PROFILE = "b550c402-16bd-40f7-970d-0af24b2fc7d2";
 				SKIP_INSTALL = YES;
@@ -2367,6 +2395,7 @@
 					"-DEXTENSION",
 					"-DENTERPRISE",
 				);
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "ShareExtension Enterprise";
 				PROVISIONING_PROFILE = "c5713f32-8fd3-466a-83ba-cb84af9f5a8b";
 				SKIP_INSTALL = YES;
@@ -2409,6 +2438,7 @@
 					"-DEXTENSION",
 					"-DENTERPRISE",
 				);
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "ShareExtension Enterprise";
 				PROVISIONING_PROFILE = "5331390f-7149-4ce6-ab4d-ace8d5fae5c2";
 				SKIP_INSTALL = YES;
@@ -2481,6 +2511,7 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "a5e68e51-ca4a-4732-b998-fbbaca01d693";
 				WRAPPER_EXTENSION = app;
@@ -2536,6 +2567,7 @@
 					"-DAPPSTORE",
 					"-DENTERPRISE",
 				);
+				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = IRCEnterprise;
 				PROVISIONING_PROFILE = "";
 				WRAPPER_EXTENSION = app;

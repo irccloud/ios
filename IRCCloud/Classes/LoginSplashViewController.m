@@ -16,6 +16,7 @@
 
 
 #import <QuartzCore/QuartzCore.h>
+#import <Grab/Grab.h>
 #import "LoginSplashViewController.h"
 #import "UIColor+IRCCloud.h"
 #import "AppDelegate.h"
@@ -723,6 +724,11 @@
                     [d setObject:IRCCLOUD_HOST forKey:@"host"];
                     [d setObject:IRCCLOUD_PATH forKey:@"path"];
                     [d synchronize];
+                }
+                if(name.alpha) {
+                    [Grab signUp:nil];
+                } else {
+                    [Grab login:nil];
                 }
                 loginHint.alpha = 0;
                 signupHint.alpha = 0;

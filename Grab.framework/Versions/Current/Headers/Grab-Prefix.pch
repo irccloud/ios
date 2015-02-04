@@ -1,0 +1,7 @@
+//
+// Prefix header for all source files of the 'Grab' target in the 'Grab' project
+//
+
+#ifdef __OBJC__
+
+#endif
