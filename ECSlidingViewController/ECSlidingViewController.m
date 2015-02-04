@@ -94,6 +94,10 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 @synthesize topViewIsOffScreen = _topViewIsOffScreen;
 @synthesize topViewSnapshotPanGesture = _topViewSnapshotPanGesture;
 
+-(void)applicationDidResume {
+    //We do our own layout higher up in the stack, so override this to prevent a crash on iOS 8
+}
+
 - (void)setTopViewController:(UIViewController *)theTopViewController
 {
   CGRect topViewFrame = _topViewController ? _topViewController.view.frame : self.view.bounds;
