@@ -300,7 +300,7 @@ int __timestampWidth;
 }
 
 - (void)_sendHeartbeat {
-    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus]) {
+    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus] && !_requestingBacklog) {
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         NSTimeInterval eid = _buffer.scrolledUpFrom;
         if(eid <= 0) {
@@ -1430,7 +1430,7 @@ int __timestampWidth;
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(!_ready || !_buffer)
+    if(!_ready || !_buffer || _requestingBacklog)
         return;
 
     UITableView *tableView = self.tableView;
@@ -1443,11 +1443,12 @@ int __timestampWidth;
     }
     
     if(tableView.tableHeaderView == _headerView && _minEid > 0 && _buffer && _buffer.bid != -1 && (_buffer.scrolledUp || (_data.count && firstRow == 0 && lastRow == _data.count - 1))) {
-        if(!_requestingBacklog && _conn.state == kIRCCloudStateConnected && scrollView.contentOffset.y < _headerView.frame.size.height) {
+        if(_conn.state == kIRCCloudStateConnected && scrollView.contentOffset.y < _headerView.frame.size.height) {
             NSLog(@"The table scrolled and the loading header became visible, requesting more backlog");
             _requestingBacklog = YES;
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Downloading more chat history");
+            return;
         }
     }
     
