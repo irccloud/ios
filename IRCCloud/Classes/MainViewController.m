@@ -2046,17 +2046,18 @@
     }
     
     if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width || self.view.frame.size.width != width) {
-        self.slidingViewController.view.frame = frame;
         CGRect f = self.navigationController.view.frame;
-        if(self.slidingViewController.underLeftShowing)
+        
+        if(f.origin.x == self.slidingViewController.anchorRightRevealAmount)
             f.origin.x = self.slidingViewController.anchorRightRevealAmount;
-        else if(self.slidingViewController.underRightShowing)
+        else if(f.origin.x == -self.slidingViewController.anchorLeftRevealAmount)
             f.origin.x = -self.slidingViewController.anchorLeftRevealAmount;
         else
             f.origin.x = 0;
         f.origin.y = 0;
-        f.size.width = self.slidingViewController.view.bounds.size.width;
-        f.size.height = self.slidingViewController.view.bounds.size.height;
+        f.size.width = frame.size.width;
+        f.size.height = frame.size.height;
+        self.slidingViewController.view.frame = frame;
         self.navigationController.view.frame = f;
     }
     
