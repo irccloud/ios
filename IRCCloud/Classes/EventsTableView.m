@@ -284,13 +284,13 @@ int __timestampWidth;
                         break;
                 }
                 [_lock unlock];
-            }
-            for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
-                if(event.rowType == ROW_LASTSEENEID) {
-                    NSLog(@"removing the last seen EID marker");
-                    [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
-                    NSLog(@"removed!");
-                    break;
+                for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid]) {
+                    if(event.rowType == ROW_LASTSEENEID) {
+                        NSLog(@"removing the last seen EID marker");
+                        [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
+                        NSLog(@"removed!");
+                        break;
+                    }
                 }
             }
             NSLog(@"Rebuilding the message table");
