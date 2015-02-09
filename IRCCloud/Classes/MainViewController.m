@@ -2079,23 +2079,25 @@
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
-        self.slidingViewController.underRightViewController = nil;
         [self addChildViewController:_buffersView];
-        [self addChildViewController:_usersView];
         _buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,height);
         _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height);
-        _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,0,220,height);
-        _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = _eventsView.tableView.contentInset;
         _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
         _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
         [_buffersView willMoveToParentViewController:self];
         [_buffersView viewWillAppear:NO];
         _buffersView.view.hidden = NO;
         [self.view insertSubview:_buffersView.view atIndex:1];
-        [_usersView willMoveToParentViewController:self];
-        [_usersView viewWillAppear:NO];
-        _usersView.view.hidden = NO;
-        [self.view insertSubview:_usersView.view atIndex:1];
+        if(![[UIDevice currentDevice] isBigPhone] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+            self.slidingViewController.underRightViewController = nil;
+            [self addChildViewController:_usersView];
+            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,0,220,height);
+            _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = _eventsView.tableView.contentInset;
+            [_usersView willMoveToParentViewController:self];
+            [_usersView viewWillAppear:NO];
+            _usersView.view.hidden = NO;
+            [self.view insertSubview:_usersView.view atIndex:1];
+        }
         _borders.hidden = NO;
         frame = _serverStatusBar.frame;
         frame.origin.x = _buffersView.view.frame.size.width;
@@ -2264,7 +2266,6 @@
                 frame = _serverStatusBar.frame;
                 frame.size.width = width - _buffersView.view.bounds.size.width;
                 _serverStatusBar.frame = frame;
-                _usersView.view.hidden = YES;
                 frame = _borders.frame;
                 frame.size.width = width - _buffersView.view.bounds.size.width + 2;
                 _borders.frame = frame;
