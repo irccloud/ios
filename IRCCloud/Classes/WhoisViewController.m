@@ -179,7 +179,7 @@
                 } else {
                     NSString *url = [[data attributedSubstringFromRange:NSMakeRange(result.range.location+offset, result.range.length)] string];
                     if(![url hasPrefix:@"irc"])
-                        url = [[NSString stringWithFormat:@"irc%@://%@:%i/%@", (s.ssl==1)?@"s":@"", s.hostname, s.port, url] stringByReplacingOccurrencesOfString:@"#" withString:@"%23"];
+                        url = [[NSString stringWithFormat:@"irc://%i/%@", s.cid, url] stringByReplacingOccurrencesOfString:@"#" withString:@"%23"];
                     u = [NSURL URLWithString:url];
 
                 }
