@@ -73,6 +73,7 @@
 -(IBAction)bottomUnreadBarClicked:(id)sender;
 -(IBAction)dismissButtonPressed:(id)sender;
 -(IBAction)loadMoreBacklogButtonPressed:(id)sender;
+-(void)_scrollToBottom;
 -(void)scrollToBottom;
 -(void)clearLastSeenMarker;
 -(void)refresh;

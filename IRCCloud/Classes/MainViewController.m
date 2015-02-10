@@ -1976,6 +1976,8 @@
         frame = _eventsView.bottomUnreadView.frame;
         frame.origin.y = _serverStatusBar.frame.origin.y - frame.size.height;
         _eventsView.bottomUnreadView.frame = frame;
+        if(!_buffer.scrolledUp)
+            [_eventsView _scrollToBottom];
     } else {
         if(!_serverStatusBar.hidden) {
             CGRect frame = _eventsView.view.frame;
