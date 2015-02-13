@@ -17,7 +17,6 @@
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
 #import <AdSupport/AdSupport.h>
-#import <Grab/Grab.h>
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
 #import "EditConnectionViewController.h"
@@ -115,9 +114,6 @@
     }
 #ifdef CRASHLYTICS_TOKEN
     [Fabric with:@[CrashlyticsKit]];
-#endif
-#ifdef GRAB_SECRET
-    [Grab initWithSecret:@GRAB_SECRET];
 #endif
     _conn = [NetworkConnection sharedInstance];
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];

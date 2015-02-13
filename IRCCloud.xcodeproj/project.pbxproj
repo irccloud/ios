@@ -316,10 +316,6 @@
 		22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363B119D0884D00500478 /* OnePasswordExtension.m */; };
 		22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */; };
 		22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */; };
-		22A897BF1A82DEAF00FBC1DE /* Grab.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897BE1A82DEAF00FBC1DE /* Grab.framework */; };
-		22A897C01A82DEAF00FBC1DE /* Grab.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897BE1A82DEAF00FBC1DE /* Grab.framework */; };
-		22A897C11A82DEAF00FBC1DE /* Grab.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897BE1A82DEAF00FBC1DE /* Grab.framework */; };
-		22A897C21A82DEAF00FBC1DE /* Grab.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897BE1A82DEAF00FBC1DE /* Grab.framework */; };
 		22A897C41A82E0A900FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22A897C51A82E0B800FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22A897C61A82E0C400FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -683,7 +679,6 @@
 		22A363B119D0884D00500478 /* OnePasswordExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnePasswordExtension.m; sourceTree = "<group>"; };
 		22A363BA19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+UIDevice_iPhone6Hax.h"; sourceTree = "<group>"; };
 		22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+UIDevice_iPhone6Hax.m"; sourceTree = "<group>"; };
-		22A897BE1A82DEAF00FBC1DE /* Grab.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Grab.framework; sourceTree = "<group>"; };
 		22A897C31A82E0A900FBC1DE /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		22AD75EB1718567D00141257 /* ChannelModeListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelModeListTableViewController.h; sourceTree = "<group>"; };
 		22AD75EC1718567D00141257 /* ChannelModeListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelModeListTableViewController.m; sourceTree = "<group>"; };
@@ -762,7 +757,6 @@
 				22103503197EFC0500AB414F /* MobileCoreServices.framework in Frameworks */,
 				22103504197EFC0500AB414F /* Security.framework in Frameworks */,
 				22103505197EFC0500AB414F /* SystemConfiguration.framework in Frameworks */,
-				22A897C11A82DEAF00FBC1DE /* Grab.framework in Frameworks */,
 				1A5703491A74145B00D58225 /* AdSupport.framework in Frameworks */,
 				22103506197EFC0500AB414F /* Twitter.framework in Frameworks */,
 				22103507197EFC0500AB414F /* UIKit.framework in Frameworks */,
@@ -780,7 +774,6 @@
 				22C8DCF31A801A4500199371 /* CloudKit.framework in Frameworks */,
 				225D977A18AA995900065087 /* Twitter.framework in Frameworks */,
 				225D977B18AA995900065087 /* SystemConfiguration.framework in Frameworks */,
-				22A897C01A82DEAF00FBC1DE /* Grab.framework in Frameworks */,
 				225D977C18AA995900065087 /* ImageIO.framework in Frameworks */,
 				225D977D18AA995900065087 /* MobileCoreServices.framework in Frameworks */,
 				225D977E18AA995900065087 /* libz.dylib in Frameworks */,
@@ -807,7 +800,6 @@
 				2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */,
 				22501740178340AB00066E71 /* Twitter.framework in Frameworks */,
 				22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */,
-				22A897BF1A82DEAF00FBC1DE /* Grab.framework in Frameworks */,
 				2223C6B61768F4500032544B /* ImageIO.framework in Frameworks */,
 				2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */,
 				2248DF3916EE375D0086BB42 /* libz.dylib in Frameworks */,
@@ -855,7 +847,6 @@
 				1A5703461A73FC7600D58225 /* Fabric.framework in Frameworks */,
 				22DB25231982DF2B0008728E /* CFNetwork.framework in Frameworks */,
 				22DB25241982DF2B0008728E /* CoreGraphics.framework in Frameworks */,
-				22A897C21A82DEAF00FBC1DE /* Grab.framework in Frameworks */,
 				22DB25251982DF2B0008728E /* CoreText.framework in Frameworks */,
 				22DB25261982DF2B0008728E /* Foundation.framework in Frameworks */,
 				22DB25271982DF2B0008728E /* ImageIO.framework in Frameworks */,
@@ -946,7 +937,6 @@
 			isa = PBXGroup;
 			children = (
 				22A897C31A82E0A900FBC1DE /* StoreKit.framework */,
-				22A897BE1A82DEAF00FBC1DE /* Grab.framework */,
 				22C8DCF21A801A4500199371 /* CloudKit.framework */,
 				1A5703471A74145400D58225 /* AdSupport.framework */,
 				1A5703421A73FB1200D58225 /* Fabric.framework */,

@@ -1136,19 +1136,19 @@ float ColorFormatterCachedFontSize = 0.0f;
 |(?:yachts|yandex|yokohama|y[et])\
 |(?:zone|z[amw])))";
     NSString *GOOD_IRI_CHAR = @"a-zA-Z0-9\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF";
-    NSString *pattern = [NSString stringWithFormat:@"([a-z_-]+:\\/{1,3}[^<>\"\\s]+)|\
-(((?:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)\
+        NSString *pattern = [NSString stringWithFormat:@"((?:[a-z_-]+:\\/{1,3}(?:(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)\
 \\,\\;\\?\\&\\=]|(?:\\%%[a-fA-F0-9]{2})){1,64}(?:\\:(?:[a-zA-Z0-9\\$\\-\\_\
 \\.\\+\\!\\*\\'\\(\\)\\,\\;\\?\\&\\=]|(?:\\%%[a-fA-F0-9]{2})){1,25})?\\@)?)?\
-((?:(?:[%@][%@\\-]{0,64}\\.)+%@\
+((?:(?:[%@][%@\\-]{0,64}\\.)+\
+%@\
 |(?:(?:25[0-5]|2[0-4]\
 [0-9]|[0-1][0-9]{2}|[1-9][0-9]|[1-9])\\.(?:25[0-5]|2[0-4][0-9]\
 |[0-1][0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(?:25[0-5]|2[0-4][0-9]|[0-1]\
 [0-9]{2}|[1-9][0-9]|[1-9]|0)\\.(?:25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}\
 |[1-9][0-9]|[0-9])))\
 (?:\\:\\d{1,5})?)\
-(\\/(?:(?:[%@\\;\\/\\?\\:\\@\\&\\=\\#\\~\\$\
-\\-\\.\\+\\!\\*\\'\\(\\)\\,\\_])|(?:\\%%[a-fA-F0-9]{2}))*)?\
+([\\/\\?\\#](?:(?:[%@\\;\\/\\?\\:\\@\\&\\=\\#\\~\\$\
+\\-\\.\\+\\!\\*\\'\\(\\)\\,\\_\\^\\{\\}\\[\\]])|(?:\\%%[a-fA-F0-9]{2}))*)?\
 (?:\\b|$)", GOOD_IRI_CHAR, GOOD_IRI_CHAR, TOP_LEVEL_DOMAIN_STR_FOR_WEB_URL, GOOD_IRI_CHAR];
     _pattern = [NSRegularExpression
             regularExpressionWithPattern:pattern
@@ -1535,17 +1535,26 @@ float ColorFormatterCachedFontSize = 0.0f;
             }
             if(!overlap) {
                 NSString *url = [NSURL IDNEncodedURL:[[output string] substringWithRange:result.range]];
+                NSRange range = result.range;
+                
+                if([self unbalanced:url] || [url hasSuffix:@"."] || [url hasSuffix:@"?"] || [url hasSuffix:@"!"] || [url hasSuffix:@","]) {
+                    url = [url substringToIndex:url.length - 1];
+                    range.length--;
+                }
+                
+                CFStringRef safe_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, (CFStringRef)@"%", (CFStringRef)@"^", kCFStringEncodingUTF8);
+
+                url = [NSString stringWithString:(__bridge NSString *)safe_escaped];
+                CFRelease(safe_escaped);
+                
                 if([url rangeOfString:@"://"].location == NSNotFound) {
                     if([url hasPrefix:@"irc."])
                         url = [NSString stringWithFormat:@"irc://%@", url];
                     else
                         url = [NSString stringWithFormat:@"http://%@", url];
                 }
-                if([self unbalanced:url]) {
-                    [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:NSMakeRange(result.range.location, result.range.length - 1) URL:[NSURL URLWithString:[url substringToIndex:url.length - 1]]]];
-                } else {
-                    [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
-                }
+                
+                [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:range URL:[NSURL URLWithString:url]]];
             }
         }
     } else {
