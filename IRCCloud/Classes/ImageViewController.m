@@ -266,6 +266,18 @@
             }
         }];
         return;
+    } else if([url.host hasSuffix:@"leetfiles.com"]) {
+        NSString *u = url.absoluteString;
+        u = [u stringByReplacingOccurrencesOfString:@"www." withString:@""];
+        u = [u stringByReplacingOccurrencesOfString:@"leetfiles.com/image" withString:@"i.leetfiles.com/"];
+        u = [u stringByReplacingOccurrencesOfString:@"?id=" withString:@""];
+        url = [NSURL URLWithString:u];
+    } else if([url.host hasSuffix:@"leetfil.es"]) {
+        NSString *u = url.absoluteString;
+        u = [u stringByReplacingOccurrencesOfString:@"www." withString:@""];
+        u = [u stringByReplacingOccurrencesOfString:@"leetfil.es/image" withString:@"i.leetfiles.com/"];
+        u = [u stringByReplacingOccurrencesOfString:@"?id=" withString:@""];
+        url = [NSURL URLWithString:u];
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
