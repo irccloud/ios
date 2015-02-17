@@ -2884,10 +2884,12 @@
 }
 
 -(void)fileUploadDidFinish {
+    NSLog(@"File upload did finish");
     [self _hideConnectingView];
 }
 
 -(void)fileUploadWasCancelled {
+    NSLog(@"File upload was cancelled");
     [self _hideConnectingView];
 }
 

@@ -36,6 +36,10 @@
 }
 
 -(void)cancel {
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
+    _cancelled = YES;
     _bid = -1;
     _msg = _filename = _originalFilename = _mimeType = nil;
     [_connection cancel];
@@ -330,7 +334,7 @@
 }
 
 -(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
-    if(_delegate)
+    if(_delegate && !_cancelled)
         [_delegate fileUploadProgress:(float)totalBytesWritten / (float)totalBytesExpectedToWrite];
 }
 
@@ -350,6 +354,8 @@
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
+    if(_cancelled)
+        return;
     NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:_response];
     if(d) {
         NSLog(@"Upload finished: %@", d);

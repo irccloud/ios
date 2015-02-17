@@ -36,6 +36,7 @@
     int _reqid;
     BOOL _filenameSet;
     BOOL _finished;
+    BOOL _cancelled;
     NSString *_id;
     NSString *_msg;
     NSMutableData *_body;
