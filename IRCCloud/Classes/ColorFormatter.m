@@ -1541,7 +1541,7 @@ float ColorFormatterCachedFontSize = 0.0f;
                     range.length--;
                 }
                 
-                CFStringRef safe_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, (CFStringRef)@"%", (CFStringRef)@"^", kCFStringEncodingUTF8);
+                CFStringRef safe_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, (CFStringRef)@"%#", (CFStringRef)@"^", kCFStringEncodingUTF8);
 
                 url = [NSString stringWithString:(__bridge NSString *)safe_escaped];
                 CFRelease(safe_escaped);

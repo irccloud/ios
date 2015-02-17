@@ -299,7 +299,7 @@ int __timestampWidth;
 }
 
 - (void)_sendHeartbeat {
-    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus] && !_requestingBacklog) {
+    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus] && !_requestingBacklog && _conn.state == kIRCCloudStateConnected) {
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         NSTimeInterval eid = _buffer.scrolledUpFrom;
         if(eid <= 0) {
@@ -313,7 +313,7 @@ int __timestampWidth;
                 eid = last.eid;
             }
         }
-        if(eid >= 0 && eid >= _buffer.last_seen_eid && _conn.state == kIRCCloudStateConnected) {
+        if(eid >= 0 && eid >= _buffer.last_seen_eid) {
             [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
             _buffer.last_seen_eid = eid;
         }
@@ -322,7 +322,7 @@ int __timestampWidth;
 }
 
 - (void)sendHeartbeat {
-    if(!_heartbeatTimer && [UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+    if(!_heartbeatTimer && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _conn.state == kIRCCloudStateConnected)
         _heartbeatTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(_sendHeartbeat) userInfo:nil repeats:NO];
 }
 
