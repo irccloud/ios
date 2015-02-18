@@ -127,6 +127,8 @@
 		223DA90D16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		22462B5218906B03009EF986 /* ServerReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22462B5118906B03009EF986 /* ServerReorderViewController.m */; };
 		2248DF3916EE375D0086BB42 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
+		2249867E1A95138800F6C3E2 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2249867D1A95138800F6C3E2 /* AssetsLibrary.framework */; };
+		2249867F1A95139400F6C3E2 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2249867D1A95138800F6C3E2 /* AssetsLibrary.framework */; };
 		224FCF331787286000FC3879 /* licenses.txt in Resources */ = {isa = PBXBuildFile; fileRef = 224FCF321787286000FC3879 /* licenses.txt */; };
 		224FCF361787288400FC3879 /* LicenseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 224FCF351787288400FC3879 /* LicenseViewController.m */; };
 		22501740178340AB00066E71 /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
@@ -575,6 +577,7 @@
 		22462B5018906B03009EF986 /* ServerReorderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerReorderViewController.h; sourceTree = "<group>"; };
 		22462B5118906B03009EF986 /* ServerReorderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerReorderViewController.m; sourceTree = "<group>"; };
 		2248DF3816EE375D0086BB42 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
+		2249867D1A95138800F6C3E2 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
 		224FCF321787286000FC3879 /* licenses.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = licenses.txt; sourceTree = "<group>"; };
 		224FCF341787288400FC3879 /* LicenseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LicenseViewController.h; sourceTree = "<group>"; };
 		224FCF351787288400FC3879 /* LicenseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LicenseViewController.m; sourceTree = "<group>"; };
@@ -767,6 +770,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2249867F1A95139400F6C3E2 /* AssetsLibrary.framework in Frameworks */,
 				22A897C51A82E0B800FBC1DE /* StoreKit.framework in Frameworks */,
 				22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */,
 				2200DB5118BCFA0E00343583 /* QuartzCore.framework in Frameworks */,
@@ -793,6 +797,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2249867E1A95138800F6C3E2 /* AssetsLibrary.framework in Frameworks */,
 				22A897C41A82E0A900FBC1DE /* StoreKit.framework in Frameworks */,
 				1A5703481A74145400D58225 /* AdSupport.framework in Frameworks */,
 				22C8DCF41A801A6300199371 /* CloudKit.framework in Frameworks */,
@@ -936,6 +941,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2249867D1A95138800F6C3E2 /* AssetsLibrary.framework */,
 				22A897C31A82E0A900FBC1DE /* StoreKit.framework */,
 				22C8DCF21A801A4500199371 /* CloudKit.framework */,
 				1A5703471A74145400D58225 /* AdSupport.framework */,

@@ -88,15 +88,32 @@
         _mimeType = @"application/octet-stream";
     CFRelease(UTI);
     
-    _originalFilename = [file.pathComponents lastObject];
+    if(!_originalFilename)
+        _originalFilename = [file.pathComponents lastObject];
     
     NSData *data = [NSData dataWithContentsOfURL:file];
+    
     [self performSelectorInBackground:@selector(_upload:) withObject:data];
 }
 
+-(void)uploadFile:(NSString *)filename UTI:(NSString *)UTI data:(NSData *)data {
+    _originalFilename = filename;
+    _mimeType = UTI;
+    [self performSelectorInBackground:@selector(_upload:) withObject:data];
+}
+
+
 -(void)uploadImage:(UIImage *)img {
     _mimeType = @"image/jpeg";
-    _originalFilename = [NSString stringWithFormat:@"%li.jpg", time(NULL)];
+    if(_originalFilename) {
+        if([_originalFilename rangeOfString:@"." options:NSBackwardsSearch].location != NSNotFound) {
+            _originalFilename = [NSString stringWithFormat:@"%@.JPG", [_originalFilename substringToIndex:[_originalFilename rangeOfString:@"." options:NSBackwardsSearch].location]];
+        } else {
+            _originalFilename = [_originalFilename stringByAppendingString:@".JPG"];
+        }
+    } else {
+        _originalFilename = [NSString stringWithFormat:@"%li.JPG", time(NULL)];
+    }
     [self performSelectorInBackground:@selector(_uploadImage:) withObject:img];
 }
 

@@ -48,8 +48,9 @@
 @property NSObject<FileUploaderDelegate> *delegate;
 @property NSObject<FileUploaderMetadataDelegate> *metadatadelegate;
 @property int bid;
-@property (readonly) NSString *originalFilename;
+@property NSString *originalFilename;
 -(void)uploadFile:(NSURL *)file;
+-(void)uploadFile:(NSString *)filename UTI:(NSString *)UTI data:(NSData *)data;
 -(void)uploadImage:(UIImage *)image;
 -(void)setFilename:(NSString *)filename message:(NSString *)message;
 -(void)cancel;

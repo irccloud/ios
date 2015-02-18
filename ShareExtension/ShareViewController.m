@@ -57,7 +57,19 @@
                 
                 NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
                     if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                        [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                        if([item.pathExtension.lowercaseString isEqualToString:@"gif"]) {
+                            NSLog(@"Uploading file to IRCCloud");
+                            [_fileUploader uploadFile:item];
+                            if(!_filename)
+                                _filename = _fileUploader.originalFilename;
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                [self reloadConfigurationItems];
+                                [self validateContent];
+                            }];
+                        } else {
+                            _fileUploader.originalFilename = [[item pathComponents] lastObject];
+                            [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                        }
                     }
                 };
                 

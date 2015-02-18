@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+#import <AssetsLibrary/AssetsLibrary.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import "MainViewController.h"
 #import "NetworkConnection.h"
@@ -2833,7 +2833,32 @@
             FileUploader *u = [[FileUploader alloc] init];
             u.delegate = self;
             u.bid = _buffer.bid;
-            [u uploadImage:img];
+
+            NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
+            
+            // define the block to call when we get the asset based on the url (below)
+            ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
+                ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
+                if([imageRep.filename.lowercaseString hasSuffix:@".gif"]) {
+                    NSMutableData *data = [[NSMutableData alloc] initWithCapacity:imageRep.size];
+                    uint8_t buffer[4096];
+                    long long len = 0;
+                    while(len < imageRep.size) {
+                        long long i = [imageRep getBytes:buffer fromOffset:len length:4096 error:nil];
+                        [data appendBytes:buffer length:i];
+                        len += i;
+                    }
+                    [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
+                } else {
+                    NSLog(@"Filename: %@", imageRep.filename);
+                    u.originalFilename = imageRep.filename;
+                    [u uploadImage:img];
+                }
+            };
+            
+            ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
+            [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:nil];
+
             FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
             nc = [[UINavigationController alloc] initWithRootViewController:fvc];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
