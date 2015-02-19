@@ -2850,7 +2850,6 @@
                     }
                     [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
                 } else {
-                    NSLog(@"Filename: %@", imageRep.filename);
                     u.originalFilename = imageRep.filename;
                     [u uploadImage:img];
                 }

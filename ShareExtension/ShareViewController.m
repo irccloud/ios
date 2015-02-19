@@ -195,6 +195,14 @@
                 [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:urlHandler];
             } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
                 [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+            } else if([i hasItemConformingToTypeIdentifier:@"public.plain-text"]) {
+                [_conn say:self.contentText to:_buffer.name cid:_buffer.cid];
+                [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
+                AudioServicesPlaySystemSound(_sound);
+            } else {
+                CLS_LOG(@"Unknown attachment type: %@", output.attachments.firstObject);
+                [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
+                AudioServicesPlaySystemSound(_sound);
             }
         }
     } else {
