@@ -2835,29 +2835,33 @@
             u.bid = _buffer.bid;
 
             NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
-            
-            // define the block to call when we get the asset based on the url (below)
-            ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
-                ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
-                if([imageRep.filename.lowercaseString hasSuffix:@".gif"]) {
-                    NSMutableData *data = [[NSMutableData alloc] initWithCapacity:imageRep.size];
-                    uint8_t buffer[4096];
-                    long long len = 0;
-                    while(len < imageRep.size) {
-                        long long i = [imageRep getBytes:buffer fromOffset:len length:4096 error:nil];
-                        [data appendBytes:buffer length:i];
-                        len += i;
+            if(refURL) {
+                ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
+                    ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
+                    if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
+                        NSMutableData *data = [[NSMutableData alloc] initWithCapacity:imageRep.size];
+                        uint8_t buffer[4096];
+                        long long len = 0;
+                        while(len < imageRep.size) {
+                            long long i = [imageRep getBytes:buffer fromOffset:len length:4096 error:nil];
+                            [data appendBytes:buffer length:i];
+                            len += i;
+                        }
+                        [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
+                    } else {
+                        u.originalFilename = imageRep.filename;
+                        [u uploadImage:img];
                     }
-                    [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
-                } else {
-                    u.originalFilename = imageRep.filename;
+                };
+                
+                ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
+                [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:^(NSError *e) {
+                    CLS_LOG(@"Error getting asset: %@", e);
                     [u uploadImage:img];
-                }
-            };
-            
-            ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
-            [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:nil];
-
+                }];
+            } else {
+                [u uploadImage:img];
+            }
             FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
             nc = [[UINavigationController alloc] initWithRootViewController:fvc];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])

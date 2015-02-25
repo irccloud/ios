@@ -57,7 +57,7 @@
                 
                 NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
                     if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                        if([item.pathExtension.lowercaseString isEqualToString:@"gif"]) {
+                        if([item.pathExtension.lowercaseString isEqualToString:@"gif"] || [item.pathExtension.lowercaseString isEqualToString:@"png"]) {
                             NSLog(@"Uploading file to IRCCloud");
                             [_fileUploader uploadFile:item];
                             if(!_filename)

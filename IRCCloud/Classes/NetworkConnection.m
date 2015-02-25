@@ -396,6 +396,7 @@ NSLock *__parserLock = nil;
                        CLS_LOG(@"oob_include, invalidating BIDs");
                        [_buffers invalidate];
                        [_channels invalidate];
+                       [_events clear];
                        [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object) {
@@ -1565,9 +1566,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(backlog) {
             if(_numBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
                 if(object.bid != _currentBid) {
-                    if(_currentBid != -1) {
-                        [_events removeEventsBefore:_firstEID buffer:_currentBid];
-                    }
                     _currentBid = object.bid;
                     _currentCount = 0;
                     _firstEID = object.eid;
