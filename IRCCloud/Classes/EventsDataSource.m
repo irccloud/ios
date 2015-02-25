@@ -112,6 +112,7 @@
         decodeObject(_day);
         decodeObject(_ignoreMask);
         decodeObject(_chan);
+        decodeObject(_entities);
         if(_rowType == ROW_TIMESTAMP)
             _bgColor = [UIColor timestampBackgroundColor];
         else if(_rowType == ROW_LASTSEENEID)
@@ -171,6 +172,7 @@
     encodeObject(_chan);
     if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
         encodeObject(_bgColor);
+    encodeObject(_entities);
 }
 @end
 
@@ -816,6 +818,7 @@
     event.targetMode = nil;
     event.pending = NO;
     event.monospace = NO;
+    event.entities = [object objectForKey:@"entities"];
     
     void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:object.type];
     if(formatter)

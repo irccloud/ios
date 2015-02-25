@@ -67,12 +67,13 @@
     NSString *_ignoreMask;
     NSString *_chan;
     NSTimer *_expirationTimer;
+    NSDictionary *_entities;
 }
 @property int cid, bid, rowType, reqId;
 @property NSTimeInterval eid, groupEid;
 @property NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan;
 @property BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace;
-@property NSDictionary *ops;
+@property NSDictionary *ops,*entities;
 @property UIColor *color, *bgColor;
 @property NSAttributedString *formatted;
 @property float height;

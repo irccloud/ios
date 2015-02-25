@@ -1225,6 +1225,21 @@ int __timestampWidth;
         } else if(e.formatted == nil && e.formattedMsg.length > 0) {
             NSArray *links;
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links];
+            if([e.entities objectForKey:@"files"]) {
+                NSMutableArray *mutableLinks = links.mutableCopy;
+                for(int i = 0; i < mutableLinks.count; i++) {
+                    NSTextCheckingResult *r = [mutableLinks objectAtIndex:i];
+                    if(r.resultType == NSTextCheckingTypeLink) {
+                        for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
+                            if([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] && ([r.URL.absoluteString isEqualToString:[file objectForKey:@"url"]] || [r.URL.absoluteString hasPrefix:[[file objectForKey:@"url"] stringByAppendingString:@"/"]])) {
+                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/image%@", [file objectForKey:@"url"], [file objectForKey:@"extension"]]]];
+                                [mutableLinks setObject:r atIndexedSubscript:i];
+                            }
+                        }
+                    }
+                }
+                links = mutableLinks;
+            }
             e.links = links;
         } else if(e.formattedMsg.length == 0) {
             //CLS_LOG(@"No formatted message: %@", e);
