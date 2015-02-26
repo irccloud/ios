@@ -27,7 +27,8 @@
             if(output.attachments.count) {
                 NSItemProvider *i = nil;
                 for(NSItemProvider *p in output.attachments) {
-                    if([p hasItemConformingToTypeIdentifier:@"public.url"] && ![p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                    if(([p hasItemConformingToTypeIdentifier:@"public.file-url"] && ![p hasItemConformingToTypeIdentifier:@"public.image"]) || [p hasItemConformingToTypeIdentifier:@"com.apple.quicktime-movie"]) {
+                        NSLog(@"Attachment is file URL");
                         i = p;
                         break;
                     }
@@ -35,6 +36,7 @@
                 if(!i) {
                     for(NSItemProvider *p in output.attachments) {
                         if([p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                            NSLog(@"Attachment is image");
                             i = p;
                             break;
                         }
@@ -56,27 +58,27 @@
                 };
                 
                 NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
-                    if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                        if([item.pathExtension.lowercaseString isEqualToString:@"gif"] || [item.pathExtension.lowercaseString isEqualToString:@"png"]) {
-                            NSLog(@"Uploading file to IRCCloud");
-                            [_fileUploader uploadFile:item];
-                            if(!_filename)
-                                _filename = _fileUploader.originalFilename;
-                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                [self reloadConfigurationItems];
-                                [self validateContent];
-                            }];
-                        } else {
+                    if([i hasItemConformingToTypeIdentifier:@"public.image"] && ![item.pathExtension.lowercaseString isEqualToString:@"gif"] && ![item.pathExtension.lowercaseString isEqualToString:@"png"]) {
                             _fileUploader.originalFilename = [[item pathComponents] lastObject];
-                            [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
-                        }
+                        [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                    } else {
+                        NSLog(@"Uploading file to IRCCloud");
+                        [_fileUploader uploadFile:item];
+                        if(!_filename)
+                            _filename = _fileUploader.originalFilename;
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [self reloadConfigurationItems];
+                            [self validateContent];
+                        }];
                     }
                 };
                 
-                if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
-                    [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:urlHandler];
+                if([i hasItemConformingToTypeIdentifier:@"public.file-url"]) {
+                    [i loadItemForTypeIdentifier:@"public.file-url" options:nil completionHandler:urlHandler];
                 } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
                     [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                } else if([i hasItemConformingToTypeIdentifier:@"com.apple.quicktime-movie"]) {
+                    [i loadItemForTypeIdentifier:@"com.apple.quicktime-movie" options:nil completionHandler:urlHandler];
                 }
             }
         }
