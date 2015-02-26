@@ -19,7 +19,7 @@
 #else
         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-        if([d boolForKey:@"uploadsAvailable"] && [[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
+        if([d boolForKey:@"uploadsAvailable"]) {
             NSExtensionItem *input = self.extensionContext.inputItems.firstObject;
             NSExtensionItem *output = [input copy];
             output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
@@ -46,15 +46,17 @@
                     i = output.attachments.firstObject;
                 
                 NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
-                    NSLog(@"Uploading image to IRCCloud");
-                    _item = item;
-                    [_fileUploader uploadImage:item];
-                    if(!_filename)
-                        _filename = _fileUploader.originalFilename;
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [self reloadConfigurationItems];
-                        [self validateContent];
-                    }];
+                    if([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
+                        NSLog(@"Uploading image to IRCCloud");
+                        _item = item;
+                        [_fileUploader uploadImage:item];
+                        if(!_filename)
+                            _filename = _fileUploader.originalFilename;
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [self reloadConfigurationItems];
+                            [self validateContent];
+                        }];
+                    }
                 };
                 
                 NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
@@ -62,14 +64,16 @@
                             _fileUploader.originalFilename = [[item pathComponents] lastObject];
                         [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
                     } else {
-                        NSLog(@"Uploading file to IRCCloud");
-                        [_fileUploader uploadFile:item];
-                        if(!_filename)
-                            _filename = _fileUploader.originalFilename;
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [self reloadConfigurationItems];
-                            [self validateContent];
-                        }];
+                        if([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] || ![i hasItemConformingToTypeIdentifier:@"public.image"]) {
+                            NSLog(@"Uploading file to IRCCloud");
+                            [_fileUploader uploadFile:item];
+                            if(!_filename)
+                                _filename = _fileUploader.originalFilename;
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                [self reloadConfigurationItems];
+                                [self validateContent];
+                            }];
+                        }
                     }
                 };
                 
