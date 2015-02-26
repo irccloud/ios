@@ -673,11 +673,13 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _commands.text = @"";
     _commands.backgroundColor = [UIColor clearColor];
     _commands.delegate = self;
+    _commands.font = _server.font;
     
     _channels = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
     _channels.text = @"";
     _channels.backgroundColor = [UIColor clearColor];
     _channels.delegate = self;
+    _channels.font = _server.font;
     
     if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] == 0) {
         UILabel *unverified = [[UILabel alloc] init];
