@@ -59,6 +59,10 @@
     encodeObject(_away_msg);
     encodeDouble(_lastMention);
 }
+
+-(NSString *)description {
+    return [NSString stringWithFormat:@"{cid: %i, bid: %i, nick: %@, hostmask: %@}", _cid, _bid, _nick, _hostmask];
+}
 @end
 
 @implementation UsersDataSource
@@ -83,6 +87,7 @@
     }
     if(!_users)
         _users = [[NSMutableDictionary alloc] init];
+    
     return self;
 }
 

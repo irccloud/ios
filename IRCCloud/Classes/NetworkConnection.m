@@ -520,9 +520,12 @@ NSLock *__parserLock = nil;
                    },
                    @"who_response": ^(IRCCloudJSONObject *object) {
                        if(!backlog) {
-                           for(NSDictionary *user in [object objectForKey:@"users"]) {
-                               [_users updateHostmask:[user objectForKey:@"usermask"] nick:[user objectForKey:@"nick"] cid:object.cid bid:object.bid];
-                               [_users updateAway:[[user objectForKey:@"away"] intValue] nick:[user objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                           Buffer *b = [_buffers getBufferWithName:[object objectForKey:@"subject"] server:[[object objectForKey:@"cid"] intValue]];
+                           if(b) {
+                               for(NSDictionary *user in [object objectForKey:@"users"]) {
+                                   [_users updateHostmask:[user objectForKey:@"usermask"] nick:[user objectForKey:@"nick"] cid:b.cid bid:b.bid];
+                                   [_users updateAway:[[user objectForKey:@"away"] intValue] nick:[user objectForKey:@"nick"] cid:b.cid bid:b.bid];
+                               }
                            }
                            [self postObject:object forEvent:kIRCEventWhoList];
                        }
