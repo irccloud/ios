@@ -139,6 +139,7 @@
     _msg.backgroundColor = [UIColor clearColor];
     _msg.returnKeyType = UIReturnKeyDone;
     _msg.delegate = self;
+    _msg.font = _filename.font;
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
