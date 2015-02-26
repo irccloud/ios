@@ -146,9 +146,11 @@
             NSLog(@"Setting filename, bid, and message for IRCCloud upload");
             _fileUploader.bid = _buffer.bid;
             [_fileUploader setFilename:_filename message:self.contentText];
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
-            }];
+            if(!_fileUploader.finished) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
+                }];
+            }
         } else {
             NSItemProvider *i = nil;
             for(NSItemProvider *p in output.attachments) {
@@ -315,6 +317,9 @@
     NSLog(@"File upload successful");
     [_conn disconnect];
     AudioServicesPlaySystemSound(_sound);
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
+    }];
 }
 
 -(void)fileUploadWasCancelled {
