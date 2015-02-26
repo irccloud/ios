@@ -311,6 +311,12 @@
 
 -(void)fileUploadDidFail {
     NSLog(@"File upload failed");
+    UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"Unable to upload file to IRCCloud. Please try again later." preferredStyle:UIAlertControllerStyleAlert];
+    [c addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        [self cancel];
+        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
+    }]];
+    [self presentViewController:c animated:YES completion:nil];
 }
 
 -(void)fileUploadDidFinish {
@@ -330,10 +336,22 @@
 
 -(void)imageUploadDidFail {
     NSLog(@"Image upload failed");
+    UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"Unable to upload photo to imgur. Please try again later." preferredStyle:UIAlertControllerStyleAlert];
+    [c addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        [self cancel];
+        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
+    }]];
+    [self presentViewController:c animated:YES completion:nil];
 }
 
 -(void)imageUploadNotAuthorized {
     NSLog(@"Image upload not authorized");
+    UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"Unable to authorize your imgur account. Check your imgur username and password and try again." preferredStyle:UIAlertControllerStyleAlert];
+    [c addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        [self cancel];
+        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
+    }]];
+    [self presentViewController:c animated:YES completion:nil];
 }
 
 -(void)imageUploadDidFinish:(NSDictionary *)d bid:(int)bid {
