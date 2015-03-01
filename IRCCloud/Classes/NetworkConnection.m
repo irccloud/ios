@@ -1777,8 +1777,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)_scheduleTimedoutBuffers {
     for(Buffer *buffer in [_buffers getBuffers]) {
-        if(buffer.timeout > 0) {
-            CLS_LOG(@"Requesting backlog for timed-out buffer: %@", buffer.name);
+        if(buffer.timeout > 0 || (buffer.archived == 0 && buffer.last_seen_eid > 0 && ![buffer.type isEqualToString:@"console"] && [[EventsDataSource sharedInstance] sizeOfBuffer:buffer.bid] == 0)) {
+            if([buffer.type isEqualToString:@"channel"]) {
+                if(![[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid]) {
+                    buffer.timeout = 0;
+                    continue;
+                }
+            }
+            buffer.timeout = 1;
+            CLS_LOG(@"Requesting backlog for buffer: %@", buffer.name);
             [self requestBacklogForBuffer:buffer.bid server:buffer.cid];
         }
     }
