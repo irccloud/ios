@@ -241,6 +241,7 @@ int __timestampWidth;
 
 - (IBAction)loadMoreBacklogButtonPressed:(id)sender {
     _requestingBacklog = YES;
+    [_conn cancelPendingBacklogRequests];
     [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
     self.tableView.tableHeaderView = _headerView;
 }
@@ -1029,6 +1030,7 @@ int __timestampWidth;
         if(_buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
             self.tableView.tableHeaderView = _headerView;
             _requestingBacklog = YES;
+            [_conn cancelPendingBacklogRequests];
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
         } else {
             self.tableView.tableHeaderView = nil;
@@ -1183,6 +1185,7 @@ int __timestampWidth;
     if(_conn.state == kIRCCloudStateConnected) {
         if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
             _requestingBacklog = YES;
+            [_conn cancelPendingBacklogRequests];
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
         }
         [[NetworkConnection sharedInstance] scheduleIdleTimer];
@@ -1460,6 +1463,7 @@ int __timestampWidth;
         if(_conn.state == kIRCCloudStateConnected && scrollView.contentOffset.y < _headerView.frame.size.height) {
             NSLog(@"The table scrolled and the loading header became visible, requesting more backlog");
             _requestingBacklog = YES;
+            [_conn cancelPendingBacklogRequests];
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Downloading more chat history");
             return;

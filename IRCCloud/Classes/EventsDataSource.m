@@ -81,7 +81,6 @@
         decodeInt(_cid);
         decodeInt(_bid);
         decodeDouble(_eid);
-        decodeObject(_timestamp);
         decodeObject(_type);
         decodeObject(_msg);
         decodeObject(_hostmask);
@@ -91,7 +90,6 @@
         decodeObject(_oldNick);
         decodeObject(_server);
         decodeObject(_diff);
-        decodeObject(_formattedMsg);
         decodeBool(_isHighlight);
         decodeBool(_isSelf);
         decodeBool(_toChan);
@@ -133,7 +131,6 @@
     encodeInt(_cid);
     encodeInt(_bid);
     encodeDouble(_eid);
-    encodeObject(_timestamp);
     encodeObject(_type);
     encodeObject(_msg);
     encodeObject(_hostmask);
@@ -143,7 +140,6 @@
     encodeObject(_oldNick);
     encodeObject(_server);
     encodeObject(_diff);
-    encodeObject(_formattedMsg);
     encodeBool(_isHighlight);
     encodeBool(_isSelf);
     encodeBool(_toChan);

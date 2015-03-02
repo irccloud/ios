@@ -172,6 +172,7 @@ typedef enum {
 -(void)clearPrefs;
 -(void)scheduleIdleTimer;
 -(void)cancelIdleTimer;
+-(void)cancelPendingBacklogRequests;
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid;
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid;
 -(int)say:(NSString *)message to:(NSString *)to cid:(int)cid;

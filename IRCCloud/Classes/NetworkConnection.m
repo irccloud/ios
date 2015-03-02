@@ -1415,6 +1415,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
+-(void)cancelPendingBacklogRequests {
+    for(OOBFetcher *fetcher in _oobQueue.copy) {
+        if(fetcher.bid > 0) {
+            [fetcher cancel];
+            [_oobQueue removeObject:fetcher];
+        }
+    }
+}
+
 -(void)disconnect {
     CLS_LOG(@"Closing websocket");
     for(OOBFetcher *fetcher in _oobQueue) {

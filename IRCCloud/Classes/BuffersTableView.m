@@ -620,6 +620,7 @@
                         [m setObject:@0 forKey:@"joined"];
                     }
                 }
+                [m setObject:@(b.timeout) forKey:@"timeout"];
                 Server *s = [[ServersDataSource sharedInstance] getServer:[[m objectForKey:@"cid"] intValue]];
                 [m setObject:@(unread) forKey:@"unread"];
                 [m setObject:@(highlights) forKey:@"highlights"];
