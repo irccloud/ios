@@ -1788,7 +1788,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)_scheduleTimedoutBuffers {
     for(Buffer *buffer in [_buffers getBuffers]) {
-        if(buffer.timeout > 0 || (buffer.archived == 0 && buffer.last_seen_eid > 0 && ![buffer.type isEqualToString:@"console"] && [[EventsDataSource sharedInstance] sizeOfBuffer:buffer.bid] == 0)) {
+        if(buffer.timeout > 0) {
             if([buffer.type isEqualToString:@"channel"] && buffer.timeout == 0) {
                 if(![[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid])
                     continue;
