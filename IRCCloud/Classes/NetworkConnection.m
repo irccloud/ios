@@ -89,12 +89,14 @@ NSLock *__parserLock = nil;
     
     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
     if(_connection) {
-        [__parserLock lock];
+        if(_bid == -1)
+            [__parserLock lock];
         _running = YES;
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
         NSRunLoop *loop = [NSRunLoop currentRunLoop];
         while(!_cancelled && _running && [loop runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]]);
-        [__parserLock unlock];
+        if(_bid == -1)
+            [__parserLock unlock];
     } else {
         CLS_LOG(@"Failed to create NSURLConnection");
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
@@ -1787,13 +1789,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)_scheduleTimedoutBuffers {
     for(Buffer *buffer in [_buffers getBuffers]) {
         if(buffer.timeout > 0 || (buffer.archived == 0 && buffer.last_seen_eid > 0 && ![buffer.type isEqualToString:@"console"] && [[EventsDataSource sharedInstance] sizeOfBuffer:buffer.bid] == 0)) {
-            if([buffer.type isEqualToString:@"channel"]) {
-                if(![[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid]) {
-                    buffer.timeout = 0;
+            if([buffer.type isEqualToString:@"channel"] && buffer.timeout == 0) {
+                if(![[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid])
                     continue;
-                }
             }
-            buffer.timeout = 1;
             CLS_LOG(@"Requesting backlog for buffer: %@", buffer.name);
             [self requestBacklogForBuffer:buffer.bid server:buffer.cid];
         }
