@@ -48,6 +48,8 @@
 #define TAG_INVALIDNICK 6
 #define TAG_FAILEDMSG 7
 
+extern NSDictionary *emojiMap;
+
 @implementation MainViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
@@ -1297,6 +1299,11 @@
 -(void)nickSelected:(NSString *)nick {
     _message.selectedRange = NSMakeRange(0, 0);
     NSString *text = _message.text;
+    if(![text hasPrefix:@":"] && [text rangeOfString:@" "].location == NSNotFound)
+        nick = [nick stringByAppendingString:@": "];
+    else
+        nick = [nick stringByAppendingString:@" "];
+
     if(text.length == 0) {
         _message.text = nick;
     } else {
@@ -1307,10 +1314,6 @@
         _message.text = text;
     }
     
-    if([text rangeOfString:@" "].location == NSNotFound)
-        _message.text = [_message.text stringByAppendingString:@": "];
-    else
-        _message.text = [_message.text stringByAppendingString:@" "];
 }
 
 -(void)updateSuggestions:(BOOL)force {
@@ -1350,6 +1353,20 @@
                 if([nick hasPrefix:text] && ![suggestions_set containsObject:user.nick.lowercaseString]) {
                     [suggestions_set addObject:user.nick.lowercaseString];
                     [suggestions addObject:user.nick];
+                }
+            }
+        }
+        
+        if(text.length > 1 && [text hasPrefix:@":"]) {
+            NSString *q = [text substringFromIndex:1];
+            
+            for(NSString *emocode in emojiMap.keyEnumerator) {
+                if([emocode hasPrefix:q]) {
+                    NSString *emoji = [emojiMap objectForKey:emocode];
+                    if(![suggestions_set containsObject:emoji]) {
+                        [suggestions_set addObject:emoji];
+                        [suggestions addObject:emoji];
+                    }
                 }
             }
         }
