@@ -987,6 +987,7 @@
             for(Event *e in events) {
                 e.formatted = nil;
                 e.timestamp = nil;
+                e.height = 0;
             }
         }
     }

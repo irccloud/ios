@@ -97,7 +97,7 @@ int __timestampWidth;
         [_timestamp sizeToFit];
         _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = NO;
-        _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
+        _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height + 6);
         _message.hidden = NO;
     } else {
         if(_type == ROW_BACKLOG) {
@@ -1225,7 +1225,7 @@ int __timestampWidth;
     if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
         if(e.formatted != nil && e.height > 0) {
             return e.height;
-        } else if(e.formatted == nil && e.formattedMsg.length > 0) {
+        } else if(e.formattedMsg.length > 0) {
             NSArray *links;
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links];
             if([e.entities objectForKey:@"files"]) {
@@ -1244,8 +1244,8 @@ int __timestampWidth;
                 links = mutableLinks;
             }
             e.links = links;
-        } else if(e.formattedMsg.length == 0) {
-            //CLS_LOG(@"No formatted message: %@", e);
+        } else {
+            CLS_LOG(@"No formatted message: %@", e);
             return 26;
         }
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
@@ -1281,6 +1281,11 @@ int __timestampWidth;
     cell.message.font = [ColorFormatter timestampFont];
     cell.message.delegate = self;
     cell.message.text = e.formatted;
+    if(!e.formatted || e.formatted.length == 0) {
+        CLS_LOG(@"No formatted message: %@", e);
+        cell.message.text = [NSString stringWithFormat:@"Formatting missing for event, please use /crash: %@", e];
+    }
+
     if(e.from.length && e.msg.length) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];
         cell.accessibilityValue = [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
