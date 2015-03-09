@@ -96,15 +96,12 @@
         decodeBool(_toBuffer);
         decodeObject(_color);
         decodeObject(_ops);
-        decodeDouble(_groupEid);
         decodeInt(_rowType);
-        decodeObject(_groupMsg);
         decodeBool(_linkify);
         decodeObject(_targetMode);
         decodeInt(_reqid);
         decodeBool(_pending);
         decodeBool(_monospace);
-        decodeObject(_links);
         decodeObject(_to);
         decodeObject(_command);
         decodeObject(_day);
@@ -152,15 +149,12 @@
         encodeObject(_color);
     }
     encodeObject(_ops);
-    encodeDouble(_groupEid);
     encodeInt(_rowType);
-    encodeObject(_groupMsg);
     encodeBool(_linkify);
     encodeObject(_targetMode);
     encodeInt(_reqid);
     encodeBool(_pending);
     encodeBool(_monospace);
-    encodeObject(_links);
     encodeObject(_to);
     encodeObject(_command);
     encodeObject(_day);

@@ -262,6 +262,8 @@
 }
 
 -(void)_upload:(NSData *)file {
+    if(!_originalFilename)
+        _originalFilename = [NSString stringWithFormat:@"%li", time(NULL)];
     NSString *boundary = [self boundaryString];
     _response = [[NSMutableData alloc] init];
     _body = [[NSMutableData alloc] init];

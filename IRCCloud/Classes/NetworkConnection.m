@@ -1799,7 +1799,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
     if(_oobQueue.count > 0) {
         [_queue addOperationWithBlock:^{
-            [(OOBFetcher *)[_oobQueue objectAtIndex:0] start];
+            if(_oobQueue.count > 0)
+                [(OOBFetcher *)[_oobQueue objectAtIndex:0] start];
         }];
     }
 }
