@@ -286,6 +286,10 @@
     [_connection start];
 }
 
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
+    return nil;
+}
+
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
     _bytesExpected = [response expectedContentLength];
     _imageData = [[NSMutableData alloc] initWithCapacity:_bytesExpected + 32]; // Just in case? Unsure if the extra 32 bytes are necessary

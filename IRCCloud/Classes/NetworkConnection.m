@@ -102,6 +102,9 @@ NSLock *__parserLock = nil;
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
     }
 }
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
+    return nil;
+}
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     if(_cancelled)
         return;

@@ -352,6 +352,10 @@
     [d synchronize];
 }
 
+- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
+    return nil;
+}
+
 -(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     if(_delegate && !_cancelled)
         [_delegate fileUploadProgress:(float)totalBytesWritten / (float)totalBytesExpectedToWrite];
