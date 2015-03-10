@@ -1863,6 +1863,20 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [NetworkConnection sync];
 #ifndef EXTENSION
     [[UIApplication sharedApplication] unregisterForRemoteNotifications];
+    NSURL *caches = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
+    for(NSURL *file in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:caches includingPropertiesForKeys:nil options:0 error:nil]) {
+        [[NSFileManager defaultManager] removeItemAtURL:file error:nil];
+    }
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+#ifdef ENTERPRISE
+        NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
+#else
+        NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
+#endif
+        for(NSURL *file in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:sharedcontainer includingPropertiesForKeys:nil options:0 error:nil]) {
+            [[NSFileManager defaultManager] removeItemAtURL:file error:nil];
+        }
+    }
 #endif
     [self cancelIdleTimer];
 }
