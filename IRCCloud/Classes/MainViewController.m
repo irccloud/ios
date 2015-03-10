@@ -2074,8 +2074,8 @@ extern NSDictionary *emojiMap;
         else
             f.origin.x = 0;
         f.origin.y = 0;
-        f.size.width = frame.size.width;
-        f.size.height = frame.size.height;
+        f.size.width = width;
+        f.size.height = height;
         self.slidingViewController.view.frame = frame;
         self.navigationController.view.frame = f;
     }
