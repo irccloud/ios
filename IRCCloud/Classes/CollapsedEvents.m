@@ -582,9 +582,11 @@
                 } else if(e.type == kCollapsedEventNetSplit) {
                     [message appendString:[e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "]];
                 } else if(e.type == kCollapsedEventConnectionStatus) {
-                    [message appendString:e.msg];
-                    if(e.count > 1)
-                        [message appendFormat:@" (x%i)", e.count];
+                    if(e.msg) {
+                        [message appendString:e.msg];
+                        if(e.count > 1)
+                            [message appendFormat:@" (x%i)", e.count];
+                    }
                 } else if(!_showChan) {
                     [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO]];
                     [message appendString:[self was:e]];

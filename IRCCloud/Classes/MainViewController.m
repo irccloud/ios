@@ -2064,7 +2064,7 @@ extern NSDictionary *emojiMap;
         frame.size.height = height;
     }
     
-    if(self.slidingViewController.view.frame.size.height != frame.size.height || self.slidingViewController.view.frame.size.width != frame.size.width || self.view.frame.size.width != width) {
+    if(self.slidingViewController.view.frame.size.height != height || self.slidingViewController.view.frame.size.width != width || self.view.frame.size.width != width) {
         CGRect f = self.navigationController.view.frame;
         
         if(f.origin.x == self.slidingViewController.anchorRightRevealAmount)

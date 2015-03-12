@@ -2042,7 +2042,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "f41141e6-6e6e-4a46-878b-5d444851f23e";
+				PROVISIONING_PROFILE = "12348d99-cc7d-47ad-91bf-46f083df6009";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2261,7 +2261,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "f62e4ef9-7de1-4c98-b583-8b09408ba6fa";
+				PROVISIONING_PROFILE = "b702df54-7173-4f62-ab9f-7c383bee9468";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

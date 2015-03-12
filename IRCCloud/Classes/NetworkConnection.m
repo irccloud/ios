@@ -976,9 +976,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[[NSString stringWithFormat:@"realname=%@&email=%@&password=%@&token=%@&ios_impression=%@", realname_escaped, email_escaped, password_escaped, token,(impression!=nil)?impression:@""] dataUsingEncoding:NSUTF8StringEncoding]];
     
-    CFRelease(realname_escaped);
-    CFRelease(email_escaped);
-    CFRelease(password_escaped);
+    if(realname_escaped != NULL)
+        CFRelease(realname_escaped);
+    
+    if(email_escaped != NULL)
+        CFRelease(email_escaped);
+    
+    if(password_escaped != NULL)
+        CFRelease(password_escaped);
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 #ifndef EXTENSION
