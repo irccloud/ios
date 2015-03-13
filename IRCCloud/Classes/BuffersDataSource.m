@@ -56,8 +56,8 @@
             }
         }
         NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
-        NSString *nameLeft = _name?[r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""]:nil;
-        NSString *nameRight = aBuffer.name?[r stringByReplacingMatchesInString:[aBuffer.name lowercaseString] options:0 range:NSMakeRange(0, aBuffer.name.length) withTemplate:@""]:nil;
+        NSString *nameLeft = _name?[r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""]:@"";
+        NSString *nameRight = aBuffer.name?[r stringByReplacingMatchesInString:[aBuffer.name lowercaseString] options:0 range:NSMakeRange(0, aBuffer.name.length) withTemplate:@""]:@"";
         
         if([nameLeft compare:nameRight] == NSOrderedSame)
             return (_bid < aBuffer.bid)?NSOrderedAscending:NSOrderedDescending;

@@ -160,6 +160,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardWillShow:)
@@ -259,16 +260,19 @@
 }
 
 -(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     [username resignFirstResponder];
     [password resignFirstResponder];
     [host resignFirstResponder];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 

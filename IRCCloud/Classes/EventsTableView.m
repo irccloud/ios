@@ -155,10 +155,8 @@ int __timestampWidth;
     
     NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
     [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-	[mutableLinkAttributes setObject:(__bridge id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
+	[mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
     _linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
-    
-    CFRelease(paragraphStyle);
     
     [mutableLinkAttributes setObject:(id)[[UIColor lightLinkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
     _lightLinkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
@@ -180,6 +178,7 @@ int __timestampWidth;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -194,6 +193,7 @@ int __timestampWidth;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if(_data.count && _buffer.scrolledUp) {
         _bottomRow = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row];
@@ -989,7 +989,6 @@ int __timestampWidth;
     NSTimeInterval backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
     if(backlogEid < 1)
         backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
-    oldPosition = (_data.count && [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)].count)?[[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] objectAtIndex: 0] row]:-1;
 
     [_data removeAllObjects];
     _minEid = _maxEid = _earliestEid = _newMsgs = _newHighlights = 0;

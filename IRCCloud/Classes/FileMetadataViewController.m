@@ -55,10 +55,14 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    if(!_filename.text.length)
+        _filename.text = _uploader.originalFilename;
     [self.tableView reloadData];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -106,7 +110,6 @@
     }
     
     _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
-    _filename.text = _uploader.originalFilename;
     _filename.textAlignment = NSTextAlignmentRight;
     _filename.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
     _filename.autocapitalizationType = UITextAutocapitalizationTypeNone;

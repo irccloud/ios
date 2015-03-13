@@ -1075,6 +1075,7 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor whiteColor];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
@@ -1144,6 +1145,7 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         self.view.window.backgroundColor = [UIColor blackColor];
     [UIApplication sharedApplication].idleTimerDisabled = NO;
@@ -1158,6 +1160,7 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
@@ -1822,8 +1825,7 @@ extern NSDictionary *emojiMap;
         paragraphStyle.value = &alignment;
         
         CTParagraphStyleRef style = CTParagraphStyleCreate((const CTParagraphStyleSetting*) &paragraphStyle, 1);
-        [s addAttribute:(NSString*)kCTParagraphStyleAttributeName value:(__bridge id)style range:NSMakeRange(0, [s length])];
-        CFRelease(style);
+        [s addAttribute:(NSString*)kCTParagraphStyleAttributeName value:(__bridge_transfer id)style range:NSMakeRange(0, [s length])];
 
         _globalMsg.attributedText = s;
         
@@ -2850,6 +2852,7 @@ extern NSDictionary *emojiMap;
             FileUploader *u = [[FileUploader alloc] init];
             u.delegate = self;
             u.bid = _buffer.bid;
+            FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
 
             NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
             if(refURL) {
@@ -2865,9 +2868,11 @@ extern NSDictionary *emojiMap;
                             len += i;
                         }
                         [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
+                        [fvc viewWillAppear:NO];
                     } else {
                         u.originalFilename = imageRep.filename;
                         [u uploadImage:img];
+                        [fvc viewWillAppear:NO];
                     }
                 };
                 
@@ -2879,7 +2884,6 @@ extern NSDictionary *emojiMap;
             } else {
                 [u uploadImage:img];
             }
-            FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
             nc = [[UINavigationController alloc] initWithRootViewController:fvc];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;

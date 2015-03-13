@@ -69,16 +69,16 @@
     NSTimer *_expirationTimer;
     NSDictionary *_entities;
 }
-@property int cid, bid, rowType, reqId;
-@property NSTimeInterval eid, groupEid;
-@property NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan;
-@property BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace;
-@property NSDictionary *ops,*entities;
-@property UIColor *color, *bgColor;
-@property NSAttributedString *formatted;
-@property float height;
-@property NSArray *links;
-@property NSTimer *expirationTimer;
+@property (nonatomic, assign) int cid, bid, rowType, reqId;
+@property (nonatomic, assign) NSTimeInterval eid, groupEid;
+@property (nonatomic, copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan;
+@property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace;
+@property (nonatomic, copy) NSDictionary *ops,*entities;
+@property (nonatomic, strong) UIColor *color, *bgColor;
+@property (nonatomic, copy) NSAttributedString *formatted;
+@property (nonatomic, assign) float height;
+@property (nonatomic, strong) NSArray *links;
+@property (nonatomic, strong) NSTimer *expirationTimer;
 -(NSComparisonResult)compare:(Event *)aEvent;
 -(BOOL)isImportant:(NSString *)bufferType;
 -(NSString *)ignoreMask;

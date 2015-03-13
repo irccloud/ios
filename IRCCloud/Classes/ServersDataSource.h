@@ -40,10 +40,10 @@
     int _order;
     NSString *_MODE_OWNER, *_MODE_ADMIN, *_MODE_OP, *_MODE_HALFOP, *_MODE_VOICED;
 }
-@property int cid, port, ssl, order;
-@property NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED;
-@property NSDictionary *fail_info, *isupport, *PREFIX;
-@property NSArray *ignores;
+@property (nonatomic, assign) int cid, port, ssl, order;
+@property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED;
+@property (nonatomic, strong) NSDictionary *fail_info, *isupport, *PREFIX;
+@property (nonatomic, strong) NSArray *ignores;
 -(NSComparisonResult)compare:(Server *)aServer;
 @end
 

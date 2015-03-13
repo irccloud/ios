@@ -37,13 +37,13 @@
     Buffer *_lastBuffer;
     Buffer *_nextBuffer;
 }
-@property int bid, cid, archived, deferred, timeout;
-@property NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom;
-@property CGFloat savedScrollOffset;
-@property NSString *name, *type, *away_msg, *chantypes;
-@property BOOL valid, scrolledUp;
-@property (copy) NSString *draft;
-@property Buffer *lastBuffer, *nextBuffer;
+@property (nonatomic, assign) int bid, cid, archived, deferred, timeout;
+@property (nonatomic, assign) NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom;
+@property (nonatomic, assign) CGFloat savedScrollOffset;
+@property (nonatomic, copy) NSString *name, *type, *away_msg, *chantypes;
+@property (nonatomic, assign) BOOL valid, scrolledUp;
+@property (nonatomic, copy) NSString *draft;
+@property (nonatomic, strong) Buffer *lastBuffer, *nextBuffer;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;
 -(NSString *)accessibilityValue;
 @end

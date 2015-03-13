@@ -32,11 +32,11 @@
     BOOL _valid;
     BOOL _key;
 }
-@property int cid, bid;
-@property BOOL valid, key;
-@property NSString *name, *topic_text, *topic_author, *type, *mode, *url;
-@property NSTimeInterval topic_time, timestamp;
-@property NSArray *modes;
+@property (nonatomic, assign) int cid, bid;
+@property (nonatomic, assign) BOOL valid, key;
+@property (nonatomic, copy) NSString *name, *topic_text, *topic_author, *type, *mode, *url;
+@property (nonatomic, assign) NSTimeInterval topic_time, timestamp;
+@property (nonatomic, strong) NSArray *modes;
 -(void)addMode:(NSString *)mode param:(NSString *)param;
 -(void)removeMode:(NSString *)mode;
 -(BOOL)hasMode:(NSString *)mode;

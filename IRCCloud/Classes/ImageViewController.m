@@ -373,6 +373,7 @@
 }
 
 -(void)viewDidUnload {
+    [super viewDidUnload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -394,6 +395,7 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {

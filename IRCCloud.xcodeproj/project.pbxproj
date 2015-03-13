@@ -2002,7 +2002,7 @@
 				OTHER_CFLAGS = "-DEXTENSION";
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4454c442-0f2d-4b5f-8a91-b0191a3b4a7b";
+				PROVISIONING_PROFILE = "d9e66493-95b4-423d-a69a-db7e50050ac0";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2058,7 +2058,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: IRCCloud Ltd. (GED45EQAGA)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2234,7 +2234,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "c5d3f8b1-3d53-4fa1-8462-3b28dc4bc303";
+				PROVISIONING_PROFILE = "b867800d-12c6-49a3-a9c4-0dd0bbc43360";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2509,7 +2509,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "a5e68e51-ca4a-4732-b998-fbbaca01d693";
+				PROVISIONING_PROFILE = "625a0813-c3ee-4547-931c-4a88abfceb78";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;

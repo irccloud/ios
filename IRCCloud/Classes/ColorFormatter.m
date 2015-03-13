@@ -1489,8 +1489,7 @@ float ColorFormatterCachedFontSize = 0.0f;
     paragraphStyle.value = &lineSpacing;
     
     CTParagraphStyleRef style = CTParagraphStyleCreate((const CTParagraphStyleSetting*) &paragraphStyle, 1);
-    [output addAttribute:(NSString*)kCTParagraphStyleAttributeName value:(__bridge id)style range:NSMakeRange(0, [output length])];
-    CFRelease(style);
+    [output addAttribute:(NSString*)kCTParagraphStyleAttributeName value:(__bridge_transfer id)style range:NSMakeRange(0, [output length])];
     
     for(NSDictionary *dict in attributes) {
         [output addAttributes:dict range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];
@@ -1543,8 +1542,7 @@ float ColorFormatterCachedFontSize = 0.0f;
                 
                 CFStringRef safe_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, (CFStringRef)@"%#/?.;+", (CFStringRef)@"^", kCFStringEncodingUTF8);
 
-                url = [NSString stringWithString:(__bridge NSString *)safe_escaped];
-                CFRelease(safe_escaped);
+                url = [NSString stringWithString:(__bridge_transfer NSString *)safe_escaped];
                 
                 if([url rangeOfString:@"://"].location == NSNotFound) {
                     if([url hasPrefix:@"irc."])

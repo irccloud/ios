@@ -81,10 +81,12 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -135,10 +137,9 @@
         
         NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
         [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-        [mutableLinkAttributes setObject:(__bridge id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
+        [mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
         _topicLabel.linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
         
-        CFRelease(paragraphStyle);
         for(NSTextCheckingResult *result in links) {
             if(result.resultType == NSTextCheckingTypeLink) {
                 [_topicLabel addLinkWithTextCheckingResult:result];
