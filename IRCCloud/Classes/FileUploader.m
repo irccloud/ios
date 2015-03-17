@@ -31,7 +31,8 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
         _reqid = [[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename originalFilename:_originalFilename];
     } else {
-        [self _updateBackgroundUploadMetadata];
+        if(_backgroundID)
+            [self _updateBackgroundUploadMetadata];
     }
 }
 
