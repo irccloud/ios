@@ -263,7 +263,9 @@
 
 -(void)_upload:(NSData *)file {
     if(file.length > 15000000) {
-        [_delegate fileUploadTooLarge];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [_delegate fileUploadTooLarge];
+        }];
         return;
     }
     if(!_originalFilename)
