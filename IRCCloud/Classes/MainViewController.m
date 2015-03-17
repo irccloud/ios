@@ -2173,8 +2173,8 @@ extern NSDictionary *emojiMap;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
         frame = self.navigationController.navigationBar.frame;
-        frame.origin.x = _buffersView.tableView.frame.size.width + 1;
-        frame.size.width = width - _buffersView.tableView.frame.size.width - 1;
+        frame.origin.x = _buffersView.tableView.frame.size.width;
+        frame.size.width = width - _buffersView.tableView.frame.size.width;
         self.navigationController.navigationBar.frame = frame;
         _buffersView.tableView.contentInset = UIEdgeInsetsZero;
         _borders.frame = CGRectMake(_buffersView.tableView.frame.size.width - 1, -self.navigationController.navigationBar.frame.size.height, _eventsView.tableView.frame.size.width + 2, height + self.navigationController.navigationBar.frame.size.height);
@@ -2185,7 +2185,7 @@ extern NSDictionary *emojiMap;
         frame.origin.y = 0;
         frame.size.width = width - (([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))?_buffersView.view.frame.size.width:0);
         [_blur setFrame:frame];
-        frame.origin.y = sbheight;
+        frame.origin.y = sbheight - (sbheight > 20?20:0);
         [self.navigationController.navigationBar setFrame:frame];
     }
     
