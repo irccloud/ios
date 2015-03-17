@@ -262,6 +262,10 @@
 }
 
 -(void)_upload:(NSData *)file {
+    if(file.length > 15000000) {
+        [_delegate fileUploadTooLarge];
+        return;
+    }
     if(!_originalFilename)
         _originalFilename = [NSString stringWithFormat:@"%li", time(NULL)];
     NSString *boundary = [self boundaryString];
@@ -275,6 +279,8 @@
     [_body appendData:file];
     [_body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [_body appendData:[[NSString stringWithFormat:@"--%@--\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+
+    CLS_LOG(@"Uploading %@ with boundary %@ (%i bytes)", _originalFilename, boundary, _body.length);
     
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
@@ -369,7 +375,7 @@
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    NSLog(@"Error: %@", error);
+    CLS_LOG(@"Error: %@", error);
     [_delegate fileUploadDidFail];
 }
 
@@ -381,7 +387,7 @@
         return;
     NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:_response];
     if(d) {
-        NSLog(@"Upload finished: %@", d);
+        CLS_LOG(@"Upload finished: %@", d);
         if([[d objectForKey:@"success"] intValue] == 1) {
             _id = [d objectForKey:@"id"];
             _finished = YES;
@@ -393,7 +399,7 @@
             [_delegate fileUploadDidFail];
         }
     } else {
-        NSLog(@"UPLOAD: Invalid JSON response: %@", [[NSString alloc] initWithData:_response encoding:NSUTF8StringEncoding]);
+        CLS_LOG(@"UPLOAD: Invalid JSON response: %@", [[NSString alloc] initWithData:_response encoding:NSUTF8StringEncoding]);
         [_delegate fileUploadDidFail];
     }
 }

@@ -21,6 +21,7 @@
 -(void)fileUploadDidFail;
 -(void)fileUploadDidFinish;
 -(void)fileUploadWasCancelled;
+-(void)fileUploadTooLarge;
 @end
 
 @protocol FileUploaderMetadataDelegate<NSObject>

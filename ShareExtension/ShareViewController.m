@@ -323,6 +323,16 @@
     [self presentViewController:c animated:YES completion:nil];
 }
 
+-(void)fileUploadTooLarge {
+    NSLog(@"File upload too large");
+    UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" preferredStyle:UIAlertControllerStyleAlert];
+    [c addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+        [self cancel];
+        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
+    }]];
+    [self presentViewController:c animated:YES completion:nil];
+}
+
 -(void)fileUploadDidFinish {
     NSLog(@"File upload successful");
     [_conn disconnect];

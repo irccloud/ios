@@ -306,7 +306,7 @@
     
     NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:_response];
     if(!d) {
-        NSLog(@"IMGUR: Invalid JSON response: %@", [[NSString alloc] initWithData:_response encoding:NSUTF8StringEncoding]);
+        CLS_LOG(@"IMGUR: Invalid JSON response: %@", [[NSString alloc] initWithData:_response encoding:NSUTF8StringEncoding]);
     }
 #ifdef IMGUR_KEY
     if([defaults objectForKey:@"imgur_access_token"] && [[d objectForKey:@"success"] intValue] == 0 && [[d objectForKey:@"status"] intValue] == 403) {

@@ -2834,6 +2834,7 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    CLS_LOG(@"Image file chosen: %@", info);
     UINavigationController *nc = nil;
     UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
     if(!img)
@@ -2856,8 +2857,10 @@ extern NSDictionary *emojiMap;
 
             NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
             if(refURL) {
+                CLS_LOG(@"Loading image metadata from asset library");
                 ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
                     ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
+                    CLS_LOG(@"Got filename: %@", imageRep.filename);
                     if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
                         NSMutableData *data = [[NSMutableData alloc] initWithCapacity:imageRep.size];
                         uint8_t buffer[4096];
@@ -2882,6 +2885,7 @@ extern NSDictionary *emojiMap;
                     [u uploadImage:img];
                 }];
             } else {
+                CLS_LOG(@"no asset library URL, uploading image data instead");
                 [u uploadImage:img];
             }
             nc = [[UINavigationController alloc] initWithRootViewController:fvc];
@@ -2913,6 +2917,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+    CLS_LOG(@"Image picker was cancelled");
     [self.slidingViewController dismissModalViewControllerAnimated:YES];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
@@ -2920,6 +2925,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)fileUploadProgress:(float)progress {
+    CLS_LOG(@"File upload progress: %f", progress);
     [_connectingActivity stopAnimating];
     _connectingActivity.hidden = YES;
     _connectingProgress.hidden = NO;
@@ -2927,13 +2933,23 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)fileUploadDidFail {
+    CLS_LOG(@"File upload failed");
+    [self.slidingViewController dismissViewControllerAnimated:YES completion:nil];
     _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the file. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
     [_alertView show];
     [self _hideConnectingView];
 }
 
+-(void)fileUploadTooLarge {
+    CLS_LOG(@"File upload too large");
+    [self.slidingViewController dismissViewControllerAnimated:YES completion:nil];
+    _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+    [_alertView show];
+    [self _hideConnectingView];
+}
+
 -(void)fileUploadDidFinish {
-    NSLog(@"File upload did finish");
+    CLS_LOG(@"File upload did finish");
     [self _hideConnectingView];
 }
 
