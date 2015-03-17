@@ -1244,7 +1244,6 @@ int __timestampWidth;
             }
             e.links = links;
         } else {
-            CLS_LOG(@"No formatted message: %@", e);
             return 26;
         }
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
@@ -1280,10 +1279,6 @@ int __timestampWidth;
     cell.message.font = [ColorFormatter timestampFont];
     cell.message.delegate = self;
     cell.message.text = e.formatted;
-    if(!e.formatted || e.formatted.length == 0) {
-        CLS_LOG(@"No formatted message: %@", e);
-        cell.message.text = [NSString stringWithFormat:@"Formatting missing for event, please use /crash: %@", e];
-    }
 
     if(e.from.length && e.msg.length) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];

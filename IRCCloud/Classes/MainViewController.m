@@ -2023,6 +2023,8 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    [[UIApplication sharedApplication] setStatusBarHidden:([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) withAnimation:UIStatusBarAnimationNone];
+    
     if(duration > 0)
         [self.slidingViewController resetTopView];
 
@@ -2046,11 +2048,14 @@ extern NSDictionary *emojiMap;
             frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
     } else {
         frame.origin.x = 0;
-        if([UIApplication sharedApplication].statusBarFrame.size.height > 20)
+        if(![UIApplication sharedApplication].statusBarHidden && [UIApplication sharedApplication].statusBarFrame.size.height > 20)
             frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
     }
 
     int sbheight = (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8 &&UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height);
+    
+    if([UIApplication sharedApplication].statusBarHidden)
+        sbheight = 0;
     
     if(sbheight)
         height -= sbheight - 20;
@@ -2088,7 +2093,7 @@ extern NSDictionary *emojiMap;
         if([UIApplication sharedApplication].statusBarFrame.size.height > 20)
             self.view.frame = CGRectMake(0, 0, width, height);
         else
-            self.view.frame = CGRectMake(0, [UIApplication sharedApplication].statusBarFrame.size.height, width, height);
+            self.view.frame = CGRectMake(0, ([UIApplication sharedApplication].statusBarHidden)?0:[UIApplication sharedApplication].statusBarFrame.size.height, width, height);
         self.view.superview.frame = frame;
     }
 
@@ -2178,7 +2183,10 @@ extern NSDictionary *emojiMap;
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         frame = self.navigationController.navigationBar.frame;
         frame.origin.y = 0;
+        frame.size.width = width - (([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))?_buffersView.view.frame.size.width:0);
         [_blur setFrame:frame];
+        frame.origin.y = sbheight;
+        [self.navigationController.navigationBar setFrame:frame];
     }
     
     frame = _titleView.frame;

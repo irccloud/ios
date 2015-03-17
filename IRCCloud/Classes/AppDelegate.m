@@ -365,7 +365,7 @@
             [[NetworkConnection sharedInstance] connect:NO];
 
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [UIApplication sharedApplication].statusBarHidden = NO;
+            [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation);
             self.slideViewController.view.alpha = 1;
             if(self.window.rootViewController != self.slideViewController) {
                 BOOL fromLoginView = (self.window.rootViewController == self.loginSplashViewController);
@@ -385,7 +385,7 @@
         }];
     } else if(self.window.rootViewController != self.slideViewController) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [UIApplication sharedApplication].statusBarHidden = NO;
+            [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation);
             self.slideViewController.view.alpha = 1;
             [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
             self.window.rootViewController = self.slideViewController;
