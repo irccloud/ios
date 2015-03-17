@@ -282,7 +282,7 @@
     [_body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [_body appendData:[[NSString stringWithFormat:@"--%@--\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 
-    CLS_LOG(@"Uploading %@ with boundary %@ (%i bytes)", _originalFilename, boundary, _body.length);
+    CLS_LOG(@"Uploading %@ with boundary %@ (%lu bytes)", _originalFilename, boundary, (unsigned long)_body.length);
     
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
