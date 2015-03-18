@@ -74,28 +74,6 @@
     return YES;
 }
 
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    int width;
-    
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            width = [UIScreen mainScreen].applicationFrame.size.width - 300;
-        else
-            width = [UIScreen mainScreen].applicationFrame.size.height - 560;
-    } else {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            width = [UIScreen mainScreen].applicationFrame.size.width - 26;
-        else
-            width = [UIScreen mainScreen].applicationFrame.size.height - 26;
-    }
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        width += 50;
-    }
-    
-    _msg.frame = CGRectMake(0, 0, width, 70);
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     int padding = 80;
@@ -119,30 +97,13 @@
     _filename.returnKeyType = UIReturnKeyDone;
     _filename.delegate = self;
     
-    int width;
-    
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            width = [UIScreen mainScreen].applicationFrame.size.width - 300;
-        else
-            width = [UIScreen mainScreen].applicationFrame.size.height - 560;
-    } else {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            width = [UIScreen mainScreen].applicationFrame.size.width - 26;
-        else
-            width = [UIScreen mainScreen].applicationFrame.size.height - 26;
-    }
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        width += 50;
-    }
-    
-    _msg = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
+    _msg = [[UITextView alloc] initWithFrame:CGRectZero];
     _msg.text = @"";
     _msg.backgroundColor = [UIColor clearColor];
     _msg.returnKeyType = UIReturnKeyDone;
     _msg.delegate = self;
     _msg.font = _filename.font;
+    _msg.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
@@ -226,7 +187,9 @@
             break;
         case 1:
             cell.textLabel.text = nil;
-            cell.accessoryView = _msg;
+            [_msg removeFromSuperview];
+            _msg.frame = CGRectInset(cell.contentView.bounds, 4, 4);
+            [cell.contentView addSubview:_msg];
             break;
     }
     return cell;

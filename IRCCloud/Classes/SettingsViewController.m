@@ -297,29 +297,6 @@
     return YES;
 }
 
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    int width;
-    
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            width = [UIScreen mainScreen].applicationFrame.size.width - 300;
-        else
-            width = [UIScreen mainScreen].applicationFrame.size.height - 560;
-    } else {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            width = [UIScreen mainScreen].applicationFrame.size.width - 26;
-        else
-            width = [UIScreen mainScreen].applicationFrame.size.height - 26;
-    }
-
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        width += 50;
-    }
-    
-    _highlights.frame = CGRectMake(0, 0, width, 70);
-    [self refresh];
-}
-
 -(void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     IRCCloudJSONObject *o;
@@ -478,29 +455,13 @@
     _notificationSound = [[UISwitch alloc] init];
     _tabletMode = [[UISwitch alloc] init];
 
-    int width;
-    
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            width = [UIScreen mainScreen].applicationFrame.size.width - 300;
-        else
-            width = [UIScreen mainScreen].applicationFrame.size.height - 560;
-    } else {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            width = [UIScreen mainScreen].applicationFrame.size.width - 26;
-        else
-            width = [UIScreen mainScreen].applicationFrame.size.height - 26;
-    }
-
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        width += 50;
-    }
-
-    _highlights = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
+    _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
     _highlights.backgroundColor = [UIColor clearColor];
     _highlights.returnKeyType = UIReturnKeyDone;
     _highlights.delegate = self;
+    _highlights.font = _email.font;
+    _highlights.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
     _version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 #ifdef BRAND_NAME
@@ -622,7 +583,9 @@
             break;
         case 1:
             cell.textLabel.text = nil;
-            cell.accessoryView = _highlights;
+            [_highlights removeFromSuperview];
+            _highlights.frame = CGRectInset(cell.contentView.bounds, 4, 4);
+            [cell.contentView addSubview:_highlights];
             break;
         case 2:
             switch(row) {

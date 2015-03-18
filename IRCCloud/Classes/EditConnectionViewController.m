@@ -486,36 +486,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
     return YES;
 }
 
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    int width;
-    
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        if(self.presentingViewController) {
-            if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-                width = [UIScreen mainScreen].applicationFrame.size.width - 300;
-            else
-                width = [UIScreen mainScreen].applicationFrame.size.height - 560;
-        } else if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            width = [UIScreen mainScreen].applicationFrame.size.width - 100;
-        } else {
-            width = [UIScreen mainScreen].applicationFrame.size.height - 140;
-        }
-    } else {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            width = [UIScreen mainScreen].applicationFrame.size.width - 26;
-        } else {
-            width = [UIScreen mainScreen].applicationFrame.size.height - 26;
-        }
-    }
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        width += 50;
-    }
-    
-    _commands.frame = CGRectMake(0, 0, width, 70);
-    _channels.frame = CGRectMake(0, 0, width, 70);
-    [self refresh];
-}
-
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     if(touch.view.tag == 1) {
         [[NetworkConnection sharedInstance] resendVerifyEmail];
@@ -645,41 +615,19 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _serverpass.delegate = self;
     _serverpass.secureTextEntry = YES;
 
-    int width;
-    
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        if(self.presentingViewController) {
-            if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-                width = [UIScreen mainScreen].applicationFrame.size.width - 300;
-            else
-                width = [UIScreen mainScreen].applicationFrame.size.height - 560;
-        } else if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            width = self.tableView.frame.size.width - 100;
-        } else {
-            width = [UIScreen mainScreen].applicationFrame.size.height - 140;
-        }
-    } else {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation)) {
-            width = [UIScreen mainScreen].applicationFrame.size.width - 26;
-        } else {
-            width = [UIScreen mainScreen].applicationFrame.size.height - 26;
-        }
-    }
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad) {
-        width += 50;
-    }
-
-    _commands = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
+    _commands = [[UITextView alloc] initWithFrame:CGRectZero];
     _commands.text = @"";
     _commands.backgroundColor = [UIColor clearColor];
     _commands.delegate = self;
     _commands.font = _server.font;
+    _commands.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
-    _channels = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, width, 70)];
+    _channels = [[UITextView alloc] initWithFrame:CGRectZero];
     _channels.text = @"";
     _channels.backgroundColor = [UIColor clearColor];
     _channels.delegate = self;
     _channels.font = _server.font;
+    _commands.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
     if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] == 0) {
         UILabel *unverified = [[UILabel alloc] init];
@@ -902,11 +850,15 @@ static NSString * const ServerHasSSLKey = @"ssl";
             break;
         case 3:
             cell.textLabel.text = nil;
-            cell.accessoryView = (_cid==-1)?_channels:_commands;
+            [((_cid==-1)?_channels:_commands) removeFromSuperview];
+            ((_cid==-1)?_channels:_commands).frame = CGRectInset(cell.contentView.bounds, 4, 4);
+            [cell.contentView addSubview:(_cid==-1)?_channels:_commands];
             break;
         case 4:
             cell.textLabel.text = nil;
-            cell.accessoryView = _commands;
+            [_commands removeFromSuperview];
+            _commands.frame = CGRectInset(cell.contentView.bounds, 4, 4);
+            [cell.contentView addSubview:_commands];
             break;
     }
     
