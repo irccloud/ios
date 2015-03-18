@@ -271,26 +271,26 @@
     }
     if(!_originalFilename)
         _originalFilename = [NSString stringWithFormat:@"%li", time(NULL)];
-    NSString *boundary = [self boundaryString];
+    _boundary = [self boundaryString];
     _response = [[NSMutableData alloc] init];
     _body = [[NSMutableData alloc] init];
     
-    [_body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    [_body appendData:[[NSString stringWithFormat:@"--%@\r\n", _boundary] dataUsingEncoding:NSUTF8StringEncoding]];
     [_body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"file\"; filename=\"%@\"\r\n", _originalFilename] dataUsingEncoding:NSUTF8StringEncoding]];
     [_body appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n", _mimeType] dataUsingEncoding:NSUTF8StringEncoding]];
     [_body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [_body appendData:file];
     [_body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-    [_body appendData:[[NSString stringWithFormat:@"--%@--\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    [_body appendData:[[NSString stringWithFormat:@"--%@--\r\n", _boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 
-    CLS_LOG(@"Uploading %@ with boundary %@ (%lu bytes)", _originalFilename, boundary, (unsigned long)_body.length);
+    CLS_LOG(@"Uploading %@ with boundary %@ (%lu bytes)", _originalFilename, _boundary, (unsigned long)_body.length);
     
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/upload", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10];
     [request setHTTPShouldHandleCookies:NO];
-    [request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundary] forHTTPHeaderField:@"Content-Type"];
+    [request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", _boundary] forHTTPHeaderField:@"Content-Type"];
     [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
     [request setValue:[NetworkConnection sharedInstance].session forHTTPHeaderField:@"x-irccloud-session"];
     [request setHTTPMethod:@"POST"];
@@ -432,8 +432,47 @@
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
+    NSUserDefaults *d;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+        d = [NSUserDefaults standardUserDefaults];
+    } else {
+#ifdef ENTERPRISE
+        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+    }
+    NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
+    [uploadtasks removeObjectForKey:session.configuration.identifier];
+    [d setObject:uploadtasks forKey:@"uploadtasks"];
+    [d synchronize];
+
     if(error) {
+#ifndef EXTENSION
+        if([error.domain isEqualToString:NSURLErrorDomain]) {
+            if(error.code == NSURLErrorUnknown)
+                return;
+            if(error.code == NSURLErrorBackgroundSessionWasDisconnected) {
+                CLS_LOG(@"Lost connection to background upload service, retrying in-process");
+                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/upload", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10];
+                [request setHTTPShouldHandleCookies:NO];
+                [request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", _boundary] forHTTPHeaderField:@"Content-Type"];
+                [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
+                [request setValue:[NetworkConnection sharedInstance].session forHTTPHeaderField:@"x-irccloud-session"];
+                [request setHTTPMethod:@"POST"];
+                [request setHTTPBody:_body];
+                
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    _connection = [NSURLConnection connectionWithRequest:request delegate:self];
+                    [_connection start];
+                    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+                }];
+                return;
+            }
+        }
+#endif
         CLS_LOG(@"Upload error: %@", error);
+        
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [_delegate fileUploadDidFail];
         }];

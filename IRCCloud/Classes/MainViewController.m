@@ -2933,7 +2933,6 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)fileUploadProgress:(float)progress {
-    CLS_LOG(@"File upload progress: %f", progress);
     [_connectingActivity stopAnimating];
     _connectingActivity.hidden = YES;
     _connectingProgress.hidden = NO;

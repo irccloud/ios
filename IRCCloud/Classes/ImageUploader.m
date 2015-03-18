@@ -342,7 +342,54 @@
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
+    NSUserDefaults *d;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+        d = [NSUserDefaults standardUserDefaults];
+    } else {
+#ifdef ENTERPRISE
+        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+    }
+    NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
+    [uploadtasks removeObjectForKey:session.configuration.identifier];
+    [d setObject:uploadtasks forKey:@"uploadtasks"];
+    [d synchronize];
+
     if(error) {
+#ifndef EXTENSION
+        if([error.domain isEqualToString:NSURLErrorDomain]) {
+            if(error.code == NSURLErrorUnknown)
+                return;
+            if(error.code == NSURLErrorBackgroundSessionWasDisconnected) {
+                CLS_LOG(@"Lost connection to background upload service, retrying in-process");
+#ifdef MASHAPE_KEY
+                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://imgur-apiv3.p.mashape.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+                [request setValue:@MASHAPE_KEY forHTTPHeaderField:@"X-Mashape-Authorization"];
+#else
+                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://api.imgur.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+#endif
+                [request setHTTPShouldHandleCookies:NO];
+#ifdef IMGUR_KEY
+                if([d objectForKey:@"imgur_access_token"]) {
+                    [request setValue:[NSString stringWithFormat:@"Bearer %@", [d objectForKey:@"imgur_access_token"]] forHTTPHeaderField:@"Authorization"];
+                } else {
+                    [request setValue:[NSString stringWithFormat:@"Client-ID %@", @IMGUR_KEY] forHTTPHeaderField:@"Authorization"];
+                }
+#endif
+                [request setHTTPMethod:@"POST"];
+                [request setHTTPBody:_body];
+                
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    _connection = [NSURLConnection connectionWithRequest:request delegate:self];
+                    [_connection start];
+                    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+                }];
+                return;
+            }
+        }
+#endif
         CLS_LOG(@"Upload error: %@", error);
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [_delegate imageUploadDidFail];
