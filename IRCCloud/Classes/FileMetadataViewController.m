@@ -238,7 +238,6 @@
     cell.accessoryView = nil;
     cell.accessoryType = UITableViewCellAccessoryNone;
     cell.detailTextLabel.text = nil;
-    cell.backgroundView = nil;
     
     if(!_imageView)
         section++;
