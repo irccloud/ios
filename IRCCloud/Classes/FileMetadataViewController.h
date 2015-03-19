@@ -23,6 +23,9 @@
     UITextView *_msg;
     NSString *_metadata;
     FileUploader *_uploader;
+    UIImageView *_imageView;
+    CGFloat _imageHeight;
 }
 - (id)initWithUploader:(FileUploader *)uploader;
+- (void)setImage:(UIImage *)image;
 @end

@@ -104,10 +104,37 @@
     _msg.delegate = self;
     _msg.font = _filename.font;
     _msg.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    _imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+    _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _imageView.contentMode = UIViewContentModeScaleAspectFit;
+    
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+}
+
+-(void)setImage:(UIImage *)image {
+    CGFloat width = image.size.width, height = image.size.height;
+    
+    if(width > self.tableView.frame.size.width) {
+        height *= self.tableView.frame.size.width / width;
+        width = self.tableView.frame.size.width;
+    }
+    
+    if(height > 240) {
+        height = 240;
+    }
+    
+    _imageView.image = image;
+    _imageHeight = height;
+    
+    [self.tableView reloadData];
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    if(_imageView)
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:2] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    else
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
@@ -119,6 +146,11 @@
 }
 
 -(void)textFieldDidBeginEditing:(UITextField *)textField {
+    if(_imageView)
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    else
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+
     if(textField.text.length) {
         textField.selectedTextRange = [textField textRangeFromPosition:textField.beginningOfDocument
                                                             toPosition:([textField.text rangeOfString:@"."].location != NSNotFound)?[textField positionFromPosition:textField.beginningOfDocument offset:[textField.text rangeOfString:@"." options:NSBackwardsSearch].location]:textField.endOfDocument];
@@ -138,14 +170,20 @@
 #pragma mark - Table view data source
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.section == 1)
+    int section = indexPath.section;
+    if(!_imageView)
+        section++;
+    
+    if(section == 0)
+        return _imageHeight;
+    else if(section == 2)
         return 80;
     else
         return 48;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 2;
+    return (_imageView)?3:2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -153,9 +191,10 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if(_imageView && section > 0)
+        section--;
+    
     switch (section) {
-        case 0:
-            return nil;
         case 1:
             return @"Message (optional)";
     }
@@ -163,13 +202,14 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if(section == 0)
+    if(section == ((_imageView)?1:0))
         return _metadata;
     else
         return nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSInteger section = indexPath.section;
     NSString *identifier = [NSString stringWithFormat:@"uploadcell-%li-%li", (long)indexPath.section, (long)indexPath.row];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if(!cell)
@@ -179,13 +219,21 @@
     cell.accessoryView = nil;
     cell.accessoryType = UITableViewCellAccessoryNone;
     cell.detailTextLabel.text = nil;
+    cell.backgroundView = nil;
     
-    switch(indexPath.section) {
+    if(!_imageView)
+        section++;
+    
+    switch(section) {
         case 0:
+            cell.backgroundView = _imageView;
+            cell.backgroundColor = [UIColor clearColor];
+            break;
+        case 1:
             cell.textLabel.text = @"Filename";
             cell.accessoryView = _filename;
             break;
-        case 1:
+        case 2:
             cell.textLabel.text = nil;
             [_msg removeFromSuperview];
             _msg.frame = CGRectInset(cell.contentView.bounds, 4, 4);

@@ -2901,6 +2901,9 @@ extern NSDictionary *emojiMap;
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [fvc setImage:img];
+            }];
         } else {
             ImageUploader *u = [[ImageUploader alloc] init];
             u.delegate = self;
