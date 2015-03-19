@@ -24,8 +24,7 @@
         uploader.metadatadelegate = self;
         _uploader = uploader;
         self.navigationItem.title = @"Upload a File";
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(saveButtonPressed:)];
     }
     return self;
 }
@@ -43,9 +42,18 @@
 }
 
 -(void)saveButtonPressed:(id)sender {
+    _done = YES;
     [self.tableView endEditing:YES];
     [_uploader setFilename:_filename.text message:_msg.text];
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:^{
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    }];
+}
+
+-(void)didMoveToParentViewController:(UIViewController *)parent {
+    if(!parent && !_done)
+        [_uploader cancel];
 }
 
 -(void)cancelButtonPressed:(id)sender {
@@ -83,10 +91,19 @@
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
         padding = 0;
     }
-    
+
+    if(self.navigationController.viewControllers.count == 1) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+            self.navigationController.navigationBar.clipsToBounds = YES;
+        
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+        
+    } else {
+        [self.navigationController setNavigationBarHidden:NO animated:NO];
+    }
+
     _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
     _filename.textAlignment = NSTextAlignmentRight;
     _filename.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];

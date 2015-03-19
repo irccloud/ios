@@ -2787,6 +2787,11 @@ extern NSDictionary *emojiMap;
         [self.slidingViewController presentViewController:picker animated:YES completion:nil];
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
             [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+    } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone] && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        picker.modalPresentationStyle = UIModalPresentationFormSheet;
+        picker.preferredContentSize = CGSizeMake(540, 576);
+        [self.slidingViewController presentViewController:picker animated:YES completion:nil];
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     } else {
         _popover = [[UIPopoverController alloc] initWithContentViewController:picker];
         _popover.delegate = self;
@@ -2833,6 +2838,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
+    [self _resetStatusBar];
     _popover = nil;
 }
 
@@ -2843,7 +2849,7 @@ extern NSDictionary *emojiMap;
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     CLS_LOG(@"Image file chosen: %@", info);
-    UINavigationController *nc = nil;
+    FileMetadataViewController *fvc = nil;
     UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
     if(!img)
         img = [info objectForKey:UIImagePickerControllerOriginalImage];
@@ -2861,7 +2867,7 @@ extern NSDictionary *emojiMap;
             FileUploader *u = [[FileUploader alloc] init];
             u.delegate = self;
             u.bid = _buffer.bid;
-            FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+            fvc = [[FileMetadataViewController alloc] initWithUploader:u];
 
             NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
             if(refURL) {
@@ -2896,11 +2902,6 @@ extern NSDictionary *emojiMap;
                 CLS_LOG(@"no asset library URL, uploading image data instead");
                 [u uploadImage:img];
             }
-            nc = [[UINavigationController alloc] initWithRootViewController:fvc];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [fvc setImage:img];
             }];
@@ -2912,17 +2913,37 @@ extern NSDictionary *emojiMap;
         }
     }
     
-    if(_popover) {
-        [_popover dismissPopoverAnimated:YES];
-        if(nc)
-            [self.slidingViewController presentViewController:nc animated:YES completion:nil];
-    } else {
-        [self.slidingViewController dismissViewControllerAnimated:YES completion:^{
+    if((picker.sourceType == UIImagePickerControllerSourceTypeCamera && [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) || _popover) {
+        UINavigationController *nc = nil;
+        
+        if(fvc) {
+            nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        }
+        
+        if(_popover) {
+            [_popover dismissPopoverAnimated:YES];
             if(nc)
                 [self.slidingViewController presentViewController:nc animated:YES completion:nil];
-            [self _resetStatusBar];
-        }];
+        } else {
+            [self.slidingViewController dismissViewControllerAnimated:YES completion:^{
+                if(nc)
+                    [self.slidingViewController presentViewController:nc animated:YES completion:nil];
+                [self _resetStatusBar];
+            }];
+        }
+    } else {
+        if(fvc)
+            [picker pushViewController:fvc animated:YES];
+        else
+            [self.slidingViewController dismissViewControllerAnimated:YES completion:^{
+                [self _resetStatusBar];
+            }];
     }
+    
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
 }
@@ -2933,6 +2954,7 @@ extern NSDictionary *emojiMap;
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
+    [self _hideConnectingView];
 }
 
 -(void)fileUploadProgress:(float)progress {

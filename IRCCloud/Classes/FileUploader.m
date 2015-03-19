@@ -355,7 +355,7 @@
     if(!tasks)
         tasks = [[NSMutableDictionary alloc] init];
     
-    [tasks setObject:@{@"service":@"irccloud", @"bid":@(_bid), @"original_filename":_originalFilename, @"msg":_msg?_msg:@"", @"filename":_filename?_filename:@""} forKey:_backgroundID];
+    [tasks setObject:@{@"service":@"irccloud", @"bid":@(_bid), @"original_filename":_originalFilename?_originalFilename:@"", @"msg":_msg?_msg:@"", @"filename":_filename?_filename:@""} forKey:_backgroundID];
     
     [d setObject:tasks forKey:@"uploadtasks"];
     [d synchronize];

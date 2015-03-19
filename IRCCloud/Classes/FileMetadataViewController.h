@@ -25,6 +25,7 @@
     FileUploader *_uploader;
     UIImageView *_imageView;
     CGFloat _imageHeight;
+    BOOL _done;
 }
 - (id)initWithUploader:(FileUploader *)uploader;
 - (void)setImage:(UIImage *)image;
