@@ -24,7 +24,7 @@
         uploader.metadatadelegate = self;
         _uploader = uploader;
         self.navigationItem.title = @"Upload a File";
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(saveButtonPressed:)];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(saveButtonPressed:)];
     }
     return self;
 }
@@ -64,6 +64,18 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    if(self.navigationController.viewControllers.count == 1) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+            self.navigationController.navigationBar.clipsToBounds = YES;
+        
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+        
+    } else {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+            self.navigationController.navigationBar.clipsToBounds = NO;
+        [self.navigationController setNavigationBarHidden:NO animated:NO];
+    }
+    
     if(!_filename.text.length)
         _filename.text = _uploader.originalFilename;
     [self.tableView reloadData];
@@ -92,16 +104,6 @@
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
         padding = 0;
-    }
-
-    if(self.navigationController.viewControllers.count == 1) {
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-            self.navigationController.navigationBar.clipsToBounds = YES;
-        
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-        
-    } else {
-        [self.navigationController setNavigationBarHidden:NO animated:NO];
     }
 
     _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
