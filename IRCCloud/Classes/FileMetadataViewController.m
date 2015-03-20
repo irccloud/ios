@@ -189,7 +189,7 @@
 #pragma mark - Table view data source
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    int section = indexPath.section;
+    NSInteger section = indexPath.section;
     if(!_imageView)
         section++;
     
