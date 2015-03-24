@@ -887,6 +887,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         type = TYPE_UNKNOWN;
 
     if(!firstTime && type != lastType && state != kIRCCloudStateDisconnected) {
+        CLS_LOG(@"IRCCloud became unreachable, disconnecting websocket");
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
         [NetworkConnection sharedInstance].reconnectTimestamp = -1;
         state = kIRCCloudStateDisconnected;
@@ -1476,6 +1477,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _reconnectTimestamp = -1;
         _state = kIRCCloudStateConnected;
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+    } else {
+        CLS_LOG(@"Socket connected, but it wasn't the active socket");
     }
 }
 
@@ -1506,6 +1509,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [self serialize];
         }
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+    } else {
+        CLS_LOG(@"Socket closed, but it wasn't the active socket");
     }
 }
 
@@ -1517,6 +1522,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [self fail];
         }
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+    } else {
+        CLS_LOG(@"Socket received error, but it wasn't the active socket");
     }
 }
 
@@ -1527,6 +1534,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [_parser parse:[aMessage dataUsingEncoding:NSUTF8StringEncoding]];
             [__parserLock unlock];
         }
+    } else {
+        CLS_LOG(@"Got event for inactive socket");
     }
 }
 
@@ -1537,6 +1546,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [_parser parse:aMessage];
             [__parserLock unlock];
         }
+    } else {
+        CLS_LOG(@"Got event for inactive socket");
     }
 }
 

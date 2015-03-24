@@ -314,11 +314,25 @@
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
     NSTimeInterval highestEid = [EventsDataSource sharedInstance].highestEid;
-    if(_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting) {
+    if(_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting && [_conn reachabilityValid] && [_conn reachable] == kIRCCloudReachable) {
+        if(_backlogCompletedObserver) {
+            [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+            _backlogCompletedObserver = nil;
+        }
+        if(_backlogFailedObserver) {
+            [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+            _backlogFailedObserver = nil;
+        }
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-            [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
-            [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+            if(_backlogCompletedObserver) {
+                [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+                _backlogCompletedObserver = nil;
+            }
+            if(_backlogFailedObserver) {
+                [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+                _backlogFailedObserver = nil;
+            }
             [self.mainViewController refresh];
             if(highestEid < [EventsDataSource sharedInstance].highestEid) {
                 completionHandler(UIBackgroundFetchResultNewData);
@@ -326,16 +340,27 @@
                 completionHandler(UIBackgroundFetchResultNoData);
             }
             
-            if(application.applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid && _conn.notifier)
+            if(application.applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid && _conn.notifier) {
+                CLS_LOG(@"Backlog download completed for background refresh, disconnecting websocket");
                 [_conn disconnect];
-            else
+            } else {
+                CLS_LOG(@"Backlog download completed for background refresh, upgrading websocket");
                 _conn.notifier = NO;
+            }
         }];
         _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-            [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
-            [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-            if(_conn.notifier)
+            if(_backlogCompletedObserver) {
+                [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+                _backlogCompletedObserver = nil;
+            }
+            if(_backlogFailedObserver) {
+                [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+                _backlogFailedObserver = nil;
+            }
+            if(_conn.notifier) {
+                CLS_LOG(@"Backlog download failed for background refresh, disconnecting websocket");
                 [_conn disconnect];
+            }
             completionHandler(UIBackgroundFetchResultFailed);
         }];
         [_conn connect:YES];
@@ -416,6 +441,7 @@
     __block UIBackgroundTaskIdentifier background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
         if(background_task == _background_task) {
             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+                CLS_LOG(@"Background task expired, disconnecting websocket");
                 [_conn performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
                 [_conn serialize];
                 [NetworkConnection sync];
@@ -430,10 +456,11 @@
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
         }
         [_conn serialize];
-        [NSThread sleepForTimeInterval:[UIApplication sharedApplication].backgroundTimeRemaining - 30];
+        [NSThread sleepForTimeInterval:[UIApplication sharedApplication].backgroundTimeRemaining - 60];
         if(background_task == _background_task) {
             _background_task = UIBackgroundTaskInvalid;
             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+                CLS_LOG(@"Background task timed out, disconnecting websocket");
                 [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
                 [[NetworkConnection sharedInstance] serialize];
                 [NetworkConnection sync];
@@ -448,6 +475,16 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    if(_backlogCompletedObserver) {
+        NSLog(@"Backlog completed observer was registered, removing");
+        [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+        _backlogCompletedObserver = nil;
+    }
+    if(_backlogFailedObserver) {
+        NSLog(@"Backlog failed observer was registered, removing");
+        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+        _backlogFailedObserver = nil;
+    }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if(_conn.reconnectTimestamp == 0)
         _conn.reconnectTimestamp = -1;
@@ -485,6 +522,7 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
+    CLS_LOG(@"Application terminating, disconnecting websocket");
     [_conn disconnect];
     [_conn serialize];
 }
@@ -539,7 +577,7 @@
                         case kIRCEventSuccess:
                             o = n.object;
                             if(_finalizeUploadReqid && [[o objectForKey:@"_reqid"] intValue] == _finalizeUploadReqid) {
-                                NSLog(@"IRCCloud upload successful");
+                                CLS_LOG(@"IRCCloud upload successful");
                                 b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
                                 if(b) {
                                     NSString *msg = [dict objectForKey:@"msg"];
@@ -557,15 +595,17 @@
                                     alert.soundName = @"a.caf";
                                     [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                                     imageUploadCompletionHandler();
-                                    if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+                                    if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
+                                        CLS_LOG(@"background transfer session successfully completed, disconnecting websocket");
                                         [_conn disconnect];
+                                    }
                                 }
                             }
                             break;
                         case kIRCEventFailureMsg:
                             o = n.object;
                             if(_finalizeUploadReqid && [[o objectForKey:@"_reqid"] intValue] == _finalizeUploadReqid) {
-                                NSLog(@"IRCCloud upload failed");
+                                CLS_LOG(@"IRCCloud upload failed");
                                 [self.mainViewController fileUploadDidFail];
                                 [[NSNotificationCenter defaultCenter] removeObserver:_IRCEventObserver];
                                 UILocalNotification *alert = [[UILocalNotification alloc] init];
@@ -574,8 +614,10 @@
                                 alert.soundName = @"a.caf";
                                 [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                                 imageUploadCompletionHandler();
-                                if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+                                if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
+                                    CLS_LOG(@"background transfer session failed, disconnecting websocket");
                                     [_conn disconnect];
+                                }
                             }
                             break;
                         default:
@@ -594,13 +636,15 @@
                     _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
                         [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
                         [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-                        if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+                        if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
+                            CLS_LOG(@"Backlog failed during background transfer callback, disconnecting websocket");
                             [_conn disconnect];
+                        }
                     }];
-                    NSLog(@"Connecting websocket");
+                    CLS_LOG(@"Connecting websocket for background transfer callback");
                     [_conn connect:YES];
                 } else {
-                    NSLog(@"Finalizing IRCCloud upload");
+                    CLS_LOG(@"Finalizing IRCCloud upload");
                     _finalizeUploadReqid = [[NetworkConnection sharedInstance] finalizeUpload:[r objectForKey:@"id"] filename:[dict objectForKey:@"filename"] originalFilename:[dict objectForKey:@"original_filename"]];
                 }
             } else if([[dict objectForKey:@"service"] isEqualToString:@"imgur"]) {
@@ -619,20 +663,23 @@
                             alert.soundName = @"a.caf";
                             [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                             imageUploadCompletionHandler();
-                            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+                            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
+                                CLS_LOG(@"Backlog completed during background transfer callback, disconnecting websocket");
                                 [_conn disconnect];
+                            }
                         }];
                         _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
                             [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-                            [_conn disconnect];
                             UILocalNotification *alert = [[UILocalNotification alloc] init];
                             alert.fireDate = [NSDate date];
                             alert.alertBody = @"Unable to share image. Please try again shortly.";
                             alert.soundName = @"a.caf";
                             [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                             imageUploadCompletionHandler();
-                            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid)
+                            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
+                                CLS_LOG(@"Backlog failed during background transfer callback, disconnecting websocket");
                                 [_conn disconnect];
+                            }
                         }];
                         [_conn connect:YES];
                     } else {
