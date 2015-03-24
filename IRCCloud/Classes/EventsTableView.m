@@ -1026,7 +1026,8 @@ int __timestampWidth;
     
     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
     if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
-        if(_buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
+        if(_buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+            CLS_LOG(@"No data after refresh, requesting more backlog");
             self.tableView.tableHeaderView = _headerView;
             _requestingBacklog = YES;
             [_conn cancelPendingBacklogRequests];
@@ -1182,7 +1183,8 @@ int __timestampWidth;
     [_lock unlock];
     
     if(_conn.state == kIRCCloudStateConnected) {
-        if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
+        if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+            CLS_LOG(@"Empty table after refresh, requesting more backlog");
             _requestingBacklog = YES;
             [_conn cancelPendingBacklogRequests];
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
@@ -1446,7 +1448,7 @@ int __timestampWidth;
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(!_ready || !_buffer || _requestingBacklog)
+    if(!_ready || !_buffer || _requestingBacklog || [UIApplication sharedApplication].applicationState != UIApplicationStateActive)
         return;
 
     UITableView *tableView = self.tableView;
@@ -1460,7 +1462,7 @@ int __timestampWidth;
     
     if(tableView.tableHeaderView == _headerView && _minEid > 0 && _buffer && _buffer.bid != -1 && (_buffer.scrolledUp || (_data.count && firstRow == 0 && lastRow == _data.count - 1))) {
         if(_conn.state == kIRCCloudStateConnected && scrollView.contentOffset.y < _headerView.frame.size.height) {
-            NSLog(@"The table scrolled and the loading header became visible, requesting more backlog");
+            CLS_LOG(@"The table scrolled and the loading header became visible, requesting more backlog");
             _requestingBacklog = YES;
             [_conn cancelPendingBacklogRequests];
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];

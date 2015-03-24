@@ -1387,6 +1387,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             }
             [_oobQueue removeAllObjects];
         }
+        __parserLock = [[NSLock alloc] init];
         
         NSString *url = [NSString stringWithFormat:@"wss://%@%@",IRCCLOUD_HOST,IRCCLOUD_PATH];
         if(_events.highestEid > 0) {
@@ -1664,29 +1665,33 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 
 -(OOBFetcher *)fetchOOB:(NSString *)url {
-    for(OOBFetcher *fetcher in _oobQueue) {
-        if([fetcher.url isEqualToString:url]) {
-            CLS_LOG(@"Ignoring duplicate OOB request");
-            return fetcher;
+    @synchronized(_oobQueue) {
+        for(OOBFetcher *fetcher in _oobQueue) {
+            if([fetcher.url isEqualToString:url]) {
+                CLS_LOG(@"Ignoring duplicate OOB request");
+                return fetcher;
+            }
         }
+        OOBFetcher *fetcher = [[OOBFetcher alloc] initWithURL:url];
+        [_oobQueue addObject:fetcher];
+        if(_oobQueue.count == 1) {
+            [_queue addOperationWithBlock:^{
+                [fetcher start];
+            }];
+        } else {
+            CLS_LOG(@"OOB Request has been queued");
+        }
+        return fetcher;
     }
-    OOBFetcher *fetcher = [[OOBFetcher alloc] initWithURL:url];
-    [_oobQueue addObject:fetcher];
-    if(_oobQueue.count == 1) {
-        [_queue addOperationWithBlock:^{
-            [fetcher start];
-        }];
-    } else {
-        CLS_LOG(@"OOB Request has been queued");
-    }
-    return fetcher;
 }
 
 -(void)clearOOB {
-    NSMutableArray *oldQueue = _oobQueue;
-    _oobQueue = [[NSMutableArray alloc] init];
-    for(OOBFetcher *fetcher in oldQueue) {
-        [fetcher cancel];
+    @synchronized(_oobQueue) {
+        NSMutableArray *oldQueue = _oobQueue;
+        _oobQueue = [[NSMutableArray alloc] init];
+        for(OOBFetcher *fetcher in oldQueue) {
+            [fetcher cancel];
+        }
     }
 }
 
