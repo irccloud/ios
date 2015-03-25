@@ -136,6 +136,8 @@
     [self.mainViewController viewDidLoad];
     NSString *session = [NetworkConnection sharedInstance].session;
     if(session != nil && [session length] > 0) {
+        //Store the session in the keychain again to update the access policy
+        [NetworkConnection sharedInstance].session = session;
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
             [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
             self.window.backgroundColor = [UIColor whiteColor];
