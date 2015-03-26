@@ -712,7 +712,6 @@
     IRCCloudJSONObject *o = notification.object;
     Event *e = notification.object;
     switch(event) {
-        case kIRCEventUserInfo:
         case kIRCEventChannelTopic:
         case kIRCEventNickChange:
         case kIRCEventMemberUpdates:
