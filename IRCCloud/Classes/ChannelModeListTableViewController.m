@@ -18,6 +18,7 @@
 #import "ChannelModeListTableViewController.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
+#import "ColorFormatter.h"
 
 @interface MaskTableCell : UITableViewCell {
     UILabel *_mask;
@@ -77,9 +78,11 @@
         _placeholder.text = placeholder;
         _placeholder.numberOfLines = 0;
         _placeholder.backgroundColor = [UIColor whiteColor];
-        _placeholder.font = [UIFont systemFontOfSize:18];
+        _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
         _placeholder.textAlignment = NSTextAlignmentCenter;
         _placeholder.textColor = [UIColor selectedBlueColor];
+        _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+
         _list = list;
         _bid = bid;
         _mode = mode;
@@ -216,6 +219,10 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if([_data count])
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    else
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     @synchronized(_data) {
         return [_data count];
     }

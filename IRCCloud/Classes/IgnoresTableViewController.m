@@ -18,6 +18,7 @@
 #import "IgnoresTableViewController.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
+#import "ColorFormatter.h"
 
 @implementation IgnoresTableViewController
 
@@ -29,9 +30,10 @@
         _placeholder.text = @"You're not ignoring anyone at the moment.\n\nYou can ignore someone by tapping their nickname in the user list, long-pressing a message, or by using /ignore.";
         _placeholder.numberOfLines = 0;
         _placeholder.backgroundColor = [UIColor whiteColor];
-        _placeholder.font = [UIFont systemFontOfSize:18];
+        _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
         _placeholder.textAlignment = NSTextAlignmentCenter;
         _placeholder.textColor = [UIColor selectedBlueColor];
+        _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     }
     return self;
 }
@@ -121,6 +123,10 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if([_ignores count])
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    else
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     @synchronized(_ignores) {
         return [_ignores count];
     }

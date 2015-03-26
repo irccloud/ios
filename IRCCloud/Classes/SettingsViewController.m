@@ -22,6 +22,67 @@
 #import "OpenInChromeController.h"
 #import "ImgurLoginViewController.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "ColorFormatter.h"
+
+@interface FontSizeCell : UITableViewCell {
+    UILabel *_small;
+    UILabel *_large;
+    UISlider *_fontSize;
+}
+-(void)setFontSize:(UISlider *)fontSize;
+@end
+
+@implementation FontSizeCell
+
+-(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        _small = [[UILabel alloc] init];
+        _small.font = [UIFont boldSystemFontOfSize:10];
+        _small.lineBreakMode = NSLineBreakByCharWrapping;
+        _small.textAlignment = NSTextAlignmentCenter;
+        _small.numberOfLines = 0;
+        _small.text = @"Aa";
+        [self.contentView addSubview:_small];
+        
+        _large = [[UILabel alloc] init];
+        _large.font = [UIFont systemFontOfSize:18];
+        _large.lineBreakMode = NSLineBreakByCharWrapping;
+        _large.textAlignment = NSTextAlignmentCenter;
+        _large.numberOfLines = 0;
+        _large.text = @"Aa";
+        [self.contentView addSubview:_large];
+    }
+    return self;
+}
+
+-(void)setFontSize:(UISlider *)fontSize {
+    [_fontSize removeFromSuperview];
+    _fontSize = fontSize;
+    [self.contentView addSubview:_fontSize];
+}
+
+-(void)layoutSubviews {
+    [super layoutSubviews];
+    
+    CGRect frame = CGRectInset([self.contentView bounds], 6, 6);
+    
+    _small.frame = CGRectMake(frame.origin.x, frame.origin.y, 32, frame.size.height);
+    _large.frame = CGRectMake(frame.origin.x + frame.size.width - 32, frame.origin.y, 32, frame.size.height);
+    [_fontSize sizeToFit];
+    _fontSize.frame = CGRectMake(frame.origin.x + 32, 0, frame.size.width - 64 - frame.origin.x, _fontSize.frame.size.height);
+    CGPoint p = _fontSize.center;
+    p.y = self.contentView.center.y;
+    _fontSize.center = p;
+}
+
+-(void)setSelected:(BOOL)selected animated:(BOOL)animated {
+    [super setSelected:selected animated:animated];
+}
+
+@end
 
 @interface ImageServiceViewController : UITableViewController
 @end
@@ -246,6 +307,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
         [[NSUserDefaults standardUserDefaults] setBool:_notificationSound.on forKey:@"notificationSound"];
         [[NSUserDefaults standardUserDefaults] setBool:_tabletMode.on forKey:@"tabletMode"];
+        [[NSUserDefaults standardUserDefaults] setFloat:_fontSize.value forKey:@"fontSize"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
@@ -259,6 +321,10 @@
             [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] forKey:@"imageService"];
             [d synchronize];
         }
+        
+        if([ColorFormatter shouldClearFontCache])
+            [ColorFormatter clearFontCache];
+        [[EventsDataSource sharedInstance] clearFormattingCache];
     }
 }
 
@@ -403,6 +469,7 @@
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
     _notificationSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"];
     _tabletMode.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"];
+    _fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
 }
 
 - (void)viewDidLoad {
@@ -470,7 +537,18 @@
 #ifndef APPSTORE
     _version = [_version stringByAppendingFormat:@" (%@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
 #endif
+    
+    _fontSize = [[UISlider alloc] init];
+    _fontSize.minimumValue = 10;
+    _fontSize.maximumValue = 18;
+    _fontSize.continuous = YES;
+    [_fontSize addTarget:self action:@selector(sliderChanged:) forControlEvents:UIControlEventValueChanged];
+
     [self refresh];
+}
+
+-(void)sliderChanged:(UISlider *)slider {
+    [slider setValue:(int)slider.value animated:NO];
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
@@ -509,7 +587,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 6;
+    return 7;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -523,12 +601,14 @@
         case 3:
             return ((_chromeInstalled)?4:3) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
         case 4:
+            return 1;
+        case 5:
             if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
                 return [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"]?4:3;
             } else {
                 return 3;
             }
-        case 5:
+        case 6:
             return 4;
     }
     return 0;
@@ -545,8 +625,10 @@
         case 3:
             return @"Device";
         case 4:
-            return @"Photo Sharing";
+            return @"Font Size";
         case 5:
+            return @"Photo Sharing";
+        case 6:
             return @"About";
     }
     return nil;
@@ -556,14 +638,17 @@
     NSUInteger row = indexPath.row;
     NSString *identifier = [NSString stringWithFormat:@"settingscell-%li-%li", (long)indexPath.section, (long)indexPath.row];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
-    if(!cell)
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
     
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.accessoryView = nil;
-    cell.accessoryType = UITableViewCellAccessoryNone;
-    cell.detailTextLabel.text = nil;
-    
+    if(indexPath.section != 4) {
+        if(!cell)
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
+        
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        cell.accessoryView = nil;
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.detailTextLabel.text = nil;
+    }
+
     switch(indexPath.section) {
         case 0:
             switch(row) {
@@ -641,6 +726,12 @@
             }
             break;
         case 4:
+            if(!cell) {
+                cell = [[FontSizeCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
+                ((FontSizeCell *)cell).fontSize = _fontSize;
+            }
+            break;
+        case 5:
             if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
                 if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"] && row > 0)
                     row++;
@@ -683,7 +774,7 @@
                     break;
             }
             break;
-        case 5:
+        case 6:
             switch(row) {
                 case 0:
                     cell.textLabel.text = @"FAQ";
@@ -709,7 +800,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
-    if(indexPath.section == 4) {
+    if(indexPath.section == 5) {
         NSInteger row = indexPath.row;
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
             if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"] && row > 0)
@@ -734,16 +825,16 @@
             [self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];
         }
     }
-    if(indexPath.section == 5 && indexPath.row == 0) {
+    if(indexPath.section == 6 && indexPath.row == 0) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];
     }
-    if(indexPath.section == 5 && indexPath.row == 1) {
+    if(indexPath.section == 6 && indexPath.row == 1) {
         [self.tableView endEditing:YES];
         [self dismissViewControllerAnimated:YES completion:^{
             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
         }];
     }
-    if(indexPath.section == 5 && indexPath.row == 2) {
+    if(indexPath.section == 6 && indexPath.row == 2) {
         [self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];
     }
 }

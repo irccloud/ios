@@ -1008,21 +1008,11 @@ int __timestampWidth;
 
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
-    __timestampWidth = [@"88:88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
+    __timestampWidth = [@"88:88" sizeWithFont:[ColorFormatter timestampFont]].width;
     if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-        __timestampWidth += [@":88" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
+        __timestampWidth += [@":88" sizeWithFont:[ColorFormatter timestampFont]].width;
     if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
-        __timestampWidth += [@" AM" sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE]].width;
-    } else {
-        UIFont *f = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-        f = [UIFont fontWithName:f.fontName size:f.pointSize * 0.8];
-        __timestampWidth = [@"88:88" sizeWithFont:f].width;
-        if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-            __timestampWidth += [@":88" sizeWithFont:f].width;
-        if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
-            __timestampWidth += [@" AM" sizeWithFont:f].width;
-    }
+        __timestampWidth += [@" AM" sizeWithFont:[ColorFormatter timestampFont]].width;
     
     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
     if(!events || (events.count == 0 && _buffer.min_eid > 0)) {

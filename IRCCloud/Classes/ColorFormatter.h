@@ -24,7 +24,7 @@
 #define ITALICS 22
 #define UNDERLINE 31
 
-#define FONT_SIZE 14
+#define FONT_SIZE [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"]
 
 @interface ColorFormatter : NSObject
 +(NSRegularExpression*)ircChannelRegexForServer:(Server *)s;

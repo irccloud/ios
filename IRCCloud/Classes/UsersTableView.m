@@ -20,6 +20,7 @@
 #import "UsersDataSource.h"
 #import "UIColor+IRCCloud.h"
 #import "ECSlidingViewController.h"
+#import "ColorFormatter.h"
 
 #define TYPE_HEADING 0
 #define TYPE_USER 1
@@ -218,14 +219,9 @@
         [sectionSizes addObject:@(data.count)];
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-            _headingFont = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline];
-            _headingFont = [UIFont fontWithName:_headingFont.fontName size:_headingFont.pointSize * 0.8];
-            _countFont = [UIFont preferredFontForTextStyle:UIFontTextStyleSubheadline];
-            _countFont = [UIFont fontWithName:_countFont.fontName size:_countFont.pointSize * 0.8];
-            _userFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-            _userFont = [UIFont fontWithName:_userFont.fontName size:_userFont.pointSize * 0.8];
-        }
+        _headingFont = [UIFont fontWithName:_headingFont.fontName size:FONT_SIZE];
+        _countFont = [UIFont fontWithName:_countFont.fontName size:FONT_SIZE];
+        _userFont = [UIFont fontWithName:_userFont.fontName size:FONT_SIZE];
         
         _refreshTimer = nil;
         _data = data;

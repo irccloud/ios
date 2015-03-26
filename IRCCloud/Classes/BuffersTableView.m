@@ -24,6 +24,7 @@
 #import "EditConnectionViewController.h"
 #import "ServerReorderViewController.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "ColorFormatter.h"
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
@@ -365,19 +366,9 @@
           }];
 #endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-                UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
-                _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
-            } else {
-                _boldFont = [UIFont boldSystemFontOfSize:16.0f];
-            }
-            
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-                UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
-                _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
-            } else {
-                _normalFont = [UIFont systemFontOfSize:16.0f];
-            }
+            _boldFont = [UIFont boldSystemFontOfSize:FONT_SIZE];
+           _normalFont = [UIFont systemFontOfSize:FONT_SIZE];
+
             if(data.count <= 1) {
                 CLS_LOG(@"The buffer list doesn't have any buffers: %@", data);
                 CLS_LOG(@"I should have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);

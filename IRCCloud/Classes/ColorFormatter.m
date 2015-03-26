@@ -33,12 +33,7 @@ float ColorFormatterCachedFontSize = 0.0f;
 @implementation ColorFormatter
 
 +(BOOL)shouldClearFontCache {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
-        return NO;
-    } else {
-        UIFontDescriptor *bodyFontDesciptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
-        return ColorFormatterCachedFontSize != bodyFontDesciptor.pointSize;
-    }
+    return ColorFormatterCachedFontSize != FONT_SIZE;
 }
 
 +(void)clearFontCache {
@@ -60,12 +55,7 @@ float ColorFormatterCachedFontSize = 0.0f;
 
 +(UIFont *)timestampFont {
     if(!timestampFont) {
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-            timestampFont = [UIFont systemFontOfSize:FONT_SIZE];
-        else {
-            timestampFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-            timestampFont = [UIFont fontWithName:timestampFont.fontName size:timestampFont.pointSize * 0.8];
-        }
+        timestampFont = [UIFont systemFontOfSize:FONT_SIZE];
     }
     return timestampFont;
 }
@@ -1191,32 +1181,16 @@ float ColorFormatterCachedFontSize = 0.0f;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
     
     if(!Courier) {
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
-            arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL);
-            Courier = CTFontCreateWithName((CFStringRef)@"Courier", FONT_SIZE, NULL);
-            CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL);
-            CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", FONT_SIZE, NULL);
-            CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", FONT_SIZE, NULL);
-            Helvetica = CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL);
-            HelveticaBold = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
-            HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
-            HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
-        } else {
-            UIFontDescriptor *bodyFontDesciptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
-            UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
-            UIFontDescriptor *italicBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
-            UIFontDescriptor *boldItalicBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold|UIFontDescriptorTraitItalic];
-            arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", bodyFontDesciptor.pointSize * 0.8, NULL);
-            Courier = CTFontCreateWithName((CFStringRef)@"Courier", bodyFontDesciptor.pointSize * 0.8, NULL);
-            CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", bodyFontDesciptor.pointSize * 0.8, NULL);
-            CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", bodyFontDesciptor.pointSize * 0.8, NULL);
-            CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", bodyFontDesciptor.pointSize * 0.8, NULL);
-            Helvetica = CTFontCreateWithName((CFStringRef)[bodyFontDesciptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], bodyFontDesciptor.pointSize * 0.8, NULL);
-            HelveticaBold = CTFontCreateWithName((CFStringRef)[boldBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldBodyFontDescriptor.pointSize * 0.8, NULL);
-            HelveticaOblique = CTFontCreateWithName((CFStringRef)[italicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], italicBodyFontDescriptor.pointSize * 0.8, NULL);
-            HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)[boldItalicBodyFontDescriptor.fontAttributes objectForKey:UIFontDescriptorNameAttribute], boldItalicBodyFontDescriptor.pointSize * 0.8, NULL);
-            ColorFormatterCachedFontSize = bodyFontDesciptor.pointSize;
-        }
+        arrowFont = CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL);
+        Courier = CTFontCreateWithName((CFStringRef)@"Courier", FONT_SIZE, NULL);
+        CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL);
+        CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", FONT_SIZE, NULL);
+        CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", FONT_SIZE, NULL);
+        Helvetica = CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL);
+        HelveticaBold = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
+        HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
+        HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
+        ColorFormatterCachedFontSize = FONT_SIZE;
     }
     
     if(mono) {
