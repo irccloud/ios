@@ -1186,10 +1186,17 @@ float ColorFormatterCachedFontSize = 0.0f;
         CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL);
         CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", FONT_SIZE, NULL);
         CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", FONT_SIZE, NULL);
-        Helvetica = CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL);
-        HelveticaBold = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
-        HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
-        HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
+            Helvetica = CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL);
+            HelveticaBold = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
+            HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
+            HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
+        } else {
+            Helvetica = CTFontCreateWithName((CFStringRef)@".AppleSystemUIBody", FONT_SIZE, NULL);
+            HelveticaBold = CTFontCreateWithName((CFStringRef)@".AppleSystemUIEmphasizedBody", FONT_SIZE, NULL);
+            HelveticaOblique = CTFontCreateWithName((CFStringRef)@".AppleSystemUIItalicBody", FONT_SIZE, NULL);
+            HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@".AppleSystemUIEmphasizedItalicBody", FONT_SIZE, NULL);
+        }
         ColorFormatterCachedFontSize = FONT_SIZE;
     }
     
