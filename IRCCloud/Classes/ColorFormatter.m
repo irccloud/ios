@@ -24,7 +24,7 @@
 
 CTFontRef Courier = NULL, CourierBold, CourierOblique,CourierBoldOblique;
 CTFontRef Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
-CTFontRef arrowFont, chalkboardFont;
+CTFontRef arrowFont, chalkboardFont, markerFont;
 UIFont *timestampFont;
 NSDictionary *emojiMap;
 NSDictionary *quotes;
@@ -49,8 +49,9 @@ float ColorFormatterCachedFontSize = 0.0f;
         CFRelease(HelveticaOblique);
         CFRelease(arrowFont);
         CFRelease(chalkboardFont);
+        CFRelease(markerFont);
     }
-    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = arrowFont = chalkboardFont = NULL;
+    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = arrowFont = chalkboardFont = markerFont = NULL;
     timestampFont = NULL;
 }
 
@@ -1187,18 +1188,18 @@ float ColorFormatterCachedFontSize = 0.0f;
         CourierBold = CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL);
         CourierOblique = CTFontCreateWithName((CFStringRef)@"Courier-Oblique", FONT_SIZE, NULL);
         CourierBoldOblique = CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", FONT_SIZE, NULL);
+        chalkboardFont = CTFontCreateWithName((CFStringRef)@"ChalkboardSE-Light", FONT_SIZE, NULL);
+        markerFont = CTFontCreateWithName((CFStringRef)@"MarkerFelt-Thin", FONT_SIZE, NULL);
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
             Helvetica = CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL);
             HelveticaBold = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
             HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
             HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
-            chalkboardFont = CTFontCreateWithName((CFStringRef)@"ChalkboardSE-Light", FONT_SIZE, NULL);
         } else {
             Helvetica = CTFontCreateWithName((CFStringRef)@".AppleSystemUIBody", FONT_SIZE, NULL);
             HelveticaBold = CTFontCreateWithName((CFStringRef)@".AppleSystemUIEmphasizedBody", FONT_SIZE, NULL);
             HelveticaOblique = CTFontCreateWithName((CFStringRef)@".AppleSystemUIItalicBody", FONT_SIZE, NULL);
             HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@".AppleSystemUIEmphasizedItalicBody", FONT_SIZE, NULL);
-            chalkboardFont = CTFontCreateWithName((CFStringRef)@"ChalkboardSE-Light", FONT_SIZE, NULL);
         }
         ColorFormatterCachedFontSize = FONT_SIZE;
     }
@@ -1484,6 +1485,16 @@ float ColorFormatterCachedFontSize = 0.0f;
         r = [text rangeOfString:@"comic sans" options:NSCaseInsensitiveSearch range:r];
         if(r.location != NSNotFound) {
             [output addAttributes:@{(NSString *)kCTFontAttributeName:(__bridge id)chalkboardFont} range:r];
+            r.location++;
+            r.length = text.length - r.location;
+        }
+    } while(r.location != NSNotFound);
+    
+    r = NSMakeRange(0, text.length);
+    do {
+        r = [text rangeOfString:@"marker felt" options:NSCaseInsensitiveSearch range:r];
+        if(r.location != NSNotFound) {
+            [output addAttributes:@{(NSString *)kCTFontAttributeName:(__bridge id)markerFont} range:r];
             r.location++;
             r.length = text.length - r.location;
         }
