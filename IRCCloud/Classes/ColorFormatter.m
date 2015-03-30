@@ -24,7 +24,7 @@
 
 CTFontRef Courier = NULL, CourierBold, CourierOblique,CourierBoldOblique;
 CTFontRef Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
-CTFontRef arrowFont;
+CTFontRef arrowFont, chalkboardFont;
 UIFont *timestampFont;
 NSDictionary *emojiMap;
 NSDictionary *quotes;
@@ -48,8 +48,9 @@ float ColorFormatterCachedFontSize = 0.0f;
         CFRelease(HelveticaBoldOblique);
         CFRelease(HelveticaOblique);
         CFRelease(arrowFont);
+        CFRelease(chalkboardFont);
     }
-    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = arrowFont = NULL;
+    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = arrowFont = chalkboardFont = NULL;
     timestampFont = NULL;
 }
 
@@ -1191,11 +1192,13 @@ float ColorFormatterCachedFontSize = 0.0f;
             HelveticaBold = CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL);
             HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
             HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
+            chalkboardFont = CTFontCreateWithName((CFStringRef)@"ChalkboardSE-Light", FONT_SIZE, NULL);
         } else {
             Helvetica = CTFontCreateWithName((CFStringRef)@".AppleSystemUIBody", FONT_SIZE, NULL);
             HelveticaBold = CTFontCreateWithName((CFStringRef)@".AppleSystemUIEmphasizedBody", FONT_SIZE, NULL);
             HelveticaOblique = CTFontCreateWithName((CFStringRef)@".AppleSystemUIItalicBody", FONT_SIZE, NULL);
             HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@".AppleSystemUIEmphasizedItalicBody", FONT_SIZE, NULL);
+            chalkboardFont = CTFontCreateWithName((CFStringRef)@"ChalkboardSE-Light", FONT_SIZE, NULL);
         }
         ColorFormatterCachedFontSize = FONT_SIZE;
     }
@@ -1475,6 +1478,16 @@ float ColorFormatterCachedFontSize = 0.0f;
     for(NSDictionary *dict in attributes) {
         [output addAttributes:dict range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];
     }
+    
+    NSRange r = NSMakeRange(0, text.length);
+    do {
+        r = [text rangeOfString:@"comic sans" options:NSCaseInsensitiveSearch range:r];
+        if(r.location != NSNotFound) {
+            [output addAttributes:@{(NSString *)kCTFontAttributeName:(__bridge id)chalkboardFont} range:r];
+            r.location++;
+            r.length = text.length - r.location;
+        }
+    } while(r.location != NSNotFound);
     
     if(linkify) {
         NSArray *results = [[self email] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
