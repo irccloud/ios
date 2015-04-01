@@ -146,7 +146,7 @@
             } else {
                 NSString *url = [[_topic attributedSubstringFromRange:result.range] string];
                 if(![url hasPrefix:@"irc"])
-                    url = [NSString stringWithFormat:@"irc%@://%@:%i/%@", (server.ssl==1)?@"s":@"", server.hostname, server.port, url];
+                    url = [NSString stringWithFormat:@"irc://%i/%@", server.cid, url];
                 [_topicLabel addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
             }
         }
