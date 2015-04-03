@@ -78,6 +78,12 @@
     
     if(!_filename.text.length)
         _filename.text = _uploader.originalFilename;
+    if(!_metadata) {
+        if(_uploader.mimeType.length)
+            _metadata = [NSString stringWithFormat:@"Calculating size… • %@", _uploader.mimeType];
+        else
+            _metadata = @"Calculating size…";
+    }
     [self.tableView reloadData];
 }
 

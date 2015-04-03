@@ -2891,20 +2891,29 @@ extern NSDictionary *emojiMap;
                         [u uploadImage:img];
                         [fvc viewWillAppear:NO];
                     }
+                    UIImage *thumbnail = [FileUploader image:[UIImage imageWithCGImage:imageRep.fullScreenImage] scaledCopyOfSize:CGSizeMake(2048, 2048)];
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [fvc setImage:thumbnail];
+                    }];
                 };
                 
                 ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
                 [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:^(NSError *e) {
                     CLS_LOG(@"Error getting asset: %@", e);
                     [u uploadImage:img];
+                    UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [fvc setImage:thumbnail];
+                    }];
                 }];
             } else {
                 CLS_LOG(@"no asset library URL, uploading image data instead");
                 [u uploadImage:img];
+                UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [fvc setImage:thumbnail];
+                }];
             }
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [fvc setImage:img];
-            }];
         } else {
             ImageUploader *u = [[ImageUploader alloc] init];
             u.delegate = self;

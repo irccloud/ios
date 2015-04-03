@@ -130,12 +130,20 @@
 #endif
     }
     int size = [[d objectForKey:@"photoSize"] intValue];
-    NSData *file = UIImageJPEGRepresentation((size != -1)?[self image:img scaledCopyOfSize:CGSizeMake(size,size)]:img, 0.8);
+    if(size == -1 && (img.size.width * img.size.height > 15000000)) {
+        CLS_LOG(@"Image dimensions too large, scaling down to 3872x3872");
+        size = 3872;
+    }
+    if(size > 0) {
+        img = [FileUploader image:img scaledCopyOfSize:CGSizeMake(size,size)];
+    }
+
+    NSData *file = UIImageJPEGRepresentation(img, 0.8);
     [self _upload:file];
 }
 
 //http://stackoverflow.com/a/19697172
-- (UIImage *)image:(UIImage *)image scaledCopyOfSize:(CGSize)newSize {
++ (UIImage *)image:(UIImage *)image scaledCopyOfSize:(CGSize)newSize {
     if(image.size.width <= newSize.width && image.size.height <= newSize.height)
         return image;
 

@@ -50,11 +50,12 @@
 @property NSObject<FileUploaderDelegate> *delegate;
 @property NSObject<FileUploaderMetadataDelegate> *metadatadelegate;
 @property int bid;
-@property NSString *originalFilename;
+@property NSString *originalFilename, *mimeType;
 @property BOOL finished;
 -(void)uploadFile:(NSURL *)file;
 -(void)uploadFile:(NSString *)filename UTI:(NSString *)UTI data:(NSData *)data;
 -(void)uploadImage:(UIImage *)image;
 -(void)setFilename:(NSString *)filename message:(NSString *)message;
 -(void)cancel;
++(UIImage *)image:(UIImage *)image scaledCopyOfSize:(CGSize)newSize;
 @end
