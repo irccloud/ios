@@ -2967,18 +2967,11 @@ extern NSDictionary *emojiMap;
     [self _hideConnectingView];
 }
 
--(void)filesTableViewControllerDidSelectFile:(NSDictionary *)file {
-    if(file) {
-        if(_message.text.length == 0) {
-            _message.text = [file objectForKey:@"url"];
-        } else {
-            if(![_message.text hasSuffix:@" "])
-                _message.text = [_message.text stringByAppendingString:@" "];
-            _message.text = [_message.text stringByAppendingString:[file objectForKey:@"url"]];
-        }
-    }
-    if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+-(void)filesTableViewControllerDidSelectFile:(NSDictionary *)file message:(NSString *)message {
+    if(message.length)
+        message = [message stringByAppendingString:@" "];
+    message = [message stringByAppendingString:[file objectForKey:@"url"]];
+    [[NetworkConnection sharedInstance] say:message to:_buffer.name cid:_buffer.cid];
 }
 
 -(void)fileUploadProgress:(float)progress {

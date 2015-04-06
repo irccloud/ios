@@ -27,6 +27,8 @@
     CGFloat _imageHeight;
     BOOL _done;
 }
+@property (readonly) UITextView *msg;
 - (id)initWithUploader:(FileUploader *)uploader;
 - (void)setImage:(UIImage *)image;
+- (void)setFilename:(NSString *)filename metadata:(NSString *)metadata;
 @end

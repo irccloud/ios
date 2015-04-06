@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @protocol FilesTableViewDelegate<NSObject>
--(void)filesTableViewControllerDidSelectFile:(NSDictionary *)file;
+-(void)filesTableViewControllerDidSelectFile:(NSDictionary *)file message:(NSString *)message;
 @end
 
 @interface FilesTableViewController : UITableViewController {
@@ -22,6 +22,7 @@
     BOOL _canLoadMore;
     id<FilesTableViewDelegate> _delegate;
     UIView *_footerView;
+    NSDictionary *_selectedFile;
 }
 @property id<FilesTableViewDelegate> delegate;
 @end

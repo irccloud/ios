@@ -64,16 +64,18 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if(self.navigationController.viewControllers.count == 1) {
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-            self.navigationController.navigationBar.clipsToBounds = YES;
-        
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-        
-    } else {
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-            self.navigationController.navigationBar.clipsToBounds = NO;
-        [self.navigationController setNavigationBarHidden:NO animated:NO];
+    if(_uploader) {
+        if(self.navigationController.viewControllers.count == 1) {
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                self.navigationController.navigationBar.clipsToBounds = YES;
+            
+            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+            
+        } else {
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                self.navigationController.navigationBar.clipsToBounds = NO;
+            [self.navigationController setNavigationBarHidden:NO animated:NO];
+        }
     }
     
     if(!_filename.text.length)
@@ -135,6 +137,13 @@
     _imageView.contentMode = UIViewContentModeScaleAspectFit;
     
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+}
+
+- (void)setFilename:(NSString *)filename metadata:(NSString *)metadata {
+    _filename.text = filename;
+    _filename.enabled = NO;
+    _metadata = metadata;
+    [self.tableView reloadData];
 }
 
 -(void)setImage:(UIImage *)image {

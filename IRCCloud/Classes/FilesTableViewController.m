@@ -10,6 +10,7 @@
 #import "NetworkConnection.h"
 #import "ColorFormatter.h"
 #import "UIColor+IRCCloud.h"
+#import "FileMetadataViewController.h"
 
 @interface FilesTableCell : UITableViewCell {
     UILabel *_date;
@@ -202,7 +203,7 @@
                 NSURLResponse *response = nil;
                 NSError *error = nil;
                 
-                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[[d objectForKey:@"url_template"] stringByReplacingOccurrencesOfString:@":modifiers" withString:@"h128"]] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:30];
+                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[[d objectForKey:@"url_template"] stringByReplacingOccurrencesOfString:@":modifiers" withString:[NSString stringWithFormat:@"w%f", self.view.frame.size.width]]] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:30];
                 [request setHTTPShouldHandleCookies:NO];
                 
                 data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
@@ -318,9 +319,26 @@
     }
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+-(void)saveButtonPressed:(id)sender {
     if(_delegate)
-        [_delegate filesTableViewControllerDidSelectFile:[_files objectAtIndex:indexPath.row]];
+        [_delegate filesTableViewControllerDidSelectFile:_selectedFile message:((FileMetadataViewController *)self.navigationController.topViewController).msg.text];
+    [self dismissModalViewControllerAnimated:YES];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    _selectedFile = [_files objectAtIndex:indexPath.row];
+    if(_selectedFile) {
+        FileMetadataViewController *c = [[FileMetadataViewController alloc] initWithUploader:nil];
+        c.navigationItem.title = @"Share a File";
+        c.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(saveButtonPressed:)];
+        [c loadView];
+        [c viewDidLoad];
+        int bytes = [[_selectedFile objectForKey:@"size"] intValue];
+        int exp = (int)(log(bytes) / log(1024));
+        [c setFilename:[_selectedFile objectForKey:@"name"] metadata:[NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [_selectedFile objectForKey:@"mime_type"]]];
+        [c setImage:[_thumbnails objectForKey:[_selectedFile objectForKey:@"id"]]];
+        [self.navigationController pushViewController:c animated:YES];
+    }
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 @end
