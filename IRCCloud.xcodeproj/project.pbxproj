@@ -89,6 +89,8 @@
 		2210352F197F1AD400AB414F /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
 		2212AF89175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
+		221E3F4C1AD2DEE00090934B /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */; };
+		221E3F4D1AD2DEE00090934B /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */; };
 		221F0BC5177368B40008EE04 /* CallerIDTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */; };
 		2223C6AA1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
 		2223C6AB1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
@@ -539,6 +541,8 @@
 		221034EC197EFBAF00AB414F /* ShareViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShareViewController.m; sourceTree = "<group>"; };
 		2212AF86175F82F900D08C7F /* ChannelInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelInfoViewController.h; sourceTree = "<group>"; };
 		2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelInfoViewController.m; sourceTree = "<group>"; };
+		221E3F4A1AD2DEE00090934B /* FilesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilesTableViewController.h; sourceTree = "<group>"; };
+		221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilesTableViewController.m; sourceTree = "<group>"; };
 		221F0BC3177368A20008EE04 /* CallerIDTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CallerIDTableViewController.h; sourceTree = "<group>"; };
 		221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CallerIDTableViewController.m; sourceTree = "<group>"; };
 		2223C6A71768D7150032544B /* ImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageViewController.h; sourceTree = "<group>"; };
@@ -1067,6 +1071,8 @@
 				22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */,
 				22D46C651A13A9A900B142F7 /* FileUploader.h */,
 				22D46C661A13A9A900B142F7 /* FileUploader.m */,
+				221E3F4A1AD2DEE00090934B /* FilesTableViewController.h */,
+				221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */,
 				227FF29F16FA128A00DBE3C5 /* HighlightsCountView.h */,
 				227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */,
 				2230F8E617162ACC007F7C98 /* Ignore.h */,
@@ -1669,6 +1675,7 @@
 				225D975D18AA995900065087 /* EventsTableView.m in Sources */,
 				225D975E18AA995900065087 /* ColorFormatter.m in Sources */,
 				22D46C681A13A9A900B142F7 /* FileUploader.m in Sources */,
+				221E3F4D1AD2DEE00090934B /* FilesTableViewController.m in Sources */,
 				225D975F18AA995900065087 /* CollapsedEvents.m in Sources */,
 				228E2B8F18CF770D0011DEAB /* SBJsonStreamParserState.m in Sources */,
 				225D976018AA995900065087 /* HighlightsCountView.m in Sources */,
@@ -1750,6 +1757,7 @@
 				223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */,
 				2237E13D16E1214A00CA188F /* ColorFormatter.m in Sources */,
 				22D46C671A13A9A900B142F7 /* FileUploader.m in Sources */,
+				221E3F4C1AD2DEE00090934B /* FilesTableViewController.m in Sources */,
 				22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */,
 				228E2B8D18CF770D0011DEAB /* SBJsonStreamParserState.m in Sources */,
 				227FF2A116FA128B00DBE3C5 /* HighlightsCountView.m in Sources */,

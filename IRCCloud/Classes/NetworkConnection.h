@@ -210,4 +210,6 @@ typedef enum {
 -(int)resendVerifyEmail;
 -(int)changeEmail:(NSString *)email password:(NSString *)password;
 -(int)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename;
+-(NSDictionary *)getFiles:(int)page;
+-(int)deleteFile:(NSString *)fileID;
 @end

@@ -39,6 +39,7 @@
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "ServerMapTableViewController.h"
 #import "FileMetadataViewController.h"
+#import "FilesTableViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -2966,6 +2967,20 @@ extern NSDictionary *emojiMap;
     [self _hideConnectingView];
 }
 
+-(void)filesTableViewControllerDidSelectFile:(NSDictionary *)file {
+    if(file) {
+        if(_message.text.length == 0) {
+            _message.text = [file objectForKey:@"url"];
+        } else {
+            if(![_message.text hasSuffix:@" "])
+                _message.text = [_message.text stringByAppendingString:@" "];
+            _message.text = [_message.text stringByAppendingString:[file objectForKey:@"url"]];
+        }
+    }
+    if(self.presentedViewController)
+        [self dismissModalViewControllerAnimated:NO];
+}
+
 -(void)fileUploadProgress:(float)progress {
     [_connectingActivity stopAnimating];
     _connectingActivity.hidden = YES;
@@ -3074,7 +3089,7 @@ extern NSDictionary *emojiMap;
 
 -(void)cameraButtonPressed:(id)sender {
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"IRCCloud Files":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -3082,7 +3097,7 @@ extern NSDictionary *emojiMap;
             [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view animated:YES];
         }
     } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"Choose Document", nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"IRCCloud Files", @"Choose Document", nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -3215,6 +3230,17 @@ extern NSDictionary *emojiMap;
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self _chooseFile];
+        } else if([action isEqualToString:@"IRCCloud Files"]) {
+            FilesTableViewController *fcv = [[FilesTableViewController alloc] initWithStyle:UITableViewStylePlain];
+            fcv.delegate = self;
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fcv];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
+            [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Mark All As Read"]) {
             NSMutableArray *cids = [[NSMutableArray alloc] init];
             NSMutableArray *bids = [[NSMutableArray alloc] init];
