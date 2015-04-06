@@ -1,10 +1,18 @@
 //
 //  FilesTableViewController.m
-//  IRCCloud
 //
-//  Created by Sam Steele on 4/6/15.
-//  Copyright (c) 2015 IRCCloud, Ltd. All rights reserved.
+//  Copyright (C) 2014 IRCCloud, Ltd.
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 
 #import "FilesTableViewController.h"
 #import "NetworkConnection.h"
@@ -202,8 +210,7 @@
                 NSData *data;
                 NSURLResponse *response = nil;
                 NSError *error = nil;
-                
-                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[[d objectForKey:@"url_template"] stringByReplacingOccurrencesOfString:@":modifiers" withString:[NSString stringWithFormat:@"w%f", self.view.frame.size.width]]] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:30];
+                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[[d objectForKey:@"url_template"] stringByReplacingOccurrencesOfString:@":modifiers" withString:[NSString stringWithFormat:@"w%.f", self.view.frame.size.width]]] cachePolicy:NSURLRequestReturnCacheDataElseLoad timeoutInterval:30];
                 [request setHTTPShouldHandleCookies:NO];
                 
                 data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
