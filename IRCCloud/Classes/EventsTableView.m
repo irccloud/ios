@@ -597,7 +597,7 @@ int __timestampWidth;
         _lastCollapsedEid = -1;
         [_collapsedEvents clear];
 
-        if(!event.formatted) {
+        if(!event.formatted.length || !event.formattedMsg.length) {
             if([event.from length]) {
                 event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.msg];
             } else {
@@ -1236,6 +1236,12 @@ int __timestampWidth;
             }
             e.links = links;
         } else {
+            if(e.rowType == ROW_MESSAGE) {
+                CLS_LOG(@"Missing formatting for message event: %@, refreshing", e.type);
+                [_lock unlock];
+                [self refresh];
+                return 0;
+            }
             return 26;
         }
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
