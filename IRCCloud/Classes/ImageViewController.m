@@ -130,6 +130,9 @@
         [self _showToolbar];
     [_hideTimer invalidate];
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    
+    pScrollView.alwaysBounceHorizontal = (pScrollView.zoomScale > pScrollView.minimumZoomScale);
+    pScrollView.alwaysBounceVertical = (pScrollView.zoomScale > pScrollView.minimumZoomScale);
 }
 
 -(void)_showToolbar {
@@ -366,6 +369,10 @@
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
     [doubleTap setNumberOfTapsRequired:2];
     [_scrollView addGestureRecognizer:doubleTap];
+    
+    UISwipeGestureRecognizer *swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swiped:)];
+    swipeRecognizer.direction = UISwipeGestureRecognizerDirectionDown | UISwipeGestureRecognizerDirectionUp;
+    [self.view addGestureRecognizer:swipeRecognizer];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
@@ -391,6 +398,13 @@
         
         CGRect rectTozoom=CGRectMake(x, y, w, h);
         [_scrollView zoomToRect:rectTozoom animated:YES];
+    }
+}
+
+- (void)swiped:(UISwipeGestureRecognizer *)recognizer {
+    // Do not recognize when scrollview is zoomed in
+    if (_scrollView.zoomScale <= _scrollView.minimumZoomScale) {
+        [self doneButtonPressed:recognizer];
     }
 }
 
