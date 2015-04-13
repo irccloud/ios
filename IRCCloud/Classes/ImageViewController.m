@@ -371,9 +371,13 @@
     [_scrollView addGestureRecognizer:doubleTap];
     
     UISwipeGestureRecognizer *swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swiped:)];
-    swipeRecognizer.direction = UISwipeGestureRecognizerDirectionDown | UISwipeGestureRecognizerDirectionUp;
+    swipeRecognizer.direction = UISwipeGestureRecognizerDirectionDown;
     [self.view addGestureRecognizer:swipeRecognizer];
 
+    swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swiped:)];
+    swipeRecognizer.direction = UISwipeGestureRecognizerDirectionUp;
+    [self.view addGestureRecognizer:swipeRecognizer];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
@@ -406,6 +410,11 @@
     if (_scrollView.zoomScale <= _scrollView.minimumZoomScale) {
         [self doneButtonPressed:recognizer];
     }
+    [UIView animateWithDuration:0.25 animations:^{
+        CGRect frame = _scrollView.frame;
+        frame.origin.y = (recognizer.direction == UISwipeGestureRecognizerDirectionDown)?frame.size.height:-frame.size.height;
+        _scrollView.frame = frame;
+    }];
 }
 
 - (void)viewDidAppear:(BOOL)animated {

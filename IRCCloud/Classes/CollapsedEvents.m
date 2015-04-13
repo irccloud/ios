@@ -703,7 +703,7 @@
             lHash = [[NSNumber numberWithDouble:hash] intValue];
         }
         
-        color = [colors objectAtIndex:abs([[NSNumber numberWithDouble:hash] longLongValue] % 14)];
+        color = [colors objectAtIndex:llabs([[NSNumber numberWithDouble:hash] longLongValue] % 14)];
     }
     
     if(mode.length) {
