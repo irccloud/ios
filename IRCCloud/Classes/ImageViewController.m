@@ -406,7 +406,7 @@
         
         switch(recognizer.state) {
             case UIGestureRecognizerStateBegan:
-                if(fabs([recognizer velocityInView:self.view].y) > fabsf([recognizer velocityInView:self.view].x)) {
+                if(fabs([recognizer velocityInView:self.view].y) > fabs([recognizer velocityInView:self.view].x)) {
                     [self _hideToolbar];
                 }
                 break;
@@ -427,7 +427,7 @@
                 break;
             case UIGestureRecognizerStateEnded:
             {
-                if(fabsf([recognizer translationInView:self.view].y) > 100 || fabs([recognizer velocityInView:self.view].y) > 1000) {
+                if(fabs([recognizer translationInView:self.view].y) > 100 || fabs([recognizer velocityInView:self.view].y) > 1000) {
                     frame.origin.y = ([recognizer translationInView:self.view].y > 0)?frame.size.height:-frame.size.height;
                     [UIView animateWithDuration:0.25 animations:^{
                         _scrollView.frame = frame;
