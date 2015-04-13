@@ -370,13 +370,8 @@
     [doubleTap setNumberOfTapsRequired:2];
     [_scrollView addGestureRecognizer:doubleTap];
     
-    UISwipeGestureRecognizer *swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swiped:)];
-    swipeRecognizer.direction = UISwipeGestureRecognizerDirectionDown;
-    [self.view addGestureRecognizer:swipeRecognizer];
-
-    swipeRecognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swiped:)];
-    swipeRecognizer.direction = UISwipeGestureRecognizerDirectionUp;
-    [self.view addGestureRecognizer:swipeRecognizer];
+    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panned:)];
+    [self.view addGestureRecognizer:panGesture];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
@@ -405,16 +400,56 @@
     }
 }
 
-- (void)swiped:(UISwipeGestureRecognizer *)recognizer {
-    // Do not recognize when scrollview is zoomed in
+- (void)panned:(UIPanGestureRecognizer *)recognizer {
     if (_scrollView.zoomScale <= _scrollView.minimumZoomScale) {
-        [self doneButtonPressed:recognizer];
-    }
-    [UIView animateWithDuration:0.25 animations:^{
         CGRect frame = _scrollView.frame;
-        frame.origin.y = (recognizer.direction == UISwipeGestureRecognizerDirectionDown)?frame.size.height:-frame.size.height;
-        _scrollView.frame = frame;
-    }];
+        
+        switch(recognizer.state) {
+            case UIGestureRecognizerStateBegan:
+                if(fabsf([recognizer velocityInView:self.view].y) > fabsf([recognizer velocityInView:self.view].x)) {
+                    [self _hideToolbar];
+                }
+                break;
+            case UIGestureRecognizerStateCancelled: {
+                frame.origin.y = 0;
+                [UIView animateWithDuration:0.25 animations:^{
+                    _scrollView.frame = frame;
+                    self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
+                }];
+                [self _showToolbar];
+                _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+                break;
+            }
+            case UIGestureRecognizerStateChanged:
+                frame.origin.y = [recognizer translationInView:self.view].y;
+                _scrollView.frame = frame;
+                self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1-(fabsf([recognizer translationInView:self.view].y) / self.view.frame.size.height / 2)];
+                break;
+            case UIGestureRecognizerStateEnded:
+            {
+                if(fabsf([recognizer translationInView:self.view].y) > 100 || fabsf([recognizer velocityInView:self.view].y) > 1000) {
+                    frame.origin.y = ([recognizer translationInView:self.view].y > 0)?frame.size.height:-frame.size.height;
+                    [UIView animateWithDuration:0.25 animations:^{
+                        _scrollView.frame = frame;
+                        self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0];
+                    } completion:^(BOOL finished){
+                        [self doneButtonPressed:recognizer];
+                    }];
+                } else {
+                    frame.origin.y = 0;
+                    [self _showToolbar];
+                    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+                    [UIView animateWithDuration:0.25 animations:^{
+                        _scrollView.frame = frame;
+                        self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
+                    }];
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {

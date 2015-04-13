@@ -90,11 +90,11 @@
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         appDelegate.window.backgroundColor = [UIColor blackColor];
         appDelegate.window.rootViewController = [[ImageViewController alloc] initWithURL:url];
-        [appDelegate.window insertSubview:appDelegate.slideViewController.view aboveSubview:appDelegate.window.rootViewController.view];
+        [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
+        appDelegate.window.rootViewController.view.alpha = 0;
         [UIView animateWithDuration:0.5f animations:^{
-            appDelegate.slideViewController.view.alpha = 0;
+            appDelegate.window.rootViewController.view.alpha = 1;
         } completion:^(BOOL finished){
-            [appDelegate.slideViewController.view removeFromSuperview];
             if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
                 [UIApplication sharedApplication].statusBarHidden = YES;
         }];
