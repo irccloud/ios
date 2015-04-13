@@ -406,7 +406,7 @@
         
         switch(recognizer.state) {
             case UIGestureRecognizerStateBegan:
-                if(fabsf([recognizer velocityInView:self.view].y) > fabsf([recognizer velocityInView:self.view].x)) {
+                if(fabs([recognizer velocityInView:self.view].y) > fabsf([recognizer velocityInView:self.view].x)) {
                     [self _hideToolbar];
                 }
                 break;
@@ -423,17 +423,17 @@
             case UIGestureRecognizerStateChanged:
                 frame.origin.y = [recognizer translationInView:self.view].y;
                 _scrollView.frame = frame;
-                self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1-(fabsf([recognizer translationInView:self.view].y) / self.view.frame.size.height / 2)];
+                self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1-(fabs([recognizer translationInView:self.view].y) / self.view.frame.size.height / 2)];
                 break;
             case UIGestureRecognizerStateEnded:
             {
-                if(fabsf([recognizer translationInView:self.view].y) > 100 || fabsf([recognizer velocityInView:self.view].y) > 1000) {
+                if(fabsf([recognizer translationInView:self.view].y) > 100 || fabs([recognizer velocityInView:self.view].y) > 1000) {
                     frame.origin.y = ([recognizer translationInView:self.view].y > 0)?frame.size.height:-frame.size.height;
                     [UIView animateWithDuration:0.25 animations:^{
                         _scrollView.frame = frame;
                         self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0];
-                    } completion:^(BOOL finished){
-                        [self doneButtonPressed:recognizer];
+                    } completion:^(BOOL finished) {
+                        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
                     }];
                 } else {
                     frame.origin.y = 0;
