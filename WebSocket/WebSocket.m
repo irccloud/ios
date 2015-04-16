@@ -1090,36 +1090,44 @@ WebSocketWaitingState waitingState;
 }
 
 - (void)socketDidSecure:(GCDAsyncSocket*)aSocket;{
-    if (self.config.isSecure) {
-        if(self.config.tlsSettings && [self.config.tlsSettings objectForKey:@"fingerprint"]) {
-            SSLContextRef ctx = socket.sslContext;
-            if(ctx != NULL) {
-                SecTrustRef tm;
-                SSLCopyPeerTrust(ctx, &tm);
-                if(tm != NULL) {
-                    SecCertificateRef cert = SecTrustGetCertificateAtIndex(tm, 0);
-                    CFDataRef data = SecCertificateCopyData(cert);
-                    const unsigned char *bytes = CFDataGetBytePtr(data);
-                    CFIndex len = CFDataGetLength(data);
-                    unsigned char sha1[CC_SHA1_DIGEST_LENGTH];
-                    CC_SHA1(bytes, (CC_LONG)len, sha1);
-                    NSMutableString *hex = [[NSMutableString alloc] initWithCapacity:len*2];
-                    for(int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
-                        [hex appendFormat:@"%02X:", sha1[i]];
-                    }
-                    [hex deleteCharactersInRange:NSMakeRange(hex.length - 1, 1)];
-                    CFRelease(data);
-                    CFRelease(tm);
-                    if(![hex isEqualToString:[self.config.tlsSettings objectForKey:@"fingerprint"]]) {
-                        [self close:WebSocketCloseStatusTlsHandshakeError message:@"Fingerprint mismatch"];
-                        [self dispatchClosed:WebSocketCloseStatusTlsHandshakeError message:@"Fingerprint mismatch" error:[NSError errorWithDomain:WebSocketErrorDomain code:WebSocketCloseStatusTlsHandshakeError userInfo:nil]];
-                        return;
+    [aSocket performBlock:^{
+        if (self.config.isSecure) {
+            if(self.config.tlsSettings && [self.config.tlsSettings objectForKey:@"fingerprints"]) {
+                SSLContextRef ctx = socket.sslContext;
+                if(ctx != NULL) {
+                    SecTrustRef tm;
+                    SSLCopyPeerTrust(ctx, &tm);
+                    if(tm != NULL) {
+                        SecCertificateRef cert = SecTrustGetCertificateAtIndex(tm, 0);
+                        CFDataRef data = SecCertificateCopyData(cert);
+                        const unsigned char *bytes = CFDataGetBytePtr(data);
+                        CFIndex len = CFDataGetLength(data);
+                        unsigned char sha1[CC_SHA1_DIGEST_LENGTH];
+                        CC_SHA1(bytes, (CC_LONG)len, sha1);
+                        NSMutableString *hex = [[NSMutableString alloc] initWithCapacity:len*2];
+                        for(int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
+                            [hex appendFormat:@"%02X", sha1[i]];
+                        }
+                        CFRelease(data);
+                        CFRelease(tm);
+                        BOOL matched = NO;
+                        for(NSString *fingerprint in [self.config.tlsSettings objectForKey:@"fingerprints"]) {
+                            if([fingerprint isEqualToString:hex]) {
+                                matched = YES;
+                                break;
+                            }
+                        }
+                        if(!matched) {
+                            [self close:WebSocketCloseStatusTlsHandshakeError message:@"Fingerprint mismatch"];
+                            [self dispatchClosed:WebSocketCloseStatusTlsHandshakeError message:@"Fingerprint mismatch" error:[NSError errorWithDomain:WebSocketErrorDomain code:WebSocketCloseStatusTlsHandshakeError userInfo:nil]];
+                            return;
+                        }
                     }
                 }
             }
+            [self sendHandshake:aSocket];
         }
-        [self sendHandshake:aSocket];
-    }
+    }];
 }
 
 - (NSTimeInterval)socket:(GCDAsyncSocket*)sock shouldTimeoutReadWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length {

@@ -1440,7 +1440,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                                                                          tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
                                                                                         (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kTLSProtocol1),
 #ifndef ENTERPRISE
-                                                                                        @"fingerprint":@"8D:3B:E1:98:3F:75:F4:A4:54:6F:42:F5:EC:18:9B:C6:5A:9D:3A:42"
+                                                                                        @"fingerprints":@[@"E6B8B984CA03D68389A227021B11C496770DE26A", @"8D3BE1983F75F4A4546F42F5EC189BC65A9D3A42"]
 #endif
                                                                                         } mutableCopy]
                                                                              headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"],
