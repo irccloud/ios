@@ -64,8 +64,6 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)viewDidLoad {
-    _blur = nil;
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -1038,7 +1036,7 @@ extern NSDictionary *emojiMap;
         if(((NSIndexPath *)[rows lastObject]).row < [_eventsView tableView:_eventsView.tableView numberOfRowsInSection:0])
             [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
         else
-            [_eventsView scrollToBottom];
+            [_eventsView _scrollToBottom];
         [_buffersView scrollViewDidScroll:_buffersView.tableView];
         [UIView commitAnimations];
         [self expandingTextViewDidChange:_message];
@@ -1110,18 +1108,8 @@ extern NSDictionary *emojiMap;
     }
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        self.navigationController.navigationBar.translucent = YES;
+        self.navigationController.navigationBar.translucent = NO;
         self.edgesForExtendedLayout=UIRectEdgeNone;
-#ifdef __IPHONE_8_0
-        if(!_blur) {
-            UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
-            _blur = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
-            CGRect frame = self.navigationController.navigationBar.bounds;
-            frame.origin.y = -frame.size.height;
-            [_blur setFrame:frame];
-            [self.view addSubview:_blur];
-        }
-#endif
     }
     self.navigationController.navigationBar.clipsToBounds = YES;
     [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
@@ -2089,26 +2077,17 @@ extern NSDictionary *emojiMap;
         self.navigationController.view.frame = f;
     }
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        height -= self.navigationController.navigationBar.frame.size.height;
-    } else {
-        if([UIApplication sharedApplication].statusBarFrame.size.height > 20)
-            self.view.frame = CGRectMake(0, 0, width, height);
-        else
-            self.view.frame = CGRectMake(0, ([UIApplication sharedApplication].statusBarHidden)?0:[UIApplication sharedApplication].statusBarFrame.size.height, width, height);
-        self.view.superview.frame = frame;
-    }
+    height -= self.navigationController.navigationBar.frame.size.height;
 
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && sbheight)
         height -= 20;
     
-    _eventsView.tableView.scrollIndicatorInsets = _eventsView.tableView.contentInset = UIEdgeInsetsMake((([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?0:self.navigationController.navigationBar.frame.size.height),0,0,0);
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
         [self addChildViewController:_buffersView];
-        _buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,height);
+        _buffersView.view.frame = CGRectMake(0,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,[[UIDevice currentDevice] isBigPhone]?180:220,height + ([[UIDevice currentDevice] isBigPhone]?self.navigationController.navigationBar.frame.size.height:0));
         _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height);
         _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
         _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
@@ -2119,8 +2098,7 @@ extern NSDictionary *emojiMap;
         if(![[UIDevice currentDevice] isBigPhone] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
             self.slidingViewController.underRightViewController = nil;
             [self addChildViewController:_usersView];
-            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,0,220,height);
-            _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = _eventsView.tableView.contentInset;
+            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,220,height + ([[UIDevice currentDevice] isBigPhone]?(self.navigationController.navigationBar.frame.size.height):0));
             [_usersView willMoveToParentViewController:self];
             [_usersView viewWillAppear:NO];
             _usersView.view.hidden = NO;
@@ -2186,7 +2164,6 @@ extern NSDictionary *emojiMap;
         frame = self.navigationController.navigationBar.frame;
         frame.origin.y = 0;
         frame.size.width = width - (([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))?_buffersView.view.frame.size.width:0);
-        [_blur setFrame:frame];
         frame.origin.y = sbheight - (sbheight > 20?20:0);
         [self.navigationController.navigationBar setFrame:frame];
     }

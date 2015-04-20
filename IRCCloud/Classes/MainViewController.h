@@ -75,7 +75,6 @@
     NSArray *_sortedUsers;
     NSArray *_sortedChannels;
     UIPopoverController *_popover;
-    UIVisualEffectView *_blur;
     NSTimeInterval _lastNotificationTime;
 }
 @property (nonatomic) int bidToOpen;
