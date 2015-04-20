@@ -2010,7 +2010,7 @@
 				OTHER_CFLAGS = "-DEXTENSION";
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "c71d533e-4938-417a-8783-dba7d839a294";
+				PROVISIONING_PROFILE = "dd6ff55c-b8b5-4bc2-b9ae-610f64015021";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2050,7 +2050,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4f4a94fe-bf79-40f0-b178-6fca60950465";
+				PROVISIONING_PROFILE = "f7109245-677f-4db8-8f0e-b2bc763aba5d";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2091,7 +2091,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "fa596e92-3b59-45af-a25f-784990f6cd7e";
+				PROVISIONING_PROFILE = "bffcd510-1d33-42cb-804c-462be8688b69";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -2242,7 +2242,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "7e944f17-3ef9-44aa-a2fc-52683249f921";
+				PROVISIONING_PROFILE = "cac6d0ba-9755-4b26-8639-8f39e3f564fa";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2269,7 +2269,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "33c2843d-e34a-4855-b59d-c81d7831ad41";
+				PROVISIONING_PROFILE = "2f30287a-be84-4839-ac9f-10798ea4b76a";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2517,7 +2517,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "625a0813-c3ee-4547-931c-4a88abfceb78";
+				PROVISIONING_PROFILE = "d237acae-be6d-4736-a96c-fe4c4eca03f1";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
