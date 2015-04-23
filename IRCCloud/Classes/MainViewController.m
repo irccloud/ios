@@ -390,20 +390,53 @@ extern NSDictionary *emojiMap;
         case kIRCEventBadChannelKey:
             _alertObject = notification.object;
             s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-            _alertView.tag = TAG_BADCHANNELKEY;
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView show];
+            if(NSClassFromString(@"UIAlertController")) {
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] preferredStyle:UIAlertControllerStyleAlert];
+                
+                [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Join" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                    if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
+                        [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:_alertObject.cid];
+                }]];
+                
+                [self presentViewController:alert animated:YES completion:nil];
+                
+                [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                    textField.delegate = self;
+                }];
+            } else {
+                _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+                _alertView.tag = TAG_BADCHANNELKEY;
+                _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+                [_alertView textFieldAtIndex:0].delegate = self;
+                [_alertView show];
+            }
             break;
         case kIRCEventInvalidNick:
             _alertObject = notification.object;
             s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Change", nil];
-            _alertView.tag = TAG_INVALIDNICK;
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView show];
+            if(NSClassFromString(@"UIAlertController")) {
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." preferredStyle:UIAlertControllerStyleAlert];
+                
+                [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Change" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                    if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
+                        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:_alertObject.cid];
+                }]];
+                
+                [self presentViewController:alert animated:YES completion:nil];
+
+                [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                    textField.delegate = self;
+                }];
+            } else {
+                _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Change", nil];
+                _alertView.tag = TAG_INVALIDNICK;
+                _alertView.frame = CGRectMake(0,0,1000,1000);
+                _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+                [_alertView textFieldAtIndex:0].delegate = self;
+                [_alertView show];
+            }
             break;
         case kIRCEventAlert:
             o = notification.object;
@@ -2686,8 +2719,10 @@ extern NSDictionary *emojiMap;
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
-    [self alertView:_alertView clickedButtonAtIndex:1];
+    if(_alertView) {
+        [_alertView dismissWithClickedButtonIndex:1 animated:YES];
+        [self alertView:_alertView clickedButtonAtIndex:1];
+    }
     return NO;
 }
 
