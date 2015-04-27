@@ -2691,8 +2691,9 @@ extern NSDictionary *emojiMap;
                 _selectedUser.cid = _selectedEvent.cid;
                 _selectedUser.bid = _selectedEvent.bid;
                 _selectedUser.nick = from;
-                _selectedUser.hostmask = _selectedEvent.hostmask;
             }
+            if(event.hostmask.length)
+                _selectedUser.hostmask = event.hostmask;
         } else {
             _selectedUser = nil;
         }
