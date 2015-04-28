@@ -1304,7 +1304,7 @@ extern NSDictionary *emojiMap;
             [_message clearText];
             _buffer.draft = nil;
             if(e.reqId < 0)
-                e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
+                e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
         }
     }
 }
