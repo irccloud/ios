@@ -1226,7 +1226,10 @@ int __timestampWidth;
                     if(r.resultType == NSTextCheckingTypeLink) {
                         for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
                             if([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] && ([r.URL.absoluteString isEqualToString:[file objectForKey:@"url"]] || [r.URL.absoluteString hasPrefix:[[file objectForKey:@"url"] stringByAppendingString:@"/"]])) {
-                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/image%@", [file objectForKey:@"url"], [file objectForKey:@"extension"]]]];
+                                NSString *extension = [file objectForKey:@"extension"];
+                                if(!extension.length)
+                                    extension = [@"." stringByAppendingString:[[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
+                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/image%@", [file objectForKey:@"url"], extension]]];
                                 [mutableLinks setObject:r atIndexedSubscript:i];
                             }
                         }
