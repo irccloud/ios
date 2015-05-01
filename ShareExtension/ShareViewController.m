@@ -112,6 +112,13 @@
     _fileUploader = [[FileUploader alloc] init];
     _fileUploader.delegate = self;
     [[NSUserDefaults standardUserDefaults] setObject:[d objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@(14.0f)}];
+    } else {
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 0.8)}];
+    }
+    if([d objectForKey:@"fontSize"])
+        [[NSUserDefaults standardUserDefaults] setObject:[d objectForKey:@"fontSize"] forKey:@"fontSize"];
     [NetworkConnection sync];
     _conn = [NetworkConnection sharedInstance];
     if(_conn.session.length) {

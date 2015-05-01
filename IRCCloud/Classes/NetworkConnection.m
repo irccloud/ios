@@ -1815,6 +1815,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
             [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
+            [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] forKey:@"fontSize"];
             [d synchronize];
         }
         [NetworkConnection sync];
