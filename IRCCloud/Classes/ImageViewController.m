@@ -460,7 +460,7 @@
         NSUserActivity *activity = [self userActivity];
         [activity invalidate];
         activity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
-        activity.webpageURL = _url;
+        activity.webpageURL = [NSURL URLWithString:[_url.absoluteString stringByReplacingCharactersInRange:NSMakeRange(0, _url.scheme.length) withString:_url.scheme.lowercaseString]];
         [self setUserActivity:activity];
         [activity becomeCurrent];
     }

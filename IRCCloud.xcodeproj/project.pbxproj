@@ -2010,7 +2010,7 @@
 				OTHER_CFLAGS = "-DEXTENSION";
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "dd6ff55c-b8b5-4bc2-b9ae-610f64015021";
+				PROVISIONING_PROFILE = "8abb3989-4d6b-49c9-8a2a-79cac5b7d5dd";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2050,7 +2050,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "f7109245-677f-4db8-8f0e-b2bc763aba5d";
+				PROVISIONING_PROFILE = "677d7668-f639-4cc1-8fea-fc2e95eb7acd";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2242,7 +2242,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "cac6d0ba-9755-4b26-8639-8f39e3f564fa";
+				PROVISIONING_PROFILE = "9393539d-4ca7-407e-a514-6a68eb13b3f4";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2269,7 +2269,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2f30287a-be84-4839-ac9f-10798ea4b76a";
+				PROVISIONING_PROFILE = "8b5ec961-49b1-4ad2-bf44-f70dff4e717d";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
