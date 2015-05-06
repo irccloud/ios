@@ -97,6 +97,9 @@
         }
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    if(IRCCLOUD_HOST.length < 1)
+        [NetworkConnection sharedInstance].session = nil;
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
@@ -140,7 +143,7 @@
     [self.mainViewController loadView];
     [self.mainViewController viewDidLoad];
     NSString *session = [NetworkConnection sharedInstance].session;
-    if(session != nil && [session length] > 0) {
+    if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
         //Store the session in the keychain again to update the access policy
         [NetworkConnection sharedInstance].session = session;
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {

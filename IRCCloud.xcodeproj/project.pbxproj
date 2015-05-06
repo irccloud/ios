@@ -2120,7 +2120,7 @@
 				OTHER_CFLAGS = "-DENTERPRISE";
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "ef26701f-ae56-4377-af8a-5cd741405a9a";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2152,7 +2152,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "a9c1172e-cbfc-4b93-8a6c-2e65c98db95d";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2359,7 +2359,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "b550c402-16bd-40f7-970d-0af24b2fc7d2";
+				PROVISIONING_PROFILE = "b7a45ac7-e116-460c-ad3f-4631b8d3e1ad";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2401,7 +2401,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "c5713f32-8fd3-466a-83ba-cb84af9f5a8b";
+				PROVISIONING_PROFILE = "5ef73155-2d62-4aa2-9462-88b28d99945c";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2444,7 +2444,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "5331390f-7149-4ce6-ab4d-ace8d5fae5c2";
+				PROVISIONING_PROFILE = "0a5e6ac9-23ae-4f59-8eb2-48f9320abdfc";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -2573,7 +2573,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "ba62326b-c48f-4adb-bb4f-c723c6df9aa6";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
