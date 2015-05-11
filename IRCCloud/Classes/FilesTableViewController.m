@@ -277,18 +277,16 @@
     }
     if([[file objectForKey:@"mime_type"] hasPrefix:@"image/"]) {
         cell.extension.hidden = YES;
-        @synchronized(_thumbnails) {
-            if([_thumbnails objectForKey:[file objectForKey:@"id"]]) {
-                [cell.thumbnail setImage:[_thumbnails objectForKey:[file objectForKey:@"id"]]];
-                cell.thumbnail.hidden = NO;
-                cell.spinner.hidden = YES;
-                [cell.spinner stopAnimating];
-            } else {
-                cell.thumbnail.hidden = YES;
-                cell.spinner.hidden = NO;
-                if(![cell.spinner isAnimating])
-                    [cell.spinner startAnimating];
-            }
+        if([_thumbnails objectForKey:[file objectForKey:@"id"]]) {
+            [cell.thumbnail setImage:[_thumbnails objectForKey:[file objectForKey:@"id"]]];
+            cell.thumbnail.hidden = NO;
+            cell.spinner.hidden = YES;
+            [cell.spinner stopAnimating];
+        } else {
+            cell.thumbnail.hidden = YES;
+            cell.spinner.hidden = NO;
+            if(![cell.spinner isAnimating])
+                [cell.spinner startAnimating];
         }
     } else {
         cell.extension.hidden = NO;
