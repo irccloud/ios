@@ -20,6 +20,7 @@
 #import "config.h"
 #import "NetworkConnection.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "SSZipArchive.h"
 
 @implementation FileUploader
 
@@ -82,19 +83,37 @@
 }
 
 -(void)uploadFile:(NSURL *)file {
-    CFStringRef extension = (__bridge CFStringRef)[file pathExtension];
-    CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, extension, NULL);
-    _mimeType = CFBridgingRelease(UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType));
-    if(!_mimeType)
-        _mimeType = @"application/octet-stream";
-    CFRelease(UTI);
+    NSFileWrapper *wrapper = [[NSFileWrapper alloc] initWithURL:file options:0 error:nil];
     
-    if(!_originalFilename)
-        _originalFilename = [file.pathComponents lastObject];
+    if(wrapper.regularFile) {
+        CFStringRef extension = (__bridge CFStringRef)[file pathExtension];
+        CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, extension, NULL);
+        _mimeType = CFBridgingRelease(UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType));
+        if(!_mimeType)
+            _mimeType = @"application/octet-stream";
+        CFRelease(UTI);
+        
+        if(!_originalFilename)
+            _originalFilename = wrapper.filename;
     
-    NSData *data = [NSData dataWithContentsOfURL:file];
-    
-    [self performSelectorInBackground:@selector(_upload:) withObject:data];
+        [self performSelectorInBackground:@selector(_upload:) withObject:wrapper.regularFileContents];
+    } else {
+        CLS_LOG(@"Uploading a bundle requires zipping first");
+        NSString *tempFile = [[NSTemporaryDirectory() stringByAppendingPathComponent:wrapper.filename] stringByAppendingString:@".zip"];
+        CLS_LOG(@"Creating %@", tempFile);
+        
+        [SSZipArchive createZipFileAtPath:tempFile withContentsOfDirectory:file.path keepParentDirectory:YES];
+        _mimeType = @"application/zip";
+
+        if(!_originalFilename)
+            _originalFilename = wrapper.filename;
+        
+        _originalFilename = [_originalFilename stringByAppendingString:@".zip"];
+        NSData *data = [NSData dataWithContentsOfFile:tempFile];
+        [self performSelectorInBackground:@selector(_upload:) withObject:data];
+        
+        [[NSFileManager defaultManager] removeItemAtPath:tempFile error:nil];
+    }
 }
 
 -(void)uploadFile:(NSString *)filename UTI:(NSString *)UTI data:(NSData *)data {
