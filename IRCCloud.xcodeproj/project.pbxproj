@@ -361,6 +361,10 @@
 		22C89B5F19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
 		22C89B6019ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
 		22C89B6119ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
+		22C8CD711B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
+		22C8CD721B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
+		22C8CD731B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
+		22C8CD741B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
 		22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22C8DCF31A801A4500199371 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8DCF21A801A4500199371 /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22C8DCF41A801A6300199371 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8DCF21A801A4500199371 /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -721,6 +725,7 @@
 		22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMetadataViewController.m; sourceTree = "<group>"; };
 		22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
 		22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
+		22C8CD701B01289900F637D2 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		22C8DCF21A801A4500199371 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		22D4309E171C663A003C0684 /* IgnoresTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IgnoresTableViewController.h; sourceTree = "<group>"; };
 		22D4309F171C663A003C0684 /* IgnoresTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IgnoresTableViewController.m; sourceTree = "<group>"; };
@@ -753,6 +758,7 @@
 				221034F9197EFC0500AB414F /* Crashlytics.framework in Frameworks */,
 				221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */,
 				221034FB197EFC0500AB414F /* AudioToolbox.framework in Frameworks */,
+				22C8CD731B01289900F637D2 /* libc++.dylib in Frameworks */,
 				1A5703451A73FC7600D58225 /* Fabric.framework in Frameworks */,
 				221034FC197EFC0500AB414F /* CFNetwork.framework in Frameworks */,
 				221034FD197EFC0500AB414F /* CoreGraphics.framework in Frameworks */,
@@ -787,6 +793,7 @@
 				225D977E18AA995900065087 /* libz.dylib in Frameworks */,
 				225D977F18AA995900065087 /* CoreText.framework in Frameworks */,
 				225D978018AA995900065087 /* libicucore.dylib in Frameworks */,
+				22C8CD721B01289900F637D2 /* libc++.dylib in Frameworks */,
 				225D978118AA995900065087 /* Security.framework in Frameworks */,
 				225D978218AA995900065087 /* UIKit.framework in Frameworks */,
 				225D978318AA995900065087 /* CFNetwork.framework in Frameworks */,
@@ -814,6 +821,7 @@
 				2248DF3916EE375D0086BB42 /* libz.dylib in Frameworks */,
 				228A05D716D3DFDA0029769C /* CoreText.framework in Frameworks */,
 				2200DB4C18B7F1FD00343583 /* Crashlytics.framework in Frameworks */,
+				22C8CD711B01289900F637D2 /* libc++.dylib in Frameworks */,
 				228A05CF16D3DD540029769C /* libicucore.dylib in Frameworks */,
 				228A05D016D3DD570029769C /* Security.framework in Frameworks */,
 				228A057016D3DABA0029769C /* UIKit.framework in Frameworks */,
@@ -853,6 +861,7 @@
 				22DB25201982DF2B0008728E /* Crashlytics.framework in Frameworks */,
 				22DB25211982DF2B0008728E /* QuartzCore.framework in Frameworks */,
 				22DB25221982DF2B0008728E /* AudioToolbox.framework in Frameworks */,
+				22C8CD741B01289900F637D2 /* libc++.dylib in Frameworks */,
 				1A5703461A73FC7600D58225 /* Fabric.framework in Frameworks */,
 				22DB25231982DF2B0008728E /* CFNetwork.framework in Frameworks */,
 				22DB25241982DF2B0008728E /* CoreGraphics.framework in Frameworks */,
@@ -959,6 +968,7 @@
 				228A057116D3DABA0029769C /* Foundation.framework */,
 				2223C6B51768F4500032544B /* ImageIO.framework */,
 				228A05CD16D3DD310029769C /* libicucore.dylib */,
+				22C8CD701B01289900F637D2 /* libc++.dylib */,
 				2248DF3816EE375D0086BB42 /* libz.dylib */,
 				2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */,
 				228A05CB16D3DCE20029769C /* Security.framework */,
