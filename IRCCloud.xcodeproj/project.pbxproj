@@ -2010,7 +2010,7 @@
 				OTHER_CFLAGS = "-DEXTENSION";
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "8abb3989-4d6b-49c9-8a2a-79cac5b7d5dd";
+				PROVISIONING_PROFILE = "4d9218f9-869f-46dd-93ac-24e0ecde96df";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2120,7 +2120,7 @@
 				OTHER_CFLAGS = "-DENTERPRISE";
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "ef26701f-ae56-4377-af8a-5cd741405a9a";
+				PROVISIONING_PROFILE = "deea6d01-d072-47ff-9779-81042dc1ffad";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2152,7 +2152,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "a9c1172e-cbfc-4b93-8a6c-2e65c98db95d";
+				PROVISIONING_PROFILE = "ffa24e81-3639-4bc1-b04b-a2831c8d1e05";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2242,7 +2242,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9393539d-4ca7-407e-a514-6a68eb13b3f4";
+				PROVISIONING_PROFILE = "f1eb3bd4-ce15-4f68-bf26-18b1b86b2425";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2359,7 +2359,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "b7a45ac7-e116-460c-ad3f-4631b8d3e1ad";
+				PROVISIONING_PROFILE = "af701556-3286-4eb7-9ea5-7dff085a9ecd";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2401,7 +2401,7 @@
 				);
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "5ef73155-2d62-4aa2-9462-88b28d99945c";
+				PROVISIONING_PROFILE = "1705eeeb-b9a5-419b-a4ec-98f98fe4a65f";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;

@@ -269,9 +269,12 @@
     cell.date.text = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:[[file objectForKey:@"date"] intValue]]];
     cell.name.text = [file objectForKey:@"name"];
     int bytes = [[file objectForKey:@"size"] intValue];
-    int exp = (int)(log(bytes) / log(1024));
-    cell.metadata.text = [NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [file objectForKey:@"mime_type"]];
-    
+    if(bytes < 1024) {
+        cell.metadata.text = [NSString stringWithFormat:@"%i B • %@", bytes, [file objectForKey:@"mime_type"]];
+    } else {
+        int exp = (int)(log(bytes) / log(1024));
+        cell.metadata.text = [NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [file objectForKey:@"mime_type"]];
+    }
     if([[file objectForKey:@"mime_type"] hasPrefix:@"image/"]) {
         cell.extension.hidden = YES;
         @synchronized(_thumbnails) {
