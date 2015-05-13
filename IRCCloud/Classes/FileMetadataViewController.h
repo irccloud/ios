@@ -26,9 +26,11 @@
     UIImageView *_imageView;
     CGFloat _imageHeight;
     BOOL _done;
+    NSString *_url;
 }
 @property (readonly) UITextView *msg;
 - (id)initWithUploader:(FileUploader *)uploader;
+- (void)setURL:(NSString *)url;
 - (void)setImage:(UIImage *)image;
 - (void)setFilename:(NSString *)filename metadata:(NSString *)metadata;
 @end

@@ -15,6 +15,8 @@
 //  limitations under the License.
 
 #import "FileMetadataViewController.h"
+#import "imageViewController.h"
+#import "AppDelegate.h"
 
 @implementation FileMetadataViewController
 
@@ -137,6 +139,10 @@
     _imageView.contentMode = UIViewContentModeScaleAspectFit;
     
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+}
+
+- (void)setURL:(NSString *)url {
+    _url = url;
 }
 
 - (void)setFilename:(NSString *)filename metadata:(NSString *)metadata {
@@ -281,6 +287,20 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
+    
+    if(_imageView && _url && indexPath.section == 0) {
+        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+        appDelegate.window.backgroundColor = [UIColor blackColor];
+        appDelegate.window.rootViewController = [[ImageViewController alloc] initWithURL:[NSURL URLWithString:_url]];
+        [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
+        appDelegate.window.rootViewController.view.alpha = 0;
+        [UIView animateWithDuration:0.5f animations:^{
+            appDelegate.window.rootViewController.view.alpha = 1;
+        } completion:^(BOOL finished){
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+                [UIApplication sharedApplication].statusBarHidden = YES;
+        }];
+    }
 }
 
 @end
