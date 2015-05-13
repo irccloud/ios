@@ -278,11 +278,12 @@
         if(![_thumbnails objectForKey:fileID]) {
             NSString *url = [[d objectForKey:@"url_template"] stringByReplacingOccurrencesOfString:@":modifiers" withString:[NSString stringWithFormat:@"w%.f", self.view.frame.size.width]];
 
-            ImageFetcher *i = [[ImageFetcher alloc] initWithURL:url fileID:fileID];
-            i.delegate = self;
-            
-            [_imageFetchers setObject:i forKey:fileID];
-            [i performSelectorOnMainThread:@selector(start) withObject:nil waitUntilDone:NO];
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                ImageFetcher *i = [[ImageFetcher alloc] initWithURL:url fileID:fileID];
+                i.delegate = self;
+                [_imageFetchers setObject:i forKey:fileID];
+                [i start];
+            }];
         }
     }
     
