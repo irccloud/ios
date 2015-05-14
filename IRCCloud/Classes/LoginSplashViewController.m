@@ -246,6 +246,9 @@
             forgotPasswordLogin.alpha = 0;
             forgotPasswordSignup.alpha = 0;
             [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
+#ifndef ENTERPRISE
+            [CrashlyticsKit logEvent:@"login" attributes:@{@"method":@"access-link"}];
+#endif
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [UIView beginAnimations:nil context:nil];
@@ -728,6 +731,12 @@
                     [d setObject:IRCCLOUD_PATH forKey:@"path"];
                     [d synchronize];
                 }
+#ifndef ENTERPRISE
+                if(name.alpha)
+                    [CrashlyticsKit logEvent:@"signup" attributes:@{@"method":@"email"}];
+                else
+                    [CrashlyticsKit logEvent:@"login" attributes:@{@"method":@"email"}];
+#endif
                 loginHint.alpha = 0;
                 signupHint.alpha = 0;
                 enterpriseHint.alpha = 0;
