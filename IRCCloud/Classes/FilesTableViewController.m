@@ -346,9 +346,9 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    FilesTableCell *cell = [tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"filecell-%i-%i", indexPath.section, indexPath.row]];
+    FilesTableCell *cell = [tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"filecell-%li-%li", (long)indexPath.section, (long)indexPath.row]];
     if(!cell)
-        cell = [[FilesTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"filecell-%i-%i", indexPath.section, indexPath.row]];
+        cell = [[FilesTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"filecell-%li-%li", (long)indexPath.section, (long)indexPath.row]];
 
     NSDictionary *file = [_files objectAtIndex:indexPath.row];
     
