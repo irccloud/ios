@@ -86,7 +86,7 @@ h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
 .mainContainerFull, .mainContent, .mainContentPaste, div.paste { margin: 0px; padding: 0px; border: none; width: 100%; height: 100%; }\
 </style></head>"];
         
-        [html replaceCharactersInRange:[html rangeOfString:@"</body>"] withString:@"<script>window.PASTEVIEW.on('rendered', _.bind(function () { window.PASTEVIEW.ace.container.style.height = \"100%\";}, window.PASTEVIEW));</script></body>"];
+        [html replaceCharactersInRange:[html rangeOfString:@"</body>"] withString:@"<script>window.PASTEVIEW.on('rendered', _.bind(function () { window.PASTEVIEW.ace.container.style.height = \"100%\"; location.href = \"hide-spinner:\";}, window.PASTEVIEW));</script></body>"];
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [_webView loadHTMLString:html baseURL:_url];
@@ -165,13 +165,19 @@ h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
 
 -(void)webViewDidStartLoad:(UIWebView *)webView {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [_activity startAnimating];
 }
 
 -(void)webViewDidFinishLoad:(UIWebView *)webView {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [_activity stopAnimating];
-    _lineNumbers.enabled = YES;
+}
+
+-(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    if([request.URL.scheme isEqualToString:@"hide-spinner"]) {
+        [_activity stopAnimating];
+        _lineNumbers.enabled = YES;
+        return NO;
+    }
+    return YES;
 }
 
 -(void)didReceiveMemoryWarning {
