@@ -1219,7 +1219,7 @@ int __timestampWidth;
         } else if(e.formattedMsg.length > 0) {
             NSArray *links;
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links];
-            if([e.entities objectForKey:@"files"]) {
+            if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
                 NSMutableArray *mutableLinks = links.mutableCopy;
                 for(int i = 0; i < mutableLinks.count; i++) {
                     NSTextCheckingResult *r = [mutableLinks objectAtIndex:i];
@@ -1230,6 +1230,12 @@ int __timestampWidth;
                                 if(!extension.length)
                                     extension = [@"." stringByAppendingString:[[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
                                 r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/image%@", [file objectForKey:@"url"], extension]]];
+                                [mutableLinks setObject:r atIndexedSubscript:i];
+                            }
+                        }
+                        for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
+                            if(([r.URL.absoluteString isEqualToString:[paste objectForKey:@"url"]] || [r.URL.absoluteString hasPrefix:[[paste objectForKey:@"url"] stringByAppendingString:@"/"]])) {
+                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", [paste objectForKey:@"url"], [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
                                 [mutableLinks setObject:r atIndexedSubscript:i];
                             }
                         }

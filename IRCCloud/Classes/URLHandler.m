@@ -19,6 +19,7 @@
 #import "MainViewController.h"
 #import "ImageViewController.h"
 #import "OpenInChromeController.h"
+#import "PastebinViewController.h"
 
 @implementation URLHandler
 {
@@ -68,7 +69,12 @@
         [app.keyWindow.rootViewController dismissModalViewControllerAnimated:NO];
     }
     
-    if([url.scheme hasPrefix:@"irc"]) {
+    if([url.scheme hasPrefix:@"irccloud-paste-"]) {
+        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [appDelegate.window.rootViewController presentViewController:[[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]] animated:YES completion:nil];
+        }];
+    } else if([url.scheme hasPrefix:@"irc"]) {
         [mainViewController launchURL:[NSURL URLWithString:[url.description stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
     } else if([url.scheme isEqualToString:@"spotify"]) {
         if(![[UIApplication sharedApplication] openURL:url])

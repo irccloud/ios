@@ -353,6 +353,10 @@
 		22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22C2075C1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
 		22C2075D1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
+		22C2E0581B0E2E4800387B4B /* PastebinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2E0561B0E2E4800387B4B /* PastebinViewController.m */; };
+		22C2E0591B0E2E4800387B4B /* PastebinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2E0561B0E2E4800387B4B /* PastebinViewController.m */; };
+		22C2E05A1B0E2E4800387B4B /* PastebinViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */; };
+		22C2E05B1B0E2E4800387B4B /* PastebinViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */; };
 		22C89B5A19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
 		22C89B5B19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
 		22C89B5C19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
@@ -743,6 +747,9 @@
 		22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "ShareExtension Enterprise.entitlements"; path = "../ShareExtension Enterprise.entitlements"; sourceTree = "<group>"; };
 		22C2075A1A19125700EDACA4 /* FileMetadataViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileMetadataViewController.h; sourceTree = "<group>"; };
 		22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMetadataViewController.m; sourceTree = "<group>"; };
+		22C2E0551B0E2E4800387B4B /* PastebinViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastebinViewController.h; sourceTree = "<group>"; };
+		22C2E0561B0E2E4800387B4B /* PastebinViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastebinViewController.m; sourceTree = "<group>"; };
+		22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PastebinViewController.xib; path = Classes/PastebinViewController.xib; sourceTree = "<group>"; };
 		22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
 		22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
 		22C8CD701B01289900F637D2 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
@@ -1019,6 +1026,7 @@
 				2223C6A91768D7150032544B /* ImageViewController.xib */,
 				22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */,
 				2236F64116DC2EF5007BE535 /* MainViewController.xib */,
+				22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */,
 				228A05AD16D3DB7B0029769C /* Classes */,
 				228A05B416D3DB930029769C /* Resources */,
 				228A057616D3DABA0029769C /* Supporting Files */,
@@ -1141,6 +1149,8 @@
 				22032A6E1884529700BE4A10 /* NickCompletionView.m */,
 				22B4284616D7E36300498507 /* NetworkConnection.h */,
 				22B4284716D7E36300498507 /* NetworkConnection.m */,
+				22C2E0551B0E2E4800387B4B /* PastebinViewController.h */,
+				22C2E0561B0E2E4800387B4B /* PastebinViewController.m */,
 				2293907919D754D600A73946 /* ServerMapTableViewController.h */,
 				2293907A19D754D600A73946 /* ServerMapTableViewController.m */,
 				22462B5018906B03009EF986 /* ServerReorderViewController.h */,
@@ -1544,6 +1554,7 @@
 				225D979918AA995900065087 /* licenses.txt in Resources */,
 				225D979A18AA995900065087 /* a.caf in Resources */,
 				225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */,
+				22C2E05B1B0E2E4800387B4B /* PastebinViewController.xib in Resources */,
 				22C89B5F19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1554,6 +1565,7 @@
 			files = (
 				228A057A16D3DABA0029769C /* InfoPlist.strings in Resources */,
 				22988AAB19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */,
+				22C2E05A1B0E2E4800387B4B /* PastebinViewController.xib in Resources */,
 				2236F64216DC2EF6007BE535 /* MainViewController.xib in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
 				2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */,
@@ -1761,6 +1773,7 @@
 				225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */,
 				228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */,
 				225D976418AA995900065087 /* UIExpandingTextView.m in Sources */,
+				22C2E0591B0E2E4800387B4B /* PastebinViewController.m in Sources */,
 				223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				225D976518AA995900065087 /* UIExpandingTextViewInternal.m in Sources */,
 				22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */,
@@ -1848,6 +1861,7 @@
 				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
 				228E2BA218CF770D0011DEAB /* SBJsonWriter.m in Sources */,
 				22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
+				22C2E0581B0E2E4800387B4B /* PastebinViewController.m in Sources */,
 				223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				22D430A81725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
 				22A363B419D0884D00500478 /* OnePasswordExtension.m in Sources */,

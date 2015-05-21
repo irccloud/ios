@@ -1371,6 +1371,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"delete-file" args:@{@"file":fileID}];
 }
 
+-(int)deletePaste:(NSString *)pasteID {
+    return [self _sendRequest:@"delete-pastebin" args:@{@"id":pasteID}];
+}
+
 -(void)connect:(BOOL)notifier {
     @synchronized(self) {
         if(IRCCLOUD_HOST.length < 1) {
