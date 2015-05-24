@@ -89,6 +89,8 @@
 		2210352F197F1AD400AB414F /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
 		2212AF89175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
+		221390FE1B115CD000ECF001 /* PastebinEditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221390FD1B115CD000ECF001 /* PastebinEditorViewController.m */; };
+		221390FF1B115CD000ECF001 /* PastebinEditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221390FD1B115CD000ECF001 /* PastebinEditorViewController.m */; };
 		221E3F4C1AD2DEE00090934B /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */; };
 		221E3F4D1AD2DEE00090934B /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */; };
 		221F0BC5177368B40008EE04 /* CallerIDTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */; };
@@ -569,6 +571,8 @@
 		221034EC197EFBAF00AB414F /* ShareViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ShareViewController.m; sourceTree = "<group>"; };
 		2212AF86175F82F900D08C7F /* ChannelInfoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelInfoViewController.h; sourceTree = "<group>"; };
 		2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelInfoViewController.m; sourceTree = "<group>"; };
+		221390FC1B115CD000ECF001 /* PastebinEditorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastebinEditorViewController.h; sourceTree = "<group>"; };
+		221390FD1B115CD000ECF001 /* PastebinEditorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastebinEditorViewController.m; sourceTree = "<group>"; };
 		221E3F4A1AD2DEE00090934B /* FilesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilesTableViewController.h; sourceTree = "<group>"; };
 		221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilesTableViewController.m; sourceTree = "<group>"; };
 		221F0BC3177368A20008EE04 /* CallerIDTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CallerIDTableViewController.h; sourceTree = "<group>"; };
@@ -1149,6 +1153,8 @@
 				22032A6E1884529700BE4A10 /* NickCompletionView.m */,
 				22B4284616D7E36300498507 /* NetworkConnection.h */,
 				22B4284716D7E36300498507 /* NetworkConnection.m */,
+				221390FC1B115CD000ECF001 /* PastebinEditorViewController.h */,
+				221390FD1B115CD000ECF001 /* PastebinEditorViewController.m */,
 				22C2E0551B0E2E4800387B4B /* PastebinViewController.h */,
 				22C2E0561B0E2E4800387B4B /* PastebinViewController.m */,
 				2293907919D754D600A73946 /* ServerMapTableViewController.h */,
@@ -1723,6 +1729,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				225D973818AA995900065087 /* main.m in Sources */,
+				221390FF1B115CD000ECF001 /* PastebinEditorViewController.m in Sources */,
 				225D973918AA995900065087 /* ServerReorderViewController.m in Sources */,
 				225D973A18AA995900065087 /* AppDelegate.m in Sources */,
 				225D973B18AA995900065087 /* TTTAttributedLabel.m in Sources */,
@@ -1811,6 +1818,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				228A057C16D3DABA0029769C /* main.m in Sources */,
+				221390FE1B115CD000ECF001 /* PastebinEditorViewController.m in Sources */,
 				22462B5218906B03009EF986 /* ServerReorderViewController.m in Sources */,
 				228A05B216D3DB7B0029769C /* AppDelegate.m in Sources */,
 				228A05D416D3DFB80029769C /* TTTAttributedLabel.m in Sources */,

@@ -1,5 +1,5 @@
 //
-//  PastebinViewController.h
+//  PastebinEditorViewController.h
 //
 //  Copyright (C) 2015 IRCCloud, Ltd.
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,17 +16,16 @@
 
 
 #import <UIKit/UIKit.h>
-#import "OpenInChromeController.h"
+#import "BuffersDataSource.h"
 
-@interface PastebinViewController : UIViewController<UIActionSheetDelegate,UIPopoverPresentationControllerDelegate> {
-    IBOutlet UIWebView *_webView;
-    IBOutlet UIToolbar *_toolbar;
-    IBOutlet UIActivityIndicatorView *_activity;
-    NSURL *_url;
-    UISwitch *_lineNumbers;
-    NSString *_pasteID;
-    BOOL _ownPaste;
-    OpenInChromeController *_chrome;
+@interface PastebinEditorViewController : UITableViewController<UITextFieldDelegate,UITextViewDelegate> {
+    UITextField *_filename;
+    UITextView *_message;
+    UITextView *_text;
+    UISwitch *_alwaysSendAsText;
+    int _pastereqid;
+    int _sayreqid;
+    Buffer *_buffer;
 }
--(id)initWithURL:(NSURL *)url;
+-(id)initWithBuffer:(Buffer *)buffer;
 @end

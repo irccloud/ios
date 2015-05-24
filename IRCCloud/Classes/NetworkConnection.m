@@ -1371,6 +1371,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"delete-file" args:@{@"file":fileID}];
 }
 
+-(int)paste:(NSString *)name contents:(NSString *)contents {
+    if(name.length) {
+        return [self _sendRequest:@"paste" args:@{@"name":name, @"contents":contents}];
+    } else {
+        return [self _sendRequest:@"paste" args:@{@"contents":contents}];
+    }
+}
+
 -(int)deletePaste:(NSString *)pasteID {
     return [self _sendRequest:@"delete-pastebin" args:@{@"id":pasteID}];
 }

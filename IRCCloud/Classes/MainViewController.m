@@ -40,6 +40,7 @@
 #import "ServerMapTableViewController.h"
 #import "FileMetadataViewController.h"
 #import "FilesTableViewController.h"
+#import "PastebinEditorViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -1250,6 +1251,19 @@ extern NSDictionary *emojiMap;
                 CLS_LOG(@"/crash requested");
                 [[Crashlytics sharedInstance] crash];
 #endif
+            } else if(_message.text.length > 1080 || [_message.text isEqualToString:@"/paste"] || [_message.text rangeOfString:@"\n"].location < _message.text.length - 1) {
+                if(![_message.text isEqualToString:@"/paste"])
+                    _buffer.draft = _message.text;
+                PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
+                [self presentViewController:nc animated:YES completion:nil];
+                return;
             }
             
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
@@ -1786,6 +1800,7 @@ extern NSDictionary *emojiMap;
         }];
     } else {
         [_eventsView setBuffer:_buffer];
+        _message.text = _buffer.draft;
     }
     [_usersView setBuffer:_buffer];
     [self _updateUserListVisibility];
@@ -3096,7 +3111,7 @@ extern NSDictionary *emojiMap;
 
 -(void)cameraButtonPressed:(id)sender {
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Start a Pastebin", @"Take a Photo", @"Choose Photo", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -3218,6 +3233,16 @@ extern NSDictionary *emojiMap;
         } else if([action isEqualToString:@"Add Network"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
+            [self presentViewController:nc animated:YES completion:nil];
+        } else if([action isEqualToString:@"Start a Pastebin"]) {
+            PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else
