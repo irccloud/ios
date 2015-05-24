@@ -88,6 +88,15 @@ h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
         
         [html replaceCharactersInRange:[html rangeOfString:@"</body>"] withString:@"<script>window.PASTEVIEW.on('rendered', _.bind(function () { window.PASTEVIEW.ace.container.style.height = \"100%\"; location.href = \"hide-spinner:\";}, window.PASTEVIEW));</script></body>"];
         
+        [html replaceCharactersInRange:[html rangeOfString:@"https://js.stripe.com/v2"] withString:@""];
+        [html replaceCharactersInRange:[html rangeOfString:@"https://checkout.stripe.com/v3/checkout.js"] withString:@""];
+        [html replaceCharactersInRange:[html rangeOfString:@"https://platform.twitter.com/widgets.js"] withString:@""];
+        [html replaceCharactersInRange:[html rangeOfString:@"https://platform.vine.co/static/scripts/embed.js"] withString:@""];
+        [html replaceCharactersInRange:[html rangeOfString:@"https://connect.facebook.net/en_US/all.js#xfbml=1&status=0&appId=1524400614444110"] withString:@""];
+        [html replaceCharactersInRange:[html rangeOfString:@"https://apis.google.com/js/plusone.js"] withString:@""];
+        [html replaceCharactersInRange:[html rangeOfString:@"//rum-static.pingdom.net/prum.min.js"] withString:@""];
+        [html replaceCharactersInRange:[html rangeOfString:@"window.IRCCloudAppMapSource ="] withString:@"window.IRCCloudAppMapSourceDisabled ="];
+        
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [_webView loadHTMLString:html baseURL:_url];
         }];
