@@ -1245,12 +1245,6 @@ int __timestampWidth;
             }
             e.links = links;
         } else {
-            if(e.rowType == ROW_MESSAGE) {
-                CLS_LOG(@"Missing formatting for message event: %@, refreshing", e.type);
-                [_lock unlock];
-                [self refresh];
-                return 0;
-            }
             return 26;
         }
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
