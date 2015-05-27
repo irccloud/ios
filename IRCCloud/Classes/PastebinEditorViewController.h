@@ -25,6 +25,7 @@
     UISwitch *_alwaysSendAsText;
     int _pastereqid;
     int _sayreqid;
+    int _prefsreqid;
     Buffer *_buffer;
 }
 -(id)initWithBuffer:(Buffer *)buffer;

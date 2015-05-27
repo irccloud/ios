@@ -292,6 +292,7 @@
         [prefs setObject:@(_symbols.isOn) forKey:@"mode-showsymbol"];
         [prefs setObject:@(_colors.isOn) forKey:@"nick-colors"];
         [prefs setObject:@(!_emocodes.isOn) forKey:@"emoji-disableconvert"];
+        [prefs setObject:@(!_pastebin.isOn) forKey:@"pastebin-disableprompt"];
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -464,6 +465,12 @@
         _emocodes.on = YES;
     }
     
+    if([[prefs objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
+        _pastebin.on = ![[prefs objectForKey:@"pastebin-disableprompt"] boolValue];
+    } else {
+        _pastebin.on = YES;
+    }
+    
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
@@ -522,6 +529,7 @@
     _saveToCameraRoll = [[UISwitch alloc] init];
     _notificationSound = [[UISwitch alloc] init];
     _tabletMode = [[UISwitch alloc] init];
+    _pastebin = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -598,7 +606,7 @@
         case 1:
             return 1;
         case 2:
-            return 5;
+            return 6;
         case 3:
             return ((_chromeInstalled)?4:3) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
         case 4:
@@ -642,7 +650,7 @@
     
     if(indexPath.section != 4) {
         if(!cell)
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
+            cell = [[UITableViewCell alloc] initWithStyle:(indexPath.section == 2)?UITableViewCellStyleSubtitle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
         
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryView = nil;
@@ -686,6 +694,7 @@
                 case 2:
                     cell.textLabel.text = @"Usermode Symbols";
                     cell.accessoryView = _symbols;
+                    cell.detailTextLabel.text = @"@, +, etc.";
                     break;
                 case 3:
                     cell.textLabel.text = @"Colourise Nicknames";
@@ -696,7 +705,13 @@
                         cell.textLabel.text = @"Convert :emocodes:";
                     else
                         cell.textLabel.text = @"Convert :emocodes: to Emoji";
+                    cell.detailTextLabel.text = @":thumbsup: → 👍";
                     cell.accessoryView = _emocodes;
+                    break;
+                case 5:
+                    cell.textLabel.text = @"Ask to Pastebin";
+                    cell.accessoryView = _pastebin;
+                    cell.detailTextLabel.text = @"Before sending multi-line messages";
                     break;
             }
             break;

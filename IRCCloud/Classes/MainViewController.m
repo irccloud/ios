@@ -1252,18 +1252,27 @@ extern NSDictionary *emojiMap;
                 [[Crashlytics sharedInstance] crash];
 #endif
             } else if(_message.text.length > 1080 || [_message.text isEqualToString:@"/paste"] || [_message.text rangeOfString:@"\n"].location < _message.text.length - 1) {
-                if(![_message.text isEqualToString:@"/paste"])
-                    _buffer.draft = _message.text;
-                PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
-                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
-                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
-                else
-                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-                if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
-                [self presentViewController:nc animated:YES completion:nil];
-                return;
+                BOOL prompt = YES;
+                if([[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
+                    prompt = ![[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] boolValue];
+                } else {
+                    prompt = YES;
+                }
+
+                if(prompt) {
+                    if(![_message.text isEqualToString:@"/paste"])
+                        _buffer.draft = _message.text;
+                    PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
+                    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
+                    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    else
+                        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                    if(self.presentedViewController)
+                        [self dismissModalViewControllerAnimated:NO];
+                    [self presentViewController:nc animated:YES completion:nil];
+                    return;
+                }
             }
             
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
@@ -3111,7 +3120,7 @@ extern NSDictionary *emojiMap;
 
 -(void)cameraButtonPressed:(id)sender {
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Start a Pastebin", @"Take a Photo", @"Choose Photo", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Start a Pastebin", @"Take a Photo", @"Choose Photo", @"Start a Pastebin", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -3119,7 +3128,7 @@ extern NSDictionary *emojiMap;
             [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view animated:YES];
         }
     } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"File Uploads", @"Choose Document", nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"File Uploads", @"Choose Document", @"Start a Pastebin", nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -3127,7 +3136,13 @@ extern NSDictionary *emojiMap;
             [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view animated:YES];
         }
     } else {
-        [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"Start a Pastebin", nil];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+            [self.view.window addSubview:_landscapeView];
+            [sheet showInView:_landscapeView];
+        } else {
+            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view animated:YES];
+        }
     }
 }
 
@@ -3266,6 +3281,16 @@ extern NSDictionary *emojiMap;
             FilesTableViewController *fcv = [[FilesTableViewController alloc] initWithStyle:UITableViewStylePlain];
             fcv.delegate = self;
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fcv];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            if(self.presentedViewController)
+                [self dismissModalViewControllerAnimated:NO];
+            [self presentViewController:nc animated:YES completion:nil];
+        } else if([action isEqualToString:@"Start a Pastebin"]) {
+            PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else

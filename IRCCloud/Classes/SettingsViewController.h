@@ -33,6 +33,7 @@
     UISwitch *_saveToCameraRoll;
     UISwitch *_notificationSound;
     UISwitch *_tabletMode;
+    UISwitch *_pastebin;
     NSString *_version;
     UISlider *_fontSize;
     int _userinforeqid;
