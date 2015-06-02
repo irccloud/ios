@@ -95,7 +95,7 @@
         [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
-    self.navigationItem.title = @"Pastebins";
+    self.navigationItem.title = @"Your Pastebins";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
     _url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
     
@@ -254,17 +254,17 @@
             years++;
         
         if(years == 1)
-            metadata = [metadata stringByAppendingFormat:@"%i year ago", (int)days];
+            metadata = [metadata stringByAppendingFormat:@"%i year ago", (int)years];
         else
-            metadata = [metadata stringByAppendingFormat:@"%i years ago", (int)days];
+            metadata = [metadata stringByAppendingFormat:@"%i years ago", (int)years];
     } else if(months >= 1) {
         if(months - (int)months > 0.5)
             months++;
         
         if(months == 1)
-            metadata = [metadata stringByAppendingFormat:@"%i month ago", (int)days];
+            metadata = [metadata stringByAppendingFormat:@"%i month ago", (int)months];
         else
-            metadata = [metadata stringByAppendingFormat:@"%i months ago", (int)days];
+            metadata = [metadata stringByAppendingFormat:@"%i months ago", (int)months];
     } else if(days >= 1) {
         if(days - (int)days > 0.5)
             days++;
