@@ -3121,7 +3121,7 @@ extern NSDictionary *emojiMap;
 
 -(void)cameraButtonPressed:(id)sender {
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Start a Pastebin", @"Your Pastebins", @"Take a Photo", @"Choose Photo", @"Start a Pastebin", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", @"Start a Pastebin", @"Your Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
