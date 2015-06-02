@@ -410,6 +410,8 @@
 		22D649251B1E0719003BFD86 /* CSURITemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649231B1E0719003BFD86 /* CSURITemplate.m */; };
 		22D649261B1E0719003BFD86 /* CSURITemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649231B1E0719003BFD86 /* CSURITemplate.m */; };
 		22D649271B1E0719003BFD86 /* CSURITemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649231B1E0719003BFD86 /* CSURITemplate.m */; };
+		22D6492A1B1E371D003BFD86 /* PastebinsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649291B1E371D003BFD86 /* PastebinsTableViewController.m */; };
+		22D6492B1B1E371D003BFD86 /* PastebinsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649291B1E371D003BFD86 /* PastebinsTableViewController.m */; };
 		22DB24FC1982DF2B0008728E /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		22DB24FD1982DF2B0008728E /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		22DB24FE1982DF2B0008728E /* BuffersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60516DBCA85007BE535 /* BuffersTableView.m */; };
@@ -784,6 +786,8 @@
 		22D4F9111743F3790095EE8F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		22D649221B1E0719003BFD86 /* CSURITemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSURITemplate.h; sourceTree = "<group>"; };
 		22D649231B1E0719003BFD86 /* CSURITemplate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CSURITemplate.m; sourceTree = "<group>"; };
+		22D649281B1E371D003BFD86 /* PastebinsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastebinsTableViewController.h; sourceTree = "<group>"; };
+		22D649291B1E371D003BFD86 /* PastebinsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastebinsTableViewController.m; sourceTree = "<group>"; };
 		22DB24F91982DF070008728E /* Info-Enterprise.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Enterprise.plist"; sourceTree = "<group>"; };
 		22DB25371982DF2B0008728E /* ShareExtension Enterprise.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "ShareExtension Enterprise.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22DB253D1982E2890008728E /* IRCEnterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = IRCEnterprise.entitlements; path = ../IRCEnterprise.entitlements; sourceTree = "<group>"; };
@@ -1160,6 +1164,8 @@
 				22032A6E1884529700BE4A10 /* NickCompletionView.m */,
 				22B4284616D7E36300498507 /* NetworkConnection.h */,
 				22B4284716D7E36300498507 /* NetworkConnection.m */,
+				22D649281B1E371D003BFD86 /* PastebinsTableViewController.h */,
+				22D649291B1E371D003BFD86 /* PastebinsTableViewController.m */,
 				221390FC1B115CD000ECF001 /* PastebinEditorViewController.h */,
 				221390FD1B115CD000ECF001 /* PastebinEditorViewController.m */,
 				22C2E0551B0E2E4800387B4B /* PastebinViewController.h */,
@@ -1806,6 +1812,7 @@
 				228E2B8918CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */,
 				225D976718AA995900065087 /* ECSlidingViewController.m in Sources */,
 				22D649251B1E0719003BFD86 /* CSURITemplate.m in Sources */,
+				22D6492B1B1E371D003BFD86 /* PastebinsTableViewController.m in Sources */,
 				225D976818AA995900065087 /* UIImage+ImageWithUIView.m in Sources */,
 				225D976918AA995900065087 /* OpenInChromeController.m in Sources */,
 				225D976A18AA995900065087 /* ChannelInfoViewController.m in Sources */,
@@ -1896,6 +1903,7 @@
 				228E2B8718CF770D0011DEAB /* SBJsonStreamParserAccumulator.m in Sources */,
 				22B15CFB17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,
 				22D649241B1E0719003BFD86 /* CSURITemplate.m in Sources */,
+				22D6492A1B1E371D003BFD86 /* PastebinsTableViewController.m in Sources */,
 				22B15CFD17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
 				2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */,
 				2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
