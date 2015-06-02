@@ -88,13 +88,20 @@
         NSMutableString *html = [[NSMutableString alloc] initWithBytes:data.bytes length:data.length encoding:NSUTF8StringEncoding];
         
         [html replaceCharactersInRange:[html rangeOfString:@"</head>"] withString:@"<style>\
-html, body, .mainContainer, .pasteContainer { height: 100%; width: 100% }\
+html, body, .mainContainer, .pasteContainer { width: 100% }\
 body, div.paste { background-color: #fff; }\
 h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
-.mainContainerFull, .mainContent, .mainContentPaste, div.paste { margin: 0px; padding: 0px; border: none; width: 100%; height: 100%; }\
+.mainContainerFull, .mainContent, .mainContentPaste, div.paste { margin: 0px; padding: 0px; border: none; width: 100%; }\
 </style></head>"];
         
-        [html replaceCharactersInRange:[html rangeOfString:@"</body>"] withString:@"<script>window.PASTEVIEW.on('rendered', _.bind(function () { window.PASTEVIEW.ace.container.style.height = \"100%\"; location.href = \"hide-spinner:\";}, window.PASTEVIEW));</script></body>"];
+        [html replaceCharactersInRange:[html rangeOfString:@"</body>"] withString:
+         @"<script>window.PASTEVIEW.on('rendered', _.bind(function () { \
+            var height = window.PASTEVIEW.ace.container.style.height;\
+            height = height.substring(0, height.length - 2);\
+            if(height < window.innerHeight) { window.PASTEVIEW.ace.container.style.height = window.innerHeight + \"px\"; }\
+            $('div.pasteContainer').height(window.PASTEVIEW.ace.container.style.height);\
+            location.href = \"hide-spinner:\";\
+         }, window.PASTEVIEW));</script></body>"];
         
         [html replaceCharactersInRange:[html rangeOfString:@"https://js.stripe.com/v2"] withString:@""];
         [html replaceCharactersInRange:[html rangeOfString:@"https://checkout.stripe.com/v3/checkout.js"] withString:@""];
