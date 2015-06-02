@@ -101,7 +101,17 @@ h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
             if(height < window.innerHeight) { window.PASTEVIEW.ace.container.style.height = window.innerHeight + \"px\"; }\
             $('div.pasteContainer').height(window.PASTEVIEW.ace.container.style.height);\
             location.href = \"hide-spinner:\";\
-         }, window.PASTEVIEW));</script></body>"];
+         }, window.PASTEVIEW));\
+         window.PASTEVIEW.model.on('removed', _.bind(function () { \
+             location.href = \"hide-spinner:\";\
+         }, window.PASTEVIEW.model));\
+         window.PASTEVIEW.model.on('fetchError', _.bind(function () { \
+             location.href = \"hide-spinner:\";\
+         }, window.PASTEVIEW.model));\
+         window.PASTEVIEW.model.on('loaded', _.bind(function () { \
+         location.href = \"set-title:\" + escape(window.PASTEVIEW.model.get('name'));\
+         }, window.PASTEVIEW.model));\
+         </script></body>"];
         
         [html replaceCharactersInRange:[html rangeOfString:@"https://js.stripe.com/v2"] withString:@""];
         [html replaceCharactersInRange:[html rangeOfString:@"https://checkout.stripe.com/v3/checkout.js"] withString:@""];
@@ -199,6 +209,11 @@ h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
     if([request.URL.scheme isEqualToString:@"hide-spinner"]) {
         [_activity stopAnimating];
         _lineNumbers.enabled = YES;
+        return NO;
+    } else if([request.URL.scheme isEqualToString:@"set-title"]) {
+        if(request.URL.absoluteString.length > 10) {
+            self.navigationItem.title = [[request.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] substringFromIndex:10];
+        }
         return NO;
     }
     return YES;
