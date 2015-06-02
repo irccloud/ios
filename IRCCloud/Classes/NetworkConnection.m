@@ -251,8 +251,10 @@ NSLock *__parserLock = nil;
         CLS_LOG(@"Version changed, not loading caches");
     }
 #ifndef EXTENSION
-    if(_userInfo)
+    if(_userInfo) {
         _streamId = [_userInfo objectForKey:@"streamId"];
+        _config = [_userInfo objectForKey:@"config"];
+    }
 #endif
     
     CLS_LOG(@"%@", _userAgent);
@@ -1521,6 +1523,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _reconnectTimestamp = -1;
         _state = kIRCCloudStateConnected;
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+        _config = [self requestConfiguration];
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");
     }
@@ -1812,6 +1815,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [stream setObject:_streamId forKey:@"streamId"];
         else
             [stream removeObjectForKey:@"streamId"];
+        if(_config)
+            [stream setObject:_config forKey:@"config"];
+        else
+            [stream removeObjectForKey:@"config"];
         [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
         [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
         [_servers serialize];

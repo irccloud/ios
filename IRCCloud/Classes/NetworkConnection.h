@@ -134,6 +134,7 @@ typedef enum {
     kIRCCloudState _state;
     NSDictionary *_userInfo;
     NSDictionary *_prefs;
+    NSDictionary *_config;
     NSTimeInterval _clockOffset;
     NSTimeInterval _reconnectTimestamp;
     NSOperationQueue *_queue;
@@ -155,6 +156,7 @@ typedef enum {
 @property NSString *globalMsg;
 @property int failCount;
 @property NSString *session;
+@property NSDictionary *config;
 
 +(NetworkConnection*)sharedInstance;
 +(void)sync;

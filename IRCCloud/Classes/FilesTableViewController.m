@@ -166,6 +166,7 @@
     }
     self.navigationItem.title = @"File Uploads";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
+    _url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
     _formatter = [[NSDateFormatter alloc] init];
     _formatter.dateStyle = NSDateFormatterLongStyle;
     _formatter.timeStyle = NSDateFormatterMediumStyle;
@@ -276,8 +277,7 @@
     for(NSDictionary *d in _files) {
         NSString *fileID = [d objectForKey:@"id"];
         if(![_thumbnails objectForKey:fileID]) {
-            NSString *url = [[d objectForKey:@"url_template"] stringByReplacingOccurrencesOfString:@":modifiers" withString:[NSString stringWithFormat:@"w%.f", self.view.frame.size.width]];
-
+            NSString *url = [_url_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", self.view.frame.size.width]} error:nil];
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 ImageFetcher *i = [[ImageFetcher alloc] initWithURL:url fileID:fileID];
                 i.delegate = self;
@@ -436,7 +436,7 @@
         int exp = (int)(log(bytes) / log(1024));
         [c setFilename:[_selectedFile objectForKey:@"name"] metadata:[NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [_selectedFile objectForKey:@"mime_type"]]];
         [c setImage:[_thumbnails objectForKey:[_selectedFile objectForKey:@"id"]]];
-        [c setURL:[_selectedFile objectForKey:@"url"]];
+        [c setURL:[_url_template relativeStringWithVariables:_selectedFile error:nil]];
         [self.navigationController pushViewController:c animated:YES];
     }
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

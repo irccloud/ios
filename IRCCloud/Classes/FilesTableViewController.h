@@ -15,13 +15,15 @@
 //  limitations under the License.
 
 #import <UIKit/UIKit.h>
+#import "CSURITemplate.h"
 
 @protocol FilesTableViewDelegate<NSObject>
 -(void)filesTableViewControllerDidSelectFile:(NSDictionary *)file message:(NSString *)message;
 @end
 
 @protocol ImageFetcherDelegate<NSObject>
--(void)imageFetcher:(id)imageFetcher downloadedImage:(NSData *)img;
+-(void)imageFetcher:(id)imageFetcher downloadedImage:(NSData *)img
+;
 -(void)imageFetcherDidFail:(id)imageFetcher;
 @end
 
@@ -55,6 +57,7 @@
     id<FilesTableViewDelegate> _delegate;
     UIView *_footerView;
     NSDictionary *_selectedFile;
+    CSURITemplate *_url_template;
 }
 @property id<FilesTableViewDelegate> delegate;
 @end
