@@ -1014,6 +1014,9 @@ int __timestampWidth;
     if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
         __timestampWidth += [@" AM" sizeWithFont:[ColorFormatter timestampFont]].width;
     
+    _file_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
+    _paste_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
+
     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
     if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
         if(_buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
@@ -1225,17 +1228,19 @@ int __timestampWidth;
                     NSTextCheckingResult *r = [mutableLinks objectAtIndex:i];
                     if(r.resultType == NSTextCheckingTypeLink) {
                         for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
-                            if([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] && ([r.URL.absoluteString isEqualToString:[file objectForKey:@"url"]] || [r.URL.absoluteString hasPrefix:[[file objectForKey:@"url"] stringByAppendingString:@"/"]])) {
+                            NSString *url = [_file_url_template relativeStringWithVariables:@{@"id":[file objectForKey:@"id"]} error:nil];
+                            if([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
                                 NSString *extension = [file objectForKey:@"extension"];
                                 if(!extension.length)
                                     extension = [@"." stringByAppendingString:[[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
-                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/image%@", [file objectForKey:@"url"], extension]]];
+                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/image%@", url, extension]]];
                                 [mutableLinks setObject:r atIndexedSubscript:i];
                             }
                         }
                         for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
-                            if(([r.URL.absoluteString isEqualToString:[paste objectForKey:@"url"]] || [r.URL.absoluteString hasPrefix:[[paste objectForKey:@"url"] stringByAppendingString:@"/"]])) {
-                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", [paste objectForKey:@"url"], [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
+                            NSString *url = [_paste_url_template relativeStringWithVariables:@{@"id":[paste objectForKey:@"id"]} error:nil];
+                            if(([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
+                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", url, [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
                                 [mutableLinks setObject:r atIndexedSubscript:i];
                             }
                         }

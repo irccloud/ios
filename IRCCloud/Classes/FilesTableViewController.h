@@ -22,8 +22,7 @@
 @end
 
 @protocol ImageFetcherDelegate<NSObject>
--(void)imageFetcher:(id)imageFetcher downloadedImage:(NSData *)img
-;
+-(void)imageFetcher:(id)imageFetcher downloadedImage:(NSData *)img;
 -(void)imageFetcherDidFail:(id)imageFetcher;
 @end
 

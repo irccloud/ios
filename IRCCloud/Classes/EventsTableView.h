@@ -22,6 +22,7 @@
 #import "NetworkConnection.h"
 #import "HighlightsCountView.h"
 #import "Ignore.h"
+#import "CSURITemplate.h"
 
 @protocol EventsTableViewDelegate<NSObject>
 -(void)rowSelected:(Event *)event;
@@ -63,6 +64,9 @@
     
     NSDictionary *_linkAttributes;
     NSDictionary *_lightLinkAttributes;
+
+    CSURITemplate *_file_url_template;
+    CSURITemplate *_paste_url_template;
 }
 @property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;
