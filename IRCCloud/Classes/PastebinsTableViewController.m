@@ -253,7 +253,7 @@
         if(years - (int)years > 0.5)
             years++;
         
-        if(years == 1)
+        if((int)years == 1)
             metadata = [metadata stringByAppendingFormat:@"%i year ago", (int)years];
         else
             metadata = [metadata stringByAppendingFormat:@"%i years ago", (int)years];
@@ -261,7 +261,7 @@
         if(months - (int)months > 0.5)
             months++;
         
-        if(months == 1)
+        if((int)months == 1)
             metadata = [metadata stringByAppendingFormat:@"%i month ago", (int)months];
         else
             metadata = [metadata stringByAppendingFormat:@"%i months ago", (int)months];
@@ -269,7 +269,7 @@
         if(days - (int)days > 0.5)
             days++;
         
-        if(days == 1)
+        if((int)days == 1)
             metadata = [metadata stringByAppendingFormat:@"%i day ago", (int)days];
         else
             metadata = [metadata stringByAppendingFormat:@"%i days ago", (int)days];
@@ -277,7 +277,7 @@
         if(hours - (int)hours > 0.5)
             hours++;
         
-        if(hours < 2)
+        if((int)hours < 2)
             metadata = [metadata stringByAppendingFormat:@"%i hour ago", (int)hours];
         else
             metadata = [metadata stringByAppendingFormat:@"%i hours ago", (int)hours];
@@ -285,12 +285,12 @@
         if(minutes - (int)minutes > 0.5)
             minutes++;
         
-        if(minutes == 1)
+        if((int)minutes == 1)
             metadata = [metadata stringByAppendingFormat:@"%i minute ago", (int)minutes];
         else
             metadata = [metadata stringByAppendingFormat:@"%i minutes ago", (int)minutes];
     } else {
-        if(seconds == 1)
+        if((int)seconds == 1)
             metadata = [metadata stringByAppendingFormat:@"%i second ago", (int)seconds];
         else
             metadata = [metadata stringByAppendingFormat:@"%i seconds ago", (int)seconds];
