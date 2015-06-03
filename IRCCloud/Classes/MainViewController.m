@@ -44,12 +44,13 @@
 #import "PastebinsTableViewController.h"
 
 #define TAG_BAN 1
-#define TAG_IGNORE 2
-#define TAG_KICK 3
-#define TAG_INVITE 4
-#define TAG_BADCHANNELKEY 5
-#define TAG_INVALIDNICK 6
-#define TAG_FAILEDMSG 7
+#define TAG_UNBAN 2
+#define TAG_IGNORE 3
+#define TAG_KICK 4
+#define TAG_INVITE 5
+#define TAG_BADCHANNELKEY 6
+#define TAG_INVALIDNICK 7
+#define TAG_FAILEDMSG 8
 
 extern NSDictionary *emojiMap;
 
@@ -2632,6 +2633,7 @@ extern NSDictionary *emojiMap;
             if([me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
                 [sheet addButtonWithTitle:@"Kick"];
                 [sheet addButtonWithTitle:@"Ban"];
+		[sheep addButtonWithTitle:@"Unban"];
             }
         }
         [sheet addButtonWithTitle:@"Copy Hostmask"];
@@ -2761,6 +2763,9 @@ extern NSDictionary *emojiMap;
                 if([alertView textFieldAtIndex:0].text.length)
                     [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", [alertView textFieldAtIndex:0].text] chan:_buffer.name cid:_buffer.cid];
             }
+	    break;
+	case TAG_UNBAN:
+	    if([title isEqualToString:@"Unban"]) {
             break;
         case TAG_IGNORE:
             if([title isEqualToString:@"Ignore"]) {
