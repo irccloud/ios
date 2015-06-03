@@ -2764,8 +2764,11 @@ extern NSDictionary *emojiMap;
                     [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", [alertView textFieldAtIndex:0].text] chan:_buffer.name cid:_buffer.cid];
             }
 	    break;
-	case TAG_UNBAN:
-	    if([title isEqualToString:@"Unban"]) {
+        case TAG_UNBAN:
+            if([title isEqualToString:@"Unban"]) {
+                if([alertView textFieldAtIndex:0].text.length)
+                    [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-b %@", [alertView textFieldAtIndex:0].text] chan:_buffer.name cid:_buffer.cid];
+            }
             break;
         case TAG_IGNORE:
             if([title isEqualToString:@"Ignore"]) {
@@ -3357,6 +3360,14 @@ extern NSDictionary *emojiMap;
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
             _alertView.tag = TAG_BAN;
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView show];
+        } else if([action isEqualToString:@"Unban"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Remove a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Unban", nil];
+            _alertView.tag = TAG_UNBAN;
             _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
             [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
             [_alertView textFieldAtIndex:0].delegate = self;
