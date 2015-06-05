@@ -27,6 +27,9 @@
     int _sayreqid;
     int _prefsreqid;
     Buffer *_buffer;
+    NSString *_pasteID;
+    NSString *_extension;
 }
 -(id)initWithBuffer:(Buffer *)buffer;
+-(id)initWithPasteID:(NSString *)pasteID;
 @end

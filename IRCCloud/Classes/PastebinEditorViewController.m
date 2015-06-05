@@ -16,6 +16,7 @@
 
 #import "PastebinEditorViewController.h"
 #import "NetworkConnection.h"
+#import "CSURITemplate.h"
 
 @interface PastebinEditorCell : UITableViewCell
 
@@ -42,6 +43,41 @@
     return self;
 }
 
+-(id)initWithPasteID:(NSString *)pasteID {
+    self = [super initWithStyle:UITableViewStyleGrouped];
+    if (self) {
+        self.navigationItem.title = @"Pastebin";
+        _pasteID = pasteID;
+        _pastereqid = _sayreqid = _prefsreqid = -1;
+        UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [spinny startAnimating];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+    }
+    return self;
+}
+
+-(void)_fetchPaste {
+    CSURITemplate *url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
+
+    NSString *url = [url_template relativeStringWithVariables:@{@"id":_pasteID, @"type":@"json"} error:nil];
+    
+    NSURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
+        } else {
+            SBJsonParser *parser = [[SBJsonParser alloc] init];
+            NSDictionary *dict = [parser objectWithData:data];
+            _text.text = [dict objectForKey:@"body"];
+            _filename.text = [dict objectForKey:@"name"];
+            _text.editable = _filename.enabled = YES;
+            _extension = [dict objectForKey:@"extension"];
+        }
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
+    }];
+
+}
+
 -(void)sendButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
     
@@ -49,7 +85,22 @@
     [spinny startAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
     
-    _pastereqid = [[NetworkConnection sharedInstance] paste:_filename.text contents:_text.text];
+    if([_filename.text containsString:@"."]) {
+        NSString *extension = [_filename.text substringFromIndex:[_filename.text rangeOfString:@"." options:NSBackwardsSearch].location + 1];
+        if(extension.length)
+            _extension = extension;
+        else if(!_extension.length)
+            _extension = @"txt";
+            
+    } else {
+        if(!_extension.length)
+            _extension = @"txt";
+    }
+    
+    if(_pasteID)
+        _pastereqid = [[NetworkConnection sharedInstance] editPaste:_pasteID name:_filename.text contents:_text.text extension:_extension];
+    else
+        _pastereqid = [[NetworkConnection sharedInstance] paste:_filename.text contents:_text.text extension:_extension];
 }
 
 -(void)cancelButtonPressed:(id)sender {
@@ -94,7 +145,7 @@
             if(reqid == _pastereqid) {
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save pastebin, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
-                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:_pasteID?@"Save":@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
             } else if(reqid == _sayreqid) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [self.tableView endEditing:YES];
@@ -109,12 +160,19 @@
             o = notification.object;
             reqid = [[o objectForKey:@"_reqid"] intValue];
             if(reqid == _pastereqid) {
-                if(_message.text.length) {
-                    _buffer.draft = [NSString stringWithFormat:@"%@ %@", _message.text, [o objectForKey:@"url"]];
+                if(_pasteID) {
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [self.tableView endEditing:YES];
+                        [self.navigationController popViewControllerAnimated:YES];
+                    }];
                 } else {
-                    _buffer.draft = [o objectForKey:@"url"];
+                    if(_message.text.length) {
+                        _buffer.draft = [NSString stringWithFormat:@"%@ %@", _message.text, [o objectForKey:@"url"]];
+                    } else {
+                        _buffer.draft = [o objectForKey:@"url"];
+                    }
+                    _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid];
                 }
-                _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid];
                 _pastereqid = -1;
             } else if(reqid == _prefsreqid) {
                 NSLog(@"Preferences updated.");
@@ -153,6 +211,7 @@
     _filename.adjustsFontSizeToFitWidth = YES;
     _filename.returnKeyType = UIReturnKeyDone;
     _filename.delegate = self;
+    _filename.enabled = !_pasteID;
     _filename.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
     _alwaysSendAsText = [[UISwitch alloc] init];
@@ -170,7 +229,11 @@
     _text.text = _buffer.draft;
     _text.backgroundColor = [UIColor clearColor];
     _text.font = _filename.font;
+    _text.editable = !_pasteID;
     _text.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    if(_pasteID)
+        [self _fetchPaste];
 }
 
 -(void)_alwaysSendToggled:(id)sender {
@@ -211,7 +274,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 5;
+    return _pasteID?2:5;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

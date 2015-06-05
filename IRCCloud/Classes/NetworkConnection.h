@@ -214,7 +214,8 @@ typedef enum {
 -(int)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename;
 -(NSDictionary *)getFiles:(int)page;
 -(int)deleteFile:(NSString *)fileID;
--(int)paste:(NSString *)name contents:(NSString *)contents;
+-(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension;
 -(int)deletePaste:(NSString *)pasteID;
+-(int)editPaste:(NSString *)pasteID name:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension;
 -(NSDictionary *)getPastebins:(int)page;
 @end

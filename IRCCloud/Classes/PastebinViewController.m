@@ -21,6 +21,7 @@
 #import "ARChromeActivity.h"
 #import "TUSafariActivity.h"
 #import "AppDelegate.h"
+#import "PastebinEditorViewController.h"
 
 @implementation PastebinViewController
 
@@ -45,6 +46,15 @@
     return self;
 }
 
+-(void)viewWillAppear:(BOOL)animated {
+    if(!_metadataLabel.text.length) {
+        [_activity startAnimating];
+        _lineNumbers.enabled = NO;
+        _lineNumbers.on = YES;
+        [self performSelectorInBackground:@selector(_fetch) withObject:nil];
+    }
+}
+
 -(void)viewDidLoad {
     [super viewDidLoad];
     
@@ -60,6 +70,8 @@
     if(_ownPaste) {
         [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
                              [[UIBarButtonItem alloc] initWithCustomView:_lineNumbers],
+                             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(_editPaste)],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(_removePaste)],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
@@ -155,6 +167,13 @@ h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
 -(void)_removePaste {
     [[NetworkConnection sharedInstance] deletePaste:_pasteID];
     [self.presentingViewController dismissModalViewControllerAnimated:YES];
+}
+
+-(void)_editPaste {
+    [self.navigationController pushViewController:[[PastebinEditorViewController alloc] initWithPasteID:_pasteID] animated:YES];
+    self.navigationItem.titleView = nil;
+    _metadataLabel.text = @"";
+    [_webView loadHTMLString:@"" baseURL:nil];
 }
 
 -(IBAction)shareButtonPressed:(id)sender {

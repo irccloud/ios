@@ -1394,16 +1394,24 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"delete-file" args:@{@"file":fileID}];
 }
 
--(int)paste:(NSString *)name contents:(NSString *)contents {
+-(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension {
     if(name.length) {
-        return [self _sendRequest:@"paste" args:@{@"name":name, @"contents":contents}];
+        return [self _sendRequest:@"paste" args:@{@"name":name, @"contents":contents, @"extension":extension}];
     } else {
-        return [self _sendRequest:@"paste" args:@{@"contents":contents}];
+        return [self _sendRequest:@"paste" args:@{@"contents":contents, @"extension":extension}];
     }
 }
 
 -(int)deletePaste:(NSString *)pasteID {
     return [self _sendRequest:@"delete-pastebin" args:@{@"id":pasteID}];
+}
+
+-(int)editPaste:(NSString *)pasteID name:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension {
+    if(name.length) {
+        return [self _sendRequest:@"edit-pastebin" args:@{@"id":pasteID, @"name":name, @"body":contents, @"extension":extension}];
+    } else {
+        return [self _sendRequest:@"edit-pastebin" args:@{@"id":pasteID, @"body":contents, @"extension":extension}];
+    }
 }
 
 -(void)connect:(BOOL)notifier {
