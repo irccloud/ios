@@ -239,8 +239,8 @@ h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
         return NO;
     } else if([request.URL.scheme isEqualToString:@"set-title"]) {
         NSString *url = request.URL.absoluteString;
-        int start = [url rangeOfString:@":"].location + 1;
-        int end = [url rangeOfString:@"&"].location;
+        NSUInteger start = [url rangeOfString:@":"].location + 1;
+        NSUInteger end = [url rangeOfString:@"&"].location;
         if(start != end)
             _titleLabel.text = [[url substringWithRange:NSMakeRange(start, end - start)] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         else
