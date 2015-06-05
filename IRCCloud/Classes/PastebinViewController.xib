@@ -8,6 +8,9 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PastebinViewController">
             <connections>
                 <outlet property="_activity" destination="fpX-Ph-CWS" id="WBt-98-Brk"/>
+                <outlet property="_metadataLabel" destination="Ouw-Mg-e1g" id="cxi-RJ-gFZ"/>
+                <outlet property="_titleLabel" destination="wle-Vr-Yq5" id="uTv-Ge-tri"/>
+                <outlet property="_titleView" destination="bWn-Zs-x1S" id="dlY-vw-UVs"/>
                 <outlet property="_toolbar" destination="eZU-m6-N0I" id="zVb-uI-GW1"/>
                 <outlet property="_webView" destination="Lwm-kC-AFf" id="p2R-o7-Djc"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
@@ -39,6 +42,30 @@
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
             <point key="canvasLocation" x="389" y="333"/>
+        </view>
+        <view opaque="NO" contentMode="scaleToFill" id="bWn-Zs-x1S" userLabel="Title View" customClass="UIControl">
+            <rect key="frame" x="0.0" y="0.0" width="200" height="40"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="12" id="wle-Vr-Yq5">
+                    <rect key="frame" x="0.0" y="2" width="200" height="18"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                    <nil key="highlightedColor"/>
+                    <size key="shadowOffset" width="0.0" height="0.0"/>
+                </label>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" id="Ouw-Mg-e1g">
+                    <rect key="frame" x="0.0" y="20.000000046359173" width="200" height="18"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES" heightSizable="YES"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                    <size key="shadowOffset" width="0.0" height="0.0"/>
+                </label>
+            </subviews>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
         </view>
     </objects>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

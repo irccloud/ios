@@ -30,13 +30,18 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_doneButtonPressed)];
     _chrome = [[OpenInChromeController alloc] init];
     _url = url;
-    
-    for(NSURLQueryItem *item in [[NSURLComponents componentsWithString:_url.absoluteString] queryItems]) {
-        if([item.name isEqualToString:@"id"])
-            _pasteID = item.value;
-        else if([item.name isEqualToString:@"own_paste"])
-            _ownPaste = [item.value isEqualToString:@"1"];
+
+    if([_url.absoluteString containsString:@"?"]) {
+        for(NSURLQueryItem *item in [[NSURLComponents componentsWithString:_url.absoluteString] queryItems]) {
+            if([item.name isEqualToString:@"id"])
+                _pasteID = item.value;
+            else if([item.name isEqualToString:@"own_paste"])
+                _ownPaste = [item.value isEqualToString:@"1"];
+        }
+        
+        _url = [NSURL URLWithString:[_url.absoluteString substringToIndex:[_url.absoluteString rangeOfString:@"?"].location]];
     }
+    
     return self;
 }
 
@@ -69,6 +74,9 @@
         
     }
     _lineNumbers.enabled = NO;
+    
+    _titleView.frame = CGRectMake(0,0,self.navigationController.navigationBar.frame.size.width - 120, self.navigationController.navigationBar.frame.size.height);
+
     [self performSelectorInBackground:@selector(_fetch) withObject:nil];
 }
 
@@ -109,7 +117,7 @@ h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
              location.href = \"hide-spinner:\";\
          }, window.PASTEVIEW.model));\
          window.PASTEVIEW.model.on('loaded', _.bind(function () { \
-         location.href = \"set-title:\" + escape(window.PASTEVIEW.model.get('name'));\
+         location.href = \"set-title:\" + escape(window.PASTEVIEW.model.get('name')) + '&' + escape(window.PASTEVIEW.syntax() + ' • ' + window.PASTEVIEW.lines());\
          }, window.PASTEVIEW.model));\
          </script></body>"];
         
@@ -211,12 +219,23 @@ h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
         _lineNumbers.enabled = YES;
         return NO;
     } else if([request.URL.scheme isEqualToString:@"set-title"]) {
-        if(request.URL.absoluteString.length > 10) {
-            self.navigationItem.title = [[request.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] substringFromIndex:10];
-        }
+        NSString *url = request.URL.absoluteString;
+        int start = [url rangeOfString:@":"].location + 1;
+        int end = [url rangeOfString:@"&"].location;
+        if(start != end)
+            _titleLabel.text = [[url substringWithRange:NSMakeRange(start, end - start)] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        else
+            _titleLabel.text = @"Pastebin";
+        self.navigationItem.title = _titleLabel.text;
+        _metadataLabel.text = [[[url substringFromIndex:end + 1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByReplacingOccurrencesOfString:@"%u2022" withString:@"•"];
+        self.navigationItem.titleView = _titleView;
         return NO;
     }
     return YES;
+}
+
+-(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    _titleView.frame = CGRectMake(0,0,self.navigationController.navigationBar.frame.size.width - 120, self.navigationController.navigationBar.frame.size.height);
 }
 
 -(void)didReceiveMemoryWarning {
