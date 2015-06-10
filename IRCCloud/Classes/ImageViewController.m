@@ -180,7 +180,8 @@
 }
 
 -(void)loadOembed:(NSString *)url {
-    NSURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
+    NSURL *URL = [NSURL URLWithString:url];
+    NSURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
             NSLog(@"Error fetching oembed. Error %li : %@", (long)error.code, error.userInfo);
@@ -193,8 +194,51 @@
                 _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
                 
                 [_connection start];
+            } else if([[dict objectForKey:@"type"] isEqualToString:@"rich"] && [[dict objectForKey:@"provider_url"] isEqualToString:@"https://imgur.com"]) {
+                NSString *html = [dict objectForKey:@"html"];
+                int start = [html rangeOfString:@"data-id=\""].location;
+                int len = [[html substringFromIndex:start + 9] rangeOfString:@"\""].location;
+                [self loadImgur:[html substringWithRange:NSMakeRange(start + 9, len)]];
             } else {
                 NSLog(@"Invalid type from oembed");
+                [self fail];
+            }
+        }
+    }];
+}
+
+-(void)loadImgur:(NSString *)imageID {
+#ifdef MASHAPE_KEY
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://imgur-apiv3.p.mashape.com/3/image/%@", imageID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setValue:@MASHAPE_KEY forHTTPHeaderField:@"X-Mashape-Authorization"];
+#else
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.imgur.com/3/image/%@", imageID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+#endif
+    [request setHTTPShouldHandleCookies:NO];
+#ifdef IMGUR_KEY
+    [request setValue:[NSString stringWithFormat:@"Client-ID %@", @IMGUR_KEY] forHTTPHeaderField:@"Authorization"];
+#endif
+
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
+            [self fail];
+        } else {
+            SBJsonParser *parser = [[SBJsonParser alloc] init];
+            NSDictionary *dict = [parser objectWithData:data];
+            if([[dict objectForKey:@"success"] intValue]) {
+                dict = [dict objectForKey:@"data"];
+                if([[dict objectForKey:@"type"] hasPrefix:@"image/"]) {
+                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"link"]]];
+                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    
+                    [_connection start];
+                } else {
+                    NSLog(@"Invalid type from imgur");
+                    [self fail];
+                }
+            } else {
+                NSLog(@"Imgur failure");
                 [self fail];
             }
         }
