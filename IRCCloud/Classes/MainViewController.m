@@ -2231,7 +2231,7 @@ extern NSDictionary *emojiMap;
         frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
         _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
     }
-    frame.size.width = width - 200;
+    frame.size.width = width - 128;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
         frame.size.width -= _buffersView.tableView.frame.size.width;
     _connectingView.frame = _titleView.frame = frame;
