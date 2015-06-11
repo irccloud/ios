@@ -127,7 +127,7 @@
             [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"host"]] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:s links:nil]];
         }
         
-        [self addChannels:[object objectForKey:@"channels_super_owner"] forGroup:@"Super owner" attributedString:data links:links server:s];
+        [self addChannels:[object objectForKey:@"channels_oper"] forGroup:@"Oper" attributedString:data links:links server:s];
         [self addChannels:[object objectForKey:@"channels_owner"] forGroup:@"Owner" attributedString:data links:links server:s];
         [self addChannels:[object objectForKey:@"channels_admin"] forGroup:@"Admin" attributedString:data links:links server:s];
         [self addChannels:[object objectForKey:@"channels_op"] forGroup:@"Operator" attributedString:data links:links server:s];
