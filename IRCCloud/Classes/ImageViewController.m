@@ -196,8 +196,8 @@
                 [_connection start];
             } else if([[dict objectForKey:@"type"] isEqualToString:@"rich"] && [[dict objectForKey:@"provider_url"] isEqualToString:@"https://imgur.com"]) {
                 NSString *html = [dict objectForKey:@"html"];
-                int start = [html rangeOfString:@"data-id=\""].location;
-                int len = [[html substringFromIndex:start + 9] rangeOfString:@"\""].location;
+                NSUInteger start = [html rangeOfString:@"data-id=\""].location;
+                NSUInteger len = [[html substringFromIndex:start + 9] rangeOfString:@"\""].location;
                 [self loadImgur:[html substringWithRange:NSMakeRange(start + 9, len)]];
             } else {
                 NSLog(@"Invalid type from oembed");
