@@ -21,7 +21,7 @@
 -(id)init {
     self = [super init];
     @synchronized(self) {
-        _MODE_SUPER_OWNER = @"Y";
+        _MODE_OPER = @"Y";
         _MODE_OWNER = @"q";
         _MODE_ADMIN = @"a";
         _MODE_OP = @"o";
@@ -64,7 +64,7 @@
     encodeObject(_CHANTYPES);
     encodeObject(_PREFIX);
     encodeInt(_order);
-    encodeObject(_MODE_SUPER_OWNER);
+    encodeObject(_MODE_OPER);
     encodeObject(_MODE_OWNER);
     encodeObject(_MODE_ADMIN);
     encodeObject(_MODE_OP);
@@ -92,7 +92,7 @@
         decodeObject(_CHANTYPES);
         decodeObject(_PREFIX);
         decodeInt(_order);
-        decodeObject(_MODE_SUPER_OWNER);
+        decodeObject(_MODE_OPER);
         decodeObject(_MODE_OWNER);
         decodeObject(_MODE_ADMIN);
         decodeObject(_MODE_OP);

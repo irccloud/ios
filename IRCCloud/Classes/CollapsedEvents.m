@@ -112,13 +112,13 @@
 }
 -(NSString *)modes:(BOOL)showSymbol mode_modes:(NSArray *)mode_modes {
     static NSString *mode_msgs[] = {
-        @"promoted to super owner",
+        @"promoted to oper",
         @"promoted to owner",
         @"promoted to admin",
         @"opped",
         @"halfopped",
         @"voiced",
-        @"demoted from super owner",
+        @"demoted from oper",
         @"demoted from owner",
         @"demoted from admin",
         @"de-opped",
@@ -126,7 +126,7 @@
         @"de-voiced"
     };
     static NSString *mode_colors[] = {
-        @"E7AA00",
+        @"E02305",
         @"E7AA00",
         @"6500A5",
         @"BA1719",
@@ -195,13 +195,13 @@
     _server = server;
     if(server) {
         _mode_modes = @[
-            [NSString stringWithFormat:@"+%@", server.MODE_SUPER_OWNER],
+            [NSString stringWithFormat:@"+%@", server.MODE_OPER],
             [NSString stringWithFormat:@"+%@", server.MODE_OWNER],
             [NSString stringWithFormat:@"+%@", server.MODE_ADMIN],
             [NSString stringWithFormat:@"+%@", server.MODE_OP],
             [NSString stringWithFormat:@"+%@", server.MODE_HALFOP],
             [NSString stringWithFormat:@"+%@", server.MODE_VOICED],
-            [NSString stringWithFormat:@"-%@", server.MODE_SUPER_OWNER],
+            [NSString stringWithFormat:@"-%@", server.MODE_OPER],
             [NSString stringWithFormat:@"-%@", server.MODE_OWNER],
             [NSString stringWithFormat:@"-%@", server.MODE_ADMIN],
             [NSString stringWithFormat:@"-%@", server.MODE_OP],
@@ -674,7 +674,7 @@
         PREFIX = _server.PREFIX;
     
     if(!PREFIX || PREFIX.count == 0) {
-        PREFIX = @{_server?_server.MODE_SUPER_OWNER:@"Y":@"!",
+        PREFIX = @{_server?_server.MODE_OPER:@"Y":@"!",
                    _server?_server.MODE_OWNER:@"q":@"~",
                    _server?_server.MODE_ADMIN:@"a":@"&",
                    _server?_server.MODE_OP:@"o":@"@",
@@ -683,7 +683,7 @@
     }
     
     NSDictionary *mode_colors = @{
-        _server?_server.MODE_SUPER_OWNER:@"Y":@"E7AA00",
+        _server?_server.MODE_OPER:@"Y":@"E7AA00",
         _server?_server.MODE_OWNER:@"q":@"E7AA00",
         _server?_server.MODE_ADMIN:@"a":@"6500A5",
         _server?_server.MODE_OP:@"o":@"BA1719",
@@ -716,8 +716,8 @@
     }
     
     if(mode.length) {
-        if([mode rangeOfString:_server?_server.MODE_SUPER_OWNER:@"Y"].location != NSNotFound)
-            mode = _server?_server.MODE_SUPER_OWNER:@"Y";
+        if([mode rangeOfString:_server?_server.MODE_OPER:@"Y"].location != NSNotFound)
+            mode = _server?_server.MODE_OPER:@"Y";
         else if([mode rangeOfString:_server?_server.MODE_OWNER:@"q"].location != NSNotFound)
             mode = _server?_server.MODE_OWNER:@"q";
         else if([mode rangeOfString:_server?_server.MODE_ADMIN:@"a"].location != NSNotFound)

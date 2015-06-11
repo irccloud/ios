@@ -39,6 +39,12 @@ UIImage *__newMsgsBackgroundImage;
         c = [UIColor colorWithRed:0.753 green:0.824 blue:1 alpha:1]; /*#c0d2ff*/
     return c;
 }
++(UIColor *)opersGroupColor {
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:1 green:0.859 blue:0.78 alpha:1];
+    return c;
+}
 +(UIColor *)ownersGroupColor {
     static UIColor *c = nil;
     if(!c)
@@ -67,6 +73,12 @@ UIImage *__newMsgsBackgroundImage;
     static UIColor *c = nil;
     if(!c)
         c = [UIColor colorWithRed:0.957 green:1 blue:0.929 alpha:1];
+    return c;
+}
++(UIColor *)opersHeadingColor {
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.878 green:0.137 blue:0.02 alpha:1];
     return c;
 }
 +(UIColor *)ownersHeadingColor {
@@ -105,10 +117,22 @@ UIImage *__newMsgsBackgroundImage;
         c = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
     return c;
 }
++(UIColor *)opersBorderColor {
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.996 green:0.686 blue:0.384 alpha:1];
+    return c;
+}
 +(UIColor *)ownersBorderColor {
     static UIColor *c = nil;
     if(!c)
         c = [UIColor colorWithRed:0.996 green:0.89 blue:0.455 alpha:1]; /*#fee374*/
+    return c;
+}
++(UIColor *)opersLightColor {
+    static UIColor *c = nil;
+    if(!c)
+        c = [UIColor colorWithRed:0.996 green:0.847 blue:0.361 alpha:1];
     return c;
 }
 +(UIColor *)ownersLightColor {

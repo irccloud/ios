@@ -181,7 +181,7 @@
     }
     
     NSMutableArray *data = [[NSMutableArray alloc] init];
-    NSMutableArray *super_owners = [[NSMutableArray alloc] init];
+    NSMutableArray *opers = [[NSMutableArray alloc] init];
     NSMutableArray *owners = [[NSMutableArray alloc] init];
     NSMutableArray *admins = [[NSMutableArray alloc] init];
     NSMutableArray *ops = [[NSMutableArray alloc] init];
@@ -194,8 +194,8 @@
     
     for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
         if(user.nick.length) {
-            if([user.mode rangeOfString:s?s.MODE_SUPER_OWNER:@"Y"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_SUPER_OWNER:@"Y"])
-                [super_owners addObject:user];
+            if([user.mode rangeOfString:s?s.MODE_OPER:@"Y"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OPER:@"Y"])
+                [opers addObject:user];
             else if([user.mode rangeOfString:s?s.MODE_OWNER:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
                 [owners addObject:user];
             else if([user.mode rangeOfString:s?s.MODE_ADMIN:@"a"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_ADMIN:@"a"])
@@ -211,7 +211,7 @@
         }
     }
     
-    [self _addUsersFromList:super_owners heading:@"Super Owners" symbol:[PREFIX objectForKey:s?s.MODE_SUPER_OWNER:@"Y"] headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:opers heading:@"Opers" symbol:[PREFIX objectForKey:s?s.MODE_OPER:@"Y"] headingColor:[UIColor whiteColor] countColor:[UIColor opersLightColor] headingBgColor:[UIColor opersHeadingColor] groupColor:[UIColor opersGroupColor] borderColor:[UIColor opersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
     [self _addUsersFromList:owners heading:@"Owners" symbol:[PREFIX objectForKey:s?s.MODE_OWNER:@"q"] headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
     [self _addUsersFromList:admins heading:@"Admins" symbol:[PREFIX objectForKey:s?s.MODE_ADMIN:@"a"] headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
     [self _addUsersFromList:ops heading:@"Ops" symbol:[PREFIX objectForKey:s?s.MODE_OP:@"o"] headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
