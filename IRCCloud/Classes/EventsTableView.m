@@ -1588,6 +1588,8 @@ int __timestampWidth;
                             else
                                 url = [NSURL URLWithString:[NSString stringWithFormat:@"irc://%@%@", s.hostname, [url.path stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
                         }
+                    } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
+                        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@%@", [url.scheme substringFromIndex:15], url.host, url.path]];
                     }
                 }
                 [_delegate rowLongPressed:[_data objectAtIndex:indexPath.row] rect:[self.tableView rectForRowAtIndexPath:indexPath] link:url.absoluteString];
