@@ -583,6 +583,7 @@
                           event.from = @"";
                           event.msg = [NSString stringWithFormat:@"You invited %@ to join %@", [object objectForKey:@"recipient"], [object objectForKey:@"channel"]];
                           event.bgColor = [UIColor noticeBackgroundColor];
+                          event.monospace = YES;
                       },
                       @"channel_invite":^(Event *event, IRCCloudJSONObject *object) {
                           event.msg = [NSString stringWithFormat:@"Invite to join %@", [object objectForKey:@"channel"]];
