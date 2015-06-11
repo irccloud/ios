@@ -112,11 +112,13 @@
 }
 -(NSString *)modes:(BOOL)showSymbol mode_modes:(NSArray *)mode_modes {
     static NSString *mode_msgs[] = {
+        @"promoted to super owner",
         @"promoted to owner",
         @"promoted to admin",
         @"opped",
         @"halfopped",
         @"voiced",
+        @"demoted from super owner",
         @"demoted from owner",
         @"demoted from admin",
         @"de-opped",
@@ -124,6 +126,7 @@
         @"de-voiced"
     };
     static NSString *mode_colors[] = {
+        @"E7AA00",
         @"E7AA00",
         @"6500A5",
         @"BA1719",
@@ -133,17 +136,19 @@
     NSString *output = nil;
     if(!mode_modes) {
         mode_modes = @[
-                        @"+q",
-                        @"+a",
-                        @"+o",
-                        @"+h",
-                        @"+v",
-                        @"-q",
-                        @"-a",
-                        @"-o",
-                        @"-h",
-                        @"-v"
-                        ];
+            @"+Y",
+            @"+q",
+            @"+a",
+            @"+o",
+            @"+h",
+            @"+v",
+            @"-Y",
+            @"-q",
+            @"-a",
+            @"-o",
+            @"-h",
+            @"-v"
+        ];
     }
     
     if([self modeCount]) {
@@ -190,11 +195,13 @@
     _server = server;
     if(server) {
         _mode_modes = @[
+            [NSString stringWithFormat:@"+%@", server.MODE_SUPER_OWNER],
             [NSString stringWithFormat:@"+%@", server.MODE_OWNER],
             [NSString stringWithFormat:@"+%@", server.MODE_ADMIN],
             [NSString stringWithFormat:@"+%@", server.MODE_OP],
             [NSString stringWithFormat:@"+%@", server.MODE_HALFOP],
             [NSString stringWithFormat:@"+%@", server.MODE_VOICED],
+            [NSString stringWithFormat:@"-%@", server.MODE_SUPER_OWNER],
             [NSString stringWithFormat:@"-%@", server.MODE_OWNER],
             [NSString stringWithFormat:@"-%@", server.MODE_ADMIN],
             [NSString stringWithFormat:@"-%@", server.MODE_OP],
@@ -667,7 +674,8 @@
         PREFIX = _server.PREFIX;
     
     if(!PREFIX || PREFIX.count == 0) {
-        PREFIX = @{_server?_server.MODE_OWNER:@"q":@"~",
+        PREFIX = @{_server?_server.MODE_SUPER_OWNER:@"Y":@"!",
+                   _server?_server.MODE_OWNER:@"q":@"~",
                    _server?_server.MODE_ADMIN:@"a":@"&",
                    _server?_server.MODE_OP:@"o":@"@",
                    _server?_server.MODE_HALFOP:@"h":@"%",
@@ -675,6 +683,7 @@
     }
     
     NSDictionary *mode_colors = @{
+        _server?_server.MODE_SUPER_OWNER:@"Y":@"E7AA00",
         _server?_server.MODE_OWNER:@"q":@"E7AA00",
         _server?_server.MODE_ADMIN:@"a":@"6500A5",
         _server?_server.MODE_OP:@"o":@"BA1719",
@@ -707,7 +716,9 @@
     }
     
     if(mode.length) {
-        if([mode rangeOfString:_server?_server.MODE_OWNER:@"q"].location != NSNotFound)
+        if([mode rangeOfString:_server?_server.MODE_SUPER_OWNER:@"Y"].location != NSNotFound)
+            mode = _server?_server.MODE_SUPER_OWNER:@"Y";
+        else if([mode rangeOfString:_server?_server.MODE_OWNER:@"q"].location != NSNotFound)
             mode = _server?_server.MODE_OWNER:@"q";
         else if([mode rangeOfString:_server?_server.MODE_ADMIN:@"a"].location != NSNotFound)
             mode = _server?_server.MODE_ADMIN:@"a";
