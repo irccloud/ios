@@ -36,7 +36,12 @@
     return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, modes: %@, msg: %@, netsplit: %i}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, [self modes:YES mode_modes:nil], _msg, _netsplit];
 }
 -(BOOL)addMode:(NSString *)mode server:(Server *)server {
-    if([mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound) {
+    if([mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound) {
+        if(_modes[kCollapsedModeDeOper])
+            _modes[kCollapsedModeDeOper] = false;
+        else
+            _modes[kCollapsedModeOper] = true;
+    } else if([mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeOwner])
             _modes[kCollapsedModeDeOwner] = false;
         else
@@ -70,7 +75,12 @@
     return YES;
 }
 -(BOOL)removeMode:(NSString *)mode server:(Server *)server {
-    if([mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound) {
+    if([mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound) {
+        if(_modes[kCollapsedModeOper])
+            _modes[kCollapsedModeOper] = false;
+        else
+            _modes[kCollapsedModeDeOper] = true;
+    } else if([mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound) {
         if(_modes[kCollapsedModeOwner])
             _modes[kCollapsedModeOwner] = false;
         else
@@ -159,7 +169,7 @@
                     output = [output stringByAppendingString:@", "];
                 output = [output stringByAppendingString:mode_msgs[i]];
                 if(showSymbol) {
-                    output = [output stringByAppendingFormat:@" (%c%@%@%c)", COLOR_RGB, mode_colors[i%5], mode_modes[i], CLEAR];
+                    output = [output stringByAppendingFormat:@" (%c%@%@%c)", COLOR_RGB, mode_colors[i%6], mode_modes[i], CLEAR];
                 }
             }
         }

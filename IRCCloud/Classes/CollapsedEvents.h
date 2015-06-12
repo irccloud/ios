@@ -32,12 +32,14 @@ typedef enum {
 } kCollapsedEvent;
 
 typedef enum {
+    kCollapsedModeOper,
     kCollapsedModeOwner,
     kCollapsedModeAdmin,
     kCollapsedModeOp,
     kCollapsedModeHalfOp,
     kCollapsedModeVoice,
     
+    kCollapsedModeDeOper,
     kCollapsedModeDeOwner,
     kCollapsedModeDeAdmin,
     kCollapsedModeDeOp,
@@ -47,7 +49,7 @@ typedef enum {
 
 @interface CollapsedEvent : NSObject {
     kCollapsedEvent _type;
-    BOOL _modes[10];
+    BOOL _modes[12];
     BOOL _netsplit;
     NSTimeInterval _eid;
     NSString *_nick;
