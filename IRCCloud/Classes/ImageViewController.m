@@ -194,11 +194,6 @@
                 _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
                 
                 [_connection start];
-            } else if([[dict objectForKey:@"type"] isEqualToString:@"rich"] && [[dict objectForKey:@"provider_url"] isEqualToString:@"https://imgur.com"]) {
-                NSString *html = [dict objectForKey:@"html"];
-                NSUInteger start = [html rangeOfString:@"data-id=\""].location;
-                NSUInteger len = [[html substringFromIndex:start + 9] rangeOfString:@"\""].location;
-                [self loadImgur:[html substringWithRange:NSMakeRange(start + 9, len)]];
             } else {
                 NSLog(@"Invalid type from oembed");
                 [self fail];
@@ -207,7 +202,7 @@
     }];
 }
 
--(void)loadImgur:(NSString *)imageID {
+-(void)loadImgurImage:(NSString *)imageID {
 #ifdef MASHAPE_KEY
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://imgur-apiv3.p.mashape.com/3/image/%@", imageID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setValue:@MASHAPE_KEY forHTTPHeaderField:@"X-Mashape-Authorization"];
@@ -245,6 +240,44 @@
     }];
 }
 
+-(void)loadImgurGallery:(NSString *)galleryID {
+#ifdef MASHAPE_KEY
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://imgur-apiv3.p.mashape.com/3/gallery/%@", galleryID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setValue:@MASHAPE_KEY forHTTPHeaderField:@"X-Mashape-Authorization"];
+#else
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.imgur.com/3/gallery/%@", galleryID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+#endif
+    [request setHTTPShouldHandleCookies:NO];
+#ifdef IMGUR_KEY
+    [request setValue:[NSString stringWithFormat:@"Client-ID %@", @IMGUR_KEY] forHTTPHeaderField:@"Authorization"];
+#endif
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
+            [self fail];
+        } else {
+            SBJsonParser *parser = [[SBJsonParser alloc] init];
+            NSDictionary *dict = [parser objectWithData:data];
+            if([[dict objectForKey:@"success"] intValue]) {
+                dict = [dict objectForKey:@"data"];
+                if([[dict objectForKey:@"is_album"] intValue] == 0) {
+                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"link"]]];
+                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    
+                    [_connection start];
+                } else {
+                    NSLog(@"Invalid type from imgur");
+                    [self fail];
+                }
+            } else {
+                NSLog(@"Imgur failure");
+                [self fail];
+            }
+        }
+    }];
+}
+
 -(void)load {
 #ifdef DEBUG
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
@@ -259,7 +292,14 @@
     } else if(([[url.host lowercaseString] isEqualToString:@"d.pr"] || [[url.host lowercaseString] isEqualToString:@"droplr.com"]) && [url.path hasPrefix:@"/i/"] && ![url.path hasSuffix:@"+"]) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"https://droplr.com%@+", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
     } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"]) {
-        [self loadOembed:[NSString stringWithFormat:@"https://api.imgur.com/oembed.json?url=%@", url.absoluteString]];
+        NSString *imageID = [url.path substringFromIndex:1];
+        if([imageID rangeOfString:@"/"].location == NSNotFound) {
+            [self loadImgurImage:imageID];
+        } else if([imageID hasPrefix:@"gallery/"]) {
+            [self loadImgurGallery:[imageID substringFromIndex:8]];
+        } else {
+            [self fail];
+        }
         return;
     } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
         [self loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString]];
