@@ -20,20 +20,22 @@
 @implementation IRCCloudJSONObject
 -(id)initWithDictionary:(NSDictionary *)dict {
     self = [super init];
-    _dict = dict;
-    _type = [_dict objectForKey:@"type"];
-    if([_dict objectForKey:@"cid"])
-        _cid = [[_dict objectForKey:@"cid"] intValue];
-    else
-        _cid = -1;
-    if([_dict objectForKey:@"bid"])
-        _bid = [[_dict objectForKey:@"bid"] intValue];
-    else
-        _bid = -1;
-    if([_dict objectForKey:@"eid"])
-        _eid = [[_dict objectForKey:@"eid"] doubleValue];
-    else
-        _eid = -1;
+    if(self) {
+        _dict = dict;
+        _type = [_dict objectForKey:@"type"];
+        if([_dict objectForKey:@"cid"])
+            _cid = [[_dict objectForKey:@"cid"] intValue];
+        else
+            _cid = -1;
+        if([_dict objectForKey:@"bid"])
+            _bid = [[_dict objectForKey:@"bid"] intValue];
+        else
+            _bid = -1;
+        if([_dict objectForKey:@"eid"])
+            _eid = [[_dict objectForKey:@"eid"] doubleValue];
+        else
+            _eid = -1;
+    }
     return self;
 }
 -(NSString *)type {

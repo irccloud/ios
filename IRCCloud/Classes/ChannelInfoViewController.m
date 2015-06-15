@@ -257,12 +257,16 @@
         if(tableView.isEditing)
             return 148;
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)_topic);
-        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX), NULL);
-        float height = ceilf(suggestedSize.height);
-        _topicLabel.frame = CGRectMake(8,8,suggestedSize.width,suggestedSize.height);
-        _topicEdit.frame = CGRectMake(4,4,self.tableView.bounds.size.width - offset,140);
-        CFRelease(framesetter);
-        return height + 20;
+        if(framesetter) {
+            CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX), NULL);
+            float height = ceilf(suggestedSize.height);
+            _topicLabel.frame = CGRectMake(8,8,suggestedSize.width,suggestedSize.height);
+            _topicEdit.frame = CGRectMake(4,4,self.tableView.bounds.size.width - offset,140);
+            CFRelease(framesetter);
+            return height + 20;
+        } else {
+            return 0;
+        }
     } else {
         if(indexPath.row == 0 && _modeHints.count == 0) {
             return 48;

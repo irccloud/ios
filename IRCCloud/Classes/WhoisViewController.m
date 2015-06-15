@@ -238,10 +238,11 @@
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(_label.attributedText));
-    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.view.bounds.size.width - 24,CGFLOAT_MAX), NULL);
-    _label.frame = CGRectMake(12,2,self.view.bounds.size.width-24, suggestedSize.height+12);
-    CFRelease(framesetter);
-    
+    if(framesetter) {
+        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.view.bounds.size.width - 24,CGFLOAT_MAX), NULL);
+        _label.frame = CGRectMake(12,2,self.view.bounds.size.width-24, suggestedSize.height+12);
+        CFRelease(framesetter);
+    }
     _scrollView.frame = self.view.frame;
     _scrollView.contentSize = _label.frame.size;
     self.view = _scrollView;

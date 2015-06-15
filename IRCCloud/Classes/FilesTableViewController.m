@@ -24,10 +24,12 @@
 
 -(id)initWithURL:(NSString *)URL fileID:(NSString *)fileID {
     self = [super init];
-    _url = URL;
-    _fileID = fileID;
-    _cancelled = NO;
-    _running = NO;
+    if(self) {
+        _url = URL;
+        _fileID = fileID;
+        _cancelled = NO;
+        _running = NO;
+    }
     return self;
 }
 -(void)cancel {

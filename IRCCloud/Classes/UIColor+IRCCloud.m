@@ -323,13 +323,20 @@ UIImage *__newMsgsBackgroundImage;
         CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
         CGContextRef context = CGBitmapContextCreate(NULL, width * scaleFactor, 26 * scaleFactor, 8, 4 * width * scaleFactor, colorSpace, (CGBitmapInfo)kCGImageAlphaNoneSkipFirst);
         CGContextScaleCTM(context, scaleFactor, scaleFactor);
-        NSArray *colors = [NSArray arrayWithObjects:(id)[UIColor colorWithRed:0.961 green:0.961 blue:0.961 alpha:1].CGColor, (id)[UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1].CGColor, nil];
-        CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)(colors), NULL);
+        
+        CGColorRef colors[2];
+        colors[0] = [UIColor colorWithRed:0.961 green:0.961 blue:0.961 alpha:1].CGColor;
+        colors[1] = [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1].CGColor;
+        CFArrayRef colors_array = CFArrayCreate(kCFAllocatorDefault, (const void**)colors, 2, &kCFTypeArrayCallBacks);
+        CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, colors_array, NULL);
         CGContextDrawLinearGradient(context, gradient, CGPointMake(0.0f, 26.0f), CGPointMake(0.0f, 0.0f), 0);
         CGImageRef cgImage = CGBitmapContextCreateImage(context);
-        __timestampBackgroundImage = [UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp];
-        CFRelease(cgImage);
+        if(cgImage) {
+            __timestampBackgroundImage = [UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp];
+            CFRelease(cgImage);
+        }
         CFRelease(gradient);
+        CFRelease(colors_array);
         CGContextRelease(context);
         CGColorSpaceRelease(colorSpace);
     }

@@ -20,7 +20,7 @@
 @implementation Server
 -(id)init {
     self = [super init];
-    @synchronized(self) {
+    if(self) {
         _MODE_OPER = @"Y";
         _MODE_OWNER = @"q";
         _MODE_ADMIN = @"a";
@@ -118,14 +118,15 @@
 
 -(id)init {
     self = [super init];
-    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
-        NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"servers"];
-        
-        _servers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+    if(self) {
+        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
+            NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"servers"];
+            
+            _servers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+        }
+        if(!_servers)
+            _servers = [[NSMutableArray alloc] init];
     }
-    if(!_servers)
-        _servers = [[NSMutableArray alloc] init];
-    
     return self;
 }
 

@@ -604,7 +604,8 @@
                                     alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
                                     alert.soundName = @"a.caf";
                                     [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                                    imageUploadCompletionHandler();
+                                    if(imageUploadCompletionHandler)
+                                        imageUploadCompletionHandler();
                                     if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
                                         CLS_LOG(@"background transfer session successfully completed, disconnecting websocket");
                                         [_conn disconnect];
@@ -623,7 +624,8 @@
                                 alert.alertBody = @"Unable to share image. Please try again shortly.";
                                 alert.soundName = @"a.caf";
                                 [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                                imageUploadCompletionHandler();
+                                if(imageUploadCompletionHandler)
+                                    imageUploadCompletionHandler();
                                 if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
                                     CLS_LOG(@"background transfer session failed, disconnecting websocket");
                                     [_conn disconnect];
@@ -672,7 +674,8 @@
                             alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
                             alert.soundName = @"a.caf";
                             [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                            imageUploadCompletionHandler();
+                            if(imageUploadCompletionHandler)
+                                imageUploadCompletionHandler();
                             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
                                 CLS_LOG(@"Backlog completed during background transfer callback, disconnecting websocket");
                                 [_conn disconnect];
@@ -685,7 +688,8 @@
                             alert.alertBody = @"Unable to share image. Please try again shortly.";
                             alert.soundName = @"a.caf";
                             [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                            imageUploadCompletionHandler();
+                            if(imageUploadCompletionHandler)
+                                imageUploadCompletionHandler();
                             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
                                 CLS_LOG(@"Backlog failed during background transfer callback, disconnecting websocket");
                                 [_conn disconnect];
@@ -700,7 +704,8 @@
                         alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
                         alert.soundName = @"a.caf";
                         [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                        imageUploadCompletionHandler();
+                        if(imageUploadCompletionHandler)
+                            imageUploadCompletionHandler();
                     }
                 } else {
                     if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
@@ -718,7 +723,8 @@
                         alert.soundName = @"a.caf";
                         [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                     }
-                    imageUploadCompletionHandler();
+                    if(imageUploadCompletionHandler)
+                        imageUploadCompletionHandler();
                 }
             }
         }

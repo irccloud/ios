@@ -64,14 +64,16 @@ NSLock *__parserLock = nil;
 
 -(id)initWithURL:(NSString *)URL {
     self = [super init];
-    _url = URL;
-    _bid = -1;
-    _adapter = [[SBJsonStreamParserAdapter alloc] init];
-    _adapter.delegate = [NetworkConnection sharedInstance];
-    _parser = [[SBJsonStreamParser alloc] init];
-    _parser.delegate = _adapter;
-    _cancelled = NO;
-    _running = NO;
+    if(self) {
+        _url = URL;
+        _bid = -1;
+        _adapter = [[SBJsonStreamParserAdapter alloc] init];
+        _adapter.delegate = [NetworkConnection sharedInstance];
+        _parser = [[SBJsonStreamParser alloc] init];
+        _parser.delegate = _adapter;
+        _cancelled = NO;
+        _running = NO;
+    }
     return self;
 }
 -(void)cancel {
@@ -206,6 +208,7 @@ NSLock *__parserLock = nil;
 #ifdef ENTERPRISE
     IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
 #endif
+    if(self) {
     __parserLock = [[NSLock alloc] init];
     _queue = [[NSOperationQueue alloc] init];
     _servers = [ServersDataSource sharedInstance];
@@ -835,7 +838,7 @@ NSLock *__parserLock = nil;
                        [self postObject:object forEvent:kIRCEventSessionDeleted];
                    }
                };
-
+    }
     return self;
 }
 
