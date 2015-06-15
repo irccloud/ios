@@ -423,7 +423,7 @@
             _finished = YES;
             if(_filenameSet) {
                 [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-                _reqid = [[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename originalFilename:_originalFilename];
+                _reqid = [[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename?_filename:@"" originalFilename:_originalFilename?_originalFilename:@""];
             }
         } else {
             [_delegate fileUploadDidFail];

@@ -702,7 +702,7 @@ int __timestampWidth;
         _topHighlightsCountView.hidden = YES;
         _topUnreadlabel.frame = CGRectMake(4,6,rect.size.width - 8 - 32, rect.size.height-12);
     }
-    if(_lastSeenEidPos == 0) {
+    if(_lastSeenEidPos == 0 && firstRow < _data.count) {
         int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
         if(seconds < 0) {
             _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
@@ -1110,7 +1110,8 @@ int __timestampWidth;
                 break;
             markerPos++;
         }
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+        if(markerPos < [self.tableView numberOfRowsInSection:0])
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
     } else if(_eidToOpen > 0) {
         if(_eidToOpen <= _maxEid) {
             int i = 0;
