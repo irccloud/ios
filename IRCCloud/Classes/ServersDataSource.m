@@ -16,6 +16,9 @@
 
 #import "ServersDataSource.h"
 #import "BuffersDataSource.h"
+#import "ChannelsDataSource.h"
+#import "UsersDataSource.h"
+#import "EventsDataSource.h"
 
 @implementation Server
 -(id)init {
@@ -122,7 +125,16 @@
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"servers"];
             
-            _servers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+            @try {
+                _servers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+            } @catch(NSException *e) {
+                [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
+                [[BuffersDataSource sharedInstance] clear];
+                [[ChannelsDataSource sharedInstance] clear];
+                [[EventsDataSource sharedInstance] clear];
+                [[UsersDataSource sharedInstance] clear];
+            }
         }
         if(!_servers)
             _servers = [[NSMutableArray alloc] init];

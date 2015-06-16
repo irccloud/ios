@@ -16,6 +16,10 @@
 
 
 #import "UsersDataSource.h"
+#import "ChannelsDataSource.h"
+#import "BuffersDataSource.h"
+#import "ServersDataSource.h"
+#import "EventsDataSource.h"
 
 @implementation User
 
@@ -84,7 +88,16 @@
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"users"];
             
-            _users = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+            @try {
+                _users = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+            } @catch(NSException *e) {
+                [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
+                [[ServersDataSource sharedInstance] clear];
+                [[BuffersDataSource sharedInstance] clear];
+                [[ChannelsDataSource sharedInstance] clear];
+                [[EventsDataSource sharedInstance] clear];
+            }
         }
         if(!_users)
             _users = [[NSMutableDictionary alloc] init];

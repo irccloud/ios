@@ -186,7 +186,16 @@
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
             
-            _events = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+            @try {
+                _events = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+            } @catch(NSException *e) {
+                [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
+                [[ServersDataSource sharedInstance] clear];
+                [[BuffersDataSource sharedInstance] clear];
+                [[ChannelsDataSource sharedInstance] clear];
+                [[UsersDataSource sharedInstance] clear];
+            }
         }
 #endif
         _events_sorted = [[NSMutableDictionary alloc] init];
