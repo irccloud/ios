@@ -157,7 +157,6 @@
     
     if(width > self.tableView.frame.size.width) {
         height *= self.tableView.frame.size.width / width;
-        width = self.tableView.frame.size.width;
     }
     
     if(height > 240) {

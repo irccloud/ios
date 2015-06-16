@@ -873,7 +873,7 @@ WebSocketWaitingState waitingState;
 
         //verify we have a "Connection: Upgrade" header
         header = [self headerForKey:@"Connection" inHeaders:self.config.serverHeaders];
-        if ([@"Upgrade" caseInsensitiveCompare:header.value] != NSOrderedSame) {
+        if (header.value && [@"Upgrade" caseInsensitiveCompare:header.value] != NSOrderedSame) {
             return false;
         }
 

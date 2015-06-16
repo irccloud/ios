@@ -47,6 +47,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     if(!_metadataLabel.text.length) {
         [_activity startAnimating];
         _lineNumbers.enabled = NO;
