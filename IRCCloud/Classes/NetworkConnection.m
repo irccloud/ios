@@ -198,7 +198,6 @@ NSLock *__parserLock = nil;
             [NetworkConnection sync:[caches URLByAppendingPathComponent:@"servers"] with:[sharedcontainer URLByAppendingPathComponent:@"servers"]];
             [NetworkConnection sync:[caches URLByAppendingPathComponent:@"buffers"] with:[sharedcontainer URLByAppendingPathComponent:@"buffers"]];
             [NetworkConnection sync:[caches URLByAppendingPathComponent:@"channels"] with:[sharedcontainer URLByAppendingPathComponent:@"channels"]];
-            [NetworkConnection sync:[caches URLByAppendingPathComponent:@"stream"] with:[sharedcontainer URLByAppendingPathComponent:@"stream"]];
         }
     }
 }
@@ -1850,6 +1849,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [_channels serialize];
         [_users serialize];
         [_events serialize];
+#ifndef EXTENSION
         NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
         NSMutableDictionary *stream = [_userInfo mutableCopy];
         if(_streamId)
@@ -1862,6 +1862,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [stream removeObjectForKey:@"config"];
         [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
         [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+#endif
         [[NSUserDefaults standardUserDefaults] setObject:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"cacheVersion"];
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
