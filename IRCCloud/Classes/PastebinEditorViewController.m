@@ -114,7 +114,7 @@
     if([[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
         _alwaysSendAsText.on = ![[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] boolValue];
     } else {
-        _alwaysSendAsText.on = YES;
+        _alwaysSendAsText.on = NO;
     }
     [self.tableView reloadData];
 }
