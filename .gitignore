@@ -7,3 +7,4 @@ IRCCloud/InfoPlist.h
 /*.sh
 /*.mobileprovision
 /*.ipa
+infer-out/

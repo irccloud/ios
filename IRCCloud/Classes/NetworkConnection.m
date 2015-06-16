@@ -261,6 +261,8 @@ NSLock *__parserLock = nil;
 #endif
     
     CLS_LOG(@"%@", _userAgent);
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
     
     void (^ignored)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
     };
@@ -1841,6 +1843,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)serialize {
     @synchronized(self) {
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [_servers serialize];
+        [_buffers serialize];
+        [_channels serialize];
+        [_users serialize];
+        [_events serialize];
         NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
         NSMutableDictionary *stream = [_userInfo mutableCopy];
         if(_streamId)
@@ -1853,11 +1862,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [stream removeObjectForKey:@"config"];
         [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
         [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
-        [_servers serialize];
-        [_buffers serialize];
-        [_channels serialize];
-        [_users serialize];
-        [_events serialize];
         [[NSUserDefaults standardUserDefaults] setObject:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"cacheVersion"];
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
