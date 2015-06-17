@@ -1166,6 +1166,9 @@ extern NSDictionary *emojiMap;
         self.slidingViewController.view.autoresizesSubviews = NO;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
+    
+    _buffersView.tableView.scrollsToTop = YES;
+    _usersView.tableView.scrollsToTop = YES;
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -1181,6 +1184,9 @@ extern NSDictionary *emojiMap;
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         self.slidingViewController.view.autoresizesSubviews = YES;
     [self.slidingViewController resetTopView];
+    
+    _buffersView.tableView.scrollsToTop = NO;
+    _usersView.tableView.scrollsToTop = NO;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
