@@ -38,9 +38,19 @@
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
         _buffer = buffer;
-        _pastereqid = _sayreqid = _prefsreqid = -1;
+        _pastereqid = _sayreqid = -1;
+        
+        _type = [[UISegmentedControl alloc] initWithItems:@[@"Pastebin", @"Messages"]];
+        _type.selectedSegmentIndex = 0;
+        _type.segmentedControlStyle = UISegmentedControlStyleBar;
+        [_type addTarget:self action:@selector(_typeToggled) forControlEvents:UIControlEventValueChanged];
+        self.navigationItem.titleView = _type;
     }
     return self;
+}
+
+-(void)_typeToggled {
+    [self.tableView reloadData];
 }
 
 -(id)initWithPasteID:(NSString *)pasteID {
@@ -48,7 +58,7 @@
     if (self) {
         self.navigationItem.title = @"Pastebin";
         _pasteID = pasteID;
-        _pastereqid = _sayreqid = _prefsreqid = -1;
+        _pastereqid = _sayreqid = -1;
         UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         [spinny startAnimating];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
@@ -80,27 +90,35 @@
 
 -(void)sendButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
-    
-    UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [spinny startAnimating];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
-    
-    if([_filename.text containsString:@"."]) {
-        NSString *extension = [_filename.text substringFromIndex:[_filename.text rangeOfString:@"." options:NSBackwardsSearch].location + 1];
-        if(extension.length)
-            _extension = extension;
-        else if(!_extension.length)
-            _extension = @"txt";
-            
+    if(_type.selectedSegmentIndex == 1) {
+        if(_message.text.length) {
+            _buffer.draft = [NSString stringWithFormat:@"%@ %@", _message.text, _text.text];
+        } else {
+            _buffer.draft = _text.text;
+        }
+        _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid];
     } else {
-        if(!_extension.length)
-            _extension = @"txt";
+        UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        [spinny startAnimating];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+        
+        if([_filename.text containsString:@"."]) {
+            NSString *extension = [_filename.text substringFromIndex:[_filename.text rangeOfString:@"." options:NSBackwardsSearch].location + 1];
+            if(extension.length)
+                _extension = extension;
+            else if(!_extension.length)
+                _extension = @"txt";
+                
+        } else {
+            if(!_extension.length)
+                _extension = @"txt";
+        }
+        
+        if(_pasteID)
+            _pastereqid = [[NetworkConnection sharedInstance] editPaste:_pasteID name:_filename.text contents:_text.text extension:_extension];
+        else
+            _pastereqid = [[NetworkConnection sharedInstance] paste:_filename.text contents:_text.text extension:_extension];
     }
-    
-    if(_pasteID)
-        _pastereqid = [[NetworkConnection sharedInstance] editPaste:_pasteID name:_filename.text contents:_text.text extension:_extension];
-    else
-        _pastereqid = [[NetworkConnection sharedInstance] paste:_filename.text contents:_text.text extension:_extension];
 }
 
 -(void)cancelButtonPressed:(id)sender {
@@ -110,12 +128,6 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    if([[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
-        _alwaysSendAsText.on = ![[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] boolValue];
-    } else {
-        _alwaysSendAsText.on = NO;
-    }
     [self.tableView reloadData];
 }
 
@@ -151,9 +163,6 @@
                     [self.tableView endEditing:YES];
                     [self dismissViewControllerAnimated:YES completion:nil];
                 }];
-            } else if(reqid == _prefsreqid) {
-                NSLog(@"Preferences failed: %@", o);
-                _prefsreqid = -1;
             }
             break;
         case kIRCEventSuccess:
@@ -174,9 +183,6 @@
                     _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid];
                 }
                 _pastereqid = -1;
-            } else if(reqid == _prefsreqid) {
-                NSLog(@"Preferences updated.");
-                _prefsreqid = -1;
             }
             break;
         case kIRCEventBufferMsg:
@@ -214,9 +220,6 @@
     _filename.enabled = !_pasteID;
     _filename.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
-    _alwaysSendAsText = [[UISwitch alloc] init];
-    [_alwaysSendAsText addTarget:self action:@selector(_alwaysSendToggled:) forControlEvents:UIControlEventValueChanged];
-
     _message = [[UITextView alloc] initWithFrame:CGRectZero];
     _message.text = @"";
     _message.backgroundColor = [UIColor clearColor];
@@ -225,36 +228,47 @@
     _message.font = _filename.font;
     _message.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
+    _messageFooter = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, 32)];
+    _messageFooter.backgroundColor = [UIColor clearColor];
+    _messageFooter.textColor = [UIColor grayColor];
+    _messageFooter.textAlignment = NSTextAlignmentCenter;
+    _messageFooter.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
     _text = [[UITextView alloc] initWithFrame:CGRectZero];
-    _text.text = _buffer.draft;
     _text.backgroundColor = [UIColor clearColor];
     _text.font = _filename.font;
+    _text.delegate = self;
     _text.editable = !_pasteID;
     _text.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _text.text = _buffer.draft;
+    [self textViewDidChange:_text];
     
     if(_pasteID)
         [self _fetchPaste];
 }
 
--(void)_alwaysSendToggled:(id)sender {
-    NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[[NetworkConnection sharedInstance] prefs]];
-    [prefs setObject:@(!_alwaysSendAsText.isOn) forKey:@"pastebin-disableprompt"];
-    SBJsonWriter *writer = [[SBJsonWriter alloc] init];
-    NSString *json = [writer stringWithObject:prefs];
-    
-    _prefsreqid = [[NetworkConnection sharedInstance] setPrefs:json];
-}
-
 - (void)textViewDidBeginEditing:(UITextView *)textView {
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+    if(textView == _message)
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    if([text isEqualToString:@"\n"]) {
+    if(textView != _text && [text isEqualToString:@"\n"]) {
         [self.tableView endEditing:YES];
         return NO;
     }
     return YES;
+}
+
+-(void)textViewDidChange:(UITextView *)textView {
+    if(textView == _text) {
+        int count = 0;
+        NSArray *lines = [_text.text componentsSeparatedByString:@"\n"];
+        for (NSString *line in lines) {
+            count += ceil((float)line.length / 1080.0f);
+        }
+        _messageFooter.text = [NSString stringWithFormat:@"Text will be sent as %i message%@", count, (count == 1)?@"":@"s"];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -274,7 +288,12 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return _pasteID?2:5;
+    if(_pasteID)
+        return 2;
+    else if(_type.selectedSegmentIndex == 0)
+        return 3;
+    else
+        return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -289,12 +308,22 @@
             return @"File name (optional)";
         case 2:
             return @"Message (optional)";
-        case 3:
-            return nil;
-        case 4:
-            return nil;
     }
     return nil;
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    if(_type.selectedSegmentIndex == 1 && section == 0) {
+        return _messageFooter;
+    }
+    return nil;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
+    if(_type.selectedSegmentIndex == 1 && section == 0) {
+        return 32;
+    }
+    return 0;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -326,21 +355,6 @@
             _message.frame = CGRectInset(cell.contentView.bounds, 4, 4);
             [cell.contentView addSubview:_message];
             break;
-        case 3:
-            cell.textLabel.text = @"Send as text";
-            cell.textLabel.font = [UIFont boldSystemFontOfSize:cell.textLabel.font.pointSize];
-            cell.textLabel.textAlignment = NSTextAlignmentCenter;
-            if([cell.textLabel respondsToSelector:@selector(tintColor)])
-                cell.textLabel.textColor = cell.textLabel.tintColor;
-            else
-                cell.textLabel.textColor = [UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0];
-            cell.selectionStyle = UITableViewCellSelectionStyleDefault;
-            break;
-        case 4:
-            cell.textLabel.text = @"Always send as text";
-            cell.detailTextLabel.text = @"You can revert this in settings";
-            cell.accessoryView = _alwaysSendAsText;
-            break;
     }
     return cell;
 }
@@ -350,15 +364,6 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
-    
-    if(indexPath.section == 3) {
-        if(_message.text.length) {
-            _buffer.draft = [NSString stringWithFormat:@"%@ %@", _message.text, _text.text];
-        } else {
-            _buffer.draft = _text.text;
-        }
-        _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid];
-    }
 }
 
 @end

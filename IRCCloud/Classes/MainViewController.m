@@ -1260,7 +1260,7 @@ extern NSDictionary *emojiMap;
                     prompt = YES;
                 }
 
-                if(prompt) {
+                if(prompt || [_message.text isEqualToString:@"/paste"]) {
                     if(![_message.text isEqualToString:@"/paste"])
                         _buffer.draft = _message.text;
                     PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];

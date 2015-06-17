@@ -22,13 +22,13 @@
     UITextField *_filename;
     UITextView *_message;
     UITextView *_text;
-    UISwitch *_alwaysSendAsText;
     int _pastereqid;
     int _sayreqid;
-    int _prefsreqid;
     Buffer *_buffer;
     NSString *_pasteID;
     NSString *_extension;
+    UISegmentedControl *_type;
+    UILabel *_messageFooter;
 }
 -(id)initWithBuffer:(Buffer *)buffer;
 -(id)initWithPasteID:(NSString *)pasteID;
