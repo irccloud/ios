@@ -167,7 +167,8 @@
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
     self.navigationItem.title = @"File Uploads";
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(doneButtonPressed:)];
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
     _url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
     _formatter = [[NSDateFormatter alloc] init];
     _formatter.dateStyle = NSDateFormatterLongStyle;
