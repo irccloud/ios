@@ -20,25 +20,14 @@
 #import "NetworkConnection.h"
 #import "PastebinViewController.h"
 
-#define MAX_LINES 12
-
-@interface InsetLabel : UILabel
-@end
-
-@implementation InsetLabel
-
-- (void)drawTextInRect:(CGRect)rect {
-    return [super drawTextInRect:CGRectInset(rect, 4, 0)];
-}
-
-@end
+#define MAX_LINES 6
 
 @interface PastebinsTableCell : UITableViewCell {
-    InsetLabel *_metadata;
-    InsetLabel *_text;
-    UIView *_border;
+    UILabel *_name;
+    UILabel *_date;
+    UILabel *_text;
 }
-@property (readonly) InsetLabel *metadata,*text;
+@property (readonly) UILabel *name,*date,*text;
 @end
 
 @implementation PastebinsTableCell
@@ -46,19 +35,23 @@
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        _border = [[UIView alloc] init];
-        _border.backgroundColor = [UIColor blueBorderColor];
-        [self.contentView addSubview:_border];
+        _name = [[UILabel alloc] init];
+        _name.backgroundColor = [UIColor clearColor];
+        _name.textColor = [UIColor blackColor];
+        _name.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+        _name.textAlignment = NSTextAlignmentLeft;
+        [self.contentView addSubview:_name];
         
-        _metadata = [[InsetLabel alloc] init];
-        _metadata.backgroundColor = [UIColor navBarColor];
-        _metadata.textColor = [UIColor grayColor];
-        _metadata.font = [UIFont systemFontOfSize:FONT_SIZE];
-        [self.contentView addSubview:_metadata];
+        _date = [[UILabel alloc] init];
+        _date.backgroundColor = [UIColor clearColor];
+        _date.textColor = [UIColor grayColor];
+        _date.font = [UIFont systemFontOfSize:FONT_SIZE];
+        _date.textAlignment = NSTextAlignmentRight;
+        [self.contentView addSubview:_date];
         
-        _text = [[InsetLabel alloc] init];
-        _text.backgroundColor = [UIColor whiteColor];
-        _text.textColor = [UIColor blackColor];
+        _text = [[UILabel alloc] init];
+        _text.backgroundColor = [UIColor clearColor];
+        _text.textColor = [UIColor darkGrayColor];
         _text.font = [UIFont systemFontOfSize:FONT_SIZE];
         _text.lineBreakMode = NSLineBreakByTruncatingTail;
         _text.numberOfLines = 0;
@@ -71,14 +64,20 @@
     [super layoutSubviews];
     
     CGRect frame = [self.contentView bounds];
-    frame.origin.x = 4;
-    frame.origin.y = 4;
-    frame.size.width -= 8;
-    frame.size.height -= 8;
+    frame.origin.x = 16;
+    frame.origin.y = 8;
+    frame.size.width -= 20;
+    frame.size.height -= 16;
     
-    _border.frame = CGRectMake(frame.origin.x - 1, frame.origin.y - 1, frame.size.width + 2, frame.size.height + 2);
-    _metadata.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, FONT_SIZE + 6);
-    _text.frame = CGRectMake(frame.origin.x, _metadata.frame.origin.y + _metadata.frame.size.height + 1, frame.size.width, frame.size.height - _metadata.frame.size.height - 1);
+    [_date sizeToFit];
+    _date.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height - FONT_SIZE - 6, _date.frame.size.width, FONT_SIZE + 6);
+
+    if(_name.text.length) {
+        _name.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width - 4, FONT_SIZE + 6);
+        _text.frame = CGRectMake(frame.origin.x, _name.frame.origin.y + _name.frame.size.height, frame.size.width, frame.size.height - _date.frame.size.height - _name.frame.size.height);
+    } else {
+        _text.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height - _date.frame.size.height);
+    }
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -96,7 +95,8 @@
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
     self.navigationItem.title = @"Your Pastebins";
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(doneButtonPressed:)];
+    self.navigationItem.rightBarButtonItem = self.editButtonItem;
     _url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
     
     _footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
@@ -108,7 +108,7 @@
     [_footerView addSubview:a];
     
     self.tableView.tableFooterView = _footerView;
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     _pages = 0;
     _pastes = nil;
     _canLoadMore = YES;
@@ -215,7 +215,7 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return FONT_SIZE + 20 + ([[[_pastes objectAtIndex:indexPath.row] objectForKey:@"body"] sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE] constrainedToSize:CGRectMake(0,0,self.tableView.frame.size.width - 16,(FONT_SIZE + 4) * MAX_LINES).size lineBreakMode:NSLineBreakByTruncatingTail].height);
+    return FONT_SIZE + 24 + ([[[_pastes objectAtIndex:indexPath.row] objectForKey:@"body"] sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE] constrainedToSize:CGRectMake(0,0,self.tableView.frame.size.width - 26,(FONT_SIZE + 4) * MAX_LINES).size lineBreakMode:NSLineBreakByTruncatingTail].height) + ([[[_pastes objectAtIndex:indexPath.row] objectForKey:@"name"] length]?(FONT_SIZE + 6):0);
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
@@ -230,18 +230,13 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    PastebinsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"pastebincell-%li-%li", (long)indexPath.section, (long)indexPath.row]];
+    PastebinsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"pastebincell"];
     if(!cell)
-        cell = [[PastebinsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"pastebincell-%li-%li", (long)indexPath.section, (long)indexPath.row]];
+        cell = [[PastebinsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"pastebincell"];
 
     NSDictionary *pastebin = [_pastes objectAtIndex:indexPath.row];
     
-    NSString *metadata = @"";
-    
-    if([[pastebin objectForKey:@"name"] length])
-        metadata = [[pastebin objectForKey:@"name"] stringByAppendingString:@" • "];
-    
-    metadata = [metadata stringByAppendingFormat:@"%@ lines • ", [pastebin objectForKey:@"lines"]];
+    NSString *date = nil;
     double seconds = [[NSDate date] timeIntervalSince1970] - [[pastebin objectForKey:@"date"] doubleValue];
     double minutes = seconds / 60.0;
     double hours = minutes / 60.0;
@@ -254,51 +249,54 @@
             years++;
         
         if((int)years == 1)
-            metadata = [metadata stringByAppendingFormat:@"%i year ago", (int)years];
+            date = [NSString stringWithFormat:@"%i year ago", (int)years];
         else
-            metadata = [metadata stringByAppendingFormat:@"%i years ago", (int)years];
+            date = [NSString stringWithFormat:@"%i years ago", (int)years];
     } else if(months >= 1) {
         if(months - (int)months > 0.5)
             months++;
         
         if((int)months == 1)
-            metadata = [metadata stringByAppendingFormat:@"%i month ago", (int)months];
+            date = [NSString stringWithFormat:@"%i month ago", (int)months];
         else
-            metadata = [metadata stringByAppendingFormat:@"%i months ago", (int)months];
+            date = [NSString stringWithFormat:@"%i months ago", (int)months];
     } else if(days >= 1) {
         if(days - (int)days > 0.5)
             days++;
         
         if((int)days == 1)
-            metadata = [metadata stringByAppendingFormat:@"%i day ago", (int)days];
+            date = [NSString stringWithFormat:@"%i day ago", (int)days];
         else
-            metadata = [metadata stringByAppendingFormat:@"%i days ago", (int)days];
+            date = [NSString stringWithFormat:@"%i days ago", (int)days];
     } else if(hours >= 1) {
         if(hours - (int)hours > 0.5)
             hours++;
         
         if((int)hours < 2)
-            metadata = [metadata stringByAppendingFormat:@"%i hour ago", (int)hours];
+            date = [NSString stringWithFormat:@"%i hour ago", (int)hours];
         else
-            metadata = [metadata stringByAppendingFormat:@"%i hours ago", (int)hours];
+            date = [NSString stringWithFormat:@"%i hours ago", (int)hours];
     } else if(minutes >= 1) {
         if(minutes - (int)minutes > 0.5)
             minutes++;
         
         if((int)minutes == 1)
-            metadata = [metadata stringByAppendingFormat:@"%i minute ago", (int)minutes];
+            date = [NSString stringWithFormat:@"%i minute ago", (int)minutes];
         else
-            metadata = [metadata stringByAppendingFormat:@"%i minutes ago", (int)minutes];
+            date = [NSString stringWithFormat:@"%i minutes ago", (int)minutes];
     } else {
         if((int)seconds == 1)
-            metadata = [metadata stringByAppendingFormat:@"%i second ago", (int)seconds];
+            date = [NSString stringWithFormat:@"%i second ago", (int)seconds];
         else
-            metadata = [metadata stringByAppendingFormat:@"%i seconds ago", (int)seconds];
+            date = [NSString stringWithFormat:@"%i seconds ago", (int)seconds];
     }
 
-    cell.metadata.text = metadata;
+    cell.name.text = [pastebin objectForKey:@"name"];
+    cell.date.text = [NSString stringWithFormat:@"%@ • %@ line%@ • %@", date, [pastebin objectForKey:@"lines"], ([[pastebin objectForKey:@"lines"] intValue] == 1)?@"":@"s", [[pastebin objectForKey:@"extension"] length]?[pastebin objectForKey:@"extension"]:@"txt"];
     cell.text.text = [pastebin objectForKey:@"body"];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    [cell layoutSubviews];
     
     return cell;
 }
