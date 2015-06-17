@@ -131,20 +131,20 @@ extern NSDictionary *emojiMap;
     if(_mentionTip)
         _mentionTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
     
-    _cameraBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _cameraBtn.contentMode = UIViewContentModeCenter;
-    _cameraBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-    [_cameraBtn setImage:[UIImage imageNamed:@"camera"] forState:UIControlStateNormal];
-    [_cameraBtn addTarget:self action:@selector(cameraButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [_cameraBtn sizeToFit];
+    _uploadsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    _uploadsBtn.contentMode = UIViewContentModeCenter;
+    _uploadsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    [_uploadsBtn setImage:[UIImage imageNamed:@"upload_arrow"] forState:UIControlStateNormal];
+    [_uploadsBtn addTarget:self action:@selector(uploadsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [_uploadsBtn sizeToFit];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 6)
-        _cameraBtn.frame = CGRectMake(5,5,_cameraBtn.frame.size.width + 16, _cameraBtn.frame.size.height + 16);
+        _uploadsBtn.frame = CGRectMake(5,5,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
     else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 6)
-        _cameraBtn.frame = CGRectMake(5,3,_cameraBtn.frame.size.width + 16, _cameraBtn.frame.size.height + 16);
+        _uploadsBtn.frame = CGRectMake(5,3,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
     else
-        _cameraBtn.frame = CGRectMake(5,2,_cameraBtn.frame.size.width + 16, _cameraBtn.frame.size.height + 16);
-    _cameraBtn.accessibilityLabel = @"Insert a Photo";
-    [_bottomBar addSubview:_cameraBtn];
+        _uploadsBtn.frame = CGRectMake(5,2,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
+    _uploadsBtn.accessibilityLabel = @"Uploads";
+    [_bottomBar addSubview:_uploadsBtn];
 
     _sendBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     _sendBtn.contentMode = UIViewContentModeCenter;
@@ -2847,7 +2847,7 @@ extern NSDictionary *emojiMap;
     } else {
         _popover = [[UIPopoverController alloc] initWithContentViewController:picker];
         _popover.delegate = self;
-        [_popover presentPopoverFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
+        [_popover presentPopoverFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
     }
 }
 
@@ -3131,14 +3131,14 @@ extern NSDictionary *emojiMap;
     [self _hideConnectingView];
 }
 
--(void)cameraButtonPressed:(id)sender {
+-(void)uploadsButtonPressed:(id)sender {
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", @"Start a Pastebin", @"Your Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
         } else {
-            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view animated:YES];
+            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
         }
     } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
         UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"File Uploads", @"Choose Document", @"Start a Pastebin", @"Your Pastebins", nil];
@@ -3146,7 +3146,7 @@ extern NSDictionary *emojiMap;
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
         } else {
-            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view animated:YES];
+            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
         }
     } else {
         UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"Start a Pastebin", @"Your Pastebins", [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]?@"File Uploads":nil, nil];
@@ -3154,7 +3154,7 @@ extern NSDictionary *emojiMap;
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
         } else {
-            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _cameraBtn.frame.origin.x, _bottomBar.frame.origin.y,_cameraBtn.frame.size.width,_cameraBtn.frame.size.height) inView:self.view animated:YES];
+            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
         }
     }
 }

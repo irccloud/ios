@@ -49,7 +49,7 @@
     IBOutlet UIView *_mentionTip;
     IBOutlet UIView *_globalMsgContainer;
     IBOutlet TTTAttributedLabel *_globalMsg;
-    UIButton *_menuBtn, *_sendBtn, *_settingsBtn, *_cameraBtn;
+    UIButton *_menuBtn, *_sendBtn, *_settingsBtn, *_uploadsBtn;
     UIBarButtonItem *_usersButtonItem;
     Buffer *_buffer;
     User *_selectedUser;
