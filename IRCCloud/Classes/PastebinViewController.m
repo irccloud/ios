@@ -33,11 +33,15 @@
     _url = url;
 
     if([_url.absoluteString rangeOfString:@"?"].location != NSNotFound) {
-        for(NSURLQueryItem *item in [[NSURLComponents componentsWithString:_url.absoluteString] queryItems]) {
-            if([item.name isEqualToString:@"id"])
-                _pasteID = item.value;
-            else if([item.name isEqualToString:@"own_paste"])
-                _ownPaste = [item.value isEqualToString:@"1"];
+        NSString *query = [[_url absoluteString] substringFromIndex:[_url.absoluteString rangeOfString:@"?"].location + 1];
+        NSArray *args = [query componentsSeparatedByString:@"&"];
+        for(NSString *arg in args) {
+            NSArray *pair = [arg componentsSeparatedByString:@"="];
+            
+            if([[pair objectAtIndex:0] isEqualToString:@"id"])
+                _pasteID = [pair objectAtIndex:1];
+            else if([[pair objectAtIndex:0] isEqualToString:@"own_paste"])
+                _ownPaste = [[pair objectAtIndex:1] isEqualToString:@"1"];
         }
         
         _url = [NSURL URLWithString:[_url.absoluteString substringToIndex:[_url.absoluteString rangeOfString:@"?"].location]];
@@ -62,6 +66,9 @@
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
         self.navigationController.navigationBar.clipsToBounds = YES;
+    } else {
+        _titleLabel.textColor = [UIColor whiteColor];
+        _metadataLabel.textColor = [UIColor whiteColor];
     }
 
     _lineNumbers = [[UISwitch alloc] initWithFrame:CGRectZero];
@@ -69,7 +76,7 @@
     [_lineNumbers addTarget:self action:@selector(_toggleLineNumbers) forControlEvents:UIControlEventValueChanged];
     
     if(_ownPaste) {
-        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
+        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?@"Line Numbers":@"Line #s" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
                              [[UIBarButtonItem alloc] initWithCustomView:_lineNumbers],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(_editPaste)],
@@ -79,7 +86,7 @@
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
                              ]];
     } else {
-        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
+        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?@"Line Numbers":@"Line #s" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
                              [[UIBarButtonItem alloc] initWithCustomView:_lineNumbers],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
@@ -87,6 +94,7 @@
         
     }
     _lineNumbers.enabled = NO;
+    [_lineNumbers sizeToFit];
     
     _titleView.frame = CGRectMake(0,0,self.navigationController.navigationBar.frame.size.width - 120, self.navigationController.navigationBar.frame.size.height);
 
