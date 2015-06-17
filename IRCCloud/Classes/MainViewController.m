@@ -1258,7 +1258,7 @@ extern NSDictionary *emojiMap;
                 CLS_LOG(@"/crash requested");
                 [[Crashlytics sharedInstance] crash];
 #endif
-            } else if(_message.text.length > 1080 || [_message.text isEqualToString:@"/paste"] || [_message.text rangeOfString:@"\n"].location < _message.text.length - 1) {
+            } else if(_message.text.length > 1080 || [_message.text isEqualToString:@"/paste"] || [_message.text hasPrefix:@"/paste "] || [_message.text rangeOfString:@"\n"].location < _message.text.length - 1) {
                 BOOL prompt = YES;
                 if([[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
                     prompt = ![[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] boolValue];
@@ -1266,9 +1266,12 @@ extern NSDictionary *emojiMap;
                     prompt = YES;
                 }
 
-                if(prompt || [_message.text isEqualToString:@"/paste"]) {
-                    if(![_message.text isEqualToString:@"/paste"])
-                        _buffer.draft = _message.text;
+                if(prompt || [_message.text isEqualToString:@"/paste"] || [_message.text hasPrefix:@"/paste "]) {
+                    if([_message.text isEqualToString:@"/paste"])
+                       [_message clearText];
+                    else if([_message.text hasPrefix:@"/paste "])
+                        _message.text = [_message.text substringFromIndex:7];
+                    _buffer.draft = _message.text;
                     PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
                     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
                     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
