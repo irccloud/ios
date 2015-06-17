@@ -102,7 +102,7 @@
         [spinny startAnimating];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
         
-        if([_filename.text containsString:@"."]) {
+        if([_filename.text rangeOfString:@"."].location != NSNotFound) {
             NSString *extension = [_filename.text substringFromIndex:[_filename.text rangeOfString:@"." options:NSBackwardsSearch].location + 1];
             if(extension.length)
                 _extension = extension;

@@ -32,7 +32,7 @@
     _chrome = [[OpenInChromeController alloc] init];
     _url = url;
 
-    if([_url.absoluteString containsString:@"?"]) {
+    if([_url.absoluteString rangeOfString:@"?"].location != NSNotFound) {
         for(NSURLQueryItem *item in [[NSURLComponents componentsWithString:_url.absoluteString] queryItems]) {
             if([item.name isEqualToString:@"id"])
                 _pasteID = item.value;
