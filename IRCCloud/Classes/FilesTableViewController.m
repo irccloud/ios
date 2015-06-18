@@ -167,8 +167,8 @@
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
     self.navigationItem.title = @"File Uploads";
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(doneButtonPressed:)];
-    self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];
     _url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
     _formatter = [[NSDateFormatter alloc] init];
     _formatter.dateStyle = NSDateFormatterLongStyle;
@@ -192,6 +192,11 @@
     _files = nil;
     _canLoadMore = YES;
     [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
+}
+
+-(void)editButtonPressed:(id)sender {
+    [self.tableView setEditing:!self.tableView.isEditing animated:YES];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:self.tableView.isEditing?UIBarButtonSystemItemCancel:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];
 }
 
 -(void)doneButtonPressed:(id)sender {

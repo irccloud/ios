@@ -91,6 +91,9 @@
 -(instancetype)init {
     self = [super initWithStyle:UITableViewStylePlain];
     if(self) {
+        self.navigationItem.title = @"Your Pastebins";
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
         _extensions = [[NSMutableDictionary alloc] init];
         _fileTypeMap = @{
      @"ABAP":        [NSRegularExpression regularExpressionWithPattern:@"abap" options:NSRegularExpressionCaseInsensitive error:nil],
@@ -213,9 +216,6 @@
         [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
         self.navigationController.navigationBar.clipsToBounds = YES;
     }
-    self.navigationItem.title = @"Your Pastebins";
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(doneButtonPressed:)];
-    self.navigationItem.rightBarButtonItem = self.editButtonItem;
     _url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
     
     _footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
@@ -232,6 +232,11 @@
     _pastes = nil;
     _canLoadMore = YES;
     [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
+}
+
+-(void)editButtonPressed:(id)sender {
+    [self.tableView setEditing:!self.tableView.isEditing animated:YES];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:self.tableView.isEditing?UIBarButtonSystemItemCancel:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];
 }
 
 -(void)doneButtonPressed:(id)sender {
