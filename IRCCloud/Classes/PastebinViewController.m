@@ -114,36 +114,8 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     
     if(data) {
-        NSMutableString *html = [[NSMutableString alloc] initWithBytes:data.bytes length:data.length encoding:NSUTF8StringEncoding];
-        
-        [html replaceCharactersInRange:[html rangeOfString:@"</head>"] withString:@"<style>\
-html, body, .mainContainer, .pasteContainer { width: 100% }\
-body, div.paste { background-color: #fff; }\
-h1#title, div#pasteSidebar, div.paste h1 { display: none; }\
-.mainContainerFull, .mainContent, .mainContentPaste, div.paste { margin: 0px; padding: 0px; border: none; width: 100%; }\
-</style></head>"];
-        
-        [html replaceCharactersInRange:[html rangeOfString:@"</body>"] withString:
-         @"<script>window.PASTEVIEW.on('rendered', _.bind(function () { \
-            var height = window.PASTEVIEW.ace.container.style.height;\
-            height = height.substring(0, height.length - 2);\
-            if(height < window.innerHeight) { window.PASTEVIEW.ace.container.style.height = window.innerHeight + \"px\"; }\
-            $('div.pasteContainer').height(window.PASTEVIEW.ace.container.style.height);\
-            location.href = \"hide-spinner:\";\
-         }, window.PASTEVIEW));\
-         window.PASTEVIEW.model.on('removed', _.bind(function () { \
-             location.href = \"hide-spinner:\";\
-         }, window.PASTEVIEW.model));\
-         window.PASTEVIEW.model.on('fetchError', _.bind(function () { \
-             location.href = \"hide-spinner:\";\
-         }, window.PASTEVIEW.model));\
-         window.PASTEVIEW.model.on('loaded', _.bind(function () { \
-         location.href = \"set-title:\" + escape(window.PASTEVIEW.model.get('name')) + '&' + escape(window.PASTEVIEW.syntax() + ' • ' + window.PASTEVIEW.lines());\
-         }, window.PASTEVIEW.model));\
-         </script></body>"];
-        
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [_webView loadHTMLString:html baseURL:_url];
+            [_webView loadHTMLString:[[NSString alloc] initWithBytes:data.bytes length:data.length encoding:NSUTF8StringEncoding] baseURL:_url];
         }];
     }
 }

@@ -1244,7 +1244,7 @@ int __timestampWidth;
                         for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
                             NSString *url = [_paste_url_template relativeStringWithVariables:@{@"id":[paste objectForKey:@"id"]} error:nil];
                             if(([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
-                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", url, [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
+                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@&mobile=ios", url, [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
                                 [mutableLinks setObject:r atIndexedSubscript:i];
                             }
                         }
