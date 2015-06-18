@@ -95,6 +95,7 @@
 }
 
 -(void)addButtonPressed {
+    [self.view endEditing:YES];
     Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
     _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;

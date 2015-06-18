@@ -277,6 +277,7 @@
     [self.tableView endEditing:YES];
     
     if(sender && [NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"email"] && ![_email.text isEqualToString:[[NetworkConnection sharedInstance].userInfo objectForKey:@"email"]]) {
+        [self.view endEditing:YES];
         _alertView = [[UIAlertView alloc] initWithTitle:@"Change Your Email Address" message:@"Please enter your current password to confirm this change" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
         _alertView.alertViewStyle = UIAlertViewStyleSecureTextInput;
         [_alertView textFieldAtIndex:0].delegate = self;

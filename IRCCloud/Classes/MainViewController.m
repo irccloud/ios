@@ -392,6 +392,7 @@ extern NSDictionary *emojiMap;
         case kIRCEventBadChannelKey:
             _alertObject = notification.object;
             s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
+            [self dismissKeyboard];
             if(NSClassFromString(@"UIAlertController")) {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] preferredStyle:UIAlertControllerStyleAlert];
                 
@@ -417,6 +418,7 @@ extern NSDictionary *emojiMap;
         case kIRCEventInvalidNick:
             _alertObject = notification.object;
             s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
+            [self dismissKeyboard];
             if(NSClassFromString(@"UIAlertController")) {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." preferredStyle:UIAlertControllerStyleAlert];
                 

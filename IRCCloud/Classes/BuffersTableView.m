@@ -447,6 +447,7 @@
 
 - (void)joinBtnPressed:(UIButton *)sender {
 #ifndef EXTENSION
+    [_delegate dismissKeyboard];
     Server *s = [_servers getServer:(int)sender.tag];
     _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
@@ -455,7 +456,6 @@
     [_alertView textFieldAtIndex:0].text = @"#";
     [_alertView textFieldAtIndex:0].delegate = self;
     [_alertView show];
-    [_delegate dismissKeyboard];
 #endif
 }
 

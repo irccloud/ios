@@ -96,6 +96,7 @@
 }
 
 -(void)addButtonPressed {
+    [self.view endEditing:YES];
     Server *s = [[ServersDataSource sharedInstance] getServer:_event.cid];
     _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Allow messages from this user" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Allow", nil];
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
