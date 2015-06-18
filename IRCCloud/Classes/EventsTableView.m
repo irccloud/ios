@@ -205,7 +205,8 @@ int __timestampWidth;
 }
 
 -(void)drawerClosed:(NSNotification *)n {
-    [self scrollViewDidScroll:self.tableView];
+    if(self.slidingViewController.underLeftViewController)
+        [self scrollViewDidScroll:self.tableView];
 }
 
 -(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
@@ -1054,7 +1055,9 @@ int __timestampWidth;
         e.timestamp = nil;
     }
     
-    if(_minEid > 0 && _buffer.last_seen_eid > 0 && _minEid >= _buffer.last_seen_eid) {
+    if(_buffer.last_seen_eid == 0 && _data.count > 1) {
+        _lastSeenEidPos = 1;
+    } else if(_minEid > 0 && _minEid >= _buffer.last_seen_eid) {
         _lastSeenEidPos = 0;
     } else {
         Event *e = [[Event alloc] init];

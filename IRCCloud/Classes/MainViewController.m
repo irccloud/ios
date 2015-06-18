@@ -389,10 +389,12 @@ extern NSDictionary *emojiMap;
             [self _updateTitleArea];
             [self _updateUserListVisibility];
             break;
-        case kIRCEventBadChannelKey:
+        case kIRCEventBadChannelKey: {
             _alertObject = notification.object;
             s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
-            [self dismissKeyboard];
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self dismissKeyboard];
+                [self.view.window endEditing:YES];
             if(NSClassFromString(@"UIAlertController")) {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] preferredStyle:UIAlertControllerStyleAlert];
                 
@@ -406,6 +408,7 @@ extern NSDictionary *emojiMap;
                 
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                     textField.delegate = self;
+                    [textField becomeFirstResponder];
                 }];
             } else {
                 _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
@@ -414,11 +417,14 @@ extern NSDictionary *emojiMap;
                 [_alertView textFieldAtIndex:0].delegate = self;
                 [_alertView show];
             }
+            }];}
             break;
-        case kIRCEventInvalidNick:
+        case kIRCEventInvalidNick: {
             _alertObject = notification.object;
             s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
-            [self dismissKeyboard];
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self dismissKeyboard];
+                [self.view.window endEditing:YES];
             if(NSClassFromString(@"UIAlertController")) {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." preferredStyle:UIAlertControllerStyleAlert];
                 
@@ -432,6 +438,7 @@ extern NSDictionary *emojiMap;
 
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                     textField.delegate = self;
+                    [textField becomeFirstResponder];
                 }];
             } else {
                 _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Change", nil];
@@ -441,6 +448,7 @@ extern NSDictionary *emojiMap;
                 [_alertView textFieldAtIndex:0].delegate = self;
                 [_alertView show];
             }
+            }];}
             break;
         case kIRCEventAlert:
             o = notification.object;

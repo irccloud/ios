@@ -411,19 +411,21 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 
 - (void)resetTopViewWithAnimations:(void(^)())animations onComplete:(void(^)())complete
 {
-  [self topViewHorizontalCenterWillChange:self.resettedCenter];
-  
-  [UIView animateWithDuration:0.15f animations:^{
-    if (animations) {
-      animations();
+    if(self.topView.center.x != self.resettedCenter) {
+      [self topViewHorizontalCenterWillChange:self.resettedCenter];
+      
+      [UIView animateWithDuration:0.15f animations:^{
+        if (animations) {
+          animations();
+        }
+        [self updateTopViewHorizontalCenter:self.resettedCenter];
+      } completion:^(BOOL finished) {
+        if (complete) {
+          complete();
+        }
+        [self topViewHorizontalCenterDidChange:self.resettedCenter];
+      }];
     }
-    [self updateTopViewHorizontalCenter:self.resettedCenter];
-  } completion:^(BOOL finished) {
-    if (complete) {
-      complete();
-    }
-    [self topViewHorizontalCenterDidChange:self.resettedCenter];
-  }];
 }
 
 - (NSUInteger)autoResizeToFillScreen

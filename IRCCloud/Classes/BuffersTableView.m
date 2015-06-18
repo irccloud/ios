@@ -466,6 +466,8 @@
 }
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+    [_delegate dismissKeyboard];
+    [_alertView endEditing:YES];
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
     if([title isEqualToString:@"Join"]) {
@@ -477,7 +479,9 @@
                 key = [channel substringFromIndex:pos + 1];
                 channel = [channel substringToIndex:pos];
             }
-           [[NetworkConnection sharedInstance] join:channel key:key cid:(int)alertView.tag];
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [[NetworkConnection sharedInstance] join:channel key:key cid:(int)alertView.tag];
+            }];
         }
     }
     

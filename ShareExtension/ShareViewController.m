@@ -267,6 +267,7 @@
                     filenameConfigItem.valuePending = YES;
                 
                 filenameConfigItem.tapHandler = ^() {
+                    [self.view.window endEditing:YES];
                     UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Enter a Filename" message:nil preferredStyle:UIAlertControllerStyleAlert];
                     [c addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                         textField.text = _filename;
