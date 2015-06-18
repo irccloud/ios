@@ -473,7 +473,7 @@
     _selectedPaste = [_pastes objectAtIndex:indexPath.row];
     if(_selectedPaste) {
         NSString *url = [_url_template relativeStringWithVariables:_selectedPaste error:nil];
-        url = [url stringByAppendingFormat:@"?id=%@&own_paste=%@&mobile=ios", [_selectedPaste objectForKey:@"id"], [_selectedPaste objectForKey:@"own_paste"]];
+        url = [url stringByAppendingFormat:@"?id=%@&own_paste=%@", [_selectedPaste objectForKey:@"id"], [_selectedPaste objectForKey:@"own_paste"]];
         PastebinViewController *c = [[PastebinViewController alloc] initWithURL:[NSURL URLWithString:url]];
         [self.navigationController pushViewController:c animated:YES];
     }

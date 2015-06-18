@@ -30,10 +30,10 @@
     self.navigationItem.title = @"Pastebin";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_doneButtonPressed)];
     _chrome = [[OpenInChromeController alloc] init];
-    _url = url;
+    _url = url.absoluteString;
 
-    if([_url.absoluteString rangeOfString:@"?"].location != NSNotFound) {
-        NSString *query = [[_url absoluteString] substringFromIndex:[_url.absoluteString rangeOfString:@"?"].location + 1];
+    if([_url rangeOfString:@"?"].location != NSNotFound) {
+        NSString *query = [_url substringFromIndex:[_url rangeOfString:@"?"].location + 1];
         NSArray *args = [query componentsSeparatedByString:@"&"];
         for(NSString *arg in args) {
             NSArray *pair = [arg componentsSeparatedByString:@"="];
@@ -44,7 +44,7 @@
                 _ownPaste = [[pair objectAtIndex:1] isEqualToString:@"1"];
         }
         
-        _url = [NSURL URLWithString:[_url.absoluteString substringToIndex:[_url.absoluteString rangeOfString:@"?"].location]];
+        _url = [_url substringToIndex:[_url rangeOfString:@"?"].location];
     }
     
     return self;
@@ -56,7 +56,7 @@
         [_activity startAnimating];
         _lineNumbers.enabled = NO;
         _lineNumbers.on = YES;
-        [self performSelectorInBackground:@selector(_fetch) withObject:nil];
+        [self _fetch];
     }
 }
 
@@ -98,26 +98,15 @@
     
     _titleView.frame = CGRectMake(0,0,self.navigationController.navigationBar.frame.size.width - 120, self.navigationController.navigationBar.frame.size.height);
 
-    [self performSelectorInBackground:@selector(_fetch) withObject:nil];
+    [self _fetch];
 }
 
 -(void)_fetch {
-    NSData *data;
-    NSURLResponse *response = nil;
-    NSError *error = nil;
-    
+    NSLog(@"%@", [NSURL URLWithString:[_url stringByAppendingFormat:@"?mobile=ios&version=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]]]);
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:_url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:30];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[_url stringByAppendingFormat:@"?mobile=ios&version=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]]] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
-    if(data) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [_webView loadHTMLString:[[NSString alloc] initWithBytes:data.bytes length:data.length encoding:NSUTF8StringEncoding] baseURL:_url];
-        }];
-    }
+    [_webView loadRequest:request];
 }
 
 -(void)_doneButtonPressed {
@@ -173,18 +162,18 @@
     
     if([title isEqualToString:@"Copy To Clipboard"]) {
         UIPasteboard *pb = [UIPasteboard generalPasteboard];
-        pb.items = @[@{(NSString *)kUTTypeUTF8PlainText:_url.absoluteString,
-                       (NSString *)kUTTypeURL:_url}];
+        pb.items = @[@{(NSString *)kUTTypeUTF8PlainText:_url,
+                       (NSString *)kUTTypeURL:[NSURL URLWithString:_url]}];
     } else if([title isEqualToString:@"Share on Twitter"]) {
         TWTweetComposeViewController *tweetViewController = [[TWTweetComposeViewController alloc] init];
-        [tweetViewController setInitialText:_url.absoluteString];
+        [tweetViewController setInitialText:_url];
         [tweetViewController setCompletionHandler:^(TWTweetComposeViewControllerResult result) {
             [self dismissModalViewControllerAnimated:YES];
         }];
         [self presentModalViewController:tweetViewController animated:YES];
     } else if([title hasPrefix:@"Open "]) {
         [self _doneButtonPressed];
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) launchURL:_url];
+        [((AppDelegate *)[UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:_url]];
     }
 }
 

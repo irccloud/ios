@@ -25,7 +25,7 @@
     IBOutlet UIView *_titleView;
     IBOutlet UILabel *_titleLabel;
     IBOutlet UILabel *_metadataLabel;
-    NSURL *_url;
+    NSString *_url;
     UISwitch *_lineNumbers;
     NSString *_pasteID;
     BOOL _ownPaste;
