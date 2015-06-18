@@ -88,6 +88,125 @@
 
 @implementation PastebinsTableViewController
 
+-(instancetype)init {
+    self = [super initWithStyle:UITableViewStylePlain];
+    if(self) {
+        _extensions = [[NSMutableDictionary alloc] init];
+        _fileTypeMap = @{
+     @"ABAP":        [NSRegularExpression regularExpressionWithPattern:@"abap" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"ActionScript":[NSRegularExpression regularExpressionWithPattern:@"as" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"ADA":         [NSRegularExpression regularExpressionWithPattern:@"ada|adb" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Apache_Conf": [NSRegularExpression regularExpressionWithPattern:@"^htaccess|^htgroups|^htpasswd|^conf|htaccess|htgroups|htpasswd" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"AsciiDoc":    [NSRegularExpression regularExpressionWithPattern:@"asciidoc" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Assembly x86":[NSRegularExpression regularExpressionWithPattern:@"asm" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"AutoHotKey":  [NSRegularExpression regularExpressionWithPattern:@"ahk" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"BatchFile":   [NSRegularExpression regularExpressionWithPattern:@"bat|cmd" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"C9Search":    [NSRegularExpression regularExpressionWithPattern:@"c9search_results" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"C/C++":       [NSRegularExpression regularExpressionWithPattern:@"cpp|c|cc|cxx|h|hh|hpp" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Cirru":       [NSRegularExpression regularExpressionWithPattern:@"cirru|cr" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Clojure":     [NSRegularExpression regularExpressionWithPattern:@"clj|cljs" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Cobol":       [NSRegularExpression regularExpressionWithPattern:@"CBL|COB" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"CoffeeScript":[NSRegularExpression regularExpressionWithPattern:@"coffee|cf|cson|^Cakefile" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"ColdFusion":  [NSRegularExpression regularExpressionWithPattern:@"cfm" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"C#":          [NSRegularExpression regularExpressionWithPattern:@"cs" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"CSS":         [NSRegularExpression regularExpressionWithPattern:@"css" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Curly":       [NSRegularExpression regularExpressionWithPattern:@"curly" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"D":           [NSRegularExpression regularExpressionWithPattern:@"d|di" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Dart":        [NSRegularExpression regularExpressionWithPattern:@"dart" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Diff":        [NSRegularExpression regularExpressionWithPattern:@"diff|patch" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Dockerfile":  [NSRegularExpression regularExpressionWithPattern:@"^Dockerfile" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Dot":         [NSRegularExpression regularExpressionWithPattern:@"dot" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Erlang":      [NSRegularExpression regularExpressionWithPattern:@"erl|hrl" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"EJS":         [NSRegularExpression regularExpressionWithPattern:@"ejs" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Forth":       [NSRegularExpression regularExpressionWithPattern:@"frt|fs|ldr" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"FreeMarker":  [NSRegularExpression regularExpressionWithPattern:@"ftl" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Gherkin":     [NSRegularExpression regularExpressionWithPattern:@"feature" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Gitignore":   [NSRegularExpression regularExpressionWithPattern:@"^.gitignore" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Glsl":        [NSRegularExpression regularExpressionWithPattern:@"glsl|frag|vert" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Go":          [NSRegularExpression regularExpressionWithPattern:@"go" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Groovy":      [NSRegularExpression regularExpressionWithPattern:@"groovy" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"HAML":        [NSRegularExpression regularExpressionWithPattern:@"haml" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Handlebars":  [NSRegularExpression regularExpressionWithPattern:@"hbs|handlebars|tpl|mustache" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Haskell":     [NSRegularExpression regularExpressionWithPattern:@"hs" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"haXe":        [NSRegularExpression regularExpressionWithPattern:@"hx" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"HTML":        [NSRegularExpression regularExpressionWithPattern:@"html|htm|xhtml" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"HTML (Ruby)": [NSRegularExpression regularExpressionWithPattern:@"erb|rhtml|html.erb" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"INI":         [NSRegularExpression regularExpressionWithPattern:@"ini|conf|cfg|prefs" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Jack":        [NSRegularExpression regularExpressionWithPattern:@"jack" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Jade":        [NSRegularExpression regularExpressionWithPattern:@"jade" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Java":        [NSRegularExpression regularExpressionWithPattern:@"java" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"JavaScript":  [NSRegularExpression regularExpressionWithPattern:@"js|jsm" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"JSON":        [NSRegularExpression regularExpressionWithPattern:@"json" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"JSONiq":      [NSRegularExpression regularExpressionWithPattern:@"jq" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"JSP":         [NSRegularExpression regularExpressionWithPattern:@"jsp" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"JSX":         [NSRegularExpression regularExpressionWithPattern:@"jsx" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Julia":       [NSRegularExpression regularExpressionWithPattern:@"jl" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"LaTeX":       [NSRegularExpression regularExpressionWithPattern:@"tex|latex|ltx|bib" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"LESS":        [NSRegularExpression regularExpressionWithPattern:@"less" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Liquid":      [NSRegularExpression regularExpressionWithPattern:@"liquid" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Lisp":        [NSRegularExpression regularExpressionWithPattern:@"lisp" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"LiveScript":  [NSRegularExpression regularExpressionWithPattern:@"ls" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"LogiQL":      [NSRegularExpression regularExpressionWithPattern:@"logic|lql" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"LSL":         [NSRegularExpression regularExpressionWithPattern:@"lsl" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Lua":         [NSRegularExpression regularExpressionWithPattern:@"lua" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"LuaPage":     [NSRegularExpression regularExpressionWithPattern:@"lp" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Lucene":      [NSRegularExpression regularExpressionWithPattern:@"lucene" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Makefile":    [NSRegularExpression regularExpressionWithPattern:@"^Makefile|^GNUmakefile|^makefile|^OCamlMakefile|make" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"MATLAB":      [NSRegularExpression regularExpressionWithPattern:@"matlab" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Markdown":    [NSRegularExpression regularExpressionWithPattern:@"md|markdown" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"MEL":         [NSRegularExpression regularExpressionWithPattern:@"mel" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"MySQL":       [NSRegularExpression regularExpressionWithPattern:@"mysql" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"MUSHCode":    [NSRegularExpression regularExpressionWithPattern:@"mc|mush" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Nix":         [NSRegularExpression regularExpressionWithPattern:@"nix" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Objective-C": [NSRegularExpression regularExpressionWithPattern:@"m|mm" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"OCaml":       [NSRegularExpression regularExpressionWithPattern:@"ml|mli" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Pascal":      [NSRegularExpression regularExpressionWithPattern:@"pas|p" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Perl":        [NSRegularExpression regularExpressionWithPattern:@"pl|pm" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"pgSQL":       [NSRegularExpression regularExpressionWithPattern:@"pgsql" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"PHP":         [NSRegularExpression regularExpressionWithPattern:@"php|phtml" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Powershell":  [NSRegularExpression regularExpressionWithPattern:@"ps1" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Prolog":      [NSRegularExpression regularExpressionWithPattern:@"plg|prolog" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Properties":  [NSRegularExpression regularExpressionWithPattern:@"properties" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Protobuf":    [NSRegularExpression regularExpressionWithPattern:@"proto" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Python":      [NSRegularExpression regularExpressionWithPattern:@"py" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"R":           [NSRegularExpression regularExpressionWithPattern:@"r" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"RDoc":        [NSRegularExpression regularExpressionWithPattern:@"Rd" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"RHTML":       [NSRegularExpression regularExpressionWithPattern:@"Rhtml" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Ruby":        [NSRegularExpression regularExpressionWithPattern:@"rb|ru|gemspec|rake|^Guardfile|^Rakefile|^Gemfile" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Rust":        [NSRegularExpression regularExpressionWithPattern:@"rs" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"SASS":        [NSRegularExpression regularExpressionWithPattern:@"sass" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"SCAD":        [NSRegularExpression regularExpressionWithPattern:@"scad" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Scala":       [NSRegularExpression regularExpressionWithPattern:@"scala" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Smarty":      [NSRegularExpression regularExpressionWithPattern:@"smarty|tpl" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Scheme":      [NSRegularExpression regularExpressionWithPattern:@"scm|rkt" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"SCSS":        [NSRegularExpression regularExpressionWithPattern:@"scss" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"SH":          [NSRegularExpression regularExpressionWithPattern:@"sh|bash|^.bashrc" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"SJS":         [NSRegularExpression regularExpressionWithPattern:@"sjs" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Space":       [NSRegularExpression regularExpressionWithPattern:@"space" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"snippets":    [NSRegularExpression regularExpressionWithPattern:@"snippets" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Soy Template":[NSRegularExpression regularExpressionWithPattern:@"soy" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"SQL":         [NSRegularExpression regularExpressionWithPattern:@"sql" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Stylus":      [NSRegularExpression regularExpressionWithPattern:@"styl|stylus" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"SVG":         [NSRegularExpression regularExpressionWithPattern:@"svg" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Tcl":         [NSRegularExpression regularExpressionWithPattern:@"tcl" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Tex":         [NSRegularExpression regularExpressionWithPattern:@"tex" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Text":        [NSRegularExpression regularExpressionWithPattern:@"txt" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Textile":     [NSRegularExpression regularExpressionWithPattern:@"textile" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Toml":        [NSRegularExpression regularExpressionWithPattern:@"toml" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Twig":        [NSRegularExpression regularExpressionWithPattern:@"twig" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Typescript":  [NSRegularExpression regularExpressionWithPattern:@"ts|typescript|str" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Vala":        [NSRegularExpression regularExpressionWithPattern:@"vala" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"VBScript":    [NSRegularExpression regularExpressionWithPattern:@"vbs" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Velocity":    [NSRegularExpression regularExpressionWithPattern:@"vm" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"Verilog":     [NSRegularExpression regularExpressionWithPattern:@"v|vh|sv|svh" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"XML":         [NSRegularExpression regularExpressionWithPattern:@"xml|rdf|rss|wsdl|xslt|atom|mathml|mml|xul|xbl" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"XQuery":      [NSRegularExpression regularExpressionWithPattern:@"xq" options:NSRegularExpressionCaseInsensitive error:nil],
+     @"YAML":        [NSRegularExpression regularExpressionWithPattern:@"yaml|yml" options:NSRegularExpressionCaseInsensitive error:nil]
+                         };
+    }
+    return self;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
@@ -204,6 +323,26 @@
     // Dispose of any resources that can be recreated.
 }
 
+- (NSString *)fileType:(NSString *)extension {
+    if([_extensions objectForKey:extension.lowercaseString])
+        return [_extensions objectForKey:extension.lowercaseString];
+    
+    if(extension.length) {
+        NSRange range = NSMakeRange(0, extension.length);
+        for(NSString *type in _fileTypeMap.allKeys) {
+            NSRegularExpression *regex = [_fileTypeMap objectForKey:type];
+            NSArray *matches = [regex matchesInString:extension options:NSMatchingAnchored range:range];
+            for(NSTextCheckingResult *result in matches) {
+                if(result.range.location == 0 && result.range.length == range.length) {
+                    [_extensions setObject:type forKey:extension.lowercaseString];
+                    return type;
+                }
+            }
+        }
+    }
+    return @"Text";
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -292,7 +431,7 @@
     }
 
     cell.name.text = [pastebin objectForKey:@"name"];
-    cell.date.text = [NSString stringWithFormat:@"%@ • %@ line%@ • %@", date, [pastebin objectForKey:@"lines"], ([[pastebin objectForKey:@"lines"] intValue] == 1)?@"":@"s", [[pastebin objectForKey:@"extension"] length]?[pastebin objectForKey:@"extension"]:@"txt"];
+    cell.date.text = [NSString stringWithFormat:@"%@ • %@ line%@ • %@", date, [pastebin objectForKey:@"lines"], ([[pastebin objectForKey:@"lines"] intValue] == 1)?@"":@"s", [self fileType:[pastebin objectForKey:@"extension"]]];
     cell.text.text = [pastebin objectForKey:@"body"];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;

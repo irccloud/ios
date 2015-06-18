@@ -30,6 +30,8 @@
     UIView *_footerView;
     NSDictionary *_selectedPaste;
     CSURITemplate *_url_template;
+    NSDictionary *_fileTypeMap;
+    NSMutableDictionary *_extensions;
 }
 @property id<PastebinsTableViewDelegate> delegate;
 @end

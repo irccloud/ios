@@ -3302,7 +3302,7 @@ extern NSDictionary *emojiMap;
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Your Pastebins"]) {
-            PastebinsTableViewController *ptv = [[PastebinsTableViewController alloc] initWithStyle:UITableViewStylePlain];
+            PastebinsTableViewController *ptv = [[PastebinsTableViewController alloc] init];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ptv];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
