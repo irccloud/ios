@@ -115,7 +115,7 @@
 
 -(void)_toggleLineNumbers {
     if(_lineNumbers.enabled)
-        [_webView stringByEvaluatingJavaScriptFromString:@"$('a.lines').click()"];
+        [_webView stringByEvaluatingJavaScriptFromString:@"window.PASTEVIEW.doToggleLines()"];
 }
 
 -(void)_toggleLineNumbersSwitch {
