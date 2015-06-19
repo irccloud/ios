@@ -163,7 +163,7 @@
             o = notification.object;
             if(o.cid == _event.cid) {
                 _event = o;
-                _placeholder.text = [NSString stringWithFormat:@"Too many channels to list for %@", [o objectForKey:@"server"]];
+                _placeholder.text = [NSString stringWithFormat:@"Too many channels to list for %@\n\nTry limiting the list to only respond with channels that have more than e.g. 50 members: /LIST >50", [o objectForKey:@"server"]];
                 [_activity stopAnimating];
             }
             break;
