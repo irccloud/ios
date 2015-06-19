@@ -27,7 +27,6 @@
 
 -(id)initWithURL:(NSURL *)url {
     self = [super initWithNibName:@"PastebinViewController" bundle:nil];
-    self.navigationItem.title = @"Pastebin";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_doneButtonPressed)];
     _chrome = [[OpenInChromeController alloc] init];
     _url = url.absoluteString;
