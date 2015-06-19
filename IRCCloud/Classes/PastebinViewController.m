@@ -126,8 +126,18 @@
 }
 
 -(void)_removePaste {
-    [[NetworkConnection sharedInstance] deletePaste:_pasteID];
-    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete Pastebin" message:@"Are you sure you want to delete this pastebin?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Delete", nil];
+    [alert show];
+}
+
+-(void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+    if([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Delete"]) {
+        [[NetworkConnection sharedInstance] deletePaste:_pasteID];
+        if(self.navigationController.viewControllers.count == 1)
+            [self.presentingViewController dismissModalViewControllerAnimated:YES];
+        else
+            [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 -(void)_editPaste {
