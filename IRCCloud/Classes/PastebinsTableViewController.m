@@ -91,7 +91,7 @@
 -(instancetype)init {
     self = [super initWithStyle:UITableViewStylePlain];
     if(self) {
-        self.navigationItem.title = @"Your Pastebins";
+        self.navigationItem.title = @"Pastebins";
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
         _extensions = [[NSMutableDictionary alloc] init];

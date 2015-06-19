@@ -3143,7 +3143,7 @@ extern NSDictionary *emojiMap;
 
 -(void)uploadsButtonPressed:(id)sender {
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", @"Start a Pastebin", @"Your Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", @"Start a Pastebin", @"Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -3151,7 +3151,7 @@ extern NSDictionary *emojiMap;
             [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
         }
     } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"File Uploads", @"Choose Document", @"Start a Pastebin", @"Your Pastebins", nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"File Uploads", @"Choose Document", @"Start a Pastebin", @"Pastebins", nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -3159,7 +3159,7 @@ extern NSDictionary *emojiMap;
             [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
         }
     } else {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"Start a Pastebin", @"Your Pastebins", [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]?@"File Uploads":nil, nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"Start a Pastebin", @"Pastebins", [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]?@"File Uploads":nil, nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -3311,7 +3311,7 @@ extern NSDictionary *emojiMap;
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
-        } else if([action isEqualToString:@"Your Pastebins"]) {
+        } else if([action isEqualToString:@"Pastebins"]) {
             PastebinsTableViewController *ptv = [[PastebinsTableViewController alloc] init];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ptv];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
