@@ -97,6 +97,8 @@
     
     _titleView.frame = CGRectMake(0,0,self.navigationController.navigationBar.frame.size.width - 120, self.navigationController.navigationBar.frame.size.height);
 
+    _webView.scrollView.scrollsToTop = YES;
+    
     [self _fetch];
 }
 
