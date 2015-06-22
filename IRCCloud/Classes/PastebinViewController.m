@@ -189,7 +189,7 @@
 }
 
 -(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-    if([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102)
+    if(([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102) || ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled))
         return;
     NSLog(@"Error: %@", error);
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
