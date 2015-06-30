@@ -1368,7 +1368,16 @@ extern NSDictionary *emojiMap;
 -(void)nickSelected:(NSString *)nick {
     _message.selectedRange = NSMakeRange(0, 0);
     NSString *text = _message.text;
-    if(![text hasPrefix:@":"] && [text rangeOfString:@" "].location == NSNotFound)
+    BOOL isChannel = NO;
+    
+    for(Channel *channel in _sortedChannels) {
+        if([nick isEqualToString:channel.name]) {
+            isChannel = YES;
+            break;
+        }
+    }
+    
+    if(!isChannel && ![text hasPrefix:@":"] && [text rangeOfString:@" "].location == NSNotFound)
         nick = [nick stringByAppendingString:@": "];
     else
         nick = [nick stringByAppendingString:@" "];
