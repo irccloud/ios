@@ -1328,8 +1328,11 @@ int __timestampWidth;
                         [cell.message addLinkWithTextCheckingResult:result];
                 } else {
                     NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
-                    if(![url hasPrefix:@"irc"])
-                        url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url];
+                    if(![url hasPrefix:@"irc"]) {
+                        CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                        url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
+                        CFRelease(url_escaped);
+                    }
                     NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
                     if(u)
                         [cell.message addLinkToURL:u withRange:result.range];
