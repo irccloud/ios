@@ -251,6 +251,8 @@
 		227FF2A216FA128B00DBE3C5 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		227FF8231772063F00394114 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF8221772063F00394114 /* SettingsViewController.m */; };
 		2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
+		2284EF721B4AD47F0058D483 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2284EF711B4AD47F0058D483 /* MediaPlayer.framework */; };
+		2284EF731B4AD48E0058D483 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2284EF711B4AD47F0058D483 /* MediaPlayer.framework */; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -652,6 +654,7 @@
 		227FF8211772062E00394114 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		227FF8221772063F00394114 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		2283322F17944E2B00ED22EA /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		2284EF711B4AD47F0058D483 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A056F16D3DABA0029769C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -832,6 +835,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2284EF731B4AD48E0058D483 /* MediaPlayer.framework in Frameworks */,
 				2249867F1A95139400F6C3E2 /* AssetsLibrary.framework in Frameworks */,
 				22A897C51A82E0B800FBC1DE /* StoreKit.framework in Frameworks */,
 				22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */,
@@ -860,6 +864,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2284EF721B4AD47F0058D483 /* MediaPlayer.framework in Frameworks */,
 				2249867E1A95138800F6C3E2 /* AssetsLibrary.framework in Frameworks */,
 				22A897C41A82E0A900FBC1DE /* StoreKit.framework in Frameworks */,
 				1A5703481A74145400D58225 /* AdSupport.framework in Frameworks */,
@@ -1006,6 +1011,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2284EF711B4AD47F0058D483 /* MediaPlayer.framework */,
 				2249867D1A95138800F6C3E2 /* AssetsLibrary.framework */,
 				22A897C31A82E0A900FBC1DE /* StoreKit.framework */,
 				22C8DCF21A801A4500199371 /* CloudKit.framework */,
@@ -2310,7 +2316,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",

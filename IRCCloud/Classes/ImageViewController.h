@@ -16,11 +16,13 @@
 
 
 #import <UIKit/UIKit.h>
+#import <MediaPlayer/MediaPlayer.h>
 #import "OpenInChromeController.h"
 
 @interface ImageViewController : UIViewController<UIScrollViewDelegate,UIActionSheetDelegate,NSURLConnectionDataDelegate,UIPopoverPresentationControllerDelegate> {
     IBOutlet UIImageView *_imageView;
     IBOutlet UIScrollView *_scrollView;
+    MPMoviePlayerController *_movieController;
     __weak IBOutlet UIProgressView *_progressView;
     IBOutlet UIToolbar *_toolbar;
     NSURL *_url;

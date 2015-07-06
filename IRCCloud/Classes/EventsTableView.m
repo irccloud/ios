@@ -1330,8 +1330,10 @@ int __timestampWidth;
                     NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
                     if(![url hasPrefix:@"irc"]) {
                         CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                        url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
-                        CFRelease(url_escaped);
+                        if(url_escaped != NULL) {
+                            url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
+                            CFRelease(url_escaped);
+                        }
                     }
                     NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
                     if(u)

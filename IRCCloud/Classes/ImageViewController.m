@@ -73,6 +73,9 @@
     [self scrollViewDidZoom:_scrollView];
     
     _progressView.center = CGPointMake(self.view.bounds.size.width / 2.0,self.view.bounds.size.height/2.0);
+    
+    if(_movieController)
+        _movieController.view.frame = _scrollView.bounds;
 }
 
 -(void)_setImage:(UIImage *)img {
@@ -202,6 +205,17 @@
     }];
 }
 
+-(void)loadVideo:(NSString *)url {
+    _movieController = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:url]];
+    _movieController.controlStyle = MPMovieControlStyleNone;
+    _movieController.view.userInteractionEnabled = NO;
+    _movieController.view.frame = _scrollView.bounds;
+    [_scrollView addSubview:_movieController.view];
+    _scrollView.userInteractionEnabled = NO;
+    [_progressView removeFromSuperview];
+    [_movieController play];
+}
+
 -(void)loadImgurImage:(NSString *)imageID {
 #ifdef MASHAPE_KEY
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://imgur-apiv3.p.mashape.com/3/image/%@", imageID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
@@ -228,6 +242,10 @@
                     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
                     
                     [_connection start];
+                } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
+                    [self loadVideo:[dict objectForKey:@"mp4"]];
+                    if([[dict objectForKey:@"looping"] intValue] == 1)
+                        _movieController.repeatMode = MPMovieRepeatModeOne;
                 } else {
                     NSLog(@"Invalid type from imgur");
                     [self fail];
@@ -300,6 +318,9 @@
         } else {
             [self fail];
         }
+        return;
+    } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"] && [url.path hasSuffix:@".gifv"]) {
+        [self loadImgurImage:[url.path substringToIndex:url.path.length - 5]];
         return;
     } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
         [self loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString]];
@@ -485,7 +506,7 @@
 }
 
 - (void)panned:(UIPanGestureRecognizer *)recognizer {
-    if (_scrollView.zoomScale <= _scrollView.minimumZoomScale) {
+    if (_scrollView.zoomScale <= _scrollView.minimumZoomScale || _movieController) {
         CGRect frame = _scrollView.frame;
         
         switch(recognizer.state) {
