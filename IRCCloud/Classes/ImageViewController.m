@@ -197,6 +197,8 @@
                 _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
                 
                 [_connection start];
+            } else if([[dict objectForKey:@"provider_name"] isEqualToString:@"Giphy"] && [[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location != NSNotFound) {
+                [self loadGiphy:[[dict objectForKey:@"url"] substringFromIndex:[[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location + 6]];
             } else {
                 NSLog(@"Invalid type from oembed");
                 [self fail];
@@ -243,6 +245,39 @@
                 }
             } else {
                 NSLog(@"Gfycat failure");
+                [self fail];
+            }
+        }
+    }];
+}
+
+-(void)loadGiphy:(NSString *)gifID {
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.giphy.com/v1/gifs/%@?api_key=dc6zaTOxFJmzC", gifID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error fetching giphy. Error %li : %@", (long)error.code, error.userInfo);
+            [self fail];
+        } else {
+            SBJsonParser *parser = [[SBJsonParser alloc] init];
+            NSDictionary *dict = [parser objectWithData:data];
+            if([[dict objectForKey:@"data"] objectForKey:@"images"]) {
+                dict = [[[dict objectForKey:@"data"] objectForKey:@"images"] objectForKey:@"original"];
+                if([[dict objectForKey:@"mp4"] length]) {
+                    [self loadVideo:[dict objectForKey:@"mp4"]];
+                    _movieController.repeatMode = MPMovieRepeatModeOne;
+                } else if([[dict objectForKey:@"url"] hasSuffix:@".gif"]) {
+                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"url"]]];
+                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    
+                    [_connection start];
+                } else {
+                    NSLog(@"Invalid type from giphy");
+                    [self fail];
+                }
+            } else {
+                NSLog(@"giphy failure");
                 [self fail];
             }
         }
@@ -357,6 +392,13 @@
         return;
     } else if([[url.host lowercaseString] hasSuffix:@".gfycat.com"]) {
         [self loadGfycat:url.path];
+        return;
+    } else if(([[url.host lowercaseString] hasSuffix:@"giphy.com"] || [[url.host lowercaseString] isEqualToString:@"gph.is"]) && url.pathExtension.length == 0) {
+        NSString *u = url.absoluteString;
+        if([u rangeOfString:@"/gifs/"].location != NSNotFound) {
+            u = [NSString stringWithFormat:@"http://giphy.com/gifs/%@", [url.pathComponents objectAtIndex:2]];
+        }
+        [self loadOembed:[NSString stringWithFormat:@"https://giphy.com/services/oembed/?url=%@", u]];
         return;
     } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
         [self loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString]];
