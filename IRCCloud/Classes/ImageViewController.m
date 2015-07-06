@@ -390,7 +390,7 @@
     } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"] && [url.path hasSuffix:@".gifv"]) {
         [self loadImgurImage:[url.path substringToIndex:url.path.length - 5]];
         return;
-    } else if([[url.host lowercaseString] hasSuffix:@".gfycat.com"]) {
+    } else if([[url.host lowercaseString] hasSuffix:@"gfycat.com"]) {
         [self loadGfycat:url.path];
         return;
     } else if(([[url.host lowercaseString] hasSuffix:@"giphy.com"] || [[url.host lowercaseString] isEqualToString:@"gph.is"]) && url.pathExtension.length == 0) {
