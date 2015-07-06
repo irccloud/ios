@@ -216,6 +216,39 @@
     [_movieController play];
 }
 
+-(void)loadGfycat:(NSString *)gyfID {
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://gfycat.com/cajax/get%@", gyfID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error fetching gfycat. Error %li : %@", (long)error.code, error.userInfo);
+            [self fail];
+        } else {
+            SBJsonParser *parser = [[SBJsonParser alloc] init];
+            NSDictionary *dict = [parser objectWithData:data];
+            if([dict objectForKey:@"gfyItem"]) {
+                dict = [dict objectForKey:@"gfyItem"];
+                if([[dict objectForKey:@"mp4Url"] length]) {
+                    [self loadVideo:[dict objectForKey:@"mp4Url"]];
+                    _movieController.repeatMode = MPMovieRepeatModeOne;
+                } else if([[dict objectForKey:@"gifUrl"] length]) {
+                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"gifUrl"]]];
+                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    
+                    [_connection start];
+                } else {
+                    NSLog(@"Invalid type from gfycat");
+                    [self fail];
+                }
+            } else {
+                NSLog(@"Gfycat failure");
+                [self fail];
+            }
+        }
+    }];
+}
+
 -(void)loadImgurImage:(NSString *)imageID {
 #ifdef MASHAPE_KEY
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://imgur-apiv3.p.mashape.com/3/image/%@", imageID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
@@ -321,6 +354,9 @@
         return;
     } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"] && [url.path hasSuffix:@".gifv"]) {
         [self loadImgurImage:[url.path substringToIndex:url.path.length - 5]];
+        return;
+    } else if([[url.host lowercaseString] isEqualToString:@"gfycat.com"]) {
+        [self loadGfycat:url.path];
         return;
     } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
         [self loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString]];
@@ -569,6 +605,11 @@
         [self setUserActivity:activity];
         [activity becomeCurrent];
     }
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+    if(_movieController)
+        [_movieController stop];
 }
 
 -(IBAction)viewTapped:(id)sender {

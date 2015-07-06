@@ -51,11 +51,14 @@
 #define IS_LEET(url) (([url.host.lowercaseString hasSuffix:@"leetfiles.com"] || [url.host.lowercaseString hasSuffix:@"leetfil.es"]) \
                         && [url.path.lowercaseString hasPrefix:@"/image"])
 
+#define IS_GFYCAT(url) ([[url.host lowercaseString] isEqualToString:@"gfycat.com"] && url.path.length > 1 && [url.path rangeOfString:@"/" options:NSBackwardsSearch].location == 0)
+
+
 + (BOOL)isImageURL:(NSURL *)url
 {
     NSString *l = [url.path lowercaseString];
     // Use pre-processor macros instead of variables so conditions are still evaluated lazily
-    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url));
+    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GFYCAT(url));
 }
 
 - (void)launchURL:(NSURL *)url
