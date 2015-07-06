@@ -51,7 +51,7 @@
 #define IS_LEET(url) (([url.host.lowercaseString hasSuffix:@"leetfiles.com"] || [url.host.lowercaseString hasSuffix:@"leetfil.es"]) \
                         && [url.path.lowercaseString hasPrefix:@"/image"])
 
-#define IS_GFYCAT(url) ([[url.host lowercaseString] isEqualToString:@"gfycat.com"] && url.path.length > 1 && [url.path rangeOfString:@"/" options:NSBackwardsSearch].location == 0)
+#define IS_GFYCAT(url) (([[url.host lowercaseString] isEqualToString:@"gfycat.com"] || [[url.host lowercaseString] isEqualToString:@"www.gfycat.com"]) && url.path.length > 1 && [url.path rangeOfString:@"/" options:NSBackwardsSearch].location == 0)
 
 
 + (BOOL)isImageURL:(NSURL *)url
