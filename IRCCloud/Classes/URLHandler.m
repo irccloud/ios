@@ -14,6 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <MediaPlayer/MediaPlayer.h>
 #import "URLHandler.h"
 #import "AppDelegate.h"
 #import "MainViewController.h"
@@ -89,6 +90,9 @@
         [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"telprompt%@",[url.absoluteString substringFromIndex:3]]]];
     } else if([[self class] isImageURL:url]) {
         [self showImage:url];
+    } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"]) {
+        MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
+        [mainViewController presentMoviePlayerViewControllerAnimated:player];
     } else {
         [self openWebpage:url];
     }
