@@ -50,6 +50,7 @@
 #define TAG_BADCHANNELKEY 5
 #define TAG_INVALIDNICK 6
 #define TAG_FAILEDMSG 7
+#define TAG_LOGOUT 8
 
 extern NSDictionary *emojiMap;
 
@@ -2835,6 +2836,14 @@ extern NSDictionary *emojiMap;
                 if(_selectedEvent.reqId < 0)
                     _selectedEvent.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:_selectedEvent repeats:NO];
             }
+            break;
+        case TAG_LOGOUT:
+            if([title isEqualToString:@"Logout"]) {
+                [[NetworkConnection sharedInstance] logout];
+                [self bufferSelected:-1];
+                [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+            }
+            break;
     }
     _alertView = nil;
 }
@@ -3224,9 +3233,24 @@ extern NSDictionary *emojiMap;
         } else if([action isEqualToString:@"Reconnect"]) {
             [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Logout"]) {
-            [[NetworkConnection sharedInstance] logout];
-            [self bufferSelected:-1];
-            [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+            [self dismissKeyboard];
+            [self.view.window endEditing:YES];
+            if(NSClassFromString(@"UIAlertController")) {
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" preferredStyle:UIAlertControllerStyleAlert];
+                
+                [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Logout" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+                    [[NetworkConnection sharedInstance] logout];
+                    [self bufferSelected:-1];
+                    [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+                }]];
+                
+                [self presentViewController:alert animated:YES completion:nil];
+            } else {
+                _alertView = [[UIAlertView alloc] initWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Logout", nil];
+                _alertView.tag = TAG_LOGOUT;
+                [_alertView show];
+            }
         } else if([action isEqualToString:@"Ignore List"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
