@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+#import <AVFoundation/AVFoundation.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <Twitter/Twitter.h>
 #import "ImageViewController.h"
@@ -208,6 +208,7 @@
 }
 
 -(void)loadVideo:(NSString *)url {
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
     _movieController = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:url]];
     _movieController.controlStyle = MPMovieControlStyleNone;
     _movieController.view.userInteractionEnabled = NO;

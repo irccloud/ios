@@ -14,6 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import "URLHandler.h"
 #import "AppDelegate.h"
@@ -91,6 +92,7 @@
     } else if([[self class] isImageURL:url]) {
         [self showImage:url];
     } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"]) {
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
         [mainViewController presentMoviePlayerViewControllerAnimated:player];
     } else {
