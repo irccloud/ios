@@ -91,7 +91,7 @@
         [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"telprompt%@",[url.absoluteString substringFromIndex:3]]]];
     } else if([[self class] isImageURL:url]) {
         [self showImage:url];
-    } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"]) {
+    } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"]) {
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
         [mainViewController presentMoviePlayerViewControllerAnimated:player];
