@@ -1152,9 +1152,9 @@ float ColorFormatterCachedFontSize = 0.0f;
 +(NSRegularExpression *)ircChannelRegexForServer:(Server *)s {
     NSString *pattern;
     if(s && s.CHANTYPES.length) {
-        pattern = [NSString stringWithFormat:@"(\\s|^)([%@][^\\ufe0e\\ufe0f\\u20e3<>!?\"()\\[\\],\\s\\u0001]+)", s.CHANTYPES];
+        pattern = [NSString stringWithFormat:@"(\\s|^)([%@][^\\ufe0e\\ufe0f\\u20e3<>\",\\s\\u0001][^<>\",\\s\\u0001]*)", s.CHANTYPES];
     } else {
-        pattern = [NSString stringWithFormat:@"(\\s|^)([#][^\\ufe0e\\ufe0f\\u20e3<>!?\"()\\[\\],\\s\\u0001]+)"];
+        pattern = [NSString stringWithFormat:@"(\\s|^)([#][^\\ufe0e\\ufe0f\\u20e3<>\",\\s\\u0001][^<>\",\\s\\u0001]*)"];
     }
     
     return [NSRegularExpression
