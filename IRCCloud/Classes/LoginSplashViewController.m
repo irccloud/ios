@@ -247,7 +247,7 @@
             forgotPasswordSignup.alpha = 0;
             [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
 #ifndef ENTERPRISE
-            [CrashlyticsKit logEvent:@"login" attributes:@{@"method":@"access-link"}];
+            [Answers logLoginWithMethod:@"access-link" success:@YES customAttributes:nil];
 #endif
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -258,6 +258,9 @@
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:@"Invalid access link" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
             });
+#ifndef ENTERPRISE
+            [Answers logLoginWithMethod:@"access-link" success:@NO customAttributes:nil];
+#endif
         }
     });
 }
@@ -732,10 +735,11 @@
                     [d synchronize];
                 }
 #ifndef ENTERPRISE
-                if(name.alpha)
-                    [CrashlyticsKit logEvent:@"signup" attributes:@{@"method":@"email"}];
-                else
-                    [CrashlyticsKit logEvent:@"login" attributes:@{@"method":@"email"}];
+                if(name.alpha) {
+                    [Answers logSignUpWithMethod:@"email" success:@YES customAttributes:nil];
+                } else {
+                    [Answers logLoginWithMethod:@"email" success:@YES customAttributes:nil];
+                }
 #endif
                 loginHint.alpha = 0;
                 signupHint.alpha = 0;
@@ -774,6 +778,13 @@
                     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:name.alpha?@"Sign Up Failed":@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [alert show];
                 });
+#ifndef ENTERPRISE
+                if(name.alpha) {
+                    [Answers logSignUpWithMethod:@"email" success:@NO customAttributes:[result objectForKey:@"message"]?@{@"Failure": [result objectForKey:@"message"]}:nil];
+                } else {
+                    [Answers logLoginWithMethod:@"email" success:@NO customAttributes:[result objectForKey:@"message"]?@{@"Failure": [result objectForKey:@"message"]}:nil];
+                }
+#endif
             }
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
