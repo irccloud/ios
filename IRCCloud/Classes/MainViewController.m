@@ -2933,13 +2933,18 @@ extern NSDictionary *emojiMap;
     CLS_LOG(@"Image file chosen: %@", info);
     FileMetadataViewController *fvc = nil;
     NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
+    NSURL *mediaURL = [info valueForKey:UIImagePickerControllerMediaURL];
     UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
     if(!img)
         img = [info objectForKey:UIImagePickerControllerOriginalImage];
     
-    if(img || refURL) {
-        if(img && picker.sourceType == UIImagePickerControllerSourceTypeCamera && [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"])
-            UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
+    if(img || refURL || mediaURL) {
+        if(picker.sourceType == UIImagePickerControllerSourceTypeCamera && [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"]) {
+            if(img)
+                UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
+            else if(UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(mediaURL.path))
+                UISaveVideoAtPathToSavedPhotosAlbum(mediaURL.path, nil, nil, nil);
+        }
         [self _showConnectingView];
         _connectingStatus.text = @"Uploading";
         [_connectingActivity startAnimating];
@@ -3009,7 +3014,7 @@ extern NSDictionary *emojiMap;
                         [fvc setImage:thumbnail];
                     }];
                 } else {
-                    [u uploadFile:[info objectForKey:UIImagePickerControllerMediaURL]];
+                    [u uploadFile:mediaURL];
                 }
             }
         } else {
@@ -3339,11 +3344,11 @@ extern NSDictionary *emojiMap;
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
-        } else if([action isEqualToString:@"Take a Photo"]) {
+        } else if([action isEqualToString:@"Take a Photo"] || [action isEqualToString:@"Take Photo or Video"]) {
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
-        } else if([action isEqualToString:@"Choose Photo"]) {
+        } else if([action isEqualToString:@"Choose Photo"] || [action isEqualToString:@"Choose Photo or Video"]) {
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
             [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
