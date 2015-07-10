@@ -1233,11 +1233,11 @@ int __timestampWidth;
                     if(r.resultType == NSTextCheckingTypeLink) {
                         for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
                             NSString *url = [_file_url_template relativeStringWithVariables:@{@"id":[file objectForKey:@"id"]} error:nil];
-                            if([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
+                            if(([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] || [[file objectForKey:@"mime_type"] hasPrefix:@"video/"]) && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
                                 NSString *extension = [file objectForKey:@"extension"];
                                 if(!extension.length)
                                     extension = [@"." stringByAppendingString:[[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
-                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/image%@", url, extension]]];
+                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", url, [[file objectForKey:@"mime_type"] substringToIndex:5], extension]]];
                                 [mutableLinks setObject:r atIndexedSubscript:i];
                             }
                         }
