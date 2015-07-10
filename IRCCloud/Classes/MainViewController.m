@@ -3054,12 +3054,13 @@ extern NSDictionary *emojiMap;
             }];
         }
     } else {
-        if(fvc)
-            [picker pushViewController:fvc animated:YES];
-        else
+        if(fvc) {
+            [picker setViewControllers:@[picker.viewControllers.firstObject, fvc] animated:YES];
+        } else {
             [self.slidingViewController dismissViewControllerAnimated:YES completion:^{
                 [self _resetStatusBar];
             }];
+        }
     }
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
