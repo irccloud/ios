@@ -47,10 +47,8 @@
     _done = YES;
     [self.tableView endEditing:YES];
     [_uploader setFilename:_filename.text message:_msg.text];
-    [self dismissViewControllerAnimated:YES completion:^{
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
-    }];
+    [self dismissViewControllerAnimated:YES completion:nil];
+    [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
 }
 
 -(void)didMoveToParentViewController:(UIViewController *)parent {
@@ -58,10 +56,21 @@
         [_uploader cancel];
 }
 
+-(void)_resetStatusBar {
+    [[UIApplication sharedApplication] setStatusBarHidden:NO];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:NO];
+}
+
 -(void)cancelButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
     [_uploader cancel];
+    
     [self dismissViewControllerAnimated:YES completion:nil];
+    [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
+}
+
+-(void)showCancelButton {
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -72,7 +81,6 @@
                 self.navigationController.navigationBar.clipsToBounds = YES;
             
             self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-            
         } else {
             if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
                 self.navigationController.navigationBar.clipsToBounds = NO;

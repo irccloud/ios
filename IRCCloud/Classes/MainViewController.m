@@ -2956,6 +2956,9 @@ extern NSDictionary *emojiMap;
             u.delegate = self;
             u.bid = _buffer.bid;
             fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+            if(picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
+                [fvc showCancelButton];
+            }
 
             if(refURL) {
                 CLS_LOG(@"Loading metadata from asset library");

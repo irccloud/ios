@@ -33,4 +33,5 @@
 - (void)setURL:(NSString *)url;
 - (void)setImage:(UIImage *)image;
 - (void)setFilename:(NSString *)filename metadata:(NSString *)metadata;
+- (void)showCancelButton;
 @end
