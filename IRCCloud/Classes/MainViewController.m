@@ -2858,6 +2858,8 @@ extern NSDictionary *emojiMap;
 -(void)_choosePhoto:(UIImagePickerControllerSourceType)sourceType {
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.sourceType = sourceType;
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])
+        picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
     picker.delegate = (id)self;
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [picker.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
@@ -2930,12 +2932,13 @@ extern NSDictionary *emojiMap;
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     CLS_LOG(@"Image file chosen: %@", info);
     FileMetadataViewController *fvc = nil;
+    NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
     UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
     if(!img)
         img = [info objectForKey:UIImagePickerControllerOriginalImage];
     
-    if(img) {
-        if(picker.sourceType == UIImagePickerControllerSourceTypeCamera && [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"])
+    if(img || refURL) {
+        if(img && picker.sourceType == UIImagePickerControllerSourceTypeCamera && [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"])
             UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
         [self _showConnectingView];
         _connectingStatus.text = @"Uploading";
@@ -2943,19 +2946,24 @@ extern NSDictionary *emojiMap;
         _connectingActivity.hidden = NO;
         _connectingProgress.progress = 0;
         _connectingProgress.hidden = YES;
-        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+        if((!img || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
             FileUploader *u = [[FileUploader alloc] init];
             u.delegate = self;
             u.bid = _buffer.bid;
             fvc = [[FileMetadataViewController alloc] initWithUploader:u];
 
-            NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
             if(refURL) {
-                CLS_LOG(@"Loading image metadata from asset library");
+                CLS_LOG(@"Loading metadata from asset library");
                 ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
                     ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
                     CLS_LOG(@"Got filename: %@", imageRep.filename);
-                    if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
+                    u.originalFilename = imageRep.filename;
+                    if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
+                        CLS_LOG(@"Uploading file URL");
+                        [u uploadFile:[info objectForKey:UIImagePickerControllerMediaURL]];
+                        [fvc viewWillAppear:NO];
+                    } else if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
+                        CLS_LOG(@"Uploading file data");
                         NSMutableData *data = [[NSMutableData alloc] initWithCapacity:imageRep.size];
                         uint8_t buffer[4096];
                         long long len = 0;
@@ -2967,32 +2975,42 @@ extern NSDictionary *emojiMap;
                         [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
                         [fvc viewWillAppear:NO];
                     } else {
-                        u.originalFilename = imageRep.filename;
+                        CLS_LOG(@"Uploading UIImage");
                         [u uploadImage:img];
                         [fvc viewWillAppear:NO];
                     }
-                    UIImage *thumbnail = [FileUploader image:[UIImage imageWithCGImage:imageRep.fullScreenImage] scaledCopyOfSize:CGSizeMake(2048, 2048)];
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [fvc setImage:thumbnail];
-                    }];
+                    if(imageRep.fullScreenImage) {
+                        UIImage *thumbnail = [FileUploader image:[UIImage imageWithCGImage:imageRep.fullScreenImage] scaledCopyOfSize:CGSizeMake(2048, 2048)];
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [fvc setImage:thumbnail];
+                        }];
+                    }
                 };
                 
                 ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
                 [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:^(NSError *e) {
                     CLS_LOG(@"Error getting asset: %@", e);
+                    if(img) {
+                        [u uploadImage:img];
+                        UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [fvc setImage:thumbnail];
+                        }];
+                    } else {
+                        [u uploadFile:[info objectForKey:UIImagePickerControllerMediaURL]];
+                    }
+                }];
+            } else {
+                CLS_LOG(@"no asset library URL, uploading image data instead");
+                if(img) {
                     [u uploadImage:img];
                     UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         [fvc setImage:thumbnail];
                     }];
-                }];
-            } else {
-                CLS_LOG(@"no asset library URL, uploading image data instead");
-                [u uploadImage:img];
-                UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [fvc setImage:thumbnail];
-                }];
+                } else {
+                    [u uploadFile:[info objectForKey:UIImagePickerControllerMediaURL]];
+                }
             }
         } else {
             ImageUploader *u = [[ImageUploader alloc] init];
@@ -3161,7 +3179,7 @@ extern NSDictionary *emojiMap;
 
 -(void)uploadsButtonPressed:(id)sender {
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take a Photo", @"Choose Photo", @"Start a Pastebin", @"Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo", @"Start a Pastebin", @"Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -3169,7 +3187,7 @@ extern NSDictionary *emojiMap;
             [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
         }
     } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"File Uploads", @"Choose Document", @"Start a Pastebin", @"Pastebins", nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo or Video", @"File Uploads", @"Choose Document", @"Start a Pastebin", @"Pastebins", nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];
@@ -3177,7 +3195,7 @@ extern NSDictionary *emojiMap;
             [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
         }
     } else {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo", @"Start a Pastebin", @"Pastebins", [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]?@"File Uploads":nil, nil];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo", @"Start a Pastebin", @"Pastebins", [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]?@"File Uploads":nil, nil];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
             [sheet showInView:_landscapeView];

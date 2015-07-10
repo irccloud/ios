@@ -79,10 +79,10 @@
                 
                 if([i hasItemConformingToTypeIdentifier:@"public.file-url"]) {
                     [i loadItemForTypeIdentifier:@"public.file-url" options:nil completionHandler:urlHandler];
+                } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
+                    [i loadItemForTypeIdentifier:@"public.movie" options:nil completionHandler:urlHandler];
                 } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
                     [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
-                } else if([i hasItemConformingToTypeIdentifier:@"com.apple.quicktime-movie"]) {
-                    [i loadItemForTypeIdentifier:@"com.apple.quicktime-movie" options:nil completionHandler:urlHandler];
                 }
             }
         }
@@ -208,6 +208,8 @@
             
             if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
                 [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:urlHandler];
+            } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
+                [i loadItemForTypeIdentifier:@"public.movie" options:nil completionHandler:urlHandler];
             } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
                 [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
             } else if([i hasItemConformingToTypeIdentifier:@"public.plain-text"]) {
