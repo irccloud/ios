@@ -27,7 +27,7 @@
             if(output.attachments.count) {
                 NSItemProvider *i = nil;
                 for(NSItemProvider *p in output.attachments) {
-                    if(([p hasItemConformingToTypeIdentifier:@"public.file-url"] && ![p hasItemConformingToTypeIdentifier:@"public.image"]) || [p hasItemConformingToTypeIdentifier:@"com.apple.quicktime-movie"]) {
+                    if(([p hasItemConformingToTypeIdentifier:@"public.file-url"] && ![p hasItemConformingToTypeIdentifier:@"public.image"]) || [p hasItemConformingToTypeIdentifier:@"public.movie"]) {
                         NSLog(@"Attachment is file URL");
                         i = p;
                         break;
@@ -56,6 +56,8 @@
                             [self reloadConfigurationItems];
                             [self validateContent];
                         }];
+                    } else {
+                        _uploadStarted = YES;
                     }
                 };
                 
@@ -66,7 +68,7 @@
                     } else {
                         if([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] || ![i hasItemConformingToTypeIdentifier:@"public.image"]) {
                             NSLog(@"Uploading file to IRCCloud");
-                            [_fileUploader uploadFile:item];
+                            [i hasItemConformingToTypeIdentifier:@"public.movie"]?[_fileUploader uploadVideo:item]:[_fileUploader uploadFile:item];
                             if(!_filename)
                                 _filename = _fileUploader.originalFilename;
                             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -85,6 +87,8 @@
                     [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
                 }
             }
+        } else {
+            _uploadStarted = YES;
         }
     } else {
         UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Not Logged in" message:@"Please login to the IRCCloud app before sharing." preferredStyle:UIAlertControllerStyleAlert];
@@ -144,6 +148,8 @@
 }
 
 - (BOOL)isContentValid {
+    if(_fileUploader && !_uploadStarted)
+        return NO;
     return _conn.session.length && _buffer != nil && ![_buffer.type isEqualToString:@"console"];
 }
 
@@ -255,12 +261,12 @@
 #else
         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-        if([d boolForKey:@"uploadsAvailable"] && [[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
+        if([d boolForKey:@"uploadsAvailable"]) {
             NSExtensionItem *input = self.extensionContext.inputItems.firstObject;
             NSExtensionItem *output = [input copy];
             output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
             
-            if(output.attachments.count && [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.image"]) {
+            if(output.attachments.count && (([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] && [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.image"]) || [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.movie"])) {
                 SLComposeSheetConfigurationItem *filenameConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
                 filenameConfigItem.title = @"Filename";
                 if(_filename)
@@ -283,7 +289,16 @@
                     
                     [self presentViewController:c animated:YES completion:nil];
                 };
-                return @[filenameConfigItem, bufferConfigItem];
+                
+                if(!_uploadStarted) {
+                    SLComposeSheetConfigurationItem *exporting = [[SLComposeSheetConfigurationItem alloc] init];
+                    exporting.title = @"Exporting Video";
+                    exporting.valuePending = YES;
+
+                    return @[filenameConfigItem, bufferConfigItem, exporting];
+                } else {
+                    return @[filenameConfigItem, bufferConfigItem];
+                }
             } else {
                 return @[bufferConfigItem];
             }
@@ -321,6 +336,12 @@
 }
 
 -(void)fileUploadProgress:(float)progress {
+    if(!_uploadStarted) {
+        NSLog(@"File upload started");
+        _uploadStarted = YES;
+        [self reloadConfigurationItems];
+        [self validateContent];
+    }
 }
 
 -(void)fileUploadDidFail {

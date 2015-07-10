@@ -23,5 +23,6 @@
     SystemSoundID _sound;
     NSString *_filename;
     UIImage *_item;
+    BOOL _uploadStarted;
 }
 @end

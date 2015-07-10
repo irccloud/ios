@@ -52,6 +52,7 @@
 @property int bid;
 @property NSString *originalFilename, *mimeType;
 @property BOOL finished;
+-(void)uploadVideo:(NSURL *)file;
 -(void)uploadFile:(NSURL *)file;
 -(void)uploadFile:(NSString *)filename UTI:(NSString *)UTI data:(NSData *)data;
 -(void)uploadImage:(UIImage *)image;

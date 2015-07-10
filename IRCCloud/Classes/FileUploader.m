@@ -14,12 +14,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <AVFoundation/AVFoundation.h>
+#import <MobileCoreServices/MobileCoreServices.h>
 #import "FileUploader.h"
 #import "SBJson.h"
 #import "NSData+Base64.h"
 #import "config.h"
 #import "NetworkConnection.h"
-#import <MobileCoreServices/MobileCoreServices.h>
 #import "SSZipArchive.h"
 
 @implementation FileUploader
@@ -80,6 +81,83 @@
         default:
             break;
     }
+}
+
+//From http://stackoverflow.com/a/23862326
+- (BOOL)encodeVideo:(NSURL *)videoURL
+{
+    CFUUIDRef  uuid;
+    NSString  *uuidStr;
+    
+    uuid = CFUUIDCreate(NULL);
+    assert(uuid != NULL);
+    
+    uuidStr = CFBridgingRelease(CFUUIDCreateString(NULL, uuid));
+    assert(uuidStr != NULL);
+    
+    CFRelease(uuid);
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
+    
+    // Create the composition and tracks
+    AVMutableComposition *composition = [AVMutableComposition composition];
+    AVMutableCompositionTrack *videoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    AVMutableCompositionTrack *audioTrack = [composition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+    NSArray *assetVideoTracks = [asset tracksWithMediaType:AVMediaTypeVideo];
+    if (assetVideoTracks.count <= 0)
+    {
+        NSLog(@"Error reading the transformed video track");
+        return NO;
+    }
+
+    if(!_originalFilename)
+        _originalFilename = [[videoURL lastPathComponent] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@".%@", [videoURL pathExtension]] withString:@".mp4"];
+
+    // Insert the tracks in the composition's tracks
+    AVAssetTrack *assetVideoTrack = [assetVideoTracks firstObject];
+    [videoTrack insertTimeRange:assetVideoTrack.timeRange ofTrack:assetVideoTrack atTime:CMTimeMake(0, 1) error:nil];
+    [videoTrack setPreferredTransform:assetVideoTrack.preferredTransform];
+    
+    AVAssetTrack *assetAudioTrack = [[asset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0];
+    [audioTrack insertTimeRange:assetAudioTrack.timeRange ofTrack:assetAudioTrack atTime:CMTimeMake(0, 1) error:nil];
+    
+    // Export to mp4
+    NSString *mp4Quality = [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 ? AVAssetExportPresetMediumQuality : AVAssetExportPresetPassthrough;
+    NSString *exportPath = [NSString stringWithFormat:@"%@/%@.mp4", NSTemporaryDirectory(), uuidStr];
+    
+    NSURL *exportUrl = [NSURL fileURLWithPath:exportPath];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:composition presetName:mp4Quality];
+    exportSession.outputURL = exportUrl;
+    CMTime start = CMTimeMakeWithSeconds(0.0, 0);
+    CMTimeRange range = CMTimeRangeMake(start, [asset duration]);
+    exportSession.timeRange = range;
+    exportSession.outputFileType = AVFileTypeMPEG4;
+    [exportSession exportAsynchronouslyWithCompletionHandler:^{
+        switch ([exportSession status])
+        {
+            case AVAssetExportSessionStatusCompleted:
+                NSLog(@"MP4 Successful!");
+                [self uploadFile:exportUrl];
+                break;
+            case AVAssetExportSessionStatusFailed:
+                NSLog(@"Export failed: %@", [[exportSession error] localizedDescription]);
+                [_delegate fileUploadDidFail];
+                break;
+            case AVAssetExportSessionStatusCancelled:
+                NSLog(@"Export canceled");
+                [_delegate fileUploadDidFail];
+                break;
+            default:
+                break;
+        }
+        [[NSFileManager defaultManager] removeItemAtPath:exportPath error:nil];
+    }];
+    
+    return YES;
+}
+
+-(void)uploadVideo:(NSURL *)file {
+    if(![self encodeVideo:file])
+        [self uploadFile:file];
 }
 
 -(void)uploadFile:(NSURL *)file {
@@ -296,6 +374,8 @@
         }];
         return;
     }
+    if(_delegate)
+        [_delegate fileUploadProgress:0.0f];
     if(!_originalFilename)
         _originalFilename = [NSString stringWithFormat:@"%li", time(NULL)];
     _boundary = [self boundaryString];

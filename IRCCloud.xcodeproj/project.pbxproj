@@ -316,6 +316,12 @@
 		2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
 		22988AAB19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */; };
 		22988AAC19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */; };
+		229C85411B502920004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
+		229C85421B50292D004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
+		229C85431B502934004964DE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
+		229C85441B50293B004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
+		229C85451B502946004964DE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
+		229C85461B50294C004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
 		22A19C60178FCCAC00772C60 /* UINavigationController+iPadSux.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */; };
 		22A1D0271778A86900F8A89C /* WhoisViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A1D0261778A86900F8A89C /* WhoisViewController.m */; };
 		22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F25178A317100529CDA /* WhoListTableViewController.m */; };
@@ -717,6 +723,7 @@
 		2296E0B619805751002D59E3 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareExtension.entitlements; sourceTree = "<group>"; };
 		2296E0B719805767002D59E3 /* IRCCloud.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = IRCCloud.entitlements; sourceTree = "<group>"; };
 		22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LoginSplashViewController.xib; path = Classes/LoginSplashViewController.xib; sourceTree = "<group>"; };
+		229C85401B502920004964DE /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		22A19C5E178FCCAB00772C60 /* UINavigationController+iPadSux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+iPadSux.h"; sourceTree = "<group>"; };
 		22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+iPadSux.m"; sourceTree = "<group>"; };
 		22A1D0251778A86900F8A89C /* WhoisViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhoisViewController.h; sourceTree = "<group>"; };
@@ -812,6 +819,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				229C85441B50293B004964DE /* CoreMedia.framework in Frameworks */,
+				229C85431B502934004964DE /* AVFoundation.framework in Frameworks */,
 				22A897C61A82E0C400FBC1DE /* StoreKit.framework in Frameworks */,
 				221034F9197EFC0500AB414F /* Crashlytics.framework in Frameworks */,
 				221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */,
@@ -838,6 +847,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				229C85421B50292D004964DE /* CoreMedia.framework in Frameworks */,
 				226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */,
 				2284EF731B4AD48E0058D483 /* MediaPlayer.framework in Frameworks */,
 				2249867F1A95139400F6C3E2 /* AssetsLibrary.framework in Frameworks */,
@@ -868,6 +878,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				229C85411B502920004964DE /* CoreMedia.framework in Frameworks */,
 				226EB6011B4C2E8600C432C7 /* AVFoundation.framework in Frameworks */,
 				2284EF721B4AD47F0058D483 /* MediaPlayer.framework in Frameworks */,
 				2249867E1A95138800F6C3E2 /* AssetsLibrary.framework in Frameworks */,
@@ -919,6 +930,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				229C85461B50294C004964DE /* CoreMedia.framework in Frameworks */,
+				229C85451B502946004964DE /* AVFoundation.framework in Frameworks */,
 				22A897C71A82E0FB00FBC1DE /* StoreKit.framework in Frameworks */,
 				22DB25201982DF2B0008728E /* Crashlytics.framework in Frameworks */,
 				22DB25211982DF2B0008728E /* QuartzCore.framework in Frameworks */,
@@ -1016,6 +1029,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				229C85401B502920004964DE /* CoreMedia.framework */,
 				226EB6001B4C2E8600C432C7 /* AVFoundation.framework */,
 				2284EF711B4AD47F0058D483 /* MediaPlayer.framework */,
 				2249867D1A95138800F6C3E2 /* AssetsLibrary.framework */,

@@ -2965,7 +2965,8 @@ extern NSDictionary *emojiMap;
                     u.originalFilename = imageRep.filename;
                     if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
                         CLS_LOG(@"Uploading file URL");
-                        [u uploadFile:[info objectForKey:UIImagePickerControllerMediaURL]];
+                        u.originalFilename = [u.originalFilename stringByReplacingOccurrencesOfString:@".MOV" withString:@".MP4"];
+                        [u uploadVideo:[info objectForKey:UIImagePickerControllerMediaURL]];
                         [fvc viewWillAppear:NO];
                     } else if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
                         CLS_LOG(@"Uploading file data");
@@ -3001,9 +3002,12 @@ extern NSDictionary *emojiMap;
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                             [fvc setImage:thumbnail];
                         }];
+                    } else if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
+                        [u uploadVideo:mediaURL];
                     } else {
-                        [u uploadFile:[info objectForKey:UIImagePickerControllerMediaURL]];
+                        [u uploadFile:mediaURL];
                     }
+                    [fvc viewWillAppear:NO];
                 }];
             } else {
                 CLS_LOG(@"no asset library URL, uploading image data instead");
@@ -3013,6 +3017,8 @@ extern NSDictionary *emojiMap;
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         [fvc setImage:thumbnail];
                     }];
+                } else if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
+                    [u uploadVideo:mediaURL];
                 } else {
                     [u uploadFile:mediaURL];
                 }
