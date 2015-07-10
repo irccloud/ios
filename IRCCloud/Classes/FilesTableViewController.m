@@ -318,6 +318,7 @@
     if([_thumbnails objectForKey:fileID]) {
         [[_imageViews objectForKey:fileID] setImage:[_thumbnails objectForKey:fileID]];
         [[_imageViews objectForKey:fileID] setHidden:NO];
+        [[_extensions objectForKey:fileID] setHidden:YES];
     } else {
         [[_extensions objectForKey:fileID] setHidden:NO];
     }
@@ -384,6 +385,7 @@
         if([_thumbnails objectForKey:[file objectForKey:@"id"]]) {
             [cell.thumbnail setImage:[_thumbnails objectForKey:[file objectForKey:@"id"]]];
             cell.thumbnail.hidden = NO;
+            cell.extension.hidden = YES;
             cell.spinner.hidden = YES;
             [cell.spinner stopAnimating];
         } else if(cell.extension.hidden) {
