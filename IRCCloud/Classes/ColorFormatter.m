@@ -1196,10 +1196,14 @@ float ColorFormatterCachedFontSize = 0.0f;
             HelveticaOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL);
             HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL);
         } else {
-            Helvetica = CTFontCreateWithName((CFStringRef)@".AppleSystemUIBody", FONT_SIZE, NULL);
-            HelveticaBold = CTFontCreateWithName((CFStringRef)@".AppleSystemUIEmphasizedBody", FONT_SIZE, NULL);
-            HelveticaOblique = CTFontCreateWithName((CFStringRef)@".AppleSystemUIItalicBody", FONT_SIZE, NULL);
-            HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)@".AppleSystemUIEmphasizedItalicBody", FONT_SIZE, NULL);
+            UIFontDescriptor *bodyFontDesciptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
+            UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+            UIFontDescriptor *italicBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
+            UIFontDescriptor *boldItalicBodyFontDescriptor = [bodyFontDesciptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold|UIFontDescriptorTraitItalic];
+            Helvetica = CTFontCreateWithName((CFStringRef)[bodyFontDesciptor.fontAttributes objectForKey:NSFontAttributeName], FONT_SIZE, NULL);
+            HelveticaBold = CTFontCreateWithName((CFStringRef)[boldBodyFontDescriptor.fontAttributes objectForKey:NSFontAttributeName], FONT_SIZE, NULL);
+            HelveticaOblique = CTFontCreateWithName((CFStringRef)[italicBodyFontDescriptor.fontAttributes objectForKey:NSFontAttributeName], FONT_SIZE, NULL);
+            HelveticaBoldOblique = CTFontCreateWithName((CFStringRef)[boldItalicBodyFontDescriptor.fontAttributes objectForKey:NSFontAttributeName], FONT_SIZE, NULL);
         }
         ColorFormatterCachedFontSize = FONT_SIZE;
     }
