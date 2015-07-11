@@ -129,7 +129,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     // Dispose of any resources that can be recreated.
 }
 
--(NSUInteger)supportedInterfaceOrientations {
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }
 
@@ -478,7 +478,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
         _activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:2];
 }
 
--(NSUInteger)supportedInterfaceOrientations {
+-(UIInterfaceOrientationMask)supportedInterfaceOrientations {
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }
 

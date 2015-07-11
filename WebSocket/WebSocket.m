@@ -347,7 +347,7 @@ WebSocketWaitingState waitingState;
             break;*/
         case MessageOpCodeBinary:
             if (aFragment.isFinal) {
-                if(deflate && aFragment.isRSV1)
+                if(&deflate && aFragment.isRSV1)
                     [self dispatchBinaryMessageReceived:[self inflate:aFragment.payloadData]];
                 else
                     [self dispatchBinaryMessageReceived:aFragment.payloadData];
@@ -455,7 +455,7 @@ WebSocketWaitingState waitingState;
         //loop through, constructing single message
         while (fragment != nil) {
             if (fragment.payloadLength > 0) {
-                if(deflate && fragment.isRSV1)
+                if(&deflate && fragment.isRSV1)
                     [messageData appendData:[self inflate:fragment.payloadData]];
                 else
                     [messageData appendData:fragment.payloadData];
@@ -569,7 +569,7 @@ WebSocketWaitingState waitingState;
 
     //validate reserved bits
     if (!self.config.activeExtensionModifiesReservedBits) {
-        if (!deflate || fragment.isRSV2 || fragment.isRSV3) {
+        if (!&deflate || fragment.isRSV2 || fragment.isRSV3) {
             [self close:WebSocketCloseStatusProtocolError message:[NSString stringWithFormat:@"No extension is defined that modifies reserved bits: RSV1=%@, RSV2=%@, RSV3=%@", fragment.isRSV1 ? @"YES" : @"NO", fragment.isRSV2 ? @"YES" : @"NO", fragment.isRSV3 ? @"YES" : @"NO"]];
         }
     }

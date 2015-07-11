@@ -113,12 +113,6 @@
       "idiom" : "ipad",
       "filename" : "iOS7-iPad@2x.png",
       "scale" : "2x"
-    },
-    {
-      "size" : "120x120",
-      "idiom" : "car",
-      "filename" : "iOS7-iPhone@2x-1.png",
-      "scale" : "1x"
     }
   ],
   "info" : {
