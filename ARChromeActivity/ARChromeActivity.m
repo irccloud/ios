@@ -60,17 +60,23 @@
 }
 
 - (void)performActivity {
-	
+    NSURL *activityURL;
     NSString *openingURL = [_activityURL.absoluteString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    NSString *callbackURL = [self.callbackURL.absoluteString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
     NSString *sourceName = [self.callbackSource stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    
-    NSURL *activityURL = [NSURL URLWithString:
-                          [NSString stringWithFormat:@"googlechrome-x-callback://x-callback-url/open/?url=%@&x-success=%@&x-source=%@",
-                           openingURL,
-                           callbackURL,
-                           sourceName]];
-    
+
+    if(self.callbackURL) {
+        NSString *callbackURL = [self.callbackURL.absoluteString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        activityURL = [NSURL URLWithString:
+                              [NSString stringWithFormat:@"googlechrome-x-callback://x-callback-url/open/?url=%@&x-success=%@&x-source=%@",
+                               openingURL,
+                               callbackURL,
+                               sourceName]];
+    } else {
+        activityURL = [NSURL URLWithString:
+                       [NSString stringWithFormat:@"googlechrome-x-callback://x-callback-url/open/?url=%@&x-source=%@",
+                        openingURL,
+                        sourceName]];
+    }
 	[[UIApplication sharedApplication] openURL:activityURL];
     
 	[self activityDidFinish:YES];

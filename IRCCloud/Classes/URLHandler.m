@@ -126,7 +126,7 @@
                                  || ![_openInChromeController isChromeInstalled]);
     BOOL useChrome = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     if(shouldDisplayBrowser) {
-        if(!(useChrome && [_openInChromeController openInChrome:url withCallbackURL:self.appCallbackURL createNewTab:NO])) {
+        if(!(useChrome && [_openInChromeController openInChrome:url withCallbackURL:([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)?nil:self.appCallbackURL createNewTab:NO])) {
             [[UIApplication sharedApplication] openURL:url];
         }
     } else {
