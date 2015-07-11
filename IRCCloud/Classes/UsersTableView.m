@@ -255,6 +255,13 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
     
     _refreshTimer = nil;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+        _headingFont = _userFont = _countFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
+    } else {
+        _headingFont = _userFont = _countFont = [UIFont systemFontOfSize:FONT_SIZE];
+    }
+
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
