@@ -85,6 +85,8 @@
                     [i loadItemForTypeIdentifier:@"public.movie" options:nil completionHandler:urlHandler];
                 } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
                     [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                } else {
+                    _uploadStarted = YES;
                 }
             }
         } else {
