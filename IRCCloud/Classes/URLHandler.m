@@ -15,6 +15,7 @@
 //  limitations under the License.
 
 #import <AVFoundation/AVFoundation.h>
+#import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import "URLHandler.h"
 #import "AppDelegate.h"
@@ -93,8 +94,14 @@
         [self showImage:url];
     } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"]) {
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-        MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
-        [mainViewController presentMoviePlayerViewControllerAnimated:player];
+        if(NSClassFromString(@"AVPlayerViewController")) {
+            AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
+            player.player = [[AVPlayer alloc] initWithURL:url];
+            [mainViewController presentViewController:player animated:YES completion:nil];
+        } else {
+            MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
+            [mainViewController presentMoviePlayerViewControllerAnimated:player];
+        }
     } else {
         [self openWebpage:url];
     }
