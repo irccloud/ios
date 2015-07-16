@@ -409,7 +409,6 @@ NSLock *__parserLock = nil;
                        CLS_LOG(@"oob_include, invalidating BIDs");
                        [_buffers invalidate];
                        [_channels invalidate];
-                       [_events clear];
                        [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object) {
@@ -1670,18 +1669,33 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
     if(object.type) {
         //NSLog(@"New event (backlog: %i) (%@) %@", backlog, object.type, object);
+        if((backlog || _accrued > 0) && object.bid > -1 && object.bid != _currentBid && object.eid > 0) {
+            if(backlog) {
+                if(object.eid > [_events lastEidForBuffer:object.bid]) {
+                    CLS_LOG(@"Backlog gap detected in bid%i, purging cache", object.bid);
+                    [_events removeEventsForBuffer:object.bid];
+                }
+            } else {
+                if(_firstEID == 0 && object.eid > _events.highestEid) {
+                    _firstEID = object.eid;
+                    CLS_LOG(@"Backlog gap detected, purging cache");
+                    [_events clear];
+                }
+            }
+            _currentBid = object.bid;
+            _currentCount = 0;
+        }
         void (^block)(IRCCloudJSONObject *o) = [_parserMap objectForKey:object.type];
         if(block != nil) {
             block(object);
         } else {
             CLS_LOG(@"Unhandled type: %@", object.type);
         }
-        if(backlog) {
+        if(backlog || _accrued > 0) {
             if(_numBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
                 if(object.bid != _currentBid) {
                     _currentBid = object.bid;
                     _currentCount = 0;
-                    _firstEID = object.eid;
                 }
                 [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalBuffers + (float)_currentCount/100.0f)/ (float)_numBuffers) waitUntilDone:NO];
                 _currentCount++;
