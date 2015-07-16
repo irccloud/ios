@@ -2475,6 +2475,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(IBAction)settingsButtonPressed:(id)sender {
+    [self dismissKeyboard];
     _selectedBuffer = _buffer;
     User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
@@ -2516,6 +2517,7 @@ extern NSDictionary *emojiMap;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
         [self.view.window addSubview:_landscapeView];
         [sheet showInView:_landscapeView];
+        [sheet showInView:self.slidingViewController.view];
     } else {
         [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _settingsBtn.frame.origin.x, _bottomBar.frame.origin.y,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height) inView:self.view animated:YES];
     }
@@ -2634,6 +2636,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)_showUserPopupInRect:(CGRect)rect {
+    [self dismissKeyboard];
     NSString *title = @"";;
     if(_selectedUser) {
         if([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad))
@@ -2698,41 +2701,149 @@ extern NSDictionary *emojiMap;
     }
 }
 
+-(void)_markAllAsRead {
+    NSMutableArray *cids = [[NSMutableArray alloc] init];
+    NSMutableArray *bids = [[NSMutableArray alloc] init];
+    NSMutableArray *eids = [[NSMutableArray alloc] init];
+    
+    for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
+        if([[EventsDataSource sharedInstance] unreadStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] && [[EventsDataSource sharedInstance] lastEidForBuffer:b.bid]) {
+            [cids addObject:@(b.cid)];
+            [bids addObject:@(b.bid)];
+            [eids addObject:@([[EventsDataSource sharedInstance] lastEidForBuffer:b.bid])];
+        }
+    }
+    
+    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cids:cids bids:bids lastSeenEids:eids];
+}
+
+-(void)_editConnection {
+    EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    [ecv setServer:_selectedBuffer.cid];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    if(self.presentedViewController)
+        [self dismissModalViewControllerAnimated:NO];
+    [self presentViewController:nc animated:YES completion:nil];
+}
+
+-(void)_deleteSelectedBuffer {
+    //TODO: prompt for confirmation
+    if([_selectedBuffer.type isEqualToString:@"console"]) {
+        [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
+    } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
+        if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+            [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
+        else
+            [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+    } else {
+        [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+    }
+}
+
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
     _selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
-    if([_selectedBuffer.type isEqualToString:@"console"]) {
-        Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
-        if([s.status isEqualToString:@"disconnected"]) {
-            [sheet addButtonWithTitle:@"Reconnect"];
-            [sheet addButtonWithTitle:@"Delete"];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        if([_selectedBuffer.type isEqualToString:@"console"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
+            if([s.status isEqualToString:@"disconnected"]) {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Reconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                    [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid];
+                }]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
+                    [self _deleteSelectedBuffer];
+                }]];
+            } else {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Disconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                    [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil];
+                }]];
+            }
+            [alert addAction:[UIAlertAction actionWithTitle:@"Edit Connection" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [self _editConnection];
+            }]];
+        } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
+            if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Leave" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                    [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid];
+                }]];
+            } else {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Rejoin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                    [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid];
+                }]];
+                if(_selectedBuffer.archived) {
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                        [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+                    }]];
+                } else {
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Archive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                        [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+                    }]];
+                }
+                [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
+                    [self _deleteSelectedBuffer];
+                }]];
+            }
         } else {
-            [sheet addButtonWithTitle:@"Disconnect"];
+            if(_selectedBuffer.archived) {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                    [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+                }]];
+            } else {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Archive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                    [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+                }]];
+            }
+            [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
+                [self _deleteSelectedBuffer];
+            }]];
         }
-        [sheet addButtonWithTitle:@"Edit Connection"];
-    } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
-        if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
-            [sheet addButtonWithTitle:@"Leave"];
-        } else {
-            [sheet addButtonWithTitle:@"Rejoin"];
-            [sheet addButtonWithTitle:(_selectedBuffer.archived)?@"Unarchive":@"Archive"];
-            [sheet addButtonWithTitle:@"Delete"];
-        }
+        [alert addAction:[UIAlertAction actionWithTitle:@"Mark All As Read" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _markAllAsRead];
+        }]];
+
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+        alert.popoverPresentationController.sourceRect = rect;
+        alert.popoverPresentationController.sourceView = self.view;
+        [self.slidingViewController presentViewController:alert animated:YES completion:nil];
     } else {
-        if(_selectedBuffer.archived) {
-            [sheet addButtonWithTitle:@"Unarchive"];
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+        if([_selectedBuffer.type isEqualToString:@"console"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
+            if([s.status isEqualToString:@"disconnected"]) {
+                [sheet addButtonWithTitle:@"Reconnect"];
+                [sheet addButtonWithTitle:@"Delete"];
+            } else {
+                [sheet addButtonWithTitle:@"Disconnect"];
+            }
+            [sheet addButtonWithTitle:@"Edit Connection"];
+        } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
+            if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
+                [sheet addButtonWithTitle:@"Leave"];
+            } else {
+                [sheet addButtonWithTitle:@"Rejoin"];
+                [sheet addButtonWithTitle:(_selectedBuffer.archived)?@"Unarchive":@"Archive"];
+                [sheet addButtonWithTitle:@"Delete"];
+            }
         } else {
-            [sheet addButtonWithTitle:@"Archive"];
+            if(_selectedBuffer.archived) {
+                [sheet addButtonWithTitle:@"Unarchive"];
+            } else {
+                [sheet addButtonWithTitle:@"Archive"];
+            }
+            [sheet addButtonWithTitle:@"Delete"];
         }
-        [sheet addButtonWithTitle:@"Delete"];
-    }
-    [sheet addButtonWithTitle:@"Mark All As Read"];
-    sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-        [self.view.window addSubview:_landscapeView];
-        [sheet showInView:_landscapeView];
-    } else {
-        [sheet showFromRect:rect inView:_buffersView.tableView animated:YES];
+        [sheet addButtonWithTitle:@"Mark All As Read"];
+        sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+            [self.view.window addSubview:_landscapeView];
+            [sheet showInView:_landscapeView];
+        } else {
+            [sheet showFromRect:rect inView:_buffersView.tableView animated:YES];
+        }
     }
 }
 
@@ -3192,30 +3303,106 @@ extern NSDictionary *emojiMap;
     [self _hideConnectingView];
 }
 
+-(void)_startPastebin {
+    PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    if(self.presentedViewController)
+        [self dismissModalViewControllerAnimated:NO];
+    [self presentViewController:nc animated:YES completion:nil];
+}
+
+-(void)_showPastebins {
+    PastebinsTableViewController *ptv = [[PastebinsTableViewController alloc] init];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ptv];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    if(self.presentedViewController)
+        [self dismissModalViewControllerAnimated:NO];
+    [self presentViewController:nc animated:YES completion:nil];
+}
+
+-(void)_showUploads {
+    FilesTableViewController *fcv = [[FilesTableViewController alloc] initWithStyle:UITableViewStylePlain];
+    fcv.delegate = self;
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fcv];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    if(self.presentedViewController)
+        [self dismissModalViewControllerAnimated:NO];
+    [self presentViewController:nc animated:YES completion:nil];
+}
+
 -(void)uploadsButtonPressed:(id)sender {
-    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo", @"Start a Pastebin", @"Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-            [self.view.window addSubview:_landscapeView];
-            [sheet showInView:_landscapeView];
-        } else {
-            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+            [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
+                [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
+            }]];
         }
-    } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo or Video", @"File Uploads", @"Choose Document", @"Start a Pastebin", @"Pastebins", nil];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-            [self.view.window addSubview:_landscapeView];
-            [sheet showInView:_landscapeView];
-        } else {
-            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
+        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+            [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
+                [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+            }]];
         }
+        [alert addAction:[UIAlertAction actionWithTitle:@"Start a Pastebin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _startPastebin];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Pastebins" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _showPastebins];
+        }]];
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+            [alert addAction:[UIAlertAction actionWithTitle:@"File Uploads" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [self _showUploads];
+            }]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Choose Document" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                if(self.presentedViewController)
+                    [self dismissModalViewControllerAnimated:NO];
+                [self _chooseFile];
+            }]];
+        }
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+        alert.popoverPresentationController.sourceRect = CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height);
+        alert.popoverPresentationController.sourceView = self.view;
+        [self.slidingViewController presentViewController:alert animated:YES completion:nil];
     } else {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo", @"Start a Pastebin", @"Pastebins", [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]?@"File Uploads":nil, nil];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-            [self.view.window addSubview:_landscapeView];
-            [sheet showInView:_landscapeView];
+        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+            UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo", @"Start a Pastebin", @"Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+                [self.view.window addSubview:_landscapeView];
+                [sheet showInView:_landscapeView];
+            } else {
+                [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
+            }
+        } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+            UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo or Video", @"File Uploads", @"Choose Document", @"Start a Pastebin", @"Pastebins", nil];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+                [self.view.window addSubview:_landscapeView];
+                [sheet showInView:_landscapeView];
+            } else {
+                [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
+            }
         } else {
-            [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
+            UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo", @"Start a Pastebin", @"Pastebins", [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]?@"File Uploads":nil, nil];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+                [self.view.window addSubview:_landscapeView];
+                [sheet showInView:_landscapeView];
+            } else {
+                [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
+            }
         }
     }
 }
@@ -3244,17 +3431,7 @@ extern NSDictionary *emojiMap;
         } else if([action isEqualToString:@"Unarchive"]) {
             [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Delete"]) {
-            //TODO: prompt for confirmation
-            if([_selectedBuffer.type isEqualToString:@"console"]) {
-                [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
-            } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
-                if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
-                    [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
-                else
-                    [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
-            } else {
-                [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
-            }
+            [self _deleteSelectedBuffer];
         } else if([action isEqualToString:@"Leave"]) {
             [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Rejoin"]) {
@@ -3302,16 +3479,7 @@ extern NSDictionary *emojiMap;
             [self showMentionTip];
             [self _mention];
         } else if([action isEqualToString:@"Edit Connection"]) {
-            EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
-            [ecv setServer:_selectedBuffer.cid];
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
-            [self presentViewController:nc animated:YES completion:nil];
+            [self _editConnection];
         } else if([action isEqualToString:@"Settings"]) {
             SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
@@ -3345,15 +3513,7 @@ extern NSDictionary *emojiMap;
                 [self dismissModalViewControllerAnimated:NO];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Start a Pastebin"]) {
-            PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
-            [self presentViewController:nc animated:YES completion:nil];
+            [self _startPastebin];
         } else if([action isEqualToString:@"Take a Photo"] || [action isEqualToString:@"Take Photo or Video"]) {
             if(self.presentedViewController)
                 [self dismissModalViewControllerAnimated:NO];
@@ -3367,50 +3527,13 @@ extern NSDictionary *emojiMap;
                 [self dismissModalViewControllerAnimated:NO];
             [self _chooseFile];
         } else if([action isEqualToString:@"File Uploads"]) {
-            FilesTableViewController *fcv = [[FilesTableViewController alloc] initWithStyle:UITableViewStylePlain];
-            fcv.delegate = self;
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fcv];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
-            [self presentViewController:nc animated:YES completion:nil];
+            [self _showUploads];
         } else if([action isEqualToString:@"Pastebins"]) {
-            PastebinsTableViewController *ptv = [[PastebinsTableViewController alloc] init];
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ptv];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
-            [self presentViewController:nc animated:YES completion:nil];
+            [self _showPastebins];
         } else if([action isEqualToString:@"Start a Pastebin"]) {
-            PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
-            [self presentViewController:nc animated:YES completion:nil];
+            [self _startPastebin];
         } else if([action isEqualToString:@"Mark All As Read"]) {
-            NSMutableArray *cids = [[NSMutableArray alloc] init];
-            NSMutableArray *bids = [[NSMutableArray alloc] init];
-            NSMutableArray *eids = [[NSMutableArray alloc] init];
-            
-            for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
-                if([[EventsDataSource sharedInstance] unreadStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] && [[EventsDataSource sharedInstance] lastEidForBuffer:b.bid]) {
-                    [cids addObject:@(b.cid)];
-                    [bids addObject:@(b.bid)];
-                    [eids addObject:@([[EventsDataSource sharedInstance] lastEidForBuffer:b.bid])];
-                }
-            }
-            
-            [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cids:cids bids:bids lastSeenEids:eids];
+            [self _markAllAsRead];
         }
         
         if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)

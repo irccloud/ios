@@ -286,6 +286,12 @@
     }
 }
 
+-(void)setFooterView:(UIView *)v {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        self.tableView.tableFooterView = v;
+    }];
+}
+
 -(void)_loadMore {
     NSDictionary *d = [[NetworkConnection sharedInstance] getPastebins:++_pages];
     if([[d objectForKey:@"success"] boolValue]) {
@@ -296,7 +302,7 @@
             _pastes = [d objectForKey:@"pastebins"];
         
         _canLoadMore = _pastes.count < [[d objectForKey:@"total"] intValue];
-        self.tableView.tableFooterView = _canLoadMore?_footerView:nil;
+        [self setFooterView:_canLoadMore?_footerView:nil];
         if(!_pastes.count) {
             CLS_LOG(@"Pastebin list is empty");
             UILabel *fail = [[UILabel alloc] init];
@@ -305,7 +311,7 @@
             fail.textAlignment = NSTextAlignmentCenter;
             fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
             [fail sizeToFit];
-            self.tableView.tableFooterView = fail;
+            [self setFooterView:fail];
         }
     } else {
         CLS_LOG(@"Failed to load pastebin list for page %i: %@", _pages, d);
@@ -316,7 +322,7 @@
         fail.textAlignment = NSTextAlignmentCenter;
         fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         [fail sizeToFit];
-        self.tableView.tableFooterView = fail;
+        [self setFooterView:fail];
         return;
     }
 
