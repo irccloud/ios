@@ -148,7 +148,7 @@
 
 -(IBAction)shareButtonPressed:(id)sender {
     if(NSClassFromString(@"UIActivityViewController")) {
-        UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[_url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)?nil:[NSURL URLWithString:
+        UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[_url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
                                                                                                                                                                                                                                                                                                                                          @"irccloud-enterprise://"
 #else
