@@ -24,6 +24,7 @@
 #import "ChannelsDataSource.h"
 #import "UsersDataSource.h"
 #import "EventsDataSource.h"
+#import "NotificationsDataSource.h"
 
 extern NSString *IRCCLOUD_HOST;
 extern NSString *IRCCLOUD_PATH;
@@ -113,6 +114,7 @@ typedef enum {
     ChannelsDataSource *_channels;
     UsersDataSource *_users;
     EventsDataSource *_events;
+    NotificationsDataSource *_notifications;
     NSMutableArray *_oobQueue;
     NSMutableDictionary *_awayOverride;
     NSTimer *_idleTimer;

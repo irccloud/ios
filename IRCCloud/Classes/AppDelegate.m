@@ -328,7 +328,10 @@
         int bid = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
         NSTimeInterval eid = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
         
-        [UIApplication sharedApplication].applicationIconBadgeNumber = [UIApplication sharedApplication].applicationIconBadgeNumber + 1;
+        if(application.applicationState == UIApplicationStateBackground) {
+            [[NotificationsDataSource sharedInstance] notify:nil cid:cid bid:bid eid:eid];
+            [_conn serialize];
+        }
         
         if(_movedToBackground && application.applicationState == UIApplicationStateInactive) {
             self.mainViewController.bidToOpen = bid;
@@ -383,6 +386,18 @@
             handler(UIBackgroundFetchResultNoData);
         }
     } else {
+        for(NSString *key in userInfo.allKeys) {
+            if(key.intValue > 0) {
+                int cid = key.intValue;
+                NSDictionary *bids = [userInfo objectForKey:key];
+                for(NSString *bid in bids.allKeys) {
+                    NSTimeInterval eid = [[bids objectForKey:bid] doubleValue];
+                    NSLog(@"Heartbeat: %i %i %f", cid, bid.intValue, eid);
+                    [[BuffersDataSource sharedInstance] updateLastSeenEID:eid buffer:bid.intValue];
+                    [[NotificationsDataSource sharedInstance] removeNotificationsForBID:bid.intValue olderThan:eid];
+                }
+            }
+        }
         handler(UIBackgroundFetchResultNoData);
     }
 }

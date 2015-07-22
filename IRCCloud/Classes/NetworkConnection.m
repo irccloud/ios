@@ -215,6 +215,7 @@ NSLock *__parserLock = nil;
     _channels = [ChannelsDataSource sharedInstance];
     _users = [UsersDataSource sharedInstance];
     _events = [EventsDataSource sharedInstance];
+    _notifications = [NotificationsDataSource sharedInstance];
     _state = kIRCCloudStateDisconnected;
     _oobQueue = [[NSMutableArray alloc] init];
     _awayOverride = nil;
@@ -470,6 +471,7 @@ NSLock *__parserLock = nil;
                        buffer.deferred = [[object objectForKey:@"deferred"] intValue];
                        buffer.timeout = [[object objectForKey:@"timeout"] intValue];
                        buffer.valid = YES;
+                       [_notifications removeNotificationsForBID:buffer.bid olderThan:buffer.last_seen_eid];
                        if(!backlog)
                            [self postObject:buffer forEvent:kIRCEventMakeBuffer];
                        if(_numBuffers > 0) {
@@ -819,6 +821,7 @@ NSLock *__parserLock = nil;
                            for(NSNumber *bid in eids.allKeys) {
                                NSTimeInterval eid = [[eids objectForKey:bid] doubleValue];
                                [_buffers updateLastSeenEID:eid buffer:[bid intValue]];
+                               [_notifications removeNotificationsForBID:[bid intValue] olderThan:eid];
                            }
                        }
                        [self postObject:object forEvent:kIRCEventHeartbeatEcho];
@@ -1839,6 +1842,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [_channels serialize];
         [_users serialize];
         [_events serialize];
+        [_notifications serialize];
 #ifndef EXTENSION
         NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
         NSMutableDictionary *stream = [_userInfo mutableCopy];

@@ -341,6 +341,10 @@
 		22B15CFC17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF817301BAF0075EBA7 /* ECSlidingViewController.m */; };
 		22B15CFD17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */; };
 		22B15CFE17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */; };
+		22B2036E1B5FE3BE0058078D /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */; };
+		22B2036F1B5FE3BE0058078D /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */; };
+		22B203701B5FE3BE0058078D /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */; };
+		22B203711B5FE3BE0058078D /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */; };
 		22B4284816D7E36300498507 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		22B4284916D7E36300498507 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		22B4286816D831A800498507 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
@@ -744,6 +748,8 @@
 		22B15CF817301BAF0075EBA7 /* ECSlidingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ECSlidingViewController.m; sourceTree = "<group>"; };
 		22B15CF917301BAF0075EBA7 /* UIImage+ImageWithUIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+ImageWithUIView.h"; sourceTree = "<group>"; };
 		22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+ImageWithUIView.m"; sourceTree = "<group>"; };
+		22B2036C1B5FE3BE0058078D /* NotificationsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationsDataSource.h; sourceTree = "<group>"; };
+		22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationsDataSource.m; sourceTree = "<group>"; };
 		22B4284616D7E36300498507 /* NetworkConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkConnection.h; sourceTree = "<group>"; };
 		22B4284716D7E36300498507 /* NetworkConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkConnection.m; sourceTree = "<group>"; };
 		22B4284D16D831A800498507 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
@@ -1186,6 +1192,8 @@
 				22032A6E1884529700BE4A10 /* NickCompletionView.m */,
 				22B4284616D7E36300498507 /* NetworkConnection.h */,
 				22B4284716D7E36300498507 /* NetworkConnection.m */,
+				22B2036C1B5FE3BE0058078D /* NotificationsDataSource.h */,
+				22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */,
 				22D649281B1E371D003BFD86 /* PastebinsTableViewController.h */,
 				22D649291B1E371D003BFD86 /* PastebinsTableViewController.m */,
 				221390FC1B115CD000ECF001 /* PastebinEditorViewController.h */,
@@ -1749,6 +1757,7 @@
 				22C8CE001B01372100F637D2 /* unzip.c in Sources */,
 				2210350F197EFC6200AB414F /* UsersDataSource.m in Sources */,
 				22103510197EFC6200AB414F /* NSObject+SBJson.m in Sources */,
+				22B203701B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
 				22103511197EFC6200AB414F /* SBJsonParser.m in Sources */,
 				22103512197EFC6200AB414F /* SBJsonStreamParser.m in Sources */,
 				22103513197EFC6200AB414F /* SBJsonStreamParserAccumulator.m in Sources */,
@@ -1790,6 +1799,7 @@
 				2264A30219659BB100DCFDDD /* URLHandler.m in Sources */,
 				225D973C18AA995900065087 /* LoginSplashViewController.m in Sources */,
 				225D974718AA995900065087 /* NetworkConnection.m in Sources */,
+				22B2036F1B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
 				225D974918AA995900065087 /* GCDAsyncSocket.m in Sources */,
 				225D974A18AA995900065087 /* HandshakeHeader.m in Sources */,
 				228E2B9218CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
@@ -1881,6 +1891,7 @@
 				2264A30119659BB100DCFDDD /* URLHandler.m in Sources */,
 				228A05DE16D3E40F0029769C /* LoginSplashViewController.m in Sources */,
 				22B4284816D7E36300498507 /* NetworkConnection.m in Sources */,
+				22B2036E1B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
 				22B4286816D831A800498507 /* GCDAsyncSocket.m in Sources */,
 				22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */,
 				228E2B9018CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
@@ -2034,6 +2045,7 @@
 				22C8CE011B01372100F637D2 /* unzip.c in Sources */,
 				22DB25071982DF2B0008728E /* UsersDataSource.m in Sources */,
 				22DB25081982DF2B0008728E /* NSObject+SBJson.m in Sources */,
+				22B203711B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
 				22DB25091982DF2B0008728E /* SBJsonParser.m in Sources */,
 				22DB250A1982DF2B0008728E /* SBJsonStreamParser.m in Sources */,
 				22DB250B1982DF2B0008728E /* SBJsonStreamParserAccumulator.m in Sources */,
