@@ -386,20 +386,20 @@
         } else {
             handler(UIBackgroundFetchResultNoData);
         }
-    } else {
-        for(NSString *key in userInfo.allKeys) {
-            if(key.intValue > 0) {
-                int cid = key.intValue;
-                NSDictionary *bids = [userInfo objectForKey:key];
-                for(NSString *bid in bids.allKeys) {
-                    NSTimeInterval eid = [[bids objectForKey:bid] doubleValue];
-                    NSLog(@"Heartbeat: %i %i %f", cid, bid.intValue, eid);
-                    [[BuffersDataSource sharedInstance] updateLastSeenEID:eid buffer:bid.intValue];
-                    [[NotificationsDataSource sharedInstance] removeNotificationsForBID:bid.intValue olderThan:eid];
-                }
+    } else if ([userInfo objectForKey:@"hb"]) {
+        for(NSString *key in [userInfo objectForKey:@"hb"]) {
+            int cid = key.intValue;
+            NSDictionary *bids = [[userInfo objectForKey:@"hb"] objectForKey:key];
+            for(NSString *bid in bids.allKeys) {
+                NSTimeInterval eid = [[bids objectForKey:bid] doubleValue];
+                NSLog(@"Heartbeat: %i %i %f", cid, bid.intValue, eid);
+                [[BuffersDataSource sharedInstance] updateLastSeenEID:eid buffer:bid.intValue];
+                [[NotificationsDataSource sharedInstance] removeNotificationsForBID:bid.intValue olderThan:eid];
             }
         }
         [_conn serialize];
+        handler(UIBackgroundFetchResultNoData);
+    } else {
         handler(UIBackgroundFetchResultNoData);
     }
 }
@@ -604,9 +604,7 @@
             _background_task = UIBackgroundTaskInvalid;
         }
     }
-    [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
-    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
-    [[UIApplication sharedApplication] cancelAllLocalNotifications];
+    [[NotificationsDataSource sharedInstance] clear];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

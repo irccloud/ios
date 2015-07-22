@@ -62,6 +62,11 @@
 -(void)clear {
     @synchronized(_notifications) {
         [_notifications removeAllObjects];
+#ifndef EXTENSION
+        [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
+        [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
+        [[UIApplication sharedApplication] cancelAllLocalNotifications];
+#endif
     }
 }
 
