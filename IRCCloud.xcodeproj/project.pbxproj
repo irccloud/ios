@@ -152,6 +152,10 @@
 		2253BA251770CD7200CCA77F /* ChannelListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */; };
 		2257336D19BFCB3000948690 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
 		2257336E19BFCB3400948690 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
+		225886E01B5F2D49000BD672 /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 225886DF1B5F2D49000BD672 /* NotificationsDataSource.m */; };
+		225886E11B5F2D49000BD672 /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 225886DF1B5F2D49000BD672 /* NotificationsDataSource.m */; };
+		225886E21B5F2D49000BD672 /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 225886DF1B5F2D49000BD672 /* NotificationsDataSource.m */; };
+		225886E31B5F2D49000BD672 /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 225886DF1B5F2D49000BD672 /* NotificationsDataSource.m */; };
 		225D973818AA995900065087 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A057B16D3DABA0029769C /* main.m */; };
 		225D973918AA995900065087 /* ServerReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22462B5118906B03009EF986 /* ServerReorderViewController.m */; };
 		225D973A18AA995900065087 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05AF16D3DB7B0029769C /* AppDelegate.m */; };
@@ -334,10 +338,6 @@
 		22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363B119D0884D00500478 /* OnePasswordExtension.m */; };
 		22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */; };
 		22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */; };
-		22A897C41A82E0A900FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		22A897C51A82E0B800FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		22A897C61A82E0C400FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		22A897C71A82E0FB00FBC1DE /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A897C31A82E0A900FBC1DE /* StoreKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22AD75ED1718567D00141257 /* ChannelModeListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* ChannelModeListTableViewController.m */; };
 		22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
 		22B15CF5172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CF3172ECCFF0075EBA7 /* EditConnectionViewController.m */; };
@@ -652,6 +652,8 @@
 		2251693217B5A8040093ADC5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/TUSafariActivity.strings; sourceTree = "<group>"; };
 		2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelListTableViewController.m; sourceTree = "<group>"; };
 		2253BA261770CDC500CCA77F /* ChannelListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelListTableViewController.h; sourceTree = "<group>"; };
+		225886DE1B5F2D49000BD672 /* NotificationsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationsDataSource.h; sourceTree = "<group>"; };
+		225886DF1B5F2D49000BD672 /* NotificationsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationsDataSource.m; sourceTree = "<group>"; };
 		225D979F18AA995900065087 /* IRCEnterprise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCEnterprise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IRCCloud-Enterprise-Info.plist"; sourceTree = "<group>"; };
 		2264A2FF19659BB100DCFDDD /* URLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLHandler.h; sourceTree = "<group>"; };
@@ -740,7 +742,6 @@
 		22A363B119D0884D00500478 /* OnePasswordExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnePasswordExtension.m; sourceTree = "<group>"; };
 		22A363BA19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIDevice+UIDevice_iPhone6Hax.h"; sourceTree = "<group>"; };
 		22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIDevice+UIDevice_iPhone6Hax.m"; sourceTree = "<group>"; };
-		22A897C31A82E0A900FBC1DE /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		22AD75EB1718567D00141257 /* ChannelModeListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelModeListTableViewController.h; sourceTree = "<group>"; };
 		22AD75EC1718567D00141257 /* ChannelModeListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelModeListTableViewController.m; sourceTree = "<group>"; };
 		22B15CF2172ECCFF0075EBA7 /* EditConnectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditConnectionViewController.h; sourceTree = "<group>"; };
@@ -824,7 +825,6 @@
 			files = (
 				229C85441B50293B004964DE /* CoreMedia.framework in Frameworks */,
 				229C85431B502934004964DE /* AVFoundation.framework in Frameworks */,
-				22A897C61A82E0C400FBC1DE /* StoreKit.framework in Frameworks */,
 				221034F9197EFC0500AB414F /* Crashlytics.framework in Frameworks */,
 				221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */,
 				221034FB197EFC0500AB414F /* AudioToolbox.framework in Frameworks */,
@@ -855,7 +855,6 @@
 				226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */,
 				2284EF731B4AD48E0058D483 /* MediaPlayer.framework in Frameworks */,
 				2249867F1A95139400F6C3E2 /* AssetsLibrary.framework in Frameworks */,
-				22A897C51A82E0B800FBC1DE /* StoreKit.framework in Frameworks */,
 				22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */,
 				2200DB5118BCFA0E00343583 /* QuartzCore.framework in Frameworks */,
 				225D977918AA995900065087 /* AudioToolbox.framework in Frameworks */,
@@ -887,7 +886,6 @@
 				226EB6011B4C2E8600C432C7 /* AVFoundation.framework in Frameworks */,
 				2284EF721B4AD47F0058D483 /* MediaPlayer.framework in Frameworks */,
 				2249867E1A95138800F6C3E2 /* AssetsLibrary.framework in Frameworks */,
-				22A897C41A82E0A900FBC1DE /* StoreKit.framework in Frameworks */,
 				1A5703481A74145400D58225 /* AdSupport.framework in Frameworks */,
 				22C8DCF41A801A6300199371 /* CloudKit.framework in Frameworks */,
 				2200DB4718B7EDF100343583 /* QuartzCore.framework in Frameworks */,
@@ -937,7 +935,6 @@
 			files = (
 				229C85461B50294C004964DE /* CoreMedia.framework in Frameworks */,
 				229C85451B502946004964DE /* AVFoundation.framework in Frameworks */,
-				22A897C71A82E0FB00FBC1DE /* StoreKit.framework in Frameworks */,
 				22DB25201982DF2B0008728E /* Crashlytics.framework in Frameworks */,
 				22DB25211982DF2B0008728E /* QuartzCore.framework in Frameworks */,
 				22DB25221982DF2B0008728E /* AudioToolbox.framework in Frameworks */,
@@ -1039,7 +1036,6 @@
 				226EB6001B4C2E8600C432C7 /* AVFoundation.framework */,
 				2284EF711B4AD47F0058D483 /* MediaPlayer.framework */,
 				2249867D1A95138800F6C3E2 /* AssetsLibrary.framework */,
-				22A897C31A82E0A900FBC1DE /* StoreKit.framework */,
 				22C8DCF21A801A4500199371 /* CloudKit.framework */,
 				1A5703471A74145400D58225 /* AdSupport.framework */,
 				1A5703421A73FB1200D58225 /* Fabric.framework */,
@@ -1196,6 +1192,8 @@
 				22032A6E1884529700BE4A10 /* NickCompletionView.m */,
 				22B4284616D7E36300498507 /* NetworkConnection.h */,
 				22B4284716D7E36300498507 /* NetworkConnection.m */,
+				225886DE1B5F2D49000BD672 /* NotificationsDataSource.h */,
+				225886DF1B5F2D49000BD672 /* NotificationsDataSource.m */,
 				22D649281B1E371D003BFD86 /* PastebinsTableViewController.h */,
 				22D649291B1E371D003BFD86 /* PastebinsTableViewController.m */,
 				221390FC1B115CD000ECF001 /* PastebinEditorViewController.h */,
@@ -1495,7 +1493,13 @@
 							com.apple.BackgroundModes = {
 								enabled = 1;
 							};
+							com.apple.InAppPurchase = {
+								enabled = 0;
+							};
 							com.apple.Keychain = {
+								enabled = 1;
+							};
+							com.apple.Push = {
 								enabled = 1;
 							};
 							com.apple.iCloud = {
@@ -1513,6 +1517,9 @@
 								enabled = 1;
 							};
 							com.apple.Keychain = {
+								enabled = 1;
+							};
+							com.apple.Push = {
 								enabled = 1;
 							};
 							com.apple.SafariKeychain = {
@@ -1750,6 +1757,7 @@
 				22C8CE001B01372100F637D2 /* unzip.c in Sources */,
 				2210350F197EFC6200AB414F /* UsersDataSource.m in Sources */,
 				22103510197EFC6200AB414F /* NSObject+SBJson.m in Sources */,
+				225886E21B5F2D49000BD672 /* NotificationsDataSource.m in Sources */,
 				22103511197EFC6200AB414F /* SBJsonParser.m in Sources */,
 				22103512197EFC6200AB414F /* SBJsonStreamParser.m in Sources */,
 				22103513197EFC6200AB414F /* SBJsonStreamParserAccumulator.m in Sources */,
@@ -1791,6 +1799,7 @@
 				2264A30219659BB100DCFDDD /* URLHandler.m in Sources */,
 				225D973C18AA995900065087 /* LoginSplashViewController.m in Sources */,
 				225D974718AA995900065087 /* NetworkConnection.m in Sources */,
+				225886E11B5F2D49000BD672 /* NotificationsDataSource.m in Sources */,
 				225D974918AA995900065087 /* GCDAsyncSocket.m in Sources */,
 				225D974A18AA995900065087 /* HandshakeHeader.m in Sources */,
 				228E2B9218CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
@@ -1882,6 +1891,7 @@
 				2264A30119659BB100DCFDDD /* URLHandler.m in Sources */,
 				228A05DE16D3E40F0029769C /* LoginSplashViewController.m in Sources */,
 				22B4284816D7E36300498507 /* NetworkConnection.m in Sources */,
+				225886E01B5F2D49000BD672 /* NotificationsDataSource.m in Sources */,
 				22B4286816D831A800498507 /* GCDAsyncSocket.m in Sources */,
 				22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */,
 				228E2B9018CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
@@ -2035,6 +2045,7 @@
 				22C8CE011B01372100F637D2 /* unzip.c in Sources */,
 				22DB25071982DF2B0008728E /* UsersDataSource.m in Sources */,
 				22DB25081982DF2B0008728E /* NSObject+SBJson.m in Sources */,
+				225886E31B5F2D49000BD672 /* NotificationsDataSource.m in Sources */,
 				22DB25091982DF2B0008728E /* SBJsonParser.m in Sources */,
 				22DB250A1982DF2B0008728E /* SBJsonStreamParser.m in Sources */,
 				22DB250B1982DF2B0008728E /* SBJsonStreamParserAccumulator.m in Sources */,
@@ -2403,7 +2414,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -2430,7 +2442,8 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
-				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -2685,6 +2698,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",

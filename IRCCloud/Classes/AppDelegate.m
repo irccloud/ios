@@ -322,9 +322,72 @@
     }
 }
 
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
+    NSLog(@"Notification: %@", userInfo);
+    [self application:application didReceiveRemoteNotification:userInfo];
+    if([userInfo objectForKey:@"d"]) {
+        int cid = [[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue];
+        int bid = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
+        NSTimeInterval eid = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
+        
+        //[[NotificationsDataSource sharedInstance] notify:<#(NSString *)#> body:<#(NSString *)#> cid:cid bid:bid eid:eid];
+        [UIApplication sharedApplication].applicationIconBadgeNumber = [UIApplication sharedApplication].applicationIconBadgeNumber + 1;
+        
+        if(_movedToBackground && application.applicationState != UIApplicationStateActive && _conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting) {
+            if(_backlogCompletedObserver) {
+                [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+                _backlogCompletedObserver = nil;
+            }
+            if(_backlogFailedObserver) {
+                [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+                _backlogFailedObserver = nil;
+            }
+            [[NSNotificationCenter defaultCenter] removeObserver:self];
+            
+            _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
+                if([n.object bid] == bid) {
+                    if(_backlogCompletedObserver) {
+                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+                        _backlogCompletedObserver = nil;
+                    }
+                    if(_backlogFailedObserver) {
+                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+                        _backlogFailedObserver = nil;
+                    }
+                    [self.mainViewController refresh];
+                    NSLog(@"Backlog download completed for bid%i", bid);
+                    handler(UIBackgroundFetchResultNewData);
+                }
+            }];
+            _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
+                
+                if([n.object bid] == bid) {
+                    if(_backlogCompletedObserver) {
+                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
+                        _backlogCompletedObserver = nil;
+                    }
+                    if(_backlogFailedObserver) {
+                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
+                        _backlogFailedObserver = nil;
+                    }
+                    NSLog(@"Backlog download failed for bid%i", bid);
+                    handler(UIBackgroundFetchResultFailed);
+                }
+            }];
+            
+            NSLog(@"Preloading backlog for bid%i from notification", bid);
+            [_conn requestBacklogForBuffer:bid server:cid];
+        } else {
+            handler(UIBackgroundFetchResultNoData);
+        }
+    } else {
+        handler(UIBackgroundFetchResultNoData);
+    }
+}
+
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
     NSTimeInterval highestEid = [EventsDataSource sharedInstance].highestEid;
-    if(_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting && [_conn reachabilityValid] && [_conn reachable] == kIRCCloudReachable) {
+    if(_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting) {
         if(_backlogCompletedObserver) {
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
             _backlogCompletedObserver = nil;
@@ -511,13 +574,11 @@
             [[EventsDataSource sharedInstance] clearFormattingCache];
         }
         _conn.reconnectTimestamp = -1;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
+        //if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
             [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
             [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
             [[UIApplication sharedApplication] cancelAllLocalNotifications];
-        } else {
-            [_conn updateBadgeCount];
-        }
+        //}
         if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
             ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
             [evc.topViewController viewWillAppear:NO];
