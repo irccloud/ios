@@ -196,7 +196,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   [self.topViewSnapshot addGestureRecognizer:self.resetTapGesture];
 }
 
--(UIInterfaceOrientationMask)supportedInterfaceOrientations {
+-(SupportedOrientationsReturnType)supportedInterfaceOrientations {
     return [self.topViewController supportedInterfaceOrientations];
 }
 

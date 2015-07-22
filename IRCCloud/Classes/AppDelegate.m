@@ -361,6 +361,7 @@
                     }
                     [self.mainViewController refresh];
                     NSLog(@"Backlog download completed for bid%i", bid);
+                    [_conn serialize];
                     handler(UIBackgroundFetchResultNewData);
                 }
             }];
@@ -398,6 +399,7 @@
                 }
             }
         }
+        [_conn serialize];
         handler(UIBackgroundFetchResultNoData);
     }
 }

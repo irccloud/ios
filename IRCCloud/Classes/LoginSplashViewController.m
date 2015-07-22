@@ -815,7 +815,7 @@
     return YES;
 }
 
--(UIInterfaceOrientationMask)supportedInterfaceOrientations {
+-(SupportedOrientationsReturnType)supportedInterfaceOrientations {
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskPortrait:UIInterfaceOrientationMaskAll;
 }
 

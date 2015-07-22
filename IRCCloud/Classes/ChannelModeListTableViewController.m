@@ -92,7 +92,7 @@
     return self;
 }
 
--(UIInterfaceOrientationMask)supportedInterfaceOrientations {
+-(SupportedOrientationsReturnType)supportedInterfaceOrientations {
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }
 
