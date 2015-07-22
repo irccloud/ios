@@ -323,17 +323,19 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
-    NSLog(@"Notification: %@", userInfo);
-    [self application:application didReceiveRemoteNotification:userInfo];
     if([userInfo objectForKey:@"d"]) {
         int cid = [[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue];
         int bid = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
         NSTimeInterval eid = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
         
-        //[[NotificationsDataSource sharedInstance] notify:<#(NSString *)#> body:<#(NSString *)#> cid:cid bid:bid eid:eid];
         [UIApplication sharedApplication].applicationIconBadgeNumber = [UIApplication sharedApplication].applicationIconBadgeNumber + 1;
         
-        if(_movedToBackground && application.applicationState != UIApplicationStateActive && _conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting) {
+        if(_movedToBackground && application.applicationState == UIApplicationStateInactive) {
+            self.mainViewController.bidToOpen = bid;
+            self.mainViewController.eidToOpen = eid;
+            CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
+            [self.mainViewController bufferSelected:bid];
+        } else if(application.applicationState == UIApplicationStateBackground && _conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting) {
             if(_backlogCompletedObserver) {
                 [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
                 _backlogCompletedObserver = nil;
@@ -574,11 +576,6 @@
             [[EventsDataSource sharedInstance] clearFormattingCache];
         }
         _conn.reconnectTimestamp = -1;
-        //if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
-            [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
-            [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
-            [[UIApplication sharedApplication] cancelAllLocalNotifications];
-        //}
         if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
             ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
             [evc.topViewController viewWillAppear:NO];
@@ -590,6 +587,9 @@
             _background_task = UIBackgroundTaskInvalid;
         }
     }
+    [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
+    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
+    [[UIApplication sharedApplication] cancelAllLocalNotifications];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
