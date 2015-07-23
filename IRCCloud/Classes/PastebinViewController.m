@@ -57,6 +57,7 @@
         _lineNumbers.on = YES;
         [self _fetch];
     }
+    [Answers logContentViewWithName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
 }
 
 -(void)viewDidLoad {
@@ -158,6 +159,25 @@
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
             activityController.popoverPresentationController.delegate = self;
             activityController.popoverPresentationController.barButtonItem = sender;
+            activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+                if(completed) {
+                    if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                        activityType = [activityType substringFromIndex:25];
+                    if([activityType hasPrefix:@"com.apple."])
+                        activityType = [activityType substringFromIndex:10];
+                    [Answers logShareWithMethod:activityType contentName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
+                }
+            };
+        } else {
+            activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
+                if(completed) {
+                    if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                        activityType = [activityType substringFromIndex:25];
+                    if([activityType hasPrefix:@"com.apple."])
+                        activityType = [activityType substringFromIndex:10];
+                    [Answers logShareWithMethod:activityType contentName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
+                }
+            };
         }
         [self presentViewController:activityController animated:YES completion:nil];
     } else {
@@ -174,6 +194,7 @@
         pb.items = @[@{(NSString *)kUTTypeUTF8PlainText:_url,
                        (NSString *)kUTTypeURL:[NSURL URLWithString:_url]}];
     } else if([title isEqualToString:@"Share on Twitter"]) {
+        [Answers logShareWithMethod:@"Twitter" contentName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
         TWTweetComposeViewController *tweetViewController = [[TWTweetComposeViewController alloc] init];
         [tweetViewController setInitialText:_url];
         [tweetViewController setCompletionHandler:^(TWTweetComposeViewControllerResult result) {

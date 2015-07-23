@@ -684,20 +684,20 @@
             activityController.popoverPresentationController.barButtonItem = sender;
             activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
                 if(completed) {
-                    if([activityType hasPrefix:@"com."])
-                        activityType = [activityType substringFromIndex:4];
-                    if([activityType hasPrefix:@"apple."])
-                        activityType = [activityType substringFromIndex:6];
+                    if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                        activityType = [activityType substringFromIndex:25];
+                    if([activityType hasPrefix:@"com.apple."])
+                        activityType = [activityType substringFromIndex:10];
                     [Answers logShareWithMethod:activityType contentName:nil contentType:_movieController?@"Animation":@"Image" contentId:nil customAttributes:nil];
                 }
             };
         } else {
             activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
                 if(completed) {
-                    if([activityType hasPrefix:@"com."])
-                        activityType = [activityType substringFromIndex:4];
-                    if([activityType hasPrefix:@"apple."])
-                        activityType = [activityType substringFromIndex:6];
+                    if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                        activityType = [activityType substringFromIndex:25];
+                    if([activityType hasPrefix:@"com.apple."])
+                        activityType = [activityType substringFromIndex:10];
                     [Answers logShareWithMethod:activityType contentName:nil contentType:_movieController?@"Animation":@"Image" contentId:nil customAttributes:nil];
                 }
             };
