@@ -102,6 +102,7 @@
     [UIView setAnimationDuration:0.25];
     _imageView.alpha = 1;
     [UIView commitAnimations];
+    [Answers logContentViewWithName:nil contentType:@"Image" contentId:nil customAttributes:nil];
 }
 
 //Some centering magic from: http://stackoverflow.com/a/2189336/1406639
@@ -217,6 +218,7 @@
     _scrollView.userInteractionEnabled = NO;
     [_progressView removeFromSuperview];
     [_movieController play];
+    [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
 }
 
 -(void)loadGfycat:(NSString *)gyfID {
@@ -680,6 +682,25 @@
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
             activityController.popoverPresentationController.delegate = self;
             activityController.popoverPresentationController.barButtonItem = sender;
+            activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+                if(completed) {
+                    if([activityType hasPrefix:@"com."])
+                        activityType = [activityType substringFromIndex:4];
+                    if([activityType hasPrefix:@"apple."])
+                        activityType = [activityType substringFromIndex:6];
+                    [Answers logShareWithMethod:activityType contentName:nil contentType:_movieController?@"Animation":@"Image" contentId:nil customAttributes:nil];
+                }
+            };
+        } else {
+            activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
+                if(completed) {
+                    if([activityType hasPrefix:@"com."])
+                        activityType = [activityType substringFromIndex:4];
+                    if([activityType hasPrefix:@"apple."])
+                        activityType = [activityType substringFromIndex:6];
+                    [Answers logShareWithMethod:activityType contentName:nil contentType:_movieController?@"Animation":@"Image" contentId:nil customAttributes:nil];
+                }
+            };
         }
         [self presentViewController:activityController animated:YES completion:nil];
         [_hideTimer invalidate];
@@ -711,6 +732,7 @@
             [self dismissModalViewControllerAnimated:YES];
         }];
         [self presentModalViewController:tweetViewController animated:YES];
+        [Answers logShareWithMethod:@"Twitter" contentName:nil contentType:_movieController?@"Animation":@"Image" contentId:nil customAttributes:nil];
     } else if([title hasPrefix:@"Open "]) {
         [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{

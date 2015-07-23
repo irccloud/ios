@@ -102,6 +102,7 @@
             MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
             [mainViewController presentMoviePlayerViewControllerAnimated:player];
         }
+        [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
     } else {
         [self openWebpage:url];
     }
