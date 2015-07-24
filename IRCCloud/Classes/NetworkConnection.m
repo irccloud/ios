@@ -445,10 +445,6 @@ NSLock *__parserLock = nil;
                            _totalBuffers = 0;
                            CLS_LOG(@"OOB includes has %i buffers", _numBuffers);
                        }
-                       backlog = YES;
-                       [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                           [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
-                       }];
                    },
                    @"makeserver": makeserver,
                    @"server_details_changed": makeserver,
@@ -1660,6 +1656,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)parse:(NSDictionary *)dict {
+    NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
     if(backlog)
         _totalCount++;
     if([NSThread currentThread].isMainThread)
@@ -1702,6 +1699,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalBuffers + (float)_currentCount/100.0f)/ (float)_numBuffers) waitUntilDone:NO];
                 _currentCount++;
             }
+        }
+        if([NSDate timeIntervalSinceReferenceDate] - start > _longestEventTime) {
+            _longestEventTime = [NSDate timeIntervalSinceReferenceDate] - start;
+            _longestEventType = object.type;
         }
     } else {
         if([object objectForKey:@"success"] && ![[object objectForKey:@"success"] boolValue] && [object objectForKey:@"message"]) {
@@ -1791,6 +1792,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogStarted:(NSNotification *)notification {
+    _OOBStartTime = [NSDate timeIntervalSinceReferenceDate];
+    _longestEventTime = 0;
+    _longestEventType = nil;
     if(_awayOverride.count)
         NSLog(@"Caught %lu self_back events", (unsigned long)_awayOverride.count);
     _currentBid = -1;
@@ -1801,6 +1805,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogCompleted:(NSNotification *)notification {
+    if(_OOBStartTime) {
+        NSTimeInterval total = [NSDate timeIntervalSinceReferenceDate] - _OOBStartTime;
+        CLS_LOG(@"OOB processed %i events in %f seconds (%f seconds / event)", _totalCount, total, total / (double)_totalCount);
+        CLS_LOG(@"Longest event: %@ (%f seconds)", _longestEventType, _longestEventTime);
+        _OOBStartTime = 0;
+        _longestEventTime = 0;
+        _longestEventType = nil;
+    }
     _failCount = 0;
     _accrued = 0;
     backlog = NO;

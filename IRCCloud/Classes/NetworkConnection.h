@@ -126,6 +126,9 @@ typedef enum {
     int _totalCount;
     int _currentBid;
     int _failCount;
+    NSTimeInterval _OOBStartTime;
+    NSTimeInterval _longestEventTime;
+    NSString *_longestEventType;
     BOOL _resuming;
     BOOL _notifier;
     BOOL backlog;

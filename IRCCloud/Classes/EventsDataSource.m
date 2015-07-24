@@ -876,12 +876,15 @@
 
 -(void)pruneEventsForBuffer:(int)bid maxSize:(int)size {
     @synchronized(_events) {
-        NSMutableArray *events = [self eventsForBuffer:bid].mutableCopy;
-        while(events.count > size) {
-            Event *e = [events objectAtIndex:0];
-            [events removeObject:e];
-            [[_events objectForKey:@(bid)] removeObject:e];
-            [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(e.eid)];
+        if([[_events objectForKey:@(bid)] count] > size) {
+            CLS_LOG(@"Pruning events for bid%i (max = %i)", bid, size);
+            NSMutableArray *events = [self eventsForBuffer:bid].mutableCopy;
+            while(events.count > size) {
+                Event *e = [events objectAtIndex:0];
+                [events removeObject:e];
+                [[_events objectForKey:@(bid)] removeObject:e];
+                [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(e.eid)];
+            }
         }
     }
 }
@@ -889,6 +892,7 @@
 -(NSArray *)eventsForBuffer:(int)bid {
     @synchronized(_events) {
         if([_dirtyBIDs objectForKey:@(bid)]) {
+            CLS_LOG(@"Buffer bid%i needs sorting", bid);
             [[_events objectForKey:@(bid)] sortUsingSelector:@selector(compare:)];
             [_dirtyBIDs removeObjectForKey:@(bid)];
         }
