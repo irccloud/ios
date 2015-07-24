@@ -198,6 +198,8 @@
             }
         }
 #endif
+        _dirtyBIDs = [[NSMutableDictionary alloc] init];
+        _lastEIDs = [[NSMutableDictionary alloc] init];
         _events_sorted = [[NSMutableDictionary alloc] init];
         _highestEid = 0;
         if(_events) {
@@ -208,6 +210,8 @@
                     [events_sorted setObject:e forKey:@(e.eid)];
                     if(e.eid > _highestEid)
                         _highestEid = e.eid;
+                    if(![_lastEIDs objectForKey:@(e.bid)] || [[_lastEIDs objectForKey:@(e.bid)] doubleValue] < e.eid)
+                        [_lastEIDs setObject:@(e.eid) forKey:@(e.bid)];
                 }
                 
                 if(events.count > 1000) {
@@ -225,12 +229,12 @@
                     }
                 }
                 [_events_sorted setObject:events_sorted forKey:bid];
+                [[_events objectForKey:bid] sortUsingSelector:@selector(compare:)];
             }
             [self clearPendingAndFailed];
         } else {
             _events = [[NSMutableDictionary alloc] init];
         }
-        _dirty = YES;
         
         void (^error)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
             event.from = @"";
@@ -767,7 +771,10 @@
             [_events_sorted setObject:events_sorted forKey:@(event.bid)];
         }
         [events_sorted setObject:event forKey:@(event.eid)];
-        _dirty = YES;
+        [_dirtyBIDs setObject:@YES forKey:@(event.bid)];
+        if(![_lastEIDs objectForKey:@(event.bid)] || [[_lastEIDs objectForKey:@(event.bid)] doubleValue] < event.eid)
+            [_lastEIDs setObject:@(event.eid) forKey:@(event.bid)];
+
     }
 #endif
 }
@@ -783,7 +790,6 @@
         event.eid = object.eid;
         [self addEvent: event];
     }
-    _dirty = YES;
     
     event.cid = object.cid;
     event.bid = object.bid;
@@ -858,7 +864,6 @@
                 break;
             }
         }
-        _dirty = YES;
     }
 }
 
@@ -883,9 +888,9 @@
 
 -(NSArray *)eventsForBuffer:(int)bid {
     @synchronized(_events) {
-        if(_dirty) {
+        if([_dirtyBIDs objectForKey:@(bid)]) {
             [[_events objectForKey:@(bid)] sortUsingSelector:@selector(compare:)];
-            _dirty = NO;
+            [_dirtyBIDs removeObjectForKey:@(bid)];
         }
         return [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
     }
@@ -899,18 +904,15 @@
 
 -(NSTimeInterval)lastEidForBuffer:(int)bid {
     @synchronized(_events) {
-        if(_dirty) {
-            [[_events objectForKey:@(bid)] sortUsingSelector:@selector(compare:)];
-            _dirty = NO;
-        }
-        return [[[_events objectForKey:@(bid)] lastObject] eid];
+        return [[_lastEIDs objectForKey:@(bid)] doubleValue];
     }
 }
 
 -(void)removeEventsBefore:(NSTimeInterval)min_eid buffer:(int)bid {
     @synchronized(_events) {
+        NSArray *events = [_events objectForKey:@(bid)];
         NSMutableArray *eventsToRemove = [[NSMutableArray alloc] init];
-        for(Event *event in [_events objectForKey:@(bid)]) {
+        for(Event *event in events) {
             if(event.eid < min_eid) {
                 [eventsToRemove addObject:event];
             }
