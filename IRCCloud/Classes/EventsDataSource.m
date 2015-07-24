@@ -771,9 +771,11 @@
             [_events_sorted setObject:events_sorted forKey:@(event.bid)];
         }
         [events_sorted setObject:event forKey:@(event.eid)];
-        [_dirtyBIDs setObject:@YES forKey:@(event.bid)];
-        if(![_lastEIDs objectForKey:@(event.bid)] || [[_lastEIDs objectForKey:@(event.bid)] doubleValue] < event.eid)
+        if(![_lastEIDs objectForKey:@(event.bid)] || [[_lastEIDs objectForKey:@(event.bid)] doubleValue] < event.eid) {
             [_lastEIDs setObject:@(event.eid) forKey:@(event.bid)];
+        } else {
+            [_dirtyBIDs setObject:@YES forKey:@(event.bid)];
+        }
 
     }
 #endif
