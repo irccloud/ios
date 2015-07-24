@@ -125,10 +125,7 @@
 #ifdef CRASHLYTICS_TOKEN
     [Fabric with:@[CrashlyticsKit]];
 #endif
-    _conn = [NetworkConnection sharedInstance];
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
+    
     self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController" bundle:nil];
     self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
     self.slideViewController = [[ECSlidingViewController alloc] init];
@@ -142,29 +139,21 @@
     }
     [self.mainViewController loadView];
     [self.mainViewController viewDidLoad];
-    NSString *session = [NetworkConnection sharedInstance].session;
-    if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
-        //Store the session in the keychain again to update the access policy
-        [NetworkConnection sharedInstance].session = session;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-            [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
-            self.window.backgroundColor = [UIColor whiteColor];
-        }
-        self.window.rootViewController = self.slideViewController;
-    } else {
-        self.window.rootViewController = self.loginSplashViewController;
-    }
-    [self.window makeKeyAndVisible];
+
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
+    self.window.rootViewController = [[UIViewController alloc] init];
     
     _animationView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
     _animationView.backgroundColor = [UIColor colorWithRed:0.043 green:0.18 blue:0.376 alpha:1];
     
-    UIImageView *logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"login_logo"]];
-    [logo sizeToFit];
+    _logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"login_logo"]];
+    [_logo sizeToFit];
     if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
-        logo.center = CGPointMake(self.window.center.y, 39);
+        _logo.center = CGPointMake(self.window.center.y, 39);
     else
-        logo.center = CGPointMake(self.window.center.x, 39);
+        _logo.center = CGPointMake(self.window.center.x, 39);
 
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
@@ -181,44 +170,68 @@
         frame.size.height += [UIApplication sharedApplication].statusBarFrame.size.height;
         _animationView.frame = frame;
         
-        frame = logo.frame;
+        frame = _logo.frame;
         frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
-        logo.frame = frame;
+        _logo.frame = frame;
     }
 
-    [_animationView addSubview:logo];
+    [_animationView addSubview:_logo];
     [self.window addSubview:_animationView];
+    [self.window makeKeyAndVisible];
 
-    if([NetworkConnection sharedInstance].session.length) {
-        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
-        [animation setFromValue:@(logo.layer.position.x)];
-        [animation setToValue:@(_animationView.bounds.size.width + logo.bounds.size.width)];
-        [animation setDuration:0.4];
-        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.8 :-.3 :.8 :-.3]];
-        animation.removedOnCompletion = NO;
-        animation.fillMode = kCAFillModeForwards;
-        [logo.layer addAnimation:animation forKey:nil];
-    } else {
-        self.loginSplashViewController.logo.hidden = YES;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _conn = [NetworkConnection sharedInstance];
+        NSString *session = [NetworkConnection sharedInstance].session;
+        if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
+            //Store the session in the keychain again to update the access policy
+            [NetworkConnection sharedInstance].session = session;
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+                [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
+                self.window.backgroundColor = [UIColor whiteColor];
+            }
+            self.window.rootViewController = self.slideViewController;
+        } else {
+            self.window.rootViewController = self.loginSplashViewController;
+        }
         
-        CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
-        [animation setFromValue:@(logo.layer.position.x)];
-        [animation setToValue:@(self.loginSplashViewController.logo.layer.position.x)];
-        [animation setDuration:0.4];
-        [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.17 :.89 :.32 :1.28]];
-        animation.removedOnCompletion = NO;
-        animation.fillMode = kCAFillModeForwards;
-        [logo.layer addAnimation:animation forKey:nil];
-    }
-    
-    [UIView animateWithDuration:0.25 delay:0.25 options:0 animations:^{
-        _animationView.backgroundColor = [UIColor clearColor];
-    } completion:^(BOOL finished) {
-        self.loginSplashViewController.logo.hidden = NO;
-        [_animationView removeFromSuperview];
-        _animationView = nil;
+        [self.window addSubview:_animationView];
+        
+        if([NetworkConnection sharedInstance].session.length) {
+            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
+            [animation setFromValue:@(_logo.layer.position.x)];
+            [animation setToValue:@(_animationView.bounds.size.width + _logo.bounds.size.width)];
+            [animation setDuration:0.4];
+            [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.8 :-.3 :.8 :-.3]];
+            animation.removedOnCompletion = NO;
+            animation.fillMode = kCAFillModeForwards;
+            [_logo.layer addAnimation:animation forKey:nil];
+        } else {
+            self.loginSplashViewController.logo.hidden = YES;
+            
+            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
+            [animation setFromValue:@(_logo.layer.position.x)];
+            [animation setToValue:@(self.loginSplashViewController.logo.layer.position.x)];
+            [animation setDuration:0.4];
+            [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.17 :.89 :.32 :1.28]];
+            animation.removedOnCompletion = NO;
+            animation.fillMode = kCAFillModeForwards;
+            [_logo.layer addAnimation:animation forKey:nil];
+        }
+        
+        [UIView animateWithDuration:0.25 delay:0.25 options:0 animations:^{
+            _animationView.backgroundColor = [UIColor clearColor];
+        } completion:^(BOOL finished) {
+            self.loginSplashViewController.logo.hidden = NO;
+            [_animationView removeFromSuperview];
+            _animationView = nil;
+        }];
     }];
+    
     return YES;
+}
+
+-(void)_load:(NSDictionary *)launchOptions {
+
 }
 
 -(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *))restorationHandler {

@@ -1058,7 +1058,6 @@ extern NSDictionary *emojiMap;
         _eidToOpen = -1;
         if(_urlToOpen)
             [self launchURL:_urlToOpen];
-        _urlToOpen = nil;
         [[NSNotificationCenter defaultCenter] addObserver:_eventsView selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
     }
 }
@@ -1147,7 +1146,6 @@ extern NSDictionary *emojiMap;
         [self bufferSelected:bid];
         if(_urlToOpen) {
             [self launchURL:_urlToOpen];
-            _urlToOpen = nil;
         }
     } else {
         [self bufferSelected:_buffer.bid];
@@ -1687,6 +1685,7 @@ extern NSDictionary *emojiMap;
     int port = [url.port intValue];
     int ssl = [url.scheme hasSuffix:@"s"]?1:0;
     BOOL match = NO;
+    _urlToOpen = nil;
     kIRCCloudState state = [NetworkConnection sharedInstance].state;
     
     if([url.host intValue] > 0 && url.path && url.path.length > 1) {
@@ -1777,7 +1776,6 @@ extern NSDictionary *emojiMap;
         }
         _bidToOpen = -1;
         _eidToOpen = -1;
-        _urlToOpen = nil;
         _bufferToOpen = nil;
         CLS_LOG(@"BID selected: cid%i bid%i", _buffer.cid, bid);
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];

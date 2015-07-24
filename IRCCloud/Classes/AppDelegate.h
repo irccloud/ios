@@ -34,6 +34,7 @@
     BOOL _movedToBackground;
     __block UIBackgroundTaskIdentifier _background_task;
     UIView *_animationView;
+    UIImageView *_logo;
 }
 
 @property (strong, nonatomic) UIWindow *window;
