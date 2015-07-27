@@ -558,7 +558,7 @@
             loadingView.alpha = 0;
             [UIView commitAnimations];
             [activity stopAnimating];
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Password Reset Failed" message:@"Unable to request a password reset.  Please try again later." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Request Failed" message:@"Unable to request an access link.  Please try again later." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
             [alert show];
         });
     });
