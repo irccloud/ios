@@ -57,6 +57,7 @@
     CGSize _kbSize;
     NSURL *_accessLink;
     NSString *_impression;
+    BOOL _gotCredentialsFromSafari;
 }
 @property NSURL *accessLink;
 @property (nonatomic) NSString *impression;

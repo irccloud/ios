@@ -207,26 +207,29 @@
         [self _loginWithAccessLink];
 #ifndef ENTERPRISE
     } else {
-        loginView.alpha = 0;
-        SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
-            if (error != NULL) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    loginView.alpha = 1;
-                }];
-                NSLog(@"Unable to request shared web credentials: %@", error);
-                return;
-            }
-            
-            if (CFArrayGetCount(credentials) > 0) {
-                NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
-                    [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
-                    [self loginHintPressed:nil];
-                    [self loginButtonPressed:nil];
-                }];
-            }
-        });
+        if(username.text.length == 0) {
+            loginView.alpha = 0;
+            SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
+                if (error != NULL) {
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        loginView.alpha = 1;
+                    }];
+                    NSLog(@"Unable to request shared web credentials: %@", error);
+                    return;
+                }
+                
+                if (CFArrayGetCount(credentials) > 0) {
+                    _gotCredentialsFromSafari = YES;
+                    NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
+                        [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
+                        [self loginHintPressed:nil];
+                        [self loginButtonPressed:nil];
+                    }];
+                }
+            });
+        }
 #endif
     }
 }
@@ -763,12 +766,14 @@
                 } else {
                     [Answers logLoginWithMethod:@"email" success:@YES customAttributes:nil];
                 }
-                SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)(username.text), (__bridge CFStringRef)(password.text), ^(CFErrorRef error) {
-                    if (error != NULL) {
-                        NSLog(@"Unable to save shared credentials: %@", error);
-                        return;
-                    }
-                });
+                if(!_gotCredentialsFromSafari) {
+                    SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)(username.text), (__bridge CFStringRef)(password.text), ^(CFErrorRef error) {
+                        if (error != NULL) {
+                            NSLog(@"Unable to save shared credentials: %@", error);
+                            return;
+                        }
+                    });
+                }
 #endif
                 loginHint.alpha = 0;
                 signupHint.alpha = 0;
