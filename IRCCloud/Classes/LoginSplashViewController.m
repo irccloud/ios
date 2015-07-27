@@ -207,17 +207,24 @@
         [self _loginWithAccessLink];
 #ifndef ENTERPRISE
     } else {
+        loginView.alpha = 0;
         SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
             if (error != NULL) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    loginView.alpha = 1;
+                }];
                 NSLog(@"Unable to request shared web credentials: %@", error);
                 return;
             }
             
             if (CFArrayGetCount(credentials) > 0) {
-                NSDictionary *credentialsDict = CFBridgingRelease(CFArrayGetValueAtIndex(credentials, 0));
-                [username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
-                [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
-                [self loginHintPressed:nil];
+                NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
+                    [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
+                    [self loginHintPressed:nil];
+                    [self loginButtonPressed:nil];
+                }];
             }
         });
 #endif
