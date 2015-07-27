@@ -72,6 +72,7 @@
 }
 
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    [self.view endEditing:YES];
     if([request.URL.host isEqualToString:@"imgur.com"]) {
         if([request.URL.fragment hasPrefix:@"access_token="]) {
             for(NSString *param in [request.URL.fragment componentsSeparatedByString:@"&"]) {
