@@ -204,7 +204,42 @@
 #endif
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     if(_accessLink && IRCCLOUD_HOST.length) {
+        _gotCredentialsFromPasswordManager = YES;
         [self _loginWithAccessLink];
+#ifndef ENTERPRISE
+    } else {
+        [self performSelector:@selector(_promptForSWC) withObject:nil afterDelay:0.1];
+#endif
+    }
+}
+
+-(void)_promptForSWC {
+    if(username.text.length == 0 && !_gotCredentialsFromPasswordManager && !_accessLink) {
+        loginView.alpha = 0;
+        SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
+            if (error != NULL) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    loginView.alpha = 1;
+                }];
+                NSLog(@"Unable to request shared web credentials: %@", error);
+                return;
+            }
+            
+            if (CFArrayGetCount(credentials) > 0) {
+                _gotCredentialsFromPasswordManager = YES;
+                NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
+                    [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
+                    [self loginHintPressed:nil];
+                    [self loginButtonPressed:nil];
+                }];
+            } else {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    loginView.alpha = 1;
+                }];
+            }
+        });
     }
 }
 
@@ -268,35 +303,6 @@
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
-#ifndef ENTERPRISE
-    if(username.text.length == 0 && !_gotCredentialsFromPasswordManager) {
-        loginView.alpha = 0;
-        SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
-            if (error != NULL) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    loginView.alpha = 1;
-                }];
-                NSLog(@"Unable to request shared web credentials: %@", error);
-                return;
-            }
-            
-            if (CFArrayGetCount(credentials) > 0) {
-                _gotCredentialsFromPasswordManager = YES;
-                NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
-                    [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
-                    [self loginHintPressed:nil];
-                    [self loginButtonPressed:nil];
-                }];
-            } else {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    loginView.alpha = 1;
-                }];
-            }
-        });
-    }
-#endif
 }
 
 -(void)viewWillDisappear:(BOOL)animated {

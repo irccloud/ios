@@ -252,11 +252,44 @@
         }
     } else if([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]) {
         if([userActivity.webpageURL.host isEqualToString:@"www.irccloud.com"]) {
-            NSString *url = [userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/#!/" withString:@"irc://"];
-            if([url hasPrefix:@"irc://ircs://"])
-                url = [url substringFromIndex:6];
-            CLS_LOG(@"Opening URL from handoff: %@", url);
-            [self.mainViewController launchURL:[NSURL URLWithString:url]];
+            if([userActivity.webpageURL.path isEqualToString:@"/chat/access-link"]) {
+                CLS_LOG(@"Opening access-link from handoff");
+                NSString *url = [[userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/" withString:@"irccloud://"] stringByReplacingOccurrencesOfString:@"&mobile=1" withString:@""];
+                [_conn logout];
+                self.loginSplashViewController.accessLink = [NSURL URLWithString:url];
+                self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
+                self.loginSplashViewController.view.alpha = 1;
+                if(self.window.rootViewController == self.loginSplashViewController)
+                    [self.loginSplashViewController viewWillAppear:YES];
+                else
+                    self.window.rootViewController = self.loginSplashViewController;
+            } else if([userActivity.webpageURL.path hasPrefix:@"/verify-email/"]) {
+                CLS_LOG(@"Opening verify-email from handoff");
+                [[[NSURLSession sharedSession] dataTaskWithURL:userActivity.webpageURL completionHandler:
+                  ^(NSData *data, NSURLResponse *response, NSError *error) {
+                      if([(NSHTTPURLResponse *)response statusCode] == 200) {
+                          UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Confirmed" message:@"Your email address was successfully confirmed" preferredStyle:UIAlertControllerStyleAlert];
+                          [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
+                          [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
+                      } else {
+                          UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Confirmation Failed" message:@"Unable to confirm your email address.  Please try again shortly." preferredStyle:UIAlertControllerStyleAlert];
+                          [alert addAction:[UIAlertAction actionWithTitle:@"Send Again" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                              [[NetworkConnection sharedInstance] resendVerifyEmail];
+                              UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." preferredStyle:UIAlertControllerStyleAlert];
+                              [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
+                              [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
+                          }]];
+                          [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
+                          [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
+                      }
+                }] resume];
+            } else {
+                NSString *url = [userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/#!/" withString:@"irc://"];
+                if([url hasPrefix:@"irc://ircs://"])
+                    url = [url substringFromIndex:6];
+                CLS_LOG(@"Opening URL from handoff: %@", url);
+                [self.mainViewController launchURL:[NSURL URLWithString:url]];
+            }
             return YES;
         }
     }
