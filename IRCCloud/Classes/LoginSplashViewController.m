@@ -205,6 +205,22 @@
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     if(_accessLink && IRCCLOUD_HOST.length) {
         [self _loginWithAccessLink];
+#ifndef ENTERPRISE
+    } else {
+        SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
+            if (error != NULL) {
+                NSLog(@"Unable to request shared web credentials: %@", error);
+                return;
+            }
+            
+            if (CFArrayGetCount(credentials) > 0) {
+                NSDictionary *credentialsDict = CFBridgingRelease(CFArrayGetValueAtIndex(credentials, 0));
+                [username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
+                [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
+                [self loginHintPressed:nil];
+            }
+        });
+#endif
     }
 }
 
@@ -740,6 +756,12 @@
                 } else {
                     [Answers logLoginWithMethod:@"email" success:@YES customAttributes:nil];
                 }
+                SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)(username.text), (__bridge CFStringRef)(password.text), ^(CFErrorRef error) {
+                    if (error != NULL) {
+                        NSLog(@"Unable to save shared credentials: %@", error);
+                        return;
+                    }
+                });
 #endif
                 loginHint.alpha = 0;
                 signupHint.alpha = 0;
