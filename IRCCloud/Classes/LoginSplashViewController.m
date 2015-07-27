@@ -205,32 +205,6 @@
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     if(_accessLink && IRCCLOUD_HOST.length) {
         [self _loginWithAccessLink];
-#ifndef ENTERPRISE
-    } else {
-        if(username.text.length == 0) {
-            loginView.alpha = 0;
-            SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
-                if (error != NULL) {
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        loginView.alpha = 1;
-                    }];
-                    NSLog(@"Unable to request shared web credentials: %@", error);
-                    return;
-                }
-                
-                if (CFArrayGetCount(credentials) > 0) {
-                    _gotCredentialsFromSafari = YES;
-                    NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
-                        [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
-                        [self loginHintPressed:nil];
-                        [self loginButtonPressed:nil];
-                    }];
-                }
-            });
-        }
-#endif
     }
 }
 
@@ -294,6 +268,35 @@
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+#ifndef ENTERPRISE
+    if(username.text.length == 0 && !_gotCredentialsFromPasswordManager) {
+        loginView.alpha = 0;
+        SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
+            if (error != NULL) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    loginView.alpha = 1;
+                }];
+                NSLog(@"Unable to request shared web credentials: %@", error);
+                return;
+            }
+            
+            if (CFArrayGetCount(credentials) > 0) {
+                _gotCredentialsFromPasswordManager = YES;
+                NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
+                    [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
+                    [self loginHintPressed:nil];
+                    [self loginButtonPressed:nil];
+                }];
+            } else {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    loginView.alpha = 1;
+                }];
+            }
+        });
+    }
+#endif
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -562,6 +565,7 @@
 }
 
 -(IBAction)onePasswordButtonPressed:(id)sender {
+    _gotCredentialsFromPasswordManager = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
         if(login.alpha) {
 #ifdef ENTERPRISE
@@ -577,6 +581,7 @@
                     return;
                 }
                 
+                loginView.alpha = 0;
                 if([loginDict[AppExtensionUsernameKey] length])
                     username.text = loginDict[AppExtensionUsernameKey];
                 password.text = loginDict[AppExtensionPasswordKey];
@@ -587,6 +592,7 @@
                 enterpriseLearnMore.alpha = 0;
                 username.alpha = 1;
                 [self loginHintPressed:nil];
+                [self loginButtonPressed:nil];
             }];
         } else {
 #ifdef ENTERPRISE
@@ -766,7 +772,7 @@
                 } else {
                     [Answers logLoginWithMethod:@"email" success:@YES customAttributes:nil];
                 }
-                if(!_gotCredentialsFromSafari) {
+                if(!_gotCredentialsFromPasswordManager) {
                     SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)(username.text), (__bridge CFStringRef)(password.text), ^(CFErrorRef error) {
                         if (error != NULL) {
                             NSLog(@"Unable to save shared credentials: %@", error);
