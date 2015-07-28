@@ -1066,7 +1066,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)unregisterAPNs:(NSData *)token session:(NSString *)session {
-#if defined(DEBUG) || defined(EXTENSION)
+#ifdef EXTENSION
     return nil;
 #else
 	NSData *data;
@@ -1925,6 +1925,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)_logout:(NSString *)session {
     NSLog(@"Unregister result: %@", [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] session:session]);
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
     //TODO: check the above result, and retry if it fails
 	NSURLResponse *response = nil;
 	NSError *error = nil;
@@ -1958,7 +1959,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _session = nil;
     [self disconnect];
     [self performSelectorInBackground:@selector(_logout:) withObject:s];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"host"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"path"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
