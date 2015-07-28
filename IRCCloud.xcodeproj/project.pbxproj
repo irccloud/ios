@@ -2305,7 +2305,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "c2a92092-d9ed-41d7-80a1-a672ec0ef0ea";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2338,7 +2338,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "ffa24e81-3639-4bc1-b04b-a2831c8d1e05";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2552,7 +2552,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "af701556-3286-4eb7-9ea5-7dff085a9ecd";
+				PROVISIONING_PROFILE = "2b70d81f-e197-4292-ba08-e1436c910f7c";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2772,7 +2772,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE = "ba62326b-c48f-4adb-bb4f-c723c6df9aa6";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;

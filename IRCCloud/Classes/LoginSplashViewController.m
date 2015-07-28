@@ -207,7 +207,7 @@
         _gotCredentialsFromPasswordManager = YES;
         [self _loginWithAccessLink];
 #ifndef ENTERPRISE
-    } else {
+    } else if ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         [self performSelector:@selector(_promptForSWC) withObject:nil afterDelay:0.1];
 #endif
     }
@@ -778,7 +778,7 @@
                 } else {
                     [Answers logLoginWithMethod:@"email" success:@YES customAttributes:nil];
                 }
-                if(!_gotCredentialsFromPasswordManager) {
+                if(!_gotCredentialsFromPasswordManager && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
                     SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)(username.text), (__bridge CFStringRef)(password.text), ^(CFErrorRef error) {
                         if (error != NULL) {
                             NSLog(@"Unable to save shared credentials: %@", error);
