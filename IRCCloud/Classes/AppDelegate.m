@@ -344,7 +344,15 @@
 }
 
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
-    if(![devToken isEqualToData:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]]) {
+    NSData *oldToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"];
+    if(![devToken isEqualToData:oldToken]) {
+        if(oldToken) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                CLS_LOG(@"Unregistering old APNs token");
+                NSDictionary *result = [_conn unregisterAPNs:oldToken session:_conn.session];
+                NSLog(@"Unregistration result: %@", result);
+            });
+        }
         [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSDictionary *result = [_conn registerAPNs:devToken];
