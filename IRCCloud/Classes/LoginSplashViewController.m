@@ -173,18 +173,12 @@
     password.text = @"";
     loadingView.alpha = 0;
     loginView.alpha = 1;
-    if(username.text.length) {
-        loginHint.alpha = 0;
-        signupHint.alpha = 1;
-        signup.alpha = 0;
-        login.alpha = 1;
-        name.alpha = 0;
+    if(sendAccessLink.alpha) {
+        [self forgotPasswordHintPressed:nil];
+    } else if(username.text.length && !name.text.length) {
+        [self loginHintPressed:nil];
     } else {
-        loginHint.alpha = 1;
-        signupHint.alpha = 0;
-        signup.alpha = 1;
-        login.alpha = 0;
-        name.alpha = 1;
+        [self signupHintPressed:nil];
     }
 #ifdef ENTERPRISE
     host.alpha = 1;
@@ -470,7 +464,8 @@
 }
 
 -(IBAction)loginHintPressed:(id)sender {
-    [UIView beginAnimations:nil context:NULL];
+    if(sender)
+        [UIView beginAnimations:nil context:NULL];
     name.alpha = 0;
     login.alpha = 1;
     password.alpha = 1;
@@ -488,12 +483,14 @@
     sendAccessLink.alpha = 0;
     enterEmailAddressHint.alpha = 0;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
-    [UIView commitAnimations];
+    if(sender)
+        [UIView commitAnimations];
     [self textFieldChanged:name];
 }
 
 -(IBAction)signupHintPressed:(id)sender {
-    [UIView beginAnimations:nil context:NULL];
+    if(sender)
+        [UIView beginAnimations:nil context:NULL];
     name.alpha = 1;
     password.alpha = 1;
     login.alpha = 0;
@@ -508,12 +505,14 @@
     sendAccessLink.alpha = 0;
     enterEmailAddressHint.alpha = 0;
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
-    [UIView commitAnimations];
+    if(sender)
+        [UIView commitAnimations];
     [self textFieldChanged:username];
 }
 
 -(IBAction)forgotPasswordHintPressed:(id)sender {
-    [UIView beginAnimations:nil context:NULL];
+    if(sender)
+        [UIView beginAnimations:nil context:NULL];
     login.alpha = 0;
     password.alpha = 0;
     signupHint.alpha = 0;
@@ -526,7 +525,8 @@
     notAProblem.alpha = 1;
     sendAccessLink.alpha = 1;
     enterEmailAddressHint.alpha = 1;
-    [UIView commitAnimations];
+    if(sender)
+        [UIView commitAnimations];
     [self _updateFieldPositions];
 }
 
