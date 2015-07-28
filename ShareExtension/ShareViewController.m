@@ -204,7 +204,7 @@
                     [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
                 } else {
                     if(self.contentText.length)
-                        [_conn say:[NSString stringWithFormat:@"%@ [%@]",self.contentText,item.absoluteString] to:_buffer.name cid:_buffer.cid];
+                        [_conn say:[NSString stringWithFormat:@"%@ %@",self.contentText,item.absoluteString] to:_buffer.name cid:_buffer.cid];
                     else
                         [_conn say:item.absoluteString to:_buffer.name cid:_buffer.cid];
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
