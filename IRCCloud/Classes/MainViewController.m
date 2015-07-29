@@ -1471,7 +1471,6 @@ extern NSDictionary *emojiMap;
             _message.delegate = nil;
             _message.text = text;
             _message.selectedRange = NSMakeRange(text.length, 0);
-            _message.delegate = self;
             if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
                 [_message.internalTextView reloadInputViews];
@@ -1481,6 +1480,7 @@ extern NSDictionary *emojiMap;
                     objc_msgSend(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
                 }
             }
+            _message.delegate = self;
         }
     }
 }
