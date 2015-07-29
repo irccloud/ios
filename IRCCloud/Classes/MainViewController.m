@@ -936,7 +936,6 @@ extern NSDictionary *emojiMap;
 -(void)_hideConnectingView {
     self.navigationItem.titleView = _titleView;
     _connectingProgress.hidden = YES;
-    _connectingProgress.progress = 0;
 }
 
 -(void)connectivityChanged:(NSNotification *)notification {
