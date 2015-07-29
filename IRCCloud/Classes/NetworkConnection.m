@@ -410,6 +410,8 @@ NSLock *__parserLock = nil;
                        CLS_LOG(@"oob_include, invalidating BIDs");
                        [_buffers invalidate];
                        [_channels invalidate];
+                       [_events clear];
+                       [_users clear];
                        [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object) {
@@ -1461,10 +1463,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         __parserLock = [[NSLock alloc] init];
         
         NSString *url = [NSString stringWithFormat:@"wss://%@%@",IRCCLOUD_HOST,IRCCLOUD_PATH];
-        if(_events.highestEid > 0) {
-            url = [url stringByAppendingFormat:@"?since_id=%.0lf", _events.highestEid];
-            if(_streamId)
-                url = [url stringByAppendingFormat:@"&stream_id=%@", _streamId];
+        if(_events.highestEid > 0 && _streamId.length) {
+            url = [url stringByAppendingFormat:@"?since_id=%.0lf&stream_id=%@", _events.highestEid, _streamId];
         }
         if(notifier) {
             if([url rangeOfString:@"?"].location == NSNotFound)
@@ -1669,12 +1669,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(object.type) {
         //NSLog(@"New event (backlog: %i) (%@) %@", backlog, object.type, object);
         if((backlog || _accrued > 0) && object.bid > -1 && object.bid != _currentBid && object.eid > 0) {
-            if(backlog) {
-                if(object.eid > [_events lastEidForBuffer:object.bid]) {
-                    CLS_LOG(@"Backlog gap detected in bid%i, purging cache", object.bid);
-                    [_events removeEventsForBuffer:object.bid];
-                }
-            } else {
+            if(!backlog) {
                 if(_firstEID == 0 && object.eid > _events.highestEid) {
                     _firstEID = object.eid;
                     CLS_LOG(@"Backlog gap detected, purging cache");
