@@ -1015,6 +1015,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)backlogCompleted:(NSNotification *)notification {
+    if([notification.object bid] == 0) {
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
 #ifdef DEBUG
@@ -1025,6 +1026,7 @@ extern NSDictionary *emojiMap;
     else
         [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
 #endif
+    }
     if([ServersDataSource sharedInstance].count < 1) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
         return;
@@ -2518,7 +2520,6 @@ extern NSDictionary *emojiMap;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
         [self.view.window addSubview:_landscapeView];
         [sheet showInView:_landscapeView];
-        [sheet showInView:self.slidingViewController.view];
     } else {
         [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _settingsBtn.frame.origin.x, _bottomBar.frame.origin.y,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height) inView:self.view animated:YES];
     }

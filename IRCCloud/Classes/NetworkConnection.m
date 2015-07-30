@@ -268,7 +268,7 @@ NSLock *__parserLock = nil;
     };
     
     void (^alert)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
-        if(!backlog)
+        if(!backlog && !_resuming)
             [self postObject:object forEvent:kIRCEventAlert];
     };
     
@@ -298,7 +298,7 @@ NSLock *__parserLock = nil;
             server.order = [[object objectForKey:@"order"] intValue];
         else
             server.order = 0;
-        if(!backlog)
+        if(!backlog && !_resuming)
             [self postObject:server forEvent:kIRCEventMakeServer];
     };
     
@@ -306,13 +306,8 @@ NSLock *__parserLock = nil;
         Buffer *b = [_buffers getBuffer:object.bid];
         if(b) {
             Event *event = [_events addJSONObject:object];
-            if(!backlog || _resuming) {
-                //if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && [event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"]))
-                    //[self updateBadgeCount];
-
-                if(!backlog) {
-                    [self postObject:event forEvent:kIRCEventBufferMsg];
-                }
+            if(!backlog && !_resuming) {
+                [self postObject:event forEvent:kIRCEventBufferMsg];
             }
         } else {
             CLS_LOG(@"Event recieved for invalid BID, reconnecting!");
@@ -325,7 +320,7 @@ NSLock *__parserLock = nil;
     
     void (^joined_channel)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
         [_events addJSONObject:object];
-        if(!backlog || _resuming) {
+        if(!backlog) {
             User *user = [_users getUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             if(!user) {
                 user = [[User alloc] init];
@@ -340,44 +335,44 @@ NSLock *__parserLock = nil;
             user.mode = @"";
             user.away = 0;
             user.away_msg = @"";
-            if(!backlog)
+            if(!_resuming)
                 [self postObject:object forEvent:kIRCEventJoin];
         }
     };
     
     void (^parted_channel)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
         [_events addJSONObject:object];
-        if(!backlog || _resuming) {
+        if(!backlog) {
             [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             if([object.type isEqualToString:@"you_parted_channel"]) {
                 [_channels removeChannelForBuffer:object.bid];
                 [_users removeUsersForBuffer:object.bid];
             }
-            if(!backlog)
+            if(!_resuming)
                 [self postObject:object forEvent:kIRCEventPart];
         }
     };
     
     void (^kicked_channel)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
         [_events addJSONObject:object];
-        if(!backlog || _resuming) {
+        if(!backlog) {
             [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             if([object.type isEqualToString:@"you_kicked_channel"]) {
                 [_channels removeChannelForBuffer:object.bid];
                 [_users removeUsersForBuffer:object.bid];
             }
-            if(!backlog)
+            if(!_resuming)
                 [self postObject:object forEvent:kIRCEventKick];
         }
     };
     
     void (^nickchange)(IRCCloudJSONObject *object) = ^(IRCCloudJSONObject *object) {
         [_events addJSONObject:object];
-        if(!backlog || _resuming) {
+        if(!backlog) {
             [_users updateNick:[object objectForKey:@"newnick"] oldNick:[object objectForKey:@"oldnick"] cid:object.cid bid:object.bid];
             if([object.type isEqualToString:@"you_nickchange"])
                 [_servers updateNick:[object objectForKey:@"newnick"] server:object.cid];
-            if(!backlog)
+            if(!_resuming)
                 [self postObject:object forEvent:kIRCEventNickChange];
         }
     };
@@ -470,7 +465,7 @@ NSLock *__parserLock = nil;
                        buffer.timeout = [[object objectForKey:@"timeout"] intValue];
                        buffer.valid = YES;
                        [_notifications removeNotificationsForBID:buffer.bid olderThan:buffer.last_seen_eid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:buffer forEvent:kIRCEventMakeBuffer];
                        if(_numBuffers > 0) {
                            _totalBuffers++;
@@ -485,7 +480,7 @@ NSLock *__parserLock = nil;
                        }
                    },
                    @"bad_channel_key": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventBadChannelKey];
                    },
                    @"too_many_channels": alert, @"no_such_channel": alert, @"bad_channel_name": alert,
@@ -503,35 +498,35 @@ NSLock *__parserLock = nil;
                    @"no_text_to_send": alert, @"no_origin": alert, @"only_servers_can_change_mode": alert,
                    @"silence": alert, @"no_channel_topic": alert, @"invite_only_chan": alert, @"channel_full": alert,
                    @"open_buffer": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventOpenBuffer];
                    },
                    @"invalid_nick": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventInvalidNick];
                    },
                    @"ban_list": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventBanList];
                    },
                    @"accept_list": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventAcceptList];
                    },
                    @"quiet_list": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventQuietList];
                    },
                    @"ban_exception_list": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventBanExceptionList];
                    },
                    @"invite_list": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventInviteList];
                    },
                    @"who_response": ^(IRCCloudJSONObject *object) {
-                       if(!backlog) {
+                       if(!backlog && !_resuming) {
                            Buffer *b = [_buffers getBufferWithName:[object objectForKey:@"subject"] server:[[object objectForKey:@"cid"] intValue]];
                            if(b) {
                                for(NSDictionary *user in [object objectForKey:@"users"]) {
@@ -543,52 +538,52 @@ NSLock *__parserLock = nil;
                        }
                    },
                    @"names_reply": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventNamesList];
                    },
                    @"whois_response": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventWhois];
                    },
                    @"list_response_fetching": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventListResponseFetching];
                    },
                    @"list_response_toomany": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventListResponseTooManyChannels];
                    },
                    @"list_response": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventListResponse];
                    },
                    @"map_list": ^(IRCCloudJSONObject *object) {
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventServerMap];
                    },
                    @"connection_deleted": ^(IRCCloudJSONObject *object) {
                        [_servers removeAllDataForServer:object.cid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventConnectionDeleted];
                    },
                    @"delete_buffer": ^(IRCCloudJSONObject *object) {
                        [_buffers removeAllDataForBuffer:object.bid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventDeleteBuffer];
                    },
                    @"buffer_archived": ^(IRCCloudJSONObject *object) {
                        [_buffers updateArchived:1 buffer:object.bid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventBufferArchived];
                    },
                    @"buffer_unarchived": ^(IRCCloudJSONObject *object) {
                        [_buffers updateArchived:0 buffer:object.bid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventBufferUnarchived];
                    },
                    @"rename_conversation": ^(IRCCloudJSONObject *object) {
                        [_buffers updateName:[object objectForKey:@"new_name"] buffer:object.bid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventRenameConversation];
                    },
                    @"status_changed": ^(IRCCloudJSONObject *object) {
@@ -600,7 +595,8 @@ NSLock *__parserLock = nil;
                                    [_channels removeChannelForBuffer:c.bid];
                                }
                            }
-                           [self postObject:object forEvent:kIRCEventStatusChanged];
+                           if(!_resuming)
+                               [self postObject:object forEvent:kIRCEventStatusChanged];
                        }
                    },
                    @"buffer_msg": msg, @"buffer_me_msg": msg, @"wait": msg,
@@ -626,14 +622,14 @@ NSLock *__parserLock = nil;
                    @"newsflash": msg, @"invited": msg, @"server_snomask": msg, @"codepage": msg, @"logged_out": msg, @"nick_locked": msg, @"info_response": msg, @"generic_server_info": msg, @"unknown_umode": msg, @"bad_ping": msg, @"cap_raw": msg, @"rehashed_config": msg, @"knock": msg, @"bad_channel_mask": msg, @"kill_deny": msg, @"chan_own_priv_needed": msg, @"not_for_halfops": msg, @"chan_forbidden": msg, @"starircd_welcome": msg, @"zurna_motd": msg, @"ambiguous_error_message": msg, @"list_usage": msg, @"list_syntax": msg, @"who_syntax": msg, @"text": msg, @"admin_info": msg, @"watch_status": msg, @"sqline_nick": msg,
                    @"time": ^(IRCCloudJSONObject *object) {
                        Event *event = [_events addJSONObject:object];
-                       if(!backlog) {
+                       if(!backlog && !_resuming) {
                            [self postObject:object forEvent:kIRCEventAlert];
                            [self postObject:event forEvent:kIRCEventBufferMsg];
                        }
                    },
                    @"link_channel": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventLinkChannel];
                    },
                    @"channel_init": ^(IRCCloudJSONObject *object) {
@@ -666,51 +662,51 @@ NSLock *__parserLock = nil;
                            user.away = [[member objectForKey:@"away"] intValue];
                            [_users addUser:user];
                        }
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:channel forEvent:kIRCEventChannelInit];
                    },
                    @"channel_topic": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
-                       if(!backlog || _resuming) {
+                       if(!backlog) {
                            [_channels updateTopic:[object objectForKey:@"topic"] time:object.eid/1000000 author:[[object objectForKey:@"author"] length]?[object objectForKey:@"author"]:[object objectForKey:@"server"] buffer:object.bid];
-                           if(!backlog)
+                           if(!_resuming)
                                [self postObject:object forEvent:kIRCEventChannelTopic];
                        }
                    },
                    @"channel_topic_is": ^(IRCCloudJSONObject *object) {
-                       if(!backlog || _resuming) {
+                       if(!backlog) {
                            Buffer *b = [_buffers getBufferWithName:[object objectForKey:@"chan"] server:object.cid];
                            if(b) {
                                [_channels updateTopic:[object objectForKey:@"text"] time:[[object objectForKey:@"time"] longValue] author:[object objectForKey:@"author"] buffer:b.bid];
                            }
-                           if(!backlog)
+                           if(!_resuming)
                                [self postObject:object forEvent:kIRCEventChannelTopicIs];
                        }
                    },
                    @"channel_url": ^(IRCCloudJSONObject *object) {
-                       if(!backlog || _resuming)
+                       if(!backlog)
                            [_channels updateURL:[object objectForKey:@"url"] buffer:object.bid];
                    },
                    @"channel_mode": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
-                       if(!backlog || _resuming) {
+                       if(!backlog) {
                            [_channels updateMode:[object objectForKey:@"newmode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
-                           if(!backlog)
+                           if(!_resuming)
                                [self postObject:object forEvent:kIRCEventChannelMode];
                        }
                    },
                    @"channel_mode_is": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
-                       if(!backlog || _resuming) {
+                       if(!backlog) {
                            [_channels updateMode:[object objectForKey:@"newmode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
-                           if(!backlog)
+                           if(!_resuming)
                                [self postObject:object forEvent:kIRCEventChannelMode];
                        }
                    },
                    @"channel_timestamp": ^(IRCCloudJSONObject *object) {
-                       if(!backlog || _resuming) {
+                       if(!backlog) {
                            [_channels updateTimestamp:[[object objectForKey:@"timestamp"] doubleValue] buffer:object.bid];
-                           if(!backlog)
+                           if(!_resuming)
                                [self postObject:object forEvent:kIRCEventChannelTimestamp];
                        }
                    },
@@ -720,22 +716,22 @@ NSLock *__parserLock = nil;
                    @"nickchange":nickchange, @"you_nickchange":nickchange,
                    @"quit": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
-                       if(!backlog || _resuming) {
+                       if(!backlog) {
                            [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
-                           if(!backlog)
+                           if(!_resuming)
                                [self postObject:object forEvent:kIRCEventQuit];
                        }
                    },
                    @"quit_server": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventQuit];
                    },
                    @"user_channel_mode": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
-                       if(!backlog || _resuming) {
+                       if(!backlog) {
                            [_users updateMode:[object objectForKey:@"newmode"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
-                           if(!backlog)
+                           if(!_resuming)
                                [self postObject:object forEvent:kIRCEventUserChannelMode];
                        }
                    },
@@ -748,25 +744,25 @@ NSLock *__parserLock = nil;
                            [_users updateAway:[[update objectForKey:@"away"] intValue] nick:nick cid:object.cid bid:object.bid];
                            [_users updateHostmask:[update objectForKey:@"usermask"] nick:nick cid:object.cid bid:object.bid];
                        }
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventMemberUpdates];
                    },
                    @"user_away": ^(IRCCloudJSONObject *object) {
                        [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                        [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventAway];
                    },
                    @"away": ^(IRCCloudJSONObject *object) {
                        [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                        [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventAway];
                    },
                    @"user_back": ^(IRCCloudJSONObject *object) {
                        [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                        [_buffers updateAway:@"" nick:[object objectForKey:@"nick"] server:object.cid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventAway];
                    },
                    @"self_away": ^(IRCCloudJSONObject *object) {
@@ -781,20 +777,20 @@ NSLock *__parserLock = nil;
                        [_awayOverride setObject:@YES forKey:@(object.cid)];
                        [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
                        [_servers updateAway:@"" server:object.cid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventSelfBack];
                    },
                    @"self_details": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
                        [_servers updateUsermask:[object objectForKey:@"usermask"] server:object.bid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventSelfDetails];
                    },
                    @"user_mode": ^(IRCCloudJSONObject *object) {
                        [_events addJSONObject:object];
-                       if(!backlog || _resuming) {
+                       if(!backlog) {
                            [_servers updateMode:[object objectForKey:@"newmode"] server:object.cid];
-                           if(!backlog)
+                           if(!_resuming)
                                [self postObject:object forEvent:kIRCEventUserMode];
                        }
                    },
@@ -804,12 +800,12 @@ NSLock *__parserLock = nil;
                    },
                    @"set_ignores": ^(IRCCloudJSONObject *object) {
                        [_servers updateIgnores:[object objectForKey:@"masks"] server:object.cid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventSetIgnores];
                    },
                    @"ignore_list": ^(IRCCloudJSONObject *object) {
                        [_servers updateIgnores:[object objectForKey:@"masks"] server:object.cid];
-                       if(!backlog)
+                       if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventSetIgnores];
                    },
                    @"heartbeat_echo": ^(IRCCloudJSONObject *object) {
@@ -822,7 +818,9 @@ NSLock *__parserLock = nil;
                                [_notifications removeNotificationsForBID:[bid intValue] olderThan:eid];
                            }
                        }
-                       [self postObject:object forEvent:kIRCEventHeartbeatEcho];
+                       [_notifications updateBadgeCount];
+                       if(!backlog && !_resuming)
+                           [self postObject:object forEvent:kIRCEventHeartbeatEcho];
                    },
                    @"reorder_connections": ^(IRCCloudJSONObject *object) {
                        NSArray *order = [object objectForKey:@"order"];
@@ -831,7 +829,9 @@ NSLock *__parserLock = nil;
                            Server *s = [_servers getServer:[[order objectAtIndex:i] intValue]];
                            s.order = i + 1;
                        }
-                       [self postObject:object forEvent:kIRCEventReorderConnections];
+
+                       if(!backlog && !_resuming)
+                           [self postObject:object forEvent:kIRCEventReorderConnections];
                    },
                    @"session_deleted": ^(IRCCloudJSONObject *object) {
                        [self logout];
@@ -1663,7 +1663,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         NSLog(@"WARNING: Parsing on main thread");
     [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
     if(_accrued > 0) {
-        [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_currentCount++ / (float)_accrued)) waitUntilDone:NO];
+        [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalCount++ / (float)_accrued)) waitUntilDone:NO];
     }
     IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
     if(object.type) {
@@ -1831,6 +1831,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
         }
         _numBuffers = 0;
+        [_notifications updateBadgeCount];
     }
     CLS_LOG(@"I downloaded %i events", _totalCount);
     [_oobQueue removeObject:fetcher];

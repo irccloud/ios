@@ -24,18 +24,24 @@
 -(id)init {
     self = [super init];
     if(self) {
+        if(!_notifications)
+            _notifications = [[NSMutableDictionary alloc] init];
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"notifications"];
             
             @try {
-                _notifications = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                NSArray *ns = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                for(UILocalNotification *n in ns) {
+                    NSNumber *bid = [[n.userInfo objectForKey:@"d"] objectAtIndex:1];
+                    if(![_notifications objectForKey:bid])
+                        [_notifications setObject:[[NSMutableArray alloc] init] forKey:bid];
+                    [[_notifications objectForKey:bid] addObject:n];
+                }
             } @catch(NSException *e) {
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
             }
         }
-        if(!_notifications)
-            _notifications = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -43,9 +49,11 @@
 -(void)serialize {
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"notifications"];
     
-    NSArray *n;
+    NSMutableArray *n;
     @synchronized(_notifications) {
-        n = [_notifications copy];
+        for(NSNumber *bid in _notifications.allKeys) {
+            [n addObjectsFromArray:[_notifications objectForKey:bid]];
+        }
     }
     
     @synchronized(self) {
@@ -70,30 +78,49 @@
     }
 }
 
--(void)notify:(NSString *)alert cid:(int)cid bid:(int)bid eid:(int)eid {
+-(void)notify:(NSString *)alert cid:(int)cid bid:(int)bid eid:(NSTimeInterval)eid {
 #ifndef EXTENSION
     UILocalNotification *n = [[UILocalNotification alloc] init];
     n.alertTitle = @"IRCCloud";
     n.alertBody = alert;
     n.alertAction = @"Reply";
     n.userInfo = @{@"d": @[@(cid), @(bid), @(eid)]};
-    [_notifications addObject:n];
+    @synchronized(_notifications) {
+        if(![_notifications objectForKey:@(bid)])
+            [_notifications setObject:[[NSMutableArray alloc] init] forKey:@(bid)];
+        [[_notifications objectForKey:@(bid)] addObject:n];
+    }
     //[[UIApplication sharedApplication] presentLocalNotificationNow:n];
-    [UIApplication sharedApplication].applicationIconBadgeNumber = _notifications.count;
 #endif
 }
 
 -(void)removeNotificationsForBID:(int)bid olderThan:(NSTimeInterval)eid {
 #ifndef EXTENSION
-    for(UILocalNotification *n in _notifications.copy) {
-        NSArray *d = [n.userInfo objectForKey:@"d"];
-        if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] < eid) {
-            [[UIApplication sharedApplication] cancelLocalNotification:n];
-            [_notifications removeObject:n];
+    @synchronized(_notifications) {
+        NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
+        for(UILocalNotification *n in ns) {
+            NSArray *d = [n.userInfo objectForKey:@"d"];
+            if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] < eid) {
+                [[UIApplication sharedApplication] cancelLocalNotification:n];
+                [[_notifications objectForKey:@(bid)] removeObject:n];
+            }
+        }
+        if(![[_notifications objectForKey:@(bid)] count])
+            [_notifications removeObjectForKey:@(bid)];
+    }
+#endif
+}
+
+-(void)updateBadgeCount {
+#ifndef EXTENSION
+    int count = 0;
+    @synchronized(_notifications) {
+        for(NSNumber *bid in _notifications) {
+            count += [[_notifications objectForKey:bid] count];
         }
     }
-    [UIApplication sharedApplication].applicationIconBadgeNumber = _notifications.count;
-    if(!_notifications.count)
+    [UIApplication sharedApplication].applicationIconBadgeNumber = count;
+    if(!count)
         [[UIApplication sharedApplication] cancelAllLocalNotifications];
 #endif
 }

@@ -10,11 +10,12 @@
 #import "EventsDataSource.h"
 
 @interface NotificationsDataSource : NSObject {
-    NSMutableArray *_notifications;
+    NSMutableDictionary *_notifications;
 }
 +(NotificationsDataSource *)sharedInstance;
 -(void)serialize;
 -(void)clear;
--(void)notify:(NSString *)alert cid:(int)cid bid:(int)bid eid:(int)eid;
+-(void)notify:(NSString *)alert cid:(int)cid bid:(int)bid eid:(NSTimeInterval)eid;
 -(void)removeNotificationsForBID:(int)bid olderThan:(NSTimeInterval)eid;
+-(void)updateBadgeCount;
 @end

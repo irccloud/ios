@@ -414,7 +414,7 @@
                         _backlogFailedObserver = nil;
                     }
                     [self.mainViewController refresh];
-                    NSLog(@"Backlog download completed for bid%i", bid);
+                    CLS_LOG(@"Backlog download completed for bid%i", bid);
                     [_conn serialize];
                     handler(UIBackgroundFetchResultNewData);
                 }
@@ -430,23 +430,21 @@
                         [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
                         _backlogFailedObserver = nil;
                     }
-                    NSLog(@"Backlog download failed for bid%i", bid);
+                    CLS_LOG(@"Backlog download failed for bid%i", bid);
                     handler(UIBackgroundFetchResultFailed);
                 }
             }];
             
-            NSLog(@"Preloading backlog for bid%i from notification", bid);
+            CLS_LOG(@"Preloading backlog for bid%i from notification", bid);
             [_conn requestBacklogForBuffer:bid server:cid];
         } else {
             handler(UIBackgroundFetchResultNoData);
         }
     } else if ([userInfo objectForKey:@"hb"]) {
         for(NSString *key in [userInfo objectForKey:@"hb"]) {
-            int cid = key.intValue;
             NSDictionary *bids = [[userInfo objectForKey:@"hb"] objectForKey:key];
             for(NSString *bid in bids.allKeys) {
                 NSTimeInterval eid = [[bids objectForKey:bid] doubleValue];
-                NSLog(@"Heartbeat: %i %i %f", cid, bid.intValue, eid);
                 [[BuffersDataSource sharedInstance] updateLastSeenEID:eid buffer:bid.intValue];
                 [[NotificationsDataSource sharedInstance] removeNotificationsForBID:bid.intValue olderThan:eid];
             }
@@ -456,6 +454,7 @@
     } else {
         handler(UIBackgroundFetchResultNoData);
     }
+    [[NotificationsDataSource sharedInstance] updateBadgeCount];
 }
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
@@ -659,6 +658,7 @@
         }
     }
     [[NotificationsDataSource sharedInstance] clear];
+    [[NotificationsDataSource sharedInstance] updateBadgeCount];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
