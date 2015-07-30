@@ -879,7 +879,7 @@
 -(void)pruneEventsForBuffer:(int)bid maxSize:(int)size {
     @synchronized(_events) {
         if([[_events objectForKey:@(bid)] count] > size) {
-            CLS_LOG(@"Pruning events for bid%i (%lu, max = %i)", bid, [[_events objectForKey:@(bid)] count], size);
+            CLS_LOG(@"Pruning events for bid%i (%lu, max = %i)", bid, (unsigned long)[[_events objectForKey:@(bid)] count], size);
             NSMutableArray *events = [self eventsForBuffer:bid].mutableCopy;
             while(events.count > size) {
                 Event *e = [events objectAtIndex:0];
