@@ -7,6 +7,8 @@
 //
 
 #import "NotificationsDataSource.h"
+#import "BuffersDataSource.h"
+#import "EventsDataSource.h"
 
 @implementation NotificationsDataSource
 +(NotificationsDataSource *)sharedInstance {
@@ -114,10 +116,9 @@
 -(void)updateBadgeCount {
 #ifndef EXTENSION
     int count = 0;
-    @synchronized(_notifications) {
-        for(NSNumber *bid in _notifications) {
-            count += [[_notifications objectForKey:bid] count];
-        }
+    NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
+    for(Buffer *b in buffers) {
+        count += [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
     }
     [UIApplication sharedApplication].applicationIconBadgeNumber = count;
     if(!count)

@@ -1757,10 +1757,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(OOBFetcher *)fetchOOB:(NSString *)url {
     @synchronized(_oobQueue) {
-        for(OOBFetcher *fetcher in _oobQueue) {
+        NSArray *fetchers = _oobQueue.copy;
+        for(OOBFetcher *fetcher in fetchers) {
             if([fetcher.url isEqualToString:url]) {
-                CLS_LOG(@"Ignoring duplicate OOB request");
-                return fetcher;
+                CLS_LOG(@"Cancelling previous OOB request");
+                [fetcher cancel];
+                [_oobQueue removeObject:fetcher];
             }
         }
         OOBFetcher *fetcher = [[OOBFetcher alloc] initWithURL:url];

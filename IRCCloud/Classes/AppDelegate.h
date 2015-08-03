@@ -35,6 +35,7 @@
     __block UIBackgroundTaskIdentifier _background_task;
     UIView *_animationView;
     UIImageView *_logo;
+    void (^_fetchHandler)(UIBackgroundFetchResult);
 }
 
 @property (strong, nonatomic) UIWindow *window;

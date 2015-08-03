@@ -2192,7 +2192,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "f951efed-8a5a-4894-bbda-d3fc2ee3272b";
+				PROVISIONING_PROFILE = "06e15db8-699c-4b16-b8e0-f68ad0df4e4c";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2305,7 +2305,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "c2a92092-d9ed-41d7-80a1-a672ec0ef0ea";
+				PROVISIONING_PROFILE = "c314442f-ab2b-471b-9f00-80ee97e28651";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2338,7 +2338,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "ffa24e81-3639-4bc1-b04b-a2831c8d1e05";
+				PROVISIONING_PROFILE = "2b48b5a2-5025-44f7-9346-a401e02e84f4";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2431,7 +2431,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "5600fa7d-326a-4fb9-9f2e-bfd3af1e810a";
+				PROVISIONING_PROFILE = "eba5540b-d60e-406f-8349-5c22d0c3adeb";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2459,7 +2459,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9a3b74e3-f0dd-487c-9599-d20e4bbba4c7";
+				PROVISIONING_PROFILE = "2f6dd754-80be-4c2b-a94e-9060b7a87155";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2552,7 +2552,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "2b70d81f-e197-4292-ba08-e1436c910f7c";
+				PROVISIONING_PROFILE = "31043399-ef3f-42e5-a623-c5739194c7bf";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
