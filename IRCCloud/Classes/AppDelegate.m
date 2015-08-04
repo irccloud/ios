@@ -488,6 +488,7 @@
             }
             [self.mainViewController refresh];
             [[NotificationsDataSource sharedInstance] updateBadgeCount];
+            _refreshHandler = nil;
             if(highestEid < [NetworkConnection sharedInstance].highestEID) {
                 completionHandler(UIBackgroundFetchResultNewData);
             } else {
@@ -515,11 +516,29 @@
                 CLS_LOG(@"Backlog download failed for background refresh, disconnecting websocket");
                 [[NetworkConnection sharedInstance] disconnect];
             }
+            _refreshHandler = nil;
             completionHandler(UIBackgroundFetchResultFailed);
         }];
         [[NetworkConnection sharedInstance] connect:YES];
+        if(_refreshHandler)
+            _refreshHandler(UIBackgroundFetchResultNoData);
+        
+        _refreshHandler = completionHandler;
+        [self performSelector:@selector(_complete) withObject:nil afterDelay:[UIApplication sharedApplication].backgroundTimeRemaining - 5];
     } else {
         completionHandler(UIBackgroundFetchResultNoData);
+        _refreshHandler = nil;
+    }
+}
+
+-(void)_complete {
+    if(_refreshHandler) {
+        CLS_LOG(@"Refresh took too long, giving up");
+        if([NetworkConnection sharedInstance].notifier) {
+            [[NetworkConnection sharedInstance] disconnect];
+        }
+        _refreshHandler(UIBackgroundFetchResultNewData);
+        _refreshHandler = nil;
     }
 }
 
@@ -610,7 +629,7 @@
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
         }
         [_conn serialize];
-        [NSThread sleepForTimeInterval:[UIApplication sharedApplication].backgroundTimeRemaining - 60];
+        [NSThread sleepForTimeInterval:10];
         if(background_task == _background_task) {
             _background_task = UIBackgroundTaskInvalid;
             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {

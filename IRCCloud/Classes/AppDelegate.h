@@ -36,6 +36,7 @@
     UIView *_animationView;
     UIImageView *_logo;
     void (^_fetchHandler)(UIBackgroundFetchResult);
+    void (^_refreshHandler)(UIBackgroundFetchResult);
 }
 
 @property (strong, nonatomic) UIWindow *window;

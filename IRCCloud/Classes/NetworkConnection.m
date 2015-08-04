@@ -307,7 +307,7 @@ NSLock *__parserLock = nil;
         Buffer *b = [_buffers getBuffer:object.bid];
         if(b) {
             Event *event = [_events addJSONObject:object];
-            if((!backlog || _resuming) && event.eid > _highestEID) {
+            if((!backlog || _resuming || [[_oobQueue firstObject] bid] == -1) && event.eid > _highestEID) {
                 _highestEID = event.eid;
             }
             if(!backlog && !_resuming) {
