@@ -410,7 +410,6 @@ NSLock *__parserLock = nil;
                        [_buffers invalidate];
                        [_channels invalidate];
                        [_events clear];
-                       [_users clear];
                        [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object) {
