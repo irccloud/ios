@@ -87,12 +87,10 @@
 @interface EventsDataSource : NSObject {
     NSMutableDictionary *_events;
     NSMutableDictionary *_events_sorted;
-    NSTimeInterval _highestEid;
     NSMutableDictionary *_dirtyBIDs;
     NSMutableDictionary *_lastEIDs;
     NSDictionary *_formatterMap;
 }
-@property NSTimeInterval highestEid;
 +(EventsDataSource *)sharedInstance;
 -(void)serialize;
 -(void)clear;

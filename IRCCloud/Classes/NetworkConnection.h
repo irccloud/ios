@@ -150,12 +150,14 @@ typedef enum {
     NSString *_session;
     
     int _keychainFailCount;
+    NSTimeInterval _highestEID;
 }
 @property (readonly) kIRCCloudState state;
 @property NSDictionary *userInfo;
 @property (readonly) NSTimeInterval clockOffset;
 @property NSTimeInterval idleInterval;
 @property NSTimeInterval reconnectTimestamp;
+@property NSTimeInterval highestEID;
 @property BOOL notifier, reachabilityValid;
 @property (readonly) kIRCCloudReachability reachable;
 @property NSString *globalMsg;

@@ -466,7 +466,7 @@
 }
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
-    NSTimeInterval highestEid = [EventsDataSource sharedInstance].highestEid;
+    NSTimeInterval highestEid = [NetworkConnection sharedInstance].highestEID;
     if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting) {
         if(_backlogCompletedObserver) {
             [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
@@ -488,7 +488,7 @@
             }
             [self.mainViewController refresh];
             [[NotificationsDataSource sharedInstance] updateBadgeCount];
-            if(highestEid < [EventsDataSource sharedInstance].highestEid) {
+            if(highestEid < [NetworkConnection sharedInstance].highestEID) {
                 completionHandler(UIBackgroundFetchResultNewData);
             } else {
                 completionHandler(UIBackgroundFetchResultNoData);

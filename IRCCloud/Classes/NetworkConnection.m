@@ -257,6 +257,7 @@ NSLock *__parserLock = nil;
     if(_userInfo) {
         _streamId = [_userInfo objectForKey:@"streamId"];
         _config = [_userInfo objectForKey:@"config"];
+        _highestEID = [[_userInfo objectForKey:@"highestEID"] doubleValue];
     }
 #endif
     
@@ -306,6 +307,9 @@ NSLock *__parserLock = nil;
         Buffer *b = [_buffers getBuffer:object.bid];
         if(b) {
             Event *event = [_events addJSONObject:object];
+            if((!backlog || _resuming) && event.eid > _highestEID) {
+                _highestEID = event.eid;
+            }
             if(!backlog && !_resuming) {
                 [self postObject:event forEvent:kIRCEventBufferMsg];
             }
@@ -1463,8 +1467,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         __parserLock = [[NSLock alloc] init];
         
         NSString *url = [NSString stringWithFormat:@"wss://%@%@",IRCCLOUD_HOST,IRCCLOUD_PATH];
-        if(_events.highestEid > 0 && _streamId.length) {
-            url = [url stringByAppendingFormat:@"?since_id=%.0lf&stream_id=%@", _events.highestEid, _streamId];
+        if(_highestEID > 0 && _streamId.length) {
+            url = [url stringByAppendingFormat:@"?since_id=%.0lf&stream_id=%@", _highestEID, _streamId];
         }
         if(notifier) {
             if([url rangeOfString:@"?"].location == NSNotFound)
@@ -1667,10 +1671,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
     IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
     if(object.type) {
-        //NSLog(@"New event (backlog: %i) (%@) %@", backlog, object.type, object);
+        //NSLog(@"New event (backlog: %i resuming: %i) (%@) %@", backlog, _resuming, object.type, object);
         if((backlog || _accrued > 0) && object.bid > -1 && object.bid != _currentBid && object.eid > 0) {
             if(!backlog) {
-                if(_firstEID == 0 && object.eid > _events.highestEid) {
+                if(_firstEID == 0 && object.eid > _highestEID) {
                     _firstEID = object.eid;
                     CLS_LOG(@"Backlog gap detected, purging cache");
                     [_events clear];
@@ -1864,6 +1868,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [stream setObject:_config forKey:@"config"];
         else
             [stream removeObjectForKey:@"config"];
+        [stream setObject:@(_highestEID) forKey:@"highestEID"];
         [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
         [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
 #endif
@@ -1952,6 +1957,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _reconnectTimestamp = 0;
     _streamId = nil;
     _userInfo = @{};
+    _highestEID = 0;
     NSString *s = self.session;
     SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, nil]);
     _session = nil;

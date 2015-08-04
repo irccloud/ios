@@ -201,15 +201,12 @@
         _dirtyBIDs = [[NSMutableDictionary alloc] init];
         _lastEIDs = [[NSMutableDictionary alloc] init];
         _events_sorted = [[NSMutableDictionary alloc] init];
-        _highestEid = 0;
         if(_events) {
             for(NSNumber *bid in _events) {
                 NSMutableArray *events = [_events objectForKey:bid];
                 NSMutableDictionary *events_sorted = [[NSMutableDictionary alloc] init];
                 for(Event *e in events) {
                     [events_sorted setObject:e forKey:@(e.eid)];
-                    if(e.eid > _highestEid)
-                        _highestEid = e.eid;
                     if(![_lastEIDs objectForKey:@(e.bid)] || [[_lastEIDs objectForKey:@(e.bid)] doubleValue] < e.eid)
                         [_lastEIDs setObject:@(e.eid) forKey:@(e.bid)];
                 }
@@ -752,7 +749,6 @@
     @synchronized(_events) {
         [_events removeAllObjects];
         [_events_sorted removeAllObjects];
-        _highestEid = 0;
     }
 }
 
@@ -843,9 +839,6 @@
 
     if(event.isSelf && event.rowType != ROW_SOCKETCLOSED)
         event.bgColor = [UIColor selfBackgroundColor];
-    
-    if(event.eid > _highestEid)
-        _highestEid = event.eid;
     
     return event;
 #endif
