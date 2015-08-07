@@ -49,7 +49,7 @@
                           && ![url.path.lowercaseString isEqualToString:@"/robots.txt"] \
                           && ![url.path.lowercaseString isEqualToString:@"/image"])
 
-#define IS_STEAM(url) ([url.host.lowercaseString hasSuffix:@".steampowered.com"] && [url.path.lowercaseString hasPrefix:@"/ugc/"])
+#define IS_STEAM(url) (([url.host.lowercaseString hasSuffix:@".steampowered.com"] || [url.host.lowercaseString hasSuffix:@".steamusercontent.com"]) && [url.path.lowercaseString hasPrefix:@"/ugc/"])
 
 #define IS_LEET(url) (([url.host.lowercaseString hasSuffix:@"leetfiles.com"] || [url.host.lowercaseString hasSuffix:@"leetfil.es"]) \
                         && [url.path.lowercaseString hasPrefix:@"/image"])
