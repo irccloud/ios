@@ -2167,7 +2167,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
-				CODE_SIGN_IDENTITY = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2192,7 +2191,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "06e15db8-699c-4b16-b8e0-f68ad0df4e4c";
+				PROVISIONING_PROFILE = "140ca944-e12e-42f8-a88c-dedcbdfbfaa2";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2208,7 +2207,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
-				CODE_SIGN_IDENTITY = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2233,7 +2231,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "93fc3253-49e6-468e-9398-37292f2c04a0";
+				PROVISIONING_PROFILE = "7ed63e58-16bd-4739-a5c7-241dc0768483";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2249,7 +2247,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2414,8 +2411,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -2431,7 +2426,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "eba5540b-d60e-406f-8349-5c22d0c3adeb";
+				PROVISIONING_PROFILE = "4ea14883-6d5e-4eca-87da-1fde60cc171d";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2442,8 +2437,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -2459,7 +2452,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2f6dd754-80be-4c2b-a94e-9060b7a87155";
+				PROVISIONING_PROFILE = "ea24801c-0109-4fc6-91d4-f25629586e89";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2697,8 +2690,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",

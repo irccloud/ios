@@ -332,18 +332,20 @@ extern NSDictionary *emojiMap;
             }
         }
         
-        if(highlightCount) {
-            [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
-            _menuBtn.accessibilityValue = @"Unread highlights";
-        } else if(unreadCount) {
-            if(![_menuBtn.imageView.image isEqual:[UIImage imageNamed:@"menu_unread"]])
-                UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
-            [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
-            _menuBtn.accessibilityValue = @"Unread messages";
-        } else {
-            [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
-            _menuBtn.accessibilityValue = nil;
-        }
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if(highlightCount) {
+                [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
+                _menuBtn.accessibilityValue = @"Unread highlights";
+            } else if(unreadCount) {
+                if(![_menuBtn.imageView.image isEqual:[UIImage imageNamed:@"menu_unread"]])
+                    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
+                [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
+                _menuBtn.accessibilityValue = @"Unread messages";
+            } else {
+                [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
+                _menuBtn.accessibilityValue = nil;
+            }
+        }];
     }
 }
 
