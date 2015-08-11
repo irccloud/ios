@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+#import <MobileCoreServices/UTCoreTypes.h>
 #import "WhoListTableViewController.h"
 #import "TTTAttributedLabel.h"
 #import "ColorFormatter.h"
@@ -142,9 +142,51 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    [self dismissViewControllerAnimated:YES completion:nil];
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [row objectForKey:@"nick"]] to:nil cid:_event.cid];
+    _selectedRow = [_data objectAtIndex:[indexPath row]];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Send a message" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self actionSheet:nil clickedButtonAtIndex:0];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Whois" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self actionSheet:nil clickedButtonAtIndex:1];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Copy hostmask" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self actionSheet:nil clickedButtonAtIndex:2];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+        alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
+        alert.popoverPresentationController.sourceView = self.view;
+        [self.navigationController presentViewController:alert animated:YES completion:nil];
+    } else {
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Send a message", "Whois", "Copy hostmask", nil];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
+            [sheet showInView:self.view];
+        } else {
+            [sheet showFromRect:[self.tableView rectForRowAtIndexPath:indexPath] inView:self.view animated:YES];
+        }
+    }
 }
 
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    switch(buttonIndex) {
+        case 0:
+            [self dismissViewControllerAnimated:YES completion:nil];
+            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [_selectedRow objectForKey:@"nick"]] to:nil cid:_event.cid];
+            break;
+        case 1:
+            [self dismissViewControllerAnimated:YES completion:nil];
+            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/whois %@", [_selectedRow objectForKey:@"nick"]] to:nil cid:_event.cid];
+            break;
+        case 2:
+        {
+            UIPasteboard *pb = [UIPasteboard generalPasteboard];
+            [pb setValue:[NSString stringWithFormat:@"%@!%@", [_selectedRow objectForKey:@"nick"], [_selectedRow objectForKey:@"usermask"]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+        }
+            break;
+        default:
+            break;
+    }
+}
 @end
