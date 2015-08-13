@@ -1034,7 +1034,7 @@ extern NSDictionary *emojiMap;
         return;
     }
     [self _hideConnectingView];
-    if(_buffer && !_urlToOpen && _bidToOpen == -1 && _eidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
+    if(_buffer && !_urlToOpen && _bidToOpen < 1 && _eidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
         [self _updateTitleArea];
         [self _updateServerStatus];
         [self _updateUserListVisibility];
@@ -1050,7 +1050,7 @@ extern NSDictionary *emojiMap;
             if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                 bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
         }
-        if(_bidToOpen != -1) {
+        if(_bidToOpen > 0) {
             CLS_LOG(@"backlog complete: BID to open: %i", _bidToOpen);
             bid = _bidToOpen;
             _bidToOpen = -1;
@@ -1142,7 +1142,7 @@ extern NSDictionary *emojiMap;
             if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                 bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
         }
-        if(_bidToOpen != -1) {
+        if(_bidToOpen > 0) {
             CLS_LOG(@"viewwillappear: BID to open: %i", _bidToOpen);
             bid = _bidToOpen;
         }
