@@ -771,7 +771,7 @@
                                     alert.fireDate = [NSDate date];
                                     alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
                                     [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                                    AudioServicesPlaySystemSound(1003);
+                                    AudioServicesPlaySystemSound(1001);
                                     if(imageUploadCompletionHandler)
                                         imageUploadCompletionHandler();
                                     if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
@@ -840,7 +840,7 @@
                             alert.fireDate = [NSDate date];
                             alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
                             [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                            AudioServicesPlaySystemSound(1003);
+                            AudioServicesPlaySystemSound(1001);
                             if(imageUploadCompletionHandler)
                                 imageUploadCompletionHandler();
                             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
@@ -869,7 +869,7 @@
                         alert.fireDate = [NSDate date];
                         alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
                         [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                        AudioServicesPlaySystemSound(1003);
+                        AudioServicesPlaySystemSound(1001);
                         if(imageUploadCompletionHandler)
                             imageUploadCompletionHandler();
                     }
