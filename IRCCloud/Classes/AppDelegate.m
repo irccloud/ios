@@ -255,7 +255,7 @@
             if([userActivity.webpageURL.path isEqualToString:@"/chat/access-link"]) {
                 CLS_LOG(@"Opening access-link from handoff");
                 NSString *url = [[userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/" withString:@"irccloud://"] stringByReplacingOccurrencesOfString:@"&mobile=1" withString:@""];
-                [_conn logout];
+                [[NetworkConnection sharedInstance] logout];
                 self.loginSplashViewController.accessLink = [NSURL URLWithString:url];
                 self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
                 self.loginSplashViewController.view.alpha = 1;
@@ -302,7 +302,7 @@
 
     if([url.scheme hasPrefix:@"irccloud"]) {
         if([url.host isEqualToString:@"chat"] && [url.path isEqualToString:@"/access-link"]) {
-            [_conn logout];
+            [[NetworkConnection sharedInstance] logout];
             self.loginSplashViewController.accessLink = url;
             self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
             self.loginSplashViewController.view.alpha = 1;
@@ -606,6 +606,7 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
+    _conn = [NetworkConnection sharedInstance];
     _movedToBackground = YES;
     _conn.failCount = 0;
     _conn.reconnectTimestamp = 0;
@@ -655,6 +656,7 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    _conn = [NetworkConnection sharedInstance];
     if(_backlogCompletedObserver) {
         NSLog(@"Backlog completed observer was registered, removing");
         [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
@@ -726,6 +728,7 @@
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
+    _conn = [NetworkConnection sharedInstance];
     NSData *response = [NSData dataWithContentsOfURL:location];
     if(session.configuration.identifier && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
@@ -767,8 +770,8 @@
                                     UILocalNotification *alert = [[UILocalNotification alloc] init];
                                     alert.fireDate = [NSDate date];
                                     alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                                    alert.soundName = @"a.caf";
                                     [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                                    AudioServicesPlaySystemSound(1003);
                                     if(imageUploadCompletionHandler)
                                         imageUploadCompletionHandler();
                                     if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
@@ -787,7 +790,6 @@
                                 UILocalNotification *alert = [[UILocalNotification alloc] init];
                                 alert.fireDate = [NSDate date];
                                 alert.alertBody = @"Unable to share image. Please try again shortly.";
-                                alert.soundName = @"a.caf";
                                 [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                                 if(imageUploadCompletionHandler)
                                     imageUploadCompletionHandler();
@@ -837,8 +839,8 @@
                             UILocalNotification *alert = [[UILocalNotification alloc] init];
                             alert.fireDate = [NSDate date];
                             alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                            alert.soundName = @"a.caf";
                             [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                            AudioServicesPlaySystemSound(1003);
                             if(imageUploadCompletionHandler)
                                 imageUploadCompletionHandler();
                             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
@@ -851,7 +853,6 @@
                             UILocalNotification *alert = [[UILocalNotification alloc] init];
                             alert.fireDate = [NSDate date];
                             alert.alertBody = @"Unable to share image. Please try again shortly.";
-                            alert.soundName = @"a.caf";
                             [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                             if(imageUploadCompletionHandler)
                                 imageUploadCompletionHandler();
@@ -867,8 +868,8 @@
                         UILocalNotification *alert = [[UILocalNotification alloc] init];
                         alert.fireDate = [NSDate date];
                         alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                        alert.soundName = @"a.caf";
                         [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                        AudioServicesPlaySystemSound(1003);
                         if(imageUploadCompletionHandler)
                             imageUploadCompletionHandler();
                     }
@@ -885,7 +886,6 @@
                         alert.fireDate = [NSDate date];
                         alert.alertBody = @"Your image has been uploaded and is ready to send";
                         alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                        alert.soundName = @"a.caf";
                         [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                     }
                     if(imageUploadCompletionHandler)

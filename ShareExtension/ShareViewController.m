@@ -135,7 +135,8 @@
     }
     [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.title = @"IRCCloud";
-    AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &_sound);
+    _sound = 1001;
+    //AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &_sound);
 }
 
 - (void)backlogComplete:(NSNotification *)n {
@@ -294,7 +295,7 @@
                 
                 if(!_uploadStarted) {
                     SLComposeSheetConfigurationItem *exporting = [[SLComposeSheetConfigurationItem alloc] init];
-                    exporting.title = @"Exporting Video";
+                    exporting.title = [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.movie"]?@"Exporting Video":@"Resizing Photo";
                     exporting.valuePending = YES;
 
                     return @[filenameConfigItem, bufferConfigItem, exporting];
