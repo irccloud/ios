@@ -128,7 +128,6 @@ int __timestampWidth;
     self = [super initWithCoder:aDecoder];
     if (self) {
         _lock = [[NSRecursiveLock alloc] init];
-        _conn = [NetworkConnection sharedInstance];
         _ready = NO;
         _formatter = [[NSDateFormatter alloc] init];
         _data = [[NSMutableArray alloc] init];
@@ -143,6 +142,7 @@ int __timestampWidth;
 }
 
 - (void)viewDidLoad {
+    _conn = [NetworkConnection sharedInstance];
     [super viewDidLoad];
 
     CGFloat lineSpacing = 6;

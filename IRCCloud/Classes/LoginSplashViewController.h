@@ -16,7 +16,6 @@
 
 
 #import <UIKit/UIKit.h>
-#import "NetworkConnection.h"
 
 @interface LoginSplashViewController : UIViewController<UITextFieldDelegate, UIGestureRecognizerDelegate> {
     IBOutlet UIImageView *logo;
@@ -53,7 +52,6 @@
     
     IBOutlet UIButton *OnePassword;
     
-    NetworkConnection *_conn;
     CGSize _kbSize;
     NSURL *_accessLink;
     NSString *_impression;

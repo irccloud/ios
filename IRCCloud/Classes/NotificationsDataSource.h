@@ -13,6 +13,7 @@
     NSMutableDictionary *_notifications;
 }
 +(NotificationsDataSource *)sharedInstance;
+-(NSUInteger)count;
 -(void)serialize;
 -(void)clear;
 -(void)notify:(NSString *)alert cid:(int)cid bid:(int)bid eid:(NSTimeInterval)eid;

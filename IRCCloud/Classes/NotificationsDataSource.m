@@ -103,7 +103,7 @@
         for(UILocalNotification *n in ns) {
             NSArray *d = [n.userInfo objectForKey:@"d"];
             if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] < eid) {
-                [[UIApplication sharedApplication] cancelLocalNotification:n];
+                //[[UIApplication sharedApplication] cancelLocalNotification:n];
                 [[_notifications objectForKey:@(bid)] removeObject:n];
             }
         }
@@ -126,4 +126,7 @@
 #endif
 }
 
+-(NSUInteger)count {
+    return _notifications.count;
+}
 @end

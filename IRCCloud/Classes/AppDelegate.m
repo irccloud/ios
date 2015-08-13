@@ -137,8 +137,6 @@
         self.mainViewController.bidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:1] intValue];
         self.mainViewController.eidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:2] doubleValue];
     }
-    [self.mainViewController loadView];
-    [self.mainViewController viewDidLoad];
 
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:YES];
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -181,6 +179,8 @@
 
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         _conn = [NetworkConnection sharedInstance];
+        [self.mainViewController loadView];
+        [self.mainViewController viewDidLoad];
         NSString *session = [NetworkConnection sharedInstance].session;
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
             //Store the session in the keychain again to update the access policy
@@ -385,7 +385,6 @@
         
         if(application.applicationState == UIApplicationStateBackground) {
             [[NotificationsDataSource sharedInstance] notify:nil cid:cid bid:bid eid:eid];
-            [[NetworkConnection sharedInstance] serialize];
         }
         
         if(_movedToBackground && application.applicationState == UIApplicationStateInactive) {
@@ -393,7 +392,8 @@
             self.mainViewController.eidToOpen = eid;
             CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
             [self.mainViewController bufferSelected:bid];
-        } else if(application.applicationState == UIApplicationStateBackground && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting) {
+        } else if(application.applicationState == UIApplicationStateBackground && (!_conn || (_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
+            [UIApplication sharedApplication].applicationIconBadgeNumber = [UIApplication sharedApplication].applicationIconBadgeNumber + 1;
             if(_backlogCompletedObserver) {
                 [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
                 _backlogCompletedObserver = nil;
@@ -419,7 +419,7 @@
                         _backlogFailedObserver = nil;
                     }
                     [self.mainViewController refresh];
-                    CLS_LOG(@"Backlog download completed for bid%i", bid);
+                    NSLog(@"Backlog download completed for bid%i", bid);
                     [[NotificationsDataSource sharedInstance] updateBadgeCount];
                     [[NetworkConnection sharedInstance] serialize];
                     _fetchHandler(UIBackgroundFetchResultNewData);
@@ -436,15 +436,19 @@
                         [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
                         _backlogFailedObserver = nil;
                     }
-                    CLS_LOG(@"Backlog download failed for bid%i", bid);
+                    [self.mainViewController refresh];
+                    NSLog(@"Backlog download failed for bid%i", bid);
                     [[NotificationsDataSource sharedInstance] updateBadgeCount];
                     _fetchHandler(UIBackgroundFetchResultFailed);
                     _fetchHandler = nil;
                 }
             }];
-            
-            CLS_LOG(@"Preloading backlog for bid%i from notification", bid);
-            [[NetworkConnection sharedInstance] requestBacklogForBuffer:bid server:cid];
+
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                NSLog(@"Preloading backlog for bid%i from notification", bid);
+                [[NetworkConnection sharedInstance] requestBacklogForBuffer:bid server:cid];
+                [[NetworkConnection sharedInstance] serialize];
+            });
         } else {
             handler(UIBackgroundFetchResultNoData);
         }
@@ -457,12 +461,12 @@
                 [[NotificationsDataSource sharedInstance] removeNotificationsForBID:bid.intValue olderThan:eid];
             }
         }
+        [[NotificationsDataSource sharedInstance] updateBadgeCount];
         [[NetworkConnection sharedInstance] serialize];
         handler(UIBackgroundFetchResultNoData);
     } else {
         handler(UIBackgroundFetchResultNoData);
     }
-    [[NotificationsDataSource sharedInstance] updateBadgeCount];
 }
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {
@@ -516,6 +520,7 @@
                 CLS_LOG(@"Backlog download failed for background refresh, disconnecting websocket");
                 [[NetworkConnection sharedInstance] disconnect];
             }
+            [self.mainViewController refresh];
             _refreshHandler = nil;
             completionHandler(UIBackgroundFetchResultFailed);
         }];
@@ -533,6 +538,7 @@
 
 -(void)_complete {
     if(_refreshHandler) {
+        [self.mainViewController refresh];
         CLS_LOG(@"Refresh took too long, giving up");
         if([NetworkConnection sharedInstance].notifier) {
             [[NetworkConnection sharedInstance] disconnect];
@@ -645,6 +651,7 @@
         [self showMainView:NO];
         self.window.backgroundColor = [UIColor blackColor];
     }
+    [[NotificationsDataSource sharedInstance] updateBadgeCount];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {

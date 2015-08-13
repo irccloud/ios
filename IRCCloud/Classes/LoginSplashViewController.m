@@ -27,7 +27,6 @@
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        _conn = [NetworkConnection sharedInstance];
         _kbSize = CGSizeZero;
     }
     return self;
