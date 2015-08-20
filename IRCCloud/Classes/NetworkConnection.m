@@ -396,6 +396,8 @@ NSLock *__parserLock = nil;
                            }];
                        }
                        _resuming = [[object objectForKey:@"resumed"] boolValue];
+                       if(!_resuming)
+                           [_events clear];
                    },
                    @"global_system_message": ^(IRCCloudJSONObject *object) {
                        if(!_resuming && !backlog && [object objectForKey:@"system_message_type"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"eval"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"refresh"]) {
@@ -409,7 +411,6 @@ NSLock *__parserLock = nil;
                        CLS_LOG(@"oob_include, invalidating BIDs");
                        [_buffers invalidate];
                        [_channels invalidate];
-                       [_events clear];
                        [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object) {

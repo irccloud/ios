@@ -1295,6 +1295,49 @@ extern NSDictionary *emojiMap;
                     [self presentViewController:nc animated:YES completion:nil];
                     return;
                 }
+            } else if([_message.text isEqualToString:@"/buffers"]) {
+                NSMutableString *msg = [[NSMutableString alloc] init];
+                [msg appendString:@"=== Buffers ===\n"];
+                NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:_buffer.cid];
+                for(Buffer *buffer in buffers) {
+                    [msg appendFormat:@"CID: %i BID: %i Name: %@ lastSeenEID: %f unread: %i\n", buffer.cid, buffer.bid, buffer.name, buffer.last_seen_eid, [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type]];
+                    NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid];
+                    Event *e = [events firstObject];
+                    [msg appendFormat:@"First event: %f %@\n", e.eid, e.type];
+                    e = [events lastObject];
+                    [msg appendFormat:@"Last event: %f %@\n", e.eid, e.type];
+                    [msg appendString:@"======\n"];
+                }
+                
+                Event *e = [[Event alloc] init];
+                e.cid = s.cid;
+                e.bid = _buffer.bid;
+                e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset) * 1000000;
+                if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
+                    e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
+                e.isSelf = YES;
+                e.from = nil;
+                e.nick = nil;
+                e.msg = msg;
+                e.type = @"buffer_msg";
+                e.color = [UIColor timestampColor];
+                if([_buffer.name isEqualToString:s.nick])
+                    e.bgColor = [UIColor whiteColor];
+                else
+                    e.bgColor = [UIColor selfBackgroundColor];
+                e.rowType = 0;
+                e.formatted = nil;
+                e.formattedMsg = nil;
+                e.groupMsg = nil;
+                e.linkify = YES;
+                e.targetMode = nil;
+                e.isHighlight = NO;
+                e.reqId = -1;
+                e.pending = YES;
+                [_eventsView scrollToBottom];
+                [[EventsDataSource sharedInstance] addEvent:e];
+                [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
+                return;
             }
             
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
