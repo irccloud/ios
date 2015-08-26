@@ -1295,6 +1295,7 @@ extern NSDictionary *emojiMap;
                     [self presentViewController:nc animated:YES completion:nil];
                     return;
                 }
+#ifndef APPSTORE
             } else if([_message.text isEqualToString:@"/buffers"]) {
                 NSMutableString *msg = [[NSMutableString alloc] init];
                 [msg appendString:@"=== Buffers ===\n"];
@@ -1338,6 +1339,7 @@ extern NSDictionary *emojiMap;
                 [[EventsDataSource sharedInstance] addEvent:e];
                 [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
                 return;
+#endif
             }
             
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
