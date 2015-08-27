@@ -55,11 +55,11 @@
         }
         
         window.setInterval(getCurrentTime, 500);
-             
     });
 
     function onReady(event) {
         window.location.href = 'ytplayer://onReady?data=' + event.data;
+        document.getElementById('player').contentDocument.getElementsByClassName('ytp-thumbnail-overlay')[0].style.backgroundSize = '100%%';
     }
 
     function onStateChange(event) {

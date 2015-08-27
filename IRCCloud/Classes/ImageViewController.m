@@ -226,6 +226,7 @@
 -(void)loadYoutube:(NSURL *)url {
     NSString *videoID;
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+    [params setObject:url.absoluteString forKey:@"origin"];
     
     if([url.host isEqualToString:@"youtu.be"]) {
         videoID = [url.path substringFromIndex:1];
