@@ -365,6 +365,10 @@
 		22B4287F16D831A800498507 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
 		22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22B4288716D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		22C0F1511B8F61D9001D109D /* YTPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C0F14E1B8F61D8001D109D /* YTPlayerView.m */; };
+		22C0F1521B8F61D9001D109D /* YTPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C0F14E1B8F61D8001D109D /* YTPlayerView.m */; };
+		22C0F1541B8F6829001D109D /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 22C0F1531B8F6829001D109D /* Assets */; };
+		22C0F1551B8F6829001D109D /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 22C0F1531B8F6829001D109D /* Assets */; };
 		22C2075C1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
 		22C2075D1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
 		22C2E0581B0E2E4800387B4B /* PastebinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2E0561B0E2E4800387B4B /* PastebinViewController.m */; };
@@ -772,6 +776,9 @@
 		22B4288416D846BF00498507 /* IRCCloudJSONObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudJSONObject.h; sourceTree = "<group>"; };
 		22B4288516D846BF00498507 /* IRCCloudJSONObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudJSONObject.m; sourceTree = "<group>"; };
 		22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "ShareExtension Enterprise.entitlements"; path = "../ShareExtension Enterprise.entitlements"; sourceTree = "<group>"; };
+		22C0F14D1B8F61D8001D109D /* YTPlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YTPlayerView.h; path = YTPlayerView/YTPlayerView.h; sourceTree = SOURCE_ROOT; };
+		22C0F14E1B8F61D8001D109D /* YTPlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YTPlayerView.m; path = YTPlayerView/YTPlayerView.m; sourceTree = SOURCE_ROOT; };
+		22C0F1531B8F6829001D109D /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Assets; path = YTPlayerView/Assets; sourceTree = SOURCE_ROOT; };
 		22C2075A1A19125700EDACA4 /* FileMetadataViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileMetadataViewController.h; sourceTree = "<group>"; };
 		22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMetadataViewController.m; sourceTree = "<group>"; };
 		22C2E0551B0E2E4800387B4B /* PastebinViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastebinViewController.h; sourceTree = "<group>"; };
@@ -1079,6 +1086,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22C0F14B1B8F61AF001D109D /* YTPlayerView */,
 				22D649201B1E0719003BFD86 /* CSURITemplate */,
 				22C8CDE91B01372100F637D2 /* SSZipArchive */,
 				22A363AF19D0884D00500478 /* 1Password.xcassets */,
@@ -1322,6 +1330,16 @@
 			);
 			path = WebSocket;
 			sourceTree = SOURCE_ROOT;
+		};
+		22C0F14B1B8F61AF001D109D /* YTPlayerView */ = {
+			isa = PBXGroup;
+			children = (
+				22C0F1531B8F6829001D109D /* Assets */,
+				22C0F14D1B8F61D8001D109D /* YTPlayerView.h */,
+				22C0F14E1B8F61D8001D109D /* YTPlayerView.m */,
+			);
+			name = YTPlayerView;
+			sourceTree = "<group>";
 		};
 		22C8CDE91B01372100F637D2 /* SSZipArchive */ = {
 			isa = PBXGroup;
@@ -1621,6 +1639,7 @@
 				225D979918AA995900065087 /* licenses.txt in Resources */,
 				225D979A18AA995900065087 /* a.caf in Resources */,
 				225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */,
+				22C0F1551B8F6829001D109D /* Assets in Resources */,
 				22C2E05B1B0E2E4800387B4B /* PastebinViewController.xib in Resources */,
 				22C89B5F19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 			);
@@ -1631,6 +1650,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				228A057A16D3DABA0029769C /* InfoPlist.strings in Resources */,
+				22C0F1541B8F6829001D109D /* Assets in Resources */,
 				22988AAB19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */,
 				22C2E05A1B0E2E4800387B4B /* PastebinViewController.xib in Resources */,
 				2236F64216DC2EF6007BE535 /* MainViewController.xib in Resources */,
@@ -1839,6 +1859,7 @@
 				228E2B8F18CF770D0011DEAB /* SBJsonStreamParserState.m in Sources */,
 				225D976018AA995900065087 /* HighlightsCountView.m in Sources */,
 				225D976118AA995900065087 /* Ignore.m in Sources */,
+				22C0F1521B8F61D9001D109D /* YTPlayerView.m in Sources */,
 				225D976218AA995900065087 /* ChannelModeListTableViewController.m in Sources */,
 				228E2B9E18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */,
 				225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */,
@@ -1931,6 +1952,7 @@
 				228E2B8D18CF770D0011DEAB /* SBJsonStreamParserState.m in Sources */,
 				227FF2A116FA128B00DBE3C5 /* HighlightsCountView.m in Sources */,
 				2230F8E817162ACD007F7C98 /* Ignore.m in Sources */,
+				22C0F1511B8F61D9001D109D /* YTPlayerView.m in Sources */,
 				22AD75ED1718567D00141257 /* ChannelModeListTableViewController.m in Sources */,
 				228E2B9C18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */,
 				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
@@ -2191,7 +2213,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "140ca944-e12e-42f8-a88c-dedcbdfbfaa2";
+				PROVISIONING_PROFILE = "97a85dde-2b93-4595-824c-1b7990dc65da";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2231,7 +2253,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "7ed63e58-16bd-4739-a5c7-241dc0768483";
+				PROVISIONING_PROFILE = "ee51902e-31b9-4674-b765-4bca2f15a27a";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2426,7 +2448,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4ea14883-6d5e-4eca-87da-1fde60cc171d";
+				PROVISIONING_PROFILE = "779cc0d6-1913-438a-8893-d58d4e712bd1";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2452,7 +2474,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "ea24801c-0109-4fc6-91d4-f25629586e89";
+				PROVISIONING_PROFILE = "56b0f890-21d7-4923-8c5a-92357d51f038";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

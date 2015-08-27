@@ -221,6 +221,78 @@
     [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
 }
 
+-(void)loadYoutube:(NSURL *)url {
+    NSString *videoID;
+    NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+    
+    if([url.host isEqualToString:@"youtu.be"]) {
+        videoID = [url.path substringFromIndex:1];
+    }
+    
+    for(NSString *param in [url.query componentsSeparatedByString:@"&"]) {
+        NSArray *kv = [param componentsSeparatedByString:@"="];
+        if([[kv objectAtIndex:0] isEqualToString:@"v"]) {
+            videoID = [kv objectAtIndex:1];
+        } else if([[kv objectAtIndex:0] isEqualToString:@"t"]) {
+            int start = 0;
+            NSString *t = [kv objectAtIndex:1];
+            int number = 0;
+            for(int i = 0; i < t.length; i++) {
+                switch([t characterAtIndex:i]) {
+                    case '0':
+                    case '1':
+                    case '2':
+                    case '3':
+                    case '4':
+                    case '5':
+                    case '6':
+                    case '7':
+                    case '8':
+                    case '9':
+                        number *= 10;
+                        number += [t characterAtIndex:i] - '0';
+                        break;
+                    case 'h':
+                        start += number * 60;
+                        number = 0;
+                        break;
+                    case 'm':
+                        start += number * 60;
+                        number = 0;
+                        break;
+                    case 's':
+                        start += number;
+                        number = 0;
+                        break;
+                    default:
+                        CLS_LOG(@"Unrecognized time separator: %c", [t characterAtIndex:i]);
+                        number = 0;
+                        break;
+                }
+            }
+            start += number;
+            [params setObject:@(start) forKey:@"start"];
+        } else {
+            [params setObject:[kv objectAtIndex:1] forKey:[kv objectAtIndex:0]];
+        }
+    }
+    
+    _ytPlayer = [[YTPlayerView alloc] initWithFrame:_scrollView.frame];
+    _ytPlayer.delegate = self;
+    [_ytPlayer loadWithVideoId:videoID playerVars:params];
+    [self.view insertSubview:_ytPlayer aboveSubview:_scrollView];
+    [self _showToolbar];
+    [Answers logContentViewWithName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
+}
+
+-(void)playerViewDidBecomeReady:(YTPlayerView *)playerView {
+    [_progressView removeFromSuperview];
+}
+
+-(void)playerView:(YTPlayerView *)playerView receivedError:(YTPlayerError)error {
+    [self fail];
+}
+
 -(void)loadGfycat:(NSString *)gyfID {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://gfycat.com/cajax/get%@", gyfID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
@@ -467,6 +539,9 @@
         u = [u stringByReplacingOccurrencesOfString:@"leetfil.es/image" withString:@"i.leetfiles.com/"];
         u = [u stringByReplacingOccurrencesOfString:@"?id=" withString:@""];
         url = [NSURL URLWithString:u];
+    } else if([url.host hasSuffix:@"youtube.com"] || [url.host isEqualToString:@"youtu.be"]) {
+        [self loadYoutube:url];
+        return;
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:url];

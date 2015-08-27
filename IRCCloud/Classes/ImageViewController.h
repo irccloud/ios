@@ -18,11 +18,13 @@
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import "OpenInChromeController.h"
+#import "YTPlayerView.h"
 
-@interface ImageViewController : UIViewController<UIScrollViewDelegate,UIActionSheetDelegate,NSURLConnectionDataDelegate,UIPopoverPresentationControllerDelegate> {
+@interface ImageViewController : UIViewController<UIScrollViewDelegate,UIActionSheetDelegate,NSURLConnectionDataDelegate,UIPopoverPresentationControllerDelegate,YTPlayerViewDelegate> {
     IBOutlet UIImageView *_imageView;
     IBOutlet UIScrollView *_scrollView;
     MPMoviePlayerController *_movieController;
+    YTPlayerView *_ytPlayer;
     __weak IBOutlet UIProgressView *_progressView;
     IBOutlet UIToolbar *_toolbar;
     NSURL *_url;
