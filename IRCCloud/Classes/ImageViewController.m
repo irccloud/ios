@@ -151,11 +151,13 @@
 -(void)_hideToolbar {
     [_hideTimer invalidate];
     _hideTimer = nil;
-    [UIView animateWithDuration:0.5 animations:^{
-        _toolbar.alpha = 0;
-    } completion:^(BOOL finished){
-        _toolbar.hidden = YES;
-    }];
+    if(!_ytPlayer) {
+        [UIView animateWithDuration:0.5 animations:^{
+            _toolbar.alpha = 0;
+        } completion:^(BOOL finished){
+            _toolbar.hidden = YES;
+        }];
+    }
 }
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
