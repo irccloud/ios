@@ -55,6 +55,8 @@
 #define TAG_FAILEDMSG 7
 #define TAG_LOGOUT 8
 
+#define YTMARGIN 130
+
 extern NSDictionary *emojiMap;
 
 @implementation MainViewController
@@ -1859,7 +1861,6 @@ extern NSDictionary *emojiMap;
         _YTWrapperView.autoresizesSubviews = YES;
         UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_YTpanned:)];
         [_YTWrapperView addGestureRecognizer:panGesture];
-
         
         UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0,_YTWrapperView.bounds.size.height - 44,_YTWrapperView.bounds.size.width, 44)];
         [toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
@@ -1940,7 +1941,7 @@ extern NSDictionary *emojiMap;
             }
         }
         
-        int margin = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?80:0;
+        int margin = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?YTMARGIN:0;
         CGFloat width = _YTWrapperView.bounds.size.width - margin;
         CGFloat height = (width / 16.0f) * 9.0f;
         _ytPlayer = [[YTPlayerView alloc] initWithFrame:CGRectMake(margin/2, (_YTWrapperView.bounds.size.height - height) / 2.0f, width, height)];
@@ -2566,7 +2567,7 @@ extern NSDictionary *emojiMap;
     self.navigationItem.titleView = v;
     
     if(_YTWrapperView) {
-        int margin = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?80:0;
+        int margin = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?YTMARGIN:0;
         _YTWrapperView.frame = self.navigationController.view.bounds;
         CGFloat width = _YTWrapperView.bounds.size.width - margin;
         CGFloat height = (width / 16.0f) * 9.0f;
