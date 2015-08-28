@@ -42,6 +42,9 @@
 #import "FilesTableViewController.h"
 #import "PastebinEditorViewController.h"
 #import "PastebinsTableViewController.h"
+#import "ARChromeActivity.h"
+#import "TUSafariActivity.h"
+#import "OpenInChromeController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -1740,15 +1743,143 @@ extern NSDictionary *emojiMap;
         [_YTWrapperView removeFromSuperview];
         _YTWrapperView = nil;
     }];
+    [_ytActivity stopAnimating];
+    _ytActivity = nil;
     [_ytPlayer stopVideo];
     _ytPlayer = nil;
+    _ytURL = nil;
+}
+
+-(void)_YTShare:(id)sender {
+    UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[_ytURL] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                                                                                                                                                                                                                                                     @"irccloud-enterprise://"
+#else
+                                                                                                                                                                                                                                                                                                                                     @"irccloud://"
+#endif
+                                                                                                                                                                                                                                                                                                                                     ]]:[[TUSafariActivity alloc] init]]];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        activityController.popoverPresentationController.delegate = self;
+        activityController.popoverPresentationController.barButtonItem = sender;
+        activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+            if(completed) {
+                if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                    activityType = [activityType substringFromIndex:25];
+                if([activityType hasPrefix:@"com.apple."])
+                    activityType = [activityType substringFromIndex:10];
+                [Answers logShareWithMethod:activityType contentName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
+            }
+        };
+    } else {
+        activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
+            if(completed) {
+                if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                    activityType = [activityType substringFromIndex:25];
+                if([activityType hasPrefix:@"com.apple."])
+                    activityType = [activityType substringFromIndex:10];
+                [Answers logShareWithMethod:activityType contentName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
+            }
+        };
+    }
+    [self presentViewController:activityController animated:YES completion:nil];
+}
+
+-(void)playerViewDidBecomeReady:(YTPlayerView *)playerView {
+    [_ytActivity stopAnimating];
+    playerView.hidden = NO;
+}
+
+-(void)playerView:(YTPlayerView *)playerView receivedError:(YTPlayerError)error {
+    if(!_YTWrapperView)
+        return;
+    
+    if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] openInChrome:_ytURL
+                                                                                  withCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                   @"irccloud-enterprise://"
+#else
+                                                                                                   @"irccloud://"
+#endif
+                                                                                                   ]
+                                                                                     createNewTab:NO]))
+        [[UIApplication sharedApplication] openURL:_ytURL];
+}
+
+- (void)_YTpanned:(UIPanGestureRecognizer *)recognizer {
+    CGRect frame = _ytPlayer.frame;
+    
+    switch(recognizer.state) {
+        case UIGestureRecognizerStateBegan:
+            if(fabs([recognizer velocityInView:self.view].y) > fabs([recognizer velocityInView:_YTWrapperView].x)) {
+            }
+            break;
+        case UIGestureRecognizerStateCancelled: {
+            frame.origin.y = 0;
+            [UIView animateWithDuration:0.25 animations:^{
+                _ytPlayer.frame = frame;
+            }];
+            _YTWrapperView.alpha = 1;
+            break;
+        }
+        case UIGestureRecognizerStateChanged:
+            frame.origin.y = (_YTWrapperView.bounds.size.height - frame.size.height) / 2 + [recognizer translationInView:_YTWrapperView].y;
+            _ytPlayer.frame = frame;
+            _YTWrapperView.alpha = 1 - (fabs([recognizer translationInView:_YTWrapperView].y) / self.view.frame.size.height / 2);
+            break;
+        case UIGestureRecognizerStateEnded:
+        {
+            if(fabs([recognizer translationInView:_YTWrapperView].y) > 100 || fabs([recognizer velocityInView:_YTWrapperView].y) > 1000) {
+                frame.origin.y = ([recognizer translationInView:_YTWrapperView].y > 0)?_YTWrapperView.bounds.size.height:-_YTWrapperView.bounds.size.height;
+                [UIView animateWithDuration:0.25 animations:^{
+                    _ytPlayer.frame = frame;
+                    _YTWrapperView.alpha = 0;
+                } completion:^(BOOL finished) {
+                    [self _YTWrapperTapped];
+                }];
+            } else {
+                frame.origin.y = (_YTWrapperView.bounds.size.height - frame.size.height) / 2;
+                [UIView animateWithDuration:0.25 animations:^{
+                    _ytPlayer.frame = frame;
+                    _YTWrapperView.alpha = 1;
+                }];
+            }
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 -(void)launchURL:(NSURL *)url {
     if([url.host isEqualToString:@"youtu.be"] || [url.host hasSuffix:@"youtube.com"]) {
+        _ytURL = url;
         _YTWrapperView = [[UIView alloc] initWithFrame:self.navigationController.view.bounds];
-        _YTWrapperView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
+        _YTWrapperView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.9];
         _YTWrapperView.alpha = 0;
+        _YTWrapperView.autoresizesSubviews = YES;
+        UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_YTpanned:)];
+        [_YTWrapperView addGestureRecognizer:panGesture];
+
+        
+        UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0,_YTWrapperView.bounds.size.height - 44,_YTWrapperView.bounds.size.width, 44)];
+        [toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
+        [toolbar setShadowImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny];
+        [toolbar setBarStyle:UIBarStyleBlack];
+        toolbar.translucent = YES;
+        if(NSClassFromString(@"UIActivityViewController")) {
+            toolbar.items = @[
+                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(_YTShare:)],
+                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                              [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(_YTWrapperTapped)]
+                              ];
+        } else {
+            toolbar.items = @[
+                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                              [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(_YTWrapperTapped)]
+                              ];
+        }
+        toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+        [_YTWrapperView addSubview:toolbar];
         [self.navigationController.view addSubview:_YTWrapperView];
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_YTWrapperTapped)];
         [_YTWrapperView addGestureRecognizer:tap];
@@ -1813,10 +1944,18 @@ extern NSDictionary *emojiMap;
         CGFloat width = _YTWrapperView.bounds.size.width - margin;
         CGFloat height = (width / 16.0f) * 9.0f;
         _ytPlayer = [[YTPlayerView alloc] initWithFrame:CGRectMake(margin/2, (_YTWrapperView.bounds.size.height - height) / 2.0f, width, height)];
+        _ytPlayer.backgroundColor = [UIColor blackColor];
         _ytPlayer.webView.backgroundColor = [UIColor blackColor];
+        _ytPlayer.hidden = YES;
         _ytPlayer.delegate = self;
         [_ytPlayer loadWithVideoId:videoID playerVars:params];
         [_YTWrapperView addSubview:_ytPlayer];
+        
+        _ytActivity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+        _ytActivity.center = _YTWrapperView.center;
+        _ytActivity.hidesWhenStopped = YES;
+        [_ytActivity startAnimating];
+        [_YTWrapperView addSubview:_ytActivity];
 
         [UIView animateWithDuration:0.2 animations:^{
             _YTWrapperView.alpha = 1;

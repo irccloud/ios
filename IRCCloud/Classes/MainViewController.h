@@ -27,7 +27,7 @@
 #import "FilesTableViewController.h"
 #import "YTPlayerView.h"
 
-@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,YTPlayerViewDelegate> {
+@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,YTPlayerViewDelegate,UIPopoverPresentationControllerDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
@@ -79,6 +79,8 @@
     NSTimeInterval _lastNotificationTime;
     UIView *_YTWrapperView;
     YTPlayerView *_ytPlayer;
+    NSURL *_ytURL;
+    UIActivityIndicatorView *_ytActivity;
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;
