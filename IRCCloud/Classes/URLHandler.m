@@ -64,7 +64,7 @@
 {
     NSString *l = [url.path lowercaseString];
     // Use pre-processor macros instead of variables so conditions are still evaluated lazily
-    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GFYCAT(url)|| IS_GIPHY(url) || IS_YOUTUBE(url));
+    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GFYCAT(url)|| IS_GIPHY(url));
 }
 
 - (void)launchURL:(NSURL *)url
@@ -84,7 +84,7 @@
             [appDelegate.window.rootViewController presentViewController:[[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]] animated:YES completion:nil];
         }];
     } else if([url.scheme hasPrefix:@"irc"]) {
-        [mainViewController launchURL:[NSURL URLWithString:[url.description stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
+        [mainViewController launchURL:[NSURL URLWithString:[url.absoluteString stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
     } else if([url.scheme isEqualToString:@"spotify"]) {
         if(![[UIApplication sharedApplication] openURL:url])
             [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://open.spotify.com/%@",[[url.absoluteString substringFromIndex:8] stringByReplacingOccurrencesOfString:@":" withString:@"/"]]]];
@@ -105,6 +105,8 @@
             [mainViewController presentMoviePlayerViewControllerAnimated:player];
         }
         [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
+    } else if(IS_YOUTUBE(url)) {
+        [mainViewController launchURL:url];
     } else {
         [self openWebpage:url];
     }

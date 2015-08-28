@@ -230,10 +230,6 @@
     return YES;
 }
 
--(void)_load:(NSDictionary *)launchOptions {
-
-}
-
 -(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray *))restorationHandler {
     CLS_LOG(@"Continuing activity type: %@", userActivity.activityType);
 #ifdef ENTERPRISE

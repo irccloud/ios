@@ -1733,7 +1733,97 @@ extern NSDictionary *emojiMap;
     }
 }
 
+-(void)_YTWrapperTapped {
+    [UIView animateWithDuration:0.25 animations:^{
+        _YTWrapperView.alpha = 0;
+    } completion:^(BOOL finished) {
+        [_YTWrapperView removeFromSuperview];
+        _YTWrapperView = nil;
+    }];
+    [_ytPlayer stopVideo];
+    _ytPlayer = nil;
+}
+
 -(void)launchURL:(NSURL *)url {
+    if([url.host isEqualToString:@"youtu.be"] || [url.host hasSuffix:@"youtube.com"]) {
+        _YTWrapperView = [[UIView alloc] initWithFrame:self.navigationController.view.bounds];
+        _YTWrapperView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.8];
+        _YTWrapperView.alpha = 0;
+        [self.navigationController.view addSubview:_YTWrapperView];
+        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_YTWrapperTapped)];
+        [_YTWrapperView addGestureRecognizer:tap];
+
+        NSString *videoID;
+        NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+        [params setObject:url.absoluteString forKey:@"origin"];
+        
+        if([url.host isEqualToString:@"youtu.be"]) {
+            videoID = [url.path substringFromIndex:1];
+        }
+        
+        for(NSString *param in [url.query componentsSeparatedByString:@"&"]) {
+            NSArray *kv = [param componentsSeparatedByString:@"="];
+            if([[kv objectAtIndex:0] isEqualToString:@"v"]) {
+                videoID = [kv objectAtIndex:1];
+            } else if([[kv objectAtIndex:0] isEqualToString:@"t"]) {
+                int start = 0;
+                NSString *t = [kv objectAtIndex:1];
+                int number = 0;
+                for(int i = 0; i < t.length; i++) {
+                    switch([t characterAtIndex:i]) {
+                        case '0':
+                        case '1':
+                        case '2':
+                        case '3':
+                        case '4':
+                        case '5':
+                        case '6':
+                        case '7':
+                        case '8':
+                        case '9':
+                            number *= 10;
+                            number += [t characterAtIndex:i] - '0';
+                            break;
+                        case 'h':
+                            start += number * 60;
+                            number = 0;
+                            break;
+                        case 'm':
+                            start += number * 60;
+                            number = 0;
+                            break;
+                        case 's':
+                            start += number;
+                            number = 0;
+                            break;
+                        default:
+                            CLS_LOG(@"Unrecognized time separator: %c", [t characterAtIndex:i]);
+                            number = 0;
+                            break;
+                    }
+                }
+                start += number;
+                [params setObject:@(start) forKey:@"start"];
+            } else {
+                [params setObject:[kv objectAtIndex:1] forKey:[kv objectAtIndex:0]];
+            }
+        }
+        
+        int margin = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?80:0;
+        CGFloat width = _YTWrapperView.bounds.size.width - margin;
+        CGFloat height = (width / 16.0f) * 9.0f;
+        _ytPlayer = [[YTPlayerView alloc] initWithFrame:CGRectMake(margin/2, (_YTWrapperView.bounds.size.height - height) / 2.0f, width, height)];
+        _ytPlayer.webView.backgroundColor = [UIColor blackColor];
+        _ytPlayer.delegate = self;
+        [_ytPlayer loadWithVideoId:videoID playerVars:params];
+        [_YTWrapperView addSubview:_ytPlayer];
+
+        [UIView animateWithDuration:0.2 animations:^{
+            _YTWrapperView.alpha = 1;
+        }];
+        [Answers logContentViewWithName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
+        return;
+    }
     int port = [url.port intValue];
     int ssl = [url.scheme hasSuffix:@"s"]?1:0;
     BOOL match = NO;
@@ -2335,6 +2425,15 @@ extern NSDictionary *emojiMap;
     UIView *v = self.navigationItem.titleView;
     self.navigationItem.titleView = nil;
     self.navigationItem.titleView = v;
+    
+    if(_YTWrapperView) {
+        int margin = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?80:0;
+        _YTWrapperView.frame = self.navigationController.view.bounds;
+        CGFloat width = _YTWrapperView.bounds.size.width - margin;
+        CGFloat height = (width / 16.0f) * 9.0f;
+        _ytPlayer.frame = CGRectMake(margin/2, (_YTWrapperView.bounds.size.height - height) / 2.0f, width, height);
+        
+    }
 }
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
