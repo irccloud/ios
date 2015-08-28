@@ -60,6 +60,8 @@
     function onReady(event) {
         window.location.href = 'ytplayer://onReady?data=' + event.data;
         document.getElementById('player').contentDocument.getElementsByClassName('ytp-thumbnail-overlay')[0].style.backgroundSize = '100%%';
+        document.getElementById('player').contentDocument.getElementsByClassName('ytp-watch-later-button')[0].style.display = 'none';
+        document.getElementById('player').contentDocument.getElementsByClassName('ytp-share-button')[0].style.display = 'none';
     }
 
     function onStateChange(event) {
