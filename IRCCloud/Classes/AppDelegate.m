@@ -651,6 +651,10 @@
     [[NotificationsDataSource sharedInstance] updateBadgeCount];
 }
 
+-(void)applicationWillResignActive:(UIApplication *)application {
+    [_mainViewController dismissKeyboard];
+}
+
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     _conn = [NetworkConnection sharedInstance];
     if(_backlogCompletedObserver) {
