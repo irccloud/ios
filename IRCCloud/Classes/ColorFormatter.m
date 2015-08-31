@@ -1126,7 +1126,7 @@ float ColorFormatterCachedFontSize = 0.0f;
 |[1-9][0-9]|[0-9])))\
 (?:\\:\\d{1,5})?)\
 ([\\/\\?\\#](?:(?:[%@\\;\\/\\?\\:\\@\\&\\=\\#\\~\\$\
-\\-\\.\\+\\!\\*\\'\\(\\)\\,\\_\\^\\{\\}\\[\\]])|(?:\\%%[a-fA-F0-9]{2}))*)?\
+\\-\\.\\+\\!\\*\\'\\(\\)\\,\\_\\^\\{\\}\\[\\]\\|])|(?:\\%%[a-fA-F0-9]{2}))*)?\
 (?:\\b|$)", GOOD_IRI_CHAR, GOOD_IRI_CHAR, TOP_LEVEL_DOMAIN_STR_FOR_WEB_URL, GOOD_IRI_CHAR];
     _pattern = [NSRegularExpression
             regularExpressionWithPattern:pattern
