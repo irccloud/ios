@@ -500,19 +500,11 @@
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
 
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
-        _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
-    } else {
-        _boldFont = [UIFont boldSystemFontOfSize:16.0f];
-    }
+    UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+    _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
-        _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
-    } else {
-        _normalFont = [UIFont systemFontOfSize:16.0f];
-    }
+    d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+    _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     
     UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;

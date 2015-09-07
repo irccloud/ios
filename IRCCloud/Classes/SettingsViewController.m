@@ -544,18 +544,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    int padding = 80;
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        padding = 26;
-        
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-        padding = 0;
-    }
+    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
+    self.navigationController.navigationBar.clipsToBounds = YES;
 
-    _email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _email.placeholder = @"john@example.com";
     _email.text = @"";
     _email.textAlignment = NSTextAlignmentRight;
@@ -567,7 +560,7 @@
     _email.returnKeyType = UIReturnKeyDone;
     _email.delegate = self;
     
-    _name = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _name = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _name.placeholder = @"John Appleseed";
     _name.text = @"";
     _name.textAlignment = NSTextAlignmentRight;
@@ -768,10 +761,7 @@
                     cell.accessoryView = _colors;
                     break;
                 case 5:
-                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-                        cell.textLabel.text = @"Convert :emocodes:";
-                    else
-                        cell.textLabel.text = @"Convert :emocodes: to Emoji";
+                    cell.textLabel.text = @"Convert :emocodes: to Emoji";
                     cell.detailTextLabel.text = @":thumbsup: → 👍";
                     cell.accessoryView = _emocodes;
                     break;

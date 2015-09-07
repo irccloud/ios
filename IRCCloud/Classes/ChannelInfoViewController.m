@@ -43,10 +43,8 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-    }
+    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
+    self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         offset = 40;
@@ -211,18 +209,14 @@
 #pragma mark - Table view data source
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
-        label.text = [self tableView:tableView titleForHeaderInSection:section];
-        label.font = [UIFont systemFontOfSize:14];
-        label.textColor = [UIColor grayColor];
-        label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-        [header addSubview:label];
-        return header;
-    } else {
-        return nil;
-    }
+    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
+    label.text = [self tableView:tableView titleForHeaderInSection:section];
+    label.font = [UIFont systemFontOfSize:14];
+    label.textColor = [UIColor grayColor];
+    label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    [header addSubview:label];
+    return header;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -284,26 +278,14 @@
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        switch(section) {
-            case 0:
-                return @"TOPIC";
-            case 1:
-                if(_modeHints.count)
-                    return [NSString stringWithFormat:@"MODE: +%@", _channel.mode];
-                else
-                    return @"MODE";
-        }
-    } else {
-        switch(section) {
-            case 0:
-                return @"Topic";
-            case 1:
-                if(_modeHints.count)
-                    return [NSString stringWithFormat:@"Mode: +%@", _channel.mode];
-                else
-                    return @"Mode";
-        }
+    switch(section) {
+        case 0:
+            return @"TOPIC";
+        case 1:
+            if(_modeHints.count)
+                return [NSString stringWithFormat:@"MODE: +%@", _channel.mode];
+            else
+                return @"MODE";
     }
     return nil;
 }

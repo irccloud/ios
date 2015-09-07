@@ -77,13 +77,11 @@
     [super viewWillAppear:animated];
     if(_uploader) {
         if(self.navigationController.viewControllers.count == 1) {
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                self.navigationController.navigationBar.clipsToBounds = YES;
+            self.navigationController.navigationBar.clipsToBounds = YES;
             
             self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
         } else {
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                self.navigationController.navigationBar.clipsToBounds = NO;
+            self.navigationController.navigationBar.clipsToBounds = NO;
             [self.navigationController setNavigationBarHidden:NO animated:NO];
         }
     }
@@ -114,17 +112,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    int padding = 80;
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        padding = 26;
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        padding = 0;
-    }
+    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
 
-    _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _filename.textAlignment = NSTextAlignmentRight;
     _filename.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
     _filename.autocapitalizationType = UITextAutocapitalizationTypeNone;
@@ -306,8 +297,7 @@
         [UIView animateWithDuration:0.5f animations:^{
             appDelegate.window.rootViewController.view.alpha = 1;
         } completion:^(BOOL finished){
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                [UIApplication sharedApplication].statusBarHidden = YES;
+            [UIApplication sharedApplication].statusBarHidden = YES;
         }];
     }
 }

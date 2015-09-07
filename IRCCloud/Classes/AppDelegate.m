@@ -74,11 +74,7 @@
     NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
     [[NSFileManager defaultManager] removeItemAtURL:caches error:nil];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO), @"theme":@"dawn"}];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
-        [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@(14.0f)}];
-    } else {
-        [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 0.8)}];
-    }
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 0.8)}];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"www.irccloud.com"]) {
         CLS_LOG(@"Migrating host");
         [[NSUserDefaults standardUserDefaults] setObject:@"api.irccloud.com" forKey:@"host"];
@@ -165,16 +161,14 @@
                 _animationView.frame = CGRectMake(0,0,_animationView.frame.size.height,_animationView.frame.size.width);
         }
     }
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        CGRect frame = _animationView.frame;
-        frame.origin.y -= [UIApplication sharedApplication].statusBarFrame.size.height;
-        frame.size.height += [UIApplication sharedApplication].statusBarFrame.size.height;
-        _animationView.frame = frame;
-        
-        frame = _logo.frame;
-        frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
-        _logo.frame = frame;
-    }
+    CGRect frame = _animationView.frame;
+    frame.origin.y -= [UIApplication sharedApplication].statusBarFrame.size.height;
+    frame.size.height += [UIApplication sharedApplication].statusBarFrame.size.height;
+    _animationView.frame = frame;
+    
+    frame = _logo.frame;
+    frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
+    _logo.frame = frame;
 
     [_animationView addSubview:_logo];
     [self.window addSubview:_animationView];
@@ -188,10 +182,8 @@
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
             //Store the session in the keychain again to update the access policy
             [NetworkConnection sharedInstance].session = session;
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-                [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
-                self.window.backgroundColor = [UIColor whiteColor];
-            }
+            [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
+            self.window.backgroundColor = [UIColor whiteColor];
             self.window.rootViewController = self.slideViewController;
         } else {
             self.window.rootViewController = self.loginSplashViewController;
@@ -310,9 +302,7 @@
             else
                 self.window.rootViewController = self.loginSplashViewController;
         } else if([url.host isEqualToString:@"referral"]) {
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 6) {
-                [self performSelectorInBackground:@selector(_sendImpression:) withObject:url];
-            }
+            [self performSelectorInBackground:@selector(_sendImpression:) withObject:url];
         } else {
             return NO;
         }
@@ -581,8 +571,7 @@
                     v.alpha = 0;
                 } completion:^(BOOL finished){
                     [v removeFromSuperview];
-                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                        self.window.backgroundColor = [UIColor whiteColor];
+                    self.window.backgroundColor = [UIColor whiteColor];
                 }];
             }
         }];
@@ -592,8 +581,7 @@
             self.slideViewController.view.alpha = 1;
             [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
             self.window.rootViewController = self.slideViewController;
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                self.window.backgroundColor = [UIColor whiteColor];
+            self.window.backgroundColor = [UIColor whiteColor];
         }];
     }
 }

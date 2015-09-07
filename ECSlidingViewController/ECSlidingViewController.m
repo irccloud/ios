@@ -601,23 +601,21 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     } else {
         [NSException raise:@"Invalid Width Layout" format:@"underLeftWidthLayout must be a valid ECViewWidthLayout"];
     }
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
-        int sbwidth = [UIApplication sharedApplication].statusBarFrame.size.width;
-        if(sbheight > 20)
-            sbheight -= 20;
-        if(sbwidth > 20)
-            sbwidth -= 20;
-        CGRect frame = self.underLeftView.frame;
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-            frame.origin.y = sbheight;
-            frame.size.height = self.view.bounds.size.height - sbheight;
-        } else {
-            frame.origin.y = sbwidth;
-            frame.size.height = self.view.bounds.size.height - sbwidth;
-        }
-        self.underLeftView.frame = frame;
+    int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
+    int sbwidth = [UIApplication sharedApplication].statusBarFrame.size.width;
+    if(sbheight > 20)
+        sbheight -= 20;
+    if(sbwidth > 20)
+        sbwidth -= 20;
+    CGRect frame = self.underLeftView.frame;
+    if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        frame.origin.y = sbheight;
+        frame.size.height = self.view.bounds.size.height - sbheight;
+    } else {
+        frame.origin.y = sbwidth;
+        frame.size.height = self.view.bounds.size.height - sbwidth;
     }
+    self.underLeftView.frame = frame;
 }
 
 - (void)updateUnderRightLayout
@@ -655,23 +653,21 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     } else {
         [NSException raise:@"Invalid Width Layout" format:@"underRightWidthLayout must be a valid ECViewWidthLayout"];
     }
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
-        int sbwidth = [UIApplication sharedApplication].statusBarFrame.size.width;
-        if(sbheight > 20)
-            sbheight -= 20;
-        if(sbwidth > 20)
-            sbwidth -= 20;
-        CGRect frame = self.underRightView.frame;
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-            frame.origin.y = sbheight;
-            frame.size.height = self.view.bounds.size.height - sbheight;
-        } else {
-            frame.origin.y = sbwidth;
-            frame.size.height = self.view.bounds.size.height - sbwidth;
-        }
-        self.underRightView.frame = frame;
+    int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
+    int sbwidth = [UIApplication sharedApplication].statusBarFrame.size.width;
+    if(sbheight > 20)
+        sbheight -= 20;
+    if(sbwidth > 20)
+        sbwidth -= 20;
+    CGRect frame = self.underRightView.frame;
+    if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        frame.origin.y = sbheight;
+        frame.size.height = self.view.bounds.size.height - sbheight;
+    } else {
+        frame.origin.y = sbwidth;
+        frame.size.height = self.view.bounds.size.height - sbwidth;
     }
+    self.underRightView.frame = frame;
 }
 
 @end

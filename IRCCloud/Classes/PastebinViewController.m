@@ -63,20 +63,15 @@
 -(void)viewDidLoad {
     [super viewDidLoad];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-    } else {
-        _titleLabel.textColor = [UIColor whiteColor];
-        _metadataLabel.textColor = [UIColor whiteColor];
-    }
+    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
+    self.navigationController.navigationBar.clipsToBounds = YES;
 
     _lineNumbers = [[UISwitch alloc] initWithFrame:CGRectZero];
     _lineNumbers.on = YES;
     [_lineNumbers addTarget:self action:@selector(_toggleLineNumbers) forControlEvents:UIControlEventValueChanged];
     
     if(_ownPaste) {
-        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?@"Line Numbers":@"Line #s" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
+        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
                              [[UIBarButtonItem alloc] initWithCustomView:_lineNumbers],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(_editPaste)],
@@ -86,7 +81,7 @@
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
                              ]];
     } else {
-        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?@"Line Numbers":@"Line #s" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
+        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
                              [[UIBarButtonItem alloc] initWithCustomView:_lineNumbers],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]

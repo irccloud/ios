@@ -85,10 +85,7 @@ extern NSDictionary *emojiMap;
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        users.frame = CGRectMake(0,0,40,40);
-    else
-        users.frame = CGRectMake(0,0,24,22);
+    users.frame = CGRectMake(0,0,24,22);
     [users setTintColor:[UIColor navBarSubheadingColor]];
     users.accessibilityLabel = @"Channel members list";
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
@@ -167,12 +164,7 @@ extern NSDictionary *emojiMap;
     [_uploadsBtn setImage:[[UIImage imageNamed:@"upload_arrow"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_uploadsBtn addTarget:self action:@selector(uploadsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_uploadsBtn sizeToFit];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 6)
-        _uploadsBtn.frame = CGRectMake(5,5,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
-    else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 6)
-        _uploadsBtn.frame = CGRectMake(5,3,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
-    else
-        _uploadsBtn.frame = CGRectMake(5,2,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
+    _uploadsBtn.frame = CGRectMake(5,2,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
     _uploadsBtn.accessibilityLabel = @"Uploads";
     [_bottomBar addSubview:_uploadsBtn];
 
@@ -182,10 +174,7 @@ extern NSDictionary *emojiMap;
     [_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
     [_sendBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
     [_sendBtn sizeToFit];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,12,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
-    else
-        _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,4,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
+    _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,4,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
     [_sendBtn addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_sendBtn sizeToFit];
     _sendBtn.enabled = NO;
@@ -201,10 +190,7 @@ extern NSDictionary *emojiMap;
     _settingsBtn.accessibilityLabel = @"Menu";
     _settingsBtn.enabled = NO;
     _settingsBtn.alpha = 0;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 6)
-        _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,4,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
-    else
-        _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
+    _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
     [_bottomBar addSubview:_settingsBtn];
     
     self.slidingViewController.view.frame = [UIScreen mainScreen].applicationFrame;
@@ -225,10 +211,7 @@ extern NSDictionary *emojiMap;
     _menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
     [_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        _menuBtn.frame = CGRectMake(0,0,32,32);
-    else
-        _menuBtn.frame = CGRectMake(0,0,20,18);
+    _menuBtn.frame = CGRectMake(0,0,20,18);
     _menuBtn.accessibilityLabel = @"Channels list";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
     
@@ -256,12 +239,10 @@ extern NSDictionary *emojiMap;
     [self.view addSubview:_nickCompletionView];
     [_bottomBar addSubview:_message];
 
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar addSubview:_connectingProgress];
-        [_connectingProgress sizeToFit];
-        [_connectingActivity removeFromSuperview];
-        _connectingStatus.font = [UIFont boldSystemFontOfSize:20];
-    }
+    [self.navigationController.navigationBar addSubview:_connectingProgress];
+    [_connectingProgress sizeToFit];
+    [_connectingActivity removeFromSuperview];
+    _connectingStatus.font = [UIFont boldSystemFontOfSize:20];
     self.navigationItem.titleView = _titleView;
     _connectingProgress.hidden = YES;
     _connectingProgress.progress = 0;
@@ -1147,7 +1128,7 @@ extern NSDictionary *emojiMap;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self _themeChanged];
-    if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
+    if(!self.presentedViewController)
         ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor whiteColor];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -1209,8 +1190,7 @@ extern NSDictionary *emojiMap;
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-        self.view.window.backgroundColor = [UIColor blackColor];
+    self.view.window.backgroundColor = [UIColor blackColor];
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
     [_doubleTapTimer invalidate];
@@ -2413,7 +2393,7 @@ extern NSDictionary *emojiMap;
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         height += [UIApplication sharedApplication].statusBarFrame.size.height;
-    else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
+    else
         height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
 
     CGRect frame = self.slidingViewController.view.frame;
@@ -2421,11 +2401,11 @@ extern NSDictionary *emojiMap;
         if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
             frame.origin.y = _kbSize.height;
         else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
-            frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
+            frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
         else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
             frame.origin.x = _kbSize.height;
         else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
-            frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
+            frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - 20;
     } else {
         frame.origin.x = 0;
         if(![UIApplication sharedApplication].statusBarHidden && [UIApplication sharedApplication].statusBarFrame.size.height > 20)
@@ -2439,9 +2419,6 @@ extern NSDictionary *emojiMap;
     
     if(sbheight)
         height -= sbheight - 20;
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7 && sbheight > 20)
-        height += 20;
     
     if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         frame.size.width = height;
@@ -2469,7 +2446,7 @@ extern NSDictionary *emojiMap;
     
     height -= self.navigationController.navigationBar.frame.size.height;
 
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && sbheight)
+    if(sbheight)
         height -= 20;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
@@ -2568,15 +2545,12 @@ extern NSDictionary *emojiMap;
         frame.size.width -= _buffersView.tableView.frame.size.width;
     _connectingView.frame = _titleView.frame = frame;
 
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        frame = _connectingProgress.frame;
-        frame.origin.x = 0;
-        frame.origin.y = self.navigationController.navigationBar.frame.size.height - frame.size.height;
-        frame.size.width = self.navigationController.navigationBar.frame.size.width;
-        _connectingProgress.frame = frame;
-        _connectingStatus.frame = _connectingView.bounds;
-    }
-    
+    frame = _connectingProgress.frame;
+    frame.origin.x = 0;
+    frame.origin.y = self.navigationController.navigationBar.frame.size.height - frame.size.height;
+    frame.size.width = self.navigationController.navigationBar.frame.size.width;
+    _connectingProgress.frame = frame;
+    _connectingStatus.frame = _connectingView.bounds;
     
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];
@@ -3283,15 +3257,12 @@ extern NSDictionary *emojiMap;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])
         picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
     picker.delegate = (id)self;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [picker.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-    }
-    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && sourceType == UIImagePickerControllerSourceTypeCamera)) {
+    [picker.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
         picker.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self.slidingViewController presentViewController:picker animated:YES completion:nil];
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-    } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone] && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
+    } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone]) {
         picker.modalPresentationStyle = UIModalPresentationFormSheet;
         picker.preferredContentSize = CGSizeMake(540, 576);
         [self.slidingViewController presentViewController:picker animated:YES completion:nil];
@@ -3347,8 +3318,7 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)_resetStatusBar {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {

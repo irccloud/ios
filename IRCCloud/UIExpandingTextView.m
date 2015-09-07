@@ -30,7 +30,7 @@
 
 #import "UIExpandingTextView.h"
 
-#define kTextInsetX ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?2:4
+#define kTextInsetX 4
 #define kTextInsetBottom 0
 
 @implementation UIExpandingTextView
@@ -179,10 +179,7 @@
         newText = [newText stringByAppendingString:@"\n|W|"];
     }
     internalTextView.text     = newText;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        maximumHeight             = internalTextView.contentSize.height;
-    else
-        maximumHeight             = internalTextView.intrinsicContentSize.height;
+    maximumHeight             = internalTextView.intrinsicContentSize.height;
     maximumNumberOfLines      = n;
     internalTextView.scrollEnabled = oldScrollEnabled;
     internalTextView.text     = saveText;
@@ -210,10 +207,7 @@
         newText = [newText stringByAppendingString:@"\n|W|"];
     }
     internalTextView.text     = newText;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        minimumHeight             = internalTextView.contentSize.height;
-    else
-        minimumHeight             = internalTextView.intrinsicContentSize.height;
+    minimumHeight             = internalTextView.intrinsicContentSize.height;
     internalTextView.scrollEnabled = oldScrollEnabled;
     internalTextView.text     = saveText;
     internalTextView.hidden   = NO;

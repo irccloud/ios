@@ -514,18 +514,11 @@ static NSString * const ServerHasSSLKey = @"ssl";
     }
     NSDictionary *userInfo = [NetworkConnection sharedInstance].userInfo;
     NSString *name = [userInfo objectForKey:@"name"];
-    int padding = 80;
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        padding = 26;
-        
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-        padding = 0;
-    }
+    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
+    self.navigationController.navigationBar.clipsToBounds = YES;
 
-    _network = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _network = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _network.placeholder = @"Network";
     _network.text = @"";
     _network.textAlignment = NSTextAlignmentRight;
@@ -537,7 +530,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _network.returnKeyType = UIReturnKeyDone;
     _network.delegate = self;
     
-    _server = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _server = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _server.placeholder = @"irc.example.net";
     _server.text = @"";
     _server.textAlignment = NSTextAlignmentRight;
@@ -549,7 +542,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _server.returnKeyType = UIReturnKeyDone;
     _server.delegate = self;
     
-    _port = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _port = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _port.text = @"6667";
     _port.textAlignment = NSTextAlignmentRight;
     _port.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
@@ -559,7 +552,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     _ssl = [[UISwitch alloc] init];
     
-    _nickname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _nickname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _nickname.placeholder = @"john";
     _nickname.text = @"";
     _nickname.textAlignment = NSTextAlignmentRight;
@@ -576,7 +569,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
             _nickname.text = [[name substringToIndex:range.location] lowercaseString];
     }
     
-    _realname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _realname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _realname.placeholder = @"John Appleseed";
     _realname.text = @"";
     _realname.textAlignment = NSTextAlignmentRight;
@@ -591,7 +584,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
         _realname.text = name;
     }
     
-    _nspass = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _nspass = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _nspass.text = @"";
     _nspass.textAlignment = NSTextAlignmentRight;
     _nspass.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
@@ -603,7 +596,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _nspass.delegate = self;
     _nspass.secureTextEntry = YES;
 
-    _serverpass = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _serverpass = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _serverpass.text = @"";
     _serverpass.textAlignment = NSTextAlignmentRight;
     _serverpass.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];

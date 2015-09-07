@@ -123,8 +123,7 @@
         [UIView animateWithDuration:0.5f animations:^{
             appDelegate.window.rootViewController.view.alpha = 1;
         } completion:^(BOOL finished){
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                [UIApplication sharedApplication].statusBarHidden = YES;
+            [UIApplication sharedApplication].statusBarHidden = YES;
         }];
     }];
 }
