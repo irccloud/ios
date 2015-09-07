@@ -100,9 +100,8 @@
         
         /* Custom Background image */
         textViewBackgroundImage = [[UIImageView alloc] initWithFrame:backgroundFrame];
-        textViewBackgroundImage.image          = [UIImage imageNamed:@"textbg"];
+        textViewBackgroundImage.image          = [[UIImage imageNamed:@"textbg"] stretchableImageWithLeftCapWidth:0.5 topCapHeight:0.5];
         textViewBackgroundImage.contentMode    = UIViewContentModeScaleToFill;
-        textViewBackgroundImage.contentStretch = CGRectMake(0.5, 0.5, 0, 0);
         
         [self addSubview:textViewBackgroundImage];
         [self addSubview:internalTextView];
@@ -234,7 +233,7 @@
         placeholderLabel.alpha = 0;
     }
     
-    NSInteger newHeight = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?internalTextView.contentSize.height:[textView.text sizeWithFont:textView.font constrainedToSize:CGSizeMake(internalTextView.bounds.size.width - 12, maximumHeight) lineBreakMode:NSLineBreakByWordWrapping].height + 17;
+    NSInteger newHeight = ceil([textView.text boundingRectWithSize:CGSizeMake(internalTextView.bounds.size.width - 12, maximumHeight) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:textView.font} context:nil].size.height) + 17;
     
 	if(newHeight < minimumHeight || !internalTextView.hasText)
     {

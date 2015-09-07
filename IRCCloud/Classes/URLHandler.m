@@ -75,7 +75,7 @@
     MainViewController *mainViewController = [appDelegate mainViewController];
     
     if(appDelegate.window.rootViewController.presentedViewController) {
-        [app.keyWindow.rootViewController dismissModalViewControllerAnimated:NO];
+        [app.keyWindow.rootViewController dismissViewControllerAnimated:NO completion:nil];
     }
     
     if([url.scheme hasPrefix:@"irccloud-paste-"]) {

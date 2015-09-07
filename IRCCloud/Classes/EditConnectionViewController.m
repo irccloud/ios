@@ -632,7 +632,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] == 0) {
         UILabel *unverified = [[UILabel alloc] init];
         unverified.backgroundColor = [UIColor clearColor];
-        unverified.textAlignment = UITextAlignmentCenter;
+        unverified.textAlignment = NSTextAlignmentCenter;
         unverified.numberOfLines = 0;
         unverified.textColor = [UIColor grayColor];
         unverified.text = @"\nYou can't connect to external servers until you confirm your email address.\n\nIf you're still waiting for the email, you can tap here to send yourself another confirmation.";

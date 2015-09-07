@@ -104,7 +104,7 @@ int __timestampWidth;
             frame.origin.y = frame.size.height / 2;
             frame.size.height = 1;
         } else if(_type == ROW_LASTSEENEID) {
-            int width = [_timestamp.text sizeWithFont:_timestamp.font].width + 12;
+            int width = [_timestamp.text sizeWithAttributes:@{NSFontAttributeName:_timestamp.font}].width + 12;
             frame.origin.x = (frame.size.width - width) / 2;
             frame.size.width = width;
         }
@@ -694,7 +694,7 @@ int __timestampWidth;
         else
             msg = @"mentions and ";
         _topHighlightsCountView.count = [NSString stringWithFormat:@"%i", highlights];
-        CGSize size = [_topHighlightsCountView.count sizeWithFont:_topHighlightsCountView.font];
+        CGSize size = [_topHighlightsCountView.count sizeWithAttributes:@{NSFontAttributeName:_topHighlightsCountView.font}];
         size.width += 6;
         size.height = rect.size.height - 12;
         if(size.width < size.height)
@@ -760,7 +760,7 @@ int __timestampWidth;
         else
             msg = @"mentions";
         _bottomHighlightsCountView.count = [NSString stringWithFormat:@"%li", (long)_newHighlights];
-        CGSize size = [_bottomHighlightsCountView.count sizeWithFont:_bottomHighlightsCountView.font];
+        CGSize size = [_bottomHighlightsCountView.count sizeWithAttributes:@{NSFontAttributeName:_bottomHighlightsCountView.font}];
         size.width += 6;
         size.height = rect.size.height - 12;
         if(size.width < size.height)
@@ -1016,11 +1016,11 @@ int __timestampWidth;
 
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
-    __timestampWidth = [@"88:88" sizeWithFont:[ColorFormatter timestampFont]].width;
+    __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:[ColorFormatter timestampFont]}].width;
     if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-        __timestampWidth += [@":88" sizeWithFont:[ColorFormatter timestampFont]].width;
+        __timestampWidth += [@":88" sizeWithAttributes:@{NSFontAttributeName:[ColorFormatter timestampFont]}].width;
     if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
-        __timestampWidth += [@" AM" sizeWithFont:[ColorFormatter timestampFont]].width;
+        __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:[ColorFormatter timestampFont]}].width;
     
     _file_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
     _paste_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];

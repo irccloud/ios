@@ -110,7 +110,7 @@
 }
 
 -(void)_doneButtonPressed {
-    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 -(void)_toggleLineNumbers {
@@ -134,7 +134,7 @@
     if([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Delete"]) {
         [[NetworkConnection sharedInstance] deletePaste:_pasteID];
         if(self.navigationController.viewControllers.count == 1)
-            [self.presentingViewController dismissModalViewControllerAnimated:YES];
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         else
             [self.navigationController popViewControllerAnimated:YES];
     }
@@ -180,30 +180,6 @@
             };
         }
         [self presentViewController:activityController animated:YES completion:nil];
-    } else {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Copy To Clipboard", @"Share on Twitter", ([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?@"Open In Chrome":@"Open In Safari",nil];
-        [sheet showFromToolbar:_toolbar];
-    }
-}
-
--(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSString *title = [actionSheet buttonTitleAtIndex:buttonIndex];
-    
-    if([title isEqualToString:@"Copy To Clipboard"]) {
-        UIPasteboard *pb = [UIPasteboard generalPasteboard];
-        pb.items = @[@{(NSString *)kUTTypeUTF8PlainText:_url,
-                       (NSString *)kUTTypeURL:[NSURL URLWithString:_url]}];
-    } else if([title isEqualToString:@"Share on Twitter"]) {
-        [Answers logShareWithMethod:@"Twitter" contentName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
-        TWTweetComposeViewController *tweetViewController = [[TWTweetComposeViewController alloc] init];
-        [tweetViewController setInitialText:_url];
-        [tweetViewController setCompletionHandler:^(TWTweetComposeViewControllerResult result) {
-            [self dismissModalViewControllerAnimated:YES];
-        }];
-        [self presentModalViewController:tweetViewController animated:YES];
-    } else if([title hasPrefix:@"Open "]) {
-        [self _doneButtonPressed];
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:_url]];
     }
 }
 

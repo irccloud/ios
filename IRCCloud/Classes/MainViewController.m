@@ -399,7 +399,7 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         }
             break;
@@ -580,7 +580,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -598,7 +598,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -615,7 +615,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -632,7 +632,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -648,7 +648,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -665,7 +665,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -681,7 +681,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -697,7 +697,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -713,7 +713,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -1315,7 +1315,7 @@ extern NSDictionary *emojiMap;
                     else
                         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                     if(self.presentedViewController)
-                        [self dismissModalViewControllerAnimated:NO];
+                        [self dismissViewControllerAnimated:NO completion:nil];
                     [self presentViewController:nc animated:YES completion:nil];
                     return;
                 }
@@ -1692,7 +1692,7 @@ extern NSDictionary *emojiMap;
         _titleLabel.font = [UIFont boldSystemFontOfSize:18];
         _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
         _topicLabel.text = [NSString stringWithFormat:@"%@:%i", s.hostname, s.port];
-        _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,16);
+        _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,4,16,16);
         _lock.hidden = NO;
         if(s.ssl > 0)
             _lock.image = [[UIImage imageNamed:@"world_shield"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
@@ -1722,9 +1722,9 @@ extern NSDictionary *emojiMap;
                     _topicLabel.text = [[ColorFormatter format:channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
                     _topicLabel.accessibilityLabel = @"Topic";
                     _topicLabel.accessibilityValue = _topicLabel.text;
-                    _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,_titleLabel.bounds.size.height-4);
+                    _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,4,16,_titleLabel.bounds.size.height-4);
                 } else {
-                    _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,0,16,_titleLabel.bounds.size.height);
+                    _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,0,16,_titleLabel.bounds.size.height);
                     _topicLabel.hidden = YES;
                 }
             }
@@ -2046,7 +2046,7 @@ extern NSDictionary *emojiMap;
         if(state == kIRCCloudStateConnected) {
             EditConnectionViewController *evc = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [evc setURL:url];
-            [self.navigationController presentModalViewController:[[UINavigationController alloc] initWithRootViewController:evc] animated:YES];
+            [self.navigationController presentViewController:[[UINavigationController alloc] initWithRootViewController:evc] animated:YES completion:nil];
         } else {
             _urlToOpen = url;
         }
@@ -2361,7 +2361,7 @@ extern NSDictionary *emojiMap;
         frame.origin.x = 8;
         frame.origin.y = 4;
         frame.size.width = _serverStatusBar.frame.size.width - 16;
-        frame.size.height = [_serverStatus.text sizeWithFont:_serverStatus.font constrainedToSize:CGSizeMake(frame.size.width, INT_MAX) lineBreakMode:_serverStatus.lineBreakMode].height;
+        frame.size.height = ceil([_serverStatus.text boundingRectWithSize:CGSizeMake(frame.size.width, INT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _serverStatus.font} context:nil].size.height);
         if(frame.size.height < 24)
             frame.size.height = 24;
         _serverStatus.frame = frame;
@@ -2537,7 +2537,7 @@ extern NSDictionary *emojiMap;
     _eventsView.topUnreadView.frame = frame;
     frame.origin.y = _eventsView.tableView.frame.size.height - 32;
     _eventsView.bottomUnreadView.frame = frame;
-    float h = [@" " sizeWithFont:_nickCompletionView.font].height + 12;
+    float h = [@" " sizeWithAttributes:@{NSFontAttributeName:_nickCompletionView.font}].height + 12;
     _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
     _nickCompletionView.layer.cornerRadius = 5;
     
@@ -3037,7 +3037,7 @@ extern NSDictionary *emojiMap;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+        [self dismissViewControllerAnimated:NO completion:nil];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -3494,7 +3494,7 @@ extern NSDictionary *emojiMap;
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     CLS_LOG(@"Image picker was cancelled");
-    [self.slidingViewController dismissModalViewControllerAnimated:YES];
+    [self.slidingViewController dismissViewControllerAnimated:YES completion:nil];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -3570,7 +3570,7 @@ extern NSDictionary *emojiMap;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+        [self dismissViewControllerAnimated:NO completion:nil];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -3622,7 +3622,7 @@ extern NSDictionary *emojiMap;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+        [self dismissViewControllerAnimated:NO completion:nil];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -3634,7 +3634,7 @@ extern NSDictionary *emojiMap;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+        [self dismissViewControllerAnimated:NO completion:nil];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -3647,7 +3647,7 @@ extern NSDictionary *emojiMap;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+        [self dismissViewControllerAnimated:NO completion:nil];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -3658,14 +3658,14 @@ extern NSDictionary *emojiMap;
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
             [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
             }]];
         }
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
             [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
             }]];
         }
@@ -3681,7 +3681,7 @@ extern NSDictionary *emojiMap;
             }]];
             [alert addAction:[UIAlertAction actionWithTitle:@"Choose Document" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self _chooseFile];
             }]];
         }
@@ -3784,7 +3784,7 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Mention"]) {
             [self showMentionTip];
@@ -3799,7 +3799,7 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Display Options"]) {
             DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
@@ -3811,7 +3811,7 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Add Network"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
@@ -3821,21 +3821,21 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Start a Pastebin"]) {
             [self _startPastebin];
         } else if([action isEqualToString:@"Take a Photo"] || [action isEqualToString:@"Take Photo or Video"]) {
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
         } else if([action isEqualToString:@"Choose Photo"] || [action isEqualToString:@"Choose Photo or Video"]) {
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
         } else if([action isEqualToString:@"Choose Document"]) {
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self _chooseFile];
         } else if([action isEqualToString:@"File Uploads"]) {
             [self _showUploads];

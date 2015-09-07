@@ -72,7 +72,7 @@
     frame.size.width -= 24;
     
     if(_type == TYPE_HEADING) {
-        float countWidth = [_count.text sizeWithFont:_count.font].width;
+        float countWidth = [_count.text sizeWithAttributes:@{NSFontAttributeName:_count.font}].width;
         _count.frame = CGRectMake(frame.origin.x + frame.size.width - countWidth, frame.origin.y, countWidth, frame.size.height);
         _count.hidden = NO;
         _label.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width - countWidth - 6, frame.size.height);

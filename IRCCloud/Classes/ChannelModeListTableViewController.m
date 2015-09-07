@@ -57,7 +57,7 @@
     frame.origin.x = frame.origin.y = 6;
     frame.size.width -= 12;
     
-    float maskHeight = [_mask.text sizeWithFont:_mask.font constrainedToSize:CGSizeMake(frame.size.width,INT_MAX) lineBreakMode:_mask.lineBreakMode].height + 2;
+    float maskHeight = ceil([_mask.text boundingRectWithSize:CGSizeMake(frame.size.width, INT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:_mask.font} context:nil].size.height) + 2;
     _mask.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, maskHeight);
     _setBy.frame = CGRectMake(frame.origin.x, frame.origin.y + maskHeight - 2, frame.size.width, frame.size.height - maskHeight - 8);
 }
@@ -212,7 +212,7 @@
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-    return [[row objectForKey:_mask] sizeWithFont:[UIFont boldSystemFontOfSize:16] constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) lineBreakMode:NSLineBreakByCharWrapping].height + [[self setByTextForRow:row] sizeWithFont:[UIFont systemFontOfSize:14] constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) lineBreakMode:NSLineBreakByCharWrapping].height + 12;
+    return ceil([[row objectForKey:_mask] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:16]} context:nil].size.height + [[self setByTextForRow:row] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]} context:nil].size.height) + 12;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

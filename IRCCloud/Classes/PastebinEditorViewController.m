@@ -42,7 +42,6 @@
         
         _type = [[UISegmentedControl alloc] initWithItems:@[@"Pastebin", @"Messages"]];
         _type.selectedSegmentIndex = 0;
-        _type.segmentedControlStyle = UISegmentedControlStyleBar;
         [_type addTarget:self action:@selector(_typeToggled) forControlEvents:UIControlEventValueChanged];
         self.navigationItem.titleView = _type;
     }

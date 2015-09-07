@@ -272,7 +272,7 @@
             return 48;
         } else {
             NSString *hint = [[_modeHints objectAtIndex:indexPath.row] objectForKey:@"hint"];
-            return [hint sizeWithFont:[UIFont systemFontOfSize:14] constrainedToSize:CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX) lineBreakMode:NSLineBreakByWordWrapping].height + 32;
+            return ceil([hint boundingRectWithSize:CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]} context:nil].size.height) + 32;
         }
     }
 }

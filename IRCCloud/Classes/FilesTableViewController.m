@@ -431,7 +431,7 @@
 -(void)saveButtonPressed:(id)sender {
     if(_delegate)
         [_delegate filesTableViewControllerDidSelectFile:_selectedFile message:((FileMetadataViewController *)self.navigationController.topViewController).msg.text];
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
