@@ -218,7 +218,7 @@
     [self _addUsersFromList:halfops heading:@"Half Ops" symbol:[PREFIX objectForKey:s?s.MODE_HALFOP:@"h"] headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
     [self _addUsersFromList:voiced heading:@"Voiced" symbol:[PREFIX objectForKey:s?s.MODE_VOICED:@"v"] headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
     [sectionIndexes addObject:@(0)];
-    [self _addUsersFromList:members heading:@"Members" symbol:@"" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor blueBorderColor] data:data sectionTitles:sectionTitles sectionIndexes:sectionIndexes sectionSizes:sectionSizes];
+    [self _addUsersFromList:members heading:@"Members" symbol:@"" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor unreadBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor blueBorderColor] data:data sectionTitles:sectionTitles sectionIndexes:sectionIndexes sectionSizes:sectionSizes];
     if(sectionSizes.count == 0)
         [sectionSizes addObject:@(data.count)];
     

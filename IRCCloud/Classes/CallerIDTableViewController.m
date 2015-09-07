@@ -31,7 +31,7 @@
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
         _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor selectedBlueColor];
+        _placeholder.textColor = [UIColor unreadBlueColor];
     }
     return self;
 }

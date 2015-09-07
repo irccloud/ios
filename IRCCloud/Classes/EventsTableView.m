@@ -154,7 +154,7 @@ int __timestampWidth;
     CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
     
     NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-    [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+    [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
 	[mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
     _linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
     
@@ -166,17 +166,18 @@ int __timestampWidth;
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
-    _topUnreadView.backgroundColor = [UIColor selectedBlueColor];
-    _bottomUnreadView.backgroundColor = [UIColor selectedBlueColor];
+    _topUnreadView.backgroundColor = [UIColor unreadBlueColor];
+    _bottomUnreadView.backgroundColor = [UIColor unreadBlueColor];
     [_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
     [_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateHighlighted];
-    [_backlogFailedButton setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
+    [_backlogFailedButton setTitleColor:[UIColor unreadBlueColor] forState:UIControlStateNormal];
     [_backlogFailedButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
     [_backlogFailedButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
     _backlogFailedButton.titleLabel.shadowOffset = CGSizeMake(0, 1);
     [_backlogFailedButton.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
     
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.backgroundColor = [UIColor contentBackgroundColor];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -521,11 +522,11 @@ int __timestampWidth;
         }
 
         if((_currentCollapsedEid == event.eid || [_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) && [event.type isEqualToString:@"user_channel_mode"]) {
-            event.color = [UIColor blackColor];
-            event.bgColor = [UIColor whiteColor];
+            event.color = [UIColor messageTextColor];
+            event.bgColor = [UIColor contentBackgroundColor];
         } else {
-            event.color = [UIColor timestampColor];
-            event.bgColor = [UIColor whiteColor];
+            event.color = [UIColor collapsedRowTextColor];
+            event.bgColor = [UIColor contentBackgroundColor];
         }
         
         NSString *msg;
@@ -551,7 +552,7 @@ int __timestampWidth;
                 heading.eid = _currentCollapsedEid - 1;
                 heading.groupMsg = [NSString stringWithFormat:@"   %@",groupMsg];
                 heading.color = [UIColor timestampColor];
-                heading.bgColor = [UIColor whiteColor];
+                heading.bgColor = [UIColor contentBackgroundColor];
                 heading.formattedMsg = nil;
                 heading.formatted = nil;
                 heading.linkify = NO;
@@ -985,6 +986,10 @@ int __timestampWidth;
 }
 
 - (void)refresh {
+    self.tableView.backgroundColor = [UIColor contentBackgroundColor];
+    _headerView.backgroundColor = [UIColor contentBackgroundColor];
+    _backlogFailedView.backgroundColor = [UIColor contentBackgroundColor];
+    
     [_lock lock];
     [_scrollTimer invalidate];
     _ready = NO;
@@ -1052,7 +1057,7 @@ int __timestampWidth;
         e.type = TYPE_BACKLOG;
         e.rowType = ROW_BACKLOG;
         e.formattedMsg = nil;
-        e.bgColor = [UIColor whiteColor];
+        e.bgColor = [UIColor contentBackgroundColor];
         [self _addItem:e eid:backlogEid];
         e.timestamp = nil;
     }
@@ -1306,7 +1311,7 @@ int __timestampWidth;
                 cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
             } else {
                 cell.accessory.image = [UIImage imageNamed:@"tiny_plus"];
-                cell.contentView.backgroundColor = [UIColor collapsedRowBackgroundColor];
+                cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
             }
         } else {
             cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_plus"];
@@ -1352,16 +1357,16 @@ int __timestampWidth;
     else
         cell.timestamp.text = e.timestamp;
     if(e.rowType == ROW_TIMESTAMP) {
-        cell.timestamp.textColor = [UIColor blackColor];
+        cell.timestamp.textColor = [UIColor messageTextColor];
     } else if(e.isHighlight && !e.isSelf) {
         cell.timestamp.textColor = [UIColor highlightTimestampColor];
     } else {
         cell.timestamp.textColor = [UIColor timestampColor];
     }
     if(e.rowType == ROW_BACKLOG) {
-        cell.timestamp.backgroundColor = [UIColor selectedBlueColor];
+        cell.timestamp.backgroundColor = [UIColor unreadBlueColor];
     } else if(e.rowType == ROW_LASTSEENEID) {
-        cell.timestamp.backgroundColor = [UIColor whiteColor];
+        cell.timestamp.backgroundColor = [UIColor contentBackgroundColor];
     } else {
         cell.timestamp.backgroundColor = [UIColor clearColor];
     }

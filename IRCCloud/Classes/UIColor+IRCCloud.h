@@ -18,8 +18,12 @@
 #import <UIKit/UIKit.h>
 
 @interface UIColor (IRCCloud)
++(UIColor *)colorWithHue:(CGFloat)hue saturation:(CGFloat)saturation lightness:(CGFloat)brightness alpha:(CGFloat)alpha;
++(void)setDarkTheme:(NSString *)theme;
++(UIColor *)contentBackgroundColor;
++(UIColor *)messageTextColor;
 +(UIColor *)backgroundBlueColor;
-+(UIColor *)selectedBlueColor;
++(UIColor *)unreadBlueColor;
 +(UIColor *)blueBorderColor;
 +(UIColor *)opersGroupColor;
 +(UIColor *)ownersGroupColor;
@@ -60,12 +64,27 @@
 +(UIColor *)noticeBackgroundColor;
 +(UIColor *)timestampBackgroundColor;
 +(UIColor *)newMsgsBackgroundColor;
-+(UIColor *)collapsedRowBackgroundColor;
++(UIColor *)collapsedRowTextColor;
 +(UIColor *)collapsedHeadingBackgroundColor;
 +(UIColor *)navBarColor;
++(UIColor *)navBarHeadingColor;
++(UIColor *)navBarSubheadingColor;
++(UIImage *)navBarBackgroundImage;
++(UIColor *)textareaTextColor;
++(UIImage *)textareaBackgroundImage;
++(UIColor *)textareaBackgroundColor;
++(UIColor *)linkColor;
 +(UIColor *)lightLinkColor;
-+(UIColor *)bufferBlueColor;
++(UIColor *)serverBackgroundColor;
++(UIColor *)bufferBackgroundColor;
 +(UIColor *)unreadBorderColor;
 +(UIColor *)highlightBorderColor;
 +(UIColor *)networkErrorBorderColor;
++(UIColor *)bufferTextColor;
++(UIColor *)inactiveBufferTextColor;
++(UIColor *)unreadBufferTextColor;
++(UIColor *)selectedBufferTextColor;
++(UIColor *)selectedBufferBackgroundColor;
++(UIColor *)bufferBorderColor;
++(UIColor *)selectedBufferBorderColor;
 @end

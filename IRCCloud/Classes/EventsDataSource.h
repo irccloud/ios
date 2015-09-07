@@ -109,4 +109,5 @@
 -(int)highlightStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type;
 -(NSTimeInterval)lastEidForBuffer:(int)bid;
 -(void)clearPendingAndFailed;
+-(void)reformat;
 @end

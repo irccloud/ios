@@ -32,7 +32,7 @@
         _placeholder.backgroundColor = [UIColor whiteColor];
         _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
         _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor selectedBlueColor];
+        _placeholder.textColor = [UIColor unreadBlueColor];
         _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     }
     return self;

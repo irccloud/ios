@@ -121,7 +121,7 @@
         
         _extension = [[UILabel alloc] init];
         _extension.textColor = [UIColor whiteColor];
-        _extension.backgroundColor = [UIColor selectedBlueColor];
+        _extension.backgroundColor = [UIColor unreadBlueColor];
         _extension.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
         _extension.textAlignment = NSTextAlignmentCenter;
         _extension.hidden = YES;

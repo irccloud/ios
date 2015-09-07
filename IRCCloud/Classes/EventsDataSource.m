@@ -260,21 +260,25 @@
         void (^unhandled_line)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
             event.from = @"";
             event.msg = @"";
-            if([object objectForKey:@"command"])
-                event.msg = [[object objectForKey:@"command"] stringByAppendingString:@" "];
-            if([object objectForKey:@"raw"])
-                event.msg = [event.msg stringByAppendingString:[object objectForKey:@"raw"]];
-            else
-                event.msg = [event.msg stringByAppendingString:[object objectForKey:@"msg"]];
+            if(object) {
+                if([object objectForKey:@"command"])
+                    event.msg = [[object objectForKey:@"command"] stringByAppendingString:@" "];
+                if([object objectForKey:@"raw"])
+                    event.msg = [event.msg stringByAppendingString:[object objectForKey:@"raw"]];
+                else
+                    event.msg = [event.msg stringByAppendingString:[object objectForKey:@"msg"]];
+            }
             event.bgColor = [UIColor errorBackgroundColor];
         };
         
         void (^kicked_channel)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
             event.from = @"";
             event.fromMode = nil;
-            event.oldNick = [object objectForKey:@"nick"];
-            event.nick = [object objectForKey:@"kicker"];
-            event.hostmask = [object objectForKey:@"kicker_hostmask"];
+            if(object) {
+                event.oldNick = [object objectForKey:@"nick"];
+                event.nick = [object objectForKey:@"kicker"];
+                event.hostmask = [object objectForKey:@"kicker_hostmask"];
+            }
             event.color = [UIColor timestampColor];
             event.linkify = NO;
             if(event.isSelf)
@@ -282,16 +286,18 @@
         };
         
         void (^motd)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
-            NSArray *lines = [object objectForKey:@"lines"];
-            event.from = @"";
-            if([lines count]) {
-                if([[object objectForKey:@"start"] length])
-                    event.msg = [[object objectForKey:@"start"] stringByAppendingString:@"\n"];
-                else
-                    event.msg = @"";
-                
-                for(NSString *line in lines) {
-                    event.msg = [event.msg stringByAppendingFormat:@"%@\n", line];
+            if(object) {
+                NSArray *lines = [object objectForKey:@"lines"];
+                event.from = @"";
+                if([lines count]) {
+                    if([[object objectForKey:@"start"] length])
+                        event.msg = [[object objectForKey:@"start"] stringByAppendingString:@"\n"];
+                    else
+                        event.msg = @"";
+                    
+                    for(NSString *line in lines) {
+                        event.msg = [event.msg stringByAppendingFormat:@"%@\n", line];
+                    }
                 }
             }
             event.bgColor = [UIColor selfBackgroundColor];
@@ -302,16 +308,18 @@
             event.bgColor = [UIColor statusBackgroundColor];
             event.linkify = NO;
             event.from = @"CAP";
-            if([event.type isEqualToString:@"cap_ls"])
-                event.msg = @"Server supports: ";
-            else if([event.type isEqualToString:@"cap_req"])
-                event.msg = @"Requesting: ";
-            else if([event.type isEqualToString:@"cap_ack"])
-                event.msg = @"Acknowledged: ";
-            else if([event.type isEqualToString:@"cap_raw"])
-                event.msg = [object objectForKey:@"line"];
-            if([object objectForKey:@"caps"])
-                event.msg = [event.msg stringByAppendingString:[[object objectForKey:@"caps"] componentsJoinedByString:@" | "]];
+            if(object) {
+                if([event.type isEqualToString:@"cap_ls"])
+                    event.msg = @"Server supports: ";
+                else if([event.type isEqualToString:@"cap_req"])
+                    event.msg = @"Requesting: ";
+                else if([event.type isEqualToString:@"cap_ack"])
+                    event.msg = @"Acknowledged: ";
+                else if([event.type isEqualToString:@"cap_raw"])
+                    event.msg = [object objectForKey:@"line"];
+                if([object objectForKey:@"caps"])
+                    event.msg = [event.msg stringByAppendingString:[[object objectForKey:@"caps"] componentsJoinedByString:@" | "]];
+            }
             event.monospace = YES;
         };
         
@@ -337,11 +345,70 @@
                               event.from = @"";
                               event.rowType = ROW_SOCKETCLOSED;
                               event.color = [UIColor timestampColor];
-                              if([object objectForKey:@"pool_lost"])
-                                  event.msg = @"Connection pool lost";
-                              else if([object objectForKey:@"server_ping_timeout"])
-                                  event.msg = @"Server PING timed out";
-                              else if([object objectForKey:@"reason"] && [[object objectForKey:@"reason"] length] > 0) {
+                              if(object) {
+                                  if([object objectForKey:@"pool_lost"])
+                                      event.msg = @"Connection pool lost";
+                                  else if([object objectForKey:@"server_ping_timeout"])
+                                      event.msg = @"Server PING timed out";
+                                  else if([object objectForKey:@"reason"] && [[object objectForKey:@"reason"] length] > 0) {
+                                      NSString *reason = [object objectForKey:@"reason"];
+                                      if([reason isKindOfClass:[NSString class]] && [reason length]) {
+                                          if([reason isEqualToString:@"pool_lost"])
+                                              reason = @"Connection pool failed";
+                                          else if([reason isEqualToString:@"no_pool"])
+                                              reason = @"No available connection pools";
+                                          else if([reason isEqualToString:@"enetdown"])
+                                              reason = @"Network down";
+                                          else if([reason isEqualToString:@"etimedout"] || [reason isEqualToString:@"timeout"])
+                                              reason = @"Timed out";
+                                          else if([reason isEqualToString:@"ehostunreach"])
+                                              reason = @"Host unreachable";
+                                          else if([reason isEqualToString:@"econnrefused"])
+                                              reason = @"Connection refused";
+                                          else if([reason isEqualToString:@"nxdomain"])
+                                              reason = @"Invalid hostname";
+                                          else if([reason isEqualToString:@"server_ping_timeout"])
+                                              reason = @"PING timeout";
+                                          else if([reason isEqualToString:@"ssl_certificate_error"])
+                                              reason = @"SSL certificate error";
+                                          else if([reason isEqualToString:@"ssl_error"])
+                                              reason = @"SSL error";
+                                          else if([reason isEqualToString:@"crash"])
+                                              reason = @"Connection crashed";
+                                      }
+                                      event.msg = [@"Connection lost: " stringByAppendingString:reason];
+                                  } else if([object objectForKey:@"abnormal"])
+                                      event.msg = @"Connection closed unexpectedly";
+                                  else
+                                      event.msg = @"";
+                              }
+                          },
+                          @"user_channel_mode":^(Event *event, IRCCloudJSONObject *object) {
+                              if(object) {
+                                  event.targetMode = [object objectForKey:@"newmode"];
+                                  event.chan = [object objectForKey:@"channel"];
+                              }
+                              event.isSelf = NO;
+                          },
+                          @"buffer_me_msg":^(Event *event, IRCCloudJSONObject *object) {
+                              event.nick = event.from;
+                              event.from = @"";
+                          },
+                          @"nickname_in_use":^(Event *event, IRCCloudJSONObject *object) {
+                              event.from = [object objectForKey:@"nick"];
+                              event.msg = @"is already in use";
+                              event.bgColor = [UIColor errorBackgroundColor];
+                          },
+                          @"connecting_cancelled":^(Event *event, IRCCloudJSONObject *object) {
+                              event.from = @"";
+                              event.msg = @"Cancelled";
+                              event.bgColor = [UIColor errorBackgroundColor];
+                          },
+                          @"connecting_failed":^(Event *event, IRCCloudJSONObject *object) {
+                              event.rowType = ROW_SOCKETCLOSED;
+                              event.color = [UIColor timestampColor];
+                              event.from = @"";
+                              if(object) {
                                   NSString *reason = [object objectForKey:@"reason"];
                                   if([reason isKindOfClass:[NSString class]] && [reason length]) {
                                       if([reason isEqualToString:@"pool_lost"])
@@ -366,63 +433,10 @@
                                           reason = @"SSL error";
                                       else if([reason isEqualToString:@"crash"])
                                           reason = @"Connection crashed";
+                                      event.msg = [@"Failed to connect: " stringByAppendingString:reason];
+                                  } else {
+                                      event.msg = @"Failed to connect.";
                                   }
-                                  event.msg = [@"Connection lost: " stringByAppendingString:reason];
-                              } else if([object objectForKey:@"abnormal"])
-                                  event.msg = @"Connection closed unexpectedly";
-                              else
-                                  event.msg = @"";
-                          },
-                          @"user_channel_mode":^(Event *event, IRCCloudJSONObject *object) {
-                              event.targetMode = [object objectForKey:@"newmode"];
-                              event.chan = [object objectForKey:@"channel"];
-                              event.isSelf = NO;
-                          },
-                          @"buffer_me_msg":^(Event *event, IRCCloudJSONObject *object) {
-                              event.nick = event.from;
-                              event.from = @"";
-                          },
-                          @"nickname_in_use":^(Event *event, IRCCloudJSONObject *object) {
-                              event.from = [object objectForKey:@"nick"];
-                              event.msg = @"is already in use";
-                              event.bgColor = [UIColor errorBackgroundColor];
-                          },
-                          @"connecting_cancelled":^(Event *event, IRCCloudJSONObject *object) {
-                              event.from = @"";
-                              event.msg = @"Cancelled";
-                              event.bgColor = [UIColor errorBackgroundColor];
-                          },
-                          @"connecting_failed":^(Event *event, IRCCloudJSONObject *object) {
-                              event.rowType = ROW_SOCKETCLOSED;
-                              event.color = [UIColor timestampColor];
-                              event.from = @"";
-                              NSString *reason = [object objectForKey:@"reason"];
-                              if([reason isKindOfClass:[NSString class]] && [reason length]) {
-                                  if([reason isEqualToString:@"pool_lost"])
-                                      reason = @"Connection pool failed";
-                                  else if([reason isEqualToString:@"no_pool"])
-                                      reason = @"No available connection pools";
-                                  else if([reason isEqualToString:@"enetdown"])
-                                      reason = @"Network down";
-                                  else if([reason isEqualToString:@"etimedout"] || [reason isEqualToString:@"timeout"])
-                                      reason = @"Timed out";
-                                  else if([reason isEqualToString:@"ehostunreach"])
-                                      reason = @"Host unreachable";
-                                  else if([reason isEqualToString:@"econnrefused"])
-                                      reason = @"Connection refused";
-                                  else if([reason isEqualToString:@"nxdomain"])
-                                      reason = @"Invalid hostname";
-                                  else if([reason isEqualToString:@"server_ping_timeout"])
-                                      reason = @"PING timeout";
-                                  else if([reason isEqualToString:@"ssl_certificate_error"])
-                                      reason = @"SSL certificate error";
-                                  else if([reason isEqualToString:@"ssl_error"])
-                                      reason = @"SSL error";
-                                  else if([reason isEqualToString:@"crash"])
-                                      reason = @"Connection crashed";
-                                  event.msg = [@"Failed to connect: " stringByAppendingString:reason];
-                              } else {
-                                  event.msg = @"Failed to connect.";
                               }
                           },
                           @"quit_server":^(Event *event, IRCCloudJSONObject *object) {
@@ -433,151 +447,168 @@
                           },
                           @"self_details":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
-                              event.msg = [NSString stringWithFormat:@"Your hostmask: %c%@%c", BOLD, [object objectForKey:@"usermask"], BOLD];
+                              if(object)
+                                  event.msg = [NSString stringWithFormat:@"Your hostmask: %c%@%c", BOLD, [object objectForKey:@"usermask"], BOLD];
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.linkify = NO;
                               event.monospace = YES;
                           },
                           @"myinfo":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
-                              event.msg = [NSString stringWithFormat:@"Host: %@\n", [object objectForKey:@"server"]];
-                              event.msg = [event.msg stringByAppendingFormat:@"IRCd: %@\n", [object objectForKey:@"version"]];
-                              event.msg = [event.msg stringByAppendingFormat:@"User modes: %@\n", [object objectForKey:@"user_modes"]];
-                              event.msg = [event.msg stringByAppendingFormat:@"Channel modes: %@\n", [object objectForKey:@"channel_modes"]];
-                              if([[object objectForKey:@"rest"] length])
-                                  event.msg = [event.msg stringByAppendingFormat:@"Parametric channel modes: %@\n", [object objectForKey:@"rest"]];
+                              if(object) {
+                                  event.msg = [NSString stringWithFormat:@"Host: %@\n", [object objectForKey:@"server"]];
+                                  event.msg = [event.msg stringByAppendingFormat:@"IRCd: %@\n", [object objectForKey:@"version"]];
+                                  event.msg = [event.msg stringByAppendingFormat:@"User modes: %@\n", [object objectForKey:@"user_modes"]];
+                                  event.msg = [event.msg stringByAppendingFormat:@"Channel modes: %@\n", [object objectForKey:@"channel_modes"]];
+                                  if([[object objectForKey:@"rest"] length])
+                                      event.msg = [event.msg stringByAppendingFormat:@"Parametric channel modes: %@\n", [object objectForKey:@"rest"]];
+                              }
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.linkify = NO;
                               event.monospace = YES;
                           },
                           @"user_mode":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
-                              event.msg = [NSString stringWithFormat:@"Your user mode is: %c+%@%c", BOLD, [object objectForKey:@"newmode"], BOLD];
+                              if(object)
+                                  event.msg = [NSString stringWithFormat:@"Your user mode is: %c+%@%c", BOLD, [object objectForKey:@"newmode"], BOLD];
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.monospace = YES;
                           },
                           @"your_unique_id":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
-                              event.msg = [NSString stringWithFormat:@"Your unique ID is: %c%@%c", BOLD, [object objectForKey:@"unique_id"], BOLD];
+                              if(object)
+                                  event.msg = [NSString stringWithFormat:@"Your unique ID is: %c%@%c", BOLD, [object objectForKey:@"unique_id"], BOLD];
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.monospace = YES;
                           },
                           @"kill":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
-                              event.msg = @"You were killed";
-                              if([object objectForKey:@"from"])
-                                  event.msg = [event.msg stringByAppendingFormat:@" by %@", [object objectForKey:@"from"]];
-                              if([object objectForKey:@"killer_hostmask"])
-                                  event.msg = [event.msg stringByAppendingFormat:@" (%@)", [object objectForKey:@"killer_hostmask"]];
-                              if([object objectForKey:@"reason"])
-                                  event.msg = [event.msg stringByAppendingFormat:@": %@", [object objectForKey:@"reason"]];
+                              if(object) {
+                                  event.msg = @"You were killed";
+                                  if([object objectForKey:@"from"])
+                                      event.msg = [event.msg stringByAppendingFormat:@" by %@", [object objectForKey:@"from"]];
+                                  if([object objectForKey:@"killer_hostmask"])
+                                      event.msg = [event.msg stringByAppendingFormat:@" (%@)", [object objectForKey:@"killer_hostmask"]];
+                                  if([object objectForKey:@"reason"])
+                                      event.msg = [event.msg stringByAppendingFormat:@": %@", [object objectForKey:@"reason"]];
+                              }
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.linkify = NO;
                           },
                           @"banned":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
-                              event.msg = @"You were banned";
-                              if([object objectForKey:@"server"])
-                                  event.msg = [event.msg stringByAppendingFormat:@" from %@", [object objectForKey:@"server"]];
-                              if([object objectForKey:@"reason"])
-                                  event.msg = [event.msg stringByAppendingFormat:@": %@", [object objectForKey:@"reason"]];
+                              if(object) {
+                                  event.msg = @"You were banned";
+                                  if([object objectForKey:@"server"])
+                                      event.msg = [event.msg stringByAppendingFormat:@" from %@", [object objectForKey:@"server"]];
+                                  if([object objectForKey:@"reason"])
+                                      event.msg = [event.msg stringByAppendingFormat:@": %@", [object objectForKey:@"reason"]];
+                              }
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.linkify = NO;
                           },
                           @"channel_topic":^(Event *event, IRCCloudJSONObject *object) {
-                              event.from = [[object objectForKey:@"author"] length]?[object objectForKey:@"author"]:[object objectForKey:@"server"];
-                              if([object objectForKey:@"topic"] && [[object objectForKey:@"topic"] length])
-                                  event.msg = [NSString stringWithFormat:@"set the topic: %@", [object objectForKey:@"topic"]];
-                              else
-                                  event.msg = @"cleared the topic";
+                              if(object) {
+                                  event.from = [[object objectForKey:@"author"] length]?[object objectForKey:@"author"]:[object objectForKey:@"server"];
+                                  if([object objectForKey:@"topic"] && [[object objectForKey:@"topic"] length])
+                                      event.msg = [NSString stringWithFormat:@"set the topic: %@", [object objectForKey:@"topic"]];
+                                  else
+                                      event.msg = @"cleared the topic";
+                              }
                               event.bgColor = [UIColor statusBackgroundColor];
                           },
                           @"channel_mode":^(Event *event, IRCCloudJSONObject *object) {
                               event.nick = event.from;
                               event.from = @"";
-                              if(event.server && [event.server isKindOfClass:[NSString class]] && event.server.length)
-                                  event.msg = [NSString stringWithFormat:@"Channel mode set to: %c%@%c by the server %c%@%c", BOLD, [object objectForKey:@"diff"], CLEAR, BOLD, event.server, CLEAR];
-                              else
-                                  event.msg = [NSString stringWithFormat:@"Channel mode set to: %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
+                              if(object) {
+                                  if(event.server && [event.server isKindOfClass:[NSString class]] && event.server.length)
+                                      event.msg = [NSString stringWithFormat:@"Channel mode set to: %c%@%c by the server %c%@%c", BOLD, [object objectForKey:@"diff"], CLEAR, BOLD, event.server, CLEAR];
+                                  else
+                                      event.msg = [NSString stringWithFormat:@"Channel mode set to: %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
+                              }
                               event.linkify = NO;
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.isSelf = NO;
                           },
                           @"channel_mode_is":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
-                              if([[object objectForKey:@"diff"] length] > 0)
-                                  event.msg = [NSString stringWithFormat:@"Channel mode is: %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
-                              else
-                                  event.msg = @"No channel mode";
+                              if(object) {
+                                  if([[object objectForKey:@"diff"] length] > 0)
+                                      event.msg = [NSString stringWithFormat:@"Channel mode is: %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
+                                  else
+                                      event.msg = @"No channel mode";
+                              }
                               event.bgColor = [UIColor statusBackgroundColor];
                           },
                           @"channel_mode_list_change":^(Event *event, IRCCloudJSONObject *object) {
-                              BOOL unknown = YES;
-                              NSDictionary *ops = [object objectForKey:@"ops"];
-                              if(ops) {
-                                  NSArray *add = [ops objectForKey:@"add"];
-                                  if(add.count > 0) {
-                                      NSDictionary *op = [add objectAtIndex:0];
-                                      if([[op objectForKey:@"mode"] isEqualToString:@"b"]) {
-                                          event.nick = event.from;
-                                          event.from = @"";
-                                          event.msg = [NSString stringWithFormat:@"banned %c%@%c (%c14+b%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
-                                          unknown = NO;
-                                      } else if([[op objectForKey:@"mode"] isEqualToString:@"e"]) {
-                                          event.nick = event.from;
-                                          event.from = @"";
-                                          event.msg = [NSString stringWithFormat:@"exempted %c%@%c from bans (%c14+e%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
-                                          unknown = NO;
-                                      } else if([[op objectForKey:@"mode"] isEqualToString:@"q"]) {
-                                          if([[op objectForKey:@"param"] rangeOfString:@"@"].location == NSNotFound && [[op objectForKey:@"param"] rangeOfString:@"$"].location == NSNotFound) {
-                                              event.type = @"user_channel_mode";
-                                          } else {
+                              if(object) {
+                                  BOOL unknown = YES;
+                                  NSDictionary *ops = [object objectForKey:@"ops"];
+                                  if(ops) {
+                                      NSArray *add = [ops objectForKey:@"add"];
+                                      if(add.count > 0) {
+                                          NSDictionary *op = [add objectAtIndex:0];
+                                          if([[op objectForKey:@"mode"] isEqualToString:@"b"]) {
                                               event.nick = event.from;
                                               event.from = @"";
-                                              event.msg = [NSString stringWithFormat:@"quieted %c%@%c (%c14+q%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
-                                          }
-                                          unknown = NO;
-                                      } else if([[op objectForKey:@"mode"] isEqualToString:@"I"]) {
-                                          event.nick = event.from;
-                                          event.from = @"";
-                                          event.msg = [NSString stringWithFormat:@"added %c%@%c to the invite list (%c14+I%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
-                                          unknown = NO;
-                                      }
-                                  }
-                                  NSArray *remove = [ops objectForKey:@"remove"];
-                                  if(remove.count > 0) {
-                                      NSDictionary *op = [remove objectAtIndex:0];
-                                      if([[op objectForKey:@"mode"] isEqualToString:@"b"]) {
-                                          event.nick = event.from;
-                                          event.from = @"";
-                                          event.msg = [NSString stringWithFormat:@"un-banned %c%@%c (%c14-b%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
-                                          unknown = NO;
-                                      } else if([[op objectForKey:@"mode"] isEqualToString:@"e"]) {
-                                          event.nick = event.from;
-                                          event.from = @"";
-                                          event.msg = [NSString stringWithFormat:@"un-exempted %c%@%c from bans (%c14-e%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
-                                          unknown = NO;
-                                      } else if([[op objectForKey:@"mode"] isEqualToString:@"q"]) {
-                                          if([[op objectForKey:@"param"] rangeOfString:@"@"].location == NSNotFound && [[op objectForKey:@"param"] rangeOfString:@"$"].location == NSNotFound) {
-                                              event.type = @"user_channel_mode";
-                                          } else {
+                                              event.msg = [NSString stringWithFormat:@"banned %c%@%c (%c14+b%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                              unknown = NO;
+                                          } else if([[op objectForKey:@"mode"] isEqualToString:@"e"]) {
                                               event.nick = event.from;
                                               event.from = @"";
-                                              event.msg = [NSString stringWithFormat:@"un-quieted %c%@%c (%c14-q%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                              event.msg = [NSString stringWithFormat:@"exempted %c%@%c from bans (%c14+e%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                              unknown = NO;
+                                          } else if([[op objectForKey:@"mode"] isEqualToString:@"q"]) {
+                                              if([[op objectForKey:@"param"] rangeOfString:@"@"].location == NSNotFound && [[op objectForKey:@"param"] rangeOfString:@"$"].location == NSNotFound) {
+                                                  event.type = @"user_channel_mode";
+                                              } else {
+                                                  event.nick = event.from;
+                                                  event.from = @"";
+                                                  event.msg = [NSString stringWithFormat:@"quieted %c%@%c (%c14+q%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                              }
+                                              unknown = NO;
+                                          } else if([[op objectForKey:@"mode"] isEqualToString:@"I"]) {
+                                              event.nick = event.from;
+                                              event.from = @"";
+                                              event.msg = [NSString stringWithFormat:@"added %c%@%c to the invite list (%c14+I%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                              unknown = NO;
                                           }
-                                          unknown = NO;
-                                      } else if([[op objectForKey:@"mode"] isEqualToString:@"I"]) {
-                                          event.nick = event.from;
-                                          event.from = @"";
-                                          event.msg = [NSString stringWithFormat:@"removed %c%@%c from the invite list (%c14-I%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
-                                          unknown = NO;
+                                      }
+                                      NSArray *remove = [ops objectForKey:@"remove"];
+                                      if(remove.count > 0) {
+                                          NSDictionary *op = [remove objectAtIndex:0];
+                                          if([[op objectForKey:@"mode"] isEqualToString:@"b"]) {
+                                              event.nick = event.from;
+                                              event.from = @"";
+                                              event.msg = [NSString stringWithFormat:@"un-banned %c%@%c (%c14-b%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                              unknown = NO;
+                                          } else if([[op objectForKey:@"mode"] isEqualToString:@"e"]) {
+                                              event.nick = event.from;
+                                              event.from = @"";
+                                              event.msg = [NSString stringWithFormat:@"un-exempted %c%@%c from bans (%c14-e%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                              unknown = NO;
+                                          } else if([[op objectForKey:@"mode"] isEqualToString:@"q"]) {
+                                              if([[op objectForKey:@"param"] rangeOfString:@"@"].location == NSNotFound && [[op objectForKey:@"param"] rangeOfString:@"$"].location == NSNotFound) {
+                                                  event.type = @"user_channel_mode";
+                                              } else {
+                                                  event.nick = event.from;
+                                                  event.from = @"";
+                                                  event.msg = [NSString stringWithFormat:@"un-quieted %c%@%c (%c14-q%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                              }
+                                              unknown = NO;
+                                          } else if([[op objectForKey:@"mode"] isEqualToString:@"I"]) {
+                                              event.nick = event.from;
+                                              event.from = @"";
+                                              event.msg = [NSString stringWithFormat:@"removed %c%@%c from the invite list (%c14-I%c)", BOLD, [op objectForKey:@"param"], BOLD, COLOR_MIRC, COLOR_MIRC];
+                                              unknown = NO;
+                                          }
                                       }
                                   }
-                              }
-                              if(unknown) {
-                                  event.nick = event.from;
-                                  event.from = @"";
-                                  event.msg = [NSString stringWithFormat:@"set channel mode %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
+                                  if(unknown) {
+                                      event.nick = event.from;
+                                      event.from = @"";
+                                      event.msg = [NSString stringWithFormat:@"set channel mode %c%@%c", BOLD, [object objectForKey:@"diff"], BOLD];
+                                  }
                               }
                               event.isSelf = NO;
                               event.bgColor = [UIColor statusBackgroundColor];
@@ -587,18 +618,22 @@
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.linkify = NO;
                               event.from = @"";
-                              event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"hidden_host"], BOLD, event.msg];
+                              if(object)
+                                  event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"hidden_host"], BOLD, event.msg];
                               event.monospace = YES;
                           },
                           @"inviting_to_channel":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
-                              event.msg = [NSString stringWithFormat:@"You invited %@ to join %@", [object objectForKey:@"recipient"], [object objectForKey:@"channel"]];
+                              if(object)
+                                  event.msg = [NSString stringWithFormat:@"You invited %@ to join %@", [object objectForKey:@"recipient"], [object objectForKey:@"channel"]];
                               event.bgColor = [UIColor noticeBackgroundColor];
                               event.monospace = YES;
                           },
                           @"channel_invite":^(Event *event, IRCCloudJSONObject *object) {
-                              event.msg = [NSString stringWithFormat:@"Invite to join %@", [object objectForKey:@"channel"]];
-                              event.oldNick = [object objectForKey:@"channel"];
+                              if(object) {
+                                  event.msg = [NSString stringWithFormat:@"Invite to join %@", [object objectForKey:@"channel"]];
+                                  event.oldNick = [object objectForKey:@"channel"];
+                              }
                               event.bgColor = [UIColor noticeBackgroundColor];
                               event.monospace = YES;
                           },
@@ -608,25 +643,30 @@
                               event.isHighlight = YES;
                               event.linkify = NO;
                               event.monospace = YES;
-                              event.hostmask = [object objectForKey:@"usermask"];
+                              if(object)
+                                  event.hostmask = [object objectForKey:@"usermask"];
                           },
                           @"target_callerid":^(Event *event, IRCCloudJSONObject *object) {
-                              event.from = [object objectForKey:@"target_nick"];
+                              if(object)
+                                  event.from = [object objectForKey:@"target_nick"];
                               event.bgColor = [UIColor errorBackgroundColor];
                               event.monospace = YES;
                           },
                           @"target_notified":^(Event *event, IRCCloudJSONObject *object) {
-                              event.from = [object objectForKey:@"target_nick"];
+                              if(object)
+                                  event.from = [object objectForKey:@"target_nick"];
                               event.bgColor = [UIColor errorBackgroundColor];
                               event.monospace = YES;
                           },
                           @"link_channel":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
-                              if([[object objectForKey:@"invalid_chan"] isKindOfClass:[NSString class]] && [[object objectForKey:@"invalid_chan"] length]) {
-                                  if([[object objectForKey:@"valid_chan"] isKindOfClass:[NSString class]] && [[object objectForKey:@"valid_chan"] length]) {
-                                      event.msg = [NSString stringWithFormat:@"%@ → %@ %@", [object objectForKey:@"invalid_chan"], [object objectForKey:@"valid_chan"], event.msg];
-                                  } else {
-                                      event.msg = [NSString stringWithFormat:@"%@ %@", [object objectForKey:@"invalid_chan"], event.msg];
+                              if(object) {
+                                  if([[object objectForKey:@"invalid_chan"] isKindOfClass:[NSString class]] && [[object objectForKey:@"invalid_chan"] length]) {
+                                      if([[object objectForKey:@"valid_chan"] isKindOfClass:[NSString class]] && [[object objectForKey:@"valid_chan"] length]) {
+                                          event.msg = [NSString stringWithFormat:@"%@ → %@ %@", [object objectForKey:@"invalid_chan"], [object objectForKey:@"valid_chan"], event.msg];
+                                      } else {
+                                          event.msg = [NSString stringWithFormat:@"%@ %@", [object objectForKey:@"invalid_chan"], event.msg];
+                                      }
                                   }
                               }
                               event.bgColor = [UIColor errorBackgroundColor];
@@ -636,76 +676,89 @@
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.linkify = NO;
                               event.from = @"";
-                              event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"server_version"], BOLD, [object objectForKey:@"comments"]];
+                              if(object)
+                                  event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"server_version"], BOLD, [object objectForKey:@"comments"]];
                               event.monospace = YES;
                           },
                           @"rehashed_config":^(Event *event, IRCCloudJSONObject *object) {
                               event.bgColor = [UIColor noticeBackgroundColor];
                               event.linkify = NO;
                               event.from = @"";
-                              event.msg = [NSString stringWithFormat:@"Rehashed config: %@ (%@)", [object objectForKey:@"file"], event.msg];
+                              if(object)
+                                  event.msg = [NSString stringWithFormat:@"Rehashed config: %@ (%@)", [object objectForKey:@"file"], event.msg];
                               event.monospace = YES;
                           },
                           @"knock":^(Event *event, IRCCloudJSONObject *object) {
                               event.bgColor = [UIColor noticeBackgroundColor];
                               event.linkify = NO;
                               event.monospace = YES;
-                              if(event.nick.length) {
-                                  event.from = event.nick;
-                                  if(event.hostmask.length)
-                                      event.msg = [event.msg stringByAppendingFormat:@" (%@)", event.hostmask];
-                              } else {
-                                  event.msg = [NSString stringWithFormat:@"%@ %@", [object objectForKey:@"userhost"], event.msg];
+                              if(object) {
+                                  if(event.nick.length) {
+                                      event.from = event.nick;
+                                      if(event.hostmask.length)
+                                          event.msg = [event.msg stringByAppendingFormat:@" (%@)", event.hostmask];
+                                  } else {
+                                      event.msg = [NSString stringWithFormat:@"%@ %@", [object objectForKey:@"userhost"], event.msg];
+                                  }
                               }
                           },
                           @"rehashed_config":^(Event *event, IRCCloudJSONObject *object) {
                               event.bgColor = [UIColor noticeBackgroundColor];
                               event.linkify = NO;
                               event.from = @"";
-                              event.msg = [NSString stringWithFormat:@"Rehashed config: %@ (%@)", [object objectForKey:@"file"], event.msg];
+                              if(object)
+                                  event.msg = [NSString stringWithFormat:@"Rehashed config: %@ (%@)", [object objectForKey:@"file"], event.msg];
                               event.monospace = YES;
                           },
                           @"unknown_umode":^(Event *event, IRCCloudJSONObject *object) {
                               event.bgColor = [UIColor errorBackgroundColor];
                               event.linkify = NO;
                               event.from = @"";
-                              if([[object objectForKey:@"flag"] length])
+                              if(object && [[object objectForKey:@"flag"] length])
                                   event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"flag"], BOLD, event.msg];
                           },
                           @"kill_deny":^(Event *event, IRCCloudJSONObject *object) {
                               event.bgColor = [UIColor errorBackgroundColor];
-                              event.from = [object objectForKey:@"channel"];
+                              if(object)
+                                  event.from = [object objectForKey:@"channel"];
                           },
                           @"chan_own_priv_needed":^(Event *event, IRCCloudJSONObject *object) {
                               event.bgColor = [UIColor errorBackgroundColor];
-                              event.from = [object objectForKey:@"channel"];
+                              if(object)
+                                  event.from = [object objectForKey:@"channel"];
                           },
                           @"chan_forbidden":^(Event *event, IRCCloudJSONObject *object) {
                               event.bgColor = [UIColor errorBackgroundColor];
-                              event.from = [object objectForKey:@"channel"];
+                              if(object)
+                                  event.from = [object objectForKey:@"channel"];
                           },
                           @"time":^(Event *event, IRCCloudJSONObject *object) {
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.linkify = NO;
                               event.from = @"";
                               event.monospace = YES;
-                              event.msg = [object objectForKey:@"time_string"];
-                              if([[object objectForKey:@"time_stamp"] length]) {
-                                  event.msg = [event.msg stringByAppendingFormat:@" (%@)", [object objectForKey:@"time_stamp"]];
+                              if(object) {
+                                  event.msg = [object objectForKey:@"time_string"];
+                                  if([[object objectForKey:@"time_stamp"] length]) {
+                                      event.msg = [event.msg stringByAppendingFormat:@" (%@)", [object objectForKey:@"time_stamp"]];
+                                  }
+                                  event.msg = [event.msg stringByAppendingFormat:@" — %c%@%c", BOLD, [object objectForKey:@"time_server"], CLEAR];
                               }
-                              event.msg = [event.msg stringByAppendingFormat:@" — %c%@%c", BOLD, [object objectForKey:@"time_server"], CLEAR];
                           },
                           @"watch_status":^(Event *event, IRCCloudJSONObject *object) {
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.linkify = NO;
-                              event.from = [object objectForKey:@"watch_nick"];
-                              event.msg = [event.msg stringByAppendingFormat:@" (%@@%@)", [object objectForKey:@"username"], [object objectForKey:@"userhost"]];
+                              if(object) {
+                                  event.from = [object objectForKey:@"watch_nick"];
+                                  event.msg = [event.msg stringByAppendingFormat:@" (%@@%@)", [object objectForKey:@"username"], [object objectForKey:@"userhost"]];
+                              }
                               event.monospace = YES;
                           },
                           @"sqline_nick":^(Event *event, IRCCloudJSONObject *object) {
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.linkify = NO;
-                              event.from = [object objectForKey:@"charset"];
+                              if(object)
+                                  event.from = [object objectForKey:@"charset"];
                               event.monospace = YES;
                           },
       };
@@ -814,8 +867,8 @@
         event.reqId = [[object objectForKey:@"reqid"] intValue];
     else
         event.reqId = -1;
-    event.color = [UIColor blackColor];
-    event.bgColor = [UIColor whiteColor];
+    event.color = [UIColor messageTextColor];
+    event.bgColor = [UIColor contentBackgroundColor];
     event.rowType = 0;
     event.formatted = nil;
     event.formattedMsg = nil;
@@ -1004,6 +1057,25 @@
             }
         }
     }
+}
+
+-(void)reformat {
+    @synchronized(_events) {
+        for(NSNumber *bid in _events) {
+            NSArray *events = [_events objectForKey:bid];
+            for(Event *e in events) {
+                e.color = [UIColor messageTextColor];
+                e.bgColor = [UIColor contentBackgroundColor];
+                e.formatted = nil;
+                e.timestamp = nil;
+                e.height = 0;
+                void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:e.type];
+                if(formatter)
+                    formatter(e, nil);
+            }
+        }
+    }
+
 }
 
 -(void)clearPendingAndFailed {

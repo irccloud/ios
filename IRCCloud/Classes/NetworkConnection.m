@@ -19,6 +19,7 @@
 #import "SBJson.h"
 #import "HandshakeHeader.h"
 #import "IRCCloudJSONObject.h"
+#import "UIColor+IRCCloud.h"
 
 NSString *_userAgent = nil;
 NSString *kIRCCloudConnectivityNotification = @"com.irccloud.notification.connectivity";
@@ -419,7 +420,6 @@ NSLock *__parserLock = nil;
                            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"uploadsAvailable"];
                        else
                            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"uploadsAvailable"];
-                       [[NSUserDefaults standardUserDefaults] synchronize];
                        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
                            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
@@ -431,12 +431,19 @@ NSLock *__parserLock = nil;
                        }
 
                        _prefs = nil;
-                       [[EventsDataSource sharedInstance] clearFormattingCache];
+                       NSDictionary *p = [self prefs];
+                       if([p objectForKey:@"theme"]) {
+                           [UIColor setDarkTheme:[p objectForKey:@"theme"]];
+                           [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"theme"] forKey:@"theme"];
+                       }
+                       [[NSUserDefaults standardUserDefaults] synchronize];
+                       [[EventsDataSource sharedInstance] reformat];
 #ifndef EXTENSION
                        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
                            [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];
+                       NSLog(@"Info: %@", _userInfo);
                        [self postObject:object forEvent:kIRCEventUserInfo];
                    },
                    @"backlog_starts": ^(IRCCloudJSONObject *object) {

@@ -118,6 +118,18 @@
     return self;
 }
 
+-(void)setBackgroundImage:(UIImage *)image {
+    textViewBackgroundImage.image = image;
+}
+
+-(void)setKeyboardAppearance:(UIKeyboardAppearance)keyboardAppearance {
+    internalTextView.keyboardAppearance = keyboardAppearance;
+}
+
+-(UIKeyboardAppearance)keyboardAppearance {
+    return internalTextView.keyboardAppearance;
+}
+
 -(void)sizeToFit
 {
     CGRect r = self.frame;

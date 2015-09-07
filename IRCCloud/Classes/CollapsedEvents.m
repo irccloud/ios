@@ -701,7 +701,37 @@
         _server?_server.MODE_VOICED:@"v":@"25B100"
     };
     
-    NSArray *colors = @[@"fc009a", @"ff1f1a", @"d20004", @"fd6508", @"880019", @"c7009c", @"804fc4", @"5200b7", @"123e92", @"1d40ff", @"108374", @"2e980d", @"207607", @"196d61"];
+    NSArray *light_colors = @[];
+    NSArray *dark_colors = @[
+                             @"deb887",
+                             @"ffd700",
+                             @"ffa07a",
+                             @"fab072",
+                             @"ff8c00",
+                             @"00ff00",
+                             @"ffff00",
+                             @"bdb76b",
+                             @"9acd32",
+                             @"32cd32",
+                             @"8fbc8f",
+                             @"3cb371",
+                             @"66cdaa",
+                             @"20b2aa",
+                             @"afeeee",
+                             @"00ffff",
+                             @"87ceeb",
+                             @"a3b7c2",
+                             @"87cefa",
+                             @"6495ed",
+                             @"b2a9e5",
+                             @"d8bfd8",
+                             @"da70d6",
+                             @"ee82ee",
+                             @"d68fff",
+                             @"ff69b4",
+                             @"ffb6c1"
+                             ];
+    NSArray *colors = dark_colors;
     NSString *color = nil;
     NSMutableString *output = [[NSMutableString alloc] initWithFormat:@"%c", BOLD];
     BOOL showSymbol = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue];
@@ -722,7 +752,7 @@
             lHash = [[NSNumber numberWithDouble:hash] intValue];
         }
         
-        color = [colors objectAtIndex:llabs([[NSNumber numberWithDouble:hash] longLongValue] % 14)];
+        color = [colors objectAtIndex:llabs([[NSNumber numberWithDouble:hash] longLongValue] % (int)(colors.count))];
     }
     
     if(mode.length) {

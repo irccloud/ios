@@ -73,7 +73,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
     [[NSFileManager defaultManager] removeItemAtURL:caches error:nil];
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO)}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO), @"theme":@"dawn"}];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
         [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@(14.0f)}];
     } else {
@@ -97,6 +97,9 @@
         }
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
+    
+    [UIColor setDarkTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [[EventsDataSource sharedInstance] reformat];
     
     if(IRCCLOUD_HOST.length < 1)
         [NetworkConnection sharedInstance].session = nil;

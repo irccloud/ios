@@ -88,8 +88,9 @@
 @property (nonatomic) UIImageView *textViewBackgroundImage;
 @property (nonatomic,copy) NSString *placeholder;
 @property (nonatomic) int minimumHeight;
+@property (nonatomic) UIKeyboardAppearance keyboardAppearance;
 - (BOOL)hasText;
 - (void)scrollRangeToVisible:(NSRange)range;
 - (void)clearText;
-
+- (void)setBackgroundImage:(UIImage *)image;
 @end

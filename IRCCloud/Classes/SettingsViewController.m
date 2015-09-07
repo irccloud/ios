@@ -238,6 +238,64 @@
 
 @end
 
+@interface ThemesViewController : UITableViewController {
+    NSArray *_themes;
+}
+@end
+
+@implementation ThemesViewController
+
+-(id)init {
+    self = [super initWithStyle:UITableViewStyleGrouped];
+    if (self) {
+        self.navigationItem.title = @"Theme";
+        _themes = @[@"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash"];
+    }
+    return self;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Table view data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return _themes.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"themecell"];
+    if(!cell)
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"themecell"];
+    
+    cell.textLabel.text = [_themes objectAtIndex:indexPath.row];
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] isEqualToString:[[_themes objectAtIndex:indexPath.row] lowercaseString]])
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    else
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    
+    return cell;
+}
+
+#pragma mark - Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [[NSUserDefaults standardUserDefaults] setObject:[[_themes objectAtIndex:indexPath.row] lowercaseString] forKey:@"theme"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [UIColor setDarkTheme:[[_themes objectAtIndex:indexPath.row] lowercaseString]];
+    [[EventsDataSource sharedInstance] reformat];
+    [tableView reloadData];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+@end
+
 @implementation SettingsViewController
 
 - (id)initWithStyle:(UITableViewStyle)style {
@@ -294,6 +352,9 @@
         [prefs setObject:@(_colors.isOn) forKey:@"nick-colors"];
         [prefs setObject:@(!_emocodes.isOn) forKey:@"emoji-disableconvert"];
         [prefs setObject:@(!_pastebin.isOn) forKey:@"pastebin-disableprompt"];
+        [prefs setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] forKey:@"theme"];
+        
+        NSLog(@"Saving: %@", prefs);
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -607,7 +668,7 @@
         case 1:
             return 1;
         case 2:
-            return 6;
+            return 7;
         case 3:
             return ((_chromeInstalled)?4:3) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
         case 4:
@@ -651,7 +712,7 @@
     
     if(indexPath.section != 4) {
         if(!cell)
-            cell = [[UITableViewCell alloc] initWithStyle:(indexPath.section == 2)?UITableViewCellStyleSubtitle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
+            cell = [[UITableViewCell alloc] initWithStyle:(indexPath.section == 2 && indexPath.row > 0)?UITableViewCellStyleSubtitle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
         
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryView = nil;
@@ -685,23 +746,28 @@
         case 2:
             switch(row) {
                 case 0:
+                    cell.textLabel.text = @"Theme";
+                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    break;
+                case 1:
                     cell.textLabel.text = @"24-hour Clock";
                     cell.accessoryView = _24hour;
                     break;
-                case 1:
+                case 2:
                     cell.textLabel.text = @"Show Seconds";
                     cell.accessoryView = _seconds;
                     break;
-                case 2:
+                case 3:
                     cell.textLabel.text = @"Usermode Symbols";
                     cell.accessoryView = _symbols;
                     cell.detailTextLabel.text = @"@, +, etc.";
                     break;
-                case 3:
+                case 4:
                     cell.textLabel.text = @"Colourise Nicknames";
                     cell.accessoryView = _colors;
                     break;
-                case 4:
+                case 5:
                     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
                         cell.textLabel.text = @"Convert :emocodes:";
                     else
@@ -709,7 +775,7 @@
                     cell.detailTextLabel.text = @":thumbsup: → 👍";
                     cell.accessoryView = _emocodes;
                     break;
-                case 5:
+                case 6:
                     cell.textLabel.text = @"Ask to Pastebin";
                     cell.accessoryView = _pastebin;
                     cell.detailTextLabel.text = @"Before sending multi-line messages";
@@ -817,6 +883,9 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
+    if(indexPath.section == 2 && indexPath.row == 0) {
+        [self.navigationController pushViewController:[[ThemesViewController alloc] init] animated:YES];
+    }
     if(indexPath.section == 5) {
         NSInteger row = indexPath.row;
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {

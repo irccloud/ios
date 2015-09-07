@@ -71,6 +71,30 @@ extern NSDictionary *emojiMap;
     return self;
 }
 
+- (void)_themeChanged {
+    self.view.window.backgroundColor = [UIColor contentBackgroundColor];
+    self.view.backgroundColor = [UIColor contentBackgroundColor];
+    _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
+    [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
+    [_sendBtn setTitleColor:[UIColor textareaBackgroundColor] forState:UIControlStateNormal];
+    [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
+    [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
+    _message.textColor = [UIColor textareaTextColor];
+    _message.keyboardAppearance = UIKeyboardAppearanceDark;
+
+    UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
+    [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
+        users.frame = CGRectMake(0,0,40,40);
+    else
+        users.frame = CGRectMake(0,0,24,22);
+    [users setTintColor:[UIColor navBarSubheadingColor]];
+    users.accessibilityLabel = @"Channel members list";
+    _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+    [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+}
+
 - (void)viewDidLoad {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     
@@ -140,7 +164,7 @@ extern NSDictionary *emojiMap;
     _uploadsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     _uploadsBtn.contentMode = UIViewContentModeCenter;
     _uploadsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-    [_uploadsBtn setImage:[UIImage imageNamed:@"upload_arrow"] forState:UIControlStateNormal];
+    [_uploadsBtn setImage:[[UIImage imageNamed:@"upload_arrow"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_uploadsBtn addTarget:self action:@selector(uploadsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_uploadsBtn sizeToFit];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 6)
@@ -156,7 +180,6 @@ extern NSDictionary *emojiMap;
     _sendBtn.contentMode = UIViewContentModeCenter;
     _sendBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
     [_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
-    [_sendBtn setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
     [_sendBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
     [_sendBtn sizeToFit];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
@@ -172,7 +195,7 @@ extern NSDictionary *emojiMap;
     _settingsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     _settingsBtn.contentMode = UIViewContentModeCenter;
     _settingsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
-    [_settingsBtn setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
+    [_settingsBtn setImage:[[UIImage imageNamed:@"settings"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_settingsBtn addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_settingsBtn sizeToFit];
     _settingsBtn.accessibilityLabel = @"Menu";
@@ -232,15 +255,6 @@ extern NSDictionary *emojiMap;
     _nickCompletionView.alpha = 0;
     [self.view addSubview:_nickCompletionView];
     [_bottomBar addSubview:_message];
-    UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
-    [users setImage:[UIImage imageNamed:@"users"] forState:UIControlStateNormal];
-    [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        users.frame = CGRectMake(0,0,40,40);
-    else
-        users.frame = CGRectMake(0,0,24,22);
-    users.accessibilityLabel = @"Channel members list";
-    _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
 
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
         [self.navigationController.navigationBar addSubview:_connectingProgress];
@@ -251,6 +265,7 @@ extern NSDictionary *emojiMap;
     self.navigationItem.titleView = _titleView;
     _connectingProgress.hidden = YES;
     _connectingProgress.progress = 0;
+    [self _themeChanged];
     [self connectivityChanged:nil];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     
@@ -742,6 +757,7 @@ extern NSDictionary *emojiMap;
             }
             break;
         case kIRCEventUserInfo:
+            [self _themeChanged];
         case kIRCEventPart:
         case kIRCEventKick:
             [self _updateTitleArea];
@@ -946,6 +962,8 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)connectivityChanged:(NSNotification *)notification {
+    _connectingStatus.textColor = [UIColor navBarHeadingColor];
+    
     switch([NetworkConnection sharedInstance].state) {
         case kIRCCloudStateConnecting:
             [self _showConnectingView];
@@ -1128,6 +1146,7 @@ extern NSDictionary *emojiMap;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [self _themeChanged];
     if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
         ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor whiteColor];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
@@ -1158,7 +1177,7 @@ extern NSDictionary *emojiMap;
     } else {
         [self bufferSelected:_buffer.bid];
     }
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         self.navigationController.navigationBar.translucent = NO;
         self.edgesForExtendedLayout=UIRectEdgeNone;
@@ -1657,6 +1676,8 @@ extern NSDictionary *emojiMap;
 
 -(void)_updateTitleArea {
     _lock.hidden = YES;
+    _titleLabel.textColor = [UIColor navBarHeadingColor];
+    _topicLabel.textColor = [UIColor navBarSubheadingColor];
     if([_buffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s.name.length)
@@ -1674,16 +1695,18 @@ extern NSDictionary *emojiMap;
         _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,16);
         _lock.hidden = NO;
         if(s.ssl > 0)
-            _lock.image = [UIImage imageNamed:@"world_shield"];
+            _lock.image = [[UIImage imageNamed:@"world_shield"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
         else
-            _lock.image = [UIImage imageNamed:@"world"];
+            _lock.image = [[UIImage imageNamed:@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        _lock.tintColor = [UIColor navBarHeadingColor];
     } else {
         self.navigationItem.title = _titleLabel.text = _buffer.name;
         _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
         _titleLabel.font = [UIFont boldSystemFontOfSize:20];
         _titleLabel.accessibilityValue = _buffer.accessibilityValue;
         _topicLabel.hidden = YES;
-        _lock.image = [UIImage imageNamed:@"lock"];
+        _lock.image = [[UIImage imageNamed:@"lock"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        _lock.tintColor = [UIColor navBarHeadingColor];
         if([_buffer.type isEqualToString:@"channel"]) {
             _titleLabel.accessibilityLabel = @"Channel";
             BOOL lock = NO;
