@@ -61,7 +61,6 @@ int __timestampWidth;
         [self.contentView addSubview:_message];
         
         _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
-        _socketClosedBar.backgroundColor = [UIColor newMsgsBackgroundColor];
         _socketClosedBar.hidden = YES;
         [self.contentView addSubview:_socketClosedBar];
         
@@ -86,6 +85,7 @@ int __timestampWidth;
             frame.size.height -= 20;
             _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, frame.size.width + 12, 26);
             _socketClosedBar.hidden = NO;
+            _socketClosedBar.backgroundColor = [UIColor newMsgsBackgroundColor];
         } else if(_type == ROW_FAILED) {
             frame.size.width -= 20;
             _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);

@@ -88,11 +88,6 @@ UIColor *__unreadColor;
 }
 
 +(void)setDarkTheme:(NSString *)theme {
-    __timestampBackgroundImage = nil;
-    __newMsgsBackgroundImage = nil;
-    __navbarBackgroundImage = nil;
-    __textareaBackgroundImage = nil;
-
     //Default to Dusk
     CGFloat hue = 210.0f/360.0f;
     CGFloat saturation = 0.55f;
@@ -181,6 +176,11 @@ UIColor *__unreadColor;
     [[UISwitch appearance] setOnTintColor:__color_text7];
     
     [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceDark];
+    
+    __timestampBackgroundImage = nil;
+    __newMsgsBackgroundImage = nil;
+    __navbarBackgroundImage = nil;
+    __textareaBackgroundImage = nil;
 }
 
 +(UIColor *)contentBackgroundColor {

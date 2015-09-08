@@ -442,7 +442,6 @@ NSLock *__parserLock = nil;
                        [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];
-                       NSLog(@"Info: %@", _userInfo);
                        [self postObject:object forEvent:kIRCEventUserInfo];
                    },
                    @"backlog_starts": ^(IRCCloudJSONObject *object) {
