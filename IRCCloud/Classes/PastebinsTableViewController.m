@@ -37,21 +37,21 @@
     if (self) {
         _name = [[UILabel alloc] init];
         _name.backgroundColor = [UIColor clearColor];
-        _name.textColor = [UIColor blackColor];
+        _name.textColor = [UITableViewCell appearance].textLabelColor;
         _name.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
         _name.textAlignment = NSTextAlignmentLeft;
         [self.contentView addSubview:_name];
         
         _date = [[UILabel alloc] init];
         _date.backgroundColor = [UIColor clearColor];
-        _date.textColor = [UIColor grayColor];
+        _date.textColor = [UITableViewCell appearance].textLabelColor;
         _date.font = [UIFont systemFontOfSize:FONT_SIZE];
         _date.textAlignment = NSTextAlignmentRight;
         [self.contentView addSubview:_date];
         
         _text = [[UILabel alloc] init];
         _text.backgroundColor = [UIColor clearColor];
-        _text.textColor = [UIColor darkGrayColor];
+        _text.textColor = [UITableViewCell appearance].detailTextLabelColor;
         _text.font = [UIFont systemFontOfSize:FONT_SIZE];
         _text.lineBreakMode = NSLineBreakByTruncatingTail;
         _text.numberOfLines = 0;

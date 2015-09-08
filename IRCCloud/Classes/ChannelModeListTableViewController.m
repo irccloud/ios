@@ -36,13 +36,14 @@
         
         _mask = [[UILabel alloc] init];
         _mask.font = [UIFont boldSystemFontOfSize:16];
+        _mask.textColor = [UITableViewCell appearance].textLabelColor;
         _mask.lineBreakMode = NSLineBreakByCharWrapping;
         _mask.numberOfLines = 0;
         [self.contentView addSubview:_mask];
         
         _setBy = [[UILabel alloc] init];
         _setBy.font = [UIFont systemFontOfSize:14];
-        _setBy.textColor = [UIColor grayColor];
+        _setBy.textColor = [UITableViewCell appearance].detailTextLabelColor;
         _setBy.lineBreakMode = NSLineBreakByCharWrapping;
         _setBy.numberOfLines = 0;
         [self.contentView addSubview:_setBy];
@@ -77,10 +78,10 @@
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
         _placeholder.text = placeholder;
         _placeholder.numberOfLines = 0;
-        _placeholder.backgroundColor = [UIColor whiteColor];
+        _placeholder.backgroundColor = [UIColor contentBackgroundColor];
         _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
         _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor unreadBlueColor];
+        _placeholder.textColor = [UIColor messageTextColor];
         _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
         _list = list;

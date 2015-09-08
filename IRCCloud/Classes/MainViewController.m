@@ -80,7 +80,7 @@ extern NSDictionary *emojiMap;
     [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
     [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
     _message.textColor = [UIColor textareaTextColor];
-    _message.keyboardAppearance = UIKeyboardAppearanceDark;
+    _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
 
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];

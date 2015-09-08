@@ -36,7 +36,6 @@
         
         _info = [[TTTAttributedLabel alloc] init];
         _info.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _info.textColor = [UIColor grayColor];
         _info.lineBreakMode = NSLineBreakByCharWrapping;
         _info.numberOfLines = 0;
         [self.contentView addSubview:_info];
@@ -84,10 +83,10 @@
         NSMutableDictionary *u = [[NSMutableDictionary alloc] initWithDictionary:user];
         NSString *name;
         if([[user objectForKey:@"realname"] length])
-            name = [NSString stringWithFormat:@"%c1%c%@%c (%@)", COLOR_MIRC, BOLD, [user objectForKey:@"nick"], BOLD, [user objectForKey:@"realname"]];
+            name = [NSString stringWithFormat:@"%c%@%c (%@)", BOLD, [user objectForKey:@"nick"], BOLD, [user objectForKey:@"realname"]];
         else
-            name = [NSString stringWithFormat:@"%c1%c%@", COLOR_MIRC, BOLD, [user objectForKey:@"nick"]];
-        NSAttributedString *formatted = [ColorFormatter format:[NSString stringWithFormat:@"%@%c%@%cConnected via %@\n%@",name,CLEAR,[[user objectForKey:@"away"] intValue]?@" [away]\n":@"\n", ITALICS,[user objectForKey:@"ircserver"], [user objectForKey:@"usermask"]] defaultColor:[UIColor lightGrayColor] mono:NO linkify:NO server:nil links:nil];
+            name = [NSString stringWithFormat:@"%c%@", BOLD, [user objectForKey:@"nick"]];
+        NSAttributedString *formatted = [ColorFormatter format:[NSString stringWithFormat:@"%@%c%@%cConnected via %@\n%@",name,CLEAR,[[user objectForKey:@"away"] intValue]?@" [away]\n":@"\n", ITALICS,[user objectForKey:@"ircserver"], [user objectForKey:@"usermask"]] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
         [u setObject:formatted forKey:@"formatted"];
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(formatted));
         CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.bounds.size.width - 6 - 12,CGFLOAT_MAX), NULL);

@@ -40,7 +40,8 @@
     [super viewDidLoad];
     self.navigationController.navigationBar.clipsToBounds = YES;
     UITextView *tv = [[UITextView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,self.view.frame.size.height)];
-    tv.backgroundColor = [UIColor whiteColor];
+    tv.textColor = [UIColor messageTextColor];
+    tv.backgroundColor = [UIColor contentBackgroundColor];
     tv.text = [NSString stringWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"licenses" ofType:@"txt"] encoding:NSUTF8StringEncoding error:nil];
     tv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     tv.editable = NO;

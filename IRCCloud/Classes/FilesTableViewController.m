@@ -106,16 +106,17 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         _date = [[UILabel alloc] init];
-        _date.textColor = [UIColor grayColor];
+        _date.textColor = [UITableViewCell appearance].detailTextLabelColor;
         _date.font = [UIFont systemFontOfSize:FONT_SIZE];
         [self.contentView addSubview:_date];
 
         _name = [[UILabel alloc] init];
+        _name.textColor = [UITableViewCell appearance].textLabelColor;
         _name.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
         [self.contentView addSubview:_name];
         
         _metadata = [[UILabel alloc] init];
-        _metadata.textColor = [UIColor grayColor];
+        _metadata.textColor = [UITableViewCell appearance].detailTextLabelColor;
         _metadata.font = [UIFont systemFontOfSize:FONT_SIZE];
         [self.contentView addSubview:_metadata];
         

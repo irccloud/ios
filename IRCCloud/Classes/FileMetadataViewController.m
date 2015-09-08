@@ -17,6 +17,7 @@
 #import "FileMetadataViewController.h"
 #import "imageViewController.h"
 #import "AppDelegate.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation FileMetadataViewController
 
@@ -115,7 +116,7 @@
     
     _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _filename.textAlignment = NSTextAlignmentRight;
-    _filename.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _filename.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _filename.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _filename.autocorrectionType = UITextAutocorrectionTypeNo;
     _filename.keyboardType = UIKeyboardTypeDefault;
@@ -125,11 +126,13 @@
     
     _msg = [[UITextView alloc] initWithFrame:CGRectZero];
     _msg.text = @"";
+    _msg.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _msg.backgroundColor = [UIColor clearColor];
     _msg.returnKeyType = UIReturnKeyDone;
     _msg.delegate = self;
     _msg.font = _filename.font;
     _msg.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _msg.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     
     _imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;

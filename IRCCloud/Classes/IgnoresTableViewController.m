@@ -29,10 +29,10 @@
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
         _placeholder.text = @"You're not ignoring anyone at the moment.\n\nYou can ignore someone by tapping their nickname in the user list, long-pressing a message, or by using /ignore.";
         _placeholder.numberOfLines = 0;
-        _placeholder.backgroundColor = [UIColor whiteColor];
+        _placeholder.backgroundColor = [UIColor contentBackgroundColor];
         _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
         _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor unreadBlueColor];
+        _placeholder.textColor = [UIColor messageTextColor];
         _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     }
     return self;

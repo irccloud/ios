@@ -43,7 +43,6 @@
         
         _topic = [[TTTAttributedLabel alloc] init];
         _topic.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _topic.textColor = [UIColor grayColor];
         _topic.lineBreakMode = NSLineBreakByCharWrapping;
         _topic.numberOfLines = 0;
         [self.contentView addSubview:_topic];
@@ -76,11 +75,11 @@
     self = [super initWithStyle:style];
     if (self) {
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
-        _placeholder.backgroundColor = [UIColor whiteColor];
+        _placeholder.backgroundColor = [UIColor contentBackgroundColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
         _placeholder.numberOfLines = 0;
         _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor unreadBlueColor];
+        _placeholder.textColor = [UIColor messageTextColor];
         _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         _activity.hidesWhenStopped = YES;
         [_placeholder addSubview:_activity];
@@ -128,7 +127,7 @@
     
     for(NSDictionary *channel in _channels) {
         NSMutableDictionary *c = [[NSMutableDictionary alloc] initWithDictionary:channel];
-        NSAttributedString *topic = [ColorFormatter format:[c objectForKey:@"topic"] defaultColor:[UIColor lightGrayColor] mono:NO linkify:NO server:nil links:nil];
+        NSAttributedString *topic = [ColorFormatter format:[c objectForKey:@"topic"] defaultColor:[UITableViewCell appearance].detailTextLabelColor mono:NO linkify:NO server:nil links:nil];
         [c setObject:topic forKey:@"formatted_topic"];
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(topic));
         CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.bounds.size.width - 6 - 12,CGFLOAT_MAX), NULL);
@@ -197,7 +196,7 @@
     if(!cell)
         cell = [[ChannelTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"channelcell"];
     NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-    cell.channel.attributedText = [ColorFormatter format:[NSString stringWithFormat:@"%c%@%c (%i member%@)",BOLD,[row objectForKey:@"name"],CLEAR, [[row objectForKey:@"num_members"] intValue],[[row objectForKey:@"num_members"] intValue]==1?@"":@"s"] defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil];
+    cell.channel.attributedText = [ColorFormatter format:[NSString stringWithFormat:@"%c%@%c (%i member%@)",BOLD,[row objectForKey:@"name"],CLEAR, [[row objectForKey:@"num_members"] intValue],[[row objectForKey:@"num_members"] intValue]==1?@"":@"s"] defaultColor:[UITableViewCell appearance].textLabelColor mono:NO linkify:NO server:nil links:nil];
     cell.topic.attributedText = [row objectForKey:@"formatted_topic"];
     return cell;
 }

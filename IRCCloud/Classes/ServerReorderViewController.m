@@ -23,6 +23,7 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if(self) {
         _icon = [[UIImageView alloc] initWithFrame:CGRectMake(0,14,16,16)];
+        _icon.tintColor = [UITableViewCell appearance].textLabelColor;
         [self.contentView addSubview:_icon];
     }
     return self;
@@ -112,12 +113,7 @@
     else
         cell.textLabel.text = s.hostname;
     
-    if([s.status isEqualToString:@"connected_ready"])
-        cell.textLabel.textColor = [UIColor blackColor];
-    else
-        cell.textLabel.textColor = [UIColor grayColor];
-    
-    cell.icon.image = [UIImage imageNamed:(s.ssl > 0)?@"world_shield":@"world"];
+    cell.icon.image = [[UIImage imageNamed:(s.ssl > 0)?@"world_shield":@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     
     return cell;
 }

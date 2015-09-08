@@ -64,6 +64,7 @@
     _topicEdit.returnKeyType = UIReturnKeyDone;
     _topicEdit.delegate = self;
     _topicEdit.backgroundColor = [UIColor clearColor];
+    _topicEdit.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     [self refresh];
 }
 

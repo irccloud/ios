@@ -179,6 +179,8 @@ UIColor *__unreadColor;
     [[UITableViewCell appearance] setDetailTextLabelColor:__color_text7];
     [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:__color_text8];
     [[UISwitch appearance] setOnTintColor:__color_text7];
+    
+    [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceDark];
 }
 
 +(UIColor *)contentBackgroundColor {

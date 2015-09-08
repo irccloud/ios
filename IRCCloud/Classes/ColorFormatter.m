@@ -1168,7 +1168,7 @@ float ColorFormatterCachedFontSize = 0.0f;
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
     if(!color)
-        color = [UIColor blackColor];
+        color = [UIColor messageTextColor];
     
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;

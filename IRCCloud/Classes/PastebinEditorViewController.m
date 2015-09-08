@@ -17,6 +17,7 @@
 #import "PastebinEditorViewController.h"
 #import "NetworkConnection.h"
 #import "CSURITemplate.h"
+#import "UIColor+IRCCloud.h"
 
 @interface PastebinEditorCell : UITableViewCell
 
@@ -208,7 +209,7 @@
 
     _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - 32, 22)];
     _filename.text = @"";
-    _filename.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _filename.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _filename.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _filename.autocorrectionType = UITextAutocorrectionTypeNo;
     _filename.adjustsFontSizeToFitWidth = YES;
@@ -219,25 +220,29 @@
     
     _message = [[UITextView alloc] initWithFrame:CGRectZero];
     _message.text = @"";
+    _message.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _message.backgroundColor = [UIColor clearColor];
     _message.returnKeyType = UIReturnKeyDone;
     _message.delegate = self;
     _message.font = _filename.font;
     _message.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
 
     _messageFooter = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, 32)];
     _messageFooter.backgroundColor = [UIColor clearColor];
-    _messageFooter.textColor = [UIColor grayColor];
+    _messageFooter.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
     _messageFooter.textAlignment = NSTextAlignmentCenter;
     _messageFooter.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
     _text = [[UITextView alloc] initWithFrame:CGRectZero];
     _text.backgroundColor = [UIColor clearColor];
     _text.font = _filename.font;
+    _text.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _text.delegate = self;
     _text.editable = !_pasteID;
     _text.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _text.text = _buffer.draft;
+    _text.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     [self textViewDidChange:_text];
     
     if(_pasteID)

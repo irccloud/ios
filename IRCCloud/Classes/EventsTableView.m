@@ -44,7 +44,7 @@ int __timestampWidth;
         _type = 0;
         
         self.selectionStyle = UITableViewCellSelectionStyleNone;
-        self.backgroundColor = [UIColor whiteColor];
+        self.backgroundColor = [UIColor contentBackgroundColor];
         
         _timestamp = [[UILabel alloc] init];
         _timestamp.backgroundColor = [UIColor clearColor];
@@ -56,7 +56,7 @@ int __timestampWidth;
         _message.numberOfLines = 0;
         _message.lineBreakMode = NSLineBreakByWordWrapping;
         _message.backgroundColor = [UIColor clearColor];
-        _message.textColor = [UIColor blackColor];
+        _message.textColor = [UIColor messageTextColor];
         _message.dataDetectorTypes = UIDataDetectorTypeNone;
         [self.contentView addSubview:_message];
         

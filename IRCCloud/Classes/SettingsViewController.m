@@ -592,6 +592,7 @@
     _highlights.delegate = self;
     _highlights.font = _email.font;
     _highlights.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _highlights.keyboardAppearance = [UITextField appearance].keyboardAppearance;
 
     _version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 #ifdef BRAND_NAME
