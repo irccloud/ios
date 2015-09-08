@@ -291,9 +291,10 @@
     [UIColor setDarkTheme:[[_themes objectAtIndex:indexPath.row] lowercaseString]];
     [[EventsDataSource sharedInstance] reformat];
     [tableView reloadData];
-    [self.navigationController popViewControllerAnimated:YES];
+    UIView *v = self.navigationController.view.superview;
+    [self.navigationController.view removeFromSuperview];
+    [v addSubview: self.navigationController.view];
 }
-
 @end
 
 @implementation SettingsViewController
@@ -411,6 +412,9 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    _email.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    _name.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    _highlights.textColor = [UITableViewCell appearance].detailTextLabelColor;
     [self.tableView reloadData];
 }
 
@@ -551,7 +555,6 @@
     _email.placeholder = @"john@example.com";
     _email.text = @"";
     _email.textAlignment = NSTextAlignmentRight;
-    _email.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _email.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _email.autocorrectionType = UITextAutocorrectionTypeNo;
     _email.keyboardType = UIKeyboardTypeEmailAddress;
@@ -563,7 +566,6 @@
     _name.placeholder = @"John Appleseed";
     _name.text = @"";
     _name.textAlignment = NSTextAlignmentRight;
-    _name.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _name.autocapitalizationType = UITextAutocapitalizationTypeWords;
     _name.autocorrectionType = UITextAutocorrectionTypeNo;
     _name.keyboardType = UIKeyboardTypeDefault;

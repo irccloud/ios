@@ -89,6 +89,10 @@ extern NSDictionary *emojiMap;
     [users setTintColor:[UIColor navBarSubheadingColor]];
     users.accessibilityLabel = @"Channel members list";
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+    
+    UIView *v = self.navigationController.view.superview;
+    [self.navigationController.view removeFromSuperview];
+    [v addSubview: self.navigationController.view];
 }
 
 - (void)viewDidLoad {
