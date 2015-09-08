@@ -62,6 +62,24 @@ UIColor *__selectedColor;
 UIColor *__selectedBorder;
 UIColor *__unreadColor;
 
+@implementation UITableViewCell (IRCCloudAppearanceHax)
+- (UIColor *)textLabelColor {
+    return self.textLabel.textColor;
+}
+
+- (void)setTextLabelColor:(UIColor *)textLabelColor {
+    self.textLabel.textColor = textLabelColor;
+}
+
+- (UIColor *)detailTextLabelColor {
+    return self.detailTextLabel.textColor;
+}
+
+- (void)setDetailTextLabelColor:(UIColor *)detailTextLabelColor {
+    self.detailTextLabel.textColor = detailTextLabelColor;
+}
+@end
+
 @implementation UIColor (IRCCloud)
 +(UIColor *)colorWithHue:(CGFloat)hue saturation:(CGFloat)saturation lightness:(CGFloat)light alpha:(CGFloat)alpha {
     saturation *= (light < 0.5)?light:(1-light);
@@ -149,6 +167,18 @@ UIColor *__unreadColor;
     __selectedColor = [UIColor colorWithHue:hue saturation:selectedSaturation lightness:0.40f alpha:1.0f];
     __selectedBorder = [UIColor colorWithHue:hue saturation:selectedSaturation lightness:0.30f alpha:1.0f];
     __unreadColor = [self colorFromHexString:@"1E72FF"];
+    
+    [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+    [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
+    [[UINavigationBar appearance] setTintColor:[UIColor navBarSubheadingColor]];
+
+    [[UITableView appearance] setBackgroundColor:__color_background7];
+    [[UITableView appearance] setSeparatorColor:__color_border11];
+    [[UITableViewCell appearance] setBackgroundColor:__color_background6];
+    [[UITableViewCell appearance] setTextLabelColor:__color_text4];
+    [[UITableViewCell appearance] setDetailTextLabelColor:__color_text7];
+    [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:__color_text8];
+    [[UISwitch appearance] setOnTintColor:__color_text7];
 }
 
 +(UIColor *)contentBackgroundColor {

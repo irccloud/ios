@@ -515,7 +515,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
     NSDictionary *userInfo = [NetworkConnection sharedInstance].userInfo;
     NSString *name = [userInfo objectForKey:@"name"];
     
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.clipsToBounds = YES;
 
     _network = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];

@@ -20,6 +20,7 @@
 #import "NetworkConnection.h"
 #import "AppDelegate.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation ChannelInfoViewController
 
@@ -43,7 +44,6 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
@@ -123,7 +123,7 @@
     Server *server = [[ServersDataSource sharedInstance] getServer:_channel.cid];
     if([_channel.topic_text isKindOfClass:[NSString class]] && _channel.topic_text.length) {
         NSArray *links;
-        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
+        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor messageTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
         _topicLabel.text = _topic;
         CGFloat lineSpacing = 6;
         CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
@@ -134,7 +134,7 @@
         CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
         
         NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-        [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+        [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
         [mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
         _topicLabel.linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
         
@@ -163,7 +163,7 @@
             _topicSetBy = nil;
         }
     } else {
-        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor grayColor] mono:NO linkify:NO server:nil links:nil];
+        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
         _topicLabel.text = _topic;
         _topicEdit.text = @"";
         _topicSetBy = nil;
@@ -213,7 +213,7 @@
     UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
     label.text = [self tableView:tableView titleForHeaderInSection:section];
     label.font = [UIFont systemFontOfSize:14];
-    label.textColor = [UIColor grayColor];
+    label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
     label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
     [header addSubview:label];
     return header;

@@ -17,6 +17,11 @@
 
 #import <UIKit/UIKit.h>
 
+@interface UITableViewCell (IRCCloudAppearanceHax) <UIAppearance>
+@property (strong, nonatomic) UIColor *textLabelColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *detailTextLabelColor UI_APPEARANCE_SELECTOR;
+@end
+
 @interface UIColor (IRCCloud)
 +(UIColor *)colorWithHue:(CGFloat)hue saturation:(CGFloat)saturation lightness:(CGFloat)brightness alpha:(CGFloat)alpha;
 +(void)setDarkTheme:(NSString *)theme;

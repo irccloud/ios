@@ -89,7 +89,6 @@ extern NSDictionary *emojiMap;
     [users setTintColor:[UIColor navBarSubheadingColor]];
     users.accessibilityLabel = @"Channel members list";
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
-    [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
 }
 
 - (void)viewDidLoad {
@@ -1158,7 +1157,6 @@ extern NSDictionary *emojiMap;
     } else {
         [self bufferSelected:_buffer.bid];
     }
-    [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         self.navigationController.navigationBar.translucent = NO;
         self.edgesForExtendedLayout=UIRectEdgeNone;
@@ -3257,7 +3255,6 @@ extern NSDictionary *emojiMap;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])
         picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
     picker.delegate = (id)self;
-    [picker.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
         picker.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self.slidingViewController presentViewController:picker animated:YES completion:nil];

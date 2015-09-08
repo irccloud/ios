@@ -9,6 +9,7 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import "ShareViewController.h"
 #import "BuffersTableView.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation ShareViewController
 
@@ -129,7 +130,7 @@
         }
         [_conn connect:YES];
     }
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
+    [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.title = @"IRCCloud";
     _sound = 1001;
     //AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &_sound);

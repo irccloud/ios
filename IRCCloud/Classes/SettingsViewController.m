@@ -545,14 +545,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.navigationBar.clipsToBounds = YES;
 
     _email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _email.placeholder = @"john@example.com";
     _email.text = @"";
     _email.textAlignment = NSTextAlignmentRight;
-    _email.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _email.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _email.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _email.autocorrectionType = UITextAutocorrectionTypeNo;
     _email.keyboardType = UIKeyboardTypeEmailAddress;
@@ -564,7 +563,7 @@
     _name.placeholder = @"John Appleseed";
     _name.text = @"";
     _name.textAlignment = NSTextAlignmentRight;
-    _name.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _name.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _name.autocapitalizationType = UITextAutocapitalizationTypeWords;
     _name.autocorrectionType = UITextAutocorrectionTypeNo;
     _name.keyboardType = UIKeyboardTypeDefault;
