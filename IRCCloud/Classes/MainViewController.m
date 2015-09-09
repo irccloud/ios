@@ -72,7 +72,8 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)_themeChanged {
-    self.view.window.backgroundColor = [UIColor contentBackgroundColor];
+    if(!self.presentedViewController)
+        ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor textareaBackgroundColor];
     self.view.backgroundColor = [UIColor contentBackgroundColor];
     _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
     [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
@@ -1133,8 +1134,6 @@ extern NSDictionary *emojiMap;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self _themeChanged];
-    if(!self.presentedViewController)
-        ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor textareaBackgroundColor];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     for(Event *e in [_pendingEvents copy]) {
