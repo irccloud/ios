@@ -355,6 +355,7 @@
         [prefs setObject:@(_colors.isOn) forKey:@"nick-colors"];
         [prefs setObject:@(!_emocodes.isOn) forKey:@"emoji-disableconvert"];
         [prefs setObject:@(!_pastebin.isOn) forKey:@"pastebin-disableprompt"];
+        [prefs setObject:_mono.isOn?@"mono":@"sans" forKey:@"font"];
         [prefs setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] forKey:@"theme"];
         
         NSLog(@"Saving: %@", prefs);
@@ -538,7 +539,13 @@
     } else {
         _pastebin.on = YES;
     }
-    
+
+    if([[prefs objectForKey:@"font"] isKindOfClass:[NSString class]]) {
+        _mono.on = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
+    } else {
+        _mono.on = NO;
+    }
+
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
@@ -588,6 +595,7 @@
     _notificationSound = [[UISwitch alloc] init];
     _tabletMode = [[UISwitch alloc] init];
     _pastebin = [[UISwitch alloc] init];
+    _mono = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -665,7 +673,7 @@
         case 1:
             return 1;
         case 2:
-            return 7;
+            return 8;
         case 3:
             return ((_chromeInstalled)?4:3) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
         case 4:
@@ -773,6 +781,10 @@
                     cell.textLabel.text = @"Ask to Pastebin";
                     cell.accessoryView = _pastebin;
                     cell.detailTextLabel.text = @"Before sending multi-line messages";
+                    break;
+                case 7:
+                    cell.textLabel.text = @"Monospace Font";
+                    cell.accessoryView = _mono;
                     break;
             }
             break;

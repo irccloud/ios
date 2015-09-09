@@ -49,6 +49,7 @@ int __timestampWidth;
         _timestamp = [[UILabel alloc] init];
         _timestamp.backgroundColor = [UIColor clearColor];
         _timestamp.textColor = [UIColor timestampColor];
+        _timestamp.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:_timestamp];
 
         _message = [[TTTAttributedLabel alloc] init];
@@ -93,7 +94,6 @@ int __timestampWidth;
             _socketClosedBar.hidden = YES;
             _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         }
-        _timestamp.textAlignment = NSTextAlignmentRight;
         [_timestamp sizeToFit];
         _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = NO;
@@ -110,7 +110,6 @@ int __timestampWidth;
         }
         _timestamp.frame = frame;
         _timestamp.hidden = NO;
-        _timestamp.textAlignment = NSTextAlignmentCenter;
         _message.hidden = YES;
         _socketClosedBar.hidden = YES;
     }
@@ -1016,11 +1015,13 @@ int __timestampWidth;
 
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
-    __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:[ColorFormatter timestampFont]}].width;
+    UIFont *f = [[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"]?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
+    __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
     if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-        __timestampWidth += [@":88" sizeWithAttributes:@{NSFontAttributeName:[ColorFormatter timestampFont]}].width;
+        __timestampWidth += [@":88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
     if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
-        __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:[ColorFormatter timestampFont]}].width;
+        __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:f}].width;
+    __timestampWidth += 4;
     
     _file_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
     _paste_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
@@ -1232,7 +1233,7 @@ int __timestampWidth;
             return e.height;
         } else if(e.formattedMsg.length > 0) {
             NSArray *links;
-            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links];
+            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:[[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"] || e.monospace linkify:e.linkify server:_server links:&links];
             if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
                 NSMutableArray *mutableLinks = links.mutableCopy;
                 for(int i = 0; i < mutableLinks.count; i++) {
@@ -1294,7 +1295,7 @@ int __timestampWidth;
     cell.backgroundView = nil;
     cell.backgroundColor = nil;
     cell.contentView.backgroundColor = e.bgColor;
-    cell.timestamp.font = [ColorFormatter timestampFont];
+    cell.timestamp.font = [[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"]?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
     cell.message.font = [ColorFormatter timestampFont];
     cell.message.delegate = self;
     cell.message.text = e.formatted;

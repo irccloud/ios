@@ -72,8 +72,7 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)_themeChanged {
-    if(!self.presentedViewController)
-        ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor textareaBackgroundColor];
+    self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
     self.view.backgroundColor = [UIColor contentBackgroundColor];
     _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
     [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];

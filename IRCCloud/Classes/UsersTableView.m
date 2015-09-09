@@ -223,9 +223,9 @@
         [sectionSizes addObject:@(data.count)];
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _headingFont = [UIFont fontWithName:_headingFont.fontName size:FONT_SIZE];
-        _countFont = [UIFont fontWithName:_countFont.fontName size:FONT_SIZE];
-        _userFont = [UIFont fontWithName:_userFont.fontName size:FONT_SIZE];
+        _headingFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_headingFont.fontName size:FONT_SIZE];
+        _countFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_countFont.fontName size:FONT_SIZE];
+        _userFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_userFont.fontName size:FONT_SIZE];
         
         _refreshTimer = nil;
         _data = data;

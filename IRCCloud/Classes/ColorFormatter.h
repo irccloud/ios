@@ -32,4 +32,5 @@
 +(BOOL)shouldClearFontCache;
 +(void)clearFontCache;
 +(UIFont *)timestampFont;
++(UIFont *)monoTimestampFont;
 @end
