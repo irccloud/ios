@@ -1077,6 +1077,12 @@
                 void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:e.type];
                 if(formatter)
                     formatter(e, nil);
+                
+                if(e.isHighlight)
+                    e.bgColor = [UIColor highlightBackgroundColor];
+                
+                if(e.isSelf && e.rowType != ROW_SOCKETCLOSED)
+                    e.bgColor = [UIColor selfBackgroundColor];
             }
         }
     }
