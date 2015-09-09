@@ -94,6 +94,14 @@ UIColor *__color_member_border;
 - (void)setDetailTextLabelColor:(UIColor *)detailTextLabelColor {
     self.detailTextLabel.textColor = detailTextLabelColor;
 }
+
+/*- (UIColor *)contentBackgroundColor {
+    return self.contentView.backgroundColor;
+}
+
+- (void)setContentBackgroundColor:(UIColor *)backgroundColor {
+    self.backgroundColor = self.contentView.backgroundColor = backgroundColor;
+}*/
 @end
 
 @implementation UIColor (IRCCloud)
