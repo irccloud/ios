@@ -1065,7 +1065,12 @@
             NSArray *events = [_events objectForKey:bid];
             for(Event *e in events) {
                 e.color = [UIColor messageTextColor];
-                e.bgColor = [UIColor contentBackgroundColor];
+                if(e.rowType == ROW_LASTSEENEID)
+                    e.bgColor = [UIColor newMsgsBackgroundColor];
+                else if(e.rowType == ROW_TIMESTAMP)
+                    e.bgColor = [UIColor timestampBackgroundColor];
+                else
+                    e.bgColor = [UIColor contentBackgroundColor];
                 e.formatted = nil;
                 e.timestamp = nil;
                 e.height = 0;
