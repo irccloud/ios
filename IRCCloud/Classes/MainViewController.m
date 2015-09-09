@@ -89,6 +89,8 @@ extern NSDictionary *emojiMap;
     [users setTintColor:[UIColor navBarSubheadingColor]];
     users.accessibilityLabel = @"Channel members list";
     _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+
+    _menuBtn.tintColor = [UIColor navBarSubheadingColor];
     
     UIView *v = self.navigationController.view.superview;
     [self.navigationController.view removeFromSuperview];
@@ -212,7 +214,7 @@ extern NSDictionary *emojiMap;
     self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
 
     _menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
+    [_menuBtn setImage:[[UIImage imageNamed:@"menu"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     _menuBtn.frame = CGRectMake(0,0,20,18);
     _menuBtn.accessibilityLabel = @"Channels list";
@@ -338,15 +340,15 @@ extern NSDictionary *emojiMap;
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if(highlightCount) {
-                [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
+                _menuBtn.tintColor = [UIColor redColor];
                 _menuBtn.accessibilityValue = @"Unread highlights";
             } else if(unreadCount) {
-                if(![_menuBtn.imageView.image isEqual:[UIImage imageNamed:@"menu_unread"]])
+                if(![_menuBtn.tintColor isEqual:[UIColor unreadBlueColor]])
                     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
-                [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
+                _menuBtn.tintColor = [UIColor unreadBlueColor];
                 _menuBtn.accessibilityValue = @"Unread messages";
             } else {
-                [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
+                _menuBtn.tintColor = [UIColor navBarSubheadingColor];
                 _menuBtn.accessibilityValue = nil;
             }
         }];
@@ -833,7 +835,7 @@ extern NSDictionary *emojiMap;
                             AudioServicesPlaySystemSound(alertSound);
                             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
                         }
-                        [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
+                        _menuBtn.tintColor = [UIColor redColor];
                         _menuBtn.accessibilityValue = @"Unread highlights";
                     } else if(_menuBtn.accessibilityValue == nil) {
                         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
@@ -845,7 +847,7 @@ extern NSDictionary *emojiMap;
                                 break;
                         }
                         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
-                        [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
+                        _menuBtn.tintColor = [UIColor unreadBlueColor];
                         _menuBtn.accessibilityValue = @"Unread messages";
                     }
                 }

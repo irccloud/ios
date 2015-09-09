@@ -879,7 +879,7 @@
                 }
             } else {
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
-                    cell.icon.tintColor = cell.label.textColor = [UIColor ownersHeadingColor];
+                    cell.icon.tintColor = cell.label.textColor = [UIColor ownersBorderColor];
                 else if(![status isEqualToString:@"connected_ready"])
                     cell.icon.tintColor = cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
                 else if([[row objectForKey:@"unread"] intValue])

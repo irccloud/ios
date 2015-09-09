@@ -62,6 +62,22 @@ UIColor *__selectedColor;
 UIColor *__selectedBorder;
 UIColor *__unreadColor;
 
+UIColor *__color_opers_bg;
+UIColor *__color_owners_bg;
+UIColor *__color_admins_bg;
+UIColor *__color_ops_bg;
+UIColor *__color_halfops_bg;
+UIColor *__color_voiced_bg;
+UIColor *__color_member_bg;
+
+UIColor *__color_opers_border;
+UIColor *__color_owners_border;
+UIColor *__color_admins_border;
+UIColor *__color_ops_border;
+UIColor *__color_halfops_border;
+UIColor *__color_voiced_border;
+UIColor *__color_member_border;
+
 @implementation UITableViewCell (IRCCloudAppearanceHax)
 - (UIColor *)textLabelColor {
     return self.textLabel.textColor;
@@ -163,6 +179,22 @@ UIColor *__unreadColor;
     __selectedBorder = [UIColor colorWithHue:hue saturation:selectedSaturation lightness:0.30f alpha:1.0f];
     __unreadColor = [self colorFromHexString:@"1E72FF"];
     
+    __color_opers_border = [UIColor colorWithHue:30.0/360.0 saturation:0.85 lightness:0.25 alpha:1.0];
+    __color_owners_border = [UIColor colorWithHue:47.0/360.0 saturation:0.68 lightness:0.25 alpha:1.0];
+    __color_admins_border = [UIColor colorWithHue:265.0/360.0 saturation:0.44 lightness:0.36 alpha:1.0];
+    __color_ops_border = [UIColor colorWithHue:0 saturation:0.36 lightness:0.38 alpha:1.0];
+    __color_halfops_border = [UIColor colorWithHue:37.0/360.0 saturation:0.45 lightness:0.28 alpha:1.0];
+    __color_voiced_border = [UIColor colorWithHue:85.0/360.0 saturation:1.0 lightness:0.17 alpha:1.0];
+    __color_member_border = [UIColor colorWithHue:221.0/360.0 saturation:0.55 lightness:0.23 alpha:1.0];
+
+    __color_opers_bg = [UIColor colorWithHue:27.0/360.0 saturation:0.64 lightness:0.16 alpha:1.0];
+    __color_owners_bg = [UIColor colorWithHue:45.0/360.0 saturation:0.29 lightness:0.19 alpha:1.0];
+    __color_admins_bg = [UIColor colorWithHue:276.0/360.0 saturation:0.27 lightness:0.15 alpha:1.0];
+    __color_ops_bg = [UIColor colorWithHue:0 saturation:0.42 lightness:0.19 alpha:1.0];
+    __color_halfops_bg = [UIColor colorWithHue:37.0/360.0 saturation:0.26 lightness:0.17 alpha:1.0];
+    __color_voiced_bg = [UIColor colorWithHue:94.0/360.0 saturation:0.25 lightness:0.16 alpha:1.0];
+    __color_member_bg = [UIColor colorWithHue:217.0/360.0 saturation:0.30 lightness:0.15 alpha:1.0];
+    
     [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
     [[UINavigationBar appearance] setTintColor:[UIColor navBarSubheadingColor]];
@@ -210,154 +242,52 @@ UIColor *__unreadColor;
     return c;
 }
 +(UIColor *)opersGroupColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:1 green:0.859 blue:0.78 alpha:1];
-    return c;
+    return __color_opers_bg;
 }
 +(UIColor *)ownersGroupColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:1 green:1 blue:0.82 alpha:1];
-    return c;
+    return __color_owners_bg;
 }
 +(UIColor *)adminsGroupColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.929 green:0.8 blue:1 alpha:1];
-    return c;
+    return __color_admins_bg;
 }
 +(UIColor *)opsGroupColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.996 green:0.949 blue:0.949 alpha:1];
-    return c;
+    return __color_ops_bg;
 }
 +(UIColor *)halfopsGroupColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.996 green:0.929 blue:0.855 alpha:1];
-    return c;
+    return __color_halfops_bg;
 }
 +(UIColor *)voicedGroupColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.957 green:1 blue:0.929 alpha:1];
-    return c;
+    return __color_voiced_bg;
 }
-+(UIColor *)opersHeadingColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.878 green:0.137 blue:0.02 alpha:1];
-    return c;
-}
-+(UIColor *)ownersHeadingColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.906 green:0.667 blue:0 alpha:1];
-    return c;
-}
-+(UIColor *)adminsHeadingColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.396 green:0 blue:0.647 alpha:1];
-    return c;
-}
-+(UIColor *)opsHeadingColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.729 green:0.09 blue:0.098 alpha:1];
-    return c;
-}
-+(UIColor *)halfopsHeadingColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.71 green:0.349 blue:0 alpha:1];
-    return c;
-}
-+(UIColor *)voicedHeadingColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.145 green:0.694 blue:0 alpha:1];
-    return c;
-}
-+(UIColor *)membersHeadingColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
-    return c;
++(UIColor *)membersGroupColor {
+    return __color_member_bg;
 }
 +(UIColor *)opersBorderColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.996 green:0.686 blue:0.384 alpha:1];
-    return c;
+    return __color_opers_border;
 }
 +(UIColor *)ownersBorderColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.996 green:0.89 blue:0.455 alpha:1]; /*#fee374*/
-    return c;
-}
-+(UIColor *)opersLightColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.996 green:0.847 blue:0.361 alpha:1];
-    return c;
-}
-+(UIColor *)ownersLightColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.996 green:0.847 blue:0.361 alpha:1]; /*#fed85c*/
-    return c;
+    return __color_owners_border;
 }
 +(UIColor *)adminsBorderColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.776 green:0.616 blue:1 alpha:1]; /*#c69dff*/
-    return c;
-}
-+(UIColor *)adminsLightColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.71 green:0.502 blue:1 alpha:1]; /*#b580ff*/
-    return c;
+    return __color_admins_border;
 }
 +(UIColor *)opsBorderColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.98 green:0.788 blue:0.796 alpha:1]; /*#fac9cb*/
-    return c;
-}
-+(UIColor *)opsLightColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.988 green:0.678 blue:0.686 alpha:1]; /*#fcadaf*/
-    return c;
+    return __color_ops_border;
 }
 +(UIColor *)halfopsBorderColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.969 green:0.843 blue:0.671 alpha:1]; /*#f7d7ab*/
-    return c;
-}
-+(UIColor *)halfopsLightColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.992 green:0.8 blue:0.604 alpha:1]; /*#fdcc9a*/
-    return c;
+    return __color_halfops_border;
 }
 +(UIColor *)voicedBorderColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.557 green:0.992 blue:0.537 alpha:1]; /*#8efd89*/
-    return c;
+    return __color_voiced_border;
 }
-+(UIColor *)voicedLightColor {
-    static UIColor *c = nil;
-    if(!c)
-        c = [UIColor colorWithRed:0.62 green:0.922 blue:0.29 alpha:1]; /*#9eeb4a*/
-    return c;
++(UIColor *)membersBorderColor {
+    return __color_member_border;
+}
++(UIColor *)memberListTextColor {
+    return __color_text5;
+}
++(UIColor *)memberListAwayTextColor {
+    return __color_text9;
 }
 +(UIColor *)timestampColor {
     return __color_text10;
