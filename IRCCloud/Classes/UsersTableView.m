@@ -260,6 +260,13 @@
     _headingFont = _userFont = _countFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    _headingFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_headingFont.fontName size:FONT_SIZE];
+    _countFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_countFont.fontName size:FONT_SIZE];
+    _userFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_userFont.fontName size:FONT_SIZE];
+    [self.tableView reloadData];
+}
+
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [self refresh];
     _refreshTimer = nil;
