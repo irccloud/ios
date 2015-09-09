@@ -212,8 +212,12 @@ UIColor *__color_member_border;
     [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceDark];
     
     [[UITextView appearance] setTintColor:[self textareaTextColor]];
+    [[UITextView appearance] setTextColor:[self textareaTextColor]];
+    
+    [[UIScrollView appearance] setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
 
     [[UITableViewCell appearanceWhenContainedIn:[UIImagePickerController class], nil] setBackgroundColor:nil];
+    [[UIScrollView appearanceWhenContainedIn:[UIImagePickerController class], nil] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
 
     __timestampBackgroundImage = nil;
     __newMsgsBackgroundImage = nil;
