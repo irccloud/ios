@@ -207,6 +207,7 @@ UIColor *__color_member_border;
     [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:__color_text8];
     [[UISwitch appearance] setOnTintColor:__color_text7];
     
+    [[UITextField appearance] setTintColor:[self textareaTextColor]];
     [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceDark];
     
     __timestampBackgroundImage = nil;

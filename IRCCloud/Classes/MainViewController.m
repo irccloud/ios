@@ -79,7 +79,7 @@ extern NSDictionary *emojiMap;
     [_sendBtn setTitleColor:[UIColor textareaBackgroundColor] forState:UIControlStateNormal];
     [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
     [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
-    _message.textColor = [UIColor textareaTextColor];
+    _message.tintColor = _message.textColor = [UIColor textareaTextColor];
     _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
 
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -1134,7 +1134,7 @@ extern NSDictionary *emojiMap;
     [super viewWillAppear:animated];
     [self _themeChanged];
     if(!self.presentedViewController)
-        ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor whiteColor];
+        ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor textareaBackgroundColor];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     for(Event *e in [_pendingEvents copy]) {

@@ -183,7 +183,7 @@
             //Store the session in the keychain again to update the access policy
             [NetworkConnection sharedInstance].session = session;
             [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
-            self.window.backgroundColor = [UIColor whiteColor];
+            self.window.backgroundColor = [UIColor textareaBackgroundColor];
             self.window.rootViewController = self.slideViewController;
         } else {
             self.window.rootViewController = self.loginSplashViewController;
@@ -571,7 +571,7 @@
                     v.alpha = 0;
                 } completion:^(BOOL finished){
                     [v removeFromSuperview];
-                    self.window.backgroundColor = [UIColor whiteColor];
+                    self.window.backgroundColor = [UIColor textareaBackgroundColor];
                 }];
             }
         }];
@@ -581,7 +581,7 @@
             self.slideViewController.view.alpha = 1;
             [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
             self.window.rootViewController = self.slideViewController;
-            self.window.backgroundColor = [UIColor whiteColor];
+            self.window.backgroundColor = [UIColor textareaBackgroundColor];
         }];
     }
 }
