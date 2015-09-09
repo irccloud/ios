@@ -79,7 +79,7 @@ extern NSDictionary *emojiMap;
     [_sendBtn setTitleColor:[UIColor textareaBackgroundColor] forState:UIControlStateNormal];
     [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
     [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
-    _message.tintColor = _message.textColor = [UIColor textareaTextColor];
+    _message.textColor = [UIColor textareaTextColor];
     _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
 
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -3264,12 +3264,10 @@ extern NSDictionary *emojiMap;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
         picker.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self.slidingViewController presentViewController:picker animated:YES completion:nil];
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone]) {
         picker.modalPresentationStyle = UIModalPresentationFormSheet;
         picker.preferredContentSize = CGSizeMake(540, 576);
         [self.slidingViewController presentViewController:picker animated:YES completion:nil];
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     } else {
         _popover = [[UIPopoverController alloc] initWithContentViewController:picker];
         _popover.delegate = self;
@@ -3285,7 +3283,6 @@ extern NSDictionary *emojiMap;
         documentPicker.modalPresentationStyle = UIModalPresentationFormSheet;
     else {
         documentPicker.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     }
     [self presentViewController:documentPicker animated:YES completion:nil];
 }

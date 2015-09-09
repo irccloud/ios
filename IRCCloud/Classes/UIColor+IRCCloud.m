@@ -94,14 +94,6 @@ UIColor *__color_member_border;
 - (void)setDetailTextLabelColor:(UIColor *)detailTextLabelColor {
     self.detailTextLabel.textColor = detailTextLabelColor;
 }
-
-/*- (UIColor *)contentBackgroundColor {
-    return self.contentView.backgroundColor;
-}
-
-- (void)setContentBackgroundColor:(UIColor *)backgroundColor {
-    self.backgroundColor = self.contentView.backgroundColor = backgroundColor;
-}*/
 @end
 
 @implementation UIColor (IRCCloud)
@@ -212,12 +204,17 @@ UIColor *__color_member_border;
     [[UITableViewCell appearance] setBackgroundColor:__color_background6];
     [[UITableViewCell appearance] setTextLabelColor:__color_text4];
     [[UITableViewCell appearance] setDetailTextLabelColor:__color_text7];
+    [[UITableViewCell appearance] setTintColor:__color_text7];
     [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:__color_text8];
     [[UISwitch appearance] setOnTintColor:__color_text7];
     
     [[UITextField appearance] setTintColor:[self textareaTextColor]];
     [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceDark];
     
+    [[UITextView appearance] setTintColor:[self textareaTextColor]];
+
+    [[UITableViewCell appearanceWhenContainedIn:[UIImagePickerController class], nil] setBackgroundColor:nil];
+
     __timestampBackgroundImage = nil;
     __newMsgsBackgroundImage = nil;
     __navbarBackgroundImage = nil;

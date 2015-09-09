@@ -260,6 +260,8 @@
     cell.accessoryView = nil;
     cell.accessoryType = UITableViewCellAccessoryNone;
     cell.detailTextLabel.text = nil;
+    cell.backgroundView = nil;
+    cell.backgroundColor = [UITableViewCell appearance].backgroundColor;
     
     if(!_imageView)
         section++;
