@@ -1366,7 +1366,7 @@ int __timestampWidth;
         cell.timestamp.textColor = [UIColor timestampColor];
     }
     if(e.rowType == ROW_BACKLOG) {
-        cell.timestamp.backgroundColor = [UIColor unreadBlueColor];
+        cell.timestamp.backgroundColor = [UIColor backlogDividerColor];
     } else if(e.rowType == ROW_LASTSEENEID) {
         cell.timestamp.backgroundColor = [UIColor contentBackgroundColor];
     } else {

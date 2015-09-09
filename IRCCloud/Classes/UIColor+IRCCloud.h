@@ -83,4 +83,5 @@
 +(UIColor *)selectedBufferBackgroundColor;
 +(UIColor *)bufferBorderColor;
 +(UIColor *)selectedBufferBorderColor;
++(UIColor *)backlogDividerColor;
 @end

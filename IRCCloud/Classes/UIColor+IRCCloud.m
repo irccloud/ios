@@ -569,5 +569,7 @@ UIColor *__color_member_border;
 +(UIColor *)selectedBufferBorderColor {
     return __color_border4;
 }
-
++(UIColor *)backlogDividerColor {
+    return __color_border1;
+}
 @end
