@@ -45,6 +45,7 @@
         _small.textAlignment = NSTextAlignmentCenter;
         _small.numberOfLines = 0;
         _small.text = @"Aa";
+        _small.textColor = [[UITableViewCell appearance] textLabelColor];
         [self.contentView addSubview:_small];
         
         _large = [[UILabel alloc] init];
@@ -53,6 +54,7 @@
         _large.textAlignment = NSTextAlignmentCenter;
         _large.numberOfLines = 0;
         _large.text = @"Aa";
+        _large.textColor = [[UITableViewCell appearance] textLabelColor];
         [self.contentView addSubview:_large];
     }
     return self;

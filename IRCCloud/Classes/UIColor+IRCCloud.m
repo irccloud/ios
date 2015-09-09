@@ -207,6 +207,7 @@ UIColor *__color_member_border;
     [[UITableViewCell appearance] setTintColor:__color_text7];
     [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:__color_text8];
     [[UISwitch appearance] setOnTintColor:__color_text7];
+    [[UISlider appearance] setTintColor:__color_text7];
     
     [[UITextField appearance] setTintColor:[self textareaTextColor]];
     [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceDark];
