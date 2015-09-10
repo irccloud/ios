@@ -84,4 +84,12 @@
 +(UIColor *)bufferBorderColor;
 +(UIColor *)selectedBufferBorderColor;
 +(UIColor *)backlogDividerColor;
++(UIColor *)chatterBarTextColor;
++(UIColor *)chatterBarColor;
++(UIColor *)awayBarTextColor;
++(UIColor *)awayBarColor;
++(UIColor *)connectionBarTextColor;
++(UIColor *)connectionBarColor;
++(UIColor *)connectionErrorBarTextColor;
++(UIColor *)connectionErrorBarColor;
 @end

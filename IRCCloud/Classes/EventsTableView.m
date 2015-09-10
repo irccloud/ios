@@ -687,6 +687,7 @@ int __timestampWidth;
     }
     NSString *msg = @"";
     CGRect rect = _topUnreadView.frame;
+    _topUnreadArrow.frame = CGRectMake(0,8,12,rect.size.height-12);
     if(highlights) {
         if(highlights == 1)
             msg = @"mention and ";
@@ -698,12 +699,12 @@ int __timestampWidth;
         size.height = rect.size.height - 12;
         if(size.width < size.height)
             size.width = size.height;
-        _topHighlightsCountView.frame = CGRectMake(4,6,size.width,size.height);
+        _topHighlightsCountView.frame = CGRectMake(16,6,size.width,size.height);
         _topHighlightsCountView.hidden = NO;
-        _topUnreadlabel.frame = CGRectMake(8+size.width,6,rect.size.width - size.width - 8 - 32, rect.size.height-12);
+        _topUnreadlabel.frame = CGRectMake(20+size.width,6,rect.size.width - size.width - 8 - 32, rect.size.height-12);
     } else {
         _topHighlightsCountView.hidden = YES;
-        _topUnreadlabel.frame = CGRectMake(4,6,rect.size.width - 8 - 32, rect.size.height-12);
+        _topUnreadlabel.frame = CGRectMake(16,6,rect.size.width - 8 - 32, rect.size.height-12);
     }
     if(_lastSeenEidPos == 0 && firstRow < _data.count) {
         int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
@@ -753,6 +754,7 @@ int __timestampWidth;
 -(void)updateUnread {
     NSString *msg = @"";
     CGRect rect = _bottomUnreadView.frame;
+    _bottomUnreadArrow.frame = CGRectMake(0,8,12,rect.size.height-12);
     if(_newHighlights) {
         if(_newHighlights == 1)
             msg = @"mention";
@@ -764,12 +766,12 @@ int __timestampWidth;
         size.height = rect.size.height - 12;
         if(size.width < size.height)
             size.width = size.height;
-        _bottomHighlightsCountView.frame = CGRectMake(4,6,size.width,size.height);
+        _bottomHighlightsCountView.frame = CGRectMake(16,6,size.width,size.height);
         _bottomHighlightsCountView.hidden = NO;
-        _bottomUndreadlabel.frame = CGRectMake(8+size.width,6,rect.size.width - size.width - 8, rect.size.height-12);
+        _bottomUnreadlabel.frame = CGRectMake(20+size.width,6,rect.size.width - size.width - 8, rect.size.height-12);
     } else {
         _bottomHighlightsCountView.hidden = YES;
-        _bottomUndreadlabel.frame = CGRectMake(4,6,rect.size.width - 8, rect.size.height-12);
+        _bottomUnreadlabel.frame = CGRectMake(16,6,rect.size.width - 8, rect.size.height-12);
     }
     if(_newMsgs - _newHighlights > 0) {
         if(_newHighlights)
@@ -780,7 +782,7 @@ int __timestampWidth;
             msg = [msg stringByAppendingFormat:@"%li unread messages", (long)(_newMsgs - _newHighlights)];
     }
     if(msg.length) {
-        _bottomUndreadlabel.text = msg;
+        _bottomUnreadlabel.text = msg;
         [UIView beginAnimations:nil context:nil];
         [UIView setAnimationDuration:0.1];
         _bottomUnreadView.alpha = 1;

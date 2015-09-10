@@ -92,6 +92,10 @@ extern NSDictionary *emojiMap;
 
     _menuBtn.tintColor = [UIColor navBarSubheadingColor];
     
+    _eventsView.topUnreadView.backgroundColor = _eventsView.bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
+    _eventsView.topUnreadLabel.textColor = _eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
+    _eventsView.topUnreadArrow.textColor = _eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
+    
     UIView *v = self.navigationController.view.superview;
     [self.navigationController.view removeFromSuperview];
     [v addSubview: self.navigationController.view];
@@ -2210,13 +2214,13 @@ extern NSDictionary *emojiMap;
         if(_serverStatusBar.hidden) {
             _serverStatusBar.hidden = NO;
         }
-        _serverStatusBar.backgroundColor = [UIColor backgroundBlueColor];
-        _serverStatus.textColor = [UIColor darkBlueColor];
+        _serverStatusBar.backgroundColor = [UIColor connectionBarColor];
+        _serverStatus.textColor = [UIColor connectionBarTextColor];
         _serverStatus.font = [UIFont systemFontOfSize:FONT_SIZE];
         if([s.status isEqualToString:@"connected_ready"]) {
             if([s.away isKindOfClass:[NSString class]]) {
-                _serverStatusBar.backgroundColor = [UIColor lightGrayColor];
-                _serverStatus.textColor = [UIColor blackColor];
+                _serverStatusBar.backgroundColor = [UIColor awayBarColor];
+                _serverStatus.textColor = [UIColor awayBarTextColor];
                 if(![[s.away lowercaseString] isEqualToString:@"away"]) {
                     _serverStatus.text = [NSString stringWithFormat:@"Away (%@). Tap to come back.", s.away];
                 } else {
@@ -2272,8 +2276,8 @@ extern NSDictionary *emojiMap;
                         reason = @"You can't connect to passworded servers with free accounts.";
                     _serverStatus.text = [NSString stringWithFormat:@"Disconnected: %@", reason];
                 }
-                _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
-                _serverStatus.textColor = [UIColor networkErrorColor];
+                _serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
+                _serverStatus.textColor = [UIColor connectionErrorBarTextColor];
             } else {
                 _serverStatus.text = @"Disconnected. Tap to reconnect.";
             }
@@ -2287,8 +2291,8 @@ extern NSDictionary *emojiMap;
             _serverStatus.text = @"Connected: Joining Channels";
         } else if([s.status isEqualToString:@"pool_unavailable"]) {
             _serverStatus.text = @"Connection temporarily unavailable";
-            _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
-            _serverStatus.textColor = [UIColor networkErrorColor];
+            _serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
+            _serverStatus.textColor = [UIColor connectionErrorBarTextColor];
         } else if([s.status isEqualToString:@"waiting_to_retry"]) {
             double seconds = ([[s.fail_info objectForKey:@"timestamp"] doubleValue] + [[s.fail_info objectForKey:@"retry_timeout"] intValue]) - [[NSDate date] timeIntervalSince1970];
             if(seconds > 0) {
@@ -2324,8 +2328,8 @@ extern NSDictionary *emojiMap;
                     text = [text stringByAppendingString:@"; "];
                 text = [text stringByAppendingFormat:@"Reconnecting in %i seconds.", (int)seconds];
                 _serverStatus.text = text;
-                _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
-                _serverStatus.textColor = [UIColor networkErrorColor];
+                _serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
+                _serverStatus.textColor = [UIColor connectionErrorBarTextColor];
             } else {
                 _serverStatus.text = @"Ready to connect.  Waiting our turn…";
             }

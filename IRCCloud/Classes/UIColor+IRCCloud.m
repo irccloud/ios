@@ -572,4 +572,28 @@ UIColor *__color_member_border;
 +(UIColor *)backlogDividerColor {
     return __color_border1;
 }
++(UIColor *)chatterBarTextColor {
+    return __color_text5;
+}
++(UIColor *)chatterBarColor {
+    return __color_background3;
+}
++(UIColor *)awayBarTextColor {
+    return __color_text7;
+}
++(UIColor *)awayBarColor {
+    return __color_background6;
+}
++(UIColor *)connectionBarTextColor {
+    return __color_text4;
+}
++(UIColor *)connectionBarColor {
+    return __color_background4;
+}
++(UIColor *)connectionErrorBarTextColor {
+    return __color_text4;
+}
++(UIColor *)connectionErrorBarColor {
+    return __color_background5;
+}
 @end

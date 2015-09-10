@@ -55,11 +55,13 @@
                 <outlet property="_backlogFailedButton" destination="120" id="122"/>
                 <outlet property="_backlogFailedView" destination="119" id="123"/>
                 <outlet property="_bottomHighlightsCountView" destination="66" id="67"/>
-                <outlet property="_bottomUndreadlabel" destination="55" id="58"/>
+                <outlet property="_bottomUnreadArrow" destination="ajo-4p-cAU" id="adK-Lv-8Vk"/>
                 <outlet property="_bottomUnreadView" destination="52" id="59"/>
+                <outlet property="_bottomUnreadlabel" destination="55" id="ElN-0F-Zku"/>
                 <outlet property="_delegate" destination="-1" id="68"/>
                 <outlet property="_headerView" destination="49" id="51"/>
                 <outlet property="_topHighlightsCountView" destination="62" id="64"/>
+                <outlet property="_topUnreadArrow" destination="c43-Fg-j3T" id="WvN-6u-iFP"/>
                 <outlet property="_topUnreadView" destination="53" id="56"/>
                 <outlet property="_topUnreadlabel" destination="54" id="65"/>
                 <outlet property="view" destination="25" id="30"/>
@@ -146,6 +148,13 @@
                     <rect key="frame" x="220" y="0.0" width="584" height="32"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                     <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="↑" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="c43-Fg-j3T">
+                            <rect key="frame" x="284" y="6" width="16" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                         <view opaque="NO" contentMode="scaleToFill" id="62" customClass="HighlightsCountView">
                             <rect key="frame" x="0.0" y="4" width="24" height="24"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -157,7 +166,7 @@
                             <accessibility key="accessibilityConfiguration" hint="Scrolls to first unread message">
                                 <accessibilityTraits key="traits" none="YES" button="YES"/>
                             </accessibility>
-                            <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <nil key="highlightedColor"/>
                         </label>
@@ -187,6 +196,13 @@
                     <rect key="frame" x="220" y="692" width="584" height="32"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
                     <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="↓" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ajo-4p-cAU">
+                            <rect key="frame" x="0.0" y="0.0" width="16" height="21"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                         <view opaque="NO" contentMode="scaleToFill" id="66" customClass="HighlightsCountView">
                             <rect key="frame" x="0.0" y="0.0" width="24" height="24"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -196,7 +212,7 @@
                             <rect key="frame" x="0.0" y="0.0" width="584" height="32"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <accessibility key="accessibilityConfiguration" hint="Scrolls to bottom"/>
-                            <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <nil key="highlightedColor"/>
                         </label>
