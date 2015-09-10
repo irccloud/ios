@@ -100,6 +100,7 @@
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[_url stringByAppendingFormat:@"?mobile=ios&version=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
+    [request setValue:[NSString stringWithFormat:@"session=%@", [NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
     [_webView loadRequest:request];
 }
 
