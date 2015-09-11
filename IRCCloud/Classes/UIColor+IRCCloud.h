@@ -94,5 +94,5 @@
 +(UIColor *)connectionErrorBarColor;
 +(UIColor *)buffersDrawerBackgroundColor;
 +(UIColor *)usersDrawerBackgroundColor;
-+(UIColor *)iPodBordersColor;
++(UIColor *)iPadBordersColor;
 @end

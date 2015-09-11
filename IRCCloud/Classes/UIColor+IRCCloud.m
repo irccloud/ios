@@ -63,7 +63,7 @@ UIColor *__color_background7;
 UIColor *__selectedColor;
 UIColor *__selectedBorder;
 UIColor *__unreadColor;
-UIColor *__iPodBordersColor;
+UIColor *__iPadBordersColor;
 
 UIColor *__color_opers_bg;
 UIColor *__color_owners_bg;
@@ -80,6 +80,12 @@ UIColor *__color_ops_border;
 UIColor *__color_halfops_border;
 UIColor *__color_voiced_border;
 UIColor *__color_member_border;
+
+@implementation UITextField (IRCCloudAppearanceHax)
+-(void)setPlaceholder:(NSString *)placeholder {
+    [self setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:placeholder attributes:@{NSForegroundColorAttributeName:__color_text12}]];
+}
+@end
 
 @implementation UITableViewCell (IRCCloudAppearanceHax)
 - (UIColor *)textLabelColor {
@@ -227,8 +233,10 @@ UIColor *__color_member_border;
     __newMsgsBackgroundImage = nil;
     __navbarBackgroundImage = nil;
     __textareaBackgroundImage = nil;
+    __buffersDrawerBackgroundImage = nil;
+    __usersDrawerBackgroundImage = nil;
     
-    __iPodBordersColor = [self contentBackgroundColor];
+    __iPadBordersColor = [self contentBackgroundColor];
 }
 
 +(UIColor *)contentBackgroundColor {
@@ -647,7 +655,7 @@ UIColor *__color_member_border;
     }
     return [UIColor colorWithPatternImage:__usersDrawerBackgroundImage];
 }
-+(UIColor *)iPodBordersColor {
-    return __iPodBordersColor;
++(UIColor *)iPadBordersColor {
+    return __iPadBordersColor;
 }
 @end

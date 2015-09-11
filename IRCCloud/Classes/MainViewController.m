@@ -97,7 +97,7 @@ extern NSDictionary *emojiMap;
     _eventsView.topUnreadLabel.textColor = _eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
     _eventsView.topUnreadArrow.textColor = _eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
     
-    _borders.backgroundColor = [UIColor iPodBordersColor];
+    _borders.backgroundColor = [UIColor iPadBordersColor];
     [[_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
     
     UIView *v = self.navigationController.view.superview;

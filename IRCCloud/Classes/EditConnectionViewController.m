@@ -161,9 +161,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
     cell.textLabel.clipsToBounds = NO;
     UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(2,2.4,16,16)];
     if([[row objectForKey:@"SSL"] boolValue])
-        icon.image = [UIImage imageNamed:@"world_shield"];
+        icon.image = [[UIImage imageNamed:@"world_shield"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     else
-        icon.image = [UIImage imageNamed:@"world"];
+        icon.image = [[UIImage imageNamed:@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
 /* icon on the right instead
      if([[row objectForKey:@"SSL"] boolValue]) {
      UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake([cell.textLabel.text sizeWithFont:[UIFont boldSystemFontOfSize:18]].width + 2,2,16,16)];
@@ -172,6 +172,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
      }
 */
     [cell.textLabel addSubview:icon];
+    icon.tintColor = [UITableViewCell appearance].textLabelColor;
     cell.textLabel.text = [NSString stringWithFormat:@"     %@",[row objectForKey:@"network"]];
     cell.detailTextLabel.text = [row objectForKey:@"host"];
     

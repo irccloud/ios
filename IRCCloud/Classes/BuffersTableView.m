@@ -817,7 +817,7 @@
                 cell.icon.image = [[UIImage imageNamed:@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
             cell.icon.hidden = NO;
             if(selected) {
-                cell.label.textColor = [UIColor selectedBufferTextColor];
+                cell.icon.tintColor = cell.label.textColor = [UIColor selectedBufferTextColor];
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count]) {
                     cell.icon.tintColor = cell.label.textColor = [UIColor networkErrorColor];
                     cell.unreadIndicator.backgroundColor = cell.bgColor = [UIColor networkErrorBackgroundColor];
@@ -828,7 +828,7 @@
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
                     cell.icon.tintColor = cell.label.textColor = [UIColor ownersBorderColor];
                 else if(![status isEqualToString:@"connected_ready"])
-                    cell.icon.tintColor = cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
+                    cell.icon.tintColor = cell.label.textColor = [UIColor inactiveBufferTextColor];
                 else if([[row objectForKey:@"unread"] intValue])
                     cell.icon.tintColor = cell.label.textColor = [UIColor unreadBufferTextColor];
                 else
