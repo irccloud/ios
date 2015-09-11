@@ -143,13 +143,13 @@
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         
         [alert addAction:[UIAlertAction actionWithTitle:@"Send a message" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self actionSheet:nil clickedButtonAtIndex:0];
+            [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:0];
         }]];
         [alert addAction:[UIAlertAction actionWithTitle:@"Whois" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self actionSheet:nil clickedButtonAtIndex:1];
+            [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:1];
         }]];
         [alert addAction:[UIAlertAction actionWithTitle:@"Copy hostmask" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self actionSheet:nil clickedButtonAtIndex:2];
+            [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:2];
         }]];
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
         alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];

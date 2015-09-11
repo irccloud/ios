@@ -113,7 +113,7 @@
 #pragma mark - Table view data source
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return [[_ignores objectAtIndex:indexPath.row] sizeWithFont:[UIFont boldSystemFontOfSize:18] constrainedToSize:CGSizeMake(self.tableView.frame.size.width, CGFLOAT_MAX) lineBreakMode:NSLineBreakByCharWrapping].height + 16;
+    return [[_ignores objectAtIndex:indexPath.row] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:18]} context:nil].size.height + 16;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
