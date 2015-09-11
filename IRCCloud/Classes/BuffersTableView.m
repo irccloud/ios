@@ -30,9 +30,7 @@
 #define TYPE_CHANNEL 1
 #define TYPE_CONVERSATION 2
 #define TYPE_ARCHIVES_HEADER 3
-#define TYPE_ADD_NETWORK 4
-#define TYPE_JOIN_CHANNEL 5
-#define TYPE_REORDER 6
+#define TYPE_JOIN_CHANNEL 4
 
 @interface BuffersTableCell : UITableViewCell {
     UILabel *_label;
@@ -43,7 +41,6 @@
     UIView *_border;
     HighlightsCountView *_highlights;
     UIActivityIndicatorView *_activity;
-    UIButton *_joinBtn;
     UIColor *_bgColor;
     UIColor *_highlightColor;
 }
@@ -54,7 +51,6 @@
 @property (readonly) UIView *unreadIndicator, *bg;
 @property (readonly) HighlightsCountView *highlights;
 @property (readonly) UIActivityIndicatorView *activity;
-@property (readonly) UIButton *joinBtn;
 @end
 
 @implementation BuffersTableCell
@@ -91,12 +87,6 @@
         _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         _activity.hidden = YES;
         [self.contentView addSubview:_activity];
-        
-        _joinBtn = [[UIButton alloc] initWithFrame:CGRectZero];
-        _joinBtn.hidden = YES;
-        _joinBtn.adjustsImageWhenHighlighted = YES;
-        [_joinBtn setImage:[UIImage imageNamed:@"add"] forState:UIControlStateNormal];
-        [self.contentView addSubview:_joinBtn];
     }
     return self;
 }
@@ -110,9 +100,9 @@
     CGRect frame = [self.contentView bounds];
     _border.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
     frame.size.width -= 8;
-    if(_type == TYPE_SERVER || _type == TYPE_ADD_NETWORK) {
+    if(_type == TYPE_SERVER) {
         frame.origin.y += 6;
-        frame.size.height -= (_type == TYPE_ADD_NETWORK)?12:6;
+        frame.size.height -= 6;
     }
     _bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
     _unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
@@ -120,10 +110,6 @@
     if(!_activity.hidden) {
         frame.size.width -= _activity.frame.size.width + 12;
         _activity.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 10, _activity.frame.size.width, _activity.frame.size.height);
-    }
-    if(!_joinBtn.hidden) {
-        frame.size.width -= frame.size.height + 12;
-        _joinBtn.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y, frame.size.height, frame.size.height);
     }
     if(!_highlights.hidden) {
 #pragma GCC diagnostic push
@@ -339,7 +325,7 @@
                     }
                 }
             }
-            if(buffers.count == 1) {
+            if(buffers.count == 1 && [server.status isEqualToString:@"connected_ready"]) {
                 [data addObject:@{
                  @"type":@TYPE_JOIN_CHANNEL,
                  @"cid":@(server.cid),
@@ -351,27 +337,6 @@
                  }];
             }
         }
-#ifndef EXTENSION
-        [data addObject:@{
-         @"type":@TYPE_ADD_NETWORK,
-         @"cid":@-1,
-         @"bid":@-1,
-         @"name":@"Add a Network",
-         @"unread":@0,
-         @"highlights":@0,
-         @"archived":@0,
-         }];
-
-        [data addObject:@{
-          @"type":@TYPE_REORDER,
-          @"cid":@-1,
-          @"bid":@-1,
-          @"name":@"Reorder",
-          @"unread":@0,
-          @"highlights":@0,
-          @"archived":@0,
-          }];
-#endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             _boldFont = [UIFont boldSystemFontOfSize:FONT_SIZE];
            _normalFont = [UIFont systemFontOfSize:FONT_SIZE];
@@ -450,20 +415,6 @@
     }
     topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y + self.tableView.contentInset.top,self.view.frame.size.width, 40);
     bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
-#endif
-}
-
-- (void)joinBtnPressed:(UIButton *)sender {
-#ifndef EXTENSION
-    [_delegate dismissKeyboard];
-    Server *s = [_servers getServer:(int)sender.tag];
-    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    _alertView.tag = sender.tag;
-    [_alertView textFieldAtIndex:0].placeholder = @"#example";
-    [_alertView textFieldAtIndex:0].text = @"#";
-    [_alertView textFieldAtIndex:0].delegate = self;
-    [_alertView show];
 #endif
 }
 
@@ -820,8 +771,6 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER) {
         return 46;
-    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
-        return 52;
     } else {
         return 40;
     }
@@ -832,14 +781,12 @@
     BuffersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bufferscell"];
     if(!cell) {
         cell = [[BuffersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"bufferscell"];
-        [cell.joinBtn addTarget:self action:@selector(joinBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
     }
     NSDictionary *row = [_data objectAtIndex:[indexPath row]];
     NSString *status = [row objectForKey:@"status"];
     cell.type = [[row objectForKey:@"type"] intValue];
     cell.label.text = [row objectForKey:@"name"];
     cell.activity.hidden = YES;
-    cell.joinBtn.hidden = YES;
     cell.accessibilityValue = [row objectForKey:@"hint"];
     cell.highlightColor = [UIColor colorWithRed:0.776 green:0.855 blue:1 alpha:1];
     if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
@@ -899,10 +846,6 @@
                 [cell.activity stopAnimating];
                 cell.activity.hidden = YES;
             }
-#ifndef EXTENSION
-            cell.joinBtn.hidden = ![status isEqualToString:@"connected_ready"] || [[row objectForKey:@"count"] intValue] < 2;
-#endif
-            cell.joinBtn.tag = [[row objectForKey:@"cid"] intValue];
             break;
         case TYPE_CHANNEL:
         case TYPE_CONVERSATION:
@@ -965,24 +908,12 @@
                 cell.accessibilityHint = @"Shows archive list";
             }
             break;
-        case TYPE_ADD_NETWORK:
-            cell.icon.image = [UIImage imageNamed:@"world_add"];
-            cell.icon.hidden = NO;
-            cell.label.textColor = [UIColor unreadBlueColor];
-            cell.bgColor = [UIColor serverBackgroundColor];
-            break;
         case TYPE_JOIN_CHANNEL:
-            cell.icon.image = [UIImage imageNamed:@"add"];
-            cell.icon.hidden = NO;
-            cell.label.textColor = [UIColor colorWithRed:0.275 green:0.537 blue:0 alpha:1];
+            cell.label.textColor = [UIColor colorWithRed:0.361 green:0.69 blue:0 alpha:1];
             cell.highlightColor = [UIColor colorWithRed:0.855 green:0.961 blue:0.667 alpha:1];
             cell.bgColor = [UIColor bufferBackgroundColor];
-            break;
-        case TYPE_REORDER:
-            cell.icon.image = [UIImage imageNamed:@"move"];
-            cell.icon.hidden = NO;
-            cell.label.textColor = [UIColor unreadBlueColor];
-            cell.bgColor = [UIColor serverBackgroundColor];
+            cell.icon.image = nil;
+            cell.icon.hidden = YES;
             break;
     }
     return cell;
@@ -1044,31 +975,17 @@
         else
             [_expandedArchives setObject:@YES forKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
         [self performSelectorInBackground:@selector(refresh) withObject:nil];
+#ifndef EXTENSION
     } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
-        UIButton *b = [[UIButton alloc] init];
-        b.tag = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
-        [self joinBtnPressed:b];
-    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
-#ifndef EXTENSION
-        EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        [self.slidingViewController resetTopView];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self presentViewController:nc animated:YES completion:nil];
-#endif
-    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_REORDER) {
-#ifndef EXTENSION
-        ServerReorderViewController *svc = [[ServerReorderViewController alloc] initWithStyle:UITableViewStylePlain];
-        [self.slidingViewController resetTopView];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self presentViewController:nc animated:YES completion:nil];
+        [_delegate dismissKeyboard];
+        Server *s = [_servers getServer:[[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
+        _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+        _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+        _alertView.tag = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
+        [_alertView textFieldAtIndex:0].placeholder = @"#example";
+        [_alertView textFieldAtIndex:0].text = @"#";
+        [_alertView textFieldAtIndex:0].delegate = self;
+        [_alertView show];
 #endif
     } else {
 #ifndef EXTENSION

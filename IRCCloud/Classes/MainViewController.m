@@ -45,6 +45,7 @@
 #import "ARChromeActivity.h"
 #import "TUSafariActivity.h"
 #import "OpenInChromeController.h"
+#import "ServerReorderViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -3037,6 +3038,28 @@ extern NSDictionary *emojiMap;
     }
 }
 
+-(void)_addNetwork {
+    EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    [self.slidingViewController resetTopView];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self presentViewController:nc animated:YES completion:nil];
+}
+
+-(void)_reorder {
+    ServerReorderViewController *svc = [[ServerReorderViewController alloc] initWithStyle:UITableViewStylePlain];
+    [self.slidingViewController resetTopView];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self presentViewController:nc animated:YES completion:nil];
+}
+
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
     _selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
@@ -3097,6 +3120,12 @@ extern NSDictionary *emojiMap;
         [alert addAction:[UIAlertAction actionWithTitle:@"Mark All As Read" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             [self _markAllAsRead];
         }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Add A Network" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _addNetwork];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Reorder" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _reorder];
+        }]];
 
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
         alert.popoverPresentationController.sourceRect = rect;
@@ -3130,6 +3159,8 @@ extern NSDictionary *emojiMap;
             [sheet addButtonWithTitle:@"Delete"];
         }
         [sheet addButtonWithTitle:@"Mark All As Read"];
+        [sheet addButtonWithTitle:@"Add A Network"];
+        [sheet addButtonWithTitle:@"Reorder"];
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
@@ -3819,6 +3850,10 @@ extern NSDictionary *emojiMap;
             [self _startPastebin];
         } else if([action isEqualToString:@"Mark All As Read"]) {
             [self _markAllAsRead];
+        } else if([action isEqualToString:@"Add A Network"]) {
+            [self _addNetwork];
+        } else if([action isEqualToString:@"Reorder"]) {
+            [self _reorder];
         }
         
         if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)
