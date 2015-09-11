@@ -28,12 +28,13 @@
 @interface UsersTableCell : UITableViewCell {
     UILabel *_label;
     UILabel *_count;
-    UIView *_border;
+    UIView *_border1;
+    UIView *_border2;
     int _type;
 }
 @property int type;
 @property (readonly) UILabel *label,*count;
-@property (readonly) UIView *border;
+@property (readonly) UIView *border1, *border2;
 @end
 
 @implementation UsersTableCell
@@ -56,8 +57,11 @@
         _count.font = [UIFont systemFontOfSize:14];
         [self.contentView addSubview:_count];
         
-        _border = [[UIView alloc] init];
-        [self.contentView addSubview:_border];
+        _border1 = [[UIView alloc] init];
+        [self.contentView addSubview:_border1];
+        
+        _border2 = [[UIView alloc] init];
+        [self.contentView addSubview:_border2];
     }
     return self;
 }
@@ -66,7 +70,8 @@
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
-    _border.frame = CGRectMake(0,0,frame.size.width,1);
+    _border1.frame = CGRectMake(0,frame.size.height - 1,frame.size.width,1);
+    _border2.frame = CGRectMake(0,0,3,frame.size.height);
 
     frame.origin.x = 12;
     frame.size.width -= 24;
@@ -117,7 +122,6 @@
 }
 
 - (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data sectionTitles:(NSMutableArray *)sectionTitles sectionIndexes:(NSMutableArray *)sectionIndexes sectionSizes:(NSMutableArray *)sectionSizes {
-    int first;
     if(users.count && symbol) {
         unichar lastChar = 0;
         [data addObject:@{
@@ -130,7 +134,6 @@
          @"symbol":symbol
          }];
         NSUInteger size = data.count;
-        first = 1;
         for(User *user in users) {
             if(sectionTitles != nil) {
                 if(user.nick.length && [[user.nick lowercaseString] characterAtIndex:0] != lastChar) {
@@ -148,10 +151,9 @@
              @"text":user.nick,
              @"color":user.away?[UIColor memberListAwayTextColor]:[UIColor memberListTextColor],
              @"bgColor":groupColor,
-             @"first":@(first),
+             @"last":@(user == users.lastObject && ![heading isEqualToString:@"Members"]),
              @"borderColor":borderColor
              }];
-            first = 0;
         }
         if(sectionSizes != nil)
             [sectionSizes addObject:@(size)];
@@ -233,7 +235,7 @@
         _sectionIndexes = sectionIndexes;
         _sectionSizes = sectionSizes;
         [self.tableView reloadData];
-        self.tableView.backgroundColor = [UIColor membersGroupColor];
+        self.tableView.backgroundColor = [UIColor usersDrawerBackgroundColor];
     }];
 }
 
@@ -250,7 +252,7 @@
         delegate = (id<UsersTableViewDelegate>)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
 
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.view.backgroundColor = [UIColor membersGroupColor];
+    self.view.backgroundColor = [UIColor usersDrawerBackgroundColor];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
@@ -345,12 +347,13 @@
         if(_userFont)
             cell.label.font = _userFont;
     }
-    if(cell.type == TYPE_HEADING || [[row objectForKey:@"first"] intValue]) {
-        cell.border.hidden = YES;
+    if(cell.type == TYPE_HEADING || ![[row objectForKey:@"last"] intValue]) {
+        cell.border1.hidden = YES;
     } else {
-        cell.border.hidden = NO;
-        cell.border.backgroundColor = [row objectForKey:@"borderColor"];
+        cell.border1.hidden = NO;
+        cell.border1.backgroundColor = [row objectForKey:@"borderColor"];
     }
+    cell.border2.backgroundColor = [row objectForKey:@"borderColor"];
     return cell;
 }
 

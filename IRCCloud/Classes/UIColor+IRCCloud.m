@@ -21,6 +21,8 @@ UIImage *__timestampBackgroundImage;
 UIImage *__newMsgsBackgroundImage;
 UIImage *__navbarBackgroundImage;
 UIImage *__textareaBackgroundImage;
+UIImage *__buffersDrawerBackgroundImage;
+UIImage *__usersDrawerBackgroundImage;
 
 UIColor *__color_border1;
 UIColor *__color_border2;
@@ -61,6 +63,7 @@ UIColor *__color_background7;
 UIColor *__selectedColor;
 UIColor *__selectedBorder;
 UIColor *__unreadColor;
+UIColor *__iPodBordersColor;
 
 UIColor *__color_opers_bg;
 UIColor *__color_owners_bg;
@@ -224,6 +227,8 @@ UIColor *__color_member_border;
     __newMsgsBackgroundImage = nil;
     __navbarBackgroundImage = nil;
     __textareaBackgroundImage = nil;
+    
+    __iPodBordersColor = [self contentBackgroundColor];
 }
 
 +(UIColor *)contentBackgroundColor {
@@ -595,5 +600,54 @@ UIColor *__color_member_border;
 }
 +(UIColor *)connectionErrorBarColor {
     return __color_background5;
+}
++(UIColor *)buffersDrawerBackgroundColor {
+    if(!__buffersDrawerBackgroundImage) {
+        float scaleFactor = [[UIScreen mainScreen] scale];
+        int width = [[UIScreen mainScreen] bounds].size.width;
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        CGContextRef context = CGBitmapContextCreate(NULL, width * scaleFactor, 16 * scaleFactor, 8, 4 * width * scaleFactor, colorSpace, (CGBitmapInfo)kCGImageAlphaNoneSkipFirst);
+        CGContextScaleCTM(context, scaleFactor, scaleFactor);
+        CGContextSetFillColorWithColor(context, [self bufferBackgroundColor].CGColor);
+        CGContextFillRect(context, CGRectMake(0,0,width,16));
+        CGContextSetLineCap(context, kCGLineCapSquare);
+        CGContextSetStrokeColorWithColor(context, [self bufferBorderColor].CGColor);
+        CGContextSetLineWidth(context, 6.0);
+        CGContextMoveToPoint(context, 3.0, 0.0);
+        CGContextAddLineToPoint(context, 3.0, 16.0);
+        CGContextStrokePath(context);
+        CGImageRef cgImage = CGBitmapContextCreateImage(context);
+        __buffersDrawerBackgroundImage = [[UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 6, 0, 0)];
+        CFRelease(cgImage);
+        CGContextRelease(context);
+        CGColorSpaceRelease(colorSpace);
+    }
+    return [UIColor colorWithPatternImage:__buffersDrawerBackgroundImage];
+}
++(UIColor *)usersDrawerBackgroundColor {
+    if(!__usersDrawerBackgroundImage) {
+        float scaleFactor = [[UIScreen mainScreen] scale];
+        int width = [[UIScreen mainScreen] bounds].size.width;
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        CGContextRef context = CGBitmapContextCreate(NULL, width * scaleFactor, 16 * scaleFactor, 8, 4 * width * scaleFactor, colorSpace, (CGBitmapInfo)kCGImageAlphaNoneSkipFirst);
+        CGContextScaleCTM(context, scaleFactor, scaleFactor);
+        CGContextSetFillColorWithColor(context, [self membersGroupColor].CGColor);
+        CGContextFillRect(context, CGRectMake(0,0,width,16));
+        CGContextSetLineCap(context, kCGLineCapSquare);
+        CGContextSetStrokeColorWithColor(context, [self membersBorderColor].CGColor);
+        CGContextSetLineWidth(context, 3.0);
+        CGContextMoveToPoint(context, 1.0, 0.0);
+        CGContextAddLineToPoint(context, 1.0, 16.0);
+        CGContextStrokePath(context);
+        CGImageRef cgImage = CGBitmapContextCreateImage(context);
+        __usersDrawerBackgroundImage = [[UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 6, 0, 0)];
+        CFRelease(cgImage);
+        CGContextRelease(context);
+        CGColorSpaceRelease(colorSpace);
+    }
+    return [UIColor colorWithPatternImage:__usersDrawerBackgroundImage];
+}
++(UIColor *)iPodBordersColor {
+    return __iPodBordersColor;
 }
 @end

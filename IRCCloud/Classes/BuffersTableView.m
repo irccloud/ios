@@ -388,7 +388,7 @@
             _lastUnreadPosition = lastUnreadPosition;
             _lastHighlightPosition = lastHighlightPosition;
             _lastFailurePosition = lastFailurePosition;
-            self.view.backgroundColor = [UIColor bufferBorderColor];
+            self.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
             [self.tableView reloadData];
             [self _updateUnreadIndicators];
         }];
@@ -570,7 +570,7 @@
 #endif
 
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.view.backgroundColor = [UIColor backgroundBlueColor];
+    self.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
