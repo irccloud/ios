@@ -220,55 +220,44 @@
 #endif
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
-
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            _connection = [NSURLConnection connectionWithRequest:request delegate:self];
-            [_connection start];
-#ifndef EXTENSION
-            [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-#endif
-        }];
-    } else {
-        NSURLSession *session;
-        NSURLSessionConfiguration *config;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+    NSURLSession *session;
+    NSURLSessionConfiguration *config;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-            config = [NSURLSessionConfiguration backgroundSessionConfiguration:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+        config = [NSURLSessionConfiguration backgroundSessionConfiguration:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
 #pragma GCC diagnostic pop
-        } else {
-            config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+    } else {
+        config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
 #ifdef ENTERPRISE
-            config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
+        config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
 #else
-            config.sharedContainerIdentifier = @"group.com.irccloud.share";
+        config.sharedContainerIdentifier = @"group.com.irccloud.share";
 #endif
-        }
-        config.HTTPCookieStorage = nil;
-        config.URLCache = nil;
-        config.requestCachePolicy = NSURLCacheStorageNotAllowed;
-        config.discretionary = NO;
-        session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-        _body = [[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding];
-        NSURLSessionTask *task = [session downloadTaskWithRequest:request];
-        
-        if(session.configuration.identifier) {
-            NSMutableDictionary *tasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
-            if(!tasks)
-                tasks = [[NSMutableDictionary alloc] init];
-            
-            if(_msg)
-                [tasks setObject:@{@"service":@"imgur", @"bid":@(_bid), @"msg":_msg} forKey:session.configuration.identifier];
-            else
-                [tasks setObject:@{@"service":@"imgur", @"bid":@(_bid)} forKey:session.configuration.identifier];
-
-            [d setObject:tasks forKey:@"uploadtasks"];
-            [d synchronize];
-        }
-
-        [task resume];
     }
+    config.HTTPCookieStorage = nil;
+    config.URLCache = nil;
+    config.requestCachePolicy = NSURLCacheStorageNotAllowed;
+    config.discretionary = NO;
+    session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+    _body = [[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding];
+    NSURLSessionTask *task = [session downloadTaskWithRequest:request];
+    
+    if(session.configuration.identifier) {
+        NSMutableDictionary *tasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
+        if(!tasks)
+            tasks = [[NSMutableDictionary alloc] init];
+        
+        if(_msg)
+            [tasks setObject:@{@"service":@"imgur", @"bid":@(_bid), @"msg":_msg} forKey:session.configuration.identifier];
+        else
+            [tasks setObject:@{@"service":@"imgur", @"bid":@(_bid)} forKey:session.configuration.identifier];
+
+        [d setObject:tasks forKey:@"uploadtasks"];
+        [d synchronize];
+    }
+
+    [task resume];
     CFRelease(data_escaped);
 }
 

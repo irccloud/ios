@@ -17,9 +17,19 @@
 
 #import <UIKit/UIKit.h>
 
+@interface UITableViewCell (IRCCloudAppearanceHax) <UIAppearance>
+@property (strong, nonatomic) UIColor *textLabelColor UI_APPEARANCE_SELECTOR;
+@property (strong, nonatomic) UIColor *detailTextLabelColor UI_APPEARANCE_SELECTOR;
+@end
+
 @interface UIColor (IRCCloud)
++(UIColor *)colorWithHue:(CGFloat)hue saturation:(CGFloat)saturation lightness:(CGFloat)brightness alpha:(CGFloat)alpha;
++(BOOL)isDarkTheme;
++(void)setTheme:(NSString *)theme;
++(UIColor *)contentBackgroundColor;
++(UIColor *)messageTextColor;
 +(UIColor *)backgroundBlueColor;
-+(UIColor *)selectedBlueColor;
++(UIColor *)unreadBlueColor;
 +(UIColor *)blueBorderColor;
 +(UIColor *)opersGroupColor;
 +(UIColor *)ownersGroupColor;
@@ -27,25 +37,16 @@
 +(UIColor *)opsGroupColor;
 +(UIColor *)halfopsGroupColor;
 +(UIColor *)voicedGroupColor;
-+(UIColor *)opersHeadingColor;
-+(UIColor *)ownersHeadingColor;
-+(UIColor *)adminsHeadingColor;
-+(UIColor *)opsHeadingColor;
-+(UIColor *)halfopsHeadingColor;
-+(UIColor *)voicedHeadingColor;
-+(UIColor *)membersHeadingColor;
++(UIColor *)membersGroupColor;
 +(UIColor *)opersBorderColor;
 +(UIColor *)ownersBorderColor;
-+(UIColor *)opersLightColor;
-+(UIColor *)ownersLightColor;
 +(UIColor *)adminsBorderColor;
-+(UIColor *)adminsLightColor;
 +(UIColor *)opsBorderColor;
-+(UIColor *)opsLightColor;
 +(UIColor *)halfopsBorderColor;
-+(UIColor *)halfopsLightColor;
 +(UIColor *)voicedBorderColor;
-+(UIColor *)voicedLightColor;
++(UIColor *)membersBorderColor;
++(UIColor *)memberListTextColor;
++(UIColor *)memberListAwayTextColor;
 +(UIColor *)timestampColor;
 +(UIColor *)darkBlueColor;
 +(UIColor *)networkErrorBackgroundColor;
@@ -60,12 +61,39 @@
 +(UIColor *)noticeBackgroundColor;
 +(UIColor *)timestampBackgroundColor;
 +(UIColor *)newMsgsBackgroundColor;
-+(UIColor *)collapsedRowBackgroundColor;
++(UIColor *)collapsedRowTextColor;
 +(UIColor *)collapsedHeadingBackgroundColor;
 +(UIColor *)navBarColor;
++(UIColor *)navBarHeadingColor;
++(UIColor *)navBarSubheadingColor;
++(UIImage *)navBarBackgroundImage;
++(UIColor *)textareaTextColor;
++(UIImage *)textareaBackgroundImage;
++(UIColor *)textareaBackgroundColor;
++(UIColor *)linkColor;
 +(UIColor *)lightLinkColor;
-+(UIColor *)bufferBlueColor;
++(UIColor *)serverBackgroundColor;
++(UIColor *)bufferBackgroundColor;
 +(UIColor *)unreadBorderColor;
 +(UIColor *)highlightBorderColor;
 +(UIColor *)networkErrorBorderColor;
++(UIColor *)bufferTextColor;
++(UIColor *)inactiveBufferTextColor;
++(UIColor *)unreadBufferTextColor;
++(UIColor *)selectedBufferTextColor;
++(UIColor *)selectedBufferBackgroundColor;
++(UIColor *)bufferBorderColor;
++(UIColor *)selectedBufferBorderColor;
++(UIColor *)backlogDividerColor;
++(UIColor *)chatterBarTextColor;
++(UIColor *)chatterBarColor;
++(UIColor *)awayBarTextColor;
++(UIColor *)awayBarColor;
++(UIColor *)connectionBarTextColor;
++(UIColor *)connectionBarColor;
++(UIColor *)connectionErrorBarTextColor;
++(UIColor *)connectionErrorBarColor;
++(UIColor *)buffersDrawerBackgroundColor;
++(UIColor *)usersDrawerBackgroundColor;
++(UIColor *)iPadBordersColor;
 @end

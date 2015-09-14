@@ -17,6 +17,7 @@
 #import "FileMetadataViewController.h"
 #import "imageViewController.h"
 #import "AppDelegate.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation FileMetadataViewController
 
@@ -58,7 +59,7 @@
 
 -(void)_resetStatusBar {
     [[UIApplication sharedApplication] setStatusBarHidden:NO];
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque animated:NO];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:NO];
 }
 
 -(void)cancelButtonPressed:(id)sender {
@@ -77,13 +78,11 @@
     [super viewWillAppear:animated];
     if(_uploader) {
         if(self.navigationController.viewControllers.count == 1) {
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                self.navigationController.navigationBar.clipsToBounds = YES;
+            self.navigationController.navigationBar.clipsToBounds = YES;
             
             self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
         } else {
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                self.navigationController.navigationBar.clipsToBounds = NO;
+            self.navigationController.navigationBar.clipsToBounds = NO;
             [self.navigationController setNavigationBarHidden:NO animated:NO];
         }
     }
@@ -114,19 +113,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    int padding = 80;
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        padding = 26;
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        padding = 0;
-    }
-
-    _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _filename.textAlignment = NSTextAlignmentRight;
-    _filename.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _filename.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _filename.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _filename.autocorrectionType = UITextAutocorrectionTypeNo;
     _filename.keyboardType = UIKeyboardTypeDefault;
@@ -136,11 +126,13 @@
     
     _msg = [[UITextView alloc] initWithFrame:CGRectZero];
     _msg.text = @"";
+    _msg.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _msg.backgroundColor = [UIColor clearColor];
     _msg.returnKeyType = UIReturnKeyDone;
     _msg.delegate = self;
     _msg.font = _filename.font;
     _msg.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _msg.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     
     _imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -268,6 +260,8 @@
     cell.accessoryView = nil;
     cell.accessoryType = UITableViewCellAccessoryNone;
     cell.detailTextLabel.text = nil;
+    cell.backgroundView = nil;
+    cell.backgroundColor = [UITableViewCell appearance].backgroundColor;
     
     if(!_imageView)
         section++;
@@ -306,8 +300,7 @@
         [UIView animateWithDuration:0.5f animations:^{
             appDelegate.window.rootViewController.view.alpha = 1;
         } completion:^(BOOL finished){
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-                [UIApplication sharedApplication].statusBarHidden = YES;
+            [UIApplication sharedApplication].statusBarHidden = YES;
         }];
     }
 }

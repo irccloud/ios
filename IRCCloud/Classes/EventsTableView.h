@@ -35,10 +35,12 @@
     IBOutlet UIView *_backlogFailedView;
     IBOutlet UIButton *_backlogFailedButton;
     IBOutlet UIView *_topUnreadView;
-    IBOutlet UILabel *_topUnreadlabel;
+    IBOutlet UILabel *_topUnreadArrow;
+    IBOutlet UILabel *_topUnreadLabel;
     IBOutlet HighlightsCountView *_topHighlightsCountView;
     IBOutlet UIView *_bottomUnreadView;
-    IBOutlet UILabel *_bottomUndreadlabel;
+    IBOutlet UILabel *_bottomUnreadArrow;
+    IBOutlet UILabel *_bottomUnreadLabel;
     IBOutlet HighlightsCountView *_bottomHighlightsCountView;
     
     NSDateFormatter *_formatter;
@@ -70,6 +72,10 @@
 }
 @property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;
+@property (readonly) UILabel *topUnreadArrow;
+@property (readonly) UILabel *topUnreadLabel;
+@property (readonly) UILabel *bottomUnreadLabel;
+@property (readonly) UILabel *bottomUnreadArrow;
 @property (nonatomic) NSTimeInterval eidToOpen;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(void)setBuffer:(Buffer *)buffer;

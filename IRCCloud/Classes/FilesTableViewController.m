@@ -106,22 +106,23 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         _date = [[UILabel alloc] init];
-        _date.textColor = [UIColor grayColor];
+        _date.textColor = [UITableViewCell appearance].detailTextLabelColor;
         _date.font = [UIFont systemFontOfSize:FONT_SIZE];
         [self.contentView addSubview:_date];
 
         _name = [[UILabel alloc] init];
+        _name.textColor = [UITableViewCell appearance].textLabelColor;
         _name.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
         [self.contentView addSubview:_name];
         
         _metadata = [[UILabel alloc] init];
-        _metadata.textColor = [UIColor grayColor];
+        _metadata.textColor = [UITableViewCell appearance].detailTextLabelColor;
         _metadata.font = [UIFont systemFontOfSize:FONT_SIZE];
         [self.contentView addSubview:_metadata];
         
         _extension = [[UILabel alloc] init];
         _extension.textColor = [UIColor whiteColor];
-        _extension.backgroundColor = [UIColor selectedBlueColor];
+        _extension.backgroundColor = [UIColor unreadBlueColor];
         _extension.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
         _extension.textAlignment = NSTextAlignmentCenter;
         _extension.hidden = YES;
@@ -162,10 +163,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-    }
+    self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.title = @"File Uploads";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];
@@ -431,7 +429,7 @@
 -(void)saveButtonPressed:(id)sender {
     if(_delegate)
         [_delegate filesTableViewControllerDidSelectFile:_selectedFile message:((FileMetadataViewController *)self.navigationController.topViewController).msg.text];
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

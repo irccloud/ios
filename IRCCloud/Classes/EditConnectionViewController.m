@@ -161,9 +161,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
     cell.textLabel.clipsToBounds = NO;
     UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(2,2.4,16,16)];
     if([[row objectForKey:@"SSL"] boolValue])
-        icon.image = [UIImage imageNamed:@"world_shield"];
+        icon.image = [[UIImage imageNamed:@"world_shield"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     else
-        icon.image = [UIImage imageNamed:@"world"];
+        icon.image = [[UIImage imageNamed:@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
 /* icon on the right instead
      if([[row objectForKey:@"SSL"] boolValue]) {
      UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake([cell.textLabel.text sizeWithFont:[UIFont boldSystemFontOfSize:18]].width + 2,2,16,16)];
@@ -172,6 +172,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
      }
 */
     [cell.textLabel addSubview:icon];
+    icon.tintColor = [UITableViewCell appearance].textLabelColor;
     cell.textLabel.text = [NSString stringWithFormat:@"     %@",[row objectForKey:@"network"]];
     cell.detailTextLabel.text = [row objectForKey:@"host"];
     
@@ -514,22 +515,14 @@ static NSString * const ServerHasSSLKey = @"ssl";
     }
     NSDictionary *userInfo = [NetworkConnection sharedInstance].userInfo;
     NSString *name = [userInfo objectForKey:@"name"];
-    int padding = 80;
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        padding = 26;
-        
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-        padding = 0;
-    }
+    self.navigationController.navigationBar.clipsToBounds = YES;
 
-    _network = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _network = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _network.placeholder = @"Network";
     _network.text = @"";
     _network.textAlignment = NSTextAlignmentRight;
-    _network.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _network.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _network.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _network.autocorrectionType = UITextAutocorrectionTypeNo;
     _network.keyboardType = UIKeyboardTypeDefault;
@@ -537,11 +530,11 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _network.returnKeyType = UIReturnKeyDone;
     _network.delegate = self;
     
-    _server = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _server = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _server.placeholder = @"irc.example.net";
     _server.text = @"";
     _server.textAlignment = NSTextAlignmentRight;
-    _server.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _server.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _server.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _server.autocorrectionType = UITextAutocorrectionTypeNo;
     _server.keyboardType = UIKeyboardTypeURL;
@@ -549,21 +542,21 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _server.returnKeyType = UIReturnKeyDone;
     _server.delegate = self;
     
-    _port = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _port = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _port.text = @"6667";
     _port.textAlignment = NSTextAlignmentRight;
-    _port.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _port.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _port.keyboardType = UIKeyboardTypeNumberPad;
     _port.returnKeyType = UIReturnKeyDone;
     _port.delegate = self;
     
     _ssl = [[UISwitch alloc] init];
     
-    _nickname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _nickname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _nickname.placeholder = @"john";
     _nickname.text = @"";
     _nickname.textAlignment = NSTextAlignmentRight;
-    _nickname.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _nickname.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _nickname.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _nickname.autocorrectionType = UITextAutocorrectionTypeNo;
     _nickname.keyboardType = UIKeyboardTypeDefault;
@@ -576,11 +569,11 @@ static NSString * const ServerHasSSLKey = @"ssl";
             _nickname.text = [[name substringToIndex:range.location] lowercaseString];
     }
     
-    _realname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _realname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _realname.placeholder = @"John Appleseed";
     _realname.text = @"";
     _realname.textAlignment = NSTextAlignmentRight;
-    _realname.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _realname.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _realname.autocapitalizationType = UITextAutocapitalizationTypeWords;
     _realname.autocorrectionType = UITextAutocorrectionTypeDefault;
     _realname.keyboardType = UIKeyboardTypeDefault;
@@ -591,10 +584,10 @@ static NSString * const ServerHasSSLKey = @"ssl";
         _realname.text = name;
     }
     
-    _nspass = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _nspass = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _nspass.text = @"";
     _nspass.textAlignment = NSTextAlignmentRight;
-    _nspass.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _nspass.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _nspass.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _nspass.autocorrectionType = UITextAutocorrectionTypeNo;
     _nspass.keyboardType = UIKeyboardTypeDefault;
@@ -603,10 +596,10 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _nspass.delegate = self;
     _nspass.secureTextEntry = YES;
 
-    _serverpass = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _serverpass = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _serverpass.text = @"";
     _serverpass.textAlignment = NSTextAlignmentRight;
-    _serverpass.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
+    _serverpass.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _serverpass.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _serverpass.autocorrectionType = UITextAutocorrectionTypeNo;
     _serverpass.keyboardType = UIKeyboardTypeDefault;
@@ -617,24 +610,28 @@ static NSString * const ServerHasSSLKey = @"ssl";
 
     _commands = [[UITextView alloc] initWithFrame:CGRectZero];
     _commands.text = @"";
+    _commands.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _commands.backgroundColor = [UIColor clearColor];
     _commands.delegate = self;
     _commands.font = _server.font;
     _commands.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _commands.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     
     _channels = [[UITextView alloc] initWithFrame:CGRectZero];
     _channels.text = @"";
+    _channels.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _channels.backgroundColor = [UIColor clearColor];
     _channels.delegate = self;
     _channels.font = _server.font;
-    _commands.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _channels.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _channels.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     
     if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] == 0) {
         UILabel *unverified = [[UILabel alloc] init];
         unverified.backgroundColor = [UIColor clearColor];
-        unverified.textAlignment = UITextAlignmentCenter;
+        unverified.textAlignment = NSTextAlignmentCenter;
         unverified.numberOfLines = 0;
-        unverified.textColor = [UIColor grayColor];
+        unverified.textColor = [UIColor messageTextColor];
         unverified.text = @"\nYou can't connect to external servers until you confirm your email address.\n\nIf you're still waiting for the email, you can tap here to send yourself another confirmation.";
         unverified.tag = 1;
         unverified.userInteractionEnabled = YES;

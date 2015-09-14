@@ -25,7 +25,7 @@
 id Courier = NULL, CourierBold, CourierOblique,CourierBoldOblique;
 id Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
 id arrowFont, chalkboardFont, markerFont;
-UIFont *timestampFont;
+UIFont *timestampFont, *monoTimestampFont;
 NSDictionary *emojiMap;
 NSDictionary *quotes;
 float ColorFormatterCachedFontSize = 0.0f;
@@ -39,7 +39,7 @@ float ColorFormatterCachedFontSize = 0.0f;
 +(void)clearFontCache {
     CLS_LOG(@"Clearing font cache");
     Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = arrowFont = chalkboardFont = markerFont = NULL;
-    timestampFont = NULL;
+    timestampFont = monoTimestampFont = NULL;
 }
 
 +(UIFont *)timestampFont {
@@ -47,6 +47,13 @@ float ColorFormatterCachedFontSize = 0.0f;
         timestampFont = [UIFont systemFontOfSize:FONT_SIZE];
     }
     return timestampFont;
+}
+
++(UIFont *)monoTimestampFont {
+    if(!monoTimestampFont) {
+        monoTimestampFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+    }
+    return monoTimestampFont;
 }
 
 +(NSRegularExpression *)emoji {
@@ -1160,8 +1167,7 @@ float ColorFormatterCachedFontSize = 0.0f;
 }
 
 +(void)setFont:(id)font start:(int)start length:(int)length attributes:(NSMutableArray *)attributes {
-    [attributes addObject:@{
-                            ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?((NSString *)kCTFontAttributeName):NSFontAttributeName:font,
+    [attributes addObject:@{NSFontAttributeName:font,
                             @"start":@(start),
                             @"length":@(length)
                             }];
@@ -1169,7 +1175,7 @@ float ColorFormatterCachedFontSize = 0.0f;
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
     if(!color)
-        color = [UIColor blackColor];
+        color = [UIColor messageTextColor];
     
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;
@@ -1178,35 +1184,21 @@ float ColorFormatterCachedFontSize = 0.0f;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
     
     if(!Courier) {
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
-            arrowFont = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"HiraMinProN-W3", FONT_SIZE, NULL));
-            Courier = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"Courier", FONT_SIZE, NULL));
-            CourierBold = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"Courier-Bold", FONT_SIZE, NULL));
-            CourierOblique = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"Courier-Oblique", FONT_SIZE, NULL));
-            CourierBoldOblique = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"Courier-BoldOblique", FONT_SIZE, NULL));
-            chalkboardFont = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"ChalkboardSE-Light", FONT_SIZE, NULL));
-            markerFont = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"MarkerFelt-Thin", FONT_SIZE, NULL));
-            Helvetica = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"Helvetica", FONT_SIZE, NULL));
-            HelveticaBold = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"Helvetica-Bold", FONT_SIZE, NULL));
-            HelveticaOblique = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"Helvetica-Oblique", FONT_SIZE, NULL));
-            HelveticaBoldOblique = CFBridgingRelease(CTFontCreateWithName((CFStringRef)@"Helvetica-BoldOblique", FONT_SIZE, NULL));
-        } else {
-            arrowFont = [UIFont fontWithName:@"HiraMinProN-W3" size:FONT_SIZE];
-            Courier = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-            CourierBold = [UIFont fontWithName:@"Courier-Bold" size:FONT_SIZE];
-            CourierOblique = [UIFont fontWithName:@"Courier-Oblique" size:FONT_SIZE];
-            CourierBoldOblique = [UIFont fontWithName:@"Courier-BoldOblique" size:FONT_SIZE];
-            chalkboardFont = [UIFont fontWithName:@"ChalkboardSE-Light" size:FONT_SIZE];
-            markerFont = [UIFont fontWithName:@"MarkerFelt-Thin" size:FONT_SIZE];
-            UIFontDescriptor *bodyFontDescriptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
-            UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
-            UIFontDescriptor *italicBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
-            UIFontDescriptor *boldItalicBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold|UIFontDescriptorTraitItalic];
-            Helvetica = [UIFont fontWithDescriptor:bodyFontDescriptor size:FONT_SIZE];
-            HelveticaBold = [UIFont fontWithDescriptor:boldBodyFontDescriptor size:FONT_SIZE];
-            HelveticaOblique = [UIFont fontWithDescriptor:italicBodyFontDescriptor size:FONT_SIZE];
-            HelveticaBoldOblique = [UIFont fontWithDescriptor:boldItalicBodyFontDescriptor size:FONT_SIZE];
-        }
+        arrowFont = [UIFont fontWithName:@"HiraMinProN-W3" size:FONT_SIZE];
+        Courier = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        CourierBold = [UIFont fontWithName:@"Courier-Bold" size:FONT_SIZE];
+        CourierOblique = [UIFont fontWithName:@"Courier-Oblique" size:FONT_SIZE];
+        CourierBoldOblique = [UIFont fontWithName:@"Courier-BoldOblique" size:FONT_SIZE];
+        chalkboardFont = [UIFont fontWithName:@"ChalkboardSE-Light" size:FONT_SIZE];
+        markerFont = [UIFont fontWithName:@"MarkerFelt-Thin" size:FONT_SIZE];
+        UIFontDescriptor *bodyFontDescriptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
+        UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+        UIFontDescriptor *italicBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
+        UIFontDescriptor *boldItalicBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold|UIFontDescriptorTraitItalic];
+        Helvetica = [UIFont fontWithDescriptor:bodyFontDescriptor size:FONT_SIZE];
+        HelveticaBold = [UIFont fontWithDescriptor:boldBodyFontDescriptor size:FONT_SIZE];
+        HelveticaOblique = [UIFont fontWithDescriptor:italicBodyFontDescriptor size:FONT_SIZE];
+        HelveticaBoldOblique = [UIFont fontWithDescriptor:boldItalicBodyFontDescriptor size:FONT_SIZE];
         ColorFormatterCachedFontSize = FONT_SIZE;
     }
     
@@ -1419,11 +1411,11 @@ float ColorFormatterCachedFontSize = 0.0f;
     }
     
     NSMutableAttributedString *output = [[NSMutableAttributedString alloc] initWithString:text];
-    [output addAttributes:@{([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?((NSString *)kCTFontAttributeName):NSFontAttributeName:font} range:NSMakeRange(0, text.length)];
+    [output addAttributes:@{NSFontAttributeName:font} range:NSMakeRange(0, text.length)];
     [output addAttributes:@{(NSString *)kCTForegroundColorAttributeName:(__bridge id)[color CGColor]} range:NSMakeRange(0, text.length)];
 
     for(NSNumber *i in arrowIndex) {
-        [output addAttributes:@{([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?((NSString *)kCTFontAttributeName):NSFontAttributeName:arrowFont} range:NSMakeRange([i intValue], 1)];
+        [output addAttributes:@{NSFontAttributeName:arrowFont} range:NSMakeRange([i intValue], 1)];
     }
     
     CTParagraphStyleSetting paragraphStyle;
@@ -1442,7 +1434,7 @@ float ColorFormatterCachedFontSize = 0.0f;
     do {
         r = [text rangeOfString:@"comic sans" options:NSCaseInsensitiveSearch range:r];
         if(r.location != NSNotFound) {
-            [output addAttributes:@{([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?((NSString *)kCTFontAttributeName):NSFontAttributeName:chalkboardFont} range:r];
+            [output addAttributes:@{NSFontAttributeName:chalkboardFont} range:r];
             r.location++;
             r.length = text.length - r.location;
         }
@@ -1452,7 +1444,7 @@ float ColorFormatterCachedFontSize = 0.0f;
     do {
         r = [text rangeOfString:@"marker felt" options:NSCaseInsensitiveSearch range:r];
         if(r.location != NSNotFound) {
-            [output addAttributes:@{([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?((NSString *)kCTFontAttributeName):NSFontAttributeName:markerFont} range:r];
+            [output addAttributes:@{NSFontAttributeName:markerFont} range:r];
             r.location++;
             r.length = text.length - r.location;
         }

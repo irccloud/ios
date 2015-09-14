@@ -29,10 +29,10 @@
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
         _placeholder.text = @"You're not ignoring anyone at the moment.\n\nYou can ignore someone by tapping their nickname in the user list, long-pressing a message, or by using /ignore.";
         _placeholder.numberOfLines = 0;
-        _placeholder.backgroundColor = [UIColor whiteColor];
+        _placeholder.backgroundColor = [UIColor contentBackgroundColor];
         _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
         _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor selectedBlueColor];
+        _placeholder.textColor = [UIColor messageTextColor];
         _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     }
     return self;
@@ -48,10 +48,7 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-    }
+    self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.leftBarButtonItem = _addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
 }
@@ -116,7 +113,7 @@
 #pragma mark - Table view data source
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return [[_ignores objectAtIndex:indexPath.row] sizeWithFont:[UIFont boldSystemFontOfSize:18] constrainedToSize:CGSizeMake(self.tableView.frame.size.width, CGFLOAT_MAX) lineBreakMode:NSLineBreakByCharWrapping].height + 16;
+    return [[_ignores objectAtIndex:indexPath.row] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:18]} context:nil].size.height + 16;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

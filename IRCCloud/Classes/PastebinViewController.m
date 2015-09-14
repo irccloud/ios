@@ -63,20 +63,14 @@
 -(void)viewDidLoad {
     [super viewDidLoad];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-    } else {
-        _titleLabel.textColor = [UIColor whiteColor];
-        _metadataLabel.textColor = [UIColor whiteColor];
-    }
+    self.navigationController.navigationBar.clipsToBounds = YES;
 
     _lineNumbers = [[UISwitch alloc] initWithFrame:CGRectZero];
     _lineNumbers.on = YES;
     [_lineNumbers addTarget:self action:@selector(_toggleLineNumbers) forControlEvents:UIControlEventValueChanged];
     
     if(_ownPaste) {
-        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?@"Line Numbers":@"Line #s" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
+        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
                              [[UIBarButtonItem alloc] initWithCustomView:_lineNumbers],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(_editPaste)],
@@ -86,7 +80,7 @@
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
                              ]];
     } else {
-        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?@"Line Numbers":@"Line #s" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
+        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
                              [[UIBarButtonItem alloc] initWithCustomView:_lineNumbers],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
@@ -106,11 +100,12 @@
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[_url stringByAppendingFormat:@"?mobile=ios&version=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
+    [request setValue:[NSString stringWithFormat:@"session=%@", [NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
     [_webView loadRequest:request];
 }
 
 -(void)_doneButtonPressed {
-    [self.presentingViewController dismissModalViewControllerAnimated:YES];
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 -(void)_toggleLineNumbers {
@@ -134,7 +129,7 @@
     if([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Delete"]) {
         [[NetworkConnection sharedInstance] deletePaste:_pasteID];
         if(self.navigationController.viewControllers.count == 1)
-            [self.presentingViewController dismissModalViewControllerAnimated:YES];
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         else
             [self.navigationController popViewControllerAnimated:YES];
     }
@@ -180,30 +175,6 @@
             };
         }
         [self presentViewController:activityController animated:YES completion:nil];
-    } else {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Copy To Clipboard", @"Share on Twitter", ([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?@"Open In Chrome":@"Open In Safari",nil];
-        [sheet showFromToolbar:_toolbar];
-    }
-}
-
--(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSString *title = [actionSheet buttonTitleAtIndex:buttonIndex];
-    
-    if([title isEqualToString:@"Copy To Clipboard"]) {
-        UIPasteboard *pb = [UIPasteboard generalPasteboard];
-        pb.items = @[@{(NSString *)kUTTypeUTF8PlainText:_url,
-                       (NSString *)kUTTypeURL:[NSURL URLWithString:_url]}];
-    } else if([title isEqualToString:@"Share on Twitter"]) {
-        [Answers logShareWithMethod:@"Twitter" contentName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
-        TWTweetComposeViewController *tweetViewController = [[TWTweetComposeViewController alloc] init];
-        [tweetViewController setInitialText:_url];
-        [tweetViewController setCompletionHandler:^(TWTweetComposeViewControllerResult result) {
-            [self dismissModalViewControllerAnimated:YES];
-        }];
-        [self presentModalViewController:tweetViewController animated:YES];
-    } else if([title hasPrefix:@"Open "]) {
-        [self _doneButtonPressed];
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:_url]];
     }
 }
 

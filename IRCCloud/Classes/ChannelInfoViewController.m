@@ -20,6 +20,7 @@
 #import "NetworkConnection.h"
 #import "AppDelegate.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation ChannelInfoViewController
 
@@ -43,10 +44,7 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-    }
+    self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         offset = 40;
@@ -66,6 +64,7 @@
     _topicEdit.returnKeyType = UIReturnKeyDone;
     _topicEdit.delegate = self;
     _topicEdit.backgroundColor = [UIColor clearColor];
+    _topicEdit.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     [self refresh];
 }
 
@@ -125,7 +124,7 @@
     Server *server = [[ServersDataSource sharedInstance] getServer:_channel.cid];
     if([_channel.topic_text isKindOfClass:[NSString class]] && _channel.topic_text.length) {
         NSArray *links;
-        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
+        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor messageTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
         _topicLabel.text = _topic;
         CGFloat lineSpacing = 6;
         CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
@@ -136,7 +135,7 @@
         CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
         
         NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-        [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+        [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
         [mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
         _topicLabel.linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
         
@@ -165,7 +164,7 @@
             _topicSetBy = nil;
         }
     } else {
-        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor grayColor] mono:NO linkify:NO server:nil links:nil];
+        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
         _topicLabel.text = _topic;
         _topicEdit.text = @"";
         _topicSetBy = nil;
@@ -211,18 +210,14 @@
 #pragma mark - Table view data source
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
-        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
-        label.text = [self tableView:tableView titleForHeaderInSection:section];
-        label.font = [UIFont systemFontOfSize:14];
-        label.textColor = [UIColor grayColor];
-        label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-        [header addSubview:label];
-        return header;
-    } else {
-        return nil;
-    }
+    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
+    label.text = [self tableView:tableView titleForHeaderInSection:section];
+    label.font = [UIFont systemFontOfSize:14];
+    label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
+    label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    [header addSubview:label];
+    return header;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -272,7 +267,7 @@
             return 48;
         } else {
             NSString *hint = [[_modeHints objectAtIndex:indexPath.row] objectForKey:@"hint"];
-            return [hint sizeWithFont:[UIFont systemFontOfSize:14] constrainedToSize:CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX) lineBreakMode:NSLineBreakByWordWrapping].height + 32;
+            return ceil([hint boundingRectWithSize:CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]} context:nil].size.height) + 32;
         }
     }
 }
@@ -284,26 +279,14 @@
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        switch(section) {
-            case 0:
-                return @"TOPIC";
-            case 1:
-                if(_modeHints.count)
-                    return [NSString stringWithFormat:@"MODE: +%@", _channel.mode];
-                else
-                    return @"MODE";
-        }
-    } else {
-        switch(section) {
-            case 0:
-                return @"Topic";
-            case 1:
-                if(_modeHints.count)
-                    return [NSString stringWithFormat:@"Mode: +%@", _channel.mode];
-                else
-                    return @"Mode";
-        }
+    switch(section) {
+        case 0:
+            return @"TOPIC";
+        case 1:
+            if(_modeHints.count)
+                return [NSString stringWithFormat:@"MODE: +%@", _channel.mode];
+            else
+                return @"MODE";
     }
     return nil;
 }

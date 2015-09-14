@@ -28,12 +28,13 @@
 @interface UsersTableCell : UITableViewCell {
     UILabel *_label;
     UILabel *_count;
-    UIView *_border;
+    UIView *_border1;
+    UIView *_border2;
     int _type;
 }
 @property int type;
 @property (readonly) UILabel *label,*count;
-@property (readonly) UIView *border;
+@property (readonly) UIView *border1, *border2;
 @end
 
 @implementation UsersTableCell
@@ -56,8 +57,11 @@
         _count.font = [UIFont systemFontOfSize:14];
         [self.contentView addSubview:_count];
         
-        _border = [[UIView alloc] init];
-        [self.contentView addSubview:_border];
+        _border1 = [[UIView alloc] init];
+        [self.contentView addSubview:_border1];
+        
+        _border2 = [[UIView alloc] init];
+        [self.contentView addSubview:_border2];
     }
     return self;
 }
@@ -66,13 +70,14 @@
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
-    _border.frame = CGRectMake(0,0,frame.size.width,1);
+    _border1.frame = CGRectMake(0,frame.size.height - 1,frame.size.width,1);
+    _border2.frame = CGRectMake(0,0,3,frame.size.height);
 
     frame.origin.x = 12;
     frame.size.width -= 24;
     
     if(_type == TYPE_HEADING) {
-        float countWidth = [_count.text sizeWithFont:_count.font].width;
+        float countWidth = [_count.text sizeWithAttributes:@{NSFontAttributeName:_count.font}].width;
         _count.frame = CGRectMake(frame.origin.x + frame.size.width - countWidth, frame.origin.y, countWidth, frame.size.height);
         _count.hidden = NO;
         _label.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width - countWidth - 6, frame.size.height);
@@ -116,21 +121,19 @@
     [self refresh];
 }
 
-- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol headingColor:(UIColor *)headingColor countColor:(UIColor *)countColor headingBgColor:(UIColor *)headingBgColor groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data sectionTitles:(NSMutableArray *)sectionTitles sectionIndexes:(NSMutableArray *)sectionIndexes sectionSizes:(NSMutableArray *)sectionSizes {
-    int first;
+- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data sectionTitles:(NSMutableArray *)sectionTitles sectionIndexes:(NSMutableArray *)sectionIndexes sectionSizes:(NSMutableArray *)sectionSizes {
     if(users.count && symbol) {
         unichar lastChar = 0;
         [data addObject:@{
          @"type":@TYPE_HEADING,
          @"text":heading,
-         @"color":headingColor,
-         @"bgColor":headingBgColor,
+         @"color":[UIColor whiteColor],
+         @"bgColor":borderColor,
          @"count":@(users.count),
-         @"countColor":countColor,
+         @"countColor":[UIColor whiteColor],
          @"symbol":symbol
          }];
         NSUInteger size = data.count;
-        first = 1;
         for(User *user in users) {
             if(sectionTitles != nil) {
                 if(user.nick.length && [[user.nick lowercaseString] characterAtIndex:0] != lastChar) {
@@ -146,12 +149,11 @@
             [data addObject:@{
              @"type":@TYPE_USER,
              @"text":user.nick,
-             @"color":user.away?[UIColor timestampColor]:[UIColor blackColor],
+             @"color":user.away?[UIColor memberListAwayTextColor]:[UIColor memberListTextColor],
              @"bgColor":groupColor,
-             @"first":@(first),
+             @"last":@(user == users.lastObject && ![heading isEqualToString:@"Members"]),
              @"borderColor":borderColor
              }];
-            first = 0;
         }
         if(sectionSizes != nil)
             [sectionSizes addObject:@(size)];
@@ -211,21 +213,21 @@
         }
     }
     
-    [self _addUsersFromList:opers heading:@"Opers" symbol:[PREFIX objectForKey:s?s.MODE_OPER:@"Y"] headingColor:[UIColor whiteColor] countColor:[UIColor opersLightColor] headingBgColor:[UIColor opersHeadingColor] groupColor:[UIColor opersGroupColor] borderColor:[UIColor opersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
-    [self _addUsersFromList:owners heading:@"Owners" symbol:[PREFIX objectForKey:s?s.MODE_OWNER:@"q"] headingColor:[UIColor whiteColor] countColor:[UIColor ownersLightColor] headingBgColor:[UIColor ownersHeadingColor] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
-    [self _addUsersFromList:admins heading:@"Admins" symbol:[PREFIX objectForKey:s?s.MODE_ADMIN:@"a"] headingColor:[UIColor whiteColor] countColor:[UIColor adminsLightColor] headingBgColor:[UIColor adminsHeadingColor] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
-    [self _addUsersFromList:ops heading:@"Ops" symbol:[PREFIX objectForKey:s?s.MODE_OP:@"o"] headingColor:[UIColor whiteColor] countColor:[UIColor opsLightColor] headingBgColor:[UIColor opsHeadingColor] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
-    [self _addUsersFromList:halfops heading:@"Half Ops" symbol:[PREFIX objectForKey:s?s.MODE_HALFOP:@"h"] headingColor:[UIColor whiteColor] countColor:[UIColor halfopsLightColor] headingBgColor:[UIColor halfopsHeadingColor] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
-    [self _addUsersFromList:voiced heading:@"Voiced" symbol:[PREFIX objectForKey:s?s.MODE_VOICED:@"v"] headingColor:[UIColor whiteColor] countColor:[UIColor voicedLightColor] headingBgColor:[UIColor voicedHeadingColor] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:opers heading:@"Opers" symbol:[PREFIX objectForKey:s?s.MODE_OPER:@"Y"] groupColor:[UIColor opersGroupColor] borderColor:[UIColor opersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:owners heading:@"Owners" symbol:[PREFIX objectForKey:s?s.MODE_OWNER:@"q"] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:admins heading:@"Admins" symbol:[PREFIX objectForKey:s?s.MODE_ADMIN:@"a"] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:ops heading:@"Ops" symbol:[PREFIX objectForKey:s?s.MODE_OP:@"o"] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:halfops heading:@"Half Ops" symbol:[PREFIX objectForKey:s?s.MODE_HALFOP:@"h"] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:voiced heading:@"Voiced" symbol:[PREFIX objectForKey:s?s.MODE_VOICED:@"v"] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
     [sectionIndexes addObject:@(0)];
-    [self _addUsersFromList:members heading:@"Members" symbol:@"" headingColor:[UIColor whiteColor] countColor:[UIColor whiteColor] headingBgColor:[UIColor selectedBlueColor] groupColor:[UIColor backgroundBlueColor] borderColor:[UIColor blueBorderColor] data:data sectionTitles:sectionTitles sectionIndexes:sectionIndexes sectionSizes:sectionSizes];
+    [self _addUsersFromList:members heading:@"Members" symbol:@"" groupColor:[UIColor membersGroupColor] borderColor:[UIColor membersBorderColor] data:data sectionTitles:sectionTitles sectionIndexes:sectionIndexes sectionSizes:sectionSizes];
     if(sectionSizes.count == 0)
         [sectionSizes addObject:@(data.count)];
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _headingFont = [UIFont fontWithName:_headingFont.fontName size:FONT_SIZE];
-        _countFont = [UIFont fontWithName:_countFont.fontName size:FONT_SIZE];
-        _userFont = [UIFont fontWithName:_userFont.fontName size:FONT_SIZE];
+        _headingFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_headingFont.fontName size:FONT_SIZE];
+        _countFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_countFont.fontName size:FONT_SIZE];
+        _userFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_userFont.fontName size:FONT_SIZE];
         
         _refreshTimer = nil;
         _data = data;
@@ -233,6 +235,7 @@
         _sectionIndexes = sectionIndexes;
         _sectionSizes = sectionSizes;
         [self.tableView reloadData];
+        self.tableView.backgroundColor = [UIColor usersDrawerBackgroundColor];
     }];
 }
 
@@ -249,19 +252,21 @@
         delegate = (id<UsersTableViewDelegate>)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
 
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.view.backgroundColor = [UIColor backgroundBlueColor];
+    self.view.backgroundColor = [UIColor usersDrawerBackgroundColor];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
     
     _refreshTimer = nil;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
-        _headingFont = _userFont = _countFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
-    } else {
-        _headingFont = _userFont = _countFont = [UIFont systemFontOfSize:FONT_SIZE];
-    }
+    UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+    _headingFont = _userFont = _countFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
+}
 
+- (void)viewWillAppear:(BOOL)animated {
+    _headingFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_headingFont.fontName size:FONT_SIZE];
+    _countFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_countFont.fontName size:FONT_SIZE];
+    _userFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_userFont.fontName size:FONT_SIZE];
+    [self.tableView reloadData];
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
@@ -342,12 +347,14 @@
         if(_userFont)
             cell.label.font = _userFont;
     }
-    if(cell.type == TYPE_HEADING || [[row objectForKey:@"first"] intValue]) {
-        cell.border.hidden = YES;
+    if(cell.type == TYPE_HEADING || ![[row objectForKey:@"last"] intValue]) {
+        cell.border1.hidden = YES;
     } else {
-        cell.border.hidden = NO;
-        cell.border.backgroundColor = [row objectForKey:@"borderColor"];
+        cell.border1.hidden = ![UIColor isDarkTheme];
+        cell.border1.backgroundColor = [row objectForKey:@"borderColor"];
     }
+    cell.border2.hidden = ![UIColor isDarkTheme];
+    cell.border2.backgroundColor = [row objectForKey:@"borderColor"];
     return cell;
 }
 

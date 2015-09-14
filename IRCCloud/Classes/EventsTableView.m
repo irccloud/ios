@@ -44,11 +44,12 @@ int __timestampWidth;
         _type = 0;
         
         self.selectionStyle = UITableViewCellSelectionStyleNone;
-        self.backgroundColor = [UIColor whiteColor];
+        self.backgroundColor = [UIColor contentBackgroundColor];
         
         _timestamp = [[UILabel alloc] init];
         _timestamp.backgroundColor = [UIColor clearColor];
         _timestamp.textColor = [UIColor timestampColor];
+        _timestamp.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:_timestamp];
 
         _message = [[TTTAttributedLabel alloc] init];
@@ -56,12 +57,11 @@ int __timestampWidth;
         _message.numberOfLines = 0;
         _message.lineBreakMode = NSLineBreakByWordWrapping;
         _message.backgroundColor = [UIColor clearColor];
-        _message.textColor = [UIColor blackColor];
+        _message.textColor = [UIColor messageTextColor];
         _message.dataDetectorTypes = UIDataDetectorTypeNone;
         [self.contentView addSubview:_message];
         
         _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
-        _socketClosedBar.backgroundColor = [UIColor newMsgsBackgroundColor];
         _socketClosedBar.hidden = YES;
         [self.contentView addSubview:_socketClosedBar];
         
@@ -86,6 +86,7 @@ int __timestampWidth;
             frame.size.height -= 20;
             _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, frame.size.width + 12, 26);
             _socketClosedBar.hidden = NO;
+            _socketClosedBar.backgroundColor = [UIColor newMsgsBackgroundColor];
         } else if(_type == ROW_FAILED) {
             frame.size.width -= 20;
             _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
@@ -93,7 +94,6 @@ int __timestampWidth;
             _socketClosedBar.hidden = YES;
             _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         }
-        _timestamp.textAlignment = NSTextAlignmentRight;
         [_timestamp sizeToFit];
         _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = NO;
@@ -104,13 +104,12 @@ int __timestampWidth;
             frame.origin.y = frame.size.height / 2;
             frame.size.height = 1;
         } else if(_type == ROW_LASTSEENEID) {
-            int width = [_timestamp.text sizeWithFont:_timestamp.font].width + 12;
+            int width = [_timestamp.text sizeWithAttributes:@{NSFontAttributeName:_timestamp.font}].width + 12;
             frame.origin.x = (frame.size.width - width) / 2;
             frame.size.width = width;
         }
         _timestamp.frame = frame;
         _timestamp.hidden = NO;
-        _timestamp.textAlignment = NSTextAlignmentCenter;
         _message.hidden = YES;
         _socketClosedBar.hidden = YES;
     }
@@ -154,7 +153,7 @@ int __timestampWidth;
     CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
     
     NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-    [mutableLinkAttributes setObject:(id)[[UIColor blueColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+    [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
 	[mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
     _linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
     
@@ -166,17 +165,18 @@ int __timestampWidth;
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
-    _topUnreadView.backgroundColor = [UIColor selectedBlueColor];
-    _bottomUnreadView.backgroundColor = [UIColor selectedBlueColor];
+    _topUnreadView.backgroundColor = [UIColor unreadBlueColor];
+    _bottomUnreadView.backgroundColor = [UIColor unreadBlueColor];
     [_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
     [_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateHighlighted];
-    [_backlogFailedButton setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
+    [_backlogFailedButton setTitleColor:[UIColor unreadBlueColor] forState:UIControlStateNormal];
     [_backlogFailedButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateHighlighted];
     [_backlogFailedButton setTitleShadowColor:[UIColor whiteColor] forState:UIControlStateNormal];
     _backlogFailedButton.titleLabel.shadowOffset = CGSizeMake(0, 1);
     [_backlogFailedButton.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
     
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    self.tableView.backgroundColor = [UIColor contentBackgroundColor];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -521,11 +521,11 @@ int __timestampWidth;
         }
 
         if((_currentCollapsedEid == event.eid || [_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) && [event.type isEqualToString:@"user_channel_mode"]) {
-            event.color = [UIColor blackColor];
-            event.bgColor = [UIColor whiteColor];
+            event.color = [UIColor messageTextColor];
+            event.bgColor = [UIColor contentBackgroundColor];
         } else {
-            event.color = [UIColor timestampColor];
-            event.bgColor = [UIColor whiteColor];
+            event.color = [UIColor collapsedRowTextColor];
+            event.bgColor = [UIColor contentBackgroundColor];
         }
         
         NSString *msg;
@@ -551,7 +551,7 @@ int __timestampWidth;
                 heading.eid = _currentCollapsedEid - 1;
                 heading.groupMsg = [NSString stringWithFormat:@"   %@",groupMsg];
                 heading.color = [UIColor timestampColor];
-                heading.bgColor = [UIColor whiteColor];
+                heading.bgColor = [UIColor contentBackgroundColor];
                 heading.formattedMsg = nil;
                 heading.formatted = nil;
                 heading.linkify = NO;
@@ -687,23 +687,24 @@ int __timestampWidth;
     }
     NSString *msg = @"";
     CGRect rect = _topUnreadView.frame;
+    _topUnreadArrow.frame = CGRectMake(0,8,12,rect.size.height-12);
     if(highlights) {
         if(highlights == 1)
             msg = @"mention and ";
         else
             msg = @"mentions and ";
         _topHighlightsCountView.count = [NSString stringWithFormat:@"%i", highlights];
-        CGSize size = [_topHighlightsCountView.count sizeWithFont:_topHighlightsCountView.font];
+        CGSize size = [_topHighlightsCountView.count sizeWithAttributes:@{NSFontAttributeName:_topHighlightsCountView.font}];
         size.width += 6;
         size.height = rect.size.height - 12;
         if(size.width < size.height)
             size.width = size.height;
-        _topHighlightsCountView.frame = CGRectMake(4,6,size.width,size.height);
+        _topHighlightsCountView.frame = CGRectMake(16,6,size.width,size.height);
         _topHighlightsCountView.hidden = NO;
-        _topUnreadlabel.frame = CGRectMake(8+size.width,6,rect.size.width - size.width - 8 - 32, rect.size.height-12);
+        _topUnreadLabel.frame = CGRectMake(20+size.width,6,rect.size.width - size.width - 8 - 32, rect.size.height-12);
     } else {
         _topHighlightsCountView.hidden = YES;
-        _topUnreadlabel.frame = CGRectMake(4,6,rect.size.width - 8 - 32, rect.size.height-12);
+        _topUnreadLabel.frame = CGRectMake(16,6,rect.size.width - 8 - 32, rect.size.height-12);
     }
     if(_lastSeenEidPos == 0 && firstRow < _data.count) {
         int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
@@ -717,31 +718,31 @@ int __timestampWidth;
             int days = hours / 24;
             if(days) {
                 if(days == 1)
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i day of unread messages", days];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i day of unread messages", days];
                 else
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i days of unread messages", days];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i days of unread messages", days];
             } else if(hours) {
                 if(hours == 1)
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i hour of unread messages", hours];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i hour of unread messages", hours];
                 else
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i hours of unread messages", hours];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i hours of unread messages", hours];
             } else if(minutes) {
                 if(minutes == 1)
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i minute of unread messages", minutes];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i minute of unread messages", minutes];
                 else
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i minutes of unread messages", minutes];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i minutes of unread messages", minutes];
             } else {
                 if(seconds == 1)
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i second of unread messages", seconds];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i second of unread messages", seconds];
                 else
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i seconds of unread messages", seconds];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i seconds of unread messages", seconds];
             }
         }
     } else {
         if(firstRow - _lastSeenEidPos == 1) {
-            _topUnreadlabel.text = [msg stringByAppendingFormat:@"%li unread message", (long)(firstRow - _lastSeenEidPos)];
+            _topUnreadLabel.text = [msg stringByAppendingFormat:@"%li unread message", (long)(firstRow - _lastSeenEidPos)];
         } else if(firstRow - _lastSeenEidPos > 0) {
-            _topUnreadlabel.text = [msg stringByAppendingFormat:@"%li unread messages", (long)(firstRow - _lastSeenEidPos)];
+            _topUnreadLabel.text = [msg stringByAppendingFormat:@"%li unread messages", (long)(firstRow - _lastSeenEidPos)];
         } else {
             _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
             self.tableView.tableHeaderView = self.tableView.tableHeaderView;
@@ -753,23 +754,24 @@ int __timestampWidth;
 -(void)updateUnread {
     NSString *msg = @"";
     CGRect rect = _bottomUnreadView.frame;
+    _bottomUnreadArrow.frame = CGRectMake(0,8,12,rect.size.height-12);
     if(_newHighlights) {
         if(_newHighlights == 1)
             msg = @"mention";
         else
             msg = @"mentions";
         _bottomHighlightsCountView.count = [NSString stringWithFormat:@"%li", (long)_newHighlights];
-        CGSize size = [_bottomHighlightsCountView.count sizeWithFont:_bottomHighlightsCountView.font];
+        CGSize size = [_bottomHighlightsCountView.count sizeWithAttributes:@{NSFontAttributeName:_bottomHighlightsCountView.font}];
         size.width += 6;
         size.height = rect.size.height - 12;
         if(size.width < size.height)
             size.width = size.height;
-        _bottomHighlightsCountView.frame = CGRectMake(4,6,size.width,size.height);
+        _bottomHighlightsCountView.frame = CGRectMake(16,6,size.width,size.height);
         _bottomHighlightsCountView.hidden = NO;
-        _bottomUndreadlabel.frame = CGRectMake(8+size.width,6,rect.size.width - size.width - 8, rect.size.height-12);
+        _bottomUnreadLabel.frame = CGRectMake(20+size.width,6,rect.size.width - size.width - 8, rect.size.height-12);
     } else {
         _bottomHighlightsCountView.hidden = YES;
-        _bottomUndreadlabel.frame = CGRectMake(4,6,rect.size.width - 8, rect.size.height-12);
+        _bottomUnreadLabel.frame = CGRectMake(16,6,rect.size.width - 8, rect.size.height-12);
     }
     if(_newMsgs - _newHighlights > 0) {
         if(_newHighlights)
@@ -780,7 +782,7 @@ int __timestampWidth;
             msg = [msg stringByAppendingFormat:@"%li unread messages", (long)(_newMsgs - _newHighlights)];
     }
     if(msg.length) {
-        _bottomUndreadlabel.text = msg;
+        _bottomUnreadLabel.text = msg;
         [UIView beginAnimations:nil context:nil];
         [UIView setAnimationDuration:0.1];
         _bottomUnreadView.alpha = 1;
@@ -985,6 +987,10 @@ int __timestampWidth;
 }
 
 - (void)refresh {
+    self.tableView.backgroundColor = [UIColor contentBackgroundColor];
+    _headerView.backgroundColor = [UIColor contentBackgroundColor];
+    _backlogFailedView.backgroundColor = [UIColor contentBackgroundColor];
+    
     [_lock lock];
     [_scrollTimer invalidate];
     _ready = NO;
@@ -1011,11 +1017,13 @@ int __timestampWidth;
 
     if(_conn.state == kIRCCloudStateConnected)
         [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
-    __timestampWidth = [@"88:88" sizeWithFont:[ColorFormatter timestampFont]].width;
+    UIFont *f = [[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"]?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
+    __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
     if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-        __timestampWidth += [@":88" sizeWithFont:[ColorFormatter timestampFont]].width;
+        __timestampWidth += [@":88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
     if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
-        __timestampWidth += [@" AM" sizeWithFont:[ColorFormatter timestampFont]].width;
+        __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:f}].width;
+    __timestampWidth += 4;
     
     _file_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
     _paste_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
@@ -1052,7 +1060,7 @@ int __timestampWidth;
         e.type = TYPE_BACKLOG;
         e.rowType = ROW_BACKLOG;
         e.formattedMsg = nil;
-        e.bgColor = [UIColor whiteColor];
+        e.bgColor = [UIColor contentBackgroundColor];
         [self _addItem:e eid:backlogEid];
         e.timestamp = nil;
     }
@@ -1227,7 +1235,7 @@ int __timestampWidth;
             return e.height;
         } else if(e.formattedMsg.length > 0) {
             NSArray *links;
-            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:e.monospace linkify:e.linkify server:_server links:&links];
+            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:[[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"] || e.monospace linkify:e.linkify server:_server links:&links];
             if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
                 NSMutableArray *mutableLinks = links.mutableCopy;
                 for(int i = 0; i < mutableLinks.count; i++) {
@@ -1286,8 +1294,10 @@ int __timestampWidth;
     Event *e = [_data objectAtIndex:[indexPath row]];
     [_lock unlock];
     cell.type = e.rowType;
+    cell.backgroundView = nil;
+    cell.backgroundColor = nil;
     cell.contentView.backgroundColor = e.bgColor;
-    cell.timestamp.font = [ColorFormatter timestampFont];
+    cell.timestamp.font = [[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"]?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
     cell.message.font = [ColorFormatter timestampFont];
     cell.message.delegate = self;
     cell.message.text = e.formatted;
@@ -1306,7 +1316,7 @@ int __timestampWidth;
                 cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
             } else {
                 cell.accessory.image = [UIImage imageNamed:@"tiny_plus"];
-                cell.contentView.backgroundColor = [UIColor collapsedRowBackgroundColor];
+                cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
             }
         } else {
             cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_plus"];
@@ -1352,16 +1362,16 @@ int __timestampWidth;
     else
         cell.timestamp.text = e.timestamp;
     if(e.rowType == ROW_TIMESTAMP) {
-        cell.timestamp.textColor = [UIColor blackColor];
+        cell.timestamp.textColor = [UIColor messageTextColor];
     } else if(e.isHighlight && !e.isSelf) {
         cell.timestamp.textColor = [UIColor highlightTimestampColor];
     } else {
         cell.timestamp.textColor = [UIColor timestampColor];
     }
     if(e.rowType == ROW_BACKLOG) {
-        cell.timestamp.backgroundColor = [UIColor selectedBlueColor];
+        cell.timestamp.backgroundColor = [UIColor backlogDividerColor];
     } else if(e.rowType == ROW_LASTSEENEID) {
-        cell.timestamp.backgroundColor = [UIColor whiteColor];
+        cell.timestamp.backgroundColor = [UIColor contentBackgroundColor];
     } else {
         cell.timestamp.backgroundColor = [UIColor clearColor];
     }

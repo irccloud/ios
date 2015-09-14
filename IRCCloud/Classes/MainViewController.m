@@ -45,6 +45,7 @@
 #import "ARChromeActivity.h"
 #import "TUSafariActivity.h"
 #import "OpenInChromeController.h"
+#import "ServerReorderViewController.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -69,6 +70,41 @@ extern NSDictionary *emojiMap;
         _pendingEvents = [[NSMutableArray alloc] init];
     }
     return self;
+}
+
+- (void)_themeChanged {
+    self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
+    self.view.backgroundColor = [UIColor contentBackgroundColor];
+    _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
+    [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
+    [_sendBtn setTitleColor:[UIColor textareaBackgroundColor] forState:UIControlStateNormal];
+    [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
+    [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
+    _message.textColor = [UIColor textareaTextColor];
+    _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+
+    UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
+    [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    users.frame = CGRectMake(0,0,24,22);
+    [users setTintColor:[UIColor navBarSubheadingColor]];
+    users.accessibilityLabel = @"Channel members list";
+    _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+
+    _menuBtn.tintColor = [UIColor navBarSubheadingColor];
+    
+    _eventsView.topUnreadView.backgroundColor = [UIColor chatterBarColor];
+    _eventsView.bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
+    _eventsView.topUnreadLabel.textColor = [UIColor chatterBarTextColor];
+    _eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
+    _eventsView.topUnreadArrow.textColor = _eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
+    
+    _borders.backgroundColor = [UIColor iPadBordersColor];
+    [[_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
+    
+    UIView *v = self.navigationController.view.superview;
+    [self.navigationController.view removeFromSuperview];
+    [v addSubview: self.navigationController.view];
 }
 
 - (void)viewDidLoad {
@@ -140,15 +176,10 @@ extern NSDictionary *emojiMap;
     _uploadsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     _uploadsBtn.contentMode = UIViewContentModeCenter;
     _uploadsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-    [_uploadsBtn setImage:[UIImage imageNamed:@"upload_arrow"] forState:UIControlStateNormal];
+    [_uploadsBtn setImage:[[UIImage imageNamed:@"upload_arrow"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_uploadsBtn addTarget:self action:@selector(uploadsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_uploadsBtn sizeToFit];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 6)
-        _uploadsBtn.frame = CGRectMake(5,5,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
-    else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 6)
-        _uploadsBtn.frame = CGRectMake(5,3,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
-    else
-        _uploadsBtn.frame = CGRectMake(5,2,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
+    _uploadsBtn.frame = CGRectMake(5,2,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
     _uploadsBtn.accessibilityLabel = @"Uploads";
     [_bottomBar addSubview:_uploadsBtn];
 
@@ -156,13 +187,9 @@ extern NSDictionary *emojiMap;
     _sendBtn.contentMode = UIViewContentModeCenter;
     _sendBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
     [_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
-    [_sendBtn setTitleColor:[UIColor selectedBlueColor] forState:UIControlStateNormal];
     [_sendBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
     [_sendBtn sizeToFit];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,12,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
-    else
-        _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,4,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
+    _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,4,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
     [_sendBtn addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_sendBtn sizeToFit];
     _sendBtn.enabled = NO;
@@ -172,16 +199,13 @@ extern NSDictionary *emojiMap;
     _settingsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     _settingsBtn.contentMode = UIViewContentModeCenter;
     _settingsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
-    [_settingsBtn setImage:[UIImage imageNamed:@"settings"] forState:UIControlStateNormal];
+    [_settingsBtn setImage:[[UIImage imageNamed:@"settings"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_settingsBtn addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_settingsBtn sizeToFit];
     _settingsBtn.accessibilityLabel = @"Menu";
     _settingsBtn.enabled = NO;
     _settingsBtn.alpha = 0;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 6)
-        _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,4,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
-    else
-        _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
+    _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
     [_bottomBar addSubview:_settingsBtn];
     
     self.slidingViewController.view.frame = [UIScreen mainScreen].applicationFrame;
@@ -200,12 +224,9 @@ extern NSDictionary *emojiMap;
     self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
 
     _menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
+    [_menuBtn setImage:[[UIImage imageNamed:@"menu"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        _menuBtn.frame = CGRectMake(0,0,32,32);
-    else
-        _menuBtn.frame = CGRectMake(0,0,20,18);
+    _menuBtn.frame = CGRectMake(0,0,20,18);
     _menuBtn.accessibilityLabel = @"Channels list";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
     
@@ -232,25 +253,15 @@ extern NSDictionary *emojiMap;
     _nickCompletionView.alpha = 0;
     [self.view addSubview:_nickCompletionView];
     [_bottomBar addSubview:_message];
-    UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
-    [users setImage:[UIImage imageNamed:@"users"] forState:UIControlStateNormal];
-    [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        users.frame = CGRectMake(0,0,40,40);
-    else
-        users.frame = CGRectMake(0,0,24,22);
-    users.accessibilityLabel = @"Channel members list";
-    _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
 
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar addSubview:_connectingProgress];
-        [_connectingProgress sizeToFit];
-        [_connectingActivity removeFromSuperview];
-        _connectingStatus.font = [UIFont boldSystemFontOfSize:20];
-    }
+    [self.navigationController.navigationBar addSubview:_connectingProgress];
+    [_connectingProgress sizeToFit];
+    [_connectingActivity removeFromSuperview];
+    _connectingStatus.font = [UIFont boldSystemFontOfSize:20];
     self.navigationItem.titleView = _titleView;
     _connectingProgress.hidden = YES;
     _connectingProgress.progress = 0;
+    [self _themeChanged];
     [self connectivityChanged:nil];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     
@@ -339,15 +350,15 @@ extern NSDictionary *emojiMap;
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if(highlightCount) {
-                [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
+                _menuBtn.tintColor = [UIColor redColor];
                 _menuBtn.accessibilityValue = @"Unread highlights";
             } else if(unreadCount) {
-                if(![_menuBtn.imageView.image isEqual:[UIImage imageNamed:@"menu_unread"]])
+                if(![_menuBtn.tintColor isEqual:[UIColor unreadBlueColor]])
                     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
-                [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
+                _menuBtn.tintColor = [UIColor unreadBlueColor];
                 _menuBtn.accessibilityValue = @"Unread messages";
             } else {
-                [_menuBtn setImage:[UIImage imageNamed:@"menu"] forState:UIControlStateNormal];
+                _menuBtn.tintColor = [UIColor navBarSubheadingColor];
                 _menuBtn.accessibilityValue = nil;
             }
         }];
@@ -384,7 +395,7 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         }
             break;
@@ -565,7 +576,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -583,7 +594,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -600,7 +611,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -617,7 +628,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -633,7 +644,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -650,7 +661,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -666,7 +677,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -682,7 +693,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -698,7 +709,7 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
@@ -742,6 +753,7 @@ extern NSDictionary *emojiMap;
             }
             break;
         case kIRCEventUserInfo:
+            [self _themeChanged];
         case kIRCEventPart:
         case kIRCEventKick:
             [self _updateTitleArea];
@@ -833,7 +845,7 @@ extern NSDictionary *emojiMap;
                             AudioServicesPlaySystemSound(alertSound);
                             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
                         }
-                        [_menuBtn setImage:[UIImage imageNamed:@"menu_highlight"] forState:UIControlStateNormal];
+                        _menuBtn.tintColor = [UIColor redColor];
                         _menuBtn.accessibilityValue = @"Unread highlights";
                     } else if(_menuBtn.accessibilityValue == nil) {
                         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
@@ -845,7 +857,7 @@ extern NSDictionary *emojiMap;
                                 break;
                         }
                         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
-                        [_menuBtn setImage:[UIImage imageNamed:@"menu_unread"] forState:UIControlStateNormal];
+                        _menuBtn.tintColor = [UIColor unreadBlueColor];
                         _menuBtn.accessibilityValue = @"Unread messages";
                     }
                 }
@@ -946,6 +958,8 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)connectivityChanged:(NSNotification *)notification {
+    _connectingStatus.textColor = [UIColor navBarHeadingColor];
+    
     switch([NetworkConnection sharedInstance].state) {
         case kIRCCloudStateConnecting:
             [self _showConnectingView];
@@ -1128,8 +1142,7 @@ extern NSDictionary *emojiMap;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-        ([UIApplication sharedApplication].delegate).window.backgroundColor = [UIColor whiteColor];
+    [self _themeChanged];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     for(Event *e in [_pendingEvents copy]) {
@@ -1158,7 +1171,6 @@ extern NSDictionary *emojiMap;
     } else {
         [self bufferSelected:_buffer.bid];
     }
-    [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
     if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         self.navigationController.navigationBar.translucent = NO;
         self.edgesForExtendedLayout=UIRectEdgeNone;
@@ -1190,8 +1202,6 @@ extern NSDictionary *emojiMap;
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-        self.view.window.backgroundColor = [UIColor blackColor];
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
     [_doubleTapTimer invalidate];
@@ -1296,7 +1306,7 @@ extern NSDictionary *emojiMap;
                     else
                         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                     if(self.presentedViewController)
-                        [self dismissModalViewControllerAnimated:NO];
+                        [self dismissViewControllerAnimated:NO completion:nil];
                     [self presentViewController:nc animated:YES completion:nil];
                     return;
                 }
@@ -1657,6 +1667,8 @@ extern NSDictionary *emojiMap;
 
 -(void)_updateTitleArea {
     _lock.hidden = YES;
+    _titleLabel.textColor = [UIColor navBarHeadingColor];
+    _topicLabel.textColor = [UIColor navBarSubheadingColor];
     if([_buffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s.name.length)
@@ -1671,19 +1683,21 @@ extern NSDictionary *emojiMap;
         _titleLabel.font = [UIFont boldSystemFontOfSize:18];
         _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
         _topicLabel.text = [NSString stringWithFormat:@"%@:%i", s.hostname, s.port];
-        _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,16);
+        _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,4,16,16);
         _lock.hidden = NO;
         if(s.ssl > 0)
-            _lock.image = [UIImage imageNamed:@"world_shield"];
+            _lock.image = [[UIImage imageNamed:@"world_shield"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
         else
-            _lock.image = [UIImage imageNamed:@"world"];
+            _lock.image = [[UIImage imageNamed:@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        _lock.tintColor = [UIColor navBarHeadingColor];
     } else {
         self.navigationItem.title = _titleLabel.text = _buffer.name;
         _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
         _titleLabel.font = [UIFont boldSystemFontOfSize:20];
         _titleLabel.accessibilityValue = _buffer.accessibilityValue;
         _topicLabel.hidden = YES;
-        _lock.image = [UIImage imageNamed:@"lock"];
+        _lock.image = [[UIImage imageNamed:@"lock"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        _lock.tintColor = [UIColor navBarHeadingColor];
         if([_buffer.type isEqualToString:@"channel"]) {
             _titleLabel.accessibilityLabel = @"Channel";
             BOOL lock = NO;
@@ -1699,9 +1713,9 @@ extern NSDictionary *emojiMap;
                     _topicLabel.text = [[ColorFormatter format:channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
                     _topicLabel.accessibilityLabel = @"Topic";
                     _topicLabel.accessibilityValue = _topicLabel.text;
-                    _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,4,16,_titleLabel.bounds.size.height-4);
+                    _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,4,16,_titleLabel.bounds.size.height-4);
                 } else {
-                    _lock.frame = CGRectMake((_titleView.frame.size.width - [_titleLabel.text sizeWithFont:_titleLabel.font constrainedToSize:_titleLabel.bounds.size].width)/2 - 20,0,16,_titleLabel.bounds.size.height);
+                    _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,0,16,_titleLabel.bounds.size.height);
                     _topicLabel.hidden = YES;
                 }
             }
@@ -2023,7 +2037,7 @@ extern NSDictionary *emojiMap;
         if(state == kIRCCloudStateConnected) {
             EditConnectionViewController *evc = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [evc setURL:url];
-            [self.navigationController presentModalViewController:[[UINavigationController alloc] initWithRootViewController:evc] animated:YES];
+            [self.navigationController presentViewController:[[UINavigationController alloc] initWithRootViewController:evc] animated:YES completion:nil];
         } else {
             _urlToOpen = url;
         }
@@ -2206,13 +2220,13 @@ extern NSDictionary *emojiMap;
         if(_serverStatusBar.hidden) {
             _serverStatusBar.hidden = NO;
         }
-        _serverStatusBar.backgroundColor = [UIColor backgroundBlueColor];
-        _serverStatus.textColor = [UIColor darkBlueColor];
+        _serverStatusBar.backgroundColor = [UIColor connectionBarColor];
+        _serverStatus.textColor = [UIColor connectionBarTextColor];
         _serverStatus.font = [UIFont systemFontOfSize:FONT_SIZE];
         if([s.status isEqualToString:@"connected_ready"]) {
             if([s.away isKindOfClass:[NSString class]]) {
-                _serverStatusBar.backgroundColor = [UIColor lightGrayColor];
-                _serverStatus.textColor = [UIColor blackColor];
+                _serverStatusBar.backgroundColor = [UIColor awayBarColor];
+                _serverStatus.textColor = [UIColor awayBarTextColor];
                 if(![[s.away lowercaseString] isEqualToString:@"away"]) {
                     _serverStatus.text = [NSString stringWithFormat:@"Away (%@). Tap to come back.", s.away];
                 } else {
@@ -2268,8 +2282,8 @@ extern NSDictionary *emojiMap;
                         reason = @"You can't connect to passworded servers with free accounts.";
                     _serverStatus.text = [NSString stringWithFormat:@"Disconnected: %@", reason];
                 }
-                _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
-                _serverStatus.textColor = [UIColor networkErrorColor];
+                _serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
+                _serverStatus.textColor = [UIColor connectionErrorBarTextColor];
             } else {
                 _serverStatus.text = @"Disconnected. Tap to reconnect.";
             }
@@ -2283,8 +2297,8 @@ extern NSDictionary *emojiMap;
             _serverStatus.text = @"Connected: Joining Channels";
         } else if([s.status isEqualToString:@"pool_unavailable"]) {
             _serverStatus.text = @"Connection temporarily unavailable";
-            _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
-            _serverStatus.textColor = [UIColor networkErrorColor];
+            _serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
+            _serverStatus.textColor = [UIColor connectionErrorBarTextColor];
         } else if([s.status isEqualToString:@"waiting_to_retry"]) {
             double seconds = ([[s.fail_info objectForKey:@"timestamp"] doubleValue] + [[s.fail_info objectForKey:@"retry_timeout"] intValue]) - [[NSDate date] timeIntervalSince1970];
             if(seconds > 0) {
@@ -2320,8 +2334,8 @@ extern NSDictionary *emojiMap;
                     text = [text stringByAppendingString:@"; "];
                 text = [text stringByAppendingFormat:@"Reconnecting in %i seconds.", (int)seconds];
                 _serverStatus.text = text;
-                _serverStatusBar.backgroundColor = [UIColor networkErrorBackgroundColor];
-                _serverStatus.textColor = [UIColor networkErrorColor];
+                _serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
+                _serverStatus.textColor = [UIColor connectionErrorBarTextColor];
             } else {
                 _serverStatus.text = @"Ready to connect.  Waiting our turn…";
             }
@@ -2338,7 +2352,7 @@ extern NSDictionary *emojiMap;
         frame.origin.x = 8;
         frame.origin.y = 4;
         frame.size.width = _serverStatusBar.frame.size.width - 16;
-        frame.size.height = [_serverStatus.text sizeWithFont:_serverStatus.font constrainedToSize:CGSizeMake(frame.size.width, INT_MAX) lineBreakMode:_serverStatus.lineBreakMode].height;
+        frame.size.height = ceil([_serverStatus.text boundingRectWithSize:CGSizeMake(frame.size.width, INT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _serverStatus.font} context:nil].size.height);
         if(frame.size.height < 24)
             frame.size.height = 24;
         _serverStatus.frame = frame;
@@ -2390,7 +2404,7 @@ extern NSDictionary *emojiMap;
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         height += [UIApplication sharedApplication].statusBarFrame.size.height;
-    else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
+    else
         height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
 
     CGRect frame = self.slidingViewController.view.frame;
@@ -2398,11 +2412,11 @@ extern NSDictionary *emojiMap;
         if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
             frame.origin.y = _kbSize.height;
         else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
-            frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
+            frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
         else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
             frame.origin.x = _kbSize.height;
         else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
-            frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)?20:0);
+            frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - 20;
     } else {
         frame.origin.x = 0;
         if(![UIApplication sharedApplication].statusBarHidden && [UIApplication sharedApplication].statusBarFrame.size.height > 20)
@@ -2416,9 +2430,6 @@ extern NSDictionary *emojiMap;
     
     if(sbheight)
         height -= sbheight - 20;
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7 && sbheight > 20)
-        height += 20;
     
     if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
         frame.size.width = height;
@@ -2446,7 +2457,7 @@ extern NSDictionary *emojiMap;
     
     height -= self.navigationController.navigationBar.frame.size.height;
 
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && sbheight)
+    if(sbheight)
         height -= 20;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
@@ -2514,7 +2525,7 @@ extern NSDictionary *emojiMap;
     _eventsView.topUnreadView.frame = frame;
     frame.origin.y = _eventsView.tableView.frame.size.height - 32;
     _eventsView.bottomUnreadView.frame = frame;
-    float h = [@" " sizeWithFont:_nickCompletionView.font].height + 12;
+    float h = [@" " sizeWithAttributes:@{NSFontAttributeName:_nickCompletionView.font}].height + 12;
     _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
     _nickCompletionView.layer.cornerRadius = 5;
     
@@ -2545,15 +2556,12 @@ extern NSDictionary *emojiMap;
         frame.size.width -= _buffersView.tableView.frame.size.width;
     _connectingView.frame = _titleView.frame = frame;
 
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        frame = _connectingProgress.frame;
-        frame.origin.x = 0;
-        frame.origin.y = self.navigationController.navigationBar.frame.size.height - frame.size.height;
-        frame.size.width = self.navigationController.navigationBar.frame.size.width;
-        _connectingProgress.frame = frame;
-        _connectingStatus.frame = _connectingView.bounds;
-    }
-    
+    frame = _connectingProgress.frame;
+    frame.origin.x = 0;
+    frame.origin.y = self.navigationController.navigationBar.frame.size.height - frame.size.height;
+    frame.size.width = self.navigationController.navigationBar.frame.size.width;
+    _connectingProgress.frame = frame;
+    _connectingStatus.frame = _connectingView.bounds;
     
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
     [self _updateTitleArea];
@@ -3014,7 +3022,7 @@ extern NSDictionary *emojiMap;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+        [self dismissViewControllerAnimated:NO completion:nil];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -3030,6 +3038,28 @@ extern NSDictionary *emojiMap;
     } else {
         [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
     }
+}
+
+-(void)_addNetwork {
+    EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    [self.slidingViewController resetTopView];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self presentViewController:nc animated:YES completion:nil];
+}
+
+-(void)_reorder {
+    ServerReorderViewController *svc = [[ServerReorderViewController alloc] initWithStyle:UITableViewStylePlain];
+    [self.slidingViewController resetTopView];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self presentViewController:nc animated:YES completion:nil];
 }
 
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
@@ -3092,6 +3122,12 @@ extern NSDictionary *emojiMap;
         [alert addAction:[UIAlertAction actionWithTitle:@"Mark All As Read" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             [self _markAllAsRead];
         }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Add A Network" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _addNetwork];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Reorder" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _reorder];
+        }]];
 
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
         alert.popoverPresentationController.sourceRect = rect;
@@ -3125,6 +3161,8 @@ extern NSDictionary *emojiMap;
             [sheet addButtonWithTitle:@"Delete"];
         }
         [sheet addButtonWithTitle:@"Mark All As Read"];
+        [sheet addButtonWithTitle:@"Add A Network"];
+        [sheet addButtonWithTitle:@"Reorder"];
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
             [self.view.window addSubview:_landscapeView];
@@ -3260,19 +3298,13 @@ extern NSDictionary *emojiMap;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])
         picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
     picker.delegate = (id)self;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [picker.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-    }
-    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 && sourceType == UIImagePickerControllerSourceTypeCamera)) {
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
         picker.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self.slidingViewController presentViewController:picker animated:YES completion:nil];
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
-    } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone] && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
+    } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone]) {
         picker.modalPresentationStyle = UIModalPresentationFormSheet;
         picker.preferredContentSize = CGSizeMake(540, 576);
         [self.slidingViewController presentViewController:picker animated:YES completion:nil];
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     } else {
         _popover = [[UIPopoverController alloc] initWithContentViewController:picker];
         _popover.delegate = self;
@@ -3288,7 +3320,6 @@ extern NSDictionary *emojiMap;
         documentPicker.modalPresentationStyle = UIModalPresentationFormSheet;
     else {
         documentPicker.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
     }
     [self presentViewController:documentPicker animated:YES completion:nil];
 }
@@ -3324,8 +3355,7 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)_resetStatusBar {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
@@ -3471,7 +3501,7 @@ extern NSDictionary *emojiMap;
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     CLS_LOG(@"Image picker was cancelled");
-    [self.slidingViewController dismissModalViewControllerAnimated:YES];
+    [self.slidingViewController dismissViewControllerAnimated:YES completion:nil];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -3547,7 +3577,7 @@ extern NSDictionary *emojiMap;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+        [self dismissViewControllerAnimated:NO completion:nil];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -3599,7 +3629,7 @@ extern NSDictionary *emojiMap;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+        [self dismissViewControllerAnimated:NO completion:nil];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -3611,7 +3641,7 @@ extern NSDictionary *emojiMap;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+        [self dismissViewControllerAnimated:NO completion:nil];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -3624,7 +3654,7 @@ extern NSDictionary *emojiMap;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
-        [self dismissModalViewControllerAnimated:NO];
+        [self dismissViewControllerAnimated:NO completion:nil];
     [self presentViewController:nc animated:YES completion:nil];
 }
 
@@ -3635,14 +3665,14 @@ extern NSDictionary *emojiMap;
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
             [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
             }]];
         }
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
             [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
             }]];
         }
@@ -3658,7 +3688,7 @@ extern NSDictionary *emojiMap;
             }]];
             [alert addAction:[UIAlertAction actionWithTitle:@"Choose Document" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 if(self.presentedViewController)
-                    [self dismissModalViewControllerAnimated:NO];
+                    [self dismissViewControllerAnimated:NO completion:nil];
                 [self _chooseFile];
             }]];
         }
@@ -3761,7 +3791,7 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Mention"]) {
             [self showMentionTip];
@@ -3776,7 +3806,7 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Display Options"]) {
             DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
@@ -3788,7 +3818,7 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Add Network"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
@@ -3798,21 +3828,21 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Start a Pastebin"]) {
             [self _startPastebin];
         } else if([action isEqualToString:@"Take a Photo"] || [action isEqualToString:@"Take Photo or Video"]) {
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
         } else if([action isEqualToString:@"Choose Photo"] || [action isEqualToString:@"Choose Photo or Video"]) {
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
         } else if([action isEqualToString:@"Choose Document"]) {
             if(self.presentedViewController)
-                [self dismissModalViewControllerAnimated:NO];
+                [self dismissViewControllerAnimated:NO completion:nil];
             [self _chooseFile];
         } else if([action isEqualToString:@"File Uploads"]) {
             [self _showUploads];
@@ -3822,6 +3852,10 @@ extern NSDictionary *emojiMap;
             [self _startPastebin];
         } else if([action isEqualToString:@"Mark All As Read"]) {
             [self _markAllAsRead];
+        } else if([action isEqualToString:@"Add A Network"]) {
+            [self _addNetwork];
+        } else if([action isEqualToString:@"Reorder"]) {
+            [self _reorder];
         }
         
         if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)

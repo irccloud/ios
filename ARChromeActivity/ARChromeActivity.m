@@ -52,11 +52,21 @@
 }
 
 - (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
-	return [[activityItems lastObject] isKindOfClass:[NSURL class]] && [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"googlechrome-x-callback://"]];
+    for (id activityItem in activityItems) {
+        if ([activityItem isKindOfClass:[NSURL class]] && [[UIApplication sharedApplication] canOpenURL:activityItem] && [[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"googlechrome-x-callback://"]]) {
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 - (void)prepareWithActivityItems:(NSArray *)activityItems {
-	_activityURL = [activityItems lastObject];
+    for (id activityItem in activityItems) {
+        if ([activityItem isKindOfClass:[NSURL class]]) {
+            _activityURL = activityItem;
+        }
+    }
 }
 
 - (void)performActivity {

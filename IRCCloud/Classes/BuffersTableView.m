@@ -30,9 +30,7 @@
 #define TYPE_CHANNEL 1
 #define TYPE_CONVERSATION 2
 #define TYPE_ARCHIVES_HEADER 3
-#define TYPE_ADD_NETWORK 4
-#define TYPE_JOIN_CHANNEL 5
-#define TYPE_REORDER 6
+#define TYPE_JOIN_CHANNEL 4
 
 @interface BuffersTableCell : UITableViewCell {
     UILabel *_label;
@@ -40,9 +38,9 @@
     int _type;
     UIView *_unreadIndicator;
     UIView *_bg;
+    UIView *_border;
     HighlightsCountView *_highlights;
     UIActivityIndicatorView *_activity;
-    UIButton *_joinBtn;
     UIColor *_bgColor;
     UIColor *_highlightColor;
 }
@@ -53,7 +51,6 @@
 @property (readonly) UIView *unreadIndicator, *bg;
 @property (readonly) HighlightsCountView *highlights;
 @property (readonly) UIActivityIndicatorView *activity;
-@property (readonly) UIButton *joinBtn;
 @end
 
 @implementation BuffersTableCell
@@ -63,14 +60,16 @@
     if (self) {
         _type = 0;
         
-        self.contentView.backgroundColor = [UIColor backgroundBlueColor];
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
         _bg = [[UIView alloc] init];
         [self.contentView addSubview:_bg];
         
+        _border = [[UIView alloc] init];
+        [self.contentView addSubview:_border];
+        
         _unreadIndicator = [[UIView alloc] init];
-        _unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
+        _unreadIndicator.backgroundColor = [UIColor unreadBlueColor];
         [self.contentView addSubview:_unreadIndicator];
         
         _icon = [[UIImageView alloc] init];
@@ -79,7 +78,7 @@
 
         _label = [[UILabel alloc] init];
         _label.backgroundColor = [UIColor clearColor];
-        _label.textColor = [UIColor selectedBlueColor];
+        _label.textColor = [UIColor bufferTextColor];
         [self.contentView addSubview:_label];
         
         _highlights = [[HighlightsCountView alloc] initWithFrame:CGRectZero];
@@ -88,12 +87,6 @@
         _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         _activity.hidden = YES;
         [self.contentView addSubview:_activity];
-        
-        _joinBtn = [[UIButton alloc] initWithFrame:CGRectZero];
-        _joinBtn.hidden = YES;
-        _joinBtn.adjustsImageWhenHighlighted = YES;
-        [_joinBtn setImage:[UIImage imageNamed:@"add"] forState:UIControlStateNormal];
-        [self.contentView addSubview:_joinBtn];
     }
     return self;
 }
@@ -101,11 +94,15 @@
 - (void)layoutSubviews {
 	[super layoutSubviews];
 	
-	CGRect frame = [self.contentView bounds];
+    self.contentView.backgroundColor = [UIColor bufferBackgroundColor];
+    _border.backgroundColor = [UIColor bufferBorderColor];
+
+    CGRect frame = [self.contentView bounds];
+    _border.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
     frame.size.width -= 8;
-    if(_type == TYPE_SERVER || _type == TYPE_ADD_NETWORK) {
+    if(_type == TYPE_SERVER) {
         frame.origin.y += 6;
-        frame.size.height -= (_type == TYPE_ADD_NETWORK)?12:6;
+        frame.size.height -= 6;
     }
     _bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
     _unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
@@ -113,10 +110,6 @@
     if(!_activity.hidden) {
         frame.size.width -= _activity.frame.size.width + 12;
         _activity.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 10, _activity.frame.size.width, _activity.frame.size.height);
-    }
-    if(!_joinBtn.hidden) {
-        frame.size.width -= frame.size.height + 12;
-        _joinBtn.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y, frame.size.height, frame.size.height);
     }
     if(!_highlights.hidden) {
 #pragma GCC diagnostic push
@@ -332,7 +325,7 @@
                     }
                 }
             }
-            if(buffers.count == 1) {
+            if(buffers.count == 1 && [server.status isEqualToString:@"connected_ready"]) {
                 [data addObject:@{
                  @"type":@TYPE_JOIN_CHANNEL,
                  @"cid":@(server.cid),
@@ -344,27 +337,6 @@
                  }];
             }
         }
-#ifndef EXTENSION
-        [data addObject:@{
-         @"type":@TYPE_ADD_NETWORK,
-         @"cid":@-1,
-         @"bid":@-1,
-         @"name":@"Add a Network",
-         @"unread":@0,
-         @"highlights":@0,
-         @"archived":@0,
-         }];
-
-        [data addObject:@{
-          @"type":@TYPE_REORDER,
-          @"cid":@-1,
-          @"bid":@-1,
-          @"name":@"Reorder",
-          @"unread":@0,
-          @"highlights":@0,
-          @"archived":@0,
-          }];
-#endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             _boldFont = [UIFont boldSystemFontOfSize:FONT_SIZE];
            _normalFont = [UIFont systemFontOfSize:FONT_SIZE];
@@ -381,6 +353,7 @@
             _lastUnreadPosition = lastUnreadPosition;
             _lastHighlightPosition = lastHighlightPosition;
             _lastFailurePosition = lastFailurePosition;
+            self.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
             [self.tableView reloadData];
             [self _updateUnreadIndicators];
         }];
@@ -406,7 +379,7 @@
         if(_firstUnreadPosition != -1 && first > _firstUnreadPosition) {
             topUnreadIndicator.hidden = NO;
             topUnreadIndicator.alpha = 1;
-            topUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+            topUnreadIndicatorColor.backgroundColor = [UIColor unreadBlueColor];
             topUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
         }
         if((_lastHighlightPosition != -1 && first > _lastHighlightPosition) ||
@@ -429,7 +402,7 @@
         if(_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
             bottomUnreadIndicator.hidden = NO;
             bottomUnreadIndicator.alpha = 1;
-            bottomUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+            bottomUnreadIndicatorColor.backgroundColor = [UIColor unreadBlueColor];
             bottomUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
         }
         if((_firstHighlightPosition != -1 && last < _firstHighlightPosition) ||
@@ -442,20 +415,6 @@
     }
     topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y + self.tableView.contentInset.top,self.view.frame.size.width, 40);
     bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
-#endif
-}
-
-- (void)joinBtnPressed:(UIButton *)sender {
-#ifndef EXTENSION
-    [_delegate dismissKeyboard];
-    Server *s = [_servers getServer:(int)sender.tag];
-    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    _alertView.tag = sender.tag;
-    [_alertView textFieldAtIndex:0].placeholder = @"#example";
-    [_alertView textFieldAtIndex:0].text = @"#";
-    [_alertView textFieldAtIndex:0].delegate = self;
-    [_alertView show];
 #endif
 }
 
@@ -492,19 +451,11 @@
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
 
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
-        _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
-    } else {
-        _boldFont = [UIFont boldSystemFontOfSize:16.0f];
-    }
+    UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+    _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
-        _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
-    } else {
-        _normalFont = [UIFont systemFontOfSize:16.0f];
-    }
+    d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+    _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     
     UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
@@ -520,7 +471,7 @@
         topUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,15)];
         topUnreadIndicatorColor.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         topUnreadIndicatorColor.userInteractionEnabled = NO;
-        topUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+        topUnreadIndicatorColor.backgroundColor = [UIColor unreadBlueColor];
     }
 
     if(!topUnreadIndicatorBorder) {
@@ -546,7 +497,7 @@
         bottomUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,1,self.view.frame.size.width,15)];
         bottomUnreadIndicatorColor.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         bottomUnreadIndicatorColor.userInteractionEnabled = NO;
-        bottomUnreadIndicatorColor.backgroundColor = [UIColor selectedBlueColor];
+        bottomUnreadIndicatorColor.backgroundColor = [UIColor unreadBlueColor];
     }
 
     if(!bottomUnreadIndicatorBorder) {
@@ -570,7 +521,7 @@
 #endif
 
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.view.backgroundColor = [UIColor backgroundBlueColor];
+    self.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
@@ -820,8 +771,6 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER) {
         return 46;
-    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
-        return 52;
     } else {
         return 40;
     }
@@ -832,21 +781,19 @@
     BuffersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bufferscell"];
     if(!cell) {
         cell = [[BuffersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"bufferscell"];
-        [cell.joinBtn addTarget:self action:@selector(joinBtnPressed:) forControlEvents:UIControlEventTouchUpInside];
     }
     NSDictionary *row = [_data objectAtIndex:[indexPath row]];
     NSString *status = [row objectForKey:@"status"];
     cell.type = [[row objectForKey:@"type"] intValue];
     cell.label.text = [row objectForKey:@"name"];
     cell.activity.hidden = YES;
-    cell.joinBtn.hidden = YES;
     cell.accessibilityValue = [row objectForKey:@"hint"];
     cell.highlightColor = [UIColor colorWithRed:0.776 green:0.855 blue:1 alpha:1];
     if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
         if([[row objectForKey:@"archived"] intValue])
             cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
         else
-            cell.unreadIndicator.backgroundColor = [UIColor selectedBlueColor];
+            cell.unreadIndicator.backgroundColor = selected?[UIColor selectedBufferBorderColor]:[UIColor unreadBlueColor];
         cell.unreadIndicator.hidden = NO;
         cell.label.font = _boldFont;
         cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", unread"];
@@ -865,29 +812,31 @@
         case TYPE_SERVER:
             cell.accessibilityLabel = @"Network";
             if([[row objectForKey:@"ssl"] intValue])
-                cell.icon.image = [UIImage imageNamed:@"world_shield"];
+                cell.icon.image = [[UIImage imageNamed:@"world_shield"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
             else
-                cell.icon.image = [UIImage imageNamed:@"world"];
+                cell.icon.image = [[UIImage imageNamed:@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
             cell.icon.hidden = NO;
             if(selected) {
-                cell.label.textColor = [UIColor whiteColor];
+                cell.icon.tintColor = cell.label.textColor = [UIColor selectedBufferTextColor];
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count]) {
-                    cell.label.textColor = [UIColor networkErrorColor];
+                    cell.icon.tintColor = cell.label.textColor = [UIColor networkErrorColor];
                     cell.unreadIndicator.backgroundColor = cell.bgColor = [UIColor networkErrorBackgroundColor];
                 } else {
-                    cell.bgColor = [UIColor selectedBlueColor];
+                    cell.bgColor = [UIColor selectedBufferBackgroundColor];
                 }
             } else {
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
-                    cell.label.textColor = [UIColor ownersHeadingColor];
+                    cell.icon.tintColor = cell.label.textColor = [UIColor ownersBorderColor];
                 else if(![status isEqualToString:@"connected_ready"])
-                    cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
+                    cell.icon.tintColor = cell.label.textColor = [UIColor inactiveBufferTextColor];
+                else if([[row objectForKey:@"unread"] intValue])
+                    cell.icon.tintColor = cell.label.textColor = [UIColor unreadBufferTextColor];
                 else
-                    cell.label.textColor = [UIColor selectedBlueColor];
+                    cell.icon.tintColor = cell.label.textColor = [UIColor bufferTextColor];
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
                     cell.bgColor = [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
                 else
-                    cell.bgColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
+                    cell.bgColor = [UIColor serverBackgroundColor];
             }
             if(![status isEqualToString:@"connected_ready"] && ![status isEqualToString:@"quitting"] && ![status isEqualToString:@"disconnected"]) {
                 [cell.activity startAnimating];
@@ -897,10 +846,6 @@
                 [cell.activity stopAnimating];
                 cell.activity.hidden = YES;
             }
-#ifndef EXTENSION
-            cell.joinBtn.hidden = ![status isEqualToString:@"connected_ready"] || [[row objectForKey:@"count"] intValue] < 2;
-#endif
-            cell.joinBtn.tag = [[row objectForKey:@"cid"] intValue];
             break;
         case TYPE_CHANNEL:
         case TYPE_CONVERSATION:
@@ -909,7 +854,7 @@
             else
                 cell.accessibilityLabel = @"Channel";
             if([[row objectForKey:@"key"] intValue]) {
-                cell.icon.image = [UIImage imageNamed:@"lock"];
+                cell.icon.image = [[UIImage imageNamed:@"lock"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 cell.icon.hidden = NO;
             } else {
                 cell.icon.image = nil;
@@ -921,21 +866,23 @@
                     cell.bgColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
                     cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", archived"];
                 } else {
-                    cell.label.textColor = [UIColor whiteColor];
-                    cell.bgColor = [UIColor selectedBlueColor];
+                    cell.icon.tintColor = cell.label.textColor = [UIColor selectedBufferTextColor];
+                    cell.bgColor = [UIColor selectedBufferBackgroundColor];
                 }
             } else {
                 if([[row objectForKey:@"archived"] intValue]) {
-                    cell.label.textColor = [UIColor timestampColor];
-                    cell.bgColor = [UIColor colorWithRed:0.957 green:0.957 blue:0.957 alpha:1];
+                    cell.label.textColor = [UIColor inactiveBufferTextColor];
+                    cell.bgColor = [UIColor bufferBackgroundColor];
                     cell.highlightColor = [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
                     cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", archived"];
                 } else {
                     if([[row objectForKey:@"joined"] intValue] == 0 || ![status isEqualToString:@"connected_ready"])
-                        cell.label.textColor = [UIColor colorWithRed:0.612 green:0.729 blue:1 alpha:1];
+                        cell.icon.tintColor = cell.label.textColor = [UIColor inactiveBufferTextColor];
+                    else if([[row objectForKey:@"unread"] intValue])
+                        cell.icon.tintColor = cell.label.textColor = [UIColor unreadBufferTextColor];
                     else
-                        cell.label.textColor = [UIColor selectedBlueColor];
-                    cell.bgColor = [UIColor bufferBlueColor];
+                        cell.icon.tintColor = cell.label.textColor = [UIColor bufferTextColor];
+                    cell.bgColor = [UIColor bufferBackgroundColor];
                 }
             }
             if([[row objectForKey:@"timeout"] intValue]) {
@@ -956,29 +903,17 @@
                 cell.bgColor = [UIColor timestampColor];
                 cell.accessibilityHint = @"Hides archive list";
             } else {
-                cell.label.textColor = [UIColor colorWithRed:0.133 green:0.133 blue:0.133 alpha:1];
-                cell.bgColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
+                cell.label.textColor = [UIColor inactiveBufferTextColor];
+                cell.bgColor = [UIColor bufferBackgroundColor];
                 cell.accessibilityHint = @"Shows archive list";
             }
             break;
-        case TYPE_ADD_NETWORK:
-            cell.icon.image = [UIImage imageNamed:@"world_add"];
-            cell.icon.hidden = NO;
-            cell.label.textColor = [UIColor selectedBlueColor];
-            cell.bgColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
-            break;
         case TYPE_JOIN_CHANNEL:
-            cell.icon.image = [UIImage imageNamed:@"add"];
-            cell.icon.hidden = NO;
-            cell.label.textColor = [UIColor colorWithRed:0.275 green:0.537 blue:0 alpha:1];
+            cell.label.textColor = [UIColor colorWithRed:0.361 green:0.69 blue:0 alpha:1];
             cell.highlightColor = [UIColor colorWithRed:0.855 green:0.961 blue:0.667 alpha:1];
-            cell.bgColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
-            break;
-        case TYPE_REORDER:
-            cell.icon.image = [UIImage imageNamed:@"move"];
-            cell.icon.hidden = NO;
-            cell.label.textColor = [UIColor selectedBlueColor];
-            cell.bgColor = [UIColor colorWithRed:0.886 green:0.929 blue:1 alpha:1];
+            cell.bgColor = [UIColor bufferBackgroundColor];
+            cell.icon.image = nil;
+            cell.icon.hidden = YES;
             break;
     }
     return cell;
@@ -1040,31 +975,17 @@
         else
             [_expandedArchives setObject:@YES forKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
         [self performSelectorInBackground:@selector(refresh) withObject:nil];
+#ifndef EXTENSION
     } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
-        UIButton *b = [[UIButton alloc] init];
-        b.tag = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
-        [self joinBtnPressed:b];
-    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
-#ifndef EXTENSION
-        EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        [self.slidingViewController resetTopView];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self presentViewController:nc animated:YES completion:nil];
-#endif
-    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_REORDER) {
-#ifndef EXTENSION
-        ServerReorderViewController *svc = [[ServerReorderViewController alloc] initWithStyle:UITableViewStylePlain];
-        [self.slidingViewController resetTopView];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self presentViewController:nc animated:YES completion:nil];
+        [_delegate dismissKeyboard];
+        Server *s = [_servers getServer:[[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
+        _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+        _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+        _alertView.tag = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
+        [_alertView textFieldAtIndex:0].placeholder = @"#example";
+        [_alertView textFieldAtIndex:0].text = @"#";
+        [_alertView textFieldAtIndex:0].delegate = self;
+        [_alertView show];
 #endif
     } else {
 #ifndef EXTENSION

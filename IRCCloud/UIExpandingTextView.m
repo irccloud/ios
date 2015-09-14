@@ -30,7 +30,7 @@
 
 #import "UIExpandingTextView.h"
 
-#define kTextInsetX ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?2:4
+#define kTextInsetX 4
 #define kTextInsetBottom 0
 
 @implementation UIExpandingTextView
@@ -100,9 +100,8 @@
         
         /* Custom Background image */
         textViewBackgroundImage = [[UIImageView alloc] initWithFrame:backgroundFrame];
-        textViewBackgroundImage.image          = [UIImage imageNamed:@"textbg"];
+        textViewBackgroundImage.image          = [[UIImage imageNamed:@"textbg"] stretchableImageWithLeftCapWidth:0.5 topCapHeight:0.5];
         textViewBackgroundImage.contentMode    = UIViewContentModeScaleToFill;
-        textViewBackgroundImage.contentStretch = CGRectMake(0.5, 0.5, 0, 0);
         
         [self addSubview:textViewBackgroundImage];
         [self addSubview:internalTextView];
@@ -116,6 +115,18 @@
         [self sizeToFit];
     }
     return self;
+}
+
+-(void)setBackgroundImage:(UIImage *)image {
+    textViewBackgroundImage.image = image;
+}
+
+-(void)setKeyboardAppearance:(UIKeyboardAppearance)keyboardAppearance {
+    internalTextView.keyboardAppearance = keyboardAppearance;
+}
+
+-(UIKeyboardAppearance)keyboardAppearance {
+    return internalTextView.keyboardAppearance;
 }
 
 -(void)sizeToFit
@@ -168,10 +179,7 @@
         newText = [newText stringByAppendingString:@"\n|W|"];
     }
     internalTextView.text     = newText;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        maximumHeight             = internalTextView.contentSize.height;
-    else
-        maximumHeight             = internalTextView.intrinsicContentSize.height;
+    maximumHeight             = internalTextView.intrinsicContentSize.height;
     maximumNumberOfLines      = n;
     internalTextView.scrollEnabled = oldScrollEnabled;
     internalTextView.text     = saveText;
@@ -199,10 +207,7 @@
         newText = [newText stringByAppendingString:@"\n|W|"];
     }
     internalTextView.text     = newText;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-        minimumHeight             = internalTextView.contentSize.height;
-    else
-        minimumHeight             = internalTextView.intrinsicContentSize.height;
+    minimumHeight             = internalTextView.intrinsicContentSize.height;
     internalTextView.scrollEnabled = oldScrollEnabled;
     internalTextView.text     = saveText;
     internalTextView.hidden   = NO;
@@ -222,7 +227,7 @@
         placeholderLabel.alpha = 0;
     }
     
-    NSInteger newHeight = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)?internalTextView.contentSize.height:[textView.text sizeWithFont:textView.font constrainedToSize:CGSizeMake(internalTextView.bounds.size.width - 12, maximumHeight) lineBreakMode:NSLineBreakByWordWrapping].height + 17;
+    NSInteger newHeight = ceil([textView.text boundingRectWithSize:CGSizeMake(internalTextView.bounds.size.width - 12, maximumHeight) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:textView.font} context:nil].size.height) + 17;
     
 	if(newHeight < minimumHeight || !internalTextView.hasText)
     {

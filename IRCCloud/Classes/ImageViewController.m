@@ -705,39 +705,6 @@
         [self presentViewController:activityController animated:YES completion:nil];
         [_hideTimer invalidate];
         _hideTimer = nil;
-    } else {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Copy To Clipboard", @"Share on Twitter", ([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?@"Open In Chrome":@"Open In Safari",nil];
-        [sheet showFromToolbar:_toolbar];
-    }
-}
-
--(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSString *title = [actionSheet buttonTitleAtIndex:buttonIndex];
-    
-    if([title isEqualToString:@"Copy To Clipboard"]) {
-        UIPasteboard *pb = [UIPasteboard generalPasteboard];
-        if(_imageView.image) {
-            NSData* imageData = UIImageJPEGRepresentation(_imageView.image, 1);
-            pb.items = @[@{(NSString *)kUTTypeUTF8PlainText:_url.absoluteString,
-                           (NSString *)kUTTypeJPEG:imageData,
-                           (NSString *)kUTTypeURL:_url}];
-        } else {
-            pb.items = @[@{(NSString *)kUTTypeUTF8PlainText:_url.absoluteString,
-                           (NSString *)kUTTypeURL:_url}];
-        }
-    } else if([title isEqualToString:@"Share on Twitter"]) {
-        TWTweetComposeViewController *tweetViewController = [[TWTweetComposeViewController alloc] init];
-        [tweetViewController setInitialText:_url.absoluteString];
-        [tweetViewController setCompletionHandler:^(TWTweetComposeViewControllerResult result) {
-            [self dismissModalViewControllerAnimated:YES];
-        }];
-        [self presentModalViewController:tweetViewController animated:YES];
-        [Answers logShareWithMethod:@"Twitter" contentName:nil contentType:_movieController?@"Animation":@"Image" contentId:nil customAttributes:nil];
-    } else if([title hasPrefix:@"Open "]) {
-        [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [self fail];
-        }];
     }
 }
 

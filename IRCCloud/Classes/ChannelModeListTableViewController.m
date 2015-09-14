@@ -36,13 +36,14 @@
         
         _mask = [[UILabel alloc] init];
         _mask.font = [UIFont boldSystemFontOfSize:16];
+        _mask.textColor = [UITableViewCell appearance].textLabelColor;
         _mask.lineBreakMode = NSLineBreakByCharWrapping;
         _mask.numberOfLines = 0;
         [self.contentView addSubview:_mask];
         
         _setBy = [[UILabel alloc] init];
         _setBy.font = [UIFont systemFontOfSize:14];
-        _setBy.textColor = [UIColor grayColor];
+        _setBy.textColor = [UITableViewCell appearance].detailTextLabelColor;
         _setBy.lineBreakMode = NSLineBreakByCharWrapping;
         _setBy.numberOfLines = 0;
         [self.contentView addSubview:_setBy];
@@ -57,7 +58,7 @@
     frame.origin.x = frame.origin.y = 6;
     frame.size.width -= 12;
     
-    float maskHeight = [_mask.text sizeWithFont:_mask.font constrainedToSize:CGSizeMake(frame.size.width,INT_MAX) lineBreakMode:_mask.lineBreakMode].height + 2;
+    float maskHeight = ceil([_mask.text boundingRectWithSize:CGSizeMake(frame.size.width, INT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:_mask.font} context:nil].size.height) + 2;
     _mask.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, maskHeight);
     _setBy.frame = CGRectMake(frame.origin.x, frame.origin.y + maskHeight - 2, frame.size.width, frame.size.height - maskHeight - 8);
 }
@@ -77,10 +78,10 @@
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
         _placeholder.text = placeholder;
         _placeholder.numberOfLines = 0;
-        _placeholder.backgroundColor = [UIColor whiteColor];
+        _placeholder.backgroundColor = [UIColor contentBackgroundColor];
         _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
         _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor selectedBlueColor];
+        _placeholder.textColor = [UIColor messageTextColor];
         _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
         _list = list;
@@ -102,10 +103,7 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-    }
+    self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.leftBarButtonItem = _addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
 }
@@ -212,7 +210,7 @@
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-    return [[row objectForKey:_mask] sizeWithFont:[UIFont boldSystemFontOfSize:16] constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) lineBreakMode:NSLineBreakByCharWrapping].height + [[self setByTextForRow:row] sizeWithFont:[UIFont systemFontOfSize:14] constrainedToSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) lineBreakMode:NSLineBreakByCharWrapping].height + 12;
+    return ceil([[row objectForKey:_mask] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:16]} context:nil].size.height + [[self setByTextForRow:row] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]} context:nil].size.height) + 12;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

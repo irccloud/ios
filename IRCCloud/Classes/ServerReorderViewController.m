@@ -23,6 +23,7 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if(self) {
         _icon = [[UIImageView alloc] initWithFrame:CGRectMake(0,14,16,16)];
+        _icon.tintColor = [UITableViewCell appearance].textLabelColor;
         [self.contentView addSubview:_icon];
     }
     return self;
@@ -50,15 +51,12 @@
 }
 
 - (void)doneButtonPressed:(id)sender {
-    [self. presentingViewController dismissModalViewControllerAnimated:YES];
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-    }
+    self.navigationController.navigationBar.clipsToBounds = YES;
     self.tableView.separatorColor = [UIColor clearColor];
     self.tableView.editing = YES;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
@@ -115,12 +113,7 @@
     else
         cell.textLabel.text = s.hostname;
     
-    if([s.status isEqualToString:@"connected_ready"])
-        cell.textLabel.textColor = [UIColor blackColor];
-    else
-        cell.textLabel.textColor = [UIColor grayColor];
-    
-    cell.icon.image = [UIImage imageNamed:(s.ssl > 0)?@"world_shield":@"world"];
+    cell.icon.image = [[UIImage imageNamed:(s.ssl > 0)?@"world_shield":@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     
     return cell;
 }

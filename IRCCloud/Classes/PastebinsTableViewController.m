@@ -37,21 +37,21 @@
     if (self) {
         _name = [[UILabel alloc] init];
         _name.backgroundColor = [UIColor clearColor];
-        _name.textColor = [UIColor blackColor];
+        _name.textColor = [UITableViewCell appearance].textLabelColor;
         _name.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
         _name.textAlignment = NSTextAlignmentLeft;
         [self.contentView addSubview:_name];
         
         _date = [[UILabel alloc] init];
         _date.backgroundColor = [UIColor clearColor];
-        _date.textColor = [UIColor grayColor];
+        _date.textColor = [UITableViewCell appearance].textLabelColor;
         _date.font = [UIFont systemFontOfSize:FONT_SIZE];
         _date.textAlignment = NSTextAlignmentRight;
         [self.contentView addSubview:_date];
         
         _text = [[UILabel alloc] init];
         _text.backgroundColor = [UIColor clearColor];
-        _text.textColor = [UIColor darkGrayColor];
+        _text.textColor = [UITableViewCell appearance].detailTextLabelColor;
         _text.font = [UIFont systemFontOfSize:FONT_SIZE];
         _text.lineBreakMode = NSLineBreakByTruncatingTail;
         _text.numberOfLines = 0;
@@ -212,10 +212,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-    }
+    self.navigationController.navigationBar.clipsToBounds = YES;
     _url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
     
     _footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
@@ -365,7 +362,7 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return FONT_SIZE + 24 + ([[[_pastes objectAtIndex:indexPath.row] objectForKey:@"body"] sizeWithFont:[UIFont systemFontOfSize:FONT_SIZE] constrainedToSize:CGRectMake(0,0,self.tableView.frame.size.width - 26,(FONT_SIZE + 4) * MAX_LINES).size lineBreakMode:NSLineBreakByTruncatingTail].height) + ([[[_pastes objectAtIndex:indexPath.row] objectForKey:@"name"] length]?(FONT_SIZE + 6):0);
+    return FONT_SIZE + 24 + ([[[_pastes objectAtIndex:indexPath.row] objectForKey:@"body"] boundingRectWithSize:CGRectMake(0,0,self.tableView.frame.size.width - 26,(FONT_SIZE + 4) * MAX_LINES).size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:FONT_SIZE]} context:nil].size.height) + ([[[_pastes objectAtIndex:indexPath.row] objectForKey:@"name"] length]?(FONT_SIZE + 6):0);
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {

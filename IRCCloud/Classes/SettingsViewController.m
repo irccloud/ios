@@ -45,6 +45,7 @@
         _small.textAlignment = NSTextAlignmentCenter;
         _small.numberOfLines = 0;
         _small.text = @"Aa";
+        _small.textColor = [[UITableViewCell appearance] textLabelColor];
         [self.contentView addSubview:_small];
         
         _large = [[UILabel alloc] init];
@@ -53,6 +54,7 @@
         _large.textAlignment = NSTextAlignmentCenter;
         _large.numberOfLines = 0;
         _large.text = @"Aa";
+        _large.textColor = [[UITableViewCell appearance] textLabelColor];
         [self.contentView addSubview:_large];
     }
     return self;
@@ -238,6 +240,65 @@
 
 @end
 
+@interface ThemesViewController : UITableViewController {
+    NSArray *_themes;
+}
+@end
+
+@implementation ThemesViewController
+
+-(id)init {
+    self = [super initWithStyle:UITableViewStyleGrouped];
+    if (self) {
+        self.navigationItem.title = @"Theme";
+        _themes = @[@"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash"];
+    }
+    return self;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Table view data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return _themes.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"themecell"];
+    if(!cell)
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"themecell"];
+    
+    cell.textLabel.text = [_themes objectAtIndex:indexPath.row];
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] isEqualToString:[[_themes objectAtIndex:indexPath.row] lowercaseString]])
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    else
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    
+    return cell;
+}
+
+#pragma mark - Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    [[NSUserDefaults standardUserDefaults] setObject:[[_themes objectAtIndex:indexPath.row] lowercaseString] forKey:@"theme"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [UIColor setTheme:[[_themes objectAtIndex:indexPath.row] lowercaseString]];
+    [[EventsDataSource sharedInstance] reformat];
+    [tableView reloadData];
+    UIView *v = self.navigationController.view.superview;
+    [self.navigationController.view removeFromSuperview];
+    [v addSubview: self.navigationController.view];
+}
+@end
+
 @implementation SettingsViewController
 
 - (id)initWithStyle:(UITableViewStyle)style {
@@ -294,6 +355,10 @@
         [prefs setObject:@(_colors.isOn) forKey:@"nick-colors"];
         [prefs setObject:@(!_emocodes.isOn) forKey:@"emoji-disableconvert"];
         [prefs setObject:@(!_pastebin.isOn) forKey:@"pastebin-disableprompt"];
+        [prefs setObject:_mono.isOn?@"mono":@"sans" forKey:@"font"];
+        [prefs setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] forKey:@"theme"];
+        
+        NSLog(@"Saving: %@", prefs);
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -350,6 +415,9 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    _email.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    _name.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    _highlights.textColor = [UITableViewCell appearance].detailTextLabelColor;
     [self.tableView reloadData];
 }
 
@@ -471,7 +539,13 @@
     } else {
         _pastebin.on = YES;
     }
-    
+
+    if([[prefs objectForKey:@"font"] isKindOfClass:[NSString class]]) {
+        _mono.on = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
+    } else {
+        _mono.on = NO;
+    }
+
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
@@ -483,22 +557,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    int padding = 80;
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)
-        padding = 26;
-        
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-        padding = 0;
-    }
+    self.navigationController.navigationBar.clipsToBounds = YES;
 
-    _email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _email.placeholder = @"john@example.com";
     _email.text = @"";
     _email.textAlignment = NSTextAlignmentRight;
-    _email.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
     _email.autocapitalizationType = UITextAutocapitalizationTypeNone;
     _email.autocorrectionType = UITextAutocorrectionTypeNo;
     _email.keyboardType = UIKeyboardTypeEmailAddress;
@@ -506,11 +571,10 @@
     _email.returnKeyType = UIReturnKeyDone;
     _email.delegate = self;
     
-    _name = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2 - padding, 22)];
+    _name = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
     _name.placeholder = @"John Appleseed";
     _name.text = @"";
     _name.textAlignment = NSTextAlignmentRight;
-    _name.textColor = [UIColor colorWithRed:56.0f/255.0f green:84.0f/255.0f blue:135.0f/255.0f alpha:1.0f];
     _name.autocapitalizationType = UITextAutocapitalizationTypeWords;
     _name.autocorrectionType = UITextAutocorrectionTypeNo;
     _name.keyboardType = UIKeyboardTypeDefault;
@@ -531,6 +595,7 @@
     _notificationSound = [[UISwitch alloc] init];
     _tabletMode = [[UISwitch alloc] init];
     _pastebin = [[UISwitch alloc] init];
+    _mono = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -539,6 +604,7 @@
     _highlights.delegate = self;
     _highlights.font = _email.font;
     _highlights.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _highlights.keyboardAppearance = [UITextField appearance].keyboardAppearance;
 
     _version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 #ifdef BRAND_NAME
@@ -607,7 +673,7 @@
         case 1:
             return 1;
         case 2:
-            return 6;
+            return 8;
         case 3:
             return ((_chromeInstalled)?4:3) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
         case 4:
@@ -651,7 +717,7 @@
     
     if(indexPath.section != 4) {
         if(!cell)
-            cell = [[UITableViewCell alloc] initWithStyle:(indexPath.section == 2)?UITableViewCellStyleSubtitle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
+            cell = [[UITableViewCell alloc] initWithStyle:(indexPath.section == 2 && indexPath.row > 0)?UITableViewCellStyleSubtitle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
         
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryView = nil;
@@ -685,34 +751,40 @@
         case 2:
             switch(row) {
                 case 0:
+                    cell.textLabel.text = @"Theme";
+                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    break;
+                case 1:
                     cell.textLabel.text = @"24-hour Clock";
                     cell.accessoryView = _24hour;
                     break;
-                case 1:
+                case 2:
                     cell.textLabel.text = @"Show Seconds";
                     cell.accessoryView = _seconds;
                     break;
-                case 2:
+                case 3:
                     cell.textLabel.text = @"Usermode Symbols";
                     cell.accessoryView = _symbols;
                     cell.detailTextLabel.text = @"@, +, etc.";
                     break;
-                case 3:
+                case 4:
                     cell.textLabel.text = @"Colourise Nicknames";
                     cell.accessoryView = _colors;
                     break;
-                case 4:
-                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7)
-                        cell.textLabel.text = @"Convert :emocodes:";
-                    else
-                        cell.textLabel.text = @"Convert :emocodes: to Emoji";
+                case 5:
+                    cell.textLabel.text = @"Convert :emocodes: to Emoji";
                     cell.detailTextLabel.text = @":thumbsup: → 👍";
                     cell.accessoryView = _emocodes;
                     break;
-                case 5:
+                case 6:
                     cell.textLabel.text = @"Ask to Pastebin";
                     cell.accessoryView = _pastebin;
                     cell.detailTextLabel.text = @"Before sending multi-line messages";
+                    break;
+                case 7:
+                    cell.textLabel.text = @"Monospace Font";
+                    cell.accessoryView = _mono;
                     break;
             }
             break;
@@ -817,6 +889,9 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
+    if(indexPath.section == 2 && indexPath.row == 0) {
+        [self.navigationController pushViewController:[[ThemesViewController alloc] init] animated:YES];
+    }
     if(indexPath.section == 5) {
         NSInteger row = indexPath.row;
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {

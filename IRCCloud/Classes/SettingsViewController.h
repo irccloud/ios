@@ -34,6 +34,7 @@
     UISwitch *_notificationSound;
     UISwitch *_tabletMode;
     UISwitch *_pastebin;
+    UISwitch *_mono;
     NSString *_version;
     UISlider *_fontSize;
     int _userinforeqid;

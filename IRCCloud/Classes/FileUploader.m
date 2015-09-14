@@ -121,11 +121,10 @@
     [audioTrack insertTimeRange:assetAudioTrack.timeRange ofTrack:assetAudioTrack atTime:CMTimeMake(0, 1) error:nil];
     
     // Export to mp4
-    NSString *mp4Quality = [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7 ? AVAssetExportPresetMediumQuality : AVAssetExportPresetPassthrough;
     NSString *exportPath = [NSString stringWithFormat:@"%@/%@.mp4", NSTemporaryDirectory(), uuidStr];
     
     NSURL *exportUrl = [NSURL fileURLWithPath:exportPath];
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:composition presetName:mp4Quality];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:composition presetName:AVAssetExportPresetMediumQuality];
     exportSession.outputURL = exportUrl;
     CMTime start = CMTimeMakeWithSeconds(0.0, 0);
     CMTimeRange range = CMTimeRangeMake(start, [asset duration]);
@@ -406,45 +405,34 @@
     if(_metadatadelegate)
         [_metadatadelegate fileUploadWillUpload:file.length mimeType:_mimeType];
 
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 7) {
-
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            _connection = [NSURLConnection connectionWithRequest:request delegate:self];
-            [_connection start];
-#ifndef EXTENSION
-            [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-#endif
-        }];
-    } else {
-        NSURLSession *session;
-        NSURLSessionConfiguration *config;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+    NSURLSession *session;
+    NSURLSessionConfiguration *config;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-            config = [NSURLSessionConfiguration backgroundSessionConfiguration:[NSString stringWithFormat:@"com.irccloud.share.file.%li", time(NULL)]];
+        config = [NSURLSessionConfiguration backgroundSessionConfiguration:[NSString stringWithFormat:@"com.irccloud.share.file.%li", time(NULL)]];
 #pragma GCC diagnostic pop
-        } else {
-            config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+    } else {
+        config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
 #ifdef ENTERPRISE
-            config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
+        config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
 #else
-            config.sharedContainerIdentifier = @"group.com.irccloud.share";
+        config.sharedContainerIdentifier = @"group.com.irccloud.share";
 #endif
-        }
-        config.HTTPCookieStorage = nil;
-        config.URLCache = nil;
-        config.requestCachePolicy = NSURLCacheStorageNotAllowed;
-        config.discretionary = NO;
-        session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-        NSURLSessionTask *task = [session downloadTaskWithRequest:request];
-        
-        if(session.configuration.identifier) {
-            _backgroundID = session.configuration.identifier;
-            [self _updateBackgroundUploadMetadata];
-        }
-
-        [task resume];
     }
+    config.HTTPCookieStorage = nil;
+    config.URLCache = nil;
+    config.requestCachePolicy = NSURLCacheStorageNotAllowed;
+    config.discretionary = NO;
+    session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+    NSURLSessionTask *task = [session downloadTaskWithRequest:request];
+    
+    if(session.configuration.identifier) {
+        _backgroundID = session.configuration.identifier;
+        [self _updateBackgroundUploadMetadata];
+    }
+
+    [task resume];
 }
 
 -(void)_updateBackgroundUploadMetadata {

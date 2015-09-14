@@ -28,10 +28,10 @@
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
         _placeholder.text = @"No accepted nicks.\n\nYou can accept someone by tapping their message request or by using /accept.";
         _placeholder.numberOfLines = 0;
-        _placeholder.backgroundColor = [UIColor whiteColor];
+        _placeholder.backgroundColor = [UIColor contentBackgroundColor];
         _placeholder.font = [UIFont systemFontOfSize:18];
         _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor selectedBlueColor];
+        _placeholder.textColor = [UIColor messageTextColor];
     }
     return self;
 }
@@ -46,10 +46,7 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7) {
-        [self.navigationController.navigationBar setBackgroundImage:[[UIImage imageNamed:@"navbar"] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 0, 1, 0)] forBarMetrics:UIBarMetricsDefault];
-        self.navigationController.navigationBar.clipsToBounds = YES;
-    }
+    self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.leftBarButtonItem = _addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
 }

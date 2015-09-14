@@ -15,10 +15,10 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor selectedBlueColor];
+        self.backgroundColor = [UIColor unreadBlueColor];
         _selection = -1;
         _scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
-        _scrollView.backgroundColor = [UIColor bufferBlueColor];
+        _scrollView.backgroundColor = [UIColor textareaBackgroundColor];
         [self addSubview:_scrollView];
         [self setSuggestions:@[]];
     }
@@ -30,10 +30,7 @@
     _scrollView.frame = CGRectMake(1, 1, frame.size.width - 2, frame.size.height - 3);
     _scrollView.layer.masksToBounds = YES;
     _scrollView.layer.cornerRadius = 4;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 7)
-        _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-    else
-        _font = [UIFont fontWithName:@"Helvetica" size:FONT_SIZE + 4];
+    _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
 }
 
 -(void)setSuggestions:(NSArray *)suggestions {
@@ -46,7 +43,7 @@
         UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
         b.titleLabel.font = _font;
         [b setTitle:label forState:UIControlStateNormal];
-        [b setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+        [b setTitleColor:[UIColor textareaTextColor] forState:UIControlStateNormal];
         [b addTarget:self action:@selector(suggestionTapped:) forControlEvents:UIControlEventTouchUpInside];
         [b sizeToFit];
         CGRect frame = b.frame;
@@ -92,7 +89,7 @@
             if([b isKindOfClass:[UIButton class]]) {
                 if(i == selection) {
                     [b setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                    b.titleLabel.superview.backgroundColor = [UIColor selectedBlueColor];
+                    b.titleLabel.superview.backgroundColor = [UIColor unreadBlueColor];
                     [_scrollView scrollRectToVisible:b.frame animated:YES];
                 } else {
                     [b setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
