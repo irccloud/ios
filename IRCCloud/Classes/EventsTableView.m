@@ -701,10 +701,10 @@ int __timestampWidth;
             size.width = size.height;
         _topHighlightsCountView.frame = CGRectMake(16,6,size.width,size.height);
         _topHighlightsCountView.hidden = NO;
-        _topUnreadlabel.frame = CGRectMake(20+size.width,6,rect.size.width - size.width - 8 - 32, rect.size.height-12);
+        _topUnreadLabel.frame = CGRectMake(20+size.width,6,rect.size.width - size.width - 8 - 32, rect.size.height-12);
     } else {
         _topHighlightsCountView.hidden = YES;
-        _topUnreadlabel.frame = CGRectMake(16,6,rect.size.width - 8 - 32, rect.size.height-12);
+        _topUnreadLabel.frame = CGRectMake(16,6,rect.size.width - 8 - 32, rect.size.height-12);
     }
     if(_lastSeenEidPos == 0 && firstRow < _data.count) {
         int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
@@ -718,31 +718,31 @@ int __timestampWidth;
             int days = hours / 24;
             if(days) {
                 if(days == 1)
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i day of unread messages", days];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i day of unread messages", days];
                 else
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i days of unread messages", days];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i days of unread messages", days];
             } else if(hours) {
                 if(hours == 1)
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i hour of unread messages", hours];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i hour of unread messages", hours];
                 else
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i hours of unread messages", hours];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i hours of unread messages", hours];
             } else if(minutes) {
                 if(minutes == 1)
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i minute of unread messages", minutes];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i minute of unread messages", minutes];
                 else
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i minutes of unread messages", minutes];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i minutes of unread messages", minutes];
             } else {
                 if(seconds == 1)
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i second of unread messages", seconds];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i second of unread messages", seconds];
                 else
-                    _topUnreadlabel.text = [msg stringByAppendingFormat:@"%i seconds of unread messages", seconds];
+                    _topUnreadLabel.text = [msg stringByAppendingFormat:@"%i seconds of unread messages", seconds];
             }
         }
     } else {
         if(firstRow - _lastSeenEidPos == 1) {
-            _topUnreadlabel.text = [msg stringByAppendingFormat:@"%li unread message", (long)(firstRow - _lastSeenEidPos)];
+            _topUnreadLabel.text = [msg stringByAppendingFormat:@"%li unread message", (long)(firstRow - _lastSeenEidPos)];
         } else if(firstRow - _lastSeenEidPos > 0) {
-            _topUnreadlabel.text = [msg stringByAppendingFormat:@"%li unread messages", (long)(firstRow - _lastSeenEidPos)];
+            _topUnreadLabel.text = [msg stringByAppendingFormat:@"%li unread messages", (long)(firstRow - _lastSeenEidPos)];
         } else {
             _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
             self.tableView.tableHeaderView = self.tableView.tableHeaderView;
@@ -768,10 +768,10 @@ int __timestampWidth;
             size.width = size.height;
         _bottomHighlightsCountView.frame = CGRectMake(16,6,size.width,size.height);
         _bottomHighlightsCountView.hidden = NO;
-        _bottomUnreadlabel.frame = CGRectMake(20+size.width,6,rect.size.width - size.width - 8, rect.size.height-12);
+        _bottomUnreadLabel.frame = CGRectMake(20+size.width,6,rect.size.width - size.width - 8, rect.size.height-12);
     } else {
         _bottomHighlightsCountView.hidden = YES;
-        _bottomUnreadlabel.frame = CGRectMake(16,6,rect.size.width - 8, rect.size.height-12);
+        _bottomUnreadLabel.frame = CGRectMake(16,6,rect.size.width - 8, rect.size.height-12);
     }
     if(_newMsgs - _newHighlights > 0) {
         if(_newHighlights)
@@ -782,7 +782,7 @@ int __timestampWidth;
             msg = [msg stringByAppendingFormat:@"%li unread messages", (long)(_newMsgs - _newHighlights)];
     }
     if(msg.length) {
-        _bottomUnreadlabel.text = msg;
+        _bottomUnreadLabel.text = msg;
         [UIView beginAnimations:nil context:nil];
         [UIView setAnimationDuration:0.1];
         _bottomUnreadView.alpha = 1;

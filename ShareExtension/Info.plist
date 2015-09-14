@@ -21,7 +21,7 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.19</string>
+	<string>2.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
@@ -37,10 +37,10 @@
     SUBQUERY (
         $extensionItem.attachments,
         $attachment,
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image" ||
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.movie" ||
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.plain-text" ||
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url"
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.image&quot; ||
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.movie&quot; ||
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.plain-text&quot; ||
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.url&quot;
     ).@count == $extensionItem.attachments.@count).@count == 1 AND
 SUBQUERY (
     extensionItems,
@@ -48,8 +48,8 @@ SUBQUERY (
     SUBQUERY (
         $extensionItem.attachments,
         $attachment,
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image" ||
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.movie"
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.image&quot; ||
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.movie&quot;
     ).@count &lt;= 1).@count == 1 AND
 SUBQUERY (
     extensionItems,
@@ -57,11 +57,11 @@ SUBQUERY (
     SUBQUERY (
         $extensionItem.attachments,
         $attachment,
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.file-url"
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.file-url&quot;
     ).@count &lt;= 1).@count == 1
 ) OR (
 SUBQUERY(extensionItems, $extensionItem, 
-SUBQUERY($extensionItem.attachments, $attachment, SUBQUERY($attachment.registeredTypeIdentifiers, $uti, $uti UTI-CONFORMS-TO "public.url" AND NOT $uti UTI-CONFORMS-TO "public.file-url").@count == 1).@count == 1).@count == 1
+SUBQUERY($extensionItem.attachments, $attachment, SUBQUERY($attachment.registeredTypeIdentifiers, $uti, $uti UTI-CONFORMS-TO &quot;public.url&quot; AND NOT $uti UTI-CONFORMS-TO &quot;public.file-url&quot;).@count == 1).@count == 1).@count == 1
 )</string>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>

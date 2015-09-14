@@ -36,11 +36,11 @@
     IBOutlet UIButton *_backlogFailedButton;
     IBOutlet UIView *_topUnreadView;
     IBOutlet UILabel *_topUnreadArrow;
-    IBOutlet UILabel *_topUnreadlabel;
+    IBOutlet UILabel *_topUnreadLabel;
     IBOutlet HighlightsCountView *_topHighlightsCountView;
     IBOutlet UIView *_bottomUnreadView;
     IBOutlet UILabel *_bottomUnreadArrow;
-    IBOutlet UILabel *_bottomUnreadlabel;
+    IBOutlet UILabel *_bottomUnreadLabel;
     IBOutlet HighlightsCountView *_bottomHighlightsCountView;
     
     NSDateFormatter *_formatter;

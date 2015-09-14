@@ -433,7 +433,7 @@ NSLock *__parserLock = nil;
                        _prefs = nil;
                        NSDictionary *p = [self prefs];
                        if([p objectForKey:@"theme"]) {
-                           [UIColor setDarkTheme:[p objectForKey:@"theme"]];
+                           [UIColor setTheme:[p objectForKey:@"theme"]];
                            [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"theme"] forKey:@"theme"];
                        }
                        [[NSUserDefaults standardUserDefaults] synchronize];

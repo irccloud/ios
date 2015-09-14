@@ -24,7 +24,8 @@
 
 @interface UIColor (IRCCloud)
 +(UIColor *)colorWithHue:(CGFloat)hue saturation:(CGFloat)saturation lightness:(CGFloat)brightness alpha:(CGFloat)alpha;
-+(void)setDarkTheme:(NSString *)theme;
++(BOOL)isDarkTheme;
++(void)setTheme:(NSString *)theme;
 +(UIColor *)contentBackgroundColor;
 +(UIColor *)messageTextColor;
 +(UIColor *)backgroundBlueColor;

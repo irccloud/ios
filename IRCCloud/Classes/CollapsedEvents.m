@@ -18,6 +18,7 @@
 #import "CollapsedEvents.h"
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation CollapsedEvent
 -(NSComparisonResult)compare:(CollapsedEvent *)aEvent {
@@ -701,7 +702,35 @@
         _server?_server.MODE_VOICED:@"v":@"25B100"
     };
     
-    NSArray *light_colors = @[];
+    NSArray *light_colors = @[
+                              @"b22222",
+                              @"d2691e",
+                              @"ffa07a",
+                              @"fa8072",
+                              @"ff8c00",
+                              @"228b22",
+                              @"808000",
+                              @"bdb76b",
+                              @"9acd32",
+                              @"32cd32",
+                              @"8fbc8f",
+                              @"3cb371",
+                              @"66cdaa",
+                              @"20b2aa",
+                              @"5f9ea0",
+                              @"008b8b",
+                              @"00bfff",
+                              @"4682b4",
+                              @"1e90ff",
+                              @"4169e1",
+                              @"6a5acd",
+                              @"7b68ee",
+                              @"9400d3",
+                              @"8b008b",
+                              @"ba55d3",
+                              @"ff00ff",
+                              @"ff1493",
+                              ];
     NSArray *dark_colors = @[
                              @"deb887",
                              @"ffd700",
@@ -731,7 +760,7 @@
                              @"ff69b4",
                              @"ffb6c1"
                              ];
-    NSArray *colors = dark_colors;
+    NSArray *colors = [UIColor isDarkTheme]?dark_colors:light_colors;
     NSString *color = nil;
     NSMutableString *output = [[NSMutableString alloc] initWithFormat:@"%c", BOLD];
     BOOL showSymbol = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue];

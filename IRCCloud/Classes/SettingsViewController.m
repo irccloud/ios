@@ -251,7 +251,7 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         self.navigationItem.title = @"Theme";
-        _themes = @[@"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash"];
+        _themes = @[@"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash"];
     }
     return self;
 }
@@ -290,7 +290,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [[NSUserDefaults standardUserDefaults] setObject:[[_themes objectAtIndex:indexPath.row] lowercaseString] forKey:@"theme"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [UIColor setDarkTheme:[[_themes objectAtIndex:indexPath.row] lowercaseString]];
+    [UIColor setTheme:[[_themes objectAtIndex:indexPath.row] lowercaseString]];
     [[EventsDataSource sharedInstance] reformat];
     [tableView reloadData];
     UIView *v = self.navigationController.view.superview;

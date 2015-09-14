@@ -94,7 +94,7 @@
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
     
-    [UIColor setDarkTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [[EventsDataSource sharedInstance] reformat];
     
     if(IRCCLOUD_HOST.length < 1)

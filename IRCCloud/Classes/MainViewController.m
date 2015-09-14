@@ -93,8 +93,10 @@ extern NSDictionary *emojiMap;
 
     _menuBtn.tintColor = [UIColor navBarSubheadingColor];
     
-    _eventsView.topUnreadView.backgroundColor = _eventsView.bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
-    _eventsView.topUnreadLabel.textColor = _eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
+    _eventsView.topUnreadView.backgroundColor = [UIColor chatterBarColor];
+    _eventsView.bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
+    _eventsView.topUnreadLabel.textColor = [UIColor chatterBarTextColor];
+    _eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
     _eventsView.topUnreadArrow.textColor = _eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
     
     _borders.backgroundColor = [UIColor iPadBordersColor];

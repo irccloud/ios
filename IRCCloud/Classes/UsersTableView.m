@@ -350,9 +350,10 @@
     if(cell.type == TYPE_HEADING || ![[row objectForKey:@"last"] intValue]) {
         cell.border1.hidden = YES;
     } else {
-        cell.border1.hidden = NO;
+        cell.border1.hidden = ![UIColor isDarkTheme];
         cell.border1.backgroundColor = [row objectForKey:@"borderColor"];
     }
+    cell.border2.hidden = ![UIColor isDarkTheme];
     cell.border2.backgroundColor = [row objectForKey:@"borderColor"];
     return cell;
 }
