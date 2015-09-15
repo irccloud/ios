@@ -103,7 +103,7 @@ BOOL __color_theme_is_dark;
 
 @implementation UITextField (IRCCloudAppearanceHax)
 -(void)setPlaceholder:(NSString *)placeholder {
-    [self setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:placeholder attributes:@{NSForegroundColorAttributeName:__placeholderColor}]];
+    [self setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:placeholder?placeholder:@"" attributes:@{NSForegroundColorAttributeName:__placeholderColor}]];
 }
 @end
 
