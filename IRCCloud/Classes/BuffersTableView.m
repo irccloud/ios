@@ -48,7 +48,7 @@
 @property UIColor *bgColor, *highlightColor;
 @property (readonly) UILabel *label;
 @property (readonly) UIImageView *icon;
-@property (readonly) UIView *unreadIndicator, *bg;
+@property (readonly) UIView *unreadIndicator, *bg, *border;
 @property (readonly) HighlightsCountView *highlights;
 @property (readonly) UIActivityIndicatorView *activity;
 @end
@@ -94,9 +94,6 @@
 - (void)layoutSubviews {
 	[super layoutSubviews];
 	
-    self.contentView.backgroundColor = [UIColor bufferBackgroundColor];
-    _border.backgroundColor = [UIColor bufferBorderColor];
-
     CGRect frame = [self.contentView bounds];
     _border.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
     frame.size.width -= 8;
@@ -787,8 +784,12 @@
     cell.type = [[row objectForKey:@"type"] intValue];
     cell.label.text = [row objectForKey:@"name"];
     cell.activity.hidden = YES;
+    cell.activity.activityIndicatorViewStyle = [UIColor isDarkTheme]?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
     cell.accessibilityValue = [row objectForKey:@"hint"];
     cell.highlightColor = [UIColor colorWithRed:0.776 green:0.855 blue:1 alpha:1];
+    cell.border.backgroundColor = [UIColor bufferBorderColor];
+    cell.contentView.backgroundColor = [UIColor bufferBackgroundColor];
+
     if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
         if([[row objectForKey:@"archived"] intValue])
             cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
@@ -798,7 +799,15 @@
         cell.label.font = _boldFont;
         cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", unread"];
     } else {
-        cell.unreadIndicator.hidden = YES;
+        if(cell.type == TYPE_SERVER) {
+            if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
+                cell.unreadIndicator.backgroundColor = [UIColor failedServerBorderColor];
+            else
+                cell.unreadIndicator.backgroundColor = [UIColor serverBorderColor];
+            cell.unreadIndicator.hidden = NO;
+        } else {
+            cell.unreadIndicator.hidden = YES;
+        }
         cell.label.font = _normalFont;
     }
     if([[row objectForKey:@"highlights"] intValue]) {
@@ -871,7 +880,7 @@
                 }
             } else {
                 if([[row objectForKey:@"archived"] intValue]) {
-                    cell.label.textColor = [UIColor inactiveBufferTextColor];
+                    cell.label.textColor = (cell.type == TYPE_CHANNEL)?[UIColor archivedChannelTextColor]:[UIColor archivedBufferTextColor];
                     cell.bgColor = [UIColor bufferBackgroundColor];
                     cell.highlightColor = [UIColor colorWithRed:0.933 green:0.933 blue:0.933 alpha:1];
                     cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", archived"];
@@ -903,7 +912,7 @@
                 cell.bgColor = [UIColor timestampColor];
                 cell.accessibilityHint = @"Hides archive list";
             } else {
-                cell.label.textColor = [UIColor inactiveBufferTextColor];
+                cell.label.textColor = [UIColor archivesHeadingTextColor];
                 cell.bgColor = [UIColor bufferBackgroundColor];
                 cell.accessibilityHint = @"Shows archive list";
             }

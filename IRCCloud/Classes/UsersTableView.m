@@ -44,7 +44,7 @@
     if (self) {
         _type = 0;
         
-        self.backgroundColor = [UIColor backgroundBlueColor];
+        self.backgroundColor = [UIColor membersGroupColor];
         
         _label = self.textLabel;
         _label.backgroundColor = [UIColor clearColor];

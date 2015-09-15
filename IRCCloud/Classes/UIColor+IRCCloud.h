@@ -28,9 +28,6 @@
 +(void)setTheme:(NSString *)theme;
 +(UIColor *)contentBackgroundColor;
 +(UIColor *)messageTextColor;
-+(UIColor *)backgroundBlueColor;
-+(UIColor *)unreadBlueColor;
-+(UIColor *)blueBorderColor;
 +(UIColor *)opersGroupColor;
 +(UIColor *)ownersGroupColor;
 +(UIColor *)adminsGroupColor;
@@ -84,6 +81,8 @@
 +(UIColor *)selectedBufferBackgroundColor;
 +(UIColor *)bufferBorderColor;
 +(UIColor *)selectedBufferBorderColor;
++(UIColor *)serverBorderColor;
++(UIColor *)failedServerBorderColor;
 +(UIColor *)backlogDividerColor;
 +(UIColor *)chatterBarTextColor;
 +(UIColor *)chatterBarColor;
@@ -96,4 +95,11 @@
 +(UIColor *)buffersDrawerBackgroundColor;
 +(UIColor *)usersDrawerBackgroundColor;
 +(UIColor *)iPadBordersColor;
++(UIColor *)unreadBlueColor;
++(UIColor *)archivesHeadingTextColor;
++(UIColor *)archivedChannelTextColor;
++(UIColor *)archivedBufferTextColor;
++(UIColor *)selectedArchivesHeadingColor;
++(UIColor *)timestampTopBorderColor;
++(UIColor *)timestampBottomBorderColor;
 @end

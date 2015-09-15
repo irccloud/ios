@@ -29,6 +29,8 @@ int __timestampWidth;
     int _type;
     UIView *_socketClosedBar;
     UIImageView *_accessory;
+    UIView *_topBorder;
+    UIView *_bottomBorder;
 }
 @property int type;
 @property (readonly) UILabel *timestamp;
@@ -69,6 +71,15 @@ int __timestampWidth;
         _accessory.hidden = YES;
         _accessory.contentMode = UIViewContentModeCenter;
         [self.contentView addSubview:_accessory];
+
+        _topBorder = [[UIView alloc] initWithFrame:CGRectZero];
+        _topBorder.hidden = YES;
+        [self.contentView addSubview:_topBorder];
+        
+        _bottomBorder = [[UIView alloc] initWithFrame:CGRectZero];
+        _bottomBorder.hidden = YES;
+        [self.contentView addSubview:_bottomBorder];
+        
     }
     return self;
 }
@@ -77,6 +88,18 @@ int __timestampWidth;
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
+    _topBorder.frame = CGRectMake(0,0,frame.size.width, 1);
+    _bottomBorder.frame = CGRectMake(0,frame.size.height - 3,frame.size.width, 3);
+    if(_type == ROW_TIMESTAMP) {
+        _topBorder.backgroundColor = [UIColor timestampTopBorderColor];
+        _topBorder.hidden = NO;
+        
+        _bottomBorder.backgroundColor = [UIColor timestampBottomBorderColor];
+        _bottomBorder.hidden = NO;
+    } else {
+        _topBorder.hidden = _bottomBorder.hidden = YES;
+    }
+    
     if(_type == ROW_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED) {
         frame.origin.x = 6;
         frame.origin.y = 4;

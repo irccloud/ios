@@ -40,6 +40,7 @@
     IBOutlet UILabel *_serverStatus;
     IBOutlet UIView *_serverStatusBar;
     IBOutlet UIActivityIndicatorView *_eventActivity;
+    IBOutlet UIActivityIndicatorView *_headerActivity;
     IBOutlet UIView *_titleView;
     IBOutlet UILabel *_titleLabel;
     IBOutlet UILabel *_topicLabel;

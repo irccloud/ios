@@ -102,6 +102,8 @@ extern NSDictionary *emojiMap;
     _borders.backgroundColor = [UIColor iPadBordersColor];
     [[_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
     
+    _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor isDarkTheme]?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
+    
     UIView *v = self.navigationController.view.superview;
     [self.navigationController.view removeFromSuperview];
     [v addSubview: self.navigationController.view];

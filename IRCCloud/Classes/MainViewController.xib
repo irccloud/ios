@@ -19,6 +19,7 @@
                 <outlet property="_eventsView" destination="24" id="31"/>
                 <outlet property="_globalMsg" destination="c7P-Sg-igM" id="IKo-4e-UdO"/>
                 <outlet property="_globalMsgContainer" destination="bKM-qw-YA0" id="bOc-iz-K0o"/>
+                <outlet property="_headerActivity" destination="50" id="AeS-h2-zAt"/>
                 <outlet property="_lock" destination="108" id="109"/>
                 <outlet property="_mentionTip" destination="117" id="118"/>
                 <outlet property="_serverStatus" destination="92" id="93"/>
