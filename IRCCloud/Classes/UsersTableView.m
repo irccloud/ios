@@ -225,9 +225,10 @@
         [sectionSizes addObject:@(data.count)];
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _headingFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_headingFont.fontName size:FONT_SIZE];
-        _countFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_countFont.fontName size:FONT_SIZE];
-        _userFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_userFont.fontName size:FONT_SIZE];
+        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+        _headingFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
+        _countFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
+        _userFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
         
         _refreshTimer = nil;
         _data = data;
@@ -263,9 +264,10 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    _headingFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_headingFont.fontName size:FONT_SIZE];
-    _countFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_countFont.fontName size:FONT_SIZE];
-    _userFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":_userFont.fontName size:FONT_SIZE];
+    UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+    _headingFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
+    _countFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
+    _userFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
     [self.tableView reloadData];
 }
 
