@@ -1923,49 +1923,51 @@ extern NSDictionary *emojiMap;
         
         for(NSString *param in [url.query componentsSeparatedByString:@"&"]) {
             NSArray *kv = [param componentsSeparatedByString:@"="];
-            if([[kv objectAtIndex:0] isEqualToString:@"v"]) {
-                videoID = [kv objectAtIndex:1];
-            } else if([[kv objectAtIndex:0] isEqualToString:@"t"]) {
-                int start = 0;
-                NSString *t = [kv objectAtIndex:1];
-                int number = 0;
-                for(int i = 0; i < t.length; i++) {
-                    switch([t characterAtIndex:i]) {
-                        case '0':
-                        case '1':
-                        case '2':
-                        case '3':
-                        case '4':
-                        case '5':
-                        case '6':
-                        case '7':
-                        case '8':
-                        case '9':
-                            number *= 10;
-                            number += [t characterAtIndex:i] - '0';
-                            break;
-                        case 'h':
-                            start += number * 60;
-                            number = 0;
-                            break;
-                        case 'm':
-                            start += number * 60;
-                            number = 0;
-                            break;
-                        case 's':
-                            start += number;
-                            number = 0;
-                            break;
-                        default:
-                            CLS_LOG(@"Unrecognized time separator: %c", [t characterAtIndex:i]);
-                            number = 0;
-                            break;
+            if(kv.count == 2) {
+                if([[kv objectAtIndex:0] isEqualToString:@"v"]) {
+                    videoID = [kv objectAtIndex:1];
+                } else if([[kv objectAtIndex:0] isEqualToString:@"t"]) {
+                    int start = 0;
+                    NSString *t = [kv objectAtIndex:1];
+                    int number = 0;
+                    for(int i = 0; i < t.length; i++) {
+                        switch([t characterAtIndex:i]) {
+                            case '0':
+                            case '1':
+                            case '2':
+                            case '3':
+                            case '4':
+                            case '5':
+                            case '6':
+                            case '7':
+                            case '8':
+                            case '9':
+                                number *= 10;
+                                number += [t characterAtIndex:i] - '0';
+                                break;
+                            case 'h':
+                                start += number * 60;
+                                number = 0;
+                                break;
+                            case 'm':
+                                start += number * 60;
+                                number = 0;
+                                break;
+                            case 's':
+                                start += number;
+                                number = 0;
+                                break;
+                            default:
+                                CLS_LOG(@"Unrecognized time separator: %c", [t characterAtIndex:i]);
+                                number = 0;
+                                break;
+                        }
                     }
+                    start += number;
+                    [params setObject:@(start) forKey:@"start"];
+                } else {
+                    [params setObject:[kv objectAtIndex:1] forKey:[kv objectAtIndex:0]];
                 }
-                start += number;
-                [params setObject:@(start) forKey:@"start"];
-            } else {
-                [params setObject:[kv objectAtIndex:1] forKey:[kv objectAtIndex:0]];
             }
         }
         
