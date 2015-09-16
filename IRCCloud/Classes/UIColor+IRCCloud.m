@@ -167,7 +167,7 @@ BOOL __color_theme_is_dark;
         __collapsedHeadingBackgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
         __navBarColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
         __navBarBorderColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
-        __textareaTextColor = [UIColor colorWithRed:0.118 green:0.447 blue:1 alpha:1];
+        __textareaTextColor = [UIColor colorWithWhite:0.2 alpha:1.0];
         __textareaBackgroundColor = __navBarSubheadingColor;
         __navBarHeadingColor = [UIColor colorWithWhite:0.133 alpha:1.0];
         __lightLinkColor = [UIColor colorWithWhite:0.667 alpha:1.0];
