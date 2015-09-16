@@ -79,7 +79,7 @@ extern NSDictionary *emojiMap;
 
     self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
     self.view.backgroundColor = [UIColor contentBackgroundColor];
-    self.navigationController.view.backgroundColor = [UIColor isDarkTheme]?[UIColor contentBackgroundColor]:[UIColor blackColor];
+    self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor isDarkTheme]?[UIColor contentBackgroundColor]:[UIColor blackColor];
     _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
     [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
     [_sendBtn setTitleColor:[UIColor textareaBackgroundColor] forState:UIControlStateNormal];
