@@ -70,6 +70,7 @@ int __timestampWidth;
         _accessory = [[UIImageView alloc] initWithFrame:CGRectZero];
         _accessory.hidden = YES;
         _accessory.contentMode = UIViewContentModeCenter;
+        _accessory.tintColor = [UIColor expandCollapseIndicatorColor];
         [self.contentView addSubview:_accessory];
 
         _topBorder = [[UIView alloc] initWithFrame:CGRectZero];
@@ -1335,14 +1336,14 @@ int __timestampWidth;
     if((e.rowType == ROW_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
         if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
             if(e.groupEid == e.eid + 1) {
-                cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_minus"];
+                cell.accessory.image = [[UIImage imageNamed:@"bullet_toggle_minus"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
             } else {
-                cell.accessory.image = [UIImage imageNamed:@"tiny_plus"];
+                cell.accessory.image = [[UIImage imageNamed:@"tiny_plus"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
                 cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
             }
         } else {
-            cell.accessory.image = [UIImage imageNamed:@"bullet_toggle_plus"];
+            cell.accessory.image = [[UIImage imageNamed:@"bullet_toggle_plus"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
         }
         cell.accessory.hidden = NO;
     } else if(e.rowType == ROW_FAILED) {

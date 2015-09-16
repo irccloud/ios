@@ -98,6 +98,7 @@ UIColor *__archivedBufferTextColor;
 UIColor *__selectedArchivesHeadingColor;
 UIColor *__timestampTopBorderColor;
 UIColor *__timestampBottomBorderColor;
+UIColor *__expandCollapseIndicatorColor;
 
 BOOL __color_theme_is_dark;
 
@@ -193,6 +194,7 @@ BOOL __color_theme_is_dark;
         __timestampTopBorderColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
         __timestampBottomBorderColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
         __placeholderColor = [UIColor colorWithRed:0.78 green:0.78 blue:0.804 alpha:1];
+        __expandCollapseIndicatorColor = [UIColor colorWithRed:0.702 green:0.812 blue:1 alpha:1];
         
         __opersBorderColor = [UIColor colorWithRed:0.878 green:0.137 blue:0.02 alpha:1];
         __ownersBorderColor = [UIColor colorWithRed:0.906 green:0.667 blue:0 alpha:1];
@@ -390,6 +392,7 @@ BOOL __color_theme_is_dark;
         __timestampTopBorderColor = color_border9;
         __timestampBottomBorderColor = color_border6;
         __placeholderColor = color_text12;
+        __expandCollapseIndicatorColor = color_text12;
 
         __opersBorderColor = [UIColor colorWithHue:30.0/360.0 saturation:0.85 lightness:0.25 alpha:1.0];
         __ownersBorderColor = [UIColor colorWithHue:47.0/360.0 saturation:0.68 lightness:0.25 alpha:1.0];
@@ -791,6 +794,8 @@ BOOL __color_theme_is_dark;
     return [UIColor colorWithPatternImage:__buffersDrawerBackgroundImage];
 }
 +(UIColor *)usersDrawerBackgroundColor {
+    if(!__color_theme_is_dark)
+        return [self membersGroupColor];
     if(!__usersDrawerBackgroundImage) {
         float scaleFactor = [[UIScreen mainScreen] scale];
         int width = [[UIScreen mainScreen] bounds].size.width;
@@ -846,4 +851,8 @@ BOOL __color_theme_is_dark;
 +(UIActivityIndicatorViewStyle)activityIndicatorViewStyle {
     return __color_theme_is_dark?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
 }
++(UIColor *)expandCollapseIndicatorColor {
+    return __expandCollapseIndicatorColor;
+}
+
 @end

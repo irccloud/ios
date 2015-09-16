@@ -103,4 +103,5 @@
 +(UIColor *)timestampTopBorderColor;
 +(UIColor *)timestampBottomBorderColor;
 +(UIActivityIndicatorViewStyle)activityIndicatorViewStyle;
++(UIColor *)expandCollapseIndicatorColor;
 @end
