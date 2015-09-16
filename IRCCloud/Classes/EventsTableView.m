@@ -168,22 +168,6 @@ int __timestampWidth;
     _conn = [NetworkConnection sharedInstance];
     [super viewDidLoad];
 
-    CGFloat lineSpacing = 6;
-    CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
-    CTParagraphStyleSetting paragraphStyles[2] = {
-        {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
-		{.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
-	};
-    CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
-    
-    NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-    [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-	[mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
-    _linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
-    
-    [mutableLinkAttributes setObject:(id)[[UIColor lightLinkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-    _lightLinkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
-    
     self.tableView.scrollsToTop = NO;
     UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
@@ -1015,6 +999,22 @@ int __timestampWidth;
     _headerView.backgroundColor = [UIColor contentBackgroundColor];
     _backlogFailedView.backgroundColor = [UIColor contentBackgroundColor];
     
+    CGFloat lineSpacing = 6;
+    CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
+    CTParagraphStyleSetting paragraphStyles[2] = {
+        {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
+        {.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
+    };
+    CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
+    
+    NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
+    [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+    [mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
+    _linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+    
+    [mutableLinkAttributes setObject:(id)[[UIColor lightLinkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+    _lightLinkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+
     [_lock lock];
     [_scrollTimer invalidate];
     _ready = NO;
