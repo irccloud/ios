@@ -31,10 +31,13 @@
     UIView *_border1;
     UIView *_border2;
     int _type;
+    UIColor *_bgColor;
+    UIColor *_fgColor;
 }
 @property int type;
 @property (readonly) UILabel *label,*count;
 @property (readonly) UIView *border1, *border2;
+@property UIColor *bgColor, *fgColor;
 @end
 
 @implementation UsersTableCell
@@ -85,6 +88,14 @@
         _count.hidden = YES;
         _label.frame = frame;
     }
+}
+
+-(void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
+    [super setHighlighted:highlighted animated:animated];
+    if(self.selected || _type == TYPE_HEADING)
+        highlighted = NO;
+    self.contentView.backgroundColor = highlighted?_border1.backgroundColor:_bgColor;
+    _label.textColor = highlighted?[UIColor whiteColor]:_fgColor;
 }
 @end
 
@@ -327,25 +338,23 @@
         cell = [[UsersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"userscell"];
     NSUInteger idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
     NSDictionary *row = [_data objectAtIndex:idx];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.type = [[row objectForKey:@"type"] intValue];
-    cell.contentView.backgroundColor = [row objectForKey:@"bgColor"];
+    cell.bgColor = [row objectForKey:@"bgColor"];
     cell.label.text = [row objectForKey:@"text"];
-    cell.label.textColor = [row objectForKey:@"color"];
+    cell.fgColor = [row objectForKey:@"color"];
     if([[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue])
         cell.count.text = [NSString stringWithFormat:@"%@ %@", [row objectForKey:@"symbol"], [row objectForKey:@"count"]];
     else
         cell.count.text = [NSString stringWithFormat:@"%@", [row objectForKey:@"count"]];
     cell.count.textColor = [row objectForKey:@"countColor"];
     if(cell.type == TYPE_HEADING) {
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
         if(_headingFont)
             cell.label.font = _headingFont;
         
         if(_countFont)
             cell.count.font = _countFont;
     } else {
-        cell.selectionStyle = UITableViewCellSelectionStyleBlue;
-        
         if(_userFont)
             cell.label.font = _userFont;
     }
@@ -353,8 +362,8 @@
         cell.border1.hidden = YES;
     } else {
         cell.border1.hidden = ![UIColor isDarkTheme];
-        cell.border1.backgroundColor = [row objectForKey:@"borderColor"];
     }
+    cell.border1.backgroundColor = [row objectForKey:@"borderColor"];
     cell.border2.hidden = ![UIColor isDarkTheme];
     cell.border2.backgroundColor = [row objectForKey:@"borderColor"];
     return cell;
