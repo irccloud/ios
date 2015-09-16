@@ -104,4 +104,9 @@
 +(UIColor *)timestampBottomBorderColor;
 +(UIActivityIndicatorViewStyle)activityIndicatorViewStyle;
 +(UIColor *)expandCollapseIndicatorColor;
++(UIColor *)bufferHighlightColor;
++(UIColor *)selectedBufferHighlightColor;
++(UIColor *)archivedBufferHighlightColor;
++(UIColor *)selectedArchivedBufferHighlightColor;
++(UIColor *)selectedArchivedBufferBackgroundColor;
 @end

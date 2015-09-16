@@ -99,6 +99,11 @@ UIColor *__selectedArchivesHeadingColor;
 UIColor *__timestampTopBorderColor;
 UIColor *__timestampBottomBorderColor;
 UIColor *__expandCollapseIndicatorColor;
+UIColor *__bufferHighlightColor;
+UIColor *__selectedBufferHighlightColor;
+UIColor *__archivedBufferHighlightColor;
+UIColor *__selectedArchivedBufferHighlightColor;
+UIColor *__selectedArchivedBufferBackgroundColor;
 
 BOOL __color_theme_is_dark;
 
@@ -195,6 +200,11 @@ BOOL __color_theme_is_dark;
         __timestampBottomBorderColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
         __placeholderColor = [UIColor colorWithRed:0.78 green:0.78 blue:0.804 alpha:1];
         __expandCollapseIndicatorColor = [UIColor colorWithRed:0.702 green:0.812 blue:1 alpha:1];
+        __bufferHighlightColor = [UIColor colorWithRed:0.776 green:0.855 blue:1 alpha:1];
+        __selectedBufferHighlightColor = [UIColor colorWithRed:0.118 green:0.447 blue:1 alpha:1];
+        __archivedBufferHighlightColor = [UIColor colorWithRed:0.776 green:0.855 blue:1 alpha:1];
+        __selectedArchivedBufferHighlightColor = [UIColor colorWithWhite:0.667 alpha:1];
+        __selectedArchivedBufferBackgroundColor = [UIColor colorWithWhite:0.667 alpha:1];
         
         __opersBorderColor = [UIColor colorWithRed:0.878 green:0.137 blue:0.02 alpha:1];
         __ownersBorderColor = [UIColor colorWithRed:0.906 green:0.667 blue:0 alpha:1];
@@ -394,6 +404,11 @@ BOOL __color_theme_is_dark;
         __timestampBottomBorderColor = color_border6;
         __placeholderColor = color_text12;
         __expandCollapseIndicatorColor = color_text12;
+        __bufferHighlightColor = color_background5;
+        __selectedBufferHighlightColor = color_text4;
+        __archivedBufferHighlightColor = color_background5;
+        __selectedArchivedBufferHighlightColor = color_text6;
+        __selectedArchivedBufferBackgroundColor = color_text6;
 
         __opersBorderColor = [UIColor colorWithHue:30.0/360.0 saturation:0.85 lightness:0.25 alpha:1.0];
         __ownersBorderColor = [UIColor colorWithHue:47.0/360.0 saturation:0.68 lightness:0.25 alpha:1.0];
@@ -857,6 +872,21 @@ BOOL __color_theme_is_dark;
 }
 +(UIColor *)expandCollapseIndicatorColor {
     return __expandCollapseIndicatorColor;
+}
++(UIColor *)bufferHighlightColor {
+    return __bufferHighlightColor;
+}
++(UIColor *)selectedBufferHighlightColor {
+    return __selectedBufferHighlightColor;
+}
++(UIColor *)archivedBufferHighlightColor {
+    return __archivedBufferHighlightColor;
+}
++(UIColor *)selectedArchivedBufferHighlightColor {
+    return __selectedArchivedBufferHighlightColor;
+}
++(UIColor *)selectedArchivedBufferBackgroundColor {
+    return __selectedArchivedBufferBackgroundColor;
 }
 
 @end
