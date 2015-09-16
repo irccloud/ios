@@ -80,7 +80,7 @@
         _placeholder.numberOfLines = 0;
         _placeholder.textAlignment = NSTextAlignmentCenter;
         _placeholder.textColor = [UIColor messageTextColor];
-        _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
         _activity.hidesWhenStopped = YES;
         [_placeholder addSubview:_activity];
     }
@@ -99,6 +99,7 @@
     [super viewDidLoad];
     self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
+    self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
 }
 
 -(void)viewWillAppear:(BOOL)animated {

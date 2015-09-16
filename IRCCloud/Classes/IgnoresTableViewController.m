@@ -51,6 +51,7 @@
     self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.leftBarButtonItem = _addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
+    self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
 }
 
 -(void)viewWillAppear:(BOOL)animated {

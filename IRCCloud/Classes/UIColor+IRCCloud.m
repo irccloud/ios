@@ -843,5 +843,7 @@ BOOL __color_theme_is_dark;
 +(UIColor *)timestampBottomBorderColor {
     return __timestampBottomBorderColor;
 }
-
++(UIActivityIndicatorViewStyle)activityIndicatorViewStyle {
+    return __color_theme_is_dark?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
+}
 @end

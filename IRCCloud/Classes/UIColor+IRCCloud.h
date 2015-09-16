@@ -102,4 +102,5 @@
 +(UIColor *)selectedArchivesHeadingColor;
 +(UIColor *)timestampTopBorderColor;
 +(UIColor *)timestampBottomBorderColor;
++(UIActivityIndicatorViewStyle)activityIndicatorViewStyle;
 @end

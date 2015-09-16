@@ -17,6 +17,7 @@
 
 #import "ServerMapTableViewController.h"
 #import "NetworkConnection.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation ServerMapTableViewController
 
@@ -30,6 +31,7 @@
 
 -(void)viewDidLoad {
     [super viewDidLoad];
+    self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
     self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
     

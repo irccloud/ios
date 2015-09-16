@@ -56,7 +56,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
          
 - (void)fetchServerList
 {
-    _activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    _activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
     _activityIndicator.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin);
     _activityIndicator.center = (CGPoint){(self.view.bounds.size.width * 0.5), (self.view.bounds.size.height * 0.5)};
     [_activityIndicator startAnimating];
@@ -358,7 +358,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(void)saveButtonPressed:(id)sender {
-    UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
     [spinny startAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
     if(_cid == -1) {

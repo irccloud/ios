@@ -84,7 +84,7 @@
         _highlights = [[HighlightsCountView alloc] initWithFrame:CGRectZero];
         [self.contentView addSubview:_highlights];
         
-        _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
         _activity.hidden = YES;
         [self.contentView addSubview:_activity];
     }
@@ -784,7 +784,7 @@
     cell.type = [[row objectForKey:@"type"] intValue];
     cell.label.text = [row objectForKey:@"name"];
     cell.activity.hidden = YES;
-    cell.activity.activityIndicatorViewStyle = [UIColor isDarkTheme]?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
+    cell.activity.activityIndicatorViewStyle = [UIColor isDarkTheme]?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
     cell.accessibilityValue = [row objectForKey:@"hint"];
     cell.highlightColor = [UIColor colorWithRed:0.776 green:0.855 blue:1 alpha:1];
     cell.border.backgroundColor = [UIColor bufferBorderColor];
@@ -850,7 +850,7 @@
             if(![status isEqualToString:@"connected_ready"] && ![status isEqualToString:@"quitting"] && ![status isEqualToString:@"disconnected"]) {
                 [cell.activity startAnimating];
                 cell.activity.hidden = NO;
-                cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
+                cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
             } else {
                 [cell.activity stopAnimating];
                 cell.activity.hidden = YES;
@@ -897,7 +897,7 @@
             if([[row objectForKey:@"timeout"] intValue]) {
                 [cell.activity startAnimating];
                 cell.activity.hidden = NO;
-                cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
+                cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
             } else {
                 [cell.activity stopAnimating];
                 cell.activity.hidden = YES;

@@ -73,8 +73,13 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)_themeChanged {
+    UIView *v = self.navigationController.view.superview;
+    [self.navigationController.view removeFromSuperview];
+    [v addSubview: self.navigationController.view];
+
     self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
     self.view.backgroundColor = [UIColor contentBackgroundColor];
+    self.navigationController.view.backgroundColor = [UIColor isDarkTheme]?[UIColor contentBackgroundColor]:[UIColor blackColor];
     _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
     [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
     [_sendBtn setTitleColor:[UIColor textareaBackgroundColor] forState:UIControlStateNormal];
@@ -102,11 +107,11 @@ extern NSDictionary *emojiMap;
     _borders.backgroundColor = [UIColor iPadBordersColor];
     [[_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
     
-    _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor isDarkTheme]?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
+    _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
     
-    UIView *v = self.navigationController.view.superview;
-    [self.navigationController.view removeFromSuperview];
-    [v addSubview: self.navigationController.view];
+    [_eventsView refresh];
+    [_buffersView refresh];
+    [_usersView refresh];
 }
 
 - (void)viewDidLoad {
@@ -755,7 +760,11 @@ extern NSDictionary *emojiMap;
             }
             break;
         case kIRCEventUserInfo:
-            [self _themeChanged];
+        {
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self _themeChanged];
+            }];
+        }
         case kIRCEventPart:
         case kIRCEventKick:
             [self _updateTitleArea];
@@ -1039,6 +1048,9 @@ extern NSDictionary *emojiMap;
 
 -(void)backlogCompleted:(NSNotification *)notification {
     if([notification.object bid] == 0) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self _themeChanged];
+        }];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
         [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
 #ifdef DEBUG
