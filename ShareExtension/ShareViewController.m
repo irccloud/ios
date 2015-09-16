@@ -103,6 +103,7 @@
 }
 
 - (void)viewDidLoad {
+    [UIColor setTheme:@"dawn"];
     [super viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogComplete:)
