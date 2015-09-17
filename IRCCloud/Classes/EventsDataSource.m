@@ -394,8 +394,10 @@
                               event.isSelf = NO;
                           },
                           @"buffer_me_msg":^(Event *event, IRCCloudJSONObject *object) {
-                              event.nick = event.from;
-                              event.from = @"";
+                              if(object) {
+                                  event.nick = event.from;
+                                  event.from = @"";
+                              }
                           },
                           @"nickname_in_use":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = [object objectForKey:@"nick"];
