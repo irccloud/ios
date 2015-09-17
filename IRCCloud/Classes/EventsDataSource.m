@@ -119,6 +119,7 @@
             _height = 0;
             _pending = NO;
             _rowType = ROW_FAILED;
+            _color = [UIColor networkErrorColor];
             _bgColor = [UIColor errorBackgroundColor];
         }
     }
@@ -235,6 +236,7 @@
         
         void (^error)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
             event.from = @"";
+            event.color = [UIColor networkErrorColor];
             event.bgColor = [UIColor errorBackgroundColor];
         };
         
@@ -268,6 +270,7 @@
                 else
                     event.msg = [event.msg stringByAppendingString:[object objectForKey:@"msg"]];
             }
+            event.color = [UIColor networkErrorColor];
             event.bgColor = [UIColor errorBackgroundColor];
         };
         
@@ -397,11 +400,13 @@
                           @"nickname_in_use":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = [object objectForKey:@"nick"];
                               event.msg = @"is already in use";
+                              event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
                           },
                           @"connecting_cancelled":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
                               event.msg = @"Cancelled";
+                              event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
                           },
                           @"connecting_failed":^(Event *event, IRCCloudJSONObject *object) {
@@ -649,12 +654,14 @@
                           @"target_callerid":^(Event *event, IRCCloudJSONObject *object) {
                               if(object)
                                   event.from = [object objectForKey:@"target_nick"];
+                              event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
                               event.monospace = YES;
                           },
                           @"target_notified":^(Event *event, IRCCloudJSONObject *object) {
                               if(object)
                                   event.from = [object objectForKey:@"target_nick"];
+                              event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
                               event.monospace = YES;
                           },
@@ -669,6 +676,7 @@
                                       }
                                   }
                               }
+                              event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
                               event.monospace = YES;
                           },
@@ -711,6 +719,7 @@
                               event.monospace = YES;
                           },
                           @"unknown_umode":^(Event *event, IRCCloudJSONObject *object) {
+                              event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
                               event.linkify = NO;
                               event.from = @"";
@@ -718,16 +727,19 @@
                                   event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"flag"], BOLD, event.msg];
                           },
                           @"kill_deny":^(Event *event, IRCCloudJSONObject *object) {
+                              event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
                               if(object)
                                   event.from = [object objectForKey:@"channel"];
                           },
                           @"chan_own_priv_needed":^(Event *event, IRCCloudJSONObject *object) {
+                              event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
                               if(object)
                                   event.from = [object objectForKey:@"channel"];
                           },
                           @"chan_forbidden":^(Event *event, IRCCloudJSONObject *object) {
+                              event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
                               if(object)
                                   event.from = [object objectForKey:@"channel"];

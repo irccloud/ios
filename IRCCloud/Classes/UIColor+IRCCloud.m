@@ -396,7 +396,7 @@ BOOL __color_theme_is_dark;
         __connectionBarColor = color_background4;
         __connectionErrorBarTextColor = color_text4;
         __connectionErrorBarColor = color_background5;
-        __errorBackgroundColor = [UIColor colorWithRed:1 green:0.996 blue:0.914 alpha:1];
+        __errorBackgroundColor = [UIColor colorWithRed:0.698 green:0.698 blue:0.204 alpha:1];
         __archivedChannelTextColor = [UIColor colorWithWhite:0.667 alpha:1.0];
         __archivedBufferTextColor = [UIColor colorWithWhite:0.667 alpha:1.0];
         __selectedArchivesHeadingColor = [UIColor colorWithRed:0.867 green:0.867 blue:0.867 alpha:1];

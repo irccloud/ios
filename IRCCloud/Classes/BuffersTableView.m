@@ -834,7 +834,7 @@
                 cell.icon.textColor = cell.label.textColor = [UIColor selectedBufferTextColor];
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count]) {
                     cell.icon.tintColor = cell.label.textColor = [UIColor networkErrorColor];
-                    cell.unreadIndicator.backgroundColor = cell.bgColor = [UIColor networkErrorBackgroundColor];
+                    cell.unreadIndicator.backgroundColor = cell.bgColor = cell.highlightColor = [UIColor networkErrorBackgroundColor];
                 } else {
                     cell.bgColor = [UIColor selectedBufferBackgroundColor];
                 }
@@ -848,14 +848,14 @@
                 else
                     cell.icon.textColor = cell.label.textColor = [UIColor bufferTextColor];
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
-                    cell.bgColor = [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
+                    cell.bgColor = cell.highlightColor = [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
                 else
                     cell.bgColor = [UIColor serverBackgroundColor];
             }
             if(![status isEqualToString:@"connected_ready"] && ![status isEqualToString:@"quitting"] && ![status isEqualToString:@"disconnected"]) {
                 [cell.activity startAnimating];
                 cell.activity.hidden = NO;
-                cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
+                cell.activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
             } else {
                 [cell.activity stopAnimating];
                 cell.activity.hidden = YES;
