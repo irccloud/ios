@@ -464,7 +464,7 @@
     if(modes.length) {
         if(output.length > 0)
             output = [output stringByAppendingString:@"; "];
-        output = [output stringByAppendingFormat:@"%c1%@%c", COLOR_MIRC, modes, CLEAR];
+        output = [output stringByAppendingString:modes];
     }
     
     if(output.length)
