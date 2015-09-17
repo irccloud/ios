@@ -305,6 +305,8 @@
         [previews addObject:v];
         
         _themePreviews = previews;
+        
+        self.tableView.separatorInset = UIEdgeInsetsMake(0, 40, 0, 0);
     }
     return self;
 }
@@ -330,7 +332,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"themecell"];
 
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.textLabel.text = [NSString stringWithFormat:@"        %@", [_themes objectAtIndex:indexPath.row]];
+    cell.textLabel.text = [_themes objectAtIndex:indexPath.row];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] isEqualToString:[[_themes objectAtIndex:indexPath.row] lowercaseString]])
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     else
@@ -338,7 +340,8 @@
     
     UIView *v = [_themePreviews objectAtIndex:indexPath.row];
     [v removeFromSuperview];
-    v.frame = CGRectMake(2,2,cell.contentView.frame.size.height-4,cell.contentView.frame.size.height-4);
+    v.frame = CGRectMake(8,cell.contentView.frame.size.height / 2 - 12,24,24);
+    v.layer.cornerRadius = v.frame.size.width / 2;
     [cell.contentView addSubview:v];
     
     return cell;
@@ -809,7 +812,7 @@
             switch(row) {
                 case 0:
                     cell.textLabel.text = @"Theme";
-                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
+                    cell.detailTextLabel.text = [[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] capitalizedString];
                     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
                     break;
                 case 1:
