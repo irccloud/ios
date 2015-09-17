@@ -107,6 +107,10 @@
 		22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
 		223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
+		2236BD631BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
+		2236BD641BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
+		2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
+		2236BD661BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
 		2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2236F5FB16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
@@ -611,6 +615,8 @@
 		22324FDF177DE51A008B6912 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		223581C1191AD79B00A4B124 /* ImageUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUploader.h; sourceTree = "<group>"; };
 		223581C2191AD79B00A4B124 /* ImageUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUploader.m; sourceTree = "<group>"; };
+		2236BD621BAA5E0900015753 /* FontAwesome.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.otf; sourceTree = "<group>"; };
+		2236BD671BAA600900015753 /* FontAwesome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FontAwesome.h; path = Classes/FontAwesome.h; sourceTree = "<group>"; };
 		2236F5F816DA765C007BE535 /* ServersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServersDataSource.h; sourceTree = "<group>"; };
 		2236F5F916DA765C007BE535 /* ServersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServersDataSource.m; sourceTree = "<group>"; };
 		2236F5FC16DA8928007BE535 /* BuffersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuffersDataSource.h; sourceTree = "<group>"; };
@@ -1086,6 +1092,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				2236BD671BAA600900015753 /* FontAwesome.h */,
 				22C0F14B1B8F61AF001D109D /* YTPlayerView */,
 				22D649201B1E0719003BFD86 /* CSURITemplate */,
 				22C8CDE91B01372100F637D2 /* SSZipArchive */,
@@ -1239,6 +1246,7 @@
 		228A05B416D3DB930029769C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				2236BD621BAA5E0900015753 /* FontAwesome.otf */,
 				22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */,
 				22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */,
 				1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */,
@@ -1609,6 +1617,7 @@
 				2257336D19BFCB3000948690 /* a.caf in Resources */,
 				22103529197EFCF100AB414F /* Icons.xcassets in Resources */,
 				22103527197EFCEB00AB414F /* Logo.xcassets in Resources */,
+				2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				22C89B6019ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 				22103528197EFCEE00AB414F /* Images.xcassets in Resources */,
 				22C89B5C19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
@@ -1633,6 +1642,7 @@
 				225D979418AA995900065087 /* Safari.png in Resources */,
 				22C89B5B19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
 				225D979518AA995900065087 /* Safari@2x.png in Resources */,
+				2236BD641BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				225D979618AA995900065087 /* Safari@2x~ipad.png in Resources */,
 				225D979718AA995900065087 /* Safari~ipad.png in Resources */,
 				22EEA95518D0B198007D5022 /* Icons.xcassets in Resources */,
@@ -1660,6 +1670,7 @@
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
 				22C89B5E19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 				22EEA95418D0B198007D5022 /* Icons.xcassets in Resources */,
+				2236BD631BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				22A363B219D0884D00500478 /* 1Password.xcassets in Resources */,
 				1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */,
 				22C89B5A19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
@@ -1694,6 +1705,7 @@
 				2257336E19BFCB3400948690 /* a.caf in Resources */,
 				22DB25301982DF2B0008728E /* Icons.xcassets in Resources */,
 				22DB25401982E3130008728E /* EnterpriseImages.xcassets in Resources */,
+				2236BD661BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				22C89B6119ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 				22DB253F1982E3100008728E /* EnterpriseLogo.xcassets in Resources */,
 				22C89B5D19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,

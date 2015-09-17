@@ -10,11 +10,12 @@
 #import "ServersDataSource.h"
 #import "UIColor+IRCCloud.h"
 #import "NetworkConnection.h"
+#import "FontAwesome.h"
 
 @interface ReorderCell : UITableViewCell {
-    UIImageView *_icon;
+    UILabel *_icon;
 }
-@property (readonly) UIImageView *icon;
+@property (readonly) UILabel *icon;
 @end
 
 @implementation ReorderCell
@@ -22,8 +23,10 @@
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if(self) {
-        _icon = [[UIImageView alloc] initWithFrame:CGRectMake(0,14,16,16)];
-        _icon.tintColor = [UITableViewCell appearance].textLabelColor;
+        _icon = [[UILabel alloc] initWithFrame:CGRectMake(0,14,16,16)];
+        _icon.textColor = [UITableViewCell appearance].textLabelColor;
+        _icon.textAlignment = NSTextAlignmentCenter;
+        _icon.font = [UIFont fontWithName:@"FontAwesome" size:self.textLabel.font.pointSize];
         [self.contentView addSubview:_icon];
     }
     return self;
@@ -113,8 +116,8 @@
     else
         cell.textLabel.text = s.hostname;
     
-    cell.icon.image = [[UIImage imageNamed:(s.ssl > 0)?@"world_shield":@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    
+    cell.icon.text = (s.ssl > 0)?FA_SHIELD:FA_GLOBE;
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     return cell;
 }
 

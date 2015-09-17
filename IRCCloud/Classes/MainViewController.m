@@ -46,6 +46,7 @@
 #import "TUSafariActivity.h"
 #import "OpenInChromeController.h"
 #import "ServerReorderViewController.h"
+#import "FontAwesome.h"
 
 #define TAG_BAN 1
 #define TAG_IGNORE 2
@@ -180,6 +181,8 @@ extern NSDictionary *emojiMap;
     if(_mentionTip)
         _mentionTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
     
+    _lock.font = [UIFont fontWithName:@"FontAwesome" size:18];
+
     _uploadsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     _uploadsBtn.contentMode = UIViewContentModeCenter;
     _uploadsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
@@ -1700,18 +1703,18 @@ extern NSDictionary *emojiMap;
         _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,4,16,16);
         _lock.hidden = NO;
         if(s.ssl > 0)
-            _lock.image = [[UIImage imageNamed:@"world_shield"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            _lock.text = FA_SHIELD;
         else
-            _lock.image = [[UIImage imageNamed:@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        _lock.tintColor = [UIColor navBarHeadingColor];
+            _lock.text = FA_GLOBE;
+        _lock.textColor = [UIColor navBarHeadingColor];
     } else {
         self.navigationItem.title = _titleLabel.text = _buffer.name;
         _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
         _titleLabel.font = [UIFont boldSystemFontOfSize:20];
         _titleLabel.accessibilityValue = _buffer.accessibilityValue;
         _topicLabel.hidden = YES;
-        _lock.image = [[UIImage imageNamed:@"lock"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-        _lock.tintColor = [UIColor navBarHeadingColor];
+        _lock.text = FA_LOCK;
+        _lock.textColor = [UIColor navBarHeadingColor];
         if([_buffer.type isEqualToString:@"channel"]) {
             _titleLabel.accessibilityLabel = @"Channel";
             BOOL lock = NO;

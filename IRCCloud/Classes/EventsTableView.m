@@ -20,6 +20,7 @@
 #import "UIColor+IRCCloud.h"
 #import "ColorFormatter.h"
 #import "AppDelegate.h"
+#import "FontAwesome.h"
 
 int __timestampWidth;
 
@@ -28,14 +29,14 @@ int __timestampWidth;
     TTTAttributedLabel *_message;
     int _type;
     UIView *_socketClosedBar;
-    UIImageView *_accessory;
+    UILabel *_accessory;
     UIView *_topBorder;
     UIView *_bottomBorder;
 }
 @property int type;
 @property (readonly) UILabel *timestamp;
 @property (readonly) TTTAttributedLabel *message;
-@property (readonly) UIImageView *accessory;
+@property (readonly) UILabel *accessory;
 @end
 
 @implementation EventsTableCell
@@ -67,10 +68,10 @@ int __timestampWidth;
         _socketClosedBar.hidden = YES;
         [self.contentView addSubview:_socketClosedBar];
         
-        _accessory = [[UIImageView alloc] initWithFrame:CGRectZero];
+        _accessory = [[UILabel alloc] initWithFrame:CGRectZero];
         _accessory.hidden = YES;
-        _accessory.contentMode = UIViewContentModeCenter;
-        _accessory.tintColor = [UIColor expandCollapseIndicatorColor];
+        _accessory.textAlignment = NSTextAlignmentCenter;
+        _accessory.textColor = [UIColor expandCollapseIndicatorColor];
         [self.contentView addSubview:_accessory];
 
         _topBorder = [[UIView alloc] initWithFrame:CGRectZero];
@@ -1325,6 +1326,7 @@ int __timestampWidth;
     cell.message.font = [ColorFormatter timestampFont];
     cell.message.delegate = self;
     cell.message.text = e.formatted;
+    cell.accessory.font = [ColorFormatter awesomeFont];
 
     if(e.from.length && e.msg.length) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];
@@ -1336,19 +1338,19 @@ int __timestampWidth;
     if((e.rowType == ROW_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
         if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
             if(e.groupEid == e.eid + 1) {
-                cell.accessory.image = [[UIImage imageNamed:@"bullet_toggle_minus"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                cell.accessory.text = FA_MINUS_SQUARE_O;
                 cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
             } else {
-                cell.accessory.image = [[UIImage imageNamed:@"tiny_plus"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                cell.accessory.text = FA_ANGLE_RIGHT;
                 cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
             }
         } else {
-            cell.accessory.image = [[UIImage imageNamed:@"bullet_toggle_plus"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+            cell.accessory.text = FA_PLUS_SQUARE_O;
         }
         cell.accessory.hidden = NO;
     } else if(e.rowType == ROW_FAILED) {
         cell.accessory.hidden = NO;
-        cell.accessory.image = [UIImage imageNamed:@"send_fail"];
+        cell.accessory.text = FA_EXCLAMATION_TRIANGLE;
     } else {
         cell.accessory.hidden = YES;
     }

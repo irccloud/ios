@@ -24,7 +24,7 @@
 
 id Courier = NULL, CourierBold, CourierOblique,CourierBoldOblique;
 id Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
-id arrowFont, chalkboardFont, markerFont;
+id arrowFont, chalkboardFont, markerFont, awesomeFont;
 UIFont *timestampFont, *monoTimestampFont;
 NSDictionary *emojiMap;
 NSDictionary *quotes;
@@ -39,7 +39,7 @@ float ColorFormatterCachedFontSize = 0.0f;
 +(void)clearFontCache {
     CLS_LOG(@"Clearing font cache");
     Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = arrowFont = chalkboardFont = markerFont = NULL;
-    timestampFont = monoTimestampFont = NULL;
+    timestampFont = monoTimestampFont = awesomeFont = NULL;
 }
 
 +(UIFont *)timestampFont {
@@ -54,6 +54,13 @@ float ColorFormatterCachedFontSize = 0.0f;
         monoTimestampFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
     }
     return monoTimestampFont;
+}
+
++(UIFont *)awesomeFont {
+    if(!awesomeFont) {
+        awesomeFont = [UIFont fontWithName:@"FontAwesome" size:FONT_SIZE];
+    }
+    return awesomeFont;
 }
 
 +(NSRegularExpression *)emoji {

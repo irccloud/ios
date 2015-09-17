@@ -431,6 +431,7 @@ NSLock *__parserLock = nil;
                        }
 
                        _prefs = nil;
+#ifndef EXTENSION
                        NSDictionary *p = [self prefs];
                        if([p objectForKey:@"theme"]) {
                            [UIColor setTheme:[p objectForKey:@"theme"]];
@@ -438,7 +439,6 @@ NSLock *__parserLock = nil;
                        }
                        [[NSUserDefaults standardUserDefaults] synchronize];
                        [[EventsDataSource sharedInstance] reformat];
-#ifndef EXTENSION
                        [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];

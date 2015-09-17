@@ -44,7 +44,7 @@
     IBOutlet UIView *_titleView;
     IBOutlet UILabel *_titleLabel;
     IBOutlet UILabel *_topicLabel;
-    IBOutlet UIImageView *_lock;
+    IBOutlet UILabel *_lock;
     IBOutlet UIView *_borders;
     IBOutlet UIView *_swipeTip;
     IBOutlet UIView *_2swipeTip;

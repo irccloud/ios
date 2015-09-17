@@ -52,6 +52,7 @@
     
     UIFont *_boldFont;
     UIFont *_normalFont;
+    UIFont *_awesomeFont;
 }
 @property UIViewController<BuffersTableViewDelegate> *delegate;
 -(void)setBuffer:(Buffer *)buffer;

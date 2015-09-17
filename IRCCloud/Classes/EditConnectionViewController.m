@@ -21,6 +21,7 @@
 #import "UIColor+IRCCloud.h"
 #import "SBJson.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "FontAwesome.h"
 
 @interface NetworkListViewController : UITableViewController {
     id<NetworkListDelegate> _delegate;
@@ -159,11 +160,13 @@ static NSString * const ServerHasSSLKey = @"ssl";
     NSDictionary *row = [_networks objectAtIndex:indexPath.row];
     [[cell.textLabel subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     cell.textLabel.clipsToBounds = NO;
-    UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake(2,2.4,16,16)];
+    UILabel *icon = [[UILabel alloc] initWithFrame:CGRectMake(2,2.4,16,16)];
+    icon.font = [UIFont fontWithName:@"FontAwesome" size:cell.textLabel.font.pointSize];
+    icon.textAlignment = NSTextAlignmentCenter;
     if([[row objectForKey:@"SSL"] boolValue])
-        icon.image = [[UIImage imageNamed:@"world_shield"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        icon.text = FA_SHIELD;
     else
-        icon.image = [[UIImage imageNamed:@"world"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+        icon.text = FA_GLOBE;
 /* icon on the right instead
      if([[row objectForKey:@"SSL"] boolValue]) {
      UIImageView *icon = [[UIImageView alloc] initWithFrame:CGRectMake([cell.textLabel.text sizeWithFont:[UIFont boldSystemFontOfSize:18]].width + 2,2,16,16)];
@@ -172,7 +175,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
      }
 */
     [cell.textLabel addSubview:icon];
-    icon.tintColor = [UITableViewCell appearance].textLabelColor;
+    icon.textColor = [UITableViewCell appearance].textLabelColor;
     cell.textLabel.text = [NSString stringWithFormat:@"     %@",[row objectForKey:@"network"]];
     cell.detailTextLabel.text = [row objectForKey:@"host"];
     
