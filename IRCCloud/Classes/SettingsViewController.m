@@ -358,6 +358,7 @@
     UIView *v = self.navigationController.view.superview;
     [self.navigationController.view removeFromSuperview];
     [v addSubview: self.navigationController.view];
+    [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
 }
 @end
 
