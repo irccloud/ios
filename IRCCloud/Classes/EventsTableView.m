@@ -154,6 +154,7 @@ int __timestampWidth;
         _lock = [[NSRecursiveLock alloc] init];
         _ready = NO;
         _formatter = [[NSDateFormatter alloc] init];
+        _formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
         _data = [[NSMutableArray alloc] init];
         _expandedSectionEids = [[NSMutableDictionary alloc] init];
         _collapsedEvents = [[CollapsedEvents alloc] init];
