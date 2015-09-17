@@ -15,10 +15,8 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        self.backgroundColor = [UIColor unreadBlueColor];
         _selection = -1;
         _scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
-        _scrollView.backgroundColor = [UIColor textareaBackgroundColor];
         [self addSubview:_scrollView];
         [self setSuggestions:@[]];
     }
@@ -31,6 +29,8 @@
     _scrollView.layer.masksToBounds = YES;
     _scrollView.layer.cornerRadius = 4;
     _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    self.backgroundColor = [UIColor bufferBorderColor];
+    _scrollView.backgroundColor = [UIColor bufferBackgroundColor];
 }
 
 -(void)setSuggestions:(NSArray *)suggestions {
@@ -43,7 +43,7 @@
         UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
         b.titleLabel.font = _font;
         [b setTitle:label forState:UIControlStateNormal];
-        [b setTitleColor:[UIColor textareaTextColor] forState:UIControlStateNormal];
+        [b setTitleColor:[UIColor bufferTextColor] forState:UIControlStateNormal];
         [b addTarget:self action:@selector(suggestionTapped:) forControlEvents:UIControlEventTouchUpInside];
         [b sizeToFit];
         CGRect frame = b.frame;
@@ -88,11 +88,11 @@
         for(UIButton *b in [_scrollView subviews]) {
             if([b isKindOfClass:[UIButton class]]) {
                 if(i == selection) {
-                    [b setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-                    b.titleLabel.superview.backgroundColor = [UIColor unreadBlueColor];
+                    [b setTitleColor:[UIColor selectedBufferTextColor] forState:UIControlStateNormal];
+                    b.titleLabel.superview.backgroundColor = [UIColor selectedBufferBackgroundColor];
                     [_scrollView scrollRectToVisible:b.frame animated:YES];
                 } else {
-                    [b setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+                    [b setTitleColor:[UIColor bufferTextColor] forState:UIControlStateNormal];
                     b.titleLabel.superview.backgroundColor = [UIColor clearColor];
                 }
                 i++;
