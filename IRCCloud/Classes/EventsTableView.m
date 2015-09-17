@@ -117,7 +117,7 @@ int __timestampWidth;
             _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         } else {
             _socketClosedBar.hidden = YES;
-            _accessory.frame = CGRectMake(frame.origin.x + 2 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
+            _accessory.frame = CGRectMake(frame.origin.x + 4 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         }
         [_timestamp sizeToFit];
         _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, __timestampWidth, _timestamp.frame.size.height);
@@ -558,7 +558,7 @@ int __timestampWidth;
                 heading.cid = event.cid;
                 heading.bid = event.bid;
                 heading.eid = _currentCollapsedEid - 1;
-                heading.groupMsg = [NSString stringWithFormat:@"   %@",groupMsg];
+                heading.groupMsg = [NSString stringWithFormat:@"    %@",groupMsg];
                 heading.color = [UIColor timestampColor];
                 heading.bgColor = [UIColor contentBackgroundColor];
                 heading.formattedMsg = nil;
@@ -587,10 +587,10 @@ int __timestampWidth;
             _currentCollapsedEid = eid;
         }
         if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
-            msg = [NSString stringWithFormat:@"   %@", msg];
+            msg = [NSString stringWithFormat:@"    %@", msg];
         } else {
             if(eid != _currentCollapsedEid)
-                msg = [NSString stringWithFormat:@"   %@", msg];
+                msg = [NSString stringWithFormat:@"    %@", msg];
             eid = _currentCollapsedEid;
         }
         event.groupMsg = msg;
@@ -1327,6 +1327,7 @@ int __timestampWidth;
     cell.message.delegate = self;
     cell.message.text = e.formatted;
     cell.accessory.font = [ColorFormatter awesomeFont];
+    cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
 
     if(e.from.length && e.msg.length) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];
@@ -1351,6 +1352,7 @@ int __timestampWidth;
     } else if(e.rowType == ROW_FAILED) {
         cell.accessory.hidden = NO;
         cell.accessory.text = FA_EXCLAMATION_TRIANGLE;
+        cell.accessory.textColor = [UIColor networkErrorColor];
     } else {
         cell.accessory.hidden = YES;
     }
@@ -1391,6 +1393,8 @@ int __timestampWidth;
         cell.timestamp.textColor = [UIColor messageTextColor];
     } else if(e.isHighlight && !e.isSelf) {
         cell.timestamp.textColor = [UIColor highlightTimestampColor];
+    } else if(e.rowType == ROW_FAILED || [e.bgColor isEqual:[UIColor errorBackgroundColor]]) {
+        cell.timestamp.textColor = [UIColor networkErrorColor];
     } else {
         cell.timestamp.textColor = [UIColor timestampColor];
     }

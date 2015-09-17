@@ -456,7 +456,7 @@
     d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
     _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     _awesomeFont = [UIFont fontWithName:@"FontAwesome" size:d.pointSize];
-    NSLog(@"%@", _awesomeFont);
+
     UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
