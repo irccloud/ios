@@ -242,6 +242,7 @@
 
 @interface ThemesViewController : UITableViewController {
     NSArray *_themes;
+    NSArray *_themePreviews;
 }
 @end
 
@@ -252,6 +253,58 @@
     if (self) {
         self.navigationItem.title = @"Theme";
         _themes = @[@"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash"];
+        
+        NSMutableArray *previews = [[NSMutableArray alloc] init];
+        
+        UIView *v = [[UIView alloc] initWithFrame:CGRectZero];
+        v.backgroundColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
+        v.layer.borderColor = [UIColor blackColor].CGColor;
+        v.layer.borderWidth = 1.0f;
+        [previews addObject:v];
+        
+        v = [[UIView alloc] initWithFrame:CGRectZero];
+        v.backgroundColor = [UIColor colorWithRed:0 green:0.4 blue:0.8 alpha:1];
+        v.layer.borderColor = [UIColor blackColor].CGColor;
+        v.layer.borderWidth = 1.0f;
+        [previews addObject:v];
+        
+        v = [[UIView alloc] initWithFrame:CGRectZero];
+        v.backgroundColor = [UIColor colorWithRed:0 green:0.8 blue:0.8 alpha:1];
+        v.layer.borderColor = [UIColor blackColor].CGColor;
+        v.layer.borderWidth = 1.0f;
+        [previews addObject:v];
+        
+        v = [[UIView alloc] initWithFrame:CGRectZero];
+        v.backgroundColor = [UIColor colorWithRed:0.133 green:0.8 blue:0 alpha:1];
+        v.layer.borderColor = [UIColor blackColor].CGColor;
+        v.layer.borderWidth = 1.0f;
+        [previews addObject:v];
+        
+        v = [[UIView alloc] initWithFrame:CGRectZero];
+        v.backgroundColor = [UIColor colorWithRed:0.8 green:0.6 blue:0 alpha:1];
+        v.layer.borderColor = [UIColor blackColor].CGColor;
+        v.layer.borderWidth = 1.0f;
+        [previews addObject:v];
+        
+        v = [[UIView alloc] initWithFrame:CGRectZero];
+        v.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0 alpha:1];
+        v.layer.borderColor = [UIColor blackColor].CGColor;
+        v.layer.borderWidth = 1.0f;
+        [previews addObject:v];
+        
+        v = [[UIView alloc] initWithFrame:CGRectZero];
+        v.backgroundColor = [UIColor colorWithRed:0.8 green:0 blue:0.612 alpha:1];
+        v.layer.borderColor = [UIColor blackColor].CGColor;
+        v.layer.borderWidth = 1.0f;
+        [previews addObject:v];
+        
+        v = [[UIView alloc] initWithFrame:CGRectZero];
+        v.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+        v.layer.borderColor = [UIColor blackColor].CGColor;
+        v.layer.borderWidth = 1.0f;
+        [previews addObject:v];
+        
+        _themePreviews = previews;
     }
     return self;
 }
@@ -275,12 +328,18 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"themecell"];
     if(!cell)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"themecell"];
-    
-    cell.textLabel.text = [_themes objectAtIndex:indexPath.row];
+
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.textLabel.text = [NSString stringWithFormat:@"        %@", [_themes objectAtIndex:indexPath.row]];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] isEqualToString:[[_themes objectAtIndex:indexPath.row] lowercaseString]])
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     else
         cell.accessoryType = UITableViewCellAccessoryNone;
+    
+    UIView *v = [_themePreviews objectAtIndex:indexPath.row];
+    [v removeFromSuperview];
+    v.frame = CGRectMake(2,2,cell.contentView.frame.size.height-4,cell.contentView.frame.size.height-4);
+    [cell.contentView addSubview:v];
     
     return cell;
 }
@@ -357,8 +416,6 @@
         [prefs setObject:@(!_pastebin.isOn) forKey:@"pastebin-disableprompt"];
         [prefs setObject:_mono.isOn?@"mono":@"sans" forKey:@"font"];
         [prefs setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] forKey:@"theme"];
-        
-        NSLog(@"Saving: %@", prefs);
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
         NSString *json = [writer stringWithObject:prefs];
