@@ -1485,6 +1485,8 @@ float ColorFormatterCachedFontSize = 0.0f;
             }
         }
         results = [[self webURL] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
+        NSPredicate *ipAddress = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"[0-9\\.]+"];
+
         for(NSTextCheckingResult *result in results) {
             BOOL overlap = NO;
             for(NSTextCheckingResult *match in matches) {
@@ -1498,6 +1500,10 @@ float ColorFormatterCachedFontSize = 0.0f;
                 if(range.location + range.length < output.length && [[output string] characterAtIndex:range.location + range.length - 1] != '/' && [[output string] characterAtIndex:range.location + range.length] == '/')
                     range.length++;
                 NSString *url = [NSURL IDNEncodedURL:[[output string] substringWithRange:result.range]];
+                
+                if([ipAddress evaluateWithObject:url]) {
+                    continue;
+                }
                 
                 if([self unbalanced:url] || [url hasSuffix:@"."] || [url hasSuffix:@"?"] || [url hasSuffix:@"!"] || [url hasSuffix:@","]) {
                     url = [url substringToIndex:url.length - 1];
