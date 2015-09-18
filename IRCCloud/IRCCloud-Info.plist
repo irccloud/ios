@@ -89,9 +89,9 @@
 	</array>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Lato-Regular.ttf</string>
-		<string>Lato-LightItalic.ttf</string>
-        <string>FontAwesome.otf</string>
+		<string>SourceSansPro-LightIt.otf</string>
+		<string>SourceSansPro-Regular.otf</string>
+		<string>FontAwesome.otf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

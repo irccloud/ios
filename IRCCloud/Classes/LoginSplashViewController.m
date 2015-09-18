@@ -48,68 +48,68 @@
     swipe.direction = UISwipeGestureRecognizerDirectionDown;
     [self.view addGestureRecognizer:swipe];
     
-    UIFont *lato = [UIFont fontWithName:@"Lato" size:38];
-    IRC.font = lato;
+    UIFont *sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:38];
+    IRC.font = sourceSansPro;
     [IRC sizeToFit];
-    Cloud.font = lato;
+    Cloud.font = sourceSansPro;
     [Cloud sizeToFit];
 #ifdef ENTERPRISE
     Cloud.textColor = IRC.textColor;
     IRC.textColor = [UIColor whiteColor];
 #endif
     
-    lato = [UIFont fontWithName:@"Lato" size:16];
-    enterpriseHint.font = lato;
+    sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:16];
+    enterpriseHint.font = sourceSansPro;
     
     for(UILabel *l in signupHint.subviews) {
-        l.font = lato;
+        l.font = sourceSansPro;
         [l sizeToFit];
-        lato = [UIFont fontWithName:@"Lato" size:18];
+        sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:18];
     }
 
-    lato = [UIFont fontWithName:@"Lato" size:16];
+    sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:16];
     for(UILabel *l in loginHint.subviews) {
-        l.font = lato;
+        l.font = sourceSansPro;
         [l sizeToFit];
-        lato = [UIFont fontWithName:@"Lato" size:18];
+        sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:18];
     }
     
-    ((UILabel *)(forgotPasswordLogin.subviews.firstObject)).font = lato;
-    ((UILabel *)(forgotPasswordSignup.subviews.firstObject)).font = lato;
-    lato = [UIFont fontWithName:@"Lato" size:15];
-    ((UILabel *)(notAProblem.subviews.firstObject)).font = lato;
-    lato = [UIFont fontWithName:@"Lato-LightItalic" size:15];
-    ((UILabel *)(notAProblem.subviews.lastObject)).font = lato;
-    lato = [UIFont fontWithName:@"Lato" size:13];
-    enterEmailAddressHint.font = lato;
+    ((UILabel *)(forgotPasswordLogin.subviews.firstObject)).font = sourceSansPro;
+    ((UILabel *)(forgotPasswordSignup.subviews.firstObject)).font = sourceSansPro;
+    sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:15];
+    ((UILabel *)(notAProblem.subviews.firstObject)).font = sourceSansPro;
+    sourceSansPro = [UIFont fontWithName:@"SourceSansPro-LightIt" size:15];
+    ((UILabel *)(notAProblem.subviews.lastObject)).font = sourceSansPro;
+    sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:13];
+    enterEmailAddressHint.font = sourceSansPro;
     
-    lato = [UIFont fontWithName:@"Lato" size:14];
+    sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:14];
     for(UILabel *l in forgotPasswordHint.subviews) {
-        l.font = lato;
+        l.font = sourceSansPro;
         [l sizeToFit];
     }
 
     for(UILabel *l in TOSHint.subviews) {
-        l.font = lato;
+        l.font = sourceSansPro;
         [l sizeToFit];
     }
 
     for(UILabel *l in enterpriseLearnMore.subviews) {
-        l.font = lato;
+        l.font = sourceSansPro;
         [l sizeToFit];
     }
     
-    lato = [UIFont fontWithName:@"Lato-LightItalic" size:13];
-    hostHint.font = lato;
+    sourceSansPro = [UIFont fontWithName:@"SourceSansPro-LightIt" size:13];
+    hostHint.font = sourceSansPro;
     
-    lato = [UIFont fontWithName:@"Lato" size:16];
+    sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:16];
     
     self.view.frame = [UIScreen mainScreen].applicationFrame;
     username.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, username.frame.size.height)];
     username.leftViewMode = UITextFieldViewModeAlways;
     username.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, username.frame.size.height)];
     username.rightViewMode = UITextFieldViewModeAlways;
-    username.font = lato;
+    username.font = sourceSansPro;
 #ifdef ENTERPRISE
     username.placeholder = @"Email or Username";
 #endif
@@ -117,26 +117,26 @@
     password.leftViewMode = UITextFieldViewModeAlways;
     password.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, password.frame.size.height)];
     password.rightViewMode = UITextFieldViewModeAlways;
-    password.font = lato;
+    password.font = sourceSansPro;
     host.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, host.frame.size.height)];
     host.leftViewMode = UITextFieldViewModeAlways;
     host.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, host.frame.size.height)];
     host.rightViewMode = UITextFieldViewModeAlways;
-    host.font = lato;
+    host.font = sourceSansPro;
     name.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, name.frame.size.height)];
     name.leftViewMode = UITextFieldViewModeAlways;
     name.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, name.frame.size.height)];
     name.rightViewMode = UITextFieldViewModeAlways;
-    name.font = lato;
+    name.font = sourceSansPro;
     
-    lato = [UIFont fontWithName:@"Lato" size:17];
-    login.titleLabel.font = lato;
+    sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:17];
+    login.titleLabel.font = sourceSansPro;
     login.enabled = NO;
-    signup.titleLabel.font = lato;
+    signup.titleLabel.font = sourceSansPro;
     signup.enabled = NO;
-    next.titleLabel.font = lato;
+    next.titleLabel.font = sourceSansPro;
     next.enabled = NO;
-    sendAccessLink.titleLabel.font = lato;
+    sendAccessLink.titleLabel.font = sourceSansPro;
     sendAccessLink.enabled = NO;
 #ifdef BRAND_NAME
     [version setText:[NSString stringWithFormat:@"Version %@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], @BRAND_NAME]];

@@ -111,6 +111,10 @@
 		2236BD641BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
 		2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
 		2236BD661BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
+		2236BD6A1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD681BAC61A900015753 /* SourceSansPro-LightIt.otf */; };
+		2236BD6B1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD681BAC61A900015753 /* SourceSansPro-LightIt.otf */; };
+		2236BD6C1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD691BAC61A900015753 /* SourceSansPro-Regular.otf */; };
+		2236BD6D1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD691BAC61A900015753 /* SourceSansPro-Regular.otf */; };
 		2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2236F5FB16DA765C007BE535 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
@@ -379,14 +383,6 @@
 		22C2E0591B0E2E4800387B4B /* PastebinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2E0561B0E2E4800387B4B /* PastebinViewController.m */; };
 		22C2E05A1B0E2E4800387B4B /* PastebinViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */; };
 		22C2E05B1B0E2E4800387B4B /* PastebinViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */; };
-		22C89B5A19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
-		22C89B5B19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
-		22C89B5C19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
-		22C89B5D19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */; };
-		22C89B5E19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
-		22C89B5F19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
-		22C89B6019ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
-		22C89B6119ABB7CA00A8729C /* Lato-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */; };
 		22C8CD711B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
 		22C8CD721B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
 		22C8CD731B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
@@ -617,6 +613,8 @@
 		223581C2191AD79B00A4B124 /* ImageUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUploader.m; sourceTree = "<group>"; };
 		2236BD621BAA5E0900015753 /* FontAwesome.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.otf; sourceTree = "<group>"; };
 		2236BD671BAA600900015753 /* FontAwesome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FontAwesome.h; path = Classes/FontAwesome.h; sourceTree = "<group>"; };
+		2236BD681BAC61A900015753 /* SourceSansPro-LightIt.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-LightIt.otf"; sourceTree = "<group>"; };
+		2236BD691BAC61A900015753 /* SourceSansPro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Regular.otf"; sourceTree = "<group>"; };
 		2236F5F816DA765C007BE535 /* ServersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServersDataSource.h; sourceTree = "<group>"; };
 		2236F5F916DA765C007BE535 /* ServersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServersDataSource.m; sourceTree = "<group>"; };
 		2236F5FC16DA8928007BE535 /* BuffersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BuffersDataSource.h; sourceTree = "<group>"; };
@@ -790,8 +788,6 @@
 		22C2E0551B0E2E4800387B4B /* PastebinViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastebinViewController.h; sourceTree = "<group>"; };
 		22C2E0561B0E2E4800387B4B /* PastebinViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastebinViewController.m; sourceTree = "<group>"; };
 		22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PastebinViewController.xib; path = Classes/PastebinViewController.xib; sourceTree = "<group>"; };
-		22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-LightItalic.ttf"; sourceTree = "<group>"; };
-		22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Lato-Regular.ttf"; sourceTree = "<group>"; };
 		22C8CD701B01289900F637D2 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		22C8CDEB1B01372100F637D2 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
 		22C8CDEC1B01372100F637D2 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
@@ -1247,8 +1243,8 @@
 			isa = PBXGroup;
 			children = (
 				2236BD621BAA5E0900015753 /* FontAwesome.otf */,
-				22C89B5819ABB7CA00A8729C /* Lato-LightItalic.ttf */,
-				22C89B5919ABB7CA00A8729C /* Lato-Regular.ttf */,
+				2236BD681BAC61A900015753 /* SourceSansPro-LightIt.otf */,
+				2236BD691BAC61A900015753 /* SourceSansPro-Regular.otf */,
 				1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */,
 				22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */,
 				1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */,
@@ -1618,9 +1614,7 @@
 				22103529197EFCF100AB414F /* Icons.xcassets in Resources */,
 				22103527197EFCEB00AB414F /* Logo.xcassets in Resources */,
 				2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */,
-				22C89B6019ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 				22103528197EFCEE00AB414F /* Images.xcassets in Resources */,
-				22C89B5C19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1640,8 +1634,9 @@
 				22A363B319D0884D00500478 /* 1Password.xcassets in Resources */,
 				225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */,
 				225D979418AA995900065087 /* Safari.png in Resources */,
-				22C89B5B19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
+				2236BD6B1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
 				225D979518AA995900065087 /* Safari@2x.png in Resources */,
+				2236BD6D1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
 				2236BD641BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				225D979618AA995900065087 /* Safari@2x~ipad.png in Resources */,
 				225D979718AA995900065087 /* Safari~ipad.png in Resources */,
@@ -1651,7 +1646,6 @@
 				225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */,
 				22C0F1551B8F6829001D109D /* Assets in Resources */,
 				22C2E05B1B0E2E4800387B4B /* PastebinViewController.xib in Resources */,
-				22C89B5F19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1664,16 +1658,16 @@
 				22988AAB19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */,
 				22C2E05A1B0E2E4800387B4B /* PastebinViewController.xib in Resources */,
 				2236F64216DC2EF6007BE535 /* MainViewController.xib in Resources */,
+				2236BD6C1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
 				2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */,
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
-				22C89B5E19ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
+				2236BD6A1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
 				22EEA95418D0B198007D5022 /* Icons.xcassets in Resources */,
 				2236BD631BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				22A363B219D0884D00500478 /* 1Password.xcassets in Resources */,
 				1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */,
-				22C89B5A19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
 				225017661783434900066E71 /* ARChromeActivity@2x~ipad.png in Resources */,
 				225017671783434900066E71 /* ARChromeActivity~ipad.png in Resources */,
 				225017691783434900066E71 /* Safari.png in Resources */,
@@ -1706,9 +1700,7 @@
 				22DB25301982DF2B0008728E /* Icons.xcassets in Resources */,
 				22DB25401982E3130008728E /* EnterpriseImages.xcassets in Resources */,
 				2236BD661BAA5E0900015753 /* FontAwesome.otf in Resources */,
-				22C89B6119ABB7CA00A8729C /* Lato-Regular.ttf in Resources */,
 				22DB253F1982E3100008728E /* EnterpriseLogo.xcassets in Resources */,
-				22C89B5D19ABB7CA00A8729C /* Lato-LightItalic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2225,7 +2217,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "865a84ba-c8bf-41cf-9cdd-8c5507f6f50a";
+				PROVISIONING_PROFILE = "6e950bc9-03f0-49c6-83eb-31430c19d4df";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2265,7 +2257,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "8ce3dfbe-d331-4187-987f-a6a95584407c";
+				PROVISIONING_PROFILE = "7f0beb3f-002b-4948-a58a-6bc2029aa303";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2460,7 +2452,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "a90beeb5-161f-410e-9b01-3f122610499b";
+				PROVISIONING_PROFILE = "da981c6c-d80f-435f-a1d2-07faa6200ca3";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2486,7 +2478,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "0ca4c300-99fe-48bb-b753-9175d63b6891";
+				PROVISIONING_PROFILE = "366d4340-81d8-43ad-8758-c6116ee1b883";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
