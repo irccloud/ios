@@ -144,8 +144,13 @@
                 [_topicLabel addLinkWithTextCheckingResult:result];
             } else {
                 NSString *url = [[_topic attributedSubstringFromRange:result.range] string];
-                if(![url hasPrefix:@"irc"])
-                    url = [NSString stringWithFormat:@"irc://%i/%@", server.cid, url];
+                if(![url hasPrefix:@"irc"]) {
+                    CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                    if(url_escaped != NULL) {
+                        url = [NSString stringWithFormat:@"irc://%i/%@", server.cid, url_escaped];
+                        CFRelease(url_escaped);
+                    }
+                }
                 [_topicLabel addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
             }
         }

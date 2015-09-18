@@ -193,8 +193,13 @@
                     u = result.URL;
                 } else {
                     NSString *url = [[data attributedSubstringFromRange:NSMakeRange(result.range.location+offset, result.range.length)] string];
-                    if(![url hasPrefix:@"irc"])
-                        url = [[NSString stringWithFormat:@"irc://%i/%@", s.cid, url] stringByReplacingOccurrencesOfString:@"#" withString:@"%23"];
+                    if(![url hasPrefix:@"irc"]) {
+                        CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                        if(url_escaped != NULL) {
+                            url = [NSString stringWithFormat:@"irc://%i/%@", s.cid, url_escaped];
+                            CFRelease(url_escaped);
+                        }
+                    }
                     u = [NSURL URLWithString:url];
 
                 }
