@@ -83,7 +83,8 @@
 -(void)notify:(NSString *)alert cid:(int)cid bid:(int)bid eid:(NSTimeInterval)eid {
 #ifndef EXTENSION
     UILocalNotification *n = [[UILocalNotification alloc] init];
-    n.alertTitle = @"IRCCloud";
+    if([n respondsToSelector:@selector(setAlertTitle:)])
+        n.alertTitle = @"IRCCloud";
     n.alertBody = alert;
     n.alertAction = @"Reply";
     n.userInfo = @{@"d": @[@(cid), @(bid), @(eid)]};
