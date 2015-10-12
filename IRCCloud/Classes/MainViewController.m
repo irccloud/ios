@@ -111,6 +111,10 @@ extern NSDictionary *emojiMap;
     
     _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
     
+    _fetchingFailed.textColor = [UIColor timestampColor];
+    [_loadMoreBacklog setTitleColor:[UIColor isDarkTheme]?[UIColor navBarSubheadingColor]:[UIColor unreadBlueColor] forState:UIControlStateNormal];
+    [_loadMoreBacklog setTitleShadowColor:[UIColor contentBackgroundColor] forState:UIControlStateNormal];
+    
     [_eventsView refresh];
     [_buffersView refresh];
     [_usersView refresh];
