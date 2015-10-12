@@ -99,6 +99,8 @@
     if([UIColor isDarkTheme]) {
         self.navigationController.view.backgroundColor = [UIColor contentBackgroundColor];
         _activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+        [_toolbar setBackgroundImage:[UIColor navBarBackgroundImage] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+        [_toolbar setTintColor:[UIColor navBarSubheadingColor]];
     } else {
         self.navigationController.view.backgroundColor = [UIColor blackColor];
         _activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
