@@ -394,6 +394,7 @@ NSLock *__parserLock = nil;
                        if(_accrued > 0) {
                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
+                               backlog = NO;
                            }];
                        }
                        _resuming = [[object objectForKey:@"resumed"] boolValue];
