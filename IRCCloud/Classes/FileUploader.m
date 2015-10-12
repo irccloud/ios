@@ -160,6 +160,7 @@
 }
 
 -(void)uploadFile:(NSURL *)file {
+    CLS_LOG(@"Uploading file: %@", file);
     NSFileWrapper *wrapper = [[NSFileWrapper alloc] initWithURL:file options:0 error:nil];
     
     if(wrapper.regularFile) {
@@ -194,6 +195,7 @@
 }
 
 -(void)uploadFile:(NSString *)filename UTI:(NSString *)UTI data:(NSData *)data {
+    CLS_LOG(@"Uploading data with filename: %@", filename);
     _originalFilename = filename;
     _mimeType = UTI;
     [self performSelectorInBackground:@selector(_upload:) withObject:data];
@@ -201,6 +203,7 @@
 
 
 -(void)uploadImage:(UIImage *)img {
+    CLS_LOG(@"Uploading UIImage");
     _mimeType = @"image/jpeg";
     if(_originalFilename) {
         if([_originalFilename rangeOfString:@"." options:NSBackwardsSearch].location != NSNotFound) {
@@ -368,6 +371,7 @@
 
 -(void)_upload:(NSData *)file {
     if(file.length > 15000000) {
+        CLS_LOG(@"File exceeds 15M");
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [_delegate fileUploadTooLarge];
         }];
@@ -453,6 +457,9 @@
     [tasks setObject:@{@"service":@"irccloud", @"bid":@(_bid), @"original_filename":_originalFilename?_originalFilename:@"", @"msg":_msg?_msg:@"", @"filename":_filename?_filename:@""} forKey:_backgroundID];
     
     [d setObject:tasks forKey:@"uploadtasks"];
+    
+    CLS_LOG(@"Upload tasks: %@", tasks);
+    
     [d synchronize];
 }
 
@@ -503,11 +510,13 @@
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend {
+    CLS_LOG(@"Sent body data: %lli / %lli", totalBytesSent, totalBytesExpectedToSend);
     [self connection:_connection didSendBodyData:(NSInteger)bytesSent totalBytesWritten:(NSInteger)totalBytesSent totalBytesExpectedToWrite:(NSInteger)_body.length];
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
     _response = [NSData dataWithContentsOfURL:location].mutableCopy;
+    CLS_LOG(@"Did finish downloading to URL: %@", location);
     [[NSFileManager defaultManager] removeItemAtURL:location error:nil];
     [self connectionDidFinishLoading:_connection];
     NSUserDefaults *d;

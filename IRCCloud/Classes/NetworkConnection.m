@@ -1976,7 +1976,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"uploadsAvailable"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"theme"];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    [UIColor setTheme:@"dusk"];
     [self clearPrefs];
     [_servers clear];
     [_buffers clear];
@@ -1997,8 +1999,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #else
         NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
 #endif
-        for(NSURL *file in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:sharedcontainer includingPropertiesForKeys:nil options:0 error:nil]) {
-            [[NSFileManager defaultManager] removeItemAtURL:file error:nil];
+        for(NSURL *file in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:sharedcontainer includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:nil]) {
+            if(![file.absoluteString hasSuffix:@"/"]) {
+                CLS_LOG(@"Removing: %@", file);
+                [[NSFileManager defaultManager] removeItemAtURL:file error:nil];
+            }
         }
     }
 #endif
