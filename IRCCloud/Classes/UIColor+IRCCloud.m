@@ -247,6 +247,9 @@ BOOL __color_theme_is_dark;
         [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
         [[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:0 green:0.478 blue:1 alpha:1]];
+
+        [[UIToolbar appearance] setBackgroundImage:[self navBarBackgroundImage] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+        [[UIToolbar appearance] setTintColor:[UIColor colorWithRed:0 green:0.478 blue:1 alpha:1]];
     } else {
         UIColor *color_border1;
         UIColor *color_border2;
@@ -453,6 +456,9 @@ BOOL __color_theme_is_dark;
         [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
         [[UINavigationBar appearance] setTintColor:[UIColor navBarSubheadingColor]];
+
+        [[UIToolbar appearance] setBackgroundImage:[self navBarBackgroundImage] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+        [[UIToolbar appearance] setTintColor:[UIColor navBarSubheadingColor]];
     }
     
     __timestampBackgroundImage = nil;

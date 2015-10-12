@@ -22,9 +22,6 @@
     IBOutlet UIWebView *_webView;
     IBOutlet UIToolbar *_toolbar;
     IBOutlet UIActivityIndicatorView *_activity;
-    IBOutlet UIView *_titleView;
-    IBOutlet UILabel *_titleLabel;
-    IBOutlet UILabel *_metadataLabel;
     NSString *_url;
     UISwitch *_lineNumbers;
     NSString *_pasteID;

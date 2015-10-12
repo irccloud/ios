@@ -79,9 +79,8 @@
     }
     
     if([url.scheme hasPrefix:@"irccloud-paste-"]) {
-        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [appDelegate.window.rootViewController presentViewController:[[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]] animated:YES completion:nil];
+            [mainViewController presentViewController:[[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]] animated:YES completion:nil];
         }];
     } else if([url.scheme hasPrefix:@"irc"]) {
         [mainViewController launchURL:[NSURL URLWithString:[url.absoluteString stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];

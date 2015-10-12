@@ -211,14 +211,13 @@
 -(void)loadVideo:(NSString *)url {
     CLS_LOG(@"Loading video: %@", url);
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
-    _movieController = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:url]];
+    _movieController = [[MPMoviePlayerController alloc] initWithContentURL:nil];
     _movieController.controlStyle = MPMovieControlStyleNone;
     _movieController.view.userInteractionEnabled = NO;
     _movieController.view.frame = _scrollView.bounds;
     [_scrollView addSubview:_movieController.view];
     _scrollView.userInteractionEnabled = NO;
     [_progressView removeFromSuperview];
-    [_movieController play];
     [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
 }
 

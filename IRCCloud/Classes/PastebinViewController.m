@@ -22,6 +22,7 @@
 #import "TUSafariActivity.h"
 #import "AppDelegate.h"
 #import "PastebinEditorViewController.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation PastebinViewController
 
@@ -51,12 +52,10 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if(!_metadataLabel.text.length) {
-        [_activity startAnimating];
-        _lineNumbers.enabled = NO;
-        _lineNumbers.on = YES;
-        [self _fetch];
-    }
+    [_activity startAnimating];
+    _lineNumbers.enabled = NO;
+    _lineNumbers.on = YES;
+    [self _fetch];
     [Answers logContentViewWithName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
 }
 
@@ -64,6 +63,7 @@
     [super viewDidLoad];
     
     self.navigationController.navigationBar.clipsToBounds = YES;
+    self.automaticallyAdjustsScrollViewInsets = NO;
 
     _lineNumbers = [[UISwitch alloc] initWithFrame:CGRectZero];
     _lineNumbers.on = YES;
@@ -90,17 +90,36 @@
     _lineNumbers.enabled = NO;
     [_lineNumbers sizeToFit];
     
-    _titleView.frame = CGRectMake(0,0,self.navigationController.navigationBar.frame.size.width - 120, self.navigationController.navigationBar.frame.size.height);
-
+    _webView.opaque = NO;
+    _webView.backgroundColor = [UIColor contentBackgroundColor];
     _webView.scrollView.scrollsToTop = YES;
+    
+    self.view.backgroundColor = [UIColor contentBackgroundColor];
+    
+    if([UIColor isDarkTheme]) {
+        self.navigationController.view.backgroundColor = [UIColor contentBackgroundColor];
+        _activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+    } else {
+        self.navigationController.view.backgroundColor = [UIColor blackColor];
+        _activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+    }
 }
 
 -(void)_fetch {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[_url stringByAppendingFormat:@"?mobile=ios&version=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+    NSURL *url = [NSURL URLWithString:[_url stringByAppendingFormat:@"?mobile=ios&version=%@&theme=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]]];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:[NSString stringWithFormat:@"session=%@", [NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
+    
+    [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:[NSHTTPCookie cookieWithProperties:@{
+                                                                                                  NSHTTPCookieName:@"session",
+                                                                                                  NSHTTPCookieValue:[NetworkConnection sharedInstance].session,
+                                                                                                  NSHTTPCookieDomain:url.host,
+                                                                                                  NSHTTPCookiePath:@"/",
+                                                                                                  NSHTTPCookieVersion:@"0",
+                                                                                                  }]];
     [_webView loadRequest:request];
 }
 
@@ -137,8 +156,6 @@
 
 -(void)_editPaste {
     [self.navigationController pushViewController:[[PastebinEditorViewController alloc] initWithPasteID:_pasteID] animated:YES];
-    self.navigationItem.titleView = nil;
-    _metadataLabel.text = @"";
     [_webView loadHTMLString:@"" baseURL:nil];
 }
 
@@ -199,24 +216,8 @@
         [_activity stopAnimating];
         _lineNumbers.enabled = YES;
         return NO;
-    } else if([request.URL.scheme isEqualToString:@"set-title"]) {
-        NSString *url = request.URL.absoluteString;
-        NSUInteger start = [url rangeOfString:@":"].location + 1;
-        NSUInteger end = [url rangeOfString:@"&"].location;
-        if(start != end)
-            _titleLabel.text = [[url substringWithRange:NSMakeRange(start, end - start)] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        else
-            _titleLabel.text = @"Pastebin";
-        self.navigationItem.title = _titleLabel.text;
-        _metadataLabel.text = [[[url substringFromIndex:end + 1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] stringByReplacingOccurrencesOfString:@"%u2022" withString:@"•"];
-        self.navigationItem.titleView = _titleView;
-        return NO;
     }
     return YES;
-}
-
--(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    _titleView.frame = CGRectMake(0,0,self.navigationController.navigationBar.frame.size.width - 120, self.navigationController.navigationBar.frame.size.height);
 }
 
 -(void)didReceiveMemoryWarning {
