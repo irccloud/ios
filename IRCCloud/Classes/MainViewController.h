@@ -84,6 +84,7 @@
     YTPlayerView *_ytPlayer;
     NSURL *_ytURL;
     UIActivityIndicatorView *_ytActivity;
+    BOOL __ignoreLayoutChanges;
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;

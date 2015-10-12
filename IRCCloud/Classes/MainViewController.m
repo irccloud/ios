@@ -2417,197 +2417,208 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)viewWillLayoutSubviews {
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    if(!__ignoreLayoutChanges)
+        [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+}
+
+-(void)_monitorLayoutChanges {
+    __ignoreLayoutChanges = NO;
 }
 
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    if(duration > 0) {
-        [[UIApplication sharedApplication] setStatusBarHidden:([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) withAnimation:UIStatusBarAnimationSlide];
-        [self.slidingViewController resetTopView];
-    }
-    
-    int height = ((UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - _kbSize.height;
-    int width = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-        height += [UIApplication sharedApplication].statusBarFrame.size.height;
-    else
-        height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
-
-    CGRect frame = self.slidingViewController.view.frame;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
-            frame.origin.y = _kbSize.height;
-        else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
-            frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
-        else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
-            frame.origin.x = _kbSize.height;
-        else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
-            frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - 20;
-    } else {
-        frame.origin.x = 0;
-        if(![UIApplication sharedApplication].statusBarHidden && [UIApplication sharedApplication].statusBarFrame.size.height > 20)
-            frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
-    }
-
-    int sbheight = (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8 &&UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height);
-    
-    if([UIApplication sharedApplication].statusBarHidden)
-        sbheight = 0;
-    
-    if(sbheight)
-        height -= sbheight - 20;
-    
-    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        frame.size.width = height;
-        frame.size.height = width;
-    } else {
-        frame.size.width = width;
-        frame.size.height = height;
-    }
-    
-    if(self.slidingViewController.view.frame.size.height != height || self.slidingViewController.view.frame.size.width != width || self.view.frame.size.width != width) {
-        CGRect f = self.navigationController.view.frame;
-        
-        if(f.origin.x == self.slidingViewController.anchorRightRevealAmount)
-            f.origin.x = self.slidingViewController.anchorRightRevealAmount;
-        else if(f.origin.x == -self.slidingViewController.anchorLeftRevealAmount)
-            f.origin.x = -self.slidingViewController.anchorLeftRevealAmount;
-        else
-            f.origin.x = 0;
-        f.origin.y = 0;
-        f.size.width = width;
-        f.size.height = height;
-        self.slidingViewController.view.frame = frame;
-        self.navigationController.view.frame = f;
-    }
-    
-    height -= self.navigationController.navigationBar.frame.size.height;
-
-    if(sbheight)
-        height -= 20;
-    
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
-        self.navigationItem.leftBarButtonItem = nil;
-        self.navigationItem.rightBarButtonItem = nil;
-        self.slidingViewController.underLeftViewController = nil;
-        [self addChildViewController:_buffersView];
-        _buffersView.view.frame = CGRectMake(0,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,[[UIDevice currentDevice] isBigPhone]?180:220,height + ([[UIDevice currentDevice] isBigPhone]?self.navigationController.navigationBar.frame.size.height:0));
-        _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height);
-        _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
-        _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
-        [_buffersView willMoveToParentViewController:self];
-        [_buffersView viewWillAppear:NO];
-        _buffersView.view.hidden = NO;
-        [self.view insertSubview:_buffersView.view atIndex:1];
-        if(![[UIDevice currentDevice] isBigPhone] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
-            self.slidingViewController.underRightViewController = nil;
-            [self addChildViewController:_usersView];
-            _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,220,height + ([[UIDevice currentDevice] isBigPhone]?(self.navigationController.navigationBar.frame.size.height):0));
-            [_usersView willMoveToParentViewController:self];
-            [_usersView viewWillAppear:NO];
-            _usersView.view.hidden = NO;
-            [self.view insertSubview:_usersView.view atIndex:1];
+    @synchronized(self) {
+        NSLog(@"Will animate rotation");
+        __ignoreLayoutChanges = YES;
+        if(duration > 0) {
+            [[UIApplication sharedApplication] setStatusBarHidden:([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) withAnimation:UIStatusBarAnimationNone];
+            [self.slidingViewController resetTopView];
         }
-        _borders.hidden = NO;
-        frame = _serverStatusBar.frame;
-        frame.origin.x = _buffersView.view.frame.size.width;
-        frame.size.width = _eventsView.view.frame.size.width;
-        _serverStatusBar.frame = frame;
-    } else {
-        _borders.hidden = YES;
-        if(!self.slidingViewController.underLeftViewController)
-            self.slidingViewController.underLeftViewController = _buffersView;
-        if(!self.navigationItem.leftBarButtonItem)
-            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
-        _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsZero;
-        _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
-        _eventsView.view.frame = CGRectMake(0,0,width, height - _bottomBar.frame.size.height);
-        _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
-        if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
-            _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
-        else
-            _landscapeView.transform = CGAffineTransformIdentity;
-        _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
-        frame = _serverStatusBar.frame;
-        frame.origin.x = 0;
-        frame.size.width = _eventsView.view.frame.size.width;
-
-        _serverStatusBar.frame = frame;
-        [self.slidingViewController updateUnderLeftLayout];
-        [self.slidingViewController updateUnderRightLayout];
-    }
-    if(duration > 0) {
-        _eventsView.view.hidden = YES;
-        _eventActivity.center = _eventsView.tableView.center;
-        _eventActivity.alpha = 1;
-        [_eventActivity startAnimating];
-    }
-    _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;
-    if(duration > 0)
-        _message.text = _message.text;
-    frame = _eventsView.view.frame;
-    frame.origin.y = _eventsView.tableView.contentInset.top;
-    frame.size.height = 32;
-    _eventsView.topUnreadView.frame = frame;
-    frame.origin.y = _eventsView.tableView.frame.size.height - 32;
-    _eventsView.bottomUnreadView.frame = frame;
-    float h = [@" " sizeWithAttributes:@{NSFontAttributeName:_nickCompletionView.font}].height + 12;
-    _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
-    _nickCompletionView.layer.cornerRadius = 5;
-    
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-        frame = self.navigationController.navigationBar.frame;
-        frame.origin.x = _buffersView.tableView.frame.size.width;
-        frame.size.width = width - _buffersView.tableView.frame.size.width;
-        self.navigationController.navigationBar.frame = frame;
-        _buffersView.tableView.contentInset = UIEdgeInsetsZero;
-        _borders.frame = CGRectMake(_buffersView.tableView.frame.size.width - 1, -self.navigationController.navigationBar.frame.size.height, _eventsView.tableView.frame.size.width + 2, height + self.navigationController.navigationBar.frame.size.height);
-    }
-
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        frame = self.navigationController.navigationBar.frame;
-        frame.origin.y = 0;
-        frame.size.width = width - (([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))?_buffersView.view.frame.size.width:0);
-        frame.origin.y = sbheight - (sbheight > 20?20:0);
-        [self.navigationController.navigationBar setFrame:frame];
-    }
-    
-    frame = _titleView.frame;
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
-        frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
-        _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
-    }
-    frame.size.width = width - 128;
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
-        frame.size.width -= _buffersView.tableView.frame.size.width;
-    _connectingView.frame = _titleView.frame = frame;
-
-    frame = _connectingProgress.frame;
-    frame.origin.x = 0;
-    frame.origin.y = self.navigationController.navigationBar.frame.size.height - frame.size.height;
-    frame.size.width = self.navigationController.navigationBar.frame.size.width;
-    _connectingProgress.frame = frame;
-    _connectingStatus.frame = _connectingView.bounds;
-    
-    self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
-    [self _updateTitleArea];
-    [self _updateServerStatus];
-    [self _updateUserListVisibility];
-    [self _updateGlobalMsg];
-    [self _updateMessageWidth];
-    
-    UIView *v = self.navigationItem.titleView;
-    self.navigationItem.titleView = nil;
-    self.navigationItem.titleView = v;
-    
-    if(_YTWrapperView) {
-        int margin = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?YTMARGIN:0;
-        _YTWrapperView.frame = self.navigationController.view.bounds;
-        CGFloat width = _YTWrapperView.bounds.size.width - margin;
-        CGFloat height = (width / 16.0f) * 9.0f;
-        _ytPlayer.frame = CGRectMake(margin/2, (_YTWrapperView.bounds.size.height - height) / 2.0f, width, height);
         
+        int height = ((UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - _kbSize.height;
+        int width = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+            height += [UIApplication sharedApplication].statusBarFrame.size.height;
+        else
+            height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
+
+        CGRect frame = self.slidingViewController.view.frame;
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+            if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
+                frame.origin.y = _kbSize.height;
+            else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
+                frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
+            else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
+                frame.origin.x = _kbSize.height;
+            else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
+                frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - 20;
+        } else {
+            frame.origin.x = 0;
+            if(![UIApplication sharedApplication].statusBarHidden && [UIApplication sharedApplication].statusBarFrame.size.height > 20)
+                frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
+        }
+
+        int sbheight = (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8 &&UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height);
+        
+        if([UIApplication sharedApplication].statusBarHidden)
+            sbheight = 0;
+        
+        if(sbheight)
+            height -= sbheight - 20;
+        
+        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+            frame.size.width = height;
+            frame.size.height = width;
+        } else {
+            frame.size.width = width;
+            frame.size.height = height;
+        }
+        
+        if(self.slidingViewController.view.frame.size.height != height || self.slidingViewController.view.frame.size.width != width || self.view.frame.size.width != width) {
+            CGRect f = self.navigationController.view.frame;
+            
+            if(f.origin.x == self.slidingViewController.anchorRightRevealAmount)
+                f.origin.x = self.slidingViewController.anchorRightRevealAmount;
+            else if(f.origin.x == -self.slidingViewController.anchorLeftRevealAmount)
+                f.origin.x = -self.slidingViewController.anchorLeftRevealAmount;
+            else
+                f.origin.x = 0;
+            f.origin.y = 0;
+            f.size.width = width;
+            f.size.height = height;
+            self.slidingViewController.view.frame = frame;
+            self.navigationController.view.frame = f;
+        }
+        
+        height -= self.navigationController.navigationBar.frame.size.height;
+
+        if(sbheight)
+            height -= 20;
+        
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
+            self.navigationItem.leftBarButtonItem = nil;
+            self.navigationItem.rightBarButtonItem = nil;
+            self.slidingViewController.underLeftViewController = nil;
+            [self addChildViewController:_buffersView];
+            _buffersView.view.frame = CGRectMake(0,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,[[UIDevice currentDevice] isBigPhone]?180:220,height + ([[UIDevice currentDevice] isBigPhone]?self.navigationController.navigationBar.frame.size.height:0));
+            _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height);
+            _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
+            _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
+            [_buffersView willMoveToParentViewController:self];
+            [_buffersView viewWillAppear:NO];
+            _buffersView.view.hidden = NO;
+            [self.view insertSubview:_buffersView.view atIndex:1];
+            if(![[UIDevice currentDevice] isBigPhone] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+                self.slidingViewController.underRightViewController = nil;
+                [self addChildViewController:_usersView];
+                _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,220,height + ([[UIDevice currentDevice] isBigPhone]?(self.navigationController.navigationBar.frame.size.height):0));
+                [_usersView willMoveToParentViewController:self];
+                [_usersView viewWillAppear:NO];
+                _usersView.view.hidden = NO;
+                [self.view insertSubview:_usersView.view atIndex:1];
+            }
+            _borders.hidden = NO;
+            frame = _serverStatusBar.frame;
+            frame.origin.x = _buffersView.view.frame.size.width;
+            frame.size.width = _eventsView.view.frame.size.width;
+            _serverStatusBar.frame = frame;
+        } else {
+            _borders.hidden = YES;
+            if(!self.slidingViewController.underLeftViewController)
+                self.slidingViewController.underLeftViewController = _buffersView;
+            if(!self.navigationItem.leftBarButtonItem)
+                self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
+            _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsZero;
+            _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
+            _eventsView.view.frame = CGRectMake(0,0,width, height - _bottomBar.frame.size.height);
+            _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
+            if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
+                _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
+            else
+                _landscapeView.transform = CGAffineTransformIdentity;
+            _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
+            frame = _serverStatusBar.frame;
+            frame.origin.x = 0;
+            frame.size.width = _eventsView.view.frame.size.width;
+
+            _serverStatusBar.frame = frame;
+            [self.slidingViewController updateUnderLeftLayout];
+            [self.slidingViewController updateUnderRightLayout];
+        }
+        if(duration > 0) {
+            _eventsView.view.hidden = YES;
+            _eventActivity.center = _eventsView.tableView.center;
+            _eventActivity.alpha = 1;
+            [_eventActivity startAnimating];
+        }
+        _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;
+        if(duration > 0)
+            _message.text = _message.text;
+        frame = _eventsView.view.frame;
+        frame.origin.y = _eventsView.tableView.contentInset.top;
+        frame.size.height = 32;
+        _eventsView.topUnreadView.frame = frame;
+        frame.origin.y = _eventsView.tableView.frame.size.height - 32;
+        _eventsView.bottomUnreadView.frame = frame;
+        float h = [@" " sizeWithAttributes:@{NSFontAttributeName:_nickCompletionView.font}].height + 12;
+        _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
+        _nickCompletionView.layer.cornerRadius = 5;
+        
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
+            frame = self.navigationController.navigationBar.frame;
+            frame.origin.x = _buffersView.tableView.frame.size.width;
+            frame.size.width = width - _buffersView.tableView.frame.size.width;
+            self.navigationController.navigationBar.frame = frame;
+            _buffersView.tableView.contentInset = UIEdgeInsetsZero;
+            _borders.frame = CGRectMake(_buffersView.tableView.frame.size.width - 1, -self.navigationController.navigationBar.frame.size.height, _eventsView.tableView.frame.size.width + 2, height + self.navigationController.navigationBar.frame.size.height);
+        }
+
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+            frame = self.navigationController.navigationBar.frame;
+            frame.origin.y = 0;
+            frame.size.width = width - (([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))?_buffersView.view.frame.size.width:0);
+            frame.origin.y = sbheight - (sbheight > 20?20:0);
+            [self.navigationController.navigationBar setFrame:frame];
+        }
+        
+        frame = _titleView.frame;
+        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
+            frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
+            _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
+        }
+        frame.size.width = width - 128;
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
+            frame.size.width -= _buffersView.tableView.frame.size.width;
+        _connectingView.frame = _titleView.frame = frame;
+
+        frame = _connectingProgress.frame;
+        frame.origin.x = 0;
+        frame.origin.y = self.navigationController.navigationBar.frame.size.height - frame.size.height;
+        frame.size.width = self.navigationController.navigationBar.frame.size.width;
+        _connectingProgress.frame = frame;
+        _connectingStatus.frame = _connectingView.bounds;
+        
+        self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
+        [self _updateTitleArea];
+        [self _updateServerStatus];
+        [self _updateUserListVisibility];
+        [self _updateGlobalMsg];
+        [self _updateMessageWidth];
+        
+        UIView *v = self.navigationItem.titleView;
+        self.navigationItem.titleView = nil;
+        self.navigationItem.titleView = v;
+        
+        if(_YTWrapperView) {
+            int margin = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?YTMARGIN:0;
+            _YTWrapperView.frame = self.navigationController.view.bounds;
+            CGFloat width = _YTWrapperView.bounds.size.width - margin;
+            CGFloat height = (width / 16.0f) * 9.0f;
+            _ytPlayer.frame = CGRectMake(margin/2, (_YTWrapperView.bounds.size.height - height) / 2.0f, width, height);
+            
+        }
+        
+        [self performSelector:@selector(_monitorLayoutChanges) withObject:nil afterDelay:0.25];
     }
 }
 

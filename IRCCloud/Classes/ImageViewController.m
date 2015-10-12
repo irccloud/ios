@@ -580,7 +580,7 @@
 
 -(void)_debug:(NSNotification *)n {
     CLS_LOG(@"Media player notification: %@ %@", n.name, n.userInfo);
-    CLS_LOG(@"Player state: %lu %i", (unsigned long)_movieController.loadState, _movieController.playbackState);
+    CLS_LOG(@"Player state: %lu %li", (unsigned long)_movieController.loadState, _movieController.playbackState);
     if(_movieController.accessLog)
         CLS_LOG(@"Access log: %@", [NSString stringWithCString:_movieController.accessLog.extendedLogData.bytes encoding:_movieController.accessLog.extendedLogDataStringEncoding]);
     if(_movieController.errorLog)
