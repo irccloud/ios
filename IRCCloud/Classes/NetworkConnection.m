@@ -1978,7 +1978,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"uploadsAvailable"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"theme"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [UIColor setTheme:@"dusk"];
+    [UIColor setTheme:@"dawn"];
     [self clearPrefs];
     [_servers clear];
     [_buffers clear];
