@@ -438,252 +438,254 @@ int __timestampWidth;
 }
 
 - (void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped {
-    BOOL shouldExpand = NO;
-    BOOL colors = NO;
-    if(!event.isSelf && [_conn prefs] && [[[_conn prefs] objectForKey:@"nick-colors"] intValue] > 0)
-        colors = YES;
-    
-    if(_minEid == 0)
-        _minEid = event.eid;
-    if(event.eid == _buffer.min_eid) {
-        self.tableView.tableHeaderView = nil;
-    }
-    if(event.eid < _earliestEid || _earliestEid == 0)
-        _earliestEid = event.eid;
-    
-    NSTimeInterval eid = event.eid;
-    NSString *type = event.type;
-    if([type hasPrefix:@"you_"]) {
-        type = [type substringFromIndex:4];
-    }
+    @synchronized(self) {
+        BOOL shouldExpand = NO;
+        BOOL colors = NO;
+        if(!event.isSelf && [_conn prefs] && [[[_conn prefs] objectForKey:@"nick-colors"] intValue] > 0)
+            colors = YES;
+        
+        if(_minEid == 0)
+            _minEid = event.eid;
+        if(event.eid == _buffer.min_eid) {
+            self.tableView.tableHeaderView = nil;
+        }
+        if(event.eid < _earliestEid || _earliestEid == 0)
+            _earliestEid = event.eid;
+        
+        NSTimeInterval eid = event.eid;
+        NSString *type = event.type;
+        if([type hasPrefix:@"you_"]) {
+            type = [type substringFromIndex:4];
+        }
 
-    if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"] || [type isEqualToString:@"connecting_cancelled"]) {
-        _collapsedEvents.showChan = ![_buffer.type isEqualToString:@"channel"];
-        NSDictionary *prefs = _conn.prefs;
-        if(prefs) {
-            NSDictionary *hiddenMap;
-            
-            if([_buffer.type isEqualToString:@"channel"]) {
-                hiddenMap = [prefs objectForKey:@"channel-hideJoinPart"];
-            } else {
-                hiddenMap = [prefs objectForKey:@"buffer-hideJoinPart"];
+        if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"] || [type isEqualToString:@"connecting_cancelled"]) {
+            _collapsedEvents.showChan = ![_buffer.type isEqualToString:@"channel"];
+            NSDictionary *prefs = _conn.prefs;
+            if(prefs) {
+                NSDictionary *hiddenMap;
+                
+                if([_buffer.type isEqualToString:@"channel"]) {
+                    hiddenMap = [prefs objectForKey:@"channel-hideJoinPart"];
+                } else {
+                    hiddenMap = [prefs objectForKey:@"buffer-hideJoinPart"];
+                }
+                
+                if(hiddenMap && [[hiddenMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) {
+                    [_lock lock];
+                    for(Event *e in _data) {
+                        if(e.eid == event.eid) {
+                            [_data removeObject:e];
+                            break;
+                        }
+                    }
+                    [_lock unlock];
+                    if(!backlog)
+                        [self.tableView reloadData];
+                    return;
+                }
+
+                NSDictionary *expandMap;
+                
+                if([_buffer.type isEqualToString:@"channel"]) {
+                    expandMap = [prefs objectForKey:@"channel-expandJoinPart"];
+                } else if([_buffer.type isEqualToString:@"console"]) {
+                    expandMap = [prefs objectForKey:@"buffer-expandDisco"];
+                } else {
+                    expandMap = [prefs objectForKey:@"buffer-expandJoinPart"];
+                }
+                
+                if(expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                    shouldExpand = YES;
             }
             
-            if(hiddenMap && [[hiddenMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) {
-                [_lock lock];
-                for(Event *e in _data) {
-                    if(e.eid == event.eid) {
-                        [_data removeObject:e];
-                        break;
+            [_formatter setDateFormat:@"DDD"];
+            NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
+            
+            if(shouldExpand)
+                [_expandedSectionEids removeAllObjects];
+            
+            if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"] || [event.type isEqualToString:@"connecting_cancelled"]) {
+                Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
+                if(last) {
+                    if(![last.type isEqualToString:@"socket_closed"] && ![last.type isEqualToString:@"connecting_failed"] && ![last.type isEqualToString:@"connecting_cancelled"])
+                        _currentCollapsedEid = -1;
+                }
+            } else {
+                Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
+                if(last) {
+                    if([last.type isEqualToString:@"socket_closed"] || [last.type isEqualToString:@"connecting_failed"] || [last.type isEqualToString:@"connecting_cancelled"])
+                        _currentCollapsedEid = -1;
+                }
+            }
+            
+            if(_currentCollapsedEid == -1 || ![[_formatter stringFromDate:date] isEqualToString:_lastCollpasedDay] || shouldExpand) {
+                [_collapsedEvents clear];
+                _currentCollapsedEid = eid;
+                _lastCollpasedDay = [_formatter stringFromDate:date];
+            }
+            
+            if(!_collapsedEvents.showChan)
+                event.chan = _buffer.name;
+            
+            if(![_collapsedEvents addEvent:event]) {
+                [_collapsedEvents clear];
+            }
+
+            if((_currentCollapsedEid == event.eid || [_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) && [event.type isEqualToString:@"user_channel_mode"]) {
+                event.color = [UIColor messageTextColor];
+                event.bgColor = [UIColor contentBackgroundColor];
+            } else {
+                event.color = [UIColor collapsedRowTextColor];
+                event.bgColor = [UIColor contentBackgroundColor];
+            }
+            
+            NSString *msg;
+            if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
+                CollapsedEvents *c = [[CollapsedEvents alloc] init];
+                c.showChan = _collapsedEvents.showChan;
+                c.server = _server;
+                [c addEvent:event];
+                msg = [c collapse];
+                if(!nextIsGrouped) {
+                    NSString *groupMsg = [_collapsedEvents collapse];
+                    if(groupMsg == nil && [type isEqualToString:@"nickchange"])
+                        groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+                    if(groupMsg == nil && [type isEqualToString:@"user_channel_mode"]) {
+                        if(event.from.length > 0)
+                            groupMsg = [NSString stringWithFormat:@"%c%@%c was set to: %c%@%c by %c%@%c", BOLD, event.nick, BOLD, BOLD, event.diff, BOLD, BOLD, [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO], BOLD];
+                        else
+                            groupMsg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", event.nick, BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
+                    }
+                    Event *heading = [[Event alloc] init];
+                    heading.cid = event.cid;
+                    heading.bid = event.bid;
+                    heading.eid = _currentCollapsedEid - 1;
+                    heading.groupMsg = [NSString stringWithFormat:@"    %@",groupMsg];
+                    heading.color = [UIColor timestampColor];
+                    heading.bgColor = [UIColor contentBackgroundColor];
+                    heading.formattedMsg = nil;
+                    heading.formatted = nil;
+                    heading.linkify = NO;
+                    [self _addItem:heading eid:_currentCollapsedEid - 1];
+                    if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"] || [event.type isEqualToString:@"connecting_cancelled"]) {
+                        Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
+                        if(last) {
+                            last.rowType = ROW_MESSAGE;
+                        }
+                        event.rowType = ROW_SOCKETCLOSED;
                     }
                 }
-                [_lock unlock];
-                if(!backlog)
-                    [self.tableView reloadData];
-                return;
-            }
-
-            NSDictionary *expandMap;
-            
-            if([_buffer.type isEqualToString:@"channel"]) {
-                expandMap = [prefs objectForKey:@"channel-expandJoinPart"];
-            } else if([_buffer.type isEqualToString:@"console"]) {
-                expandMap = [prefs objectForKey:@"buffer-expandDisco"];
+                event.timestamp = nil;
             } else {
-                expandMap = [prefs objectForKey:@"buffer-expandJoinPart"];
+                msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse];
             }
-            
-            if(expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
-                shouldExpand = YES;
-        }
-        
-        [_formatter setDateFormat:@"DDD"];
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
-        
-        if(shouldExpand)
-            [_expandedSectionEids removeAllObjects];
-        
-        if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"] || [event.type isEqualToString:@"connecting_cancelled"]) {
-            Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
-            if(last) {
-                if(![last.type isEqualToString:@"socket_closed"] && ![last.type isEqualToString:@"connecting_failed"] && ![last.type isEqualToString:@"connecting_cancelled"])
-                    _currentCollapsedEid = -1;
+            if(msg == nil && [type isEqualToString:@"nickchange"])
+                msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+            if(msg == nil && [type isEqualToString:@"user_channel_mode"]) {
+                if(event.from.length > 0)
+                    msg = [NSString stringWithFormat:@"%c%@%c was set to: %c%@%c by %c%@%c", BOLD, event.nick, BOLD, BOLD, event.diff, BOLD, BOLD, [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO], BOLD];
+                else
+                    msg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", event.nick, BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
+                _currentCollapsedEid = eid;
             }
-        } else {
-            Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
-            if(last) {
-                if([last.type isEqualToString:@"socket_closed"] || [last.type isEqualToString:@"connecting_failed"] || [last.type isEqualToString:@"connecting_cancelled"])
-                    _currentCollapsedEid = -1;
-            }
-        }
-        
-        if(_currentCollapsedEid == -1 || ![[_formatter stringFromDate:date] isEqualToString:_lastCollpasedDay] || shouldExpand) {
-            [_collapsedEvents clear];
-            _currentCollapsedEid = eid;
-            _lastCollpasedDay = [_formatter stringFromDate:date];
-        }
-        
-        if(!_collapsedEvents.showChan)
-            event.chan = _buffer.name;
-        
-        if(![_collapsedEvents addEvent:event]) {
-            [_collapsedEvents clear];
-        }
-
-        if((_currentCollapsedEid == event.eid || [_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) && [event.type isEqualToString:@"user_channel_mode"]) {
-            event.color = [UIColor messageTextColor];
-            event.bgColor = [UIColor contentBackgroundColor];
-        } else {
-            event.color = [UIColor collapsedRowTextColor];
-            event.bgColor = [UIColor contentBackgroundColor];
-        }
-        
-        NSString *msg;
-        if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
-            CollapsedEvents *c = [[CollapsedEvents alloc] init];
-            c.showChan = _collapsedEvents.showChan;
-            c.server = _server;
-            [c addEvent:event];
-            msg = [c collapse];
-            if(!nextIsGrouped) {
-                NSString *groupMsg = [_collapsedEvents collapse];
-                if(groupMsg == nil && [type isEqualToString:@"nickchange"])
-                    groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
-                if(groupMsg == nil && [type isEqualToString:@"user_channel_mode"]) {
-                    if(event.from.length > 0)
-                        groupMsg = [NSString stringWithFormat:@"%c%@%c was set to: %c%@%c by %c%@%c", BOLD, event.nick, BOLD, BOLD, event.diff, BOLD, BOLD, [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO], BOLD];
-                    else
-                        groupMsg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", event.nick, BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
-                }
-                Event *heading = [[Event alloc] init];
-                heading.cid = event.cid;
-                heading.bid = event.bid;
-                heading.eid = _currentCollapsedEid - 1;
-                heading.groupMsg = [NSString stringWithFormat:@"    %@",groupMsg];
-                heading.color = [UIColor timestampColor];
-                heading.bgColor = [UIColor contentBackgroundColor];
-                heading.formattedMsg = nil;
-                heading.formatted = nil;
-                heading.linkify = NO;
-                [self _addItem:heading eid:_currentCollapsedEid - 1];
-                if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"] || [event.type isEqualToString:@"connecting_cancelled"]) {
-                    Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
-                    if(last) {
-                        last.rowType = ROW_MESSAGE;
-                    }
-                    event.rowType = ROW_SOCKETCLOSED;
-                }
-            }
-            event.timestamp = nil;
-        } else {
-            msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse];
-        }
-        if(msg == nil && [type isEqualToString:@"nickchange"])
-            msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
-        if(msg == nil && [type isEqualToString:@"user_channel_mode"]) {
-            if(event.from.length > 0)
-                msg = [NSString stringWithFormat:@"%c%@%c was set to: %c%@%c by %c%@%c", BOLD, event.nick, BOLD, BOLD, event.diff, BOLD, BOLD, [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO], BOLD];
-            else
-                msg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", event.nick, BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
-            _currentCollapsedEid = eid;
-        }
-        if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
-            msg = [NSString stringWithFormat:@"    %@", msg];
-        } else {
-            if(eid != _currentCollapsedEid)
+            if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
                 msg = [NSString stringWithFormat:@"    %@", msg];
-            eid = _currentCollapsedEid;
-        }
-        event.groupMsg = msg;
-        event.formattedMsg = nil;
-        event.formatted = nil;
-        event.linkify = NO;
-        _lastCollapsedEid = event.eid;
-        if([_buffer.type isEqualToString:@"console"] && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"] && ![type isEqualToString:@"connecting_cancelled"]) {
+            } else {
+                if(eid != _currentCollapsedEid)
+                    msg = [NSString stringWithFormat:@"    %@", msg];
+                eid = _currentCollapsedEid;
+            }
+            event.groupMsg = msg;
+            event.formattedMsg = nil;
+            event.formatted = nil;
+            event.linkify = NO;
+            _lastCollapsedEid = event.eid;
+            if([_buffer.type isEqualToString:@"console"] && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"] && ![type isEqualToString:@"connecting_cancelled"]) {
+                _currentCollapsedEid = -1;
+                _lastCollapsedEid = -1;
+                [_collapsedEvents clear];
+            }
+                
+        } else {
             _currentCollapsedEid = -1;
             _lastCollapsedEid = -1;
             [_collapsedEvents clear];
-        }
-            
-    } else {
-        _currentCollapsedEid = -1;
-        _lastCollapsedEid = -1;
-        [_collapsedEvents clear];
 
-        if(!event.formatted.length || !event.formattedMsg.length) {
-            if([event.from length]) {
-                event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.msg];
-            } else {
-                event.formattedMsg = event.msg;
+            if(!event.formatted.length || !event.formattedMsg.length) {
+                if([event.from length]) {
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.msg];
+                } else {
+                    event.formattedMsg = event.msg;
+                }
             }
         }
-    }
-    
-    if(event.ignoreMask.length && ([type isEqualToString:@"buffer_msg"] || [type isEqualToString:@"buffer_me_msg"] || [type isEqualToString:@"callerid"] ||[type isEqualToString:@"channel_invite"] ||[type isEqualToString:@"wallops"] ||[type isEqualToString:@"notice"])) {
-        if((!_buffer || ![_buffer.type isEqualToString:@"conversation"]) && [_ignore match:event.ignoreMask]) {
-            if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0)
-                [self sendHeartbeat];
-            return;
-        }
-    }
-    
-    if(!event.formatted) {
-        if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
-            if(event.nick.length)
-                event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO]];
-            else if(event.server.length)
-                event.formattedMsg = [NSString stringWithFormat:@"%@ by the server %c%@%c", event.msg, BOLD, event.server, CLEAR];
-        } else if([type isEqualToString:@"buffer_me_msg"]) {
-            event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.msg];
-        } else if([type isEqualToString:@"notice"]) {
-            if(event.from.length)
-                event.formattedMsg = [NSString stringWithFormat:@"%@ ", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors]];
-            else
-                event.formattedMsg = @"";
-            if([_buffer.type isEqualToString:@"console"] && event.toChan && event.chan.length) {
-                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%@%c: %@", event.chan, 1, event.msg];
-            } else {
-                event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
+        
+        if(event.ignoreMask.length && ([type isEqualToString:@"buffer_msg"] || [type isEqualToString:@"buffer_me_msg"] || [type isEqualToString:@"callerid"] ||[type isEqualToString:@"channel_invite"] ||[type isEqualToString:@"wallops"] ||[type isEqualToString:@"notice"])) {
+            if((!_buffer || ![_buffer.type isEqualToString:@"conversation"]) && [_ignore match:event.ignoreMask]) {
+                if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0)
+                    [self sendHeartbeat];
+                return;
             }
-        } else if([type isEqualToString:@"kicked_channel"]) {
-            event.formattedMsg = @"← ";
-            if([event.type hasPrefix:@"you_"])
-                event.formattedMsg = [event.formattedMsg stringByAppendingString:@"You"];
-            else
-                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c", BOLD, event.oldNick, CLEAR];
-            if([event.type hasPrefix:@"you_"])
-                event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
-            else
-                event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
-            if(event.hostmask && event.hostmask.length)
-                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %c%@%c (%@)", BOLD, event.nick, BOLD, event.hostmask];
-            else
-                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by the server %c%@%c", BOLD, event.nick, CLEAR];
-            if(event.msg.length > 0)
-                event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
-        } else if([type isEqualToString:@"channel_mode_list_change"]) {
-            if(event.from.length == 0) {
+        }
+        
+        if(!event.formatted) {
+            if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
                 if(event.nick.length)
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], event.msg];
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO]];
                 else if(event.server.length)
-                    event.formattedMsg = [NSString stringWithFormat:@"The server %c%@%c %@", BOLD, event.server, CLEAR, event.msg];
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ by the server %c%@%c", event.msg, BOLD, event.server, CLEAR];
+            } else if([type isEqualToString:@"buffer_me_msg"]) {
+                event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.msg];
+            } else if([type isEqualToString:@"notice"]) {
+                if(event.from.length)
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ ", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors]];
+                else
+                    event.formattedMsg = @"";
+                if([_buffer.type isEqualToString:@"console"] && event.toChan && event.chan.length) {
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%@%c: %@", event.chan, 1, event.msg];
+                } else {
+                    event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
+                }
+            } else if([type isEqualToString:@"kicked_channel"]) {
+                event.formattedMsg = @"← ";
+                if([event.type hasPrefix:@"you_"])
+                    event.formattedMsg = [event.formattedMsg stringByAppendingString:@"You"];
+                else
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c", BOLD, event.oldNick, CLEAR];
+                if([event.type hasPrefix:@"you_"])
+                    event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
+                else
+                    event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
+                if(event.hostmask && event.hostmask.length)
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %c%@%c (%@)", BOLD, event.nick, BOLD, event.hostmask];
+                else
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by the server %c%@%c", BOLD, event.nick, CLEAR];
+                if(event.msg.length > 0)
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
+            } else if([type isEqualToString:@"channel_mode_list_change"]) {
+                if(event.from.length == 0) {
+                    if(event.nick.length)
+                        event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], event.msg];
+                    else if(event.server.length)
+                        event.formattedMsg = [NSString stringWithFormat:@"The server %c%@%c %@", BOLD, event.server, CLEAR, event.msg];
+                }
             }
         }
-    }
-    
-    [self _addItem:event eid:eid];
-    
-    if(!backlog) {
-        [self.tableView reloadData];
-        if(!_buffer.scrolledUp) {
-            [self scrollToBottom];
-            [self _scrollToBottom];
-        } else if(!event.isSelf && [event isImportant:_buffer.type]) {
-            _newMsgs++;
-            if(event.isHighlight)
-                _newHighlights++;
-            [self updateUnread];
-            [self scrollViewDidScroll:self.tableView];
+        
+        [self _addItem:event eid:eid];
+        
+        if(!backlog) {
+            [self.tableView reloadData];
+            if(!_buffer.scrolledUp) {
+                [self scrollToBottom];
+                [self _scrollToBottom];
+            } else if(!event.isSelf && [event isImportant:_buffer.type]) {
+                _newMsgs++;
+                if(event.isHighlight)
+                    _newHighlights++;
+                [self updateUnread];
+                [self scrollViewDidScroll:self.tableView];
+            }
         }
     }
 }
@@ -801,128 +803,130 @@ int __timestampWidth;
 }
 
 -(void)_addItem:(Event *)e eid:(NSTimeInterval)eid {
-    [_lock lock];
-    NSInteger insertPos = -1;
-    NSString *lastDay = nil;
-    NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
-    if(!e.timestamp) {
-        if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]) {
-            if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-                [_formatter setDateFormat:@"H:mm:ss"];
-            else
-                [_formatter setDateFormat:@"H:mm"];
-        } else if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue]) {
-            [_formatter setDateFormat:@"h:mm:ss a"];
-        } else {
-            [_formatter setDateFormat:@"h:mm a"];
-        }
+    @synchronized(self) {
+        [_lock lock];
+        NSInteger insertPos = -1;
+        NSString *lastDay = nil;
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
+        if(!e.timestamp) {
+            if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]) {
+                if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
+                    [_formatter setDateFormat:@"H:mm:ss"];
+                else
+                    [_formatter setDateFormat:@"H:mm"];
+            } else if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue]) {
+                [_formatter setDateFormat:@"h:mm:ss a"];
+            } else {
+                [_formatter setDateFormat:@"h:mm a"];
+            }
 
-        e.timestamp = [_formatter stringFromDate:date];
-    }
-    if(!e.day) {
-        [_formatter setDateFormat:@"DDD"];
-        e.day = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:eid/1000000]];
-    }
-    if(e.groupMsg && !e.formattedMsg) {
-        e.formattedMsg = e.groupMsg;
-        e.formatted = nil;
-    }
-    e.groupEid = _currentCollapsedEid;
-    
-    if(eid > _maxEid || _data.count == 0 || (eid == e.eid && [e compare:[_data objectAtIndex:_data.count - 1]] == NSOrderedDescending)) {
-        //Message at bottom
-        if(_data.count) {
-            lastDay = ((Event *)[_data objectAtIndex:_data.count - 1]).day;
+            e.timestamp = [_formatter stringFromDate:date];
         }
-        _maxEid = eid;
-        [_data addObject:e];
-        insertPos = _data.count - 1;
-    } else if(_minEid > eid) {
-        //Message on top
-        if(_data.count > 1) {
-            lastDay = ((Event *)[_data objectAtIndex:1]).day;
-            if(![lastDay isEqualToString:e.day]) {
-                //Insert above the dateline
+        if(!e.day) {
+            [_formatter setDateFormat:@"DDD"];
+            e.day = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:eid/1000000]];
+        }
+        if(e.groupMsg && !e.formattedMsg) {
+            e.formattedMsg = e.groupMsg;
+            e.formatted = nil;
+        }
+        e.groupEid = _currentCollapsedEid;
+        
+        if(eid > _maxEid || _data.count == 0 || (eid == e.eid && [e compare:[_data objectAtIndex:_data.count - 1]] == NSOrderedDescending)) {
+            //Message at bottom
+            if(_data.count) {
+                lastDay = ((Event *)[_data objectAtIndex:_data.count - 1]).day;
+            }
+            _maxEid = eid;
+            [_data addObject:e];
+            insertPos = _data.count - 1;
+        } else if(_minEid > eid) {
+            //Message on top
+            if(_data.count > 1) {
+                lastDay = ((Event *)[_data objectAtIndex:1]).day;
+                if(![lastDay isEqualToString:e.day]) {
+                    //Insert above the dateline
+                    [_data insertObject:e atIndex:0];
+                    insertPos = 0;
+                } else {
+                    //Insert below the dateline
+                    [_data insertObject:e atIndex:1];
+                    insertPos = 1;
+                }
+            } else {
                 [_data insertObject:e atIndex:0];
                 insertPos = 0;
-            } else {
-                //Insert below the dateline
-                [_data insertObject:e atIndex:1];
-                insertPos = 1;
             }
         } else {
-            [_data insertObject:e atIndex:0];
-            insertPos = 0;
-        }
-    } else {
-        int i = 0;
-        for(Event *e1 in _data) {
-            if(e1.rowType != ROW_TIMESTAMP && [e compare:e1] == NSOrderedAscending && e.eid == eid) {
-                //Insert the message
-                if(i > 0 && ((Event *)[_data objectAtIndex:i - 1]).rowType != ROW_TIMESTAMP) {
-                    lastDay = ((Event *)[_data objectAtIndex:i - 1]).day;
+            int i = 0;
+            for(Event *e1 in _data) {
+                if(e1.rowType != ROW_TIMESTAMP && [e compare:e1] == NSOrderedAscending && e.eid == eid) {
+                    //Insert the message
+                    if(i > 0 && ((Event *)[_data objectAtIndex:i - 1]).rowType != ROW_TIMESTAMP) {
+                        lastDay = ((Event *)[_data objectAtIndex:i - 1]).day;
+                        [_data insertObject:e atIndex:i];
+                        insertPos = i;
+                        break;
+                    } else {
+                        //There was a dateline above our insertion point
+                        lastDay = e1.day;
+                        if(![lastDay isEqualToString:e.day]) {
+                            if(i > 1) {
+                                lastDay = ((Event *)[_data objectAtIndex:i - 2]).day;
+                            } else {
+                                //We're above the first dateline, so we'll need to put a new one on top
+                                lastDay = nil;
+                            }
+                            [_data insertObject:e atIndex:i-1];
+                            insertPos = i-1;
+                        } else {
+                            //Insert below the dateline
+                            [_data insertObject:e atIndex:i];
+                            insertPos = i;
+                        }
+                        break;
+                    }
+                } else if(e1.rowType != ROW_TIMESTAMP && (e1.eid == eid || e1.groupEid == eid)) {
+                    //Replace the message
+                    lastDay = e.day;
+                    [_data removeObjectAtIndex:i];
                     [_data insertObject:e atIndex:i];
                     insertPos = i;
                     break;
-                } else {
-                    //There was a dateline above our insertion point
-                    lastDay = e1.day;
-                    if(![lastDay isEqualToString:e.day]) {
-                        if(i > 1) {
-                            lastDay = ((Event *)[_data objectAtIndex:i - 2]).day;
-                        } else {
-                            //We're above the first dateline, so we'll need to put a new one on top
-                            lastDay = nil;
-                        }
-                        [_data insertObject:e atIndex:i-1];
-                        insertPos = i-1;
-                    } else {
-                        //Insert below the dateline
-                        [_data insertObject:e atIndex:i];
-                        insertPos = i;
-                    }
-                    break;
                 }
-            } else if(e1.rowType != ROW_TIMESTAMP && (e1.eid == eid || e1.groupEid == eid)) {
-                //Replace the message
-                lastDay = e.day;
-                [_data removeObjectAtIndex:i];
-                [_data insertObject:e atIndex:i];
-                insertPos = i;
-                break;
+                i++;
             }
-            i++;
         }
-    }
-    
-    if(insertPos == -1) {
-        CLS_LOG(@"Couldn't insert EID: %f MSG: %@", eid, e.formattedMsg);
+        
+        if(insertPos == -1) {
+            CLS_LOG(@"Couldn't insert EID: %f MSG: %@", eid, e.formattedMsg);
+            [_lock unlock];
+            return;
+        }
+        
+        if(eid > _buffer.last_seen_eid && e.isHighlight) {
+            [_unseenHighlightPositions addObject:@(insertPos)];
+            [_unseenHighlightPositions sortUsingSelector:@selector(compare:)];
+        }
+        
+        if(eid < _minEid || _minEid == 0)
+            _minEid = eid;
+        
+        if(![lastDay isEqualToString:e.day]) {
+            [_formatter setDateFormat:@"EEEE, MMMM dd, yyyy"];
+            Event *d = [[Event alloc] init];
+            d.type = TYPE_TIMESTMP;
+            d.rowType = ROW_TIMESTAMP;
+            d.eid = eid;
+            d.groupEid = -1;
+            d.timestamp = [_formatter stringFromDate:date];
+            d.bgColor = [UIColor timestampBackgroundColor];
+            d.day = e.day;
+            [_data insertObject:d atIndex:insertPos];
+        }
+        
         [_lock unlock];
-        return;
     }
-    
-    if(eid > _buffer.last_seen_eid && e.isHighlight) {
-        [_unseenHighlightPositions addObject:@(insertPos)];
-        [_unseenHighlightPositions sortUsingSelector:@selector(compare:)];
-    }
-    
-    if(eid < _minEid || _minEid == 0)
-        _minEid = eid;
-    
-    if(![lastDay isEqualToString:e.day]) {
-        [_formatter setDateFormat:@"EEEE, MMMM dd, yyyy"];
-        Event *d = [[Event alloc] init];
-        d.type = TYPE_TIMESTMP;
-        d.rowType = ROW_TIMESTAMP;
-        d.eid = eid;
-        d.groupEid = -1;
-        d.timestamp = [_formatter stringFromDate:date];
-        d.bgColor = [UIColor timestampBackgroundColor];
-        d.day = e.day;
-        [_data insertObject:d atIndex:insertPos];
-    }
-    
-    [_lock unlock];
 }
 
 -(void)setBuffer:(Buffer *)buffer {
@@ -997,235 +1001,237 @@ int __timestampWidth;
 }
 
 - (void)refresh {
-    self.tableView.backgroundColor = [UIColor contentBackgroundColor];
-    _headerView.backgroundColor = [UIColor contentBackgroundColor];
-    _backlogFailedView.backgroundColor = [UIColor contentBackgroundColor];
-    
-    CGFloat lineSpacing = 6;
-    CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
-    CTParagraphStyleSetting paragraphStyles[2] = {
-        {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
-        {.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
-    };
-    CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
-    
-    NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-    [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-    [mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
-    _linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
-    
-    [mutableLinkAttributes setObject:(id)[[UIColor lightLinkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-    _lightLinkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+    @synchronized(self) {
+        self.tableView.backgroundColor = [UIColor contentBackgroundColor];
+        _headerView.backgroundColor = [UIColor contentBackgroundColor];
+        _backlogFailedView.backgroundColor = [UIColor contentBackgroundColor];
+        
+        CGFloat lineSpacing = 6;
+        CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
+        CTParagraphStyleSetting paragraphStyles[2] = {
+            {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
+            {.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
+        };
+        CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
+        
+        NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
+        [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+        [mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
+        _linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+        
+        [mutableLinkAttributes setObject:(id)[[UIColor lightLinkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
+        _lightLinkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
 
-    [_lock lock];
-    [_scrollTimer invalidate];
-    _ready = NO;
-    NSInteger oldPosition = (_requestingBacklog && _data.count && [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)].count)?[[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] objectAtIndex: 0] row]:-1;
-    NSTimeInterval backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
-    if(backlogEid < 1)
-        backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
+        [_lock lock];
+        [_scrollTimer invalidate];
+        _ready = NO;
+        NSInteger oldPosition = (_requestingBacklog && _data.count && [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)].count)?[[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] objectAtIndex: 0] row]:-1;
+        NSTimeInterval backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
+        if(backlogEid < 1)
+            backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
 
-    [_data removeAllObjects];
-    _minEid = _maxEid = _earliestEid = _newMsgs = _newHighlights = 0;
-    _lastSeenEidPos = -1;
-    _currentCollapsedEid = 0;
-    _lastCollpasedDay = @"";
-    [_collapsedEvents clear];
-    _collapsedEvents.server = _server;
-    [_unseenHighlightPositions removeAllObjects];
-    
-    if(!_buffer) {
-        [_lock unlock];
-        self.tableView.tableHeaderView = nil;
-        [self.tableView reloadData];
-        return;
-    }
+        [_data removeAllObjects];
+        _minEid = _maxEid = _earliestEid = _newMsgs = _newHighlights = 0;
+        _lastSeenEidPos = -1;
+        _currentCollapsedEid = 0;
+        _lastCollpasedDay = @"";
+        [_collapsedEvents clear];
+        _collapsedEvents.server = _server;
+        [_unseenHighlightPositions removeAllObjects];
+        
+        if(!_buffer) {
+            [_lock unlock];
+            self.tableView.tableHeaderView = nil;
+            [self.tableView reloadData];
+            return;
+        }
 
-    if(_conn.state == kIRCCloudStateConnected)
-        [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
-    UIFont *f = [[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"]?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
-    __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
-    if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-        __timestampWidth += [@":88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
-    if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
-        __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:f}].width;
-    __timestampWidth += 4;
-    
-    _file_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
-    _paste_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
+        if(_conn.state == kIRCCloudStateConnected)
+            [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
+        UIFont *f = [[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"]?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
+        __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
+        if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
+            __timestampWidth += [@":88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
+        if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
+            __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:f}].width;
+        __timestampWidth += 4;
+        
+        _file_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
+        _paste_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
 
-    NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
-    if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
-        if(_buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-            CLS_LOG(@"No data after refresh, requesting more backlog");
-            self.tableView.tableHeaderView = _headerView;
-            _requestingBacklog = YES;
-            [_conn cancelPendingBacklogRequests];
-            [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
+        NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
+        if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
+            if(_buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                CLS_LOG(@"No data after refresh, requesting more backlog");
+                self.tableView.tableHeaderView = _headerView;
+                _requestingBacklog = YES;
+                [_conn cancelPendingBacklogRequests];
+                [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
+            } else {
+                self.tableView.tableHeaderView = nil;
+            }
+        } else if(events.count) {
+            [_ignore setIgnores:_server.ignores];
+            _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
+            if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
+                self.tableView.tableHeaderView = _headerView;
+            } else {
+                self.tableView.tableHeaderView = nil;
+            }
+            for(Event *e in events) {
+                [self insertEvent:e backlog:true nextIsGrouped:false];
+            }
         } else {
             self.tableView.tableHeaderView = nil;
         }
-    } else if(events.count) {
-        [_ignore setIgnores:_server.ignores];
-        _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
-        if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
-            self.tableView.tableHeaderView = _headerView;
+        
+        if(backlogEid > 0) {
+            Event *e = [[Event alloc] init];
+            e.eid = backlogEid;
+            e.type = TYPE_BACKLOG;
+            e.rowType = ROW_BACKLOG;
+            e.formattedMsg = nil;
+            e.bgColor = [UIColor contentBackgroundColor];
+            [self _addItem:e eid:backlogEid];
+            e.timestamp = nil;
+        }
+        
+        if(_buffer.last_seen_eid == 0 && _data.count > 1) {
+            _lastSeenEidPos = 1;
+        } else if(_minEid > 0 && _minEid >= _buffer.last_seen_eid) {
+            _lastSeenEidPos = 0;
         } else {
-            self.tableView.tableHeaderView = nil;
-        }
-        for(Event *e in events) {
-            [self insertEvent:e backlog:true nextIsGrouped:false];
-        }
-    } else {
-        self.tableView.tableHeaderView = nil;
-    }
-    
-    if(backlogEid > 0) {
-        Event *e = [[Event alloc] init];
-        e.eid = backlogEid;
-        e.type = TYPE_BACKLOG;
-        e.rowType = ROW_BACKLOG;
-        e.formattedMsg = nil;
-        e.bgColor = [UIColor contentBackgroundColor];
-        [self _addItem:e eid:backlogEid];
-        e.timestamp = nil;
-    }
-    
-    if(_buffer.last_seen_eid == 0 && _data.count > 1) {
-        _lastSeenEidPos = 1;
-    } else if(_minEid > 0 && _minEid >= _buffer.last_seen_eid) {
-        _lastSeenEidPos = 0;
-    } else {
-        Event *e = [[Event alloc] init];
-        e.cid = _buffer.cid;
-        e.bid = _buffer.bid;
-        e.eid = _buffer.last_seen_eid + 1;
-        e.type = TYPE_LASTSEENEID;
-        e.rowType = ROW_LASTSEENEID;
-        e.formattedMsg = nil;
-        e.bgColor = [UIColor newMsgsBackgroundColor];
-        e.timestamp = @"New Messages";
-        _lastSeenEidPos = _data.count - 1;
-        NSEnumerator *i = [_data reverseObjectEnumerator];
-        Event *event = [i nextObject];
-        while(event) {
-            if(event.eid <= _buffer.last_seen_eid && event.rowType != ROW_LASTSEENEID)
-                break;
-            event = [i nextObject];
-            _lastSeenEidPos--;
-        }
-        if(_lastSeenEidPos != _data.count - 1 && !event.isSelf && !event.pending) {
-            if(_lastSeenEidPos > 0 && [[_data objectAtIndex:_lastSeenEidPos - 1] rowType] == ROW_TIMESTAMP)
+            Event *e = [[Event alloc] init];
+            e.cid = _buffer.cid;
+            e.bid = _buffer.bid;
+            e.eid = _buffer.last_seen_eid + 1;
+            e.type = TYPE_LASTSEENEID;
+            e.rowType = ROW_LASTSEENEID;
+            e.formattedMsg = nil;
+            e.bgColor = [UIColor newMsgsBackgroundColor];
+            e.timestamp = @"New Messages";
+            _lastSeenEidPos = _data.count - 1;
+            NSEnumerator *i = [_data reverseObjectEnumerator];
+            Event *event = [i nextObject];
+            while(event) {
+                if(event.eid <= _buffer.last_seen_eid && event.rowType != ROW_LASTSEENEID)
+                    break;
+                event = [i nextObject];
                 _lastSeenEidPos--;
-            if(_lastSeenEidPos > 0) {
-                for(Event *event in events) {
-                    if(event.rowType == ROW_LASTSEENEID) {
-                        [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
-                        [_data removeObject:event];
+            }
+            if(_lastSeenEidPos != _data.count - 1 && !event.isSelf && !event.pending) {
+                if(_lastSeenEidPos > 0 && [[_data objectAtIndex:_lastSeenEidPos - 1] rowType] == ROW_TIMESTAMP)
+                    _lastSeenEidPos--;
+                if(_lastSeenEidPos > 0) {
+                    for(Event *event in events) {
+                        if(event.rowType == ROW_LASTSEENEID) {
+                            [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
+                            [_data removeObject:event];
+                            break;
+                        }
+                    }
+                    [[EventsDataSource sharedInstance] addEvent:e];
+                    [self _addItem:e eid:e.eid];
+                    e.groupEid = -1;
+                }
+            } else {
+                _lastSeenEidPos = -1;
+            }
+        }
+
+        if(_lastSeenEidPos == 0) {
+            _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 92);
+        } else {
+            _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
+        }
+        self.tableView.tableHeaderView = self.tableView.tableHeaderView;
+        
+        [self.tableView reloadData];
+        if(_requestingBacklog && backlogEid > 0 && _buffer.scrolledUp) {
+            int markerPos = -1;
+            for(Event *e in _data) {
+                if(e.eid == backlogEid)
+                    break;
+                markerPos++;
+            }
+            if(markerPos < [self.tableView numberOfRowsInSection:0])
+                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+        } else if(_eidToOpen > 0) {
+            if(_eidToOpen <= _maxEid) {
+                int i = 0;
+                for(Event *e in _data) {
+                    if(e.eid == _eidToOpen) {
+                        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                        _buffer.scrolledUpFrom = [[_data objectAtIndex:[[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row]] eid];
                         break;
                     }
+                    i++;
                 }
-                [[EventsDataSource sharedInstance] addEvent:e];
-                [self _addItem:e eid:e.eid];
-                e.groupEid = -1;
+                _eidToOpen = -1;
+            } else {
+                if(!_buffer.scrolledUp)
+                    _buffer.scrolledUpFrom = -1;
             }
-        } else {
-            _lastSeenEidPos = -1;
-        }
-    }
-
-    if(_lastSeenEidPos == 0) {
-        _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 92);
-    } else {
-        _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
-    }
-    self.tableView.tableHeaderView = self.tableView.tableHeaderView;
-    
-    [self.tableView reloadData];
-    if(_requestingBacklog && backlogEid > 0 && _buffer.scrolledUp) {
-        int markerPos = -1;
-        for(Event *e in _data) {
-            if(e.eid == backlogEid)
-                break;
-            markerPos++;
-        }
-        if(markerPos < [self.tableView numberOfRowsInSection:0])
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-    } else if(_eidToOpen > 0) {
-        if(_eidToOpen <= _maxEid) {
-            int i = 0;
-            for(Event *e in _data) {
-                if(e.eid == _eidToOpen) {
-                    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-                    _buffer.scrolledUpFrom = [[_data objectAtIndex:[[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row]] eid];
-                    break;
-                }
-                i++;
+        } else if(_buffer.scrolledUp && _buffer.savedScrollOffset > 0) {
+            if((_buffer.savedScrollOffset + self.tableView.tableHeaderView.bounds.size.height) < self.tableView.contentSize.height - self.tableView.bounds.size.height) {
+                self.tableView.contentOffset = CGPointMake(0, (_buffer.savedScrollOffset + self.tableView.tableHeaderView.bounds.size.height));
+            } else {
+                [self _scrollToBottom];
+                [self scrollToBottom];
             }
-            _eidToOpen = -1;
-        } else {
-            if(!_buffer.scrolledUp)
-                _buffer.scrolledUpFrom = -1;
-        }
-    } else if(_buffer.scrolledUp && _buffer.savedScrollOffset > 0) {
-        if((_buffer.savedScrollOffset + self.tableView.tableHeaderView.bounds.size.height) < self.tableView.contentSize.height - self.tableView.bounds.size.height) {
-            self.tableView.contentOffset = CGPointMake(0, (_buffer.savedScrollOffset + self.tableView.tableHeaderView.bounds.size.height));
-        } else {
+        } else if(!_buffer.scrolledUp || (_data.count && _scrollTimer)) {
             [self _scrollToBottom];
             [self scrollToBottom];
         }
-    } else if(!_buffer.scrolledUp || (_data.count && _scrollTimer)) {
-        [self _scrollToBottom];
-        [self scrollToBottom];
-    }
-    
-    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
-    if(_data.count && rows.count) {
-        NSInteger firstRow = [[rows objectAtIndex:0] row];
-        NSInteger lastRow = [[rows lastObject] row];
-        Event *e = ((_lastSeenEidPos+1) < _data.count)?[_data objectAtIndex:_lastSeenEidPos+1]:nil;
-        if(e && _lastSeenEidPos >= 0 && firstRow > _lastSeenEidPos && e.eid > _buffer.last_seen_eid) {
-            if(_topUnreadView.alpha == 0) {
+        
+        NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
+        if(_data.count && rows.count) {
+            NSInteger firstRow = [[rows objectAtIndex:0] row];
+            NSInteger lastRow = [[rows lastObject] row];
+            Event *e = ((_lastSeenEidPos+1) < _data.count)?[_data objectAtIndex:_lastSeenEidPos+1]:nil;
+            if(e && _lastSeenEidPos >= 0 && firstRow > _lastSeenEidPos && e.eid > _buffer.last_seen_eid) {
+                if(_topUnreadView.alpha == 0) {
+                    [UIView beginAnimations:nil context:nil];
+                    [UIView setAnimationDuration:0.1];
+                    _topUnreadView.alpha = 1;
+                    [UIView commitAnimations];
+                }
+                [self updateTopUnread:firstRow];
+            } else if(lastRow < _lastSeenEidPos) {
+                for(Event *e in _data) {
+                    if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && e.eid > _buffer.scrolledUpFrom && !e.isSelf && e.rowType != ROW_LASTSEENEID && [e isImportant:_buffer.type]) {
+                        _newMsgs++;
+                        if(e.isHighlight)
+                            _newHighlights++;
+                    }
+                }
+            } else {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
-                _topUnreadView.alpha = 1;
+                _topUnreadView.alpha = 0;
                 [UIView commitAnimations];
             }
-            [self updateTopUnread:firstRow];
-        } else if(lastRow < _lastSeenEidPos) {
-            for(Event *e in _data) {
-                if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && e.eid > _buffer.scrolledUpFrom && !e.isSelf && e.rowType != ROW_LASTSEENEID && [e isImportant:_buffer.type]) {
-                    _newMsgs++;
-                    if(e.isHighlight)
-                        _newHighlights++;
-                }
+            _requestingBacklog = NO;
+        }
+        
+        [self updateUnread];
+        [self scrollViewDidScroll:self.tableView];
+        
+        _ready = YES;
+        [_lock unlock];
+        
+        if(_conn.state == kIRCCloudStateConnected) {
+            if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                CLS_LOG(@"Empty table after refresh, requesting more backlog");
+                _requestingBacklog = YES;
+                [_conn cancelPendingBacklogRequests];
+                [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
             }
-        } else {
-            [UIView beginAnimations:nil context:nil];
-            [UIView setAnimationDuration:0.1];
-            _topUnreadView.alpha = 0;
-            [UIView commitAnimations];
+            [[NetworkConnection sharedInstance] scheduleIdleTimer];
         }
-        _requestingBacklog = NO;
+        
+        [self.tableView flashScrollIndicators];
     }
-    
-    [self updateUnread];
-    [self scrollViewDidScroll:self.tableView];
-    
-    _ready = YES;
-    [_lock unlock];
-    
-    if(_conn.state == kIRCCloudStateConnected) {
-        if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-            CLS_LOG(@"Empty table after refresh, requesting more backlog");
-            _requestingBacklog = YES;
-            [_conn cancelPendingBacklogRequests];
-            [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
-        }
-        [[NetworkConnection sharedInstance] scheduleIdleTimer];
-    }
-    
-    [self.tableView flashScrollIndicators];
 }
 
 - (void)didReceiveMemoryWarning {
