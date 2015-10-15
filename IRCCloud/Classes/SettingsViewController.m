@@ -419,6 +419,8 @@
         [prefs setObject:@(!_emocodes.isOn) forKey:@"emoji-disableconvert"];
         [prefs setObject:@(!_pastebin.isOn) forKey:@"pastebin-disableprompt"];
         [prefs setObject:_mono.isOn?@"mono":@"sans" forKey:@"font"];
+        [prefs setObject:@(!_hideJoinPart.isOn) forKey:@"hideJoinPart"];
+        [prefs setObject:@(!_expandJoinPart.isOn) forKey:@"expandJoinPart"];
         [prefs setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] forKey:@"theme"];
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
@@ -601,6 +603,18 @@
         _pastebin.on = YES;
     }
 
+    if([[prefs objectForKey:@"hideJoinPart"] isKindOfClass:[NSNumber class]]) {
+        _hideJoinPart.on = ![[prefs objectForKey:@"hideJoinPart"] boolValue];
+    } else {
+        _hideJoinPart.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"expandJoinPart"] isKindOfClass:[NSNumber class]]) {
+        _expandJoinPart.on = ![[prefs objectForKey:@"expandJoinPart"] boolValue];
+    } else {
+        _expandJoinPart.on = YES;
+    }
+    
     if([[prefs objectForKey:@"font"] isKindOfClass:[NSString class]]) {
         _mono.on = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
     } else {
@@ -657,6 +671,8 @@
     _tabletMode = [[UISwitch alloc] init];
     _pastebin = [[UISwitch alloc] init];
     _mono = [[UISwitch alloc] init];
+    _hideJoinPart = [[UISwitch alloc] init];
+    _expandJoinPart = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -734,7 +750,7 @@
         case 1:
             return 1;
         case 2:
-            return 8;
+            return 10;
         case 3:
             return ((_chromeInstalled)?4:3) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
         case 4:
@@ -846,6 +862,14 @@
                 case 7:
                     cell.textLabel.text = @"Monospace Font";
                     cell.accessoryView = _mono;
+                    break;
+                case 8:
+                    cell.textLabel.text = @"Show joins, parts, quits";
+                    cell.accessoryView = _hideJoinPart;
+                    break;
+                case 9:
+                    cell.textLabel.text = @"Collapse joins, parts, quits";
+                    cell.accessoryView = _expandJoinPart;
                     break;
             }
             break;

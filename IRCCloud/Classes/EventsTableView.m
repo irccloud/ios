@@ -470,7 +470,7 @@ int __timestampWidth;
                     hiddenMap = [prefs objectForKey:@"buffer-hideJoinPart"];
                 }
                 
-                if(hiddenMap && [[hiddenMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) {
+                if(([_conn prefs] && [[[_conn prefs] objectForKey:@"hideJoinPart"] boolValue]) || (hiddenMap && [[hiddenMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
                     [_lock lock];
                     for(Event *e in _data) {
                         if(e.eid == event.eid) {
@@ -494,7 +494,7 @@ int __timestampWidth;
                     expandMap = [prefs objectForKey:@"buffer-expandJoinPart"];
                 }
                 
-                if(expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                if(([_conn prefs] && [[[_conn prefs] objectForKey:@"expandJoinPart"] boolValue]) || (expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
                     shouldExpand = YES;
             }
             

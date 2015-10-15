@@ -35,6 +35,8 @@
     UISwitch *_tabletMode;
     UISwitch *_pastebin;
     UISwitch *_mono;
+    UISwitch *_hideJoinPart;
+    UISwitch *_expandJoinPart;
     NSString *_version;
     UISlider *_fontSize;
     int _userinforeqid;
