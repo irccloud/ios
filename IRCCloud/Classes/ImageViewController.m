@@ -209,7 +209,6 @@
 }
 
 -(void)loadVideo:(NSString *)url {
-    CLS_LOG(@"Loading video: %@", url);
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
     _movieController = [[MPMoviePlayerController alloc] initWithContentURL:nil];
     _movieController.controlStyle = MPMovieControlStyleNone;
@@ -554,18 +553,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMovieDurationAvailableNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMovieMediaTypesAvailableNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMovieNaturalSizeAvailableNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMoviePlayerLoadStateDidChangeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMoviePlayerNowPlayingMovieDidChangeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMoviePlayerPlaybackDidFinishNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMoviePlayerPlaybackStateDidChangeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMoviePlayerReadyForDisplayDidChangeNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMovieDurationAvailableNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_debug:) name:MPMovieSourceTypeAvailableNotification object:nil];
-    
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
     [doubleTap setNumberOfTapsRequired:2];
     [_scrollView addGestureRecognizer:doubleTap];
@@ -576,15 +563,6 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
-}
-
--(void)_debug:(NSNotification *)n {
-    CLS_LOG(@"Media player notification: %@ %@", n.name, n.userInfo);
-    CLS_LOG(@"Player state: %lu %li", (unsigned long)_movieController.loadState, _movieController.playbackState);
-    if(_movieController.accessLog)
-        CLS_LOG(@"Access log: %@", [NSString stringWithCString:_movieController.accessLog.extendedLogData.bytes encoding:_movieController.accessLog.extendedLogDataStringEncoding]);
-    if(_movieController.errorLog)
-        CLS_LOG(@"Error log: %@", [NSString stringWithCString:_movieController.errorLog.extendedLogData.bytes encoding:_movieController.errorLog.extendedLogDataStringEncoding]);
 }
 
 -(void)viewDidUnload {
