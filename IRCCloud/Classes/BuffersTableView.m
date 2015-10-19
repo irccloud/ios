@@ -450,10 +450,10 @@
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
 
-    UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+    UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     
-    d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
+    d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
     _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     _awesomeFont = [UIFont fontWithName:@"FontAwesome" size:d.pointSize];
 

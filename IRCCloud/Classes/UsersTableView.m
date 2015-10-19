@@ -236,10 +236,14 @@
         [sectionSizes addObject:@(data.count)];
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
-        _headingFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
-        _countFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
-        _userFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
+        if([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"]) {
+            _headingFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+            _countFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+            _userFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        } else {
+            UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
+            _headingFont = _countFont = _userFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
+        }
         
         _refreshTimer = nil;
         _data = data;
@@ -270,15 +274,26 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
     
     _refreshTimer = nil;
-    UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
-    _headingFont = _userFont = _countFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
+
+    if([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"]) {
+        _headingFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        _countFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        _userFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+    } else {
+        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
+        _headingFont = _countFont = _userFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleSubheadline];
-    _headingFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
-    _countFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
-    _userFont = [UIFont fontWithName:([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"])?@"Courier":[d objectForKey:NSFontAttributeName] size:FONT_SIZE];
+    if([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"]) {
+        _headingFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        _countFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        _userFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+    } else {
+        UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
+        _headingFont = _countFont = _userFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
+    }
     [self.tableView reloadData];
 }
 
