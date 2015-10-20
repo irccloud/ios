@@ -169,7 +169,7 @@
     
     NSRange saveSelection     = internalTextView.selectedRange;
     NSString *saveText        = internalTextView.text;
-    NSString *newText         = @"-";
+    NSString *newText         = @"|W|";
     BOOL oldScrollEnabled     = internalTextView.scrollEnabled;
     internalTextView.hidden   = YES;
     internalTextView.delegate = nil;
@@ -197,7 +197,7 @@
     
     NSRange saveSelection     = internalTextView.selectedRange;
     NSString *saveText        = internalTextView.text;
-    NSString *newText         = @"-";
+    NSString *newText         = @"|W|";
     BOOL oldScrollEnabled     = internalTextView.scrollEnabled;
     internalTextView.hidden   = YES;
     internalTextView.delegate = nil;
@@ -207,7 +207,7 @@
         newText = [newText stringByAppendingString:@"\n|W|"];
     }
     internalTextView.text     = newText;
-    minimumHeight             = internalTextView.intrinsicContentSize.height;
+    minimumHeight             = internalTextView.intrinsicContentSize.height + 1;
     internalTextView.scrollEnabled = oldScrollEnabled;
     internalTextView.text     = saveText;
     internalTextView.hidden   = NO;

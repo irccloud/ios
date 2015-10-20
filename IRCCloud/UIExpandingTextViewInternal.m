@@ -63,4 +63,9 @@
 	[super setContentInset:edgeInsets];
 }
 
+- (CGRect)caretRectForPosition:(UITextPosition *)position {
+    CGRect originalRect = [super caretRectForPosition:position];
+    originalRect.size.height = 19.4;
+    return originalRect;
+}
 @end
