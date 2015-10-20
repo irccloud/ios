@@ -56,6 +56,7 @@
 #define TAG_INVALIDNICK 6
 #define TAG_FAILEDMSG 7
 #define TAG_LOGOUT 8
+#define TAG_DELETE 9
 
 #define YTMARGIN 130
 
@@ -3076,16 +3077,39 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)_deleteSelectedBuffer {
-    //TODO: prompt for confirmation
+    [self dismissKeyboard];
+    [self.view.window endEditing:YES];
+    NSString *title = [_selectedBuffer.type isEqualToString:@"console"]?@"Delete Connection":@"Clear History";
+    NSString *msg;
     if([_selectedBuffer.type isEqualToString:@"console"]) {
-        [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
-    } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
-        if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
-            [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
-        else
-            [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+        msg = @"Are you sure you want to remove this connection?";
+    } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
+        msg = [NSString stringWithFormat:@"Are you sure you want to clear your history in %@?", _selectedBuffer.name];
     } else {
-        [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+        msg = [NSString stringWithFormat:@"Are you sure you want to clear your history with %@?", _selectedBuffer.name];
+    }
+    if(NSClassFromString(@"UIAlertController")) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+            if([_selectedBuffer.type isEqualToString:@"console"]) {
+                [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
+            } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
+                if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+                    [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
+                else
+                    [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+            } else {
+                [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+            }
+        }]];
+        
+        [self presentViewController:alert animated:YES completion:nil];
+    } else {
+        _alertView = [[UIAlertView alloc] initWithTitle:title message:msg delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Delete", nil];
+        _alertView.tag = TAG_DELETE;
+        [_alertView show];
     }
 }
 
@@ -3180,7 +3204,7 @@ extern NSDictionary *emojiMap;
 
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
         alert.popoverPresentationController.sourceRect = rect;
-        alert.popoverPresentationController.sourceView = self.view;
+        alert.popoverPresentationController.sourceView = _buffersView.tableView;
         [self.slidingViewController presentViewController:alert animated:YES completion:nil];
     } else {
         UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
@@ -3328,6 +3352,20 @@ extern NSDictionary *emojiMap;
                 [[NetworkConnection sharedInstance] logout];
                 [self bufferSelected:-1];
                 [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+            }
+            break;
+        case TAG_DELETE:
+            if([title isEqualToString:@"Delete"]) {
+                if([_selectedBuffer.type isEqualToString:@"console"]) {
+                    [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
+                } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
+                    if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+                        [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
+                    else
+                        [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+                } else {
+                    [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+                }
             }
             break;
     }
