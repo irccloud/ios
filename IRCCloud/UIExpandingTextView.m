@@ -88,6 +88,7 @@
         internalTextView.opaque          = NO;
         internalTextView.backgroundColor = [UIColor clearColor];
         internalTextView.showsHorizontalScrollIndicator = NO;
+        internalTextView.textContainer.lineBreakMode = NSLineBreakByWordWrapping;
         [internalTextView sizeToFit];
         
         /* set placeholder */
@@ -110,7 +111,7 @@
 		animateHeightChange = YES;
 		internalTextView.text = @"";
 		[self setMaximumNumberOfLines:13];
-        internalTextView.scrollEnabled = YES;
+        internalTextView.scrollEnabled = NO;
         
         [self sizeToFit];
     }
@@ -220,6 +221,7 @@
 - (void)textViewDidChange:(UITextView *)textView
 {
     if(textView.text.length == 0) {
+        internalTextView.scrollEnabled = NO;
         internalTextView.contentOffset = CGPointMake(0,0);
         internalTextView.contentInset = UIEdgeInsetsMake(-1,0,-1,0);
         placeholderLabel.alpha = 1;
@@ -277,12 +279,11 @@
             [delegate expandingTextView:self didChangeHeight:(newHeight+ kTextInsetBottom)];
         }
 		
-        if (newHeight >= maximumHeight)
+        if (newHeight > minimumHeight)
         {
             if(!internalTextView.scrollEnabled)
             {
                 internalTextView.scrollEnabled = YES;
-                [internalTextView flashScrollIndicators];
             }
         } 
         else 
