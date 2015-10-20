@@ -274,12 +274,15 @@
                           [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
                       }
                 }] resume];
-            } else {
+            } else if([userActivity.webpageURL.path hasPrefix:@"/#!/"]) {
                 NSString *url = [userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/#!/" withString:@"irc://"];
                 if([url hasPrefix:@"irc://ircs://"])
                     url = [url substringFromIndex:6];
                 CLS_LOG(@"Opening URL from handoff: %@", url);
                 [self.mainViewController launchURL:[NSURL URLWithString:url]];
+            } else {
+                [[UIApplication sharedApplication] openURL:userActivity.webpageURL];
+                return NO;
             }
             return YES;
         }
