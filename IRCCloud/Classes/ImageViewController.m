@@ -210,13 +210,14 @@
 
 -(void)loadVideo:(NSString *)url {
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
-    _movieController = [[MPMoviePlayerController alloc] initWithContentURL:nil];
+    _movieController = [[MPMoviePlayerController alloc] initWithContentURL:[NSURL URLWithString:url]];
     _movieController.controlStyle = MPMovieControlStyleNone;
     _movieController.view.userInteractionEnabled = NO;
     _movieController.view.frame = _scrollView.bounds;
     [_scrollView addSubview:_movieController.view];
     _scrollView.userInteractionEnabled = NO;
     [_progressView removeFromSuperview];
+    [_movieController play];
     [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
 }
 
@@ -390,7 +391,7 @@
             [self fail];
         }
         return;
-    } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"] && [url.path hasSuffix:@".gifv"]) {
+    } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"] && ([url.path hasSuffix:@".gifv"] || [url.path hasSuffix:@".webm"])) {
         [self loadImgurImage:[url.path substringToIndex:url.path.length - 5]];
         return;
     } else if([[url.host lowercaseString] hasSuffix:@"gfycat.com"]) {
