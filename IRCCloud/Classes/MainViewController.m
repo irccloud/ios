@@ -1114,8 +1114,15 @@ extern NSDictionary *emojiMap;
     
     NSArray *rows = [_eventsView.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_eventsView.tableView.bounds, _eventsView.tableView.contentInset)];
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
-    if(size.height != _kbSize.height) {
+    int height = size.height;
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
+        CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
+        height = [UIScreen mainScreen].applicationFrame.size.height + [UIApplication sharedApplication].statusBarFrame.size.height - origin.y;
+    }
+    if(height != _kbSize.height) {
         _kbSize = size;
+        _kbSize.height = height;
 
         [UIView beginAnimations:nil context:NULL];
         [UIView setAnimationBeginsFromCurrentState:YES];
@@ -2417,8 +2424,12 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)viewWillLayoutSubviews {
-    if(!__ignoreLayoutChanges)
-        [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    if(!__ignoreLayoutChanges) {
+        __ignoreLayoutChanges = YES;
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+        }];
+    }
 }
 
 -(void)_monitorLayoutChanges {
