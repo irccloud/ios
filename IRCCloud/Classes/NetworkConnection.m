@@ -1396,7 +1396,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(reqid > 0) {
         Server *s = [[ServersDataSource sharedInstance] getServer:cid];
         if(s) {
-            s.status = @"connecting";
+            s.status = @"queued";
             [self postObject:@{@"cid":@(cid)} forEvent:kIRCEventConnectionLag];
         }
     }

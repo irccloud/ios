@@ -81,7 +81,7 @@ extern NSDictionary *emojiMap;
 
     self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
     self.view.backgroundColor = [UIColor contentBackgroundColor];
-    self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor isDarkTheme]?[UIColor contentBackgroundColor]:[UIColor blackColor];
+    self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor isDarkTheme]?[UIColor contentBackgroundColor]:[UIColor navBarColor];
     _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
@@ -1186,6 +1186,7 @@ extern NSDictionary *emojiMap;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self _themeChanged];
+    [self _resetStatusBar];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     for(Event *e in [_pendingEvents copy]) {
@@ -3477,7 +3478,7 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)_resetStatusBar {
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
+    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
