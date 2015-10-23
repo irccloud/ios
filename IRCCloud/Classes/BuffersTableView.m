@@ -688,7 +688,6 @@
         case kIRCEventListResponseFetching:
         case kIRCEventListResponse:
         case kIRCEventListResponseTooManyChannels:
-        case kIRCEventConnectionLag:
         case kIRCEventGlobalMsg:
         case kIRCEventAcceptList:
         case kIRCEventChannelTopicIs:

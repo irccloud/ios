@@ -1392,7 +1392,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(int)reconnect:(int)cid {
-    return [self _sendRequest:@"reconnect" args:@{@"cid":@(cid)}];
+    int reqid = [self _sendRequest:@"reconnect" args:@{@"cid":@(cid)}];
+    if(reqid > 0) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:cid];
+        if(s) {
+            s.status = @"connecting";
+            [self postObject:@{@"cid":@(cid)} forEvent:kIRCEventConnectionLag];
+        }
+    }
+    return reqid;
 }
 
 -(int)reorderConnections:(NSString *)cids {
