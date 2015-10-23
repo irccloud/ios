@@ -406,6 +406,7 @@ extern NSDictionary *emojiMap;
         case kIRCEventWhois:
         {
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[WhoisViewController alloc] initWithJSONObject:notification.object]];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else
@@ -587,6 +588,7 @@ extern NSDictionary *emojiMap;
                 cmltv.data = [o objectForKey:@"bans"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -605,6 +607,7 @@ extern NSDictionary *emojiMap;
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Quiet list for %@", [o objectForKey:@"channel"]];
                 cmltv.mask = @"quiet_mask";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -622,6 +625,7 @@ extern NSDictionary *emojiMap;
                 cmltv.data = [o objectForKey:@"list"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Invite list for %@", [o objectForKey:@"channel"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -639,6 +643,7 @@ extern NSDictionary *emojiMap;
                 cmltv.data = [o objectForKey:@"exceptions"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Exception list for %@", [o objectForKey:@"channel"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -655,6 +660,7 @@ extern NSDictionary *emojiMap;
                 ctv.event = o;
                 ctv.navigationItem.title = @"Channel List";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ctv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -672,6 +678,7 @@ extern NSDictionary *emojiMap;
                 citv.nicks = [o objectForKey:@"nicks"];
                 citv.navigationItem.title = @"Accept List";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:citv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -688,6 +695,7 @@ extern NSDictionary *emojiMap;
                 wtv.event = o;
                 wtv.navigationItem.title = [NSString stringWithFormat:@"WHO For %@", [o objectForKey:@"subject"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:wtv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -704,6 +712,7 @@ extern NSDictionary *emojiMap;
                 ntv.event = o;
                 ntv.navigationItem.title = [NSString stringWithFormat:@"NAMES For %@", [o objectForKey:@"chan"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ntv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -720,6 +729,7 @@ extern NSDictionary *emojiMap;
                 smtv.event = o;
                 smtv.navigationItem.title = @"Server Map";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:smtv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -1043,6 +1053,7 @@ extern NSDictionary *emojiMap;
 
 -(void)backlogStarted:(NSNotification *)notification {
     if(!_connectingView.hidden) {
+        _connectingStatus.textColor = [UIColor navBarHeadingColor];
         [_connectingStatus setText:@"Loading"];
         _connectingActivity.hidden = YES;
         [_connectingActivity stopAnimating];
@@ -1306,6 +1317,7 @@ extern NSDictionary *emojiMap;
                 itv.cid = s.cid;
                 itv.navigationItem.title = @"Ignore List";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
@@ -1333,6 +1345,7 @@ extern NSDictionary *emojiMap;
                     _buffer.draft = _message.text;
                     PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
                     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
+                    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                         nc.modalPresentationStyle = UIModalPresentationFormSheet;
                     else
@@ -1441,7 +1454,7 @@ extern NSDictionary *emojiMap;
             [_message clearText];
             _buffer.draft = nil;
             if(e.reqId < 0)
-                e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
+                e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
         }
     }
 }
@@ -3067,6 +3080,7 @@ extern NSDictionary *emojiMap;
     EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
     [ecv setServer:_selectedBuffer.cid];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
     else
@@ -3117,6 +3131,7 @@ extern NSDictionary *emojiMap;
     EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
     [self.slidingViewController resetTopView];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
     else
@@ -3128,6 +3143,7 @@ extern NSDictionary *emojiMap;
     ServerReorderViewController *svc = [[ServerReorderViewController alloc] initWithStyle:UITableViewStylePlain];
     [self.slidingViewController resetTopView];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
     else
@@ -3277,6 +3293,7 @@ extern NSDictionary *emojiMap;
         if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else
@@ -3428,6 +3445,7 @@ extern NSDictionary *emojiMap;
     [u uploadFile:url];
     FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
     else
@@ -3555,6 +3573,7 @@ extern NSDictionary *emojiMap;
         
         if(fvc) {
             nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else
@@ -3658,6 +3677,7 @@ extern NSDictionary *emojiMap;
     [self _hideConnectingView];
     SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     [nc pushViewController:[[ImgurLoginViewController alloc] init] animated:NO];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
@@ -3711,6 +3731,7 @@ extern NSDictionary *emojiMap;
 -(void)_startPastebin {
     PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
     else
@@ -3723,6 +3744,7 @@ extern NSDictionary *emojiMap;
 -(void)_showPastebins {
     PastebinsTableViewController *ptv = [[PastebinsTableViewController alloc] init];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ptv];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
     else
@@ -3736,6 +3758,7 @@ extern NSDictionary *emojiMap;
     FilesTableViewController *fcv = [[FilesTableViewController alloc] initWithStyle:UITableViewStylePlain];
     fcv.delegate = self;
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fcv];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
     else
@@ -3815,6 +3838,8 @@ extern NSDictionary *emojiMap;
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
     [_landscapeView removeFromSuperview];
     [_message resignFirstResponder];
+    if(self.presentedViewController)
+        [self dismissViewControllerAnimated:NO completion:nil];
     if(buttonIndex != -1) {
         NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
         
@@ -3873,12 +3898,11 @@ extern NSDictionary *emojiMap;
             itv.cid = s.cid;
             itv.navigationItem.title = @"Ignore List";
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            if(self.presentedViewController)
-                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Mention"]) {
             [self showMentionTip];
@@ -3888,34 +3912,31 @@ extern NSDictionary *emojiMap;
         } else if([action isEqualToString:@"Settings"]) {
             SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            if(self.presentedViewController)
-                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Display Options"]) {
             DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
             dvc.buffer = _buffer;
             dvc.navigationItem.title = _titleLabel.text;
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:dvc];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            if(self.presentedViewController)
-                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Add Network"]) {
             EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            if(self.presentedViewController)
-                [self dismissViewControllerAnimated:NO completion:nil];
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Start a Pastebin"]) {
             [self _startPastebin];

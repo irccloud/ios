@@ -974,7 +974,8 @@
 #pragma mark - Table view delegate
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    [_delegate dismissKeyboard];
+    if([UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad)
+        [_delegate dismissKeyboard];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
