@@ -2104,6 +2104,23 @@ extern NSDictionary *emojiMap;
     Buffer *lastBuffer = _buffer;
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if(lastBuffer && changed) {
+        if([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:[lastBuffer.type isEqualToString:@"channel"]?@"channel-enableReadOnSelect":@"buffer-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",lastBuffer.bid]] boolValue]) {
+            NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:lastBuffer.bid];
+            NSTimeInterval eid = 0;
+            Event *last;
+            for(NSInteger i = events.count - 1; i >= 0; i--) {
+                last = [events objectAtIndex:i];
+                if(!last.pending && last.rowType != ROW_LASTSEENEID)
+                    break;
+            }
+            if(!last.pending) {
+                eid = last.eid;
+            }
+            if(eid >= 0 && eid >= lastBuffer.last_seen_eid) {
+                [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:lastBuffer.cid bid:lastBuffer.bid lastSeenEid:eid];
+                lastBuffer.last_seen_eid = eid;
+            }
+        }
         _buffer.lastBuffer = lastBuffer;
         _buffer.nextBuffer = nil;
         lastBuffer.draft = _message.text;

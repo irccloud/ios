@@ -26,6 +26,7 @@
     UISwitch *_showJoinPart;
     UISwitch *_collapseJoinPart;
     UISwitch *_expandDisco;
+    UISwitch *_readOnSelect;
     int _reqid;
 }
 @property (strong, nonatomic) Buffer *buffer;

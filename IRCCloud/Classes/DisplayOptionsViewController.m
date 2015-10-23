@@ -48,9 +48,21 @@
     NSMutableDictionary *hideJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *expandJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *expandDisco = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *enableReadOnSelect = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
     
     if([_buffer.type isEqualToString:@"channel"]) {
+        if([[prefs objectForKey:@"channel-enableReadOnSelect"] isKindOfClass:[NSDictionary class]])
+            [enableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"channel-enableReadOnSelect"]];
+        if(!_readOnSelect.on)
+            [enableReadOnSelect removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [enableReadOnSelect setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(enableReadOnSelect.count)
+            [prefs setObject:enableReadOnSelect forKey:@"channel-enableReadOnSelect"];
+        else
+            [prefs removeObjectForKey:@"channel-enableReadOnSelect"];
+        
         if([[prefs objectForKey:@"channel-disableTrackUnread"] isKindOfClass:[NSDictionary class]])
             [disableTrackUnread addEntriesFromDictionary:[prefs objectForKey:@"channel-disableTrackUnread"]];
         if(_trackUnread.on)
@@ -106,6 +118,17 @@
         else
             [prefs removeObjectForKey:@"channel-hiddenMembers"];
     } else {
+        if([[prefs objectForKey:@"buffer-enableReadOnSelect"] isKindOfClass:[NSDictionary class]])
+            [enableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"buffer-enableReadOnSelect"]];
+        if(!_readOnSelect.on)
+            [enableReadOnSelect removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [enableReadOnSelect setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(enableReadOnSelect.count)
+            [prefs setObject:enableReadOnSelect forKey:@"buffer-enableReadOnSelect"];
+        else
+            [prefs removeObjectForKey:@"buffer-enableReadOnSelect"];
+        
         if([[prefs objectForKey:@"buffer-disableTrackUnread"] isKindOfClass:[NSDictionary class]])
             [disableTrackUnread addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableTrackUnread"]];
         if(_trackUnread.on)
@@ -209,6 +232,11 @@
     NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     
     if([_buffer.type isEqualToString:@"channel"]) {
+        if([[[prefs objectForKey:@"channel-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+            _readOnSelect.on = YES;
+        else
+            _readOnSelect.on = NO;
+        
         if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
             _trackUnread.on = NO;
         else
@@ -234,6 +262,11 @@
         else
             _showMembers.on = YES;
     } else {
+        if([[[prefs objectForKey:@"buffer-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+            _readOnSelect.on = YES;
+        else
+            _readOnSelect.on = NO;
+        
         if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
             _trackUnread.on = NO;
         else
@@ -266,6 +299,7 @@
     _showJoinPart = [[UISwitch alloc] init];
     _collapseJoinPart = [[UISwitch alloc] init];
     _expandDisco = [[UISwitch alloc] init];
+    _readOnSelect = [[UISwitch alloc] init];
 
     [self refresh];
 }
@@ -290,11 +324,11 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if([_buffer.type isEqualToString:@"channel"])
-        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?4:5;
+        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?5:6;
     else if([_buffer.type isEqualToString:@"console"])
-        return 2;
-    else
         return 3;
+    else
+        return 4;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -306,25 +340,29 @@
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.accessoryView = nil;
     
-    if(![_buffer.type isEqualToString:@"channel"] && row > 0)
+    if(![_buffer.type isEqualToString:@"channel"] && row > 1)
         row+=2;
-    else if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && row > 0)
+    else if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && row > 1)
         row++;
     
     switch(row) {
         case 0:
-            cell.textLabel.text = @"Track unread messages";
+            cell.textLabel.text = @"Unread message indicator";
             cell.accessoryView = _trackUnread;
             break;
         case 1:
+            cell.textLabel.text = @"Mark as read automatically";
+            cell.accessoryView = _readOnSelect;
+            break;
+        case 2:
             cell.textLabel.text = @"Member list";
             cell.accessoryView = _showMembers;
             break;
-        case 2:
+        case 3:
             cell.textLabel.text = @"Notify on all messages";
             cell.accessoryView = _notifyAll;
             break;
-        case 3:
+        case 4:
             if([_buffer.type isEqualToString:@"console"]) {
                 cell.textLabel.text = @"Group repeated disconnects";
                 cell.accessoryView = _expandDisco;
@@ -333,7 +371,7 @@
                 cell.accessoryView = _showJoinPart;
             }
             break;
-        case 4:
+        case 5:
             cell.textLabel.text = @"Collapse joins/parts";
             cell.accessoryView = _collapseJoinPart;
             break;
