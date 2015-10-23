@@ -84,7 +84,7 @@
         }
         
         if([[object objectForKey:@"op_nick"] length]) {
-            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"op_nick"], [object objectForKey:@"op_msg"]] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"op_nick"], [object objectForKey:@"op_msg"]] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
         }
         
         if([[object objectForKey:@"opername"] length]) {
