@@ -2257,7 +2257,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "d7743185-f0b3-44e3-ba27-43da12e09a7a";
+				PROVISIONING_PROFILE = "4292916c-0f74-473f-bfbf-4213126e7d04";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2478,7 +2478,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "14bf5570-d7a6-46f1-93e1-21b773d468a1";
+				PROVISIONING_PROFILE = "47714bc4-dba0-4816-b6a5-c8552902c2cd";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

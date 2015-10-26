@@ -81,7 +81,7 @@ extern NSDictionary *emojiMap;
 
     self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
     self.view.backgroundColor = [UIColor contentBackgroundColor];
-    self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor isDarkTheme]?[UIColor contentBackgroundColor]:[UIColor navBarColor];
+    self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor navBarColor];
     _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
@@ -3416,6 +3416,7 @@ extern NSDictionary *emojiMap;
 
 -(void)_choosePhoto:(UIImagePickerControllerSourceType)sourceType {
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+    [picker.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     picker.sourceType = sourceType;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])
         picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];

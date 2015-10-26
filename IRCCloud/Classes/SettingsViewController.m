@@ -359,6 +359,8 @@
     [self.navigationController.view removeFromSuperview];
     [v addSubview: self.navigationController.view];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+    self.navigationController.view.backgroundColor = [UIColor navBarColor];
+    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
 }
 @end
 

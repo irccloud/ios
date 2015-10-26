@@ -1714,6 +1714,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                             [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
                             _state = kIRCCloudStateDisconnected;
                             [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
+                            return;
                         } else {
                             CLS_LOG(@"First EID matched");
                         }
