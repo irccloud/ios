@@ -114,16 +114,36 @@
 #endif
 }
 
+-(UILocalNotification *)getNotification:(NSTimeInterval)eid bid:(int)bid {
+#ifndef EXTENSION
+    @synchronized(_notifications) {
+        NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
+        for(UILocalNotification *n in ns) {
+            NSArray *d = [n.userInfo objectForKey:@"d"];
+            if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] == eid) {
+                return n;
+            }
+        }
+    }
+#endif
+    return nil;
+}
+
 -(void)updateBadgeCount {
 #ifndef EXTENSION
     int count = 0;
-    NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
+    for(NSArray *a in _notifications.allValues) {
+        count += a.count;
+    }
+    /*NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
     for(Buffer *b in buffers) {
         count += [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
-    }
-    [UIApplication sharedApplication].applicationIconBadgeNumber = count;
-    if(!count)
-        [[UIApplication sharedApplication] cancelAllLocalNotifications];
+    }*/
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [UIApplication sharedApplication].applicationIconBadgeNumber = count;
+        if(!count)
+            [[UIApplication sharedApplication] cancelAllLocalNotifications];
+    }];
 #endif
 }
 

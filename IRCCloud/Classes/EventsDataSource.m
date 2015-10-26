@@ -787,7 +787,8 @@
     NSMutableDictionary *events = [[NSMutableDictionary alloc] init];
     @synchronized(_events) {
         for(NSNumber *bid in _events) {
-            NSMutableArray *e = [[self eventsForBuffer:bid.intValue] mutableCopy];
+            [[_events objectForKey:bid] sortUsingSelector:@selector(compare:)];
+            NSMutableArray *e = [[_events objectForKey:bid] mutableCopy];
             if(e.count > 50) {
                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid.intValue];
                 if(b && !b.scrolledUp && [self highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {

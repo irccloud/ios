@@ -375,7 +375,7 @@
         int bid = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
         NSTimeInterval eid = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
         
-        if(application.applicationState == UIApplicationStateBackground) {
+        if(application.applicationState == UIApplicationStateBackground && (!_conn || (_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
             [[NotificationsDataSource sharedInstance] notify:nil cid:cid bid:bid eid:eid];
         }
         
@@ -385,7 +385,6 @@
             CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
             [self.mainViewController bufferSelected:bid];
         } else if(application.applicationState == UIApplicationStateBackground && (!_conn || (_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
-            [UIApplication sharedApplication].applicationIconBadgeNumber = [UIApplication sharedApplication].applicationIconBadgeNumber + 1;
             if(_backlogCompletedObserver) {
                 [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
                 _backlogCompletedObserver = nil;

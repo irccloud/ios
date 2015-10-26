@@ -19,4 +19,5 @@
 -(void)notify:(NSString *)alert cid:(int)cid bid:(int)bid eid:(NSTimeInterval)eid;
 -(void)removeNotificationsForBID:(int)bid olderThan:(NSTimeInterval)eid;
 -(void)updateBadgeCount;
+-(UILocalNotification *)getNotification:(NSTimeInterval)eid bid:(int)bid;
 @end

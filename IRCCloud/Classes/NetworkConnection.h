@@ -135,6 +135,7 @@ typedef enum {
     NSTimeInterval _firstEID;
     NSString *_streamId;
     int _accrued;
+    BOOL _ready;
     
     kIRCCloudState _state;
     NSDictionary *_userInfo;
@@ -164,6 +165,7 @@ typedef enum {
 @property int failCount;
 @property NSString *session;
 @property NSDictionary *config;
+@property (readonly) BOOL ready;
 
 +(NetworkConnection*)sharedInstance;
 +(void)sync;

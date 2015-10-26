@@ -311,6 +311,17 @@ NSLock *__parserLock = nil;
             if((!backlog || _resuming || [[_oobQueue firstObject] bid] == -1) && event.eid > _highestEID) {
                 _highestEID = event.eid;
             }
+            if(event.eid > b.last_seen_eid && [event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"])) {
+                BOOL show = YES;
+                if([[[[self prefs] objectForKey:@"buffer-disableTrackUnread"] objectForKey:@(b.bid)] integerValue]) {
+                    show = NO;
+                }
+                
+                if(show && ![_notifications getNotification:event.eid bid:event.bid]) {
+                    [_notifications notify:nil cid:event.cid bid:event.bid eid:event.eid];
+                    [_notifications updateBadgeCount];
+                }
+            }
             if(!backlog && !_resuming) {
                 [self postObject:event forEvent:kIRCEventBufferMsg];
             }
@@ -439,8 +450,8 @@ NSLock *__parserLock = nil;
                            [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"theme"] forKey:@"theme"];
                        }
                        [[NSUserDefaults standardUserDefaults] synchronize];
-                       [[EventsDataSource sharedInstance] reformat];
-                       [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
+                       [_events reformat];
+                       [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];
                        [self postObject:object forEvent:kIRCEventUserInfo];
@@ -1394,7 +1405,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(int)reconnect:(int)cid {
     int reqid = [self _sendRequest:@"reconnect" args:@{@"cid":@(cid)}];
     if(reqid > 0) {
-        Server *s = [[ServersDataSource sharedInstance] getServer:cid];
+        Server *s = [_servers getServer:cid];
         if(s) {
             s.status = @"queued";
             [self postObject:@{@"cid":@(cid)} forEvent:kIRCEventConnectionLag];
@@ -1467,6 +1478,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 _state = kIRCCloudStateDisconnected;
                 if(reachability == kIRCCloudUnreachable)
                     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+                _ready = YES;
                 return;
             }
         }
@@ -1499,6 +1511,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _totalCount = 0;
         _reconnectTimestamp = -1;
         _resuming = NO;
+        _ready = NO;
+        _firstEID = 0;
+        
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
                                                                          tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
@@ -1541,9 +1556,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     [_socket close];
     _socket = nil;
-    for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
-        if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
-            [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:50];
+    for(Buffer *b in [_buffers getBuffers]) {
+        if(!b.scrolledUp && [_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
+            [_events pruneEventsForBuffer:b.bid maxSize:50];
     }
 }
 
@@ -1674,59 +1689,70 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)parse:(NSDictionary *)dict {
-    NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
-    if(backlog)
-        _totalCount++;
-    if([NSThread currentThread].isMainThread)
-        NSLog(@"WARNING: Parsing on main thread");
-    [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
-    if(_accrued > 0) {
-        [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalCount++ / (float)_accrued)) waitUntilDone:NO];
-    }
-    IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
-    if(object.type) {
-        //NSLog(@"New event (backlog: %i resuming: %i) (%@) %@", backlog, _resuming, object.type, object);
-        if((backlog || _accrued > 0) && object.bid > -1 && object.bid != _currentBid && object.eid > 0) {
-            if(!backlog) {
-                if(_firstEID == 0 && object.eid > _highestEID) {
-                    _firstEID = object.eid;
-                    CLS_LOG(@"Backlog gap detected, purging cache");
-                    [_events clear];
+    @synchronized(self) {
+        NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
+        if(backlog)
+            _totalCount++;
+        if([NSThread currentThread].isMainThread)
+            NSLog(@"WARNING: Parsing on main thread");
+        [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
+        if(_accrued > 0) {
+            [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalCount++ / (float)_accrued)) waitUntilDone:NO];
+        }
+        IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
+        if(object.type) {
+            //NSLog(@"New event (backlog: %i resuming: %i highestEID: %f) (%@) %@", backlog, _resuming, _highestEID, object.type, object);
+            if((backlog || _accrued > 0) && object.bid > -1 && object.bid != _currentBid && object.eid > 0) {
+                if(!backlog) {
+                    if(_firstEID == 0) {
+                        _firstEID = object.eid;
+                        if(object.eid > _highestEID) {
+                            CLS_LOG(@"Backlog gap detected, purging cache");
+                            [_events clear];
+                            _highestEID = 0;
+                            _streamId = nil;
+                            [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
+                            _state = kIRCCloudStateDisconnected;
+                            [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
+                        } else {
+                            CLS_LOG(@"First EID matched");
+                        }
+                    }
+                }
+                _currentBid = object.bid;
+                _currentCount = 0;
+            }
+            void (^block)(IRCCloudJSONObject *o) = [_parserMap objectForKey:object.type];
+            if(block != nil) {
+                block(object);
+            } else {
+                CLS_LOG(@"Unhandled type: %@", object.type);
+            }
+            if(backlog || _accrued > 0) {
+                if(_numBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
+                    if(object.bid != _currentBid) {
+                        _currentBid = object.bid;
+                        _currentCount = 0;
+                    }
+                    [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalBuffers + (float)_currentCount/100.0f)/ (float)_numBuffers) waitUntilDone:NO];
+                    _currentCount++;
                 }
             }
-            _currentBid = object.bid;
-            _currentCount = 0;
-        }
-        void (^block)(IRCCloudJSONObject *o) = [_parserMap objectForKey:object.type];
-        if(block != nil) {
-            block(object);
+            if([NSDate timeIntervalSinceReferenceDate] - start > _longestEventTime) {
+                _longestEventTime = [NSDate timeIntervalSinceReferenceDate] - start;
+                _longestEventType = object.type;
+            }
         } else {
-            CLS_LOG(@"Unhandled type: %@", object.type);
-        }
-        if(backlog || _accrued > 0) {
-            if(_numBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
-                if(object.bid != _currentBid) {
-                    _currentBid = object.bid;
-                    _currentCount = 0;
-                }
-                [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalBuffers + (float)_currentCount/100.0f)/ (float)_numBuffers) waitUntilDone:NO];
-                _currentCount++;
+            if([object objectForKey:@"success"] && ![[object objectForKey:@"success"] boolValue] && [object objectForKey:@"message"]) {
+                CLS_LOG(@"Failure: %@", object);
+                [self postObject:object forEvent:kIRCEventFailureMsg];
+            } else if([object objectForKey:@"success"]) {
+                [self postObject:object forEvent:kIRCEventSuccess];
             }
         }
-        if([NSDate timeIntervalSinceReferenceDate] - start > _longestEventTime) {
-            _longestEventTime = [NSDate timeIntervalSinceReferenceDate] - start;
-            _longestEventType = object.type;
-        }
-    } else {
-        if([object objectForKey:@"success"] && ![[object objectForKey:@"success"] boolValue] && [object objectForKey:@"message"]) {
-            CLS_LOG(@"Failure: %@", object);
-            [self postObject:object forEvent:kIRCEventFailureMsg];
-        } else if([object objectForKey:@"success"]) {
-            [self postObject:object forEvent:kIRCEventSuccess];
-        }
+        if(!backlog && _reconnectTimestamp != 0)
+            [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
     }
-    if(!backlog && _reconnectTimestamp != 0)
-        [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
 }
 
 -(void)cancelIdleTimer {
@@ -1814,7 +1840,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         NSLog(@"Caught %lu self_back events", (unsigned long)_awayOverride.count);
     _currentBid = -1;
     _currentCount = 0;
-    _firstEID = 0;
     _totalCount = 0;
     backlog = YES;
 }
@@ -1830,7 +1855,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
     _failCount = 0;
     _accrued = 0;
-    backlog = NO;
     _resuming = NO;
     _awayOverride = nil;
     _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
@@ -1840,21 +1864,24 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(fetcher.bid > 0) {
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     } else {
+        _ready = YES;
         CLS_LOG(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
         if(fetcher.bid == -1) {
             [_buffers purgeInvalidBIDs];
             [_channels purgeInvalidChannels];
             CLS_LOG(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
         }
-        for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
-            if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
-                [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
+        for(Buffer *b in [_buffers getBuffers]) {
+            if(!b.scrolledUp && [_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
+                [_events pruneEventsForBuffer:b.bid maxSize:101];
         }
         _numBuffers = 0;
         [_notifications updateBadgeCount];
     }
     CLS_LOG(@"I downloaded %i events", _totalCount);
     [_oobQueue removeObject:fetcher];
+    if(_oobQueue.count == 0)
+        backlog = NO;
     if([_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }
@@ -1925,7 +1952,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     for(Buffer *buffer in [_buffers getBuffers]) {
         if(buffer.timeout > 0) {
             if([buffer.type isEqualToString:@"channel"] && buffer.timeout == 0) {
-                if(![[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid])
+                if(![_channels channelForBuffer:buffer.bid])
                     continue;
             }
             CLS_LOG(@"Requesting backlog for buffer: %@", buffer.name);
