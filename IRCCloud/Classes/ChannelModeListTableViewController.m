@@ -158,6 +158,7 @@
     _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Add", nil];
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     [_alertView textFieldAtIndex:0].delegate = self;
+    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
     [_alertView show];
 }
 

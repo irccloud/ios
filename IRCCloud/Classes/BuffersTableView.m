@@ -999,6 +999,7 @@
         [_alertView textFieldAtIndex:0].placeholder = @"#example";
         [_alertView textFieldAtIndex:0].text = @"#";
         [_alertView textFieldAtIndex:0].delegate = self;
+        [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
         [_alertView show];
 #endif
     } else {

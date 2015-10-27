@@ -99,6 +99,7 @@
     _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Allow messages from this user" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Allow", nil];
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     [_alertView textFieldAtIndex:0].delegate = self;
+    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
     [_alertView show];
 }
 

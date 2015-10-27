@@ -57,6 +57,7 @@
 #define TAG_FAILEDMSG 7
 #define TAG_LOGOUT 8
 #define TAG_DELETE 9
+#define TAG_JOIN 10
 
 #define YTMARGIN 130
 
@@ -451,6 +452,7 @@ extern NSDictionary *emojiMap;
                 _alertView.tag = TAG_BADCHANNELKEY;
                 _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
                 [_alertView textFieldAtIndex:0].delegate = self;
+                [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
                 [_alertView show];
             }
             }];}
@@ -482,6 +484,7 @@ extern NSDictionary *emojiMap;
                 _alertView.frame = CGRectMake(0,0,1000,1000);
                 _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
                 [_alertView textFieldAtIndex:0].delegate = self;
+                [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
                 [_alertView show];
             }
             }];}
@@ -2873,6 +2876,7 @@ extern NSDictionary *emojiMap;
             if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
                 [sheet addButtonWithTitle:@"Ban List"];
             }
+            [sheet addButtonWithTitle:@"Invite to Channel"];
         } else {
             [sheet addButtonWithTitle:@"Rejoin"];
             [sheet addButtonWithTitle:(_buffer.archived)?@"Unarchive":@"Archive"];
@@ -3169,7 +3173,30 @@ extern NSDictionary *emojiMap;
     [self presentViewController:nc animated:YES completion:nil];
 }
 
+-(void)_inviteToChannel {
+    Server *s = [[ServersDataSource sharedInstance] getServer:_selectedUser?_selectedBuffer.cid:_buffer.cid];
+    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
+    _alertView.tag = TAG_INVITE;
+    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [_alertView textFieldAtIndex:0].delegate = self;
+    [_alertView textFieldAtIndex:0].placeholder = _selectedUser?@"#channel":@"nickname";
+    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+    [_alertView show];
+}
+
+-(void)_joinAChannel {
+    Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
+    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Which channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+    _alertView.tag = TAG_JOIN;
+    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [_alertView textFieldAtIndex:0].delegate = self;
+    [_alertView textFieldAtIndex:0].placeholder = @"#channel";
+    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+    [_alertView show];
+}
+
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
+    _selectedUser = nil;
     _selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
@@ -3183,6 +3210,9 @@ extern NSDictionary *emojiMap;
                     [self _deleteSelectedBuffer];
                 }]];
             } else {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Join A Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                    [self _joinAChannel];
+                }]];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Disconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                     [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil];
                 }]];
@@ -3194,6 +3224,9 @@ extern NSDictionary *emojiMap;
             if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
                 [alert addAction:[UIAlertAction actionWithTitle:@"Leave" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                     [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid];
+                }]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Invite to Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                    [self _inviteToChannel];
                 }]];
             } else {
                 [alert addAction:[UIAlertAction actionWithTitle:@"Rejoin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
@@ -3248,12 +3281,14 @@ extern NSDictionary *emojiMap;
                 [sheet addButtonWithTitle:@"Reconnect"];
                 [sheet addButtonWithTitle:@"Delete"];
             } else {
+                [sheet addButtonWithTitle:@"Join A Channel"];
                 [sheet addButtonWithTitle:@"Disconnect"];
             }
             [sheet addButtonWithTitle:@"Edit Connection"];
         } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
             if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
                 [sheet addButtonWithTitle:@"Leave"];
+                [sheet addButtonWithTitle:@"Invite to Channel"];
             } else {
                 [sheet addButtonWithTitle:@"Rejoin"];
                 [sheet addButtonWithTitle:(_selectedBuffer.archived)?@"Unarchive":@"Archive"];
@@ -3352,8 +3387,12 @@ extern NSDictionary *emojiMap;
             break;
         case TAG_INVITE:
             if([title isEqualToString:@"Invite"]) {
-                if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] invite:_selectedUser.nick chan:[alertView textFieldAtIndex:0].text cid:_buffer.cid];
+                if([alertView textFieldAtIndex:0].text.length) {
+                    if(_selectedUser)
+                        [[NetworkConnection sharedInstance] invite:_selectedUser.nick chan:[alertView textFieldAtIndex:0].text cid:_buffer.cid];
+                    else
+                        [[NetworkConnection sharedInstance] invite:[alertView textFieldAtIndex:0].text chan:_selectedBuffer.name cid:_selectedBuffer.cid];
+                }
             }
             break;
         case TAG_BADCHANNELKEY:
@@ -3401,6 +3440,12 @@ extern NSDictionary *emojiMap;
                 } else {
                     [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
                 }
+            }
+            break;
+        case TAG_JOIN:
+            if([title isEqualToString:@"Join"]) {
+                if([alertView textFieldAtIndex:0].text.length)
+                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/join %@",[alertView textFieldAtIndex:0].text] to:nil cid:_selectedBuffer.cid];
             }
             break;
     }
@@ -3983,6 +4028,10 @@ extern NSDictionary *emojiMap;
             [self _addNetwork];
         } else if([action isEqualToString:@"Reorder"]) {
             [self _reorder];
+        } else if([action isEqualToString:@"Invite to Channel"]) {
+            [self _inviteToChannel];
+        } else if([action isEqualToString:@"Join A Channel"]) {
+            [self _joinAChannel];
         }
         
         if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)
@@ -4014,6 +4063,7 @@ extern NSDictionary *emojiMap;
             _alertView.tag = TAG_BAN;
             _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
             [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
             [_alertView textFieldAtIndex:0].delegate = self;
             [_alertView show];
         } else if([action isEqualToString:@"Ignore"]) {
@@ -4022,6 +4072,7 @@ extern NSDictionary *emojiMap;
             _alertView.tag = TAG_IGNORE;
             _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
             [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
             [_alertView textFieldAtIndex:0].delegate = self;
             [_alertView show];
         } else if([action isEqualToString:@"Kick"]) {
@@ -4030,13 +4081,7 @@ extern NSDictionary *emojiMap;
             _alertView.tag = TAG_KICK;
             _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
             [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView show];
-        } else if([action isEqualToString:@"Invite to channel"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
-            _alertView.tag = TAG_INVITE;
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
             [_alertView show];
         }
     }

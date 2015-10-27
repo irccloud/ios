@@ -407,6 +407,7 @@
         _alertView = [[UIAlertView alloc] initWithTitle:@"Change Your Email Address" message:@"Please enter your current password to confirm this change" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
         _alertView.alertViewStyle = UIAlertViewStyleSecureTextInput;
         [_alertView textFieldAtIndex:0].delegate = self;
+        [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
         [_alertView show];
     } else {
         UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
