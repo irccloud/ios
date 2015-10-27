@@ -415,15 +415,15 @@
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
         NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[[NetworkConnection sharedInstance] prefs]];
         
-        [prefs setObject:@(_24hour.isOn) forKey:@"time-24hr"];
-        [prefs setObject:@(_seconds.isOn) forKey:@"time-seconds"];
-        [prefs setObject:@(_symbols.isOn) forKey:@"mode-showsymbol"];
-        [prefs setObject:@(_colors.isOn) forKey:@"nick-colors"];
-        [prefs setObject:@(!_emocodes.isOn) forKey:@"emoji-disableconvert"];
-        [prefs setObject:@(!_pastebin.isOn) forKey:@"pastebin-disableprompt"];
+        [prefs setObject:[NSNumber numberWithBool:_24hour.isOn] forKey:@"time-24hr"];
+        [prefs setObject:[NSNumber numberWithBool:_seconds.isOn] forKey:@"time-seconds"];
+        [prefs setObject:[NSNumber numberWithBool:_symbols.isOn] forKey:@"mode-showsymbol"];
+        [prefs setObject:[NSNumber numberWithBool:_colors.isOn] forKey:@"nick-colors"];
+        [prefs setObject:[NSNumber numberWithBool:!_emocodes.isOn] forKey:@"emoji-disableconvert"];
+        [prefs setObject:[NSNumber numberWithBool:!_pastebin.isOn] forKey:@"pastebin-disableprompt"];
         [prefs setObject:_mono.isOn?@"mono":@"sans" forKey:@"font"];
-        [prefs setObject:@(!_hideJoinPart.isOn) forKey:@"hideJoinPart"];
-        [prefs setObject:@(!_expandJoinPart.isOn) forKey:@"expandJoinPart"];
+        [prefs setObject:[NSNumber numberWithBool:!_hideJoinPart.isOn] forKey:@"hideJoinPart"];
+        [prefs setObject:[NSNumber numberWithBool:!_expandJoinPart.isOn] forKey:@"expandJoinPart"];
         [prefs setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] forKey:@"theme"];
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
