@@ -402,23 +402,28 @@ int __timestampWidth;
                     }
                     [_lock unlock];
                 } else if(e.reqId != -1) {
+                    CLS_LOG(@"Searching for pending message matching reqid %i", e.reqId);
                     int reqid = e.reqId;
                     [_lock lock];
                     for(int i = 0; i < _data.count; i++) {
                         e = [_data objectAtIndex:i];
                         if(e.reqId == reqid && (e.pending || e.rowType == ROW_FAILED)) {
+                            CLS_LOG(@"Found at position %i", i);
                             if(i>0) {
                                 Event *p = [_data objectAtIndex:i-1];
                                 if(p.rowType == ROW_TIMESTAMP) {
+                                    CLS_LOG(@"Removing timestamp row");
                                     [_data removeObject:p];
                                     i--;
                                 }
                             }
+                            CLS_LOG(@"Removing pending event");
                             [_data removeObject:e];
                             i--;
                         }
                     }
                     [_lock unlock];
+                    CLS_LOG(@"Finished");
                 }
                 [self insertEvent:notification.object backlog:NO nextIsGrouped:NO];
             }

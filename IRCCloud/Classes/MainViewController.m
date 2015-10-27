@@ -908,6 +908,7 @@ extern NSDictionary *emojiMap;
                 }
             } else {
                 int reqid = e.reqId;
+                CLS_LOG(@"Removing expiration timer for reqid %i", e.reqId);
                 for(Event *e in _pendingEvents) {
                     if(e.reqId == reqid) {
                         if(e.expirationTimer && [e.expirationTimer isValid])
@@ -1452,13 +1453,14 @@ extern NSDictionary *emojiMap;
             }
             e.to = _buffer.name;
             e.command = _message.text;
-            e.reqId = [[NetworkConnection sharedInstance] say:_message.text to:_buffer.name cid:_buffer.cid];
             if(e.msg)
                 [_pendingEvents addObject:e];
             [_message clearText];
             _buffer.draft = nil;
+            e.reqId = [[NetworkConnection sharedInstance] say:e.command to:_buffer.name cid:_buffer.cid];
             if(e.reqId < 0)
-                e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:30 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
+                e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
+            CLS_LOG(@"Sending message with reqid %i", e.reqId);
         }
     }
 }
