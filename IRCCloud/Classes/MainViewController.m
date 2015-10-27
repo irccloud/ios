@@ -2774,6 +2774,7 @@ extern NSDictionary *emojiMap;
     CGRect frame = _mentionTip.frame;
     frame.origin.y = [UIScreen mainScreen].applicationFrame.size.height - frame.size.height - 40;
     _mentionTip.frame = frame;
+    [_mentionTip.superview bringSubviewToFront:_mentionTip];
 
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"mentionTip"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"mentionTip"];
@@ -2806,7 +2807,8 @@ extern NSDictionary *emojiMap;
     CGRect frame = _swipeTip.frame;
     frame.origin.y = [UIScreen mainScreen].applicationFrame.size.height - frame.size.height - 40;
     _swipeTip.frame = frame;
-
+    [_swipeTip.superview bringSubviewToFront:_swipeTip];
+    
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"swipeTip"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"swipeTip"];
         [UIView animateWithDuration:0.5 animations:^{
@@ -2828,6 +2830,7 @@ extern NSDictionary *emojiMap;
     CGRect frame = _2swipeTip.frame;
     frame.origin.y = [UIScreen mainScreen].applicationFrame.size.height - frame.size.height - 40;
     _2swipeTip.frame = frame;
+    [_2swipeTip.superview bringSubviewToFront:_2swipeTip];
     
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"twoSwipeTip"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"twoSwipeTip"];
