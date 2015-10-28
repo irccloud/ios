@@ -86,7 +86,10 @@ extern NSDictionary *emojiMap;
     _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
-    [_sendBtn setTitleColor:[UIColor textareaBackgroundColor] forState:UIControlStateNormal];
+    UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
+    [_sendBtn setTitleColor:c forState:UIControlStateNormal];
+    [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
+    [_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
     [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
     [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
     _message.textColor = [UIColor textareaTextColor];
@@ -994,6 +997,10 @@ extern NSDictionary *emojiMap;
 
 -(void)connectivityChanged:(NSNotification *)notification {
     _connectingStatus.textColor = [UIColor navBarHeadingColor];
+    UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
+    [_sendBtn setTitleColor:c forState:UIControlStateNormal];
+    [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
+    [_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
     
     switch([NetworkConnection sharedInstance].state) {
         case kIRCCloudStateConnecting:
@@ -1686,6 +1693,10 @@ extern NSDictionary *emojiMap;
     }
     if(_buffer)
         _buffer.draft = expandingTextView.text;
+    UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
+    [_sendBtn setTitleColor:c forState:UIControlStateNormal];
+    [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
+    [_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
