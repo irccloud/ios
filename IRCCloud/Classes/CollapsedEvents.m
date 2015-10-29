@@ -567,7 +567,7 @@
                         case kCollapsedEventMode:
                             if(message.length)
                                 [message appendString:@"• "];
-                            [message appendFormat:@"%c1mode:%c ", COLOR_MIRC, CLEAR];
+                            [message appendString:@"mode: "];
                             break;
                         case kCollapsedEventJoin:
                             [message appendString:@"→ "];
