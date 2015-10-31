@@ -69,6 +69,8 @@
 
     CSURITemplate *_file_url_template;
     CSURITemplate *_paste_url_template;
+    
+    NSString *_groupIndent;
 }
 @property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;

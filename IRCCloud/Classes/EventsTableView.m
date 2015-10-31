@@ -567,7 +567,7 @@ int __timestampWidth;
                     heading.cid = event.cid;
                     heading.bid = event.bid;
                     heading.eid = _currentCollapsedEid - 1;
-                    heading.groupMsg = [NSString stringWithFormat:@"    %@",groupMsg];
+                    heading.groupMsg = [NSString stringWithFormat:@"%@%@",_groupIndent,groupMsg];
                     heading.color = [UIColor timestampColor];
                     heading.bgColor = [UIColor contentBackgroundColor];
                     heading.formattedMsg = nil;
@@ -596,10 +596,10 @@ int __timestampWidth;
                 _currentCollapsedEid = eid;
             }
             if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
-                msg = [NSString stringWithFormat:@"    %@", msg];
+                msg = [NSString stringWithFormat:@"%@%@", _groupIndent, msg];
             } else {
                 if(eid != _currentCollapsedEid)
-                    msg = [NSString stringWithFormat:@"    %@", msg];
+                    msg = [NSString stringWithFormat:@"%@%@", _groupIndent, msg];
                 eid = _currentCollapsedEid;
             }
             event.groupMsg = msg;
@@ -1009,6 +1009,10 @@ int __timestampWidth;
 
 - (void)refresh {
     @synchronized(self) {
+        if([[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"])
+            _groupIndent = @"  ";
+        else
+            _groupIndent = @"    ";
         self.tableView.backgroundColor = [UIColor contentBackgroundColor];
         _headerView.backgroundColor = [UIColor contentBackgroundColor];
         _backlogFailedView.backgroundColor = [UIColor contentBackgroundColor];
@@ -1601,7 +1605,7 @@ int __timestampWidth;
                 if(e.groupEid == group)
                     count++;
             }
-            if(count > 1 || [((Event *)[_data objectAtIndex:indexPath.row]).groupMsg hasPrefix:@"   "]) {
+            if(count > 1 || [((Event *)[_data objectAtIndex:indexPath.row]).groupMsg hasPrefix:_groupIndent]) {
                 if([_expandedSectionEids objectForKey:@(group)])
                     [_expandedSectionEids removeObjectForKey:@(group)];
                 else if(((Event *)[_data objectAtIndex:indexPath.row]).eid != group)
