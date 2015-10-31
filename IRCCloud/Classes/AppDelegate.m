@@ -413,9 +413,11 @@
                     [self.mainViewController refresh];
                     NSLog(@"Backlog download completed for bid%i", bid);
                     [[NotificationsDataSource sharedInstance] updateBadgeCount];
-                    [[NetworkConnection sharedInstance] serialize];
-                    _fetchHandler(UIBackgroundFetchResultNewData);
-                    _fetchHandler = nil;
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                        [[NetworkConnection sharedInstance] serialize];
+                        _fetchHandler(UIBackgroundFetchResultNewData);
+                        _fetchHandler = nil;
+                    });
                 }
             }];
             _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
@@ -439,12 +441,14 @@
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 NSLog(@"Preloading backlog for bid%i from notification", bid);
                 [[NetworkConnection sharedInstance] requestBacklogForBuffer:bid server:cid];
-                [[NetworkConnection sharedInstance] serialize];
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    [[NetworkConnection sharedInstance] serialize];
+                });
             });
         } else {
             handler(UIBackgroundFetchResultNoData);
         }
-    } else if ([userInfo objectForKey:@"hb"]) {
+    } else if ([userInfo objectForKey:@"hb"] && application.applicationState == UIApplicationStateBackground) {
         for(NSString *key in [userInfo objectForKey:@"hb"]) {
             NSDictionary *bids = [[userInfo objectForKey:@"hb"] objectForKey:key];
             for(NSString *bid in bids.allKeys) {
@@ -454,8 +458,10 @@
             }
         }
         [[NotificationsDataSource sharedInstance] updateBadgeCount];
-        [[NetworkConnection sharedInstance] serialize];
-        handler(UIBackgroundFetchResultNoData);
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [[NetworkConnection sharedInstance] serialize];
+            handler(UIBackgroundFetchResultNoData);
+        });
     } else {
         handler(UIBackgroundFetchResultNoData);
     }
