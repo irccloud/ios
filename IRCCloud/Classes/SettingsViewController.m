@@ -456,8 +456,10 @@
             [d synchronize];
         }
         
-        if([ColorFormatter shouldClearFontCache])
+        if([ColorFormatter shouldClearFontCache]) {
             [ColorFormatter clearFontCache];
+            [ColorFormatter loadFonts];
+        }
         [[EventsDataSource sharedInstance] clearFormattingCache];
     }
 }

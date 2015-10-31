@@ -787,6 +787,7 @@ extern NSDictionary *emojiMap;
         case kIRCEventUserInfo:
         {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [ColorFormatter loadFonts];
                 [self _themeChanged];
             }];
         }
