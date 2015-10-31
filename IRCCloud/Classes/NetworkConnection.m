@@ -1694,7 +1694,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)parse:(NSDictionary *)dict {
-    @synchronized(self) {
+    @synchronized(_parserMap) {
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
         if(backlog)
             _totalCount++;
@@ -1898,7 +1898,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)serialize {
-    @synchronized(self) {
+    @synchronized(_userInfo) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
         [[NSUserDefaults standardUserDefaults] synchronize];
         [_servers serialize];
