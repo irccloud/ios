@@ -44,6 +44,7 @@ NSString *IRCCLOUD_PATH = @"/";
 #define TYPE_WWAN 2
 
 NSLock *__parserLock = nil;
+NSLock *__serializeLock = nil;
 
 @interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
     SBJsonStreamParser *_parser;
@@ -210,6 +211,7 @@ NSLock *__parserLock = nil;
 #endif
     if(self) {
     __parserLock = [[NSLock alloc] init];
+    __serializeLock = [[NSLock alloc] init];
     _queue = [[NSOperationQueue alloc] init];
     _servers = [ServersDataSource sharedInstance];
     _buffers = [BuffersDataSource sharedInstance];
@@ -1645,9 +1647,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)webSocket:(WebSocket *)socket didReceiveTextMessage:(NSString*)aMessage {
     if(socket == _socket) {
         if(aMessage) {
-            [__parserLock lock];
+            NSLock *lock = __parserLock;
+            [lock lock];
             [_parser parse:[aMessage dataUsingEncoding:NSUTF8StringEncoding]];
-            [__parserLock unlock];
+            [lock unlock];
         }
     } else {
         CLS_LOG(@"Got event for inactive socket");
@@ -1657,9 +1660,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 - (void)webSocket:(WebSocket *)socket didReceiveBinaryMessage: (NSData*) aMessage {
     if(socket == _socket) {
         if(aMessage) {
-            [__parserLock lock];
+            NSLock *lock = __parserLock;
+            [lock lock];
             [_parser parse:aMessage];
-            [__parserLock unlock];
+            [lock unlock];
         }
     } else {
         CLS_LOG(@"Got event for inactive socket");
@@ -1711,7 +1715,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 if(!backlog) {
                     if(_firstEID == 0) {
                         _firstEID = object.eid;
-                        if(object.eid > _highestEID) {
+                        if(object.eid > _highestEID || true) {
                             CLS_LOG(@"Backlog gap detected, purging cache");
                             [_events clear];
                             _highestEID = 0;
@@ -1898,43 +1902,43 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)serialize {
-    @synchronized(_userInfo) {
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        [_servers serialize];
-        [_buffers serialize];
-        [_channels serialize];
-        [_users serialize];
-        [_events serialize];
-        [_notifications serialize];
+    [__serializeLock lock];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [_servers serialize];
+    [_buffers serialize];
+    [_channels serialize];
+    [_users serialize];
+    [_events serialize];
+    [_notifications serialize];
 #ifndef EXTENSION
-        NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
-        NSMutableDictionary *stream = [_userInfo mutableCopy];
-        if(_streamId)
-            [stream setObject:_streamId forKey:@"streamId"];
-        else
-            [stream removeObjectForKey:@"streamId"];
-        if(_config)
-            [stream setObject:_config forKey:@"config"];
-        else
-            [stream removeObjectForKey:@"config"];
-        [stream setObject:@(_highestEID) forKey:@"highestEID"];
-        [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
-        [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
+    NSMutableDictionary *stream = [_userInfo mutableCopy];
+    if(_streamId)
+        [stream setObject:_streamId forKey:@"streamId"];
+    else
+        [stream removeObjectForKey:@"streamId"];
+    if(_config)
+        [stream setObject:_config forKey:@"config"];
+    else
+        [stream removeObjectForKey:@"config"];
+    [stream setObject:@(_highestEID) forKey:@"highestEID"];
+    [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
+    [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
 #endif
-        [[NSUserDefaults standardUserDefaults] setObject:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"cacheVersion"];
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+    [[NSUserDefaults standardUserDefaults] setObject:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"cacheVersion"];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
-            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-            [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
-            [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] forKey:@"fontSize"];
-            [d synchronize];
-        }
-        [NetworkConnection sync];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] forKey:@"fontSize"];
+        [d synchronize];
     }
+    [NetworkConnection sync];
+    [__serializeLock unlock];
 }
 
 -(void)_backlogFailed:(NSNotification *)notification {
