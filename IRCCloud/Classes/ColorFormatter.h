@@ -31,6 +31,7 @@
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links;
 +(BOOL)shouldClearFontCache;
 +(void)clearFontCache;
++(void)loadFonts;
 +(UIFont *)timestampFont;
 +(UIFont *)monoTimestampFont;
 +(UIFont *)awesomeFont;

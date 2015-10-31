@@ -1087,6 +1087,9 @@ int __timestampWidth;
             }
             for(Event *e in events) {
                 [self insertEvent:e backlog:true nextIsGrouped:false];
+                if(!e.formatted && e.formattedMsg.length > 0) {
+                    [self _format:e];
+                }
             }
         } else {
             self.tableView.tableHeaderView = nil;
@@ -1259,6 +1262,38 @@ int __timestampWidth;
     return count;
 }
 
+- (void)_format:(Event *)e {
+    NSArray *links;
+    e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:[[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"] || e.monospace linkify:e.linkify server:_server links:&links];
+    if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
+        NSMutableArray *mutableLinks = links.mutableCopy;
+        for(int i = 0; i < mutableLinks.count; i++) {
+            NSTextCheckingResult *r = [mutableLinks objectAtIndex:i];
+            if(r.resultType == NSTextCheckingTypeLink) {
+                for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
+                    NSString *url = [_file_url_template relativeStringWithVariables:@{@"id":[file objectForKey:@"id"]} error:nil];
+                    if(([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] || [[file objectForKey:@"mime_type"] hasPrefix:@"video/"]) && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
+                        NSString *extension = [file objectForKey:@"extension"];
+                        if(!extension.length)
+                            extension = [@"." stringByAppendingString:[[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
+                        r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", url, [[file objectForKey:@"mime_type"] substringToIndex:5], extension]]];
+                        [mutableLinks setObject:r atIndexedSubscript:i];
+                    }
+                }
+                for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
+                    NSString *url = [_paste_url_template relativeStringWithVariables:@{@"id":[paste objectForKey:@"id"]} error:nil];
+                    if(([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
+                        r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", url, [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
+                        [mutableLinks setObject:r atIndexedSubscript:i];
+                    }
+                }
+            }
+        }
+        links = mutableLinks;
+    }
+    e.links = links;
+}
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     [_lock lock];
     if(indexPath.row >= _data.count) {
@@ -1272,39 +1307,11 @@ int __timestampWidth;
     if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
         if(e.formatted != nil && e.height > 0) {
             return e.height;
-        } else if(e.formattedMsg.length > 0) {
-            NSArray *links;
-            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:[[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"] || e.monospace linkify:e.linkify server:_server links:&links];
-            if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
-                NSMutableArray *mutableLinks = links.mutableCopy;
-                for(int i = 0; i < mutableLinks.count; i++) {
-                    NSTextCheckingResult *r = [mutableLinks objectAtIndex:i];
-                    if(r.resultType == NSTextCheckingTypeLink) {
-                        for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
-                            NSString *url = [_file_url_template relativeStringWithVariables:@{@"id":[file objectForKey:@"id"]} error:nil];
-                            if(([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] || [[file objectForKey:@"mime_type"] hasPrefix:@"video/"]) && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
-                                NSString *extension = [file objectForKey:@"extension"];
-                                if(!extension.length)
-                                    extension = [@"." stringByAppendingString:[[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
-                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", url, [[file objectForKey:@"mime_type"] substringToIndex:5], extension]]];
-                                [mutableLinks setObject:r atIndexedSubscript:i];
-                            }
-                        }
-                        for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
-                            NSString *url = [_paste_url_template relativeStringWithVariables:@{@"id":[paste objectForKey:@"id"]} error:nil];
-                            if(([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
-                                r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", url, [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
-                                [mutableLinks setObject:r atIndexedSubscript:i];
-                            }
-                        }
-                    }
-                }
-                links = mutableLinks;
-            }
-            e.links = links;
-        } else {
-            return 26;
+        } else if(!e.formatted && e.formattedMsg.length > 0) {
+            [self _format:e];
         }
+        if(!e.formatted)
+            return 26;
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
         CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
          e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
@@ -1369,6 +1376,9 @@ int __timestampWidth;
         cell.accessory.textColor = [UIColor networkErrorColor];
     } else {
         cell.accessory.hidden = YES;
+    }
+    if(!e.formatted && e.formattedMsg.length > 0) {
+        [self _format:e];
     }
     if(e.links.count) {
         if(e.pending || [e.color isEqual:[UIColor timestampColor]])

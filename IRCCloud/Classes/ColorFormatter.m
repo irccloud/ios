@@ -1180,6 +1180,25 @@ float ColorFormatterCachedFontSize = 0.0f;
                             }];
 }
 
++(void)loadFonts {
+    arrowFont = [UIFont fontWithName:@"HiraMinProN-W3" size:FONT_SIZE];
+    Courier = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+    CourierBold = [UIFont fontWithName:@"Courier-Bold" size:FONT_SIZE];
+    CourierOblique = [UIFont fontWithName:@"Courier-Oblique" size:FONT_SIZE];
+    CourierBoldOblique = [UIFont fontWithName:@"Courier-BoldOblique" size:FONT_SIZE];
+    chalkboardFont = [UIFont fontWithName:@"ChalkboardSE-Light" size:FONT_SIZE];
+    markerFont = [UIFont fontWithName:@"MarkerFelt-Thin" size:FONT_SIZE];
+    UIFontDescriptor *bodyFontDescriptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
+    UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
+    UIFontDescriptor *italicBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
+    UIFontDescriptor *boldItalicBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold|UIFontDescriptorTraitItalic];
+    Helvetica = [UIFont fontWithDescriptor:bodyFontDescriptor size:FONT_SIZE];
+    HelveticaBold = [UIFont fontWithDescriptor:boldBodyFontDescriptor size:FONT_SIZE];
+    HelveticaOblique = [UIFont fontWithDescriptor:italicBodyFontDescriptor size:FONT_SIZE];
+    HelveticaBoldOblique = [UIFont fontWithDescriptor:boldItalicBodyFontDescriptor size:FONT_SIZE];
+    ColorFormatterCachedFontSize = FONT_SIZE;
+}
+
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
     if(!color)
         color = [UIColor messageTextColor];
@@ -1191,22 +1210,9 @@ float ColorFormatterCachedFontSize = 0.0f;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
     
     if(!Courier) {
-        arrowFont = [UIFont fontWithName:@"HiraMinProN-W3" size:FONT_SIZE];
-        Courier = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-        CourierBold = [UIFont fontWithName:@"Courier-Bold" size:FONT_SIZE];
-        CourierOblique = [UIFont fontWithName:@"Courier-Oblique" size:FONT_SIZE];
-        CourierBoldOblique = [UIFont fontWithName:@"Courier-BoldOblique" size:FONT_SIZE];
-        chalkboardFont = [UIFont fontWithName:@"ChalkboardSE-Light" size:FONT_SIZE];
-        markerFont = [UIFont fontWithName:@"MarkerFelt-Thin" size:FONT_SIZE];
-        UIFontDescriptor *bodyFontDescriptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
-        UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
-        UIFontDescriptor *italicBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
-        UIFontDescriptor *boldItalicBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold|UIFontDescriptorTraitItalic];
-        Helvetica = [UIFont fontWithDescriptor:bodyFontDescriptor size:FONT_SIZE];
-        HelveticaBold = [UIFont fontWithDescriptor:boldBodyFontDescriptor size:FONT_SIZE];
-        HelveticaOblique = [UIFont fontWithDescriptor:italicBodyFontDescriptor size:FONT_SIZE];
-        HelveticaBoldOblique = [UIFont fontWithDescriptor:boldItalicBodyFontDescriptor size:FONT_SIZE];
-        ColorFormatterCachedFontSize = FONT_SIZE;
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self loadFonts];
+        });
     }
     
     if(mono) {

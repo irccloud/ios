@@ -94,6 +94,7 @@
     }
     [[NSUserDefaults standardUserDefaults] synchronize];
     
+    [ColorFormatter loadFonts];
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [[EventsDataSource sharedInstance] reformat];
     
@@ -674,6 +675,7 @@
         if([ColorFormatter shouldClearFontCache]) {
             [ColorFormatter clearFontCache];
             [[EventsDataSource sharedInstance] clearFormattingCache];
+            [ColorFormatter loadFonts];
         }
         _conn.reconnectTimestamp = -1;
         if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
