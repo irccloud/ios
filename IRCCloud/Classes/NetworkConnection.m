@@ -351,6 +351,7 @@ NSLock *__parserLock = nil;
             user.mode = @"";
             user.away = 0;
             user.away_msg = @"";
+            user.ircserver = [object objectForKey:@"ircserver"];
             if(!_resuming)
                 [self postObject:object forEvent:kIRCEventJoin];
         }
@@ -681,6 +682,7 @@ NSLock *__parserLock = nil;
                            user.hostmask = [member objectForKey:@"usermask"];
                            user.mode = [member objectForKey:@"mode"];
                            user.away = [[member objectForKey:@"away"] intValue];
+                           user.ircserver = [member objectForKey:@"ircserver"];
                            [_users addUser:user];
                        }
                        if(!backlog && !_resuming)

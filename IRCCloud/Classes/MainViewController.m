@@ -3343,6 +3343,7 @@ extern NSDictionary *emojiMap;
                 _selectedUser.cid = _selectedEvent.cid;
                 _selectedUser.bid = _selectedEvent.bid;
                 _selectedUser.nick = from;
+                _selectedUser.parted = YES;
             }
             if(event.hostmask.length)
                 _selectedUser.hostmask = event.hostmask;
@@ -4065,8 +4066,12 @@ extern NSDictionary *emojiMap;
                 [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:_buffer.cid];
             }
         } else if([action isEqualToString:@"Whois"]) {
-            if(_selectedUser && _selectedUser.nick.length > 0)
-                [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
+            if(_selectedUser && _selectedUser.nick.length > 0) {
+                if(_selectedUser.parted)
+                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
+                else
+                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:_selectedUser.ircserver.length?_selectedUser.ircserver:_selectedUser.nick cid:_buffer.cid];
+            }
         } else if([action isEqualToString:@"Op"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];

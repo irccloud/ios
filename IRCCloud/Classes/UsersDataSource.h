@@ -27,10 +27,13 @@
     int _away;
     NSString *_away_msg;
     NSTimeInterval _lastMention;
+    NSString *_ircserver;
+    BOOL _parted;
 }
 @property int cid, bid, away;
-@property NSString *nick, *old_nick, *hostmask, *mode, *away_msg;
+@property NSString *nick, *old_nick, *hostmask, *mode, *away_msg, *ircserver;
 @property NSTimeInterval lastMention;
+@property BOOL parted;
 -(NSComparisonResult)compare:(User *)aUser;
 -(NSComparisonResult)compareByMentionTime:(User *)aUser;
 @end

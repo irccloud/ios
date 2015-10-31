@@ -48,6 +48,7 @@
         decodeInt(_away);
         decodeObject(_away_msg);
         decodeDouble(_lastMention);
+        decodeObject(_ircserver);
     }
     return self;
 }
@@ -62,6 +63,7 @@
     encodeInt(_away);
     encodeObject(_away_msg);
     encodeDouble(_lastMention);
+    encodeObject(_ircserver);
 }
 
 -(NSString *)description {
