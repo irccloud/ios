@@ -785,20 +785,24 @@
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
     
     NSMutableDictionary *events = [[NSMutableDictionary alloc] init];
+    NSArray *bids;
     @synchronized(_events) {
-        for(NSNumber *bid in _events) {
-            [[_events objectForKey:bid] sortUsingSelector:@selector(compare:)];
-            NSMutableArray *e = [[_events objectForKey:bid] mutableCopy];
-            if(e.count > 50) {
-                Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid.intValue];
-                if(b && !b.scrolledUp && [self highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
-                    while(e.count > 50) {
-                        [e removeObject:e.firstObject];
-                    }
-                }
-            }
-            [events setObject:e forKey:bid];
+        bids = _events.allKeys;
+    }
+    
+    for(NSNumber *bid in bids) {
+        NSMutableArray *e;
+        @synchronized(_events) {
+            e = [[_events objectForKey:bid] mutableCopy];
         }
+        [e sortUsingSelector:@selector(compare:)];
+        if(e.count > 50) {
+            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid.intValue];
+            if(b && !b.scrolledUp && [self highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
+                e = [[e subarrayWithRange:NSMakeRange(e.count - 50, 50)] mutableCopy];
+            }
+        }
+        [events setObject:e forKey:bid];
     }
     
     @synchronized(self) {
