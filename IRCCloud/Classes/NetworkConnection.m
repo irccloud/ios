@@ -1559,8 +1559,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [_socket close];
     _socket = nil;
     for(Buffer *b in [_buffers getBuffers]) {
-        if(!b.scrolledUp && [_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
-            [_events pruneEventsForBuffer:b.bid maxSize:50];
+        if(!b.scrolledUp && [_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                [_events pruneEventsForBuffer:b.bid maxSize:50];
+            });
+        }
     }
 }
 
@@ -1874,10 +1877,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [_channels purgeInvalidChannels];
             CLS_LOG(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
         }
-        for(Buffer *b in [_buffers getBuffers]) {
-            if(!b.scrolledUp && [_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
-                [_events pruneEventsForBuffer:b.bid maxSize:101];
-        }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            for(Buffer *b in [_buffers getBuffers]) {
+                if(!b.scrolledUp && [_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
+                        [_events pruneEventsForBuffer:b.bid maxSize:101];
+                }
+            }
+        });
         _numBuffers = 0;
         [_notifications updateBadgeCount];
     }

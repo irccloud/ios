@@ -917,9 +917,7 @@
 }
 
 -(Event *)event:(NSTimeInterval)eid buffer:(int)bid {
-    @synchronized(_events) {
-        return [[_events_sorted objectForKey:@(bid)] objectForKey:@(eid)];
-    }
+    return [[_events_sorted objectForKey:@(bid)] objectForKey:@(eid)];
 }
 
 -(void)removeEvent:(NSTimeInterval)eid buffer:(int)bid {
@@ -968,15 +966,11 @@
 }
 
 -(NSUInteger)sizeOfBuffer:(int)bid {
-    @synchronized(_events) {
-        return [[_events objectForKey:@(bid)] count];
-    }
+    return [[_events objectForKey:@(bid)] count];
 }
 
 -(NSTimeInterval)lastEidForBuffer:(int)bid {
-    @synchronized(_events) {
-        return [[_lastEIDs objectForKey:@(bid)] doubleValue];
-    }
+    return [[_lastEIDs objectForKey:@(bid)] doubleValue];
 }
 
 -(void)removeEventsBefore:(NSTimeInterval)min_eid buffer:(int)bid {

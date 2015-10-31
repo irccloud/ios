@@ -121,8 +121,8 @@ extern NSDictionary *emojiMap;
     [_loadMoreBacklog setTitleShadowColor:[UIColor contentBackgroundColor] forState:UIControlStateNormal];
     
     [_eventsView refresh];
-    [_buffersView refresh];
-    [_usersView refresh];
+    [_buffersView performSelectorInBackground:@selector(refresh) withObject:nil];
+    [_usersView performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
 - (void)viewDidLoad {
@@ -963,7 +963,7 @@ extern NSDictionary *emojiMap;
                 else
                     [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
             }
-            [self _updateUnreadIndicator];
+            [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
             break;
         case kIRCEventConnectionDeleted:
             o = notification.object;
@@ -979,7 +979,7 @@ extern NSDictionary *emojiMap;
                     [(AppDelegate *)[UIApplication sharedApplication].delegate showConnectionView];
                 }
             }
-            [self _updateUnreadIndicator];
+            [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
             break;
         default:
             break;
@@ -1104,7 +1104,7 @@ extern NSDictionary *emojiMap;
         [self _updateTitleArea];
         [self _updateServerStatus];
         [self _updateUserListVisibility];
-        [self _updateUnreadIndicator];
+        [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
         [self _updateGlobalMsg];
     } else {
         [[NSNotificationCenter defaultCenter] removeObserver:_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
@@ -1196,7 +1196,6 @@ extern NSDictionary *emojiMap;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self _themeChanged];
     [self _resetStatusBar];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -1232,7 +1231,7 @@ extern NSDictionary *emojiMap;
     }
     self.navigationController.navigationBar.clipsToBounds = YES;
     [self.navigationController.view addGestureRecognizer:self.slidingViewController.panGesture];
-    [self _updateUnreadIndicator];
+    [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
     [self.slidingViewController resetTopView];
     
     NSString *session = [NetworkConnection sharedInstance].session;
@@ -2221,7 +2220,7 @@ extern NSDictionary *emojiMap;
     [self _updateUserListVisibility];
     [self _updateServerStatus];
     [self.slidingViewController resetTopView];
-    [self _updateUnreadIndicator];
+    [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
     [self updateSuggestions:NO];
 }
 
@@ -2692,7 +2691,7 @@ extern NSDictionary *emojiMap;
     [_eventsView refresh];
     [_usersView refresh];
     [self _updateTitleArea];
-    [self _updateUnreadIndicator];
+    [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
 }
 
 -(void)_updateUserListVisibility {
