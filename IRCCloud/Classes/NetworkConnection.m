@@ -1715,7 +1715,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 if(!backlog) {
                     if(_firstEID == 0) {
                         _firstEID = object.eid;
-                        if(object.eid > _highestEID || true) {
+                        if(object.eid > _highestEID) {
                             CLS_LOG(@"Backlog gap detected, purging cache");
                             [_events clear];
                             _highestEID = 0;
