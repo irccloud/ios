@@ -2807,12 +2807,16 @@ extern NSDictionary *emojiMap;
 
 -(void)didSwipe:(NSNotification *)n {
     [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"swipeTip"];
-    if([n.name isEqualToString:ECSlidingViewUnderLeftWillAppear])
+    if([n.name isEqualToString:ECSlidingViewUnderLeftWillAppear]) {
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, [_buffersView.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]);
-    else if([n.name isEqualToString:ECSlidingViewUnderRightWillAppear])
+        self.view.accessibilityElementsHidden = YES;
+    } else if([n.name isEqualToString:ECSlidingViewUnderRightWillAppear]) {
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, [_usersView.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]);
-    else
+        self.view.accessibilityElementsHidden = YES;
+    } else {
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
+        self.view.accessibilityElementsHidden = NO;
+    }
 }
 
 -(void)showSwipeTip {
