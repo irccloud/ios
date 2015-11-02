@@ -525,9 +525,9 @@
                               event.bgColor = [UIColor statusBackgroundColor];
                           },
                           @"channel_mode":^(Event *event, IRCCloudJSONObject *object) {
-                              event.nick = event.from;
-                              event.from = @"";
                               if(object) {
+                                  event.nick = event.from;
+                                  event.from = @"";
                                   if(event.server && [event.server isKindOfClass:[NSString class]] && event.server.length)
                                       event.msg = [NSString stringWithFormat:@"Channel mode set to: %c%@%c by the server %c%@%c", BOLD, [object objectForKey:@"diff"], CLEAR, BOLD, event.server, CLEAR];
                                   else
