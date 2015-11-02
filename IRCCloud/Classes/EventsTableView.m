@@ -1358,6 +1358,7 @@ int __timestampWidth;
     cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
     cell.accessibilityLabel = nil;
     cell.accessibilityValue = nil;
+    cell.accessibilityHint = nil;
     cell.accessibilityElementsHidden = NO;
 
     if(e.from.length && e.msg.length) {
@@ -1366,6 +1367,19 @@ int __timestampWidth;
     } else if([e.type isEqualToString:@"buffer_me_msg"]) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Action at %@", e.timestamp];
         cell.accessibilityValue = [NSString stringWithFormat:@"%@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
+    } else if(e.rowType == ROW_MESSAGE) {
+        NSMutableString *s = [[[ColorFormatter format:e.formattedMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] mutableCopy];
+        [s replaceOccurrencesOfString:@"→" withString:@"" options:0 range:NSMakeRange(0, 1)];
+        [s replaceOccurrencesOfString:@"←" withString:@"" options:0 range:NSMakeRange(0, 1)];
+        [s replaceOccurrencesOfString:@"⇐" withString:@"" options:0 range:NSMakeRange(0, 1)];
+        [s replaceOccurrencesOfString:@"•" withString:@"" options:0 range:NSMakeRange(0, s.length)];
+        [s replaceOccurrencesOfString:@"↔" withString:@"" options:0 range:NSMakeRange(0, 1)];
+        
+        if([e.type hasSuffix:@"nickchange"])
+            [s replaceOccurrencesOfString:@"→" withString:@"changed their nickname to" options:0 range:NSMakeRange(0, s.length)];
+        
+        cell.accessibilityLabel = [NSString stringWithFormat:@"Status message at %@", e.timestamp];
+        cell.accessibilityValue = s;
     }
     if((e.rowType == ROW_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
         if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
@@ -1373,14 +1387,17 @@ int __timestampWidth;
                 cell.accessory.text = FA_MINUS_SQUARE_O;
                 cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
                 cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status messages heading. at %@", e.timestamp];
+                cell.accessibilityHint = @"Collapses this group";
             } else {
                 cell.accessory.text = FA_ANGLE_RIGHT;
                 cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
                 cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status message. at %@", e.timestamp];
+                cell.accessibilityHint = @"Collapses this group";
             }
         } else {
             cell.accessory.text = FA_PLUS_SQUARE_O;
             cell.accessibilityLabel = [NSString stringWithFormat:@"Collapsed status messages. at %@", e.timestamp];
+            cell.accessibilityHint = @"Expands this group";
         }
         cell.accessory.hidden = NO;
         NSMutableString *s = [[[ColorFormatter format:e.formattedMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] mutableCopy];
