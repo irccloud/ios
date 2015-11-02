@@ -1350,6 +1350,9 @@ int __timestampWidth;
     cell.timestamp.font = [[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"]?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
     cell.message.font = [ColorFormatter timestampFont];
     cell.message.delegate = self;
+    if(!e.formatted && e.formattedMsg.length > 0) {
+        [self _format:e];
+    }
     cell.message.text = e.formatted;
     cell.accessory.font = [ColorFormatter awesomeFont];
     cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
@@ -1368,23 +1371,32 @@ int __timestampWidth;
             if(e.groupEid == e.eid + 1) {
                 cell.accessory.text = FA_MINUS_SQUARE_O;
                 cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
+                cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status messages heading. at %@", e.timestamp];
             } else {
                 cell.accessory.text = FA_ANGLE_RIGHT;
                 cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
+                cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status message. at %@", e.timestamp];
             }
         } else {
             cell.accessory.text = FA_PLUS_SQUARE_O;
+            cell.accessibilityLabel = [NSString stringWithFormat:@"Collapsed status messages. at %@", e.timestamp];
         }
         cell.accessory.hidden = NO;
+        NSMutableString *s = [[[ColorFormatter format:e.formattedMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] mutableCopy];
+        [s replaceOccurrencesOfString:@"→" withString:@"." options:0 range:NSMakeRange(0, s.length)];
+        [s replaceOccurrencesOfString:@"←" withString:@"." options:0 range:NSMakeRange(0, s.length)];
+        [s replaceOccurrencesOfString:@"⇐" withString:@"." options:0 range:NSMakeRange(0, s.length)];
+        [s replaceOccurrencesOfString:@"•" withString:@"." options:0 range:NSMakeRange(0, s.length)];
+        [s replaceOccurrencesOfString:@"↔" withString:@"." options:0 range:NSMakeRange(0, s.length)];
+        if([s rangeOfString:@"."].location != NSNotFound)
+            [s replaceCharactersInRange:[s rangeOfString:@"."] withString:@""];
+        cell.accessibilityValue = s;
     } else if(e.rowType == ROW_FAILED) {
         cell.accessory.hidden = NO;
         cell.accessory.text = FA_EXCLAMATION_TRIANGLE;
         cell.accessory.textColor = [UIColor networkErrorColor];
     } else {
         cell.accessory.hidden = YES;
-    }
-    if(!e.formatted && e.formattedMsg.length > 0) {
-        [self _format:e];
     }
     if(e.links.count) {
         if(e.pending || [e.color isEqual:[UIColor timestampColor]])
