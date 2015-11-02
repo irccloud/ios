@@ -1358,6 +1358,7 @@ int __timestampWidth;
     cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
     cell.accessibilityLabel = nil;
     cell.accessibilityValue = nil;
+    cell.accessibilityElementsHidden = NO;
 
     if(e.from.length && e.msg.length) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];
@@ -1442,6 +1443,7 @@ int __timestampWidth;
     }
     if(e.rowType == ROW_BACKLOG) {
         cell.timestamp.backgroundColor = [UIColor backlogDividerColor];
+        cell.accessibilityElementsHidden = YES;
     } else if(e.rowType == ROW_LASTSEENEID) {
         cell.timestamp.backgroundColor = [UIColor contentBackgroundColor];
     } else {
