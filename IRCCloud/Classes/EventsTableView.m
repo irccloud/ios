@@ -1353,6 +1353,8 @@ int __timestampWidth;
     cell.message.text = e.formatted;
     cell.accessory.font = [ColorFormatter awesomeFont];
     cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
+    cell.accessibilityLabel = nil;
+    cell.accessibilityValue = nil;
 
     if(e.from.length && e.msg.length) {
         cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];
