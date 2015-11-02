@@ -861,7 +861,7 @@ extern NSDictionary *emojiMap;
                         u.lastMention = e.eid;
                     }
                 }
-                if(!e.isSelf && !_buffer.scrolledUp) {
+                if(!e.isSelf && !_buffer.scrolledUp && !self.view.accessibilityElementsHidden) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         if(e.from.length)
                             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, [NSString stringWithFormat:@"New message from %@: %@", e.from, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]]);
