@@ -32,8 +32,10 @@ int __timestampWidth;
     UILabel *_accessory;
     UIView *_topBorder;
     UIView *_bottomBorder;
+    float _timestampPosition;
 }
 @property int type;
+@property float timestampPosition;
 @property (readonly) UILabel *timestamp;
 @property (readonly) TTTAttributedLabel *message;
 @property (readonly) UILabel *accessory;
@@ -119,12 +121,11 @@ int __timestampWidth;
             _socketClosedBar.hidden = YES;
             _accessory.frame = CGRectMake(frame.origin.x + 4 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         }
-        int lines = floorf(frame.size.height / FONT_SIZE);
-        float line_height = frame.size.height / lines;
-        _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y + 1, __timestampWidth, line_height);
+        [_timestamp sizeToFit];
+        _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y + _timestampPosition - _timestamp.frame.size.height + 4, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = NO;
-        _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height + 6);
         _message.hidden = NO;
+        _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
     } else {
         if(_type == ROW_BACKLOG) {
             frame.origin.y = frame.size.height / 2;
@@ -1300,6 +1301,19 @@ int __timestampWidth;
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
     CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
     e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+    
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPathAddRect(path, NULL, CGRectMake(0,0,suggestedSize.width,suggestedSize.height));
+    CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
+
+    NSArray *lines = (__bridge NSArray *)CTFrameGetLines(frame);
+    CGPoint origins[[lines count]];
+    CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), origins);
+
+    e.timestampPosition = suggestedSize.height - origins[0].y;
+    
+    CFRelease(frame);
+    CFRelease(path);
     CFRelease(framesetter);
 }
 
@@ -1351,6 +1365,7 @@ int __timestampWidth;
     if(!e.formatted && e.formattedMsg.length > 0) {
         [self _format:e];
     }
+    cell.timestampPosition = e.timestampPosition;
     cell.message.text = e.formatted;
     cell.accessory.font = [ColorFormatter awesomeFont];
     cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];

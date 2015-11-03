@@ -108,6 +108,7 @@
         decodeObject(_ignoreMask);
         decodeObject(_chan);
         decodeObject(_entities);
+        decodeFloat(_timestampPosition);
         if(_rowType == ROW_TIMESTAMP)
             _bgColor = [UIColor timestampBackgroundColor];
         else if(_rowType == ROW_LASTSEENEID)
@@ -164,6 +165,7 @@
     if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
         encodeObject(_bgColor);
     encodeObject(_entities);
+    encodeFloat(_timestampPosition);
 }
 @end
 

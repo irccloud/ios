@@ -68,6 +68,7 @@
     NSString *_chan;
     NSTimer *_expirationTimer;
     NSDictionary *_entities;
+    float _timestampPosition;
 }
 @property (nonatomic, assign) int cid, bid, rowType, reqId;
 @property (nonatomic, assign) NSTimeInterval eid, groupEid;
@@ -76,7 +77,7 @@
 @property (nonatomic, copy) NSDictionary *ops,*entities;
 @property (nonatomic, strong) UIColor *color, *bgColor;
 @property (nonatomic, copy) NSAttributedString *formatted;
-@property (nonatomic, assign) float height;
+@property (nonatomic, assign) float height, timestampPosition;
 @property (nonatomic, strong) NSArray *links;
 @property (nonatomic, strong) NSTimer *expirationTimer;
 -(NSComparisonResult)compare:(Event *)aEvent;
