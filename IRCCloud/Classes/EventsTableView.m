@@ -679,6 +679,9 @@ int __timestampWidth;
             }
         }
         
+        if(!event.formatted && event.formattedMsg.length > 0) {
+            [self _format:event];
+        }
         [self _addItem:event eid:eid];
         
         if(!backlog) {
@@ -1091,9 +1094,6 @@ int __timestampWidth;
             }
             for(Event *e in events) {
                 [self insertEvent:e backlog:true nextIsGrouped:false];
-                if(!e.formatted && e.formattedMsg.length > 0) {
-                    [self _format:e];
-                }
             }
         } else {
             self.tableView.tableHeaderView = nil;
@@ -1296,6 +1296,10 @@ int __timestampWidth;
         links = mutableLinks;
     }
     e.links = links;
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
+    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
+    e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+    CFRelease(framesetter);
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -1313,17 +1317,10 @@ int __timestampWidth;
             return e.height;
         } else if(!e.formatted && e.formattedMsg.length > 0) {
             [self _format:e];
+            return e.height;
         }
-        if(!e.formatted)
-            return 26;
-        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
-         e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
-         CFRelease(framesetter);
-        return e.height;
-    } else {
-        return 26;
     }
+    return 26;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
