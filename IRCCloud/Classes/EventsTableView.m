@@ -119,8 +119,9 @@ int __timestampWidth;
             _socketClosedBar.hidden = YES;
             _accessory.frame = CGRectMake(frame.origin.x + 4 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         }
-        [_timestamp sizeToFit];
-        _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y, __timestampWidth, _timestamp.frame.size.height);
+        int lines = floorf(frame.size.height / FONT_SIZE);
+        float line_height = frame.size.height / lines;
+        _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y + 1, __timestampWidth, line_height);
         _timestamp.hidden = NO;
         _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height + 6);
         _message.hidden = NO;
