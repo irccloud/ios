@@ -3277,10 +3277,10 @@ extern NSDictionary *emojiMap;
                 [self _deleteSelectedBuffer];
             }]];
         }
-        [alert addAction:[UIAlertAction actionWithTitle:@"Mark All As Read" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [alert addAction:[UIAlertAction actionWithTitle:@"Mark All as Read" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             [self _markAllAsRead];
         }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Add A Network" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [alert addAction:[UIAlertAction actionWithTitle:@"Add a Network" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             [self _addNetwork];
         }]];
         [alert addAction:[UIAlertAction actionWithTitle:@"Join a Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
