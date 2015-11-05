@@ -23,6 +23,7 @@ UIImage *__navbarBackgroundImage;
 UIImage *__textareaBackgroundImage;
 UIImage *__buffersDrawerBackgroundImage;
 UIImage *__usersDrawerBackgroundImage;
+UIImage *__socketClosedBackgroundImage;
 
 UIColor *__contentBackgroundColor;
 UIColor *__messageTextColor;
@@ -461,6 +462,7 @@ BOOL __color_theme_is_dark;
     __textareaBackgroundImage = nil;
     __buffersDrawerBackgroundImage = nil;
     __usersDrawerBackgroundImage = nil;
+    __socketClosedBackgroundImage = nil;
     __unreadBlueColor = [UIColor colorWithRed:0.118 green:0.447 blue:1 alpha:1];
 }
 
@@ -651,6 +653,31 @@ BOOL __color_theme_is_dark;
         CGColorSpaceRelease(colorSpace);
     }
     return [UIColor colorWithPatternImage:__newMsgsBackgroundImage];
+}
++(UIColor *)socketClosedBackgroundColor {
+    if(!__socketClosedBackgroundImage) {
+        float scaleFactor = [[UIScreen mainScreen] scale];
+        int width = [[UIScreen mainScreen] bounds].size.width;
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        CGContextRef context = CGBitmapContextCreate(NULL, width * scaleFactor, 26 * scaleFactor, 8, 4 * width * scaleFactor, colorSpace, (CGBitmapInfo)kCGImageAlphaNoneSkipFirst);
+        CGContextScaleCTM(context, scaleFactor, scaleFactor);
+        CGContextSetFillColorWithColor(context, [self contentBackgroundColor].CGColor);
+        CGContextFillRect(context, CGRectMake(0,0,width,26));
+        CGContextSetLineCap(context, kCGLineCapSquare);
+        CGContextSetStrokeColorWithColor(context, [UIColor timestampColor].CGColor);
+        CGContextSetLineWidth(context, 1.0);
+        CGContextMoveToPoint(context, 0.0, 12.0);
+        CGContextAddLineToPoint(context, width, 12.0);
+        CGContextMoveToPoint(context, 0.0, 14.0);
+        CGContextAddLineToPoint(context, width, 14.0);
+        CGContextStrokePath(context);
+        CGImageRef cgImage = CGBitmapContextCreateImage(context);
+        __socketClosedBackgroundImage = [UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp];
+        CFRelease(cgImage);
+        CGContextRelease(context);
+        CGColorSpaceRelease(colorSpace);
+    }
+    return [UIColor colorWithPatternImage:__socketClosedBackgroundImage];
 }
 +(UIColor *)collapsedRowTextColor {
     return __collapsedRowTextColor;

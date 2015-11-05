@@ -109,4 +109,5 @@
 +(UIColor *)archivedBufferHighlightColor;
 +(UIColor *)selectedArchivedBufferHighlightColor;
 +(UIColor *)selectedArchivedBufferBackgroundColor;
++(UIColor *)socketClosedBackgroundColor;
 @end

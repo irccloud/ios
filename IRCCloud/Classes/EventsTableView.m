@@ -113,7 +113,7 @@ int __timestampWidth;
             frame.size.height -= 26;
             _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, frame.size.width + 12, 26);
             _socketClosedBar.hidden = NO;
-            _socketClosedBar.backgroundColor = [UIColor newMsgsBackgroundColor];
+            _socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
             _accessory.frame = CGRectMake(frame.origin.x + 4 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         } else if(_type == ROW_FAILED) {
             frame.size.width -= 20;
