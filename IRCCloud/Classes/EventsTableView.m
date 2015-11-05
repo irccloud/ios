@@ -110,10 +110,11 @@ int __timestampWidth;
         frame.size.height -= 6;
         frame.size.width -= 12;
         if(_type == ROW_SOCKETCLOSED) {
-            frame.size.height -= 20;
+            frame.size.height -= 26;
             _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, frame.size.width + 12, 26);
             _socketClosedBar.hidden = NO;
             _socketClosedBar.backgroundColor = [UIColor newMsgsBackgroundColor];
+            _accessory.frame = CGRectMake(frame.origin.x + 4 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         } else if(_type == ROW_FAILED) {
             frame.size.width -= 20;
             _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
@@ -123,8 +124,7 @@ int __timestampWidth;
         }
         [_timestamp sizeToFit];
         _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y + _timestampPosition - _timestamp.frame.size.height + 4, __timestampWidth, _timestamp.frame.size.height);
-        _timestamp.hidden = NO;
-        _message.hidden = NO;
+        _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && frame.size.height < 0);
         _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
     } else {
         if(_type == ROW_BACKLOG) {
@@ -1270,6 +1270,7 @@ int __timestampWidth;
 
 - (void)_format:(Event *)e {
     NSArray *links;
+    [_lock lock];
     e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:[[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"] || e.monospace linkify:e.linkify server:_server links:&links];
     if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
         NSMutableArray *mutableLinks = links.mutableCopy;
@@ -1315,6 +1316,7 @@ int __timestampWidth;
     CFRelease(frame);
     CFRelease(path);
     CFRelease(framesetter);
+    [_lock unlock];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -1364,6 +1366,12 @@ int __timestampWidth;
     cell.message.delegate = self;
     if(!e.formatted && e.formattedMsg.length > 0) {
         [self _format:e];
+        if(e.formatted) {
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self.tableView reloadData];
+            }];
+            CLS_LOG(@"Event was formatted during cellForRowAtIndexPath, reloading table heights");
+        }
     }
     cell.timestampPosition = e.timestampPosition;
     cell.message.text = e.formatted;

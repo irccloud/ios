@@ -1181,6 +1181,9 @@ float ColorFormatterCachedFontSize = 0.0f;
 }
 
 +(void)loadFonts {
+    monoTimestampFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+    timestampFont = [UIFont systemFontOfSize:FONT_SIZE];
+    awesomeFont = [UIFont fontWithName:@"FontAwesome" size:FONT_SIZE];
     arrowFont = [UIFont fontWithName:@"HiraMinProN-W3" size:FONT_SIZE];
     Courier = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
     CourierBold = [UIFont fontWithName:@"Courier-Bold" size:FONT_SIZE];
