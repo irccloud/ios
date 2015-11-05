@@ -1698,6 +1698,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)parse:(NSDictionary *)dict {
+    if(![dict isKindOfClass:[NSDictionary class]])
+        return;
     @synchronized(_parserMap) {
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
         if(backlog)
