@@ -2912,6 +2912,7 @@ extern NSDictionary *emojiMap;
     }
     [sheet addButtonWithTitle:@"Ignore List"];
     [sheet addButtonWithTitle:@"Add Network"];
+    [sheet addButtonWithTitle:@"Join a Channel"];
     [sheet addButtonWithTitle:@"Display Options"];
     [sheet addButtonWithTitle:@"Settings"];
     [sheet addButtonWithTitle:@"Logout"];
@@ -3230,9 +3231,6 @@ extern NSDictionary *emojiMap;
                     [self _deleteSelectedBuffer];
                 }]];
             } else {
-                [alert addAction:[UIAlertAction actionWithTitle:@"Join A Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                    [self _joinAChannel];
-                }]];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Disconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                     [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil];
                 }]];
@@ -3285,6 +3283,9 @@ extern NSDictionary *emojiMap;
         [alert addAction:[UIAlertAction actionWithTitle:@"Add A Network" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             [self _addNetwork];
         }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Join a Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _joinAChannel];
+        }]];
         [alert addAction:[UIAlertAction actionWithTitle:@"Reorder" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             [self _reorder];
         }]];
@@ -3301,7 +3302,7 @@ extern NSDictionary *emojiMap;
                 [sheet addButtonWithTitle:@"Reconnect"];
                 [sheet addButtonWithTitle:@"Delete"];
             } else {
-                [sheet addButtonWithTitle:@"Join A Channel"];
+                [sheet addButtonWithTitle:@"Join a Channel"];
                 [sheet addButtonWithTitle:@"Disconnect"];
             }
             [sheet addButtonWithTitle:@"Edit Connection"];
@@ -4051,7 +4052,7 @@ extern NSDictionary *emojiMap;
             [self _reorder];
         } else if([action isEqualToString:@"Invite to Channel"]) {
             [self _inviteToChannel];
-        } else if([action isEqualToString:@"Join A Channel"]) {
+        } else if([action isEqualToString:@"Join a Channel"]) {
             [self _joinAChannel];
         }
         
