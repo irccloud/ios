@@ -94,7 +94,8 @@
 		<string>FontAwesome.otf</string>
 	</array>
 	<key>UIBackgroundModes</key>
-	<array>
+    <array>
+        <string>audio</string>
 		<string>fetch</string>
 		<string>remote-notification</string>
 	</array>
