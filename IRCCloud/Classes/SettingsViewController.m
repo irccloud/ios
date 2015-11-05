@@ -374,6 +374,7 @@
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
         OpenInChromeController *c = [[OpenInChromeController alloc] init];
         _chromeInstalled = [c isChromeInstalled];
+        _oldTheme = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
     }
     return self;
 }
@@ -477,6 +478,16 @@
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] forKey:@"imageService"];
         [d synchronize];
     }
+    [[NSUserDefaults standardUserDefaults] setObject:_oldTheme forKey:@"theme"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [UIColor setTheme:_oldTheme];
+    [[EventsDataSource sharedInstance] reformat];
+    UIView *v = self.navigationController.view.superview;
+    [self.navigationController.view removeFromSuperview];
+    [v addSubview: self.navigationController.view];
+    [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+    self.navigationController.view.backgroundColor = [UIColor navBarColor];
+    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

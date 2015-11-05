@@ -45,6 +45,7 @@
     BOOL _userinfosaved;
     BOOL _prefssaved;
     BOOL _chromeInstalled;
+    NSString *_oldTheme;
     UIAlertView *_alertView;
 }
 @end

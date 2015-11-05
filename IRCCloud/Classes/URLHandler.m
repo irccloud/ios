@@ -23,6 +23,7 @@
 #import "ImageViewController.h"
 #import "OpenInChromeController.h"
 #import "PastebinViewController.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation URLHandler
 {
@@ -80,7 +81,9 @@
     
     if([url.scheme hasPrefix:@"irccloud-paste-"]) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [mainViewController.slidingViewController presentViewController:[[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]] animated:YES completion:nil];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            [mainViewController.slidingViewController presentViewController:nc animated:YES completion:nil];
         }];
     } else if([url.scheme hasPrefix:@"irc"]) {
         [mainViewController launchURL:[NSURL URLWithString:[url.absoluteString stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
