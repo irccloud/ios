@@ -1335,6 +1335,25 @@ int __timestampWidth;
         } else if(!e.formatted && e.formattedMsg.length > 0) {
             [self _format:e];
             return e.height;
+        } else if(e.height == 0 && e.formatted) {
+            CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
+            CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
+            e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+            
+            CGMutablePathRef path = CGPathCreateMutable();
+            CGPathAddRect(path, NULL, CGRectMake(0,0,suggestedSize.width,suggestedSize.height));
+            CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
+            
+            NSArray *lines = (__bridge NSArray *)CTFrameGetLines(frame);
+            CGPoint origins[[lines count]];
+            CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), origins);
+            
+            e.timestampPosition = suggestedSize.height - origins[0].y;
+            
+            CFRelease(frame);
+            CFRelease(path);
+            CFRelease(framesetter);
+            return e.height;
         }
     }
     return 26;
