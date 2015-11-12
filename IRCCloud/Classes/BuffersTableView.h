@@ -32,12 +32,12 @@
     NSMutableDictionary *_expandedArchives;
     Buffer *_selectedBuffer;
     
-    IBOutlet UIControl *topUnreadIndicator;
-    IBOutlet UIView *topUnreadIndicatorColor;
-    IBOutlet UIView *topUnreadIndicatorBorder;
-    IBOutlet UIControl *bottomUnreadIndicator;
-    IBOutlet UIView *bottomUnreadIndicatorColor;
-    IBOutlet UIView *bottomUnreadIndicatorBorder;
+    UIControl *topUnreadIndicator;
+    UIView *topUnreadIndicatorColor;
+    UIView *topUnreadIndicatorBorder;
+    UIControl *bottomUnreadIndicator;
+    UIView *bottomUnreadIndicatorColor;
+    UIView *bottomUnreadIndicatorBorder;
 
     NSInteger _firstUnreadPosition;
 	NSInteger _lastUnreadPosition;

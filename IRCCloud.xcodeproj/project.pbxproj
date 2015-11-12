@@ -96,8 +96,6 @@
 		221F0BC5177368B40008EE04 /* CallerIDTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */; };
 		2223C6AA1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
 		2223C6AB1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
-		2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
-		2223C6AD1768D7150032544B /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
 		2223C6B01768F36F0032544B /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */; };
 		2223C6B11768F36F0032544B /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */; };
 		2223C6B61768F4500032544B /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
@@ -127,8 +125,6 @@
 		2236F60C16DBCBC6007BE535 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60916DBCBC6007BE535 /* MainViewController.m */; };
 		2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		2236F63D16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
-		2236F64216DC2EF6007BE535 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController.xib */; };
-		2236F64316DC2EF6007BE535 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController.xib */; };
 		2236F64616DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		2236F64716DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
@@ -226,9 +222,7 @@
 		225D978318AA995900065087 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
 		225D978418AA995900065087 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		225D978518AA995900065087 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
-		225D978B18AA995900065087 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2236F64116DC2EF5007BE535 /* MainViewController.xib */; };
 		225D978D18AA995900065087 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22D4F9101743F3790095EE8F /* Localizable.strings */; };
-		225D978F18AA995900065087 /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2223C6A91768D7150032544B /* ImageViewController.xib */; };
 		225D979018AA995900065087 /* ARChromeActivity.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017441783434800066E71 /* ARChromeActivity.png */; };
 		225D979118AA995900065087 /* ARChromeActivity@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017451783434800066E71 /* ARChromeActivity@2x.png */; };
 		225D979218AA995900065087 /* ARChromeActivity@2x~ipad.png in Resources */ = {isa = PBXBuildFile; fileRef = 225017461783434800066E71 /* ARChromeActivity@2x~ipad.png */; };
@@ -324,8 +318,6 @@
 		2293907B19D754D600A73946 /* ServerMapTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293907A19D754D600A73946 /* ServerMapTableViewController.m */; };
 		2293907C19D754D600A73946 /* ServerMapTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293907A19D754D600A73946 /* ServerMapTableViewController.m */; };
 		2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
-		22988AAB19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */; };
-		22988AAC19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */; };
 		229C85411B502920004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
 		229C85421B50292D004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
 		229C85431B502934004964DE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
@@ -381,8 +373,6 @@
 		22C2075D1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
 		22C2E0581B0E2E4800387B4B /* PastebinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2E0561B0E2E4800387B4B /* PastebinViewController.m */; };
 		22C2E0591B0E2E4800387B4B /* PastebinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2E0561B0E2E4800387B4B /* PastebinViewController.m */; };
-		22C2E05A1B0E2E4800387B4B /* PastebinViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */; };
-		22C2E05B1B0E2E4800387B4B /* PastebinViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */; };
 		22C8CD711B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
 		22C8CD721B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
 		22C8CD731B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
@@ -410,6 +400,10 @@
 		22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22C8DCF31A801A4500199371 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8DCF21A801A4500199371 /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22C8DCF41A801A6300199371 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8DCF21A801A4500199371 /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		22D268C21BF4F40800B682AE /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22D268C11BF4F40800B682AE /* MainStoryboard.storyboard */; };
+		22D268C31BF4F40800B682AE /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22D268C11BF4F40800B682AE /* MainStoryboard.storyboard */; };
+		22D268C61BF4F95200B682AE /* SplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D268C51BF4F95200B682AE /* SplashViewController.m */; };
+		22D268C71BF4F95200B682AE /* SplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D268C51BF4F95200B682AE /* SplashViewController.m */; };
 		22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A1171C663A003C0684 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
 		22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A31725AAEA003C0684 /* UIExpandingTextView.m */; };
@@ -601,7 +595,6 @@
 		221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CallerIDTableViewController.m; sourceTree = "<group>"; };
 		2223C6A71768D7150032544B /* ImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageViewController.h; sourceTree = "<group>"; };
 		2223C6A81768D7150032544B /* ImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageViewController.m; sourceTree = "<group>"; };
-		2223C6A91768D7150032544B /* ImageViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ImageViewController.xib; path = Classes/ImageViewController.xib; sourceTree = "<group>"; };
 		2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+animatedGIF.m"; sourceTree = "<group>"; };
 		2223C6AF1768F36F0032544B /* UIImage+animatedGIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+animatedGIF.h"; sourceTree = "<group>"; };
 		2223C6B51768F4500032544B /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
@@ -627,7 +620,6 @@
 		2236F60916DBCBC6007BE535 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
 		2236F63A16DBF3CA007BE535 /* UIColor+IRCCloud.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+IRCCloud.h"; sourceTree = "<group>"; };
 		2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+IRCCloud.m"; sourceTree = "<group>"; };
-		2236F64116DC2EF5007BE535 /* MainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainViewController.xib; path = Classes/MainViewController.xib; sourceTree = "<group>"; };
 		2236F64416DD138A007BE535 /* UsersDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersDataSource.h; sourceTree = "<group>"; };
 		2236F64516DD138B007BE535 /* UsersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersDataSource.m; sourceTree = "<group>"; };
 		2236F64816DD30E0007BE535 /* UsersTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersTableView.h; sourceTree = "<group>"; };
@@ -733,7 +725,6 @@
 		2293AF0017F9CCD10022BD06 /* NSURL+IDN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+IDN.h"; path = "NSURL+IDN/NSURL+IDN.h"; sourceTree = SOURCE_ROOT; };
 		2296E0B619805751002D59E3 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareExtension.entitlements; sourceTree = "<group>"; };
 		2296E0B719805767002D59E3 /* IRCCloud.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = IRCCloud.entitlements; sourceTree = "<group>"; };
-		22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = LoginSplashViewController.xib; path = Classes/LoginSplashViewController.xib; sourceTree = "<group>"; };
 		229C85401B502920004964DE /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		22A19C5E178FCCAB00772C60 /* UINavigationController+iPadSux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+iPadSux.h"; sourceTree = "<group>"; };
 		22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+iPadSux.m"; sourceTree = "<group>"; };
@@ -787,7 +778,6 @@
 		22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMetadataViewController.m; sourceTree = "<group>"; };
 		22C2E0551B0E2E4800387B4B /* PastebinViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastebinViewController.h; sourceTree = "<group>"; };
 		22C2E0561B0E2E4800387B4B /* PastebinViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastebinViewController.m; sourceTree = "<group>"; };
-		22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PastebinViewController.xib; path = Classes/PastebinViewController.xib; sourceTree = "<group>"; };
 		22C8CD701B01289900F637D2 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
 		22C8CDEB1B01372100F637D2 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
 		22C8CDEC1B01372100F637D2 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
@@ -801,6 +791,9 @@
 		22C8CDF41B01372100F637D2 /* SSZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSZipArchive.h; sourceTree = "<group>"; };
 		22C8CDF51B01372100F637D2 /* SSZipArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
 		22C8DCF21A801A4500199371 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		22D268C11BF4F40800B682AE /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
+		22D268C41BF4F95200B682AE /* SplashViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SplashViewController.h; sourceTree = "<group>"; };
+		22D268C51BF4F95200B682AE /* SplashViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SplashViewController.m; sourceTree = "<group>"; };
 		22D4309E171C663A003C0684 /* IgnoresTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IgnoresTableViewController.h; sourceTree = "<group>"; };
 		22D4309F171C663A003C0684 /* IgnoresTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IgnoresTableViewController.m; sourceTree = "<group>"; };
 		22D430A21725AAE9003C0684 /* UIExpandingTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIExpandingTextView.h; sourceTree = "<group>"; };
@@ -1074,10 +1067,7 @@
 				22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */,
 				22DB253D1982E2890008728E /* IRCEnterprise.entitlements */,
 				2296E0B719805767002D59E3 /* IRCCloud.entitlements */,
-				2223C6A91768D7150032544B /* ImageViewController.xib */,
-				22988AAA19B12B6B006F4635 /* LoginSplashViewController.xib */,
-				2236F64116DC2EF5007BE535 /* MainViewController.xib */,
-				22C2E0571B0E2E4800387B4B /* PastebinViewController.xib */,
+				22D268C11BF4F40800B682AE /* MainStoryboard.storyboard */,
 				228A05AD16D3DB7B0029769C /* Classes */,
 				228A05B416D3DB930029769C /* Resources */,
 				228A057616D3DABA0029769C /* Supporting Files */,
@@ -1219,6 +1209,8 @@
 				2236F5F916DA765C007BE535 /* ServersDataSource.m */,
 				227FF8211772062E00394114 /* SettingsViewController.h */,
 				227FF8221772063F00394114 /* SettingsViewController.m */,
+				22D268C41BF4F95200B682AE /* SplashViewController.h */,
+				22D268C51BF4F95200B682AE /* SplashViewController.m */,
 				2236F63A16DBF3CA007BE535 /* UIColor+IRCCloud.h */,
 				2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */,
 				22A19C5E178FCCAB00772C60 /* UINavigationController+iPadSux.h */,
@@ -1623,16 +1615,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				22EEA94E18D0AC08007D5022 /* EnterpriseImages.xcassets in Resources */,
-				225D978B18AA995900065087 /* MainViewController.xib in Resources */,
-				22988AAC19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */,
 				1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */,
 				225D978D18AA995900065087 /* Localizable.strings in Resources */,
-				225D978F18AA995900065087 /* ImageViewController.xib in Resources */,
 				225D979018AA995900065087 /* ARChromeActivity.png in Resources */,
 				225D979118AA995900065087 /* ARChromeActivity@2x.png in Resources */,
 				225D979218AA995900065087 /* ARChromeActivity@2x~ipad.png in Resources */,
 				22A363B319D0884D00500478 /* 1Password.xcassets in Resources */,
 				225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */,
+				22D268C31BF4F40800B682AE /* MainStoryboard.storyboard in Resources */,
 				225D979418AA995900065087 /* Safari.png in Resources */,
 				2236BD6B1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
 				225D979518AA995900065087 /* Safari@2x.png in Resources */,
@@ -1645,7 +1635,6 @@
 				225D979A18AA995900065087 /* a.caf in Resources */,
 				225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */,
 				22C0F1551B8F6829001D109D /* Assets in Resources */,
-				22C2E05B1B0E2E4800387B4B /* PastebinViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1655,12 +1644,9 @@
 			files = (
 				228A057A16D3DABA0029769C /* InfoPlist.strings in Resources */,
 				22C0F1541B8F6829001D109D /* Assets in Resources */,
-				22988AAB19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */,
-				22C2E05A1B0E2E4800387B4B /* PastebinViewController.xib in Resources */,
-				2236F64216DC2EF6007BE535 /* MainViewController.xib in Resources */,
 				2236BD6C1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
-				2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */,
+				22D268C21BF4F40800B682AE /* MainStoryboard.storyboard in Resources */,
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
 				2236BD6A1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
@@ -1686,9 +1672,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				228A05A116D3DABB0029769C /* InfoPlist.strings in Resources */,
-				2236F64316DC2EF6007BE535 /* MainViewController.xib in Resources */,
 				22D4F9131743F3790095EE8F /* Localizable.strings in Resources */,
-				2223C6AD1768D7150032544B /* ImageViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1865,6 +1849,7 @@
 				225D976118AA995900065087 /* Ignore.m in Sources */,
 				22C0F1521B8F61D9001D109D /* YTPlayerView.m in Sources */,
 				225D976218AA995900065087 /* ChannelModeListTableViewController.m in Sources */,
+				22D268C71BF4F95200B682AE /* SplashViewController.m in Sources */,
 				228E2B9E18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */,
 				225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */,
 				228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */,
@@ -1958,6 +1943,7 @@
 				2230F8E817162ACD007F7C98 /* Ignore.m in Sources */,
 				22C0F1511B8F61D9001D109D /* YTPlayerView.m in Sources */,
 				22AD75ED1718567D00141257 /* ChannelModeListTableViewController.m in Sources */,
+				22D268C61BF4F95200B682AE /* SplashViewController.m in Sources */,
 				228E2B9C18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */,
 				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
 				228E2BA218CF770D0011DEAB /* SBJsonWriter.m in Sources */,

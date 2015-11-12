@@ -80,8 +80,10 @@
     }
     
     if([url.scheme hasPrefix:@"irccloud-paste-"]) {
+        PastebinViewController *pvc = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"PastebinViewController"];
+        [pvc setUrl:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]];
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pvc];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             [mainViewController.slidingViewController presentViewController:nc animated:YES completion:nil];
         }];
@@ -117,13 +119,15 @@
 - (void)showImage:(NSURL *)url
 {
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    ImageViewController *ivc = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"ImageViewController"];
+    ivc.url = url;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         appDelegate.window.backgroundColor = [UIColor blackColor];
-        appDelegate.window.rootViewController = [[ImageViewController alloc] initWithURL:url];
-        [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
-        appDelegate.window.rootViewController.view.alpha = 0;
+        appDelegate.window.rootViewController = ivc;
+        [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:ivc.view];
+        ivc.view.alpha = 0;
         [UIView animateWithDuration:0.5f animations:^{
-            appDelegate.window.rootViewController.view.alpha = 1;
+            ivc.view.alpha = 1;
         } completion:^(BOOL finished){
             [UIApplication sharedApplication].statusBarHidden = YES;
         }];

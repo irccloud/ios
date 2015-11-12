@@ -31,7 +31,7 @@
     float _progressScale;
     NSURLConnection *_connection;
 }
--(id)initWithURL:(NSURL *)url;
+@property NSURL *url;
 -(IBAction)viewTapped:(id)sender;
 -(IBAction)doneButtonPressed:(id)sender;
 -(IBAction)shareButtonPressed:(id)sender;

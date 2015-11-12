@@ -291,13 +291,15 @@
     [self.tableView endEditing:YES];
     
     if(_imageView && _url && indexPath.section == 0) {
+        ImageViewController *ivc = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"ImageViewController"];
+        ivc.url = [NSURL URLWithString:_url];
         AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         appDelegate.window.backgroundColor = [UIColor blackColor];
-        appDelegate.window.rootViewController = [[ImageViewController alloc] initWithURL:[NSURL URLWithString:_url]];
-        [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
-        appDelegate.window.rootViewController.view.alpha = 0;
+        appDelegate.window.rootViewController = ivc;
+        [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:ivc.view];
+        ivc.view.alpha = 0;
         [UIView animateWithDuration:0.5f animations:^{
-            appDelegate.window.rootViewController.view.alpha = 1;
+            ivc.view.alpha = 1;
         } completion:^(BOOL finished){
             [UIApplication sharedApplication].statusBarHidden = YES;
         }];

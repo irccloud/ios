@@ -28,5 +28,5 @@
     BOOL _ownPaste;
     OpenInChromeController *_chrome;
 }
--(id)initWithURL:(NSURL *)url;
+-(void)setUrl:(NSURL *)url;
 @end
