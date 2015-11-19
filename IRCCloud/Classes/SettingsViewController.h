@@ -37,6 +37,9 @@
     UISwitch *_mono;
     UISwitch *_hideJoinPart;
     UISwitch *_expandJoinPart;
+    UISwitch *_notifyAll;
+    UISwitch *_showUnread;
+    UISwitch *_markAsRead;
     NSString *_version;
     UISlider *_fontSize;
     int _userinforeqid;

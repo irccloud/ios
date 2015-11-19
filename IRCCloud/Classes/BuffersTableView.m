@@ -267,6 +267,17 @@
                         if(type == TYPE_CONVERSATION && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
                             highlights = 0;
                     }
+                    if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+                        if(type == TYPE_CHANNEL) {
+                            if(![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                                unread = 0;
+                        } else {
+                            if(![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                                unread = 0;
+                            if(type == TYPE_CONVERSATION && ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                                highlights = 0;
+                        }
+                    }
                     [data addObject:@{
                      @"type":@(type),
                      @"cid":@(buffer.cid),
@@ -553,6 +564,17 @@
                         unread = 0;
                     if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
                         highlights = 0;
+                }
+                if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+                    if([b.type isEqualToString:@"channel"]) {
+                        if(![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                            unread = 0;
+                    } else {
+                        if(![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                            unread = 0;
+                        if([b.type isEqualToString:@"conversation"] && ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                            highlights = 0;
+                    }
                 }
                 if([b.type isEqualToString:@"channel"]) {
                     Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:b.bid];

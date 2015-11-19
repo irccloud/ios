@@ -359,6 +359,17 @@ extern NSDictionary *emojiMap;
                     if(type == 2 && [[prefs objectForKey:@"buffer-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
                         highlights = 0;
                 }
+                if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+                    if(type == 1) {
+                        if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            unread = 0;
+                    } else {
+                        if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            unread = 0;
+                        if(type == 2 && (![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1))
+                            highlights = 0;
+                    }
+                }
                 if(buffer.bid != _buffer.bid) {
                     unreadCount += unread;
                     highlightCount += highlights;
@@ -893,6 +904,15 @@ extern NSDictionary *emojiMap;
                         } else {
                             if([[prefs objectForKey:@"buffer-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
                                 break;
+                        }
+                        if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+                            if([b.type isEqualToString:@"channel"]) {
+                                if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                    break;
+                            } else {
+                                if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                    break;
+                            }
                         }
                         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
                         _menuBtn.tintColor = [UIColor unreadBlueColor];
@@ -2121,21 +2141,27 @@ extern NSDictionary *emojiMap;
     Buffer *lastBuffer = _buffer;
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if(lastBuffer && changed) {
-        if([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:[lastBuffer.type isEqualToString:@"channel"]?@"channel-enableReadOnSelect":@"buffer-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",lastBuffer.bid]] boolValue]) {
-            NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:lastBuffer.bid];
-            NSTimeInterval eid = 0;
-            Event *last;
-            for(NSInteger i = events.count - 1; i >= 0; i--) {
-                last = [events objectAtIndex:i];
-                if(!last.pending && last.rowType != ROW_LASTSEENEID)
-                    break;
-            }
-            if(!last.pending) {
-                eid = last.eid;
-            }
-            if(eid >= 0 && eid >= lastBuffer.last_seen_eid) {
-                [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:lastBuffer.cid bid:lastBuffer.bid lastSeenEid:eid];
-                lastBuffer.last_seen_eid = eid;
+        if([NetworkConnection sharedInstance].prefs) {
+            BOOL enabled = [[[[NetworkConnection sharedInstance].prefs objectForKey:[lastBuffer.type isEqualToString:@"channel"]?@"channel-enableReadOnSelect":@"buffer-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",lastBuffer.bid]] boolValue] || [[[NetworkConnection sharedInstance].prefs objectForKey:@"enableReadOnSelect"] intValue] == 1;
+            if([[[[NetworkConnection sharedInstance].prefs objectForKey:[lastBuffer.type isEqualToString:@"channel"]?@"channel-disableReadOnSelect":@"buffer-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",lastBuffer.bid]] boolValue])
+                enabled = NO;
+            
+            if(enabled) {
+                NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:lastBuffer.bid];
+                NSTimeInterval eid = 0;
+                Event *last;
+                for(NSInteger i = events.count - 1; i >= 0; i--) {
+                    last = [events objectAtIndex:i];
+                    if(!last.pending && last.rowType != ROW_LASTSEENEID)
+                        break;
+                }
+                if(!last.pending) {
+                    eid = last.eid;
+                }
+                if(eid >= 0 && eid >= lastBuffer.last_seen_eid) {
+                    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:lastBuffer.cid bid:lastBuffer.bid lastSeenEid:eid];
+                    lastBuffer.last_seen_eid = eid;
+                }
             }
         }
         _buffer.lastBuffer = lastBuffer;
