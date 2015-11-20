@@ -244,10 +244,13 @@
         
         void (^notice)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
             event.bgColor = [UIColor noticeBackgroundColor];
-            event.chan = [object objectForKey:@"target"];
+            if(object) {
+                event.chan = [object objectForKey:@"target"];
+                event.nick = [object objectForKey:@"target"];
+                if([[object objectForKey:@"op_only"] intValue] == 1)
+                    event.msg = [NSString stringWithFormat:@"%c(Ops)%c %@", BOLD, BOLD, event.msg];
+            }
             event.monospace = YES;
-            if([[object objectForKey:@"op_only"] intValue] == 1)
-                event.msg = [NSString stringWithFormat:@"%c(Ops)%c %@", BOLD, BOLD, event.msg];
             event.isHighlight = NO;
         };
         

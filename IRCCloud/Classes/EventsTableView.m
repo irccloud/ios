@@ -651,7 +651,9 @@ int __timestampWidth;
                 else
                     event.formattedMsg = @"";
                 if([_buffer.type isEqualToString:@"console"] && event.toChan && event.chan.length) {
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%@%c: %@", event.chan, 1, event.msg];
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c: %@", BOLD, event.chan, BOLD, event.msg];
+                } else if([_buffer.type isEqualToString:@"console"] && event.isSelf && event.nick.length) {
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c: %@", BOLD, event.nick, BOLD, event.msg];
                 } else {
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
                 }
