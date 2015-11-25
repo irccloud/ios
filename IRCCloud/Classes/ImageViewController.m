@@ -199,7 +199,14 @@
                 
                 [_connection start];
             } else if([[dict objectForKey:@"provider_name"] isEqualToString:@"Giphy"] && [[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location != NSNotFound) {
-                [self loadGiphy:[[dict objectForKey:@"url"] substringFromIndex:[[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location + 6]];
+                if([dict objectForKey:@"image"] && [[dict objectForKey:@"image"] hasSuffix:@".gif"]) {
+                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"image"]]];
+                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    
+                    [_connection start];
+                } else {
+                    [self loadGiphy:[[dict objectForKey:@"url"] substringFromIndex:[[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location + 6]];
+                }
             } else {
                 NSLog(@"Invalid type from oembed");
                 [self fail];
@@ -265,7 +272,7 @@
         } else {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
             NSDictionary *dict = [parser objectWithData:data];
-            if([[dict objectForKey:@"data"] objectForKey:@"images"]) {
+            if([[[dict objectForKey:@"meta"] objectForKey:@"status"] intValue] == 200 && [[dict objectForKey:@"data"] objectForKey:@"images"]) {
                 dict = [[[dict objectForKey:@"data"] objectForKey:@"images"] objectForKey:@"original"];
                 if([[dict objectForKey:@"mp4"] length]) {
                     [self loadVideo:[dict objectForKey:@"mp4"]];
