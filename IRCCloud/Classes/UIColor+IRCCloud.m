@@ -108,6 +108,8 @@ UIColor *__selectedArchivedBufferBackgroundColor;
 
 BOOL __color_theme_is_dark;
 
+NSString *__current_theme;
+
 @implementation UITextField (IRCCloudAppearanceHax)
 -(void)setPlaceholder:(NSString *)placeholder {
     [self setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:placeholder?placeholder:@"" attributes:@{NSForegroundColorAttributeName:__placeholderColor}]];
@@ -464,6 +466,12 @@ BOOL __color_theme_is_dark;
     __usersDrawerBackgroundImage = nil;
     __socketClosedBackgroundImage = nil;
     __unreadBlueColor = [UIColor colorWithRed:0.118 green:0.447 blue:1 alpha:1];
+    
+    __current_theme = theme;
+}
+
++(NSString *)currentTheme {
+    return __current_theme;
 }
 
 +(UIColor *)contentBackgroundColor {

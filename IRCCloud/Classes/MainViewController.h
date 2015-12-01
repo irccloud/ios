@@ -85,6 +85,7 @@
     NSURL *_ytURL;
     UIActivityIndicatorView *_ytActivity;
     BOOL __ignoreLayoutChanges;
+    NSString *__currentTheme;
 }
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;
