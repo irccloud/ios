@@ -455,12 +455,16 @@ extern NSDictionary *emojiMap;
                         [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:_alertObject.cid];
                 }]];
                 
-                [self presentViewController:alert animated:YES completion:nil];
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1)
+                    [self presentViewController:alert animated:YES completion:nil];
                 
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                     textField.delegate = self;
                     [textField becomeFirstResponder];
                 }];
+                
+                if(!([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1))
+                    [self presentViewController:alert animated:YES completion:nil];
             } else {
                 _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
                 _alertView.tag = TAG_BADCHANNELKEY;
@@ -486,12 +490,16 @@ extern NSDictionary *emojiMap;
                         [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:_alertObject.cid];
                 }]];
                 
-                [self presentViewController:alert animated:YES completion:nil];
-
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1)
+                    [self presentViewController:alert animated:YES completion:nil];
+                
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                     textField.delegate = self;
                     [textField becomeFirstResponder];
                 }];
+                
+                if(!([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1))
+                    [self presentViewController:alert animated:YES completion:nil];
             } else {
                 _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Change", nil];
                 _alertView.tag = TAG_INVALIDNICK;
