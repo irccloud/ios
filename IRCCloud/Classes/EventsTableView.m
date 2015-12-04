@@ -25,7 +25,6 @@
 #import "ImageViewController.h"
 #import "PastebinViewController.h"
 
-/*
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
 @interface UIPreviewForceInteractionProgress : NSObject
@@ -63,11 +62,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         });
     });
 }
-
-id<UIViewControllerPreviewing> __previewer;
-
 #endif
-*/
 
 int __timestampWidth;
 
@@ -256,36 +251,33 @@ int __timestampWidth;
     self.tableView.backgroundColor = [UIColor contentBackgroundColor];
 
 #if !(TARGET_IPHONE_SIMULATOR)
-    //if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
+    if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
 #endif
-        /*__previewer = */[self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+        __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
 #if !(TARGET_IPHONE_SIMULATOR)
-    //}
+    }
 #endif
-/*
+
 #if TARGET_IPHONE_SIMULATOR
     UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
     t.delegate = self;
     [self.view addGestureRecognizer:t];
 #endif
- */
 }
 
-/*
 #if TARGET_IPHONE_SIMULATOR
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.slidingViewController.view]] != nil);
+    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.tableView]] != nil);
 }
 
 - (void)_test3DTouch:(UITapGestureRecognizer *)r {
-    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.slidingViewController.view]);
+    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.tableView]);
 }
 #endif
-*/
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]];
-    NSTextCheckingResult *r = [cell.message linkAtPoint:[self.slidingViewController.view convertPoint:location toView:cell.message]];
+    NSTextCheckingResult *r = [cell.message linkAtPoint:[self.tableView convertPoint:location toView:cell.message]];
     
     if([URLHandler isImageURL:r.URL]) {
         previewingContext.sourceRect = cell.frame;

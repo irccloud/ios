@@ -71,6 +71,7 @@
     CSURITemplate *_paste_url_template;
     
     NSString *_groupIndent;
+    id<UIViewControllerPreviewing> __previewer;
 }
 @property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;

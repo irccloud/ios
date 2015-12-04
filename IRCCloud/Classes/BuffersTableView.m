@@ -68,8 +68,6 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     });
 }
 
-id<UIViewControllerPreviewing> __previewer;
-
 #endif
 */
 
@@ -584,11 +582,11 @@ id<UIViewControllerPreviewing> __previewer;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
 
 #if !(TARGET_IPHONE_SIMULATOR)
-    //if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
+    if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
 #endif
-        /*__previewer =*/ [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+        __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
 #if !(TARGET_IPHONE_SIMULATOR)
-    //}
+    }
 #endif
 
 /*
@@ -603,11 +601,11 @@ id<UIViewControllerPreviewing> __previewer;
 /*
 #if TARGET_IPHONE_SIMULATOR
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.slidingViewController.view]] != nil);
+    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.tableView]] != nil);
 }
 
 - (void)_test3DTouch:(UITapGestureRecognizer *)r {
-    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.slidingViewController.view]);
+    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.tableView]);
 }
 #endif
 */

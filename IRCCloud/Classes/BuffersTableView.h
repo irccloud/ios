@@ -53,6 +53,7 @@
     UIFont *_boldFont;
     UIFont *_normalFont;
     UIFont *_awesomeFont;
+    id<UIViewControllerPreviewing> __previewer;
 }
 @property UIViewController<BuffersTableViewDelegate> *delegate;
 -(void)setBuffer:(Buffer *)buffer;
