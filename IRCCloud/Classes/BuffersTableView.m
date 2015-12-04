@@ -26,6 +26,52 @@
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "ColorFormatter.h"
 #import "FontAwesome.h"
+#import "EventsTableView.h"
+#import "MainViewController.h"
+
+/*
+#if TARGET_IPHONE_SIMULATOR
+//Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
+@interface UIPreviewForceInteractionProgress : NSObject
+
+- (void)endInteraction:(BOOL)arg1;
+
+@end
+
+@interface UIPreviewInteractionController : NSObject
+
+@property (nonatomic, readonly) UIPreviewForceInteractionProgress *interactionProgressForPresentation;
+
+- (BOOL)startInteractivePreviewAtLocation:(CGPoint)point inView:(UIView *)view;
+- (void)cancelInteractivePreview;
+- (void)commitInteractivePreview;
+
+@end
+
+@interface _UIViewControllerPreviewSourceViewRecord : NSObject <UIViewControllerPreviewing>
+
+@property (nonatomic, readonly) UIPreviewInteractionController *previewInteractionController;
+
+@end
+
+void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation) {
+    _UIViewControllerPreviewSourceViewRecord *record = (_UIViewControllerPreviewSourceViewRecord *)previewer;
+    UIPreviewInteractionController *interactionController = record.previewInteractionController;
+    [interactionController startInteractivePreviewAtLocation:sourceLocation inView:record.sourceView];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [interactionController.interactionProgressForPresentation endInteraction:YES];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [interactionController commitInteractivePreview];
+            //[interactionController cancelInteractivePreview];
+        });
+    });
+}
+
+id<UIViewControllerPreviewing> __previewer;
+
+#endif
+*/
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
@@ -459,6 +505,13 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+#if !(TARGET_IPHONE_SIMULATOR)
+    if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
+#endif
+        /*__previewer =*/ [self registerForPreviewingWithDelegate:self sourceView:self.slidingViewController.view];
+#if !(TARGET_IPHONE_SIMULATOR)
+    }
+#endif
     self.tableView.scrollsToTop = NO;
 
     UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
@@ -536,6 +589,47 @@
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
+
+/*
+#if TARGET_IPHONE_SIMULATOR
+    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
+    t.delegate = self;
+    [self.view addGestureRecognizer:t];
+#endif
+*/
+}
+
+/*
+#if TARGET_IPHONE_SIMULATOR
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.slidingViewController.view]] != nil);
+}
+
+- (void)_test3DTouch:(UITapGestureRecognizer *)r {
+    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.slidingViewController.view]);
+}
+#endif
+*/
+
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+#ifndef EXTENSION
+    NSDictionary *d = [_data objectAtIndex:[self.tableView indexPathForRowAtPoint:[self.slidingViewController.view convertPoint:location toView:self.tableView]].row];
+
+    if(d) {
+        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectForKey:@"bid"] intValue]];
+        EventsTableView *e = [[EventsTableView alloc] init];
+        e.navigationItem.title = [d objectForKey:@"name"];
+        [e setBuffer:b];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:e];
+        nc.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
+        return nc;
+    }
+#endif
+    return nil;
+}
+
+- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    [_delegate bufferSelected:((EventsTableView *)((UINavigationController *)viewControllerToCommit).topViewController).buffer.bid];
 }
 
 - (void)backlogCompleted:(NSNotification *)notification {

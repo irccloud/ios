@@ -79,8 +79,8 @@
 @property (readonly) UILabel *bottomUnreadLabel;
 @property (readonly) UILabel *bottomUnreadArrow;
 @property (nonatomic) NSTimeInterval eidToOpen;
+@property Buffer *buffer;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
--(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadBarClicked:(id)sender;
 -(IBAction)bottomUnreadBarClicked:(id)sender;
 -(IBAction)dismissButtonPressed:(id)sender;

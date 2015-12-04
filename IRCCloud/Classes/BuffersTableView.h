@@ -25,7 +25,7 @@
 -(void)dismissKeyboard;
 @end
 
-@interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate> {
+@interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate> {
     NSMutableArray *_data;
     NSInteger _selectedRow;
     IBOutlet UIViewController<BuffersTableViewDelegate> *_delegate;

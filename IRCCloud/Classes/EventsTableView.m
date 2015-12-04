@@ -25,6 +25,7 @@
 #import "ImageViewController.h"
 #import "PastebinViewController.h"
 
+/*
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
 @interface UIPreviewForceInteractionProgress : NSObject
@@ -66,6 +67,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 id<UIViewControllerPreviewing> __previewer;
 
 #endif
+*/
 
 int __timestampWidth;
 
@@ -195,6 +197,24 @@ int __timestampWidth;
 
 @implementation EventsTableView
 
+- (id)init {
+    self = [super initWithStyle:UITableViewStylePlain];
+    if (self) {
+        _lock = [[NSRecursiveLock alloc] init];
+        _ready = NO;
+        _formatter = [[NSDateFormatter alloc] init];
+        _formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+        _data = [[NSMutableArray alloc] init];
+        _expandedSectionEids = [[NSMutableDictionary alloc] init];
+        _collapsedEvents = [[CollapsedEvents alloc] init];
+        _unseenHighlightPositions = [[NSMutableArray alloc] init];
+        _buffer = nil;
+        _ignore = [[Ignore alloc] init];
+        _eidToOpen = -1;
+    }
+    return self;
+}
+
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
@@ -220,7 +240,7 @@ int __timestampWidth;
 #if !(TARGET_IPHONE_SIMULATOR)
     if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
 #endif
-        __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.slidingViewController.view];
+        /*__previewer = */[self registerForPreviewingWithDelegate:self sourceView:self.slidingViewController.view];
 #if !(TARGET_IPHONE_SIMULATOR)
     }
 #endif
@@ -242,14 +262,17 @@ int __timestampWidth;
     
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor = [UIColor contentBackgroundColor];
-    
+
+/*
 #if TARGET_IPHONE_SIMULATOR
     UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
     t.delegate = self;
     [self.view addGestureRecognizer:t];
 #endif
+ */
 }
 
+/*
 #if TARGET_IPHONE_SIMULATOR
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.slidingViewController.view]] != nil);
@@ -259,6 +282,7 @@ int __timestampWidth;
     WFSimulate3DTouchPreview(__previewer, [r locationInView:self.slidingViewController.view]);
 }
 #endif
+*/
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:[self.slidingViewController.view convertPoint:location toView:self.tableView]]];
@@ -1042,6 +1066,10 @@ int __timestampWidth;
         
         [_lock unlock];
     }
+}
+
+-(Buffer *)buffer {
+    return _buffer;
 }
 
 -(void)setBuffer:(Buffer *)buffer {

@@ -90,6 +90,7 @@
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;
 @property (nonatomic) NSString *incomingDraft;
+@property (readonly) EventsTableView *eventsView;
 -(void)bufferSelected:(int)bid;
 -(void)sendButtonPressed:(id)sender;
 -(void)usersButtonPressed:(id)sender;
