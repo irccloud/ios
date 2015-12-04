@@ -237,19 +237,11 @@ int __timestampWidth;
     _conn = [NetworkConnection sharedInstance];
     [super viewDidLoad];
     
-#if !(TARGET_IPHONE_SIMULATOR)
-    if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
-#endif
-        /*__previewer = */[self registerForPreviewingWithDelegate:self sourceView:self.slidingViewController.view];
-#if !(TARGET_IPHONE_SIMULATOR)
-    }
-#endif
-    
     self.tableView.scrollsToTop = NO;
-    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    /*UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
-    [self.tableView addGestureRecognizer:lp];
+    [self.tableView addGestureRecognizer:lp];*/
     _topUnreadView.backgroundColor = [UIColor unreadBlueColor];
     _bottomUnreadView.backgroundColor = [UIColor unreadBlueColor];
     [_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
@@ -263,6 +255,13 @@ int __timestampWidth;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor = [UIColor contentBackgroundColor];
 
+#if !(TARGET_IPHONE_SIMULATOR)
+    if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
+#endif
+        /*__previewer = */[self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+#if !(TARGET_IPHONE_SIMULATOR)
+    }
+#endif
 /*
 #if TARGET_IPHONE_SIMULATOR
     UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];

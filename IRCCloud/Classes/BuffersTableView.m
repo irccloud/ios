@@ -505,13 +505,6 @@ id<UIViewControllerPreviewing> __previewer;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-#if !(TARGET_IPHONE_SIMULATOR)
-    if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
-#endif
-        /*__previewer =*/ [self registerForPreviewingWithDelegate:self sourceView:self.slidingViewController.view];
-#if !(TARGET_IPHONE_SIMULATOR)
-    }
-#endif
     self.tableView.scrollsToTop = NO;
 
     UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
@@ -521,10 +514,10 @@ id<UIViewControllerPreviewing> __previewer;
     _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     _awesomeFont = [UIFont fontWithName:@"FontAwesome" size:d.pointSize];
 
-    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    /*UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
-    [self.tableView addGestureRecognizer:lp];
+    [self.tableView addGestureRecognizer:lp];*/
     
 #ifndef EXTENSION
     if(!_delegate) {
@@ -589,6 +582,14 @@ id<UIViewControllerPreviewing> __previewer;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
+
+#if !(TARGET_IPHONE_SIMULATOR)
+    if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
+#endif
+        /*__previewer =*/ [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+#if !(TARGET_IPHONE_SIMULATOR)
+    }
+#endif
 
 /*
 #if TARGET_IPHONE_SIMULATOR
