@@ -617,6 +617,7 @@ id<UIViewControllerPreviewing> __previewer;
     NSDictionary *d = [_data objectAtIndex:[self.tableView indexPathForRowAtPoint:location].row];
 
     if(d) {
+        previewingContext.sourceRect = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]].frame;
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectForKey:@"bid"] intValue]];
         EventsTableView *e = [[EventsTableView alloc] init];
         e.navigationItem.title = [d objectForKey:@"name"];
