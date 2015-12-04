@@ -514,10 +514,10 @@ id<UIViewControllerPreviewing> __previewer;
     _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     _awesomeFont = [UIFont fontWithName:@"FontAwesome" size:d.pointSize];
 
-    /*UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
-    [self.tableView addGestureRecognizer:lp];*/
+    [self.tableView addGestureRecognizer:lp];
     
 #ifndef EXTENSION
     if(!_delegate) {
@@ -614,7 +614,7 @@ id<UIViewControllerPreviewing> __previewer;
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
 #ifndef EXTENSION
-    NSDictionary *d = [_data objectAtIndex:[self.tableView indexPathForRowAtPoint:[self.slidingViewController.view convertPoint:location toView:self.tableView]].row];
+    NSDictionary *d = [_data objectAtIndex:[self.tableView indexPathForRowAtPoint:location].row];
 
     if(d) {
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectForKey:@"bid"] intValue]];

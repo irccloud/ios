@@ -238,10 +238,10 @@ int __timestampWidth;
     [super viewDidLoad];
     
     self.tableView.scrollsToTop = NO;
-    /*UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
-    [self.tableView addGestureRecognizer:lp];*/
+    [self.tableView addGestureRecognizer:lp];
     _topUnreadView.backgroundColor = [UIColor unreadBlueColor];
     _bottomUnreadView.backgroundColor = [UIColor unreadBlueColor];
     [_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
@@ -284,7 +284,7 @@ int __timestampWidth;
 */
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
-    EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:[self.slidingViewController.view convertPoint:location toView:self.tableView]]];
+    EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]];
     NSTextCheckingResult *r = [cell.message linkAtPoint:[self.slidingViewController.view convertPoint:location toView:cell.message]];
     
     if([URLHandler isImageURL:r.URL]) {
