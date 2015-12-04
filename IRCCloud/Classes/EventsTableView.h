@@ -30,7 +30,7 @@
 -(void)dismissKeyboard;
 @end
 
-@interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate,UIGestureRecognizerDelegate> {
+@interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate,UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate> {
     IBOutlet UIView *_headerView;
     IBOutlet UIView *_backlogFailedView;
     IBOutlet UIButton *_backlogFailedButton;

@@ -130,7 +130,7 @@
     }
     pScrollView.contentInset = anEdgeInset;
     
-    if(_toolbar.hidden)
+    if(_toolbar.hidden && !_previewing)
         [self _showToolbar];
     [_hideTimer invalidate];
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
@@ -159,7 +159,8 @@
 }
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    [self _showToolbar];
+    if(!_previewing)
+        [self _showToolbar];
 }
 
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
@@ -571,11 +572,20 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
+    
+    if(_previewing)
+        _toolbar.hidden = YES;
 }
 
 -(void)viewDidUnload {
     [super viewDidUnload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)didMoveToParentViewController:(UIViewController *)parent {
+    _previewing = NO;
+    _toolbar.hidden = NO;
+    [self _showToolbar];
 }
 
 //From: http://stackoverflow.com/a/19146512
@@ -596,6 +606,9 @@
 }
 
 - (void)panned:(UIPanGestureRecognizer *)recognizer {
+    if(_previewing)
+        return;
+    
     if (_scrollView.zoomScale <= _scrollView.minimumZoomScale || _movieController) {
         CGRect frame = _scrollView.frame;
         
@@ -667,7 +680,7 @@
 }
 
 -(IBAction)viewTapped:(id)sender {
-    if(_toolbar.hidden) {
+    if(_toolbar.hidden && !_previewing) {
         [self _showToolbar];
         _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
     } else {

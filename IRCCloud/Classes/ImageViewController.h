@@ -30,7 +30,9 @@
     OpenInChromeController *_chrome;
     float _progressScale;
     NSURLConnection *_connection;
+    BOOL _previewing;
 }
+@property BOOL previewing;
 -(id)initWithURL:(NSURL *)url;
 -(IBAction)viewTapped:(id)sender;
 -(IBAction)doneButtonPressed:(id)sender;

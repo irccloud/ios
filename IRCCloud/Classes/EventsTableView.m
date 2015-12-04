@@ -21,6 +21,51 @@
 #import "ColorFormatter.h"
 #import "AppDelegate.h"
 #import "FontAwesome.h"
+#import "URLHandler.h"
+#import "ImageViewController.h"
+#import "PastebinViewController.h"
+
+#if TARGET_IPHONE_SIMULATOR
+//Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
+@interface UIPreviewForceInteractionProgress : NSObject
+
+- (void)endInteraction:(BOOL)arg1;
+
+@end
+
+@interface UIPreviewInteractionController : NSObject
+
+@property (nonatomic, readonly) UIPreviewForceInteractionProgress *interactionProgressForPresentation;
+
+- (BOOL)startInteractivePreviewAtLocation:(CGPoint)point inView:(UIView *)view;
+- (void)cancelInteractivePreview;
+- (void)commitInteractivePreview;
+
+@end
+
+@interface _UIViewControllerPreviewSourceViewRecord : NSObject <UIViewControllerPreviewing>
+
+@property (nonatomic, readonly) UIPreviewInteractionController *previewInteractionController;
+
+@end
+
+void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation) {
+    _UIViewControllerPreviewSourceViewRecord *record = (_UIViewControllerPreviewSourceViewRecord *)previewer;
+    UIPreviewInteractionController *interactionController = record.previewInteractionController;
+    [interactionController startInteractivePreviewAtLocation:sourceLocation inView:record.sourceView];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [interactionController.interactionProgressForPresentation endInteraction:YES];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [interactionController commitInteractivePreview];
+            //[interactionController cancelInteractivePreview];
+        });
+    });
+}
+
+id<UIViewControllerPreviewing> __previewer;
+
+#endif
 
 int __timestampWidth;
 
@@ -171,7 +216,15 @@ int __timestampWidth;
 - (void)viewDidLoad {
     _conn = [NetworkConnection sharedInstance];
     [super viewDidLoad];
-
+    
+#if !(TARGET_IPHONE_SIMULATOR)
+    if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
+#endif
+        __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.slidingViewController.view];
+#if !(TARGET_IPHONE_SIMULATOR)
+    }
+#endif
+    
     self.tableView.scrollsToTop = NO;
     UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
@@ -189,6 +242,54 @@ int __timestampWidth;
     
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor = [UIColor contentBackgroundColor];
+    
+#if TARGET_IPHONE_SIMULATOR
+    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
+    t.delegate = self;
+    [self.view addGestureRecognizer:t];
+#endif
+}
+
+#if TARGET_IPHONE_SIMULATOR
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.slidingViewController.view]] != nil);
+}
+
+- (void)_test3DTouch:(UITapGestureRecognizer *)r {
+    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.slidingViewController.view]);
+}
+#endif
+
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+    EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:[self.slidingViewController.view convertPoint:location toView:self.tableView]]];
+    NSTextCheckingResult *r = [cell.message linkAtPoint:[self.slidingViewController.view convertPoint:location toView:cell.message]];
+    
+    if([URLHandler isImageURL:r.URL]) {
+        previewingContext.sourceRect = cell.frame;
+        ImageViewController *i = [[ImageViewController alloc] initWithURL:r.URL];
+        i.preferredContentSize = self.slidingViewController.view.bounds.size;
+        i.previewing = YES;
+        return i;
+    } else if([r.URL.scheme hasPrefix:@"irccloud-paste-"]) {
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[r.URL.absoluteString substringFromIndex:15]]]];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        return nc;
+    }
+    
+    return nil;
+}
+
+- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    if([viewControllerToCommit isKindOfClass:[ImageViewController class]]) {
+        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+        appDelegate.window.backgroundColor = [UIColor blackColor];
+        appDelegate.window.rootViewController = viewControllerToCommit;
+        [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
+        [UIApplication sharedApplication].statusBarHidden = YES;
+        [viewControllerToCommit didMoveToParentViewController:nil];
+    } else {
+        [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
