@@ -584,11 +584,11 @@ id<UIViewControllerPreviewing> __previewer;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
 
 #if !(TARGET_IPHONE_SIMULATOR)
-    if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
+    //if([self.traitCollection respondsToSelector:@selector(forceTouchCapability)] && (self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable)) {
 #endif
         /*__previewer =*/ [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
 #if !(TARGET_IPHONE_SIMULATOR)
-    }
+    //}
 #endif
 
 /*
