@@ -2033,6 +2033,9 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)launchURL:(NSURL *)url {
+    if(self.presentedViewController)
+        [self dismissViewControllerAnimated:NO completion:nil];
+    
     if([url.host isEqualToString:@"youtu.be"] || [url.host hasSuffix:@"youtube.com"]) {
         _ytURL = url;
         _YTWrapperView = [[UIView alloc] initWithFrame:self.navigationController.view.bounds];
