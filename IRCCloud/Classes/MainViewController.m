@@ -48,6 +48,33 @@
 #import "ServerReorderViewController.h"
 #import "FontAwesome.h"
 
+#if TARGET_IPHONE_SIMULATOR
+//Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
+@interface UIPreviewForceInteractionProgress : NSObject
+
+- (void)endInteraction:(BOOL)arg1;
+
+@end
+
+@interface UIPreviewInteractionController : NSObject
+
+@property (nonatomic, readonly) UIPreviewForceInteractionProgress *interactionProgressForPresentation;
+
+- (BOOL)startInteractivePreviewAtLocation:(CGPoint)point inView:(UIView *)view;
+- (void)cancelInteractivePreview;
+- (void)commitInteractivePreview;
+
+@end
+
+@interface _UIViewControllerPreviewSourceViewRecord : NSObject <UIViewControllerPreviewing>
+
+@property (nonatomic, readonly) UIPreviewInteractionController *previewInteractionController;
+
+@end
+
+void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation);
+#endif
+
 #define TAG_BAN 1
 #define TAG_IGNORE 2
 #define TAG_KICK 3
@@ -299,6 +326,49 @@ extern NSDictionary *emojiMap;
     swipe.numberOfTouchesRequired = 2;
     swipe.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:swipe];
+#if !(TARGET_IPHONE_SIMULATOR)
+    if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
+#endif
+        __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.navigationController.view];
+#if !(TARGET_IPHONE_SIMULATOR)
+    }
+#endif
+    
+#if TARGET_IPHONE_SIMULATOR
+    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
+    t.delegate = self;
+    [self.navigationController.view addGestureRecognizer:t];
+#endif
+}
+
+#if TARGET_IPHONE_SIMULATOR
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.navigationController.view]] != nil);
+}
+
+- (void)_test3DTouch:(UITapGestureRecognizer *)r {
+    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.navigationController.view]);
+}
+#endif
+
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+    if(CGRectContainsPoint(_titleView.frame, [_titleView convertPoint:location fromView:self.navigationController.view])) {
+        if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
+            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            return nc;
+        }
+    }
+    return nil;
+}
+
+- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    [self presentViewController:viewControllerToCommit animated:YES completion:nil];
 }
 
 - (void)swipeBack:(UISwipeGestureRecognizer *)sender {

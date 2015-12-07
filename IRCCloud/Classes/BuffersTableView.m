@@ -621,6 +621,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         e.navigationItem.title = [d objectForKey:@"name"];
         [e setBuffer:b];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:e];
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         nc.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
         return nc;
     }
