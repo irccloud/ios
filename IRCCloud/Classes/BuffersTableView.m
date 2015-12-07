@@ -29,7 +29,6 @@
 #import "EventsTableView.h"
 #import "MainViewController.h"
 
-/*
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
 @interface UIPreviewForceInteractionProgress : NSObject
@@ -54,22 +53,8 @@
 
 @end
 
-void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation) {
-    _UIViewControllerPreviewSourceViewRecord *record = (_UIViewControllerPreviewSourceViewRecord *)previewer;
-    UIPreviewInteractionController *interactionController = record.previewInteractionController;
-    [interactionController startInteractivePreviewAtLocation:sourceLocation inView:record.sourceView];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [interactionController.interactionProgressForPresentation endInteraction:YES];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [interactionController commitInteractivePreview];
-            //[interactionController cancelInteractivePreview];
-        });
-    });
-}
-
+void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation);
 #endif
-*/
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
@@ -581,6 +566,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
 
+#ifndef EXTENSION
 #if !(TARGET_IPHONE_SIMULATOR)
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
 #endif
@@ -589,16 +575,15 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     }
 #endif
 
-/*
 #if TARGET_IPHONE_SIMULATOR
     UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
     t.delegate = self;
     [self.view addGestureRecognizer:t];
 #endif
-*/
+#endif
 }
 
-/*
+#ifndef EXTENSION
 #if TARGET_IPHONE_SIMULATOR
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.tableView]] != nil);
@@ -608,7 +593,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     WFSimulate3DTouchPreview(__previewer, [r locationInView:self.tableView]);
 }
 #endif
-*/
+#endif
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
 #ifndef EXTENSION
@@ -620,17 +605,16 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         EventsTableView *e = [[EventsTableView alloc] init];
         e.navigationItem.title = [d objectForKey:@"name"];
         [e setBuffer:b];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:e];
-        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        nc.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
-        return nc;
+        e.modalPresentationStyle = UIModalPresentationCurrentContext;
+        e.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
+        return e;
     }
 #endif
     return nil;
 }
 
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
-    [_delegate bufferSelected:((EventsTableView *)((UINavigationController *)viewControllerToCommit).topViewController).buffer.bid];
+    [_delegate bufferSelected:((EventsTableView *)viewControllerToCommit).buffer.bid];
 }
 
 - (void)backlogCompleted:(NSNotification *)notification {

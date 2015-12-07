@@ -57,6 +57,7 @@
     _lineNumbers.on = YES;
     [self _fetch];
     [Answers logContentViewWithName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
+    [self didMoveToParentViewController:nil];
 }
 
 -(void)viewDidLoad {
@@ -105,6 +106,18 @@
         self.navigationController.view.backgroundColor = [UIColor navBarColor];
         _activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
     }
+}
+
+-(void)didMoveToParentViewController:(UIViewController *)parent {
+    CGRect frame = _webView.frame;
+    if(self.navigationController.navigationBarHidden) {
+        _toolbar.hidden = YES;
+        frame.size.height = self.view.frame.size.height - _webView.frame.origin.y;
+    } else {
+        _toolbar.hidden = NO;
+        frame.size.height = self.view.frame.size.height - _webView.frame.origin.y - _toolbar.frame.size.height;
+    }
+    _webView.frame = frame;
 }
 
 -(void)_fetch {

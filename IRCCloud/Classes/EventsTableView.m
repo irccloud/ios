@@ -287,6 +287,7 @@ int __timestampWidth;
         return i;
     } else if([r.URL.scheme hasPrefix:@"irccloud-paste-"]) {
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[r.URL.absoluteString substringFromIndex:15]]]];
+        nc.navigationBarHidden = YES;
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         return nc;
     }
@@ -302,6 +303,10 @@ int __timestampWidth;
         [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
         [UIApplication sharedApplication].statusBarHidden = YES;
         [viewControllerToCommit didMoveToParentViewController:nil];
+    } else if([viewControllerToCommit isKindOfClass:[UINavigationController class]]) {
+        ((UINavigationController *)viewControllerToCommit).navigationBarHidden = NO;
+        [((UINavigationController *)viewControllerToCommit).topViewController didMoveToParentViewController:nil];
+        [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
     } else {
         [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
     }
