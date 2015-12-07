@@ -358,6 +358,7 @@ extern NSDictionary *emojiMap;
             ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            nc.navigationBarHidden = YES;
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;
             else
@@ -369,6 +370,8 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    if([viewControllerToCommit isKindOfClass:[UINavigationController class]])
+        ((UINavigationController *)viewControllerToCommit).navigationBarHidden = NO;
     [self presentViewController:viewControllerToCommit animated:YES completion:nil];
 }
 
