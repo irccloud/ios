@@ -354,7 +354,7 @@ extern NSDictionary *emojiMap;
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     if(CGRectContainsPoint(_titleView.frame, [_titleView convertPoint:location fromView:self.navigationController.view])) {
         if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-            previewingContext.sourceRect = [self.navigationController.view convertRect:_titleView.frame fromView:_titleView];
+            previewingContext.sourceRect = [self.navigationController.view convertRect:_titleView.frame fromView:self.navigationController.navigationBar];
             ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
