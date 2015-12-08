@@ -497,7 +497,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     _awesomeFont = [UIFont fontWithName:@"FontAwesome" size:d.pointSize];
 
-    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
@@ -607,6 +607,8 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         [e setBuffer:b];
         e.modalPresentationStyle = UIModalPresentationCurrentContext;
         e.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
+        lp.enabled = NO;
+        lp.enabled = YES;
         return e;
     }
 #endif

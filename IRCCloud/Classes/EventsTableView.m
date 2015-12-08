@@ -233,7 +233,7 @@ int __timestampWidth;
     [super viewDidLoad];
     
     self.tableView.scrollsToTop = NO;
-    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
@@ -284,11 +284,15 @@ int __timestampWidth;
         ImageViewController *i = [[ImageViewController alloc] initWithURL:r.URL];
         i.preferredContentSize = self.slidingViewController.view.bounds.size;
         i.previewing = YES;
+        lp.enabled = NO;
+        lp.enabled = YES;
         return i;
     } else if([r.URL.scheme hasPrefix:@"irccloud-paste-"]) {
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[r.URL.absoluteString substringFromIndex:15]]]];
         nc.navigationBarHidden = YES;
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        lp.enabled = NO;
+        lp.enabled = YES;
         return nc;
     }
     

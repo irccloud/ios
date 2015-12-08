@@ -72,6 +72,7 @@
     
     NSString *_groupIndent;
     id<UIViewControllerPreviewing> __previewer;
+    UILongPressGestureRecognizer *lp;
 }
 @property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;

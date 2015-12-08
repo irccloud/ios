@@ -54,6 +54,7 @@
     UIFont *_normalFont;
     UIFont *_awesomeFont;
     id<UIViewControllerPreviewing> __previewer;
+    UILongPressGestureRecognizer *lp;
 }
 @property UIViewController<BuffersTableViewDelegate> *delegate;
 -(void)setBuffer:(Buffer *)buffer;
