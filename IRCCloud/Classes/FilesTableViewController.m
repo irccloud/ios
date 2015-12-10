@@ -257,27 +257,31 @@
             _files = [d objectForKey:@"files"];
         
         _canLoadMore = _files.count < [[d objectForKey:@"total"] intValue];
-        self.tableView.tableFooterView = _canLoadMore?_footerView:nil;
-        if(!_files.count) {
-            CLS_LOG(@"File list is empty");
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            self.tableView.tableFooterView = _canLoadMore?_footerView:nil;
+            if(!_files.count) {
+                CLS_LOG(@"File list is empty");
+                UILabel *fail = [[UILabel alloc] init];
+                fail.text = @"\nYou haven't uploaded any files yet.\n";
+                fail.numberOfLines = 3;
+                fail.textAlignment = NSTextAlignmentCenter;
+                fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+                [fail sizeToFit];
+                self.tableView.tableFooterView = fail;
+            }
+        }];
+    } else {
+        CLS_LOG(@"Failed to load file list for page %i: %@", _pages, d);
+        _canLoadMore = NO;
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             UILabel *fail = [[UILabel alloc] init];
-            fail.text = @"\nYou haven't uploaded any files yet.\n";
-            fail.numberOfLines = 3;
+            fail.text = @"\nUnable to load files.\nPlease try again later.\n";
+            fail.numberOfLines = 4;
             fail.textAlignment = NSTextAlignmentCenter;
             fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
             [fail sizeToFit];
             self.tableView.tableFooterView = fail;
-        }
-    } else {
-        CLS_LOG(@"Failed to load file list for page %i: %@", _pages, d);
-        _canLoadMore = NO;
-        UILabel *fail = [[UILabel alloc] init];
-        fail.text = @"\nUnable to load files.\nPlease try again later.\n";
-        fail.numberOfLines = 4;
-        fail.textAlignment = NSTextAlignmentCenter;
-        fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        [fail sizeToFit];
-        self.tableView.tableFooterView = fail;
+        }];
         return;
     }
 

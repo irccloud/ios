@@ -282,7 +282,7 @@ int __timestampWidth;
     if([URLHandler isImageURL:r.URL]) {
         previewingContext.sourceRect = cell.frame;
         ImageViewController *i = [[ImageViewController alloc] initWithURL:r.URL];
-        i.preferredContentSize = self.slidingViewController.view.bounds.size;
+        i.preferredContentSize = self.view.window.bounds.size;
         i.previewing = YES;
         lp.enabled = NO;
         lp.enabled = YES;
@@ -290,6 +290,7 @@ int __timestampWidth;
     } else if([r.URL.scheme hasPrefix:@"irccloud-paste-"]) {
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[r.URL.absoluteString substringFromIndex:15]]]];
         nc.navigationBarHidden = YES;
+        nc.preferredContentSize = self.view.window.bounds.size;
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         lp.enabled = NO;
         lp.enabled = YES;

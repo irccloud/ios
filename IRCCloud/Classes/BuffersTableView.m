@@ -600,22 +600,25 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     NSDictionary *d = [_data objectAtIndex:[self.tableView indexPathForRowAtPoint:location].row];
 
     if(d) {
-        previewingContext.sourceRect = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]].frame;
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectForKey:@"bid"] intValue]];
-        EventsTableView *e = [[EventsTableView alloc] init];
-        e.navigationItem.title = [d objectForKey:@"name"];
-        [e setBuffer:b];
-        e.modalPresentationStyle = UIModalPresentationCurrentContext;
-        e.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
-        lp.enabled = NO;
-        lp.enabled = YES;
-        return e;
+        if(b) {
+            previewingContext.sourceRect = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]].frame;
+            EventsTableView *e = [[EventsTableView alloc] init];
+            e.navigationItem.title = [d objectForKey:@"name"];
+            [e setBuffer:b];
+            e.modalPresentationStyle = UIModalPresentationCurrentContext;
+            e.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
+            lp.enabled = NO;
+            lp.enabled = YES;
+            return e;
+        }
     }
 #endif
     return nil;
 }
 
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    [viewControllerToCommit viewWillDisappear:NO];
     [_delegate bufferSelected:((EventsTableView *)viewControllerToCommit).buffer.bid];
 }
 
