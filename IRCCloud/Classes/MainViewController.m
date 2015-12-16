@@ -1192,16 +1192,6 @@ extern NSDictionary *emojiMap;
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self _themeChanged];
         }];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
-#ifdef DEBUG
-    NSLog(@"This is a debug build, skipping APNs registration");
-#else
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
-    else
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
-#endif
     }
     if([ServersDataSource sharedInstance].count < 1) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
@@ -1343,6 +1333,19 @@ extern NSDictionary *emojiMap;
     [self.slidingViewController resetTopView];
     
     NSString *session = [NetworkConnection sharedInstance].session;
+    if(session.length) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
+#ifdef DEBUG
+        NSLog(@"This is a debug build, skipping APNs registration");
+#else
+        NSLog(@"APNs registration");
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+            [[UIApplication sharedApplication] registerForRemoteNotifications];
+        else
+            [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+#endif
+    }
     if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
         [[NetworkConnection sharedInstance] connect:NO];
     }

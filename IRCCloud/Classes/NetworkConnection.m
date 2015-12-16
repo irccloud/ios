@@ -256,13 +256,13 @@ NSLock *__serializeLock = nil;
     } else {
         CLS_LOG(@"Version changed, not loading caches");
     }
-#ifndef EXTENSION
     if(_userInfo) {
-        _streamId = [_userInfo objectForKey:@"streamId"];
         _config = [_userInfo objectForKey:@"config"];
+#ifdef EXTENSION
+        _streamId = [_userInfo objectForKey:@"streamId"];
         _highestEID = [[_userInfo objectForKey:@"highestEID"] doubleValue];
-    }
 #endif
+    }
     
     CLS_LOG(@"%@", _userAgent);
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
