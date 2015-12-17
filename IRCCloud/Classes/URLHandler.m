@@ -145,7 +145,7 @@
     BOOL useChrome = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     if(shouldDisplayBrowser) {
         if(!(useChrome && [_openInChromeController openInChrome:url withCallbackURL:self.appCallbackURL createNewTab:NO])) {
-            if([SFSafariViewController class]) {
+            if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     UIApplication *app = [UIApplication sharedApplication];
                     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
