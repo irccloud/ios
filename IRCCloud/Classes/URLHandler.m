@@ -17,6 +17,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
+#import <SafariServices/SafariServices.h>
 #import "URLHandler.h"
 #import "AppDelegate.h"
 #import "MainViewController.h"
@@ -140,7 +141,17 @@
     BOOL useChrome = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     if(shouldDisplayBrowser) {
         if(!(useChrome && [_openInChromeController openInChrome:url withCallbackURL:self.appCallbackURL createNewTab:NO])) {
-            [[UIApplication sharedApplication] openURL:url];
+            if([SFSafariViewController class]) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    UIApplication *app = [UIApplication sharedApplication];
+                    AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+                    MainViewController *mainViewController = [appDelegate mainViewController];
+                    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+                    [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
+                }];
+            } else {
+                [[UIApplication sharedApplication] openURL:url];
+            }
         }
     } else {
         [self showBrowserChooserAlertPendingURL:url];

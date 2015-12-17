@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+#import <SafariServices/SafariServices.h>
 #import "EventsTableView.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
@@ -56,7 +56,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [interactionController.interactionProgressForPresentation endInteraction:YES];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [interactionController commitInteractivePreview];
             //[interactionController cancelInteractivePreview];
         });
@@ -305,6 +305,11 @@ int __timestampWidth;
         lp.enabled = NO;
         lp.enabled = YES;
         return nc;
+    } else if([SFSafariViewController class] && [r.URL.scheme hasPrefix:@"http"]) {
+        SFSafariViewController *s = [[SFSafariViewController alloc] initWithURL:r.URL];
+        s.modalPresentationStyle = UIModalPresentationCurrentContext;
+        s.preferredContentSize = self.view.window.bounds.size;
+        return s;
     }
     
     return nil;
@@ -323,6 +328,7 @@ int __timestampWidth;
         [((UINavigationController *)viewControllerToCommit).topViewController didMoveToParentViewController:nil];
         [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
     } else {
+        [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
         [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
     }
 }
