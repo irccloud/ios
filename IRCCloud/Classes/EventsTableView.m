@@ -56,7 +56,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [interactionController.interactionProgressForPresentation endInteraction:YES];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [interactionController commitInteractivePreview];
             //[interactionController cancelInteractivePreview];
         });
@@ -231,6 +231,16 @@ int __timestampWidth;
 - (void)viewDidLoad {
     _conn = [NetworkConnection sharedInstance];
     [super viewDidLoad];
+    
+    if(!_headerView) {
+        _headerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.tableView.frame.size.width,20)];
+        _headerView.autoresizesSubviews = YES;
+        UIActivityIndicatorView *a = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+        a.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
+        a.center = _headerView.center;
+        [a startAnimating];
+        [_headerView addSubview:a];
+    }
     
     self.tableView.scrollsToTop = NO;
     lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
@@ -1363,9 +1373,9 @@ int __timestampWidth;
         }
         
         [self updateUnread];
-        [self scrollViewDidScroll:self.tableView];
         
         _ready = YES;
+        [self scrollViewDidScroll:self.tableView];
         [_lock unlock];
         
         if(_conn.state == kIRCCloudStateConnected) {
