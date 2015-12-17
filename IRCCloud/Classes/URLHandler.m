@@ -80,6 +80,10 @@
         [app.keyWindow.rootViewController dismissViewControllerAnimated:NO completion:nil];
     }
     
+    if(![url.scheme hasPrefix:@"irc"]) {
+        [mainViewController dismissKeyboard];
+    }
+    
     if([url.scheme hasPrefix:@"irccloud-paste-"]) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]];

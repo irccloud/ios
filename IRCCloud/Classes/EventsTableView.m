@@ -14,6 +14,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <AVFoundation/AVFoundation.h>
+#import <AVKit/AVKit.h>
+#import <MediaPlayer/MediaPlayer.h>
 #import <SafariServices/SafariServices.h>
 #import "EventsTableView.h"
 #import "NetworkConnection.h"
@@ -288,25 +291,40 @@ int __timestampWidth;
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]];
     NSTextCheckingResult *r = [cell.message linkAtPoint:[self.tableView convertPoint:location toView:cell.message]];
+    NSURL *url = r.URL;
     
-    if([URLHandler isImageURL:r.URL]) {
+    if([URLHandler isImageURL:url]) {
         previewingContext.sourceRect = cell.frame;
-        ImageViewController *i = [[ImageViewController alloc] initWithURL:r.URL];
+        ImageViewController *i = [[ImageViewController alloc] initWithURL:url];
         i.preferredContentSize = self.view.window.bounds.size;
         i.previewing = YES;
         lp.enabled = NO;
         lp.enabled = YES;
         return i;
-    } else if([r.URL.scheme hasPrefix:@"irccloud-paste-"]) {
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[r.URL.absoluteString substringFromIndex:15]]]];
+    } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]];
         nc.navigationBarHidden = YES;
         nc.preferredContentSize = self.view.window.bounds.size;
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         lp.enabled = NO;
         lp.enabled = YES;
         return nc;
-    } else if([SFSafariViewController class] && [r.URL.scheme hasPrefix:@"http"]) {
-        SFSafariViewController *s = [[SFSafariViewController alloc] initWithURL:r.URL];
+    } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"]) {
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+        if(NSClassFromString(@"AVPlayerViewController")) {
+            AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
+            player.player = [[AVPlayer alloc] initWithURL:url];
+            player.modalPresentationStyle = UIModalPresentationCurrentContext;
+            player.preferredContentSize = self.view.window.bounds.size;
+            return player;
+        } else {
+            MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
+            player.modalPresentationStyle = UIModalPresentationCurrentContext;
+            player.preferredContentSize = self.view.window.bounds.size;
+            return player;
+        }
+    } else if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
+        SFSafariViewController *s = [[SFSafariViewController alloc] initWithURL:url];
         s.modalPresentationStyle = UIModalPresentationCurrentContext;
         s.preferredContentSize = self.view.window.bounds.size;
         return s;
