@@ -865,6 +865,8 @@ int __timestampWidth;
 }
 
 -(void)updateTopUnread:(NSInteger)firstRow {
+    if(!_topUnreadView)
+        return;
     int highlights = 0;
     for(NSNumber *pos in _unseenHighlightPositions) {
         if([pos intValue] > firstRow)
@@ -938,6 +940,8 @@ int __timestampWidth;
 }
 
 -(void)updateUnread {
+    if(!_bottomUnreadView)
+        return;
     NSString *msg = @"";
     CGRect rect = _bottomUnreadView.frame;
     _bottomUnreadArrow.frame = CGRectMake(0,8,12,rect.size.height-12);
@@ -1794,7 +1798,7 @@ int __timestampWidth;
         }
     }
     
-    if(rows.count) {
+    if(rows.count && _topUnreadView) {
         if(_data.count) {
             if(lastRow < _data.count)
                 _buffer.savedScrollOffset = tableView.contentOffset.y - tableView.tableHeaderView.bounds.size.height;
