@@ -333,7 +333,7 @@
 
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.textLabel.text = [_themes objectAtIndex:indexPath.row];
-    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] isEqualToString:[[_themes objectAtIndex:indexPath.row] lowercaseString]])
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] isEqualToString:[[_themes objectAtIndex:indexPath.row] lowercaseString]] || (![[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] && indexPath.row == 0))
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     else
         cell.accessoryType = UITableViewCellAccessoryNone;
@@ -428,7 +428,6 @@
         [prefs setObject:[NSNumber numberWithBool:_notifyAll.isOn] forKey:@"notifications-all"];
         [prefs setObject:[NSNumber numberWithBool:!_showUnread.isOn] forKey:@"disableTrackUnread"];
         [prefs setObject:[NSNumber numberWithBool:_markAsRead.isOn] forKey:@"enableReadOnSelect"];
-        [prefs setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] forKey:@"theme"];
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -873,7 +872,7 @@
             switch(row) {
                 case 0:
                     cell.textLabel.text = @"Theme";
-                    cell.detailTextLabel.text = [[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] capitalizedString];
+                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]?[[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] capitalizedString]:@"Dawn";
                     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
                     break;
                 case 1:

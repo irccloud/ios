@@ -448,7 +448,7 @@ NSLock *__serializeLock = nil;
                        _prefs = nil;
 #ifndef EXTENSION
                        NSDictionary *p = [self prefs];
-                       if([p objectForKey:@"theme"]) {
+                       if([p objectForKey:@"theme"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]) {
                            dispatch_sync(dispatch_get_main_queue(), ^{
                                [UIColor setTheme:[p objectForKey:@"theme"]];
                            });

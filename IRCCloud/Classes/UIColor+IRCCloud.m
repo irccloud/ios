@@ -148,7 +148,7 @@ NSString *__current_theme;
 }
 
 +(void)setTheme:(NSString *)theme {
-    if([theme isEqualToString:@"dawn"]) {
+    if([theme isEqualToString:@"dawn"] || theme == nil) {
         __color_theme_is_dark = NO;
         
         __bufferTextColor = [UIColor colorWithRed:0.114 green:0.251 blue:1 alpha:1];
@@ -467,7 +467,7 @@ NSString *__current_theme;
     __socketClosedBackgroundImage = nil;
     __unreadBlueColor = [UIColor colorWithRed:0.118 green:0.447 blue:1 alpha:1];
     
-    __current_theme = theme;
+    __current_theme = theme?theme:@"dawn";
 }
 
 +(NSString *)currentTheme {
