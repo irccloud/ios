@@ -515,7 +515,7 @@ NSLock *__serializeLock = nil;
                    @"no_nick_change": alert, @"no_messages_from_non_registered": alert, @"not_registered": alert,
                    @"already_registered": alert, @"too_many_targets": alert, @"no_such_server": alert,
                    @"unknown_command": alert, @"help_not_found": alert, @"accept_full": alert,
-                   @"accept_not": alert, @"nick_collision": alert, @"nick_too_fast": alert,
+                   @"accept_not": alert, @"nick_collision": alert, @"nick_too_fast": alert, @"need_registered_nick": alert,
                    @"save_nick": alert, @"unknown_mode": alert, @"user_not_in_channel": alert,
                    @"need_more_params": alert, @"users_dont_match": alert, @"users_disabled": alert,
                    @"invalid_operator_password": alert, @"flood_warning": alert, @"privs_needed": alert,
