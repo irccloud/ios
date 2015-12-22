@@ -3416,7 +3416,7 @@ extern NSDictionary *emojiMap;
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
         alert.popoverPresentationController.sourceRect = rect;
         alert.popoverPresentationController.sourceView = _buffersView.tableView;
-        [self.slidingViewController presentViewController:alert animated:YES completion:nil];
+        [self presentViewController:alert animated:YES completion:nil];
     } else {
         UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
         if([_selectedBuffer.type isEqualToString:@"console"]) {
@@ -3613,11 +3613,11 @@ extern NSDictionary *emojiMap;
     picker.delegate = (id)self;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
         picker.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self.slidingViewController presentViewController:picker animated:YES completion:nil];
+        [self presentViewController:picker animated:YES completion:nil];
     } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone]) {
         picker.modalPresentationStyle = UIModalPresentationFormSheet;
         picker.preferredContentSize = CGSizeMake(540, 576);
-        [self.slidingViewController presentViewController:picker animated:YES completion:nil];
+        [self presentViewController:picker animated:YES completion:nil];
     } else {
         _popover = [[UIPopoverController alloc] initWithContentViewController:picker];
         _popover.delegate = self;
@@ -3659,7 +3659,7 @@ extern NSDictionary *emojiMap;
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-    [self.slidingViewController presentViewController:nc animated:YES completion:nil];
+    [self presentViewController:nc animated:YES completion:nil];
     [self _resetStatusBar];
 }
 
@@ -3792,11 +3792,11 @@ extern NSDictionary *emojiMap;
         if(_popover) {
             [_popover dismissPopoverAnimated:YES];
             if(nc)
-                [self.slidingViewController presentViewController:nc animated:YES completion:nil];
+                [self presentViewController:nc animated:YES completion:nil];
         } else {
-            [self.slidingViewController dismissViewControllerAnimated:YES completion:^{
+            [self dismissViewControllerAnimated:YES completion:^{
                 if(nc)
-                    [self.slidingViewController presentViewController:nc animated:YES completion:nil];
+                    [self presentViewController:nc animated:YES completion:nil];
                 [self _resetStatusBar];
             }];
         }
@@ -4014,7 +4014,7 @@ extern NSDictionary *emojiMap;
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
         alert.popoverPresentationController.sourceRect = CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height);
         alert.popoverPresentationController.sourceView = self.view;
-        [self.slidingViewController presentViewController:alert animated:YES completion:nil];
+        [self presentViewController:alert animated:YES completion:nil];
     } else {
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
             UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo", @"Start a Pastebin", @"Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];

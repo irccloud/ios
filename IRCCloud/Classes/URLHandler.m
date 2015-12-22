@@ -76,8 +76,18 @@
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
     MainViewController *mainViewController = [appDelegate mainViewController];
     
-    if(appDelegate.window.rootViewController.presentedViewController) {
-        [app.keyWindow.rootViewController dismissViewControllerAnimated:NO completion:nil];
+    if(mainViewController.slidingViewController.presentedViewController) {
+        [mainViewController.slidingViewController dismissViewControllerAnimated:NO completion:^{
+            [self launchURL:url];
+        }];
+        return;
+    }
+    
+    if(mainViewController.presentedViewController) {
+        [mainViewController dismissViewControllerAnimated:NO completion:^{
+            [self launchURL:url];
+        }];
+        return;
     }
     
     if(![url.scheme hasPrefix:@"irc"]) {
@@ -151,6 +161,7 @@
                     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                     MainViewController *mainViewController = [appDelegate mainViewController];
                     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+                    
                     [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
                 }];
             } else {
