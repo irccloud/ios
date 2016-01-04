@@ -638,7 +638,7 @@ NSLock *__serializeLock = nil;
                    @"unparsed_line": msg, @"connecting_failed": msg, @"nickname_in_use": msg,
                    @"channel_invite": msg, @"motd_response": msg, @"socket_closed": msg,
                    @"channel_mode_list_change": msg, @"msg_services": msg,
-                   @"stats": msg, @"statslinkinfo": msg, @"statscommands": msg, @"statscline": msg, @"statsnline": msg, @"statsiline": msg, @"statskline": msg, @"statsqline": msg, @"statsyline": msg, @"statsbline": msg, @"statsgline": msg, @"statstline": msg, @"statseline": msg, @"statsvline": msg, @"statslline": msg, @"statsuptime": msg, @"statsoline": msg, @"statshline": msg, @"statssline": msg, @"statsuline": msg, @"statsdebug": msg, @"endofstats": msg,
+                   @"stats": msg, @"statslinkinfo": msg, @"statscommands": msg, @"statscline": msg, @"statsnline": msg, @"statsiline": msg, @"statskline": msg, @"statsqline": msg, @"statsyline": msg, @"statsbline": msg, @"statsgline": msg, @"statstline": msg, @"statseline": msg, @"statsvline": msg, @"statslline": msg, @"statsuptime": msg, @"statsoline": msg, @"statshline": msg, @"statssline": msg, @"statsuline": msg, @"statsdebug": msg, @"spamfilter": msg, @"endofstats": msg,
                    @"inviting_to_channel": msg, @"error": msg, @"too_fast": msg, @"no_bots": msg,
                    @"wallops": msg, @"logged_in_as": msg, @"sasl_fail": msg, @"sasl_too_long": msg,
                    @"sasl_aborted": msg, @"sasl_already": msg, @"you_are_operator": msg,
