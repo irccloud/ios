@@ -2584,7 +2584,6 @@ extern NSDictionary *emojiMap;
 
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     @synchronized(self) {
-        self.view.superview.superview.clipsToBounds = NO;
         NSLog(@"Will animate rotation");
         __ignoreLayoutChanges = YES;
         if(duration > 0) {
@@ -2592,7 +2591,7 @@ extern NSDictionary *emojiMap;
             [self.slidingViewController resetTopView];
         }
         
-        int height = ((UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - _kbSize.height;
+        int height = ((UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height);
         int width = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
         
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
@@ -2652,6 +2651,8 @@ extern NSDictionary *emojiMap;
 
         if(sbheight)
             height -= 20;
+        
+        height -= _kbSize.height;
         
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
             self.navigationItem.leftBarButtonItem = nil;
