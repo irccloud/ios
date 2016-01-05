@@ -310,6 +310,7 @@ int __timestampWidth;
         [_delegate dismissKeyboard];
         return i;
     } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
+        previewingContext.sourceRect = cell.frame;
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]];
         nc.navigationBarHidden = YES;
         nc.preferredContentSize = self.view.window.bounds.size;
@@ -319,6 +320,7 @@ int __timestampWidth;
         [_delegate dismissKeyboard];
         return nc;
     } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"]) {
+        previewingContext.sourceRect = cell.frame;
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         if(NSClassFromString(@"AVPlayerViewController")) {
             AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
@@ -335,6 +337,7 @@ int __timestampWidth;
             return player;
         }
     } else if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
+        previewingContext.sourceRect = cell.frame;
         SFSafariViewController *s = [[SFSafariViewController alloc] initWithURL:url];
         s.modalPresentationStyle = UIModalPresentationCurrentContext;
         s.preferredContentSize = self.view.window.bounds.size;
