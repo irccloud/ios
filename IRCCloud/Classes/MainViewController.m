@@ -2584,6 +2584,7 @@ extern NSDictionary *emojiMap;
 
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     @synchronized(self) {
+        self.view.superview.superview.clipsToBounds = NO;
         NSLog(@"Will animate rotation");
         __ignoreLayoutChanges = YES;
         if(duration > 0) {
