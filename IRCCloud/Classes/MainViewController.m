@@ -1,3 +1,4 @@
+
 //
 //  MainViewController.m
 //
@@ -316,6 +317,7 @@ extern NSDictionary *emojiMap;
     [self _themeChanged];
     [self connectivityChanged:nil];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self _updateEventsInsets];
     
     UISwipeGestureRecognizer *swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeBack:)];
     swipe.numberOfTouchesRequired = 2;
@@ -1233,7 +1235,6 @@ extern NSDictionary *emojiMap;
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
     
-    NSArray *rows = [_eventsView.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_eventsView.tableView.bounds, _eventsView.tableView.contentInset)];
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     int height = size.height;
     
@@ -1252,10 +1253,6 @@ extern NSDictionary *emojiMap;
 
         [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
         
-        if(((NSIndexPath *)[rows lastObject]).row < [_eventsView tableView:_eventsView.tableView numberOfRowsInSection:0])
-            [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-        else
-            [_eventsView _scrollToBottom];
         [_buffersView scrollViewDidScroll:_buffersView.tableView];
         [UIView commitAnimations];
         [self expandingTextViewDidChange:_message];
@@ -1272,7 +1269,6 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
-    NSArray *rows = [_eventsView.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_eventsView.tableView.bounds, _eventsView.tableView.contentInset)];
     _kbSize = CGSizeMake(0,0);
     
     [UIView beginAnimations:nil context:NULL];
@@ -1284,7 +1280,6 @@ extern NSDictionary *emojiMap;
     [self.slidingViewController updateUnderRightLayout];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 
-    [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
     _nickCompletionView.alpha = 0;
     [UIView commitAnimations];
@@ -1816,25 +1811,14 @@ extern NSDictionary *emojiMap;
 
 -(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {
     if(expandingTextView.frame.size.height != height) {
-        CGFloat diff = height - expandingTextView.frame.size.height;
-        CGRect frame = _eventsView.tableView.frame;
-        frame.size.height = self.view.frame.size.height - height - 8;
-        if(!_serverStatusBar.hidden)
-            frame.size.height -= _serverStatusBar.frame.size.height;
-        _eventsView.tableView.frame = frame;
-        frame = _serverStatusBar.frame;
+        CGRect frame = _serverStatusBar.frame;
         frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
         _serverStatusBar.frame = frame;
         frame = _eventsView.bottomUnreadView.frame;
         frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
         _eventsView.bottomUnreadView.frame = frame;
         _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
-        if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top)) {
-            if(diff > 0 || _buffer.scrolledUp)
-                _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
-            else if([[UIDevice currentDevice].systemVersion isEqualToString:@"8.1"]) //The last line seems to get eaten when the table is fully scrolled down on iOS 8.1
-                _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + fabs(diff));
-        }
+        [self _updateEventsInsets];
     }
 }
 
@@ -2561,9 +2545,6 @@ extern NSDictionary *emojiMap;
         frame.size.height = _serverStatus.frame.size.height + 8;
         frame.origin.y = _bottomBar.frame.origin.y - frame.size.height;
         _serverStatusBar.frame = frame;
-        frame = _eventsView.view.frame;
-        frame.size.height = _serverStatusBar.frame.origin.y;
-        _eventsView.view.frame = frame;
         frame = _eventsView.bottomUnreadView.frame;
         frame.origin.y = _serverStatusBar.frame.origin.y - frame.size.height;
         _eventsView.bottomUnreadView.frame = frame;
@@ -2571,15 +2552,13 @@ extern NSDictionary *emojiMap;
             [_eventsView _scrollToBottom];
     } else {
         if(!_serverStatusBar.hidden) {
-            CGRect frame = _eventsView.view.frame;
-            frame.size.height += _serverStatusBar.frame.size.height;
-            _eventsView.view.frame = frame;
-            frame = _eventsView.bottomUnreadView.frame;
+            CGRect frame = _eventsView.bottomUnreadView.frame;
             frame.origin.y += _serverStatusBar.frame.size.height;
             _eventsView.bottomUnreadView.frame = frame;
             _serverStatusBar.hidden = YES;
         }
     }
+    [self _updateEventsInsets];
 }
 
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
@@ -2708,7 +2687,7 @@ extern NSDictionary *emojiMap;
                 self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
             _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsZero;
             _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
-            _eventsView.view.frame = CGRectMake(0,0,width, height - _bottomBar.frame.size.height);
+            _eventsView.view.frame = CGRectMake(0,0,width, height + _kbSize.height);
             _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
                 _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
@@ -2782,6 +2761,7 @@ extern NSDictionary *emojiMap;
         [self _updateUserListVisibility];
         [self _updateGlobalMsg];
         [self _updateMessageWidth];
+        [self _updateEventsInsets];
         
         UIView *v = self.navigationItem.titleView;
         self.navigationItem.titleView = nil;
@@ -2804,6 +2784,22 @@ extern NSDictionary *emojiMap;
     _eventsView.view.hidden = NO;
     _eventActivity.alpha = 0;
     [_eventActivity stopAnimating];
+}
+
+-(void)_updateEventsInsets {
+    CGFloat height = _bottomBar.frame.size.height + _kbSize.height;
+    if(!_serverStatusBar.hidden)
+        height += _serverStatusBar.bounds.size.height;
+    CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
+    [_eventsView.tableView setContentInset:UIEdgeInsetsMake(0, 0, height, 0)];
+    [_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(0, 0, height, 0)];
+    
+    if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top)) {
+        if(diff > 0 || _buffer.scrolledUp)
+            _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
+        else if([[UIDevice currentDevice].systemVersion isEqualToString:@"8.1"]) //The last line seems to get eaten when the table is fully scrolled down on iOS 8.1
+            _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + fabs(diff));
+    }
 }
 
 -(void)refresh {

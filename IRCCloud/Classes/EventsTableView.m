@@ -196,7 +196,7 @@ int __timestampWidth;
 @implementation EventsTableView
 
 - (id)init {
-    self = [super initWithStyle:UITableViewStylePlain];
+    self = [super init];
     if (self) {
         _lock = [[NSRecursiveLock alloc] init];
         _ready = NO;
@@ -243,6 +243,13 @@ int __timestampWidth;
         a.center = _headerView.center;
         [a startAnimating];
         [_headerView addSubview:a];
+    }
+    
+    if(!_tableView) {
+        _tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
+        _tableView.dataSource = self;
+        _tableView.delegate = self;
+        [self.view addSubview:_tableView];
     }
     
     self.tableView.scrollsToTop = NO;
@@ -1167,9 +1174,9 @@ int __timestampWidth;
     _buffer.scrolledUpFrom = -1;
     if(_data.count) {
         if(self.tableView.contentSize.height > (self.tableView.frame.size.height - self.tableView.contentInset.top))
-            [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentSize.height - self.tableView.frame.size.height)];
+            [self.tableView setContentOffset:CGPointMake(0, (self.tableView.contentSize.height - self.tableView.frame.size.height) + self.tableView.contentInset.bottom)];
         else
-            [self.tableView setContentOffset:CGPointMake(0, -self.tableView.contentInset.top)];
+            [self.tableView setContentOffset:CGPointMake(0, (-self.tableView.contentInset.top) + self.tableView.contentInset.bottom)];
         if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
             [self scrollViewDidScroll:self.tableView];
     }
