@@ -307,6 +307,7 @@ int __timestampWidth;
         i.previewing = YES;
         lp.enabled = NO;
         lp.enabled = YES;
+        [_delegate dismissKeyboard];
         return i;
     } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]];
@@ -315,6 +316,7 @@ int __timestampWidth;
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         lp.enabled = NO;
         lp.enabled = YES;
+        [_delegate dismissKeyboard];
         return nc;
     } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"]) {
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
@@ -323,17 +325,20 @@ int __timestampWidth;
             player.player = [[AVPlayer alloc] initWithURL:url];
             player.modalPresentationStyle = UIModalPresentationCurrentContext;
             player.preferredContentSize = self.view.window.bounds.size;
+            [_delegate dismissKeyboard];
             return player;
         } else {
             MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
             player.modalPresentationStyle = UIModalPresentationCurrentContext;
             player.preferredContentSize = self.view.window.bounds.size;
+            [_delegate dismissKeyboard];
             return player;
         }
     } else if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
         SFSafariViewController *s = [[SFSafariViewController alloc] initWithURL:url];
         s.modalPresentationStyle = UIModalPresentationCurrentContext;
         s.preferredContentSize = self.view.window.bounds.size;
+        [_delegate dismissKeyboard];
         return s;
     }
     
