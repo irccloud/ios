@@ -17,6 +17,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
+#import <SafariServices/SafariServices.h>
 #import "URLHandler.h"
 #import "AppDelegate.h"
 #import "MainViewController.h"
@@ -75,8 +76,22 @@
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
     MainViewController *mainViewController = [appDelegate mainViewController];
     
-    if(appDelegate.window.rootViewController.presentedViewController) {
-        [app.keyWindow.rootViewController dismissViewControllerAnimated:NO completion:nil];
+    if(mainViewController.slidingViewController.presentedViewController) {
+        [mainViewController.slidingViewController dismissViewControllerAnimated:NO completion:^{
+            [self launchURL:url];
+        }];
+        return;
+    }
+    
+    if(mainViewController.presentedViewController) {
+        [mainViewController dismissViewControllerAnimated:NO completion:^{
+            [self launchURL:url];
+        }];
+        return;
+    }
+    
+    if(![url.scheme hasPrefix:@"irc"]) {
+        [mainViewController dismissKeyboard];
     }
     
     if([url.scheme hasPrefix:@"irccloud-paste-"]) {
@@ -144,7 +159,18 @@
     BOOL useChrome = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     if(shouldDisplayBrowser) {
         if(!(useChrome && [_openInChromeController openInChrome:url withCallbackURL:self.appCallbackURL createNewTab:NO])) {
-            [[UIApplication sharedApplication] openURL:url];
+            if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    UIApplication *app = [UIApplication sharedApplication];
+                    AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+                    MainViewController *mainViewController = [appDelegate mainViewController];
+                    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+                    
+                    [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
+                }];
+            } else {
+                [[UIApplication sharedApplication] openURL:url];
+            }
         }
     } else {
         [self showBrowserChooserAlertPendingURL:url];

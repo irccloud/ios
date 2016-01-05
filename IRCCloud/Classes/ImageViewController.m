@@ -129,7 +129,7 @@
     }
     pScrollView.contentInset = anEdgeInset;
     
-    if(_toolbar.hidden)
+    if(_toolbar.hidden && !_previewing)
         [self _showToolbar];
     [_hideTimer invalidate];
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
@@ -158,7 +158,8 @@
 }
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    [self _showToolbar];
+    if(!_previewing)
+        [self _showToolbar];
 }
 
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
@@ -198,7 +199,14 @@
                 
                 [_connection start];
             } else if([[dict objectForKey:@"provider_name"] isEqualToString:@"Giphy"] && [[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location != NSNotFound) {
-                [self loadGiphy:[[dict objectForKey:@"url"] substringFromIndex:[[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location + 6]];
+                if([dict objectForKey:@"image"] && [[dict objectForKey:@"image"] hasSuffix:@".gif"]) {
+                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"image"]]];
+                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                    
+                    [_connection start];
+                } else {
+                    [self loadGiphy:[[dict objectForKey:@"url"] substringFromIndex:[[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location + 6]];
+                }
             } else {
                 NSLog(@"Invalid type from oembed");
                 [self fail];
@@ -264,7 +272,7 @@
         } else {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
             NSDictionary *dict = [parser objectWithData:data];
-            if([[dict objectForKey:@"data"] objectForKey:@"images"]) {
+            if([[[dict objectForKey:@"meta"] objectForKey:@"status"] intValue] == 200 && [[dict objectForKey:@"data"] objectForKey:@"images"]) {
                 dict = [[[dict objectForKey:@"data"] objectForKey:@"images"] objectForKey:@"original"];
                 if([[dict objectForKey:@"mp4"] length]) {
                     [self loadVideo:[dict objectForKey:@"mp4"]];
@@ -563,11 +571,20 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
+    
+    if(_previewing)
+        _toolbar.hidden = YES;
 }
 
 -(void)viewDidUnload {
     [super viewDidUnload];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+- (void)didMoveToParentViewController:(UIViewController *)parent {
+    _previewing = NO;
+    _toolbar.hidden = NO;
+    [self _showToolbar];
 }
 
 //From: http://stackoverflow.com/a/19146512
@@ -588,6 +605,9 @@
 }
 
 - (void)panned:(UIPanGestureRecognizer *)recognizer {
+    if(_previewing)
+        return;
+    
     if (_scrollView.zoomScale <= _scrollView.minimumZoomScale || _movieController) {
         CGRect frame = _scrollView.frame;
         
@@ -659,7 +679,7 @@
 }
 
 -(IBAction)viewTapped:(id)sender {
-    if(_toolbar.hidden) {
+    if(_toolbar.hidden && !_previewing) {
         [self _showToolbar];
         _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
     } else {

@@ -25,7 +25,7 @@
 -(void)dismissKeyboard;
 @end
 
-@interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate> {
+@interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate> {
     NSMutableArray *_data;
     NSInteger _selectedRow;
     IBOutlet UIViewController<BuffersTableViewDelegate> *_delegate;
@@ -53,6 +53,8 @@
     UIFont *_boldFont;
     UIFont *_normalFont;
     UIFont *_awesomeFont;
+    id<UIViewControllerPreviewing> __previewer;
+    UILongPressGestureRecognizer *lp;
 }
 @property UIViewController<BuffersTableViewDelegate> *delegate;
 -(void)setBuffer:(Buffer *)buffer;

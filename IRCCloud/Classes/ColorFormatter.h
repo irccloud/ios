@@ -36,3 +36,7 @@
 +(UIFont *)monoTimestampFont;
 +(UIFont *)awesomeFont;
 @end
+
+@interface NSString (ColorFormatter)
+-(NSString *)stripIRCFormatting;
+@end

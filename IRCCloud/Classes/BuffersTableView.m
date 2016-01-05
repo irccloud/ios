@@ -26,6 +26,35 @@
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "ColorFormatter.h"
 #import "FontAwesome.h"
+#import "EventsTableView.h"
+#import "MainViewController.h"
+
+#if TARGET_IPHONE_SIMULATOR
+//Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
+@interface UIPreviewForceInteractionProgress : NSObject
+
+- (void)endInteraction:(BOOL)arg1;
+
+@end
+
+@interface UIPreviewInteractionController : NSObject
+
+@property (nonatomic, readonly) UIPreviewForceInteractionProgress *interactionProgressForPresentation;
+
+- (BOOL)startInteractivePreviewAtLocation:(CGPoint)point inView:(UIView *)view;
+- (void)cancelInteractivePreview;
+- (void)commitInteractivePreview;
+
+@end
+
+@interface _UIViewControllerPreviewSourceViewRecord : NSObject <UIViewControllerPreviewing>
+
+@property (nonatomic, readonly) UIPreviewInteractionController *previewInteractionController;
+
+@end
+
+void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation);
+#endif
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
@@ -267,6 +296,17 @@
                         if(type == TYPE_CONVERSATION && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
                             highlights = 0;
                     }
+                    if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+                        if(type == TYPE_CHANNEL) {
+                            if(![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                                unread = 0;
+                        } else {
+                            if(![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                                unread = 0;
+                            if(type == TYPE_CONVERSATION && ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                                highlights = 0;
+                        }
+                    }
                     [data addObject:@{
                      @"type":@(type),
                      @"cid":@(buffer.cid),
@@ -457,7 +497,7 @@
     _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     _awesomeFont = [UIFont fontWithName:@"FontAwesome" size:d.pointSize];
 
-    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
@@ -525,6 +565,61 @@
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
+
+#ifndef EXTENSION
+#if !(TARGET_IPHONE_SIMULATOR)
+    if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
+#endif
+        __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+#if !(TARGET_IPHONE_SIMULATOR)
+    }
+#endif
+
+#if TARGET_IPHONE_SIMULATOR
+    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
+    t.delegate = self;
+    [self.view addGestureRecognizer:t];
+#endif
+#endif
+}
+
+#ifndef EXTENSION
+#if TARGET_IPHONE_SIMULATOR
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.tableView]] != nil);
+}
+
+- (void)_test3DTouch:(UITapGestureRecognizer *)r {
+    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.tableView]);
+}
+#endif
+#endif
+
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+#ifndef EXTENSION
+    NSDictionary *d = [_data objectAtIndex:[self.tableView indexPathForRowAtPoint:location].row];
+
+    if(d) {
+        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectForKey:@"bid"] intValue]];
+        if(b) {
+            previewingContext.sourceRect = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]].frame;
+            EventsTableView *e = [[EventsTableView alloc] init];
+            e.navigationItem.title = [d objectForKey:@"name"];
+            [e setBuffer:b];
+            e.modalPresentationStyle = UIModalPresentationCurrentContext;
+            e.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
+            lp.enabled = NO;
+            lp.enabled = YES;
+            return e;
+        }
+    }
+#endif
+    return nil;
+}
+
+- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    [viewControllerToCommit viewWillDisappear:NO];
+    [_delegate bufferSelected:((EventsTableView *)viewControllerToCommit).buffer.bid];
 }
 
 - (void)backlogCompleted:(NSNotification *)notification {
@@ -553,6 +648,17 @@
                         unread = 0;
                     if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
                         highlights = 0;
+                }
+                if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+                    if([b.type isEqualToString:@"channel"]) {
+                        if(![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                            unread = 0;
+                    } else {
+                        if(![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                            unread = 0;
+                        if([b.type isEqualToString:@"conversation"] && ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                            highlights = 0;
+                    }
                 }
                 if([b.type isEqualToString:@"channel"]) {
                     Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:b.bid];

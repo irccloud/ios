@@ -1555,3 +1555,9 @@ float ColorFormatterCachedFontSize = 0.0f;
     return output;
 }
 @end
+
+@implementation NSString (ColorFormatter)
+-(NSString *)stripIRCFormatting {
+    return [[ColorFormatter format:self defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+}
+@end

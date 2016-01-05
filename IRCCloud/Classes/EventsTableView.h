@@ -30,7 +30,7 @@
 -(void)dismissKeyboard;
 @end
 
-@interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate,UIGestureRecognizerDelegate> {
+@interface EventsTableView : UITableViewController<TTTAttributedLabelDelegate,UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate> {
     IBOutlet UIView *_headerView;
     IBOutlet UIView *_backlogFailedView;
     IBOutlet UIButton *_backlogFailedButton;
@@ -71,6 +71,8 @@
     CSURITemplate *_paste_url_template;
     
     NSString *_groupIndent;
+    id<UIViewControllerPreviewing> __previewer;
+    UILongPressGestureRecognizer *lp;
 }
 @property (readonly) UIView *topUnreadView;
 @property (readonly) UIView *bottomUnreadView;
@@ -79,8 +81,8 @@
 @property (readonly) UILabel *bottomUnreadLabel;
 @property (readonly) UILabel *bottomUnreadArrow;
 @property (nonatomic) NSTimeInterval eidToOpen;
+@property Buffer *buffer;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
--(void)setBuffer:(Buffer *)buffer;
 -(IBAction)topUnreadBarClicked:(id)sender;
 -(IBAction)bottomUnreadBarClicked:(id)sender;
 -(IBAction)dismissButtonPressed:(id)sender;

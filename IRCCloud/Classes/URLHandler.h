@@ -20,6 +20,7 @@
 
 @property (nonatomic, copy) NSURL *appCallbackURL;
 
++ (BOOL)isImageURL:(NSURL *)url;
 - (void)launchURL:(NSURL *)url;
 
 @end

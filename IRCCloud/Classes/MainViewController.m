@@ -48,6 +48,33 @@
 #import "ServerReorderViewController.h"
 #import "FontAwesome.h"
 
+#if TARGET_IPHONE_SIMULATOR
+//Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
+@interface UIPreviewForceInteractionProgress : NSObject
+
+- (void)endInteraction:(BOOL)arg1;
+
+@end
+
+@interface UIPreviewInteractionController : NSObject
+
+@property (nonatomic, readonly) UIPreviewForceInteractionProgress *interactionProgressForPresentation;
+
+- (BOOL)startInteractivePreviewAtLocation:(CGPoint)point inView:(UIView *)view;
+- (void)cancelInteractivePreview;
+- (void)commitInteractivePreview;
+
+@end
+
+@interface _UIViewControllerPreviewSourceViewRecord : NSObject <UIViewControllerPreviewing>
+
+@property (nonatomic, readonly) UIPreviewInteractionController *previewInteractionController;
+
+@end
+
+void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation);
+#endif
+
 #define TAG_BAN 1
 #define TAG_IGNORE 2
 #define TAG_KICK 3
@@ -76,53 +103,58 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)_themeChanged {
-    UIView *v = self.navigationController.view.superview;
-    [self.navigationController.view removeFromSuperview];
-    [v addSubview: self.navigationController.view];
+    if(![__currentTheme isEqualToString:[UIColor currentTheme]]) {
+        __currentTheme = [UIColor currentTheme];
+        UIView *v = self.navigationController.view.superview;
+        [self.navigationController.view removeFromSuperview];
+        [v addSubview: self.navigationController.view];
 
-    self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
-    self.view.backgroundColor = [UIColor contentBackgroundColor];
-    self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor navBarColor];
-    _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
-    [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-    [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
-    UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
-    [_sendBtn setTitleColor:c forState:UIControlStateNormal];
-    [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
-    [_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
-    [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
-    [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
-    _message.textColor = [UIColor textareaTextColor];
-    _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+        self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
+        self.view.backgroundColor = [UIColor contentBackgroundColor];
+        self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor navBarColor];
+        _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
+        [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
+        UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
+        [_sendBtn setTitleColor:c forState:UIControlStateNormal];
+        [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
+        [_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
+        [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
+        [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
+        _message.textColor = [UIColor textareaTextColor];
+        _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
 
-    UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
-    [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-    [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    users.frame = CGRectMake(0,0,24,22);
-    [users setTintColor:[UIColor navBarSubheadingColor]];
-    users.accessibilityLabel = @"Channel members list";
-    _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+        UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
+        [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+        [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+        users.frame = CGRectMake(0,0,24,22);
+        [users setTintColor:[UIColor navBarSubheadingColor]];
+        users.accessibilityLabel = @"Channel members list";
+        _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
 
-    _menuBtn.tintColor = [UIColor navBarSubheadingColor];
-    
-    _eventsView.topUnreadView.backgroundColor = [UIColor chatterBarColor];
-    _eventsView.bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
-    _eventsView.topUnreadLabel.textColor = [UIColor chatterBarTextColor];
-    _eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
-    _eventsView.topUnreadArrow.textColor = _eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
-    
-    _borders.backgroundColor = [UIColor iPadBordersColor];
-    [[_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
-    
-    _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
-    
-    _fetchingFailed.textColor = [UIColor timestampColor];
-    [_loadMoreBacklog setTitleColor:[UIColor isDarkTheme]?[UIColor navBarSubheadingColor]:[UIColor unreadBlueColor] forState:UIControlStateNormal];
-    [_loadMoreBacklog setTitleShadowColor:[UIColor contentBackgroundColor] forState:UIControlStateNormal];
-    
-    [_eventsView refresh];
-    [_buffersView performSelectorInBackground:@selector(refresh) withObject:nil];
-    [_usersView performSelectorInBackground:@selector(refresh) withObject:nil];
+        _menuBtn.tintColor = [UIColor navBarSubheadingColor];
+        
+        _eventsView.topUnreadView.backgroundColor = [UIColor chatterBarColor];
+        _eventsView.bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
+        _eventsView.topUnreadLabel.textColor = [UIColor chatterBarTextColor];
+        _eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
+        _eventsView.topUnreadArrow.textColor = _eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
+        
+        _borders.backgroundColor = [UIColor iPadBordersColor];
+        [[_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
+        
+        _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
+        
+        _fetchingFailed.textColor = [UIColor timestampColor];
+        [_loadMoreBacklog setTitleColor:[UIColor isDarkTheme]?[UIColor navBarSubheadingColor]:[UIColor unreadBlueColor] forState:UIControlStateNormal];
+        [_loadMoreBacklog setTitleShadowColor:[UIColor contentBackgroundColor] forState:UIControlStateNormal];
+        
+        [_eventsView refresh];
+        [_buffersView performSelectorInBackground:@selector(refresh) withObject:nil];
+        [_usersView performSelectorInBackground:@selector(refresh) withObject:nil];
+        
+        [self _resetStatusBar];
+    }
 }
 
 - (void)viewDidLoad {
@@ -294,6 +326,53 @@ extern NSDictionary *emojiMap;
     swipe.numberOfTouchesRequired = 2;
     swipe.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:swipe];
+#if !(TARGET_IPHONE_SIMULATOR)
+    if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
+#endif
+        __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.navigationController.view];
+#if !(TARGET_IPHONE_SIMULATOR)
+    }
+#endif
+    
+#if TARGET_IPHONE_SIMULATOR
+    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
+    t.delegate = self;
+    [self.navigationController.view addGestureRecognizer:t];
+#endif
+}
+
+#if TARGET_IPHONE_SIMULATOR
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.navigationController.view]] != nil);
+}
+
+- (void)_test3DTouch:(UITapGestureRecognizer *)r {
+    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.navigationController.view]);
+}
+#endif
+
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+    if(CGRectContainsPoint(_titleView.frame, [_titleView convertPoint:location fromView:self.navigationController.view])) {
+        if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
+            previewingContext.sourceRect = [self.navigationController.view convertRect:_titleView.frame fromView:self.navigationController.navigationBar];
+            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            nc.navigationBarHidden = YES;
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            return nc;
+        }
+    }
+    return nil;
+}
+
+- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    if([viewControllerToCommit isKindOfClass:[UINavigationController class]])
+        ((UINavigationController *)viewControllerToCommit).navigationBarHidden = NO;
+    [self presentViewController:viewControllerToCommit animated:YES completion:nil];
 }
 
 - (void)swipeBack:(UISwipeGestureRecognizer *)sender {
@@ -358,6 +437,17 @@ extern NSDictionary *emojiMap;
                         unread = 0;
                     if(type == 2 && [[prefs objectForKey:@"buffer-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
                         highlights = 0;
+                }
+                if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+                    if(type == 1) {
+                        if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            unread = 0;
+                    } else {
+                        if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            unread = 0;
+                        if(type == 2 && (![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1))
+                            highlights = 0;
+                    }
                 }
                 if(buffer.bid != _buffer.bid) {
                     unreadCount += unread;
@@ -444,12 +534,16 @@ extern NSDictionary *emojiMap;
                         [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:_alertObject.cid];
                 }]];
                 
-                [self presentViewController:alert animated:YES completion:nil];
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1)
+                    [self presentViewController:alert animated:YES completion:nil];
                 
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                     textField.delegate = self;
                     [textField becomeFirstResponder];
                 }];
+                
+                if(!([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1))
+                    [self presentViewController:alert animated:YES completion:nil];
             } else {
                 _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
                 _alertView.tag = TAG_BADCHANNELKEY;
@@ -475,12 +569,16 @@ extern NSDictionary *emojiMap;
                         [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:_alertObject.cid];
                 }]];
                 
-                [self presentViewController:alert animated:YES completion:nil];
-
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1)
+                    [self presentViewController:alert animated:YES completion:nil];
+                
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                     textField.delegate = self;
                     [textField becomeFirstResponder];
                 }];
+                
+                if(!([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1))
+                    [self presentViewController:alert animated:YES completion:nil];
             } else {
                 _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Change", nil];
                 _alertView.tag = TAG_INVALIDNICK;
@@ -894,6 +992,15 @@ extern NSDictionary *emojiMap;
                             if([[prefs objectForKey:@"buffer-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
                                 break;
                         }
+                        if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+                            if([b.type isEqualToString:@"channel"]) {
+                                if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                    break;
+                            } else {
+                                if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                    break;
+                            }
+                        }
                         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
                         _menuBtn.tintColor = [UIColor unreadBlueColor];
                         _menuBtn.accessibilityValue = @"Unread messages";
@@ -1085,16 +1192,6 @@ extern NSDictionary *emojiMap;
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self _themeChanged];
         }];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
-#ifdef DEBUG
-    NSLog(@"This is a debug build, skipping APNs registration");
-#else
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-        [[UIApplication sharedApplication] registerForRemoteNotifications];
-    else
-        [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
-#endif
     }
     if([ServersDataSource sharedInstance].count < 1) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
@@ -1236,6 +1333,19 @@ extern NSDictionary *emojiMap;
     [self.slidingViewController resetTopView];
     
     NSString *session = [NetworkConnection sharedInstance].session;
+    if(session.length) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
+#ifdef DEBUG
+        NSLog(@"This is a debug build, skipping APNs registration");
+#else
+        NSLog(@"APNs registration");
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
+            [[UIApplication sharedApplication] registerForRemoteNotifications];
+        else
+            [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+#endif
+    }
     if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
         [[NetworkConnection sharedInstance] connect:NO];
     }
@@ -1773,7 +1883,7 @@ extern NSDictionary *emojiMap;
                     _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
                     _titleLabel.font = [UIFont boldSystemFontOfSize:18];
                     _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
-                    _topicLabel.text = [[ColorFormatter format:channel.topic_text defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+                    _topicLabel.text = [channel.topic_text stripIRCFormatting];
                     _topicLabel.accessibilityLabel = @"Topic";
                     _topicLabel.accessibilityValue = _topicLabel.text;
                     _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,4,16,_titleLabel.bounds.size.height-4);
@@ -1930,6 +2040,9 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)launchURL:(NSURL *)url {
+    if(self.presentedViewController)
+        [self dismissViewControllerAnimated:NO completion:nil];
+    
     if([url.host isEqualToString:@"youtu.be"] || [url.host hasSuffix:@"youtube.com"]) {
         _ytURL = url;
         _YTWrapperView = [[UIView alloc] initWithFrame:self.navigationController.view.bounds];
@@ -2121,21 +2234,27 @@ extern NSDictionary *emojiMap;
     Buffer *lastBuffer = _buffer;
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if(lastBuffer && changed) {
-        if([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:[lastBuffer.type isEqualToString:@"channel"]?@"channel-enableReadOnSelect":@"buffer-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",lastBuffer.bid]] boolValue]) {
-            NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:lastBuffer.bid];
-            NSTimeInterval eid = 0;
-            Event *last;
-            for(NSInteger i = events.count - 1; i >= 0; i--) {
-                last = [events objectAtIndex:i];
-                if(!last.pending && last.rowType != ROW_LASTSEENEID)
-                    break;
-            }
-            if(!last.pending) {
-                eid = last.eid;
-            }
-            if(eid >= 0 && eid >= lastBuffer.last_seen_eid) {
-                [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:lastBuffer.cid bid:lastBuffer.bid lastSeenEid:eid];
-                lastBuffer.last_seen_eid = eid;
+        if([NetworkConnection sharedInstance].prefs) {
+            BOOL enabled = [[[[NetworkConnection sharedInstance].prefs objectForKey:[lastBuffer.type isEqualToString:@"channel"]?@"channel-enableReadOnSelect":@"buffer-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",lastBuffer.bid]] boolValue] || [[[NetworkConnection sharedInstance].prefs objectForKey:@"enableReadOnSelect"] intValue] == 1;
+            if([[[[NetworkConnection sharedInstance].prefs objectForKey:[lastBuffer.type isEqualToString:@"channel"]?@"channel-disableReadOnSelect":@"buffer-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",lastBuffer.bid]] boolValue])
+                enabled = NO;
+            
+            if(enabled) {
+                NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:lastBuffer.bid];
+                NSTimeInterval eid = 0;
+                Event *last;
+                for(NSInteger i = events.count - 1; i >= 0; i--) {
+                    last = [events objectAtIndex:i];
+                    if(!last.pending && last.rowType != ROW_LASTSEENEID)
+                        break;
+                }
+                if(!last.pending) {
+                    eid = last.eid;
+                }
+                if(eid >= 0 && eid >= lastBuffer.last_seen_eid) {
+                    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:lastBuffer.cid bid:lastBuffer.bid lastSeenEid:eid];
+                    lastBuffer.last_seen_eid = eid;
+                }
             }
         }
         _buffer.lastBuffer = lastBuffer;
@@ -3042,7 +3161,7 @@ extern NSDictionary *emojiMap;
     NSString *title = @"";;
     if(_selectedUser) {
         if([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad))
-            title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,_selectedUser.hostmask];
+            title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,[_selectedUser.hostmask stripIRCFormatting]];
         else
             title = _selectedUser.nick;
     }
@@ -3065,6 +3184,10 @@ extern NSDictionary *emojiMap;
                     [sheet addButtonWithTitle:@"Deop"];
                 else
                     [sheet addButtonWithTitle:@"Op"];
+                if([_selectedUser.mode rangeOfString:server?server.MODE_VOICED:@"v"].location != NSNotFound)
+                    [sheet addButtonWithTitle:@"Devoice"];
+                else
+                    [sheet addButtonWithTitle:@"Voice"];
             }
             if([me.mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
                 [sheet addButtonWithTitle:@"Kick"];
@@ -3293,7 +3416,7 @@ extern NSDictionary *emojiMap;
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
         alert.popoverPresentationController.sourceRect = rect;
         alert.popoverPresentationController.sourceView = _buffersView.tableView;
-        [self.slidingViewController presentViewController:alert animated:YES completion:nil];
+        [self presentViewController:alert animated:YES completion:nil];
     } else {
         UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
         if([_selectedBuffer.type isEqualToString:@"console"]) {
@@ -3490,11 +3613,11 @@ extern NSDictionary *emojiMap;
     picker.delegate = (id)self;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
         picker.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self.slidingViewController presentViewController:picker animated:YES completion:nil];
+        [self presentViewController:picker animated:YES completion:nil];
     } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone]) {
         picker.modalPresentationStyle = UIModalPresentationFormSheet;
         picker.preferredContentSize = CGSizeMake(540, 576);
-        [self.slidingViewController presentViewController:picker animated:YES completion:nil];
+        [self presentViewController:picker animated:YES completion:nil];
     } else {
         _popover = [[UIPopoverController alloc] initWithContentViewController:picker];
         _popover.delegate = self;
@@ -3536,7 +3659,7 @@ extern NSDictionary *emojiMap;
         nc.modalPresentationStyle = UIModalPresentationFormSheet;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-    [self.slidingViewController presentViewController:nc animated:YES completion:nil];
+    [self presentViewController:nc animated:YES completion:nil];
     [self _resetStatusBar];
 }
 
@@ -3669,11 +3792,11 @@ extern NSDictionary *emojiMap;
         if(_popover) {
             [_popover dismissPopoverAnimated:YES];
             if(nc)
-                [self.slidingViewController presentViewController:nc animated:YES completion:nil];
+                [self presentViewController:nc animated:YES completion:nil];
         } else {
-            [self.slidingViewController dismissViewControllerAnimated:YES completion:^{
+            [self dismissViewControllerAnimated:YES completion:^{
                 if(nc)
-                    [self.slidingViewController presentViewController:nc animated:YES completion:nil];
+                    [self presentViewController:nc animated:YES completion:nil];
                 [self _resetStatusBar];
             }];
         }
@@ -3891,7 +4014,7 @@ extern NSDictionary *emojiMap;
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
         alert.popoverPresentationController.sourceRect = CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height);
         alert.popoverPresentationController.sourceView = self.view;
-        [self.slidingViewController presentViewController:alert animated:YES completion:nil];
+        [self presentViewController:alert animated:YES completion:nil];
     } else {
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
             UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo", @"Start a Pastebin", @"Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
@@ -4083,6 +4206,12 @@ extern NSDictionary *emojiMap;
         } else if([action isEqualToString:@"Deop"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+        } else if([action isEqualToString:@"Voice"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+        } else if([action isEqualToString:@"Devoice"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
         } else if([action isEqualToString:@"Ban"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];

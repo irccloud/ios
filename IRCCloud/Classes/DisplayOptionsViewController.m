@@ -44,46 +44,88 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
     NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[[NetworkConnection sharedInstance] prefs]];
     NSMutableDictionary *disableTrackUnread = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *enableTrackUnread = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *notifyAll = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *disableNotifyAll = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hideJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *expandJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *expandDisco = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *enableReadOnSelect = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *disableReadOnSelect = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
     
     if([_buffer.type isEqualToString:@"channel"]) {
         if([[prefs objectForKey:@"channel-enableReadOnSelect"] isKindOfClass:[NSDictionary class]])
             [enableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"channel-enableReadOnSelect"]];
-        if(!_readOnSelect.on)
-            [enableReadOnSelect removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        else
-            [enableReadOnSelect setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        if(enableReadOnSelect.count)
-            [prefs setObject:enableReadOnSelect forKey:@"channel-enableReadOnSelect"];
-        else
-            [prefs removeObjectForKey:@"channel-enableReadOnSelect"];
+        if([[prefs objectForKey:@"channel-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
+            [disableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"channel-disableReadOnSelect"]];
+        if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
+            if(_readOnSelect.on)
+                [disableReadOnSelect removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [disableReadOnSelect setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(disableReadOnSelect.count)
+                [prefs setObject:enableReadOnSelect forKey:@"channel-disableReadOnSelect"];
+            else
+                [prefs removeObjectForKey:@"channel-disableReadOnSelect"];
+        } else {
+            if(!_readOnSelect.on)
+                [enableReadOnSelect removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [enableReadOnSelect setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(enableReadOnSelect.count)
+                [prefs setObject:enableReadOnSelect forKey:@"channel-enableReadOnSelect"];
+            else
+                [prefs removeObjectForKey:@"channel-enableReadOnSelect"];
+        }
         
         if([[prefs objectForKey:@"channel-disableTrackUnread"] isKindOfClass:[NSDictionary class]])
             [disableTrackUnread addEntriesFromDictionary:[prefs objectForKey:@"channel-disableTrackUnread"]];
-        if(_trackUnread.on)
-            [disableTrackUnread removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        else
-            [disableTrackUnread setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        if(disableTrackUnread.count)
-            [prefs setObject:disableTrackUnread forKey:@"channel-disableTrackUnread"];
-        else
-            [prefs removeObjectForKey:@"channel-disableTrackUnread"];
+        if([[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]])
+            [enableTrackUnread addEntriesFromDictionary:[prefs objectForKey:@"channel-enableTrackUnread"]];
+        if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+            if(!_trackUnread.on)
+                [enableTrackUnread removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [enableTrackUnread setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(enableTrackUnread.count)
+                [prefs setObject:enableTrackUnread forKey:@"channel-enableTrackUnread"];
+            else
+                [prefs removeObjectForKey:@"channel-enableTrackUnread"];
+        } else {
+            if(_trackUnread.on)
+                [disableTrackUnread removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [disableTrackUnread setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(disableTrackUnread.count)
+                [prefs setObject:disableTrackUnread forKey:@"channel-disableTrackUnread"];
+            else
+                [prefs removeObjectForKey:@"channel-disableTrackUnread"];
+        }
 
         if([[prefs objectForKey:@"channel-notifications-all"] isKindOfClass:[NSDictionary class]])
             [notifyAll addEntriesFromDictionary:[prefs objectForKey:@"channel-notifications-all"]];
-        if(_notifyAll.on)
-            [notifyAll setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        else
-            [notifyAll removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        if(notifyAll.count)
-            [prefs setObject:notifyAll forKey:@"channel-notifications-all"];
-        else
-            [prefs removeObjectForKey:@"channel-notifications-all"];
+        if([[prefs objectForKey:@"channel-notifications-all-disable"] isKindOfClass:[NSDictionary class]])
+            [disableNotifyAll addEntriesFromDictionary:[prefs objectForKey:@"channel-notifications-all-disable"]];
+        if([[prefs objectForKey:@"notifications-all"] intValue] == 1) {
+            if(!_notifyAll.on)
+                [disableNotifyAll setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [disableNotifyAll removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(disableNotifyAll.count)
+                [prefs setObject:disableNotifyAll forKey:@"channel-notifications-all-disable"];
+            else
+                [prefs removeObjectForKey:@"channel-notifications-all-disable"];
+        } else {
+            if(_notifyAll.on)
+                [notifyAll setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [notifyAll removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(notifyAll.count)
+                [prefs setObject:notifyAll forKey:@"channel-notifications-all"];
+            else
+                [prefs removeObjectForKey:@"channel-notifications-all"];
+        }
         
         if([[prefs objectForKey:@"channel-hideJoinPart"] isKindOfClass:[NSDictionary class]])
             [hideJoinPart addEntriesFromDictionary:[prefs objectForKey:@"channel-hideJoinPart"]];
@@ -118,27 +160,51 @@
         else
             [prefs removeObjectForKey:@"channel-hiddenMembers"];
     } else {
-        if([[prefs objectForKey:@"buffer-enableReadOnSelect"] isKindOfClass:[NSDictionary class]])
-            [enableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"buffer-enableReadOnSelect"]];
-        if(!_readOnSelect.on)
-            [enableReadOnSelect removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        else
-            [enableReadOnSelect setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        if(enableReadOnSelect.count)
-            [prefs setObject:enableReadOnSelect forKey:@"buffer-enableReadOnSelect"];
-        else
-            [prefs removeObjectForKey:@"buffer-enableReadOnSelect"];
+        if([[prefs objectForKey:@"buffer-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
+            [disableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableReadOnSelect"]];
+        if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
+            if(_readOnSelect.on)
+                [disableReadOnSelect removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [disableReadOnSelect setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(disableReadOnSelect.count)
+                [prefs setObject:enableReadOnSelect forKey:@"buffer-disableReadOnSelect"];
+            else
+                [prefs removeObjectForKey:@"buffer-disableReadOnSelect"];
+        } else {
+            if(!_readOnSelect.on)
+                [enableReadOnSelect removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [enableReadOnSelect setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(enableReadOnSelect.count)
+                [prefs setObject:enableReadOnSelect forKey:@"buffer-enableReadOnSelect"];
+            else
+                [prefs removeObjectForKey:@"buffer-enableReadOnSelect"];
+        }
         
         if([[prefs objectForKey:@"buffer-disableTrackUnread"] isKindOfClass:[NSDictionary class]])
             [disableTrackUnread addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableTrackUnread"]];
-        if(_trackUnread.on)
-            [disableTrackUnread removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        else
-            [disableTrackUnread setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        if(disableTrackUnread.count)
-            [prefs setObject:disableTrackUnread forKey:@"buffer-disableTrackUnread"];
-        else
-            [prefs removeObjectForKey:@"buffer-disableTrackUnread"];
+        if([[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]])
+            [enableTrackUnread addEntriesFromDictionary:[prefs objectForKey:@"buffer-enableTrackUnread"]];
+        if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+            if(!_trackUnread.on)
+                [enableTrackUnread removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [enableTrackUnread setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(enableTrackUnread.count)
+                [prefs setObject:enableTrackUnread forKey:@"buffer-enableTrackUnread"];
+            else
+                [prefs removeObjectForKey:@"buffer-enableTrackUnread"];
+        } else {
+            if(_trackUnread.on)
+                [disableTrackUnread removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [disableTrackUnread setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(disableTrackUnread.count)
+                [prefs setObject:disableTrackUnread forKey:@"buffer-disableTrackUnread"];
+            else
+                [prefs removeObjectForKey:@"buffer-disableTrackUnread"];
+        }
         
         if([_buffer.type isEqualToString:@"conversation"]) {
             if([[prefs objectForKey:@"buffer-hideJoinPart"] isKindOfClass:[NSDictionary class]])
@@ -232,20 +298,41 @@
     NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     
     if([_buffer.type isEqualToString:@"channel"]) {
-        if([[[prefs objectForKey:@"channel-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _readOnSelect.on = YES;
-        else
-            _readOnSelect.on = NO;
+        if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
+            if([[[prefs objectForKey:@"channel-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _readOnSelect.on = NO;
+            else
+                _readOnSelect.on = YES;
+        } else {
+            if([[[prefs objectForKey:@"channel-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _readOnSelect.on = YES;
+            else
+                _readOnSelect.on = NO;
+        }
         
-        if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _trackUnread.on = NO;
-        else
-            _trackUnread.on = YES;
+        if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+            if([[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _trackUnread.on = YES;
+            else
+                _trackUnread.on = NO;
+        } else {
+            if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _trackUnread.on = NO;
+            else
+                _trackUnread.on = YES;
+        }
         
-        if([[[prefs objectForKey:@"channel-notifications-all"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _notifyAll.on = YES;
-        else
-            _notifyAll.on = NO;
+        if([[prefs objectForKey:@"notifications-all"] intValue] == 1) {
+            if([[[prefs objectForKey:@"channel-notifications-all-disable"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _notifyAll.on = NO;
+            else
+                _notifyAll.on = YES;
+        } else {
+            if([[[prefs objectForKey:@"channel-notifications-all"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _notifyAll.on = YES;
+            else
+                _notifyAll.on = NO;
+        }
         
         if([[[prefs objectForKey:@"channel-hideJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
             _showJoinPart.on = NO;
@@ -262,15 +349,29 @@
         else
             _showMembers.on = YES;
     } else {
-        if([[[prefs objectForKey:@"buffer-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _readOnSelect.on = YES;
-        else
-            _readOnSelect.on = NO;
+        if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
+            if([[[prefs objectForKey:@"buffer-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _readOnSelect.on = NO;
+            else
+                _readOnSelect.on = YES;
+        } else {
+            if([[[prefs objectForKey:@"buffer-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _readOnSelect.on = YES;
+            else
+                _readOnSelect.on = NO;
+        }
         
-        if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _trackUnread.on = NO;
-        else
-            _trackUnread.on = YES;
+        if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+            if([[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _trackUnread.on = YES;
+            else
+                _trackUnread.on = NO;
+        } else {
+            if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _trackUnread.on = NO;
+            else
+                _trackUnread.on = YES;
+        }
         
         if([[[prefs objectForKey:@"buffer-hideJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
             _showJoinPart.on = NO;

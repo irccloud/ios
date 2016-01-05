@@ -256,13 +256,13 @@ NSLock *__serializeLock = nil;
     } else {
         CLS_LOG(@"Version changed, not loading caches");
     }
-#ifndef EXTENSION
     if(_userInfo) {
-        _streamId = [_userInfo objectForKey:@"streamId"];
         _config = [_userInfo objectForKey:@"config"];
+#ifdef EXTENSION
+        _streamId = [_userInfo objectForKey:@"streamId"];
         _highestEID = [[_userInfo objectForKey:@"highestEID"] doubleValue];
-    }
 #endif
+    }
     
     CLS_LOG(@"%@", _userAgent);
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
@@ -448,8 +448,10 @@ NSLock *__serializeLock = nil;
                        _prefs = nil;
 #ifndef EXTENSION
                        NSDictionary *p = [self prefs];
-                       if([p objectForKey:@"theme"]) {
-                           [UIColor setTheme:[p objectForKey:@"theme"]];
+                       if([p objectForKey:@"theme"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]) {
+                           dispatch_sync(dispatch_get_main_queue(), ^{
+                               [UIColor setTheme:[p objectForKey:@"theme"]];
+                           });
                            [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"theme"] forKey:@"theme"];
                        }
                        [[NSUserDefaults standardUserDefaults] synchronize];
@@ -513,7 +515,7 @@ NSLock *__serializeLock = nil;
                    @"no_nick_change": alert, @"no_messages_from_non_registered": alert, @"not_registered": alert,
                    @"already_registered": alert, @"too_many_targets": alert, @"no_such_server": alert,
                    @"unknown_command": alert, @"help_not_found": alert, @"accept_full": alert,
-                   @"accept_not": alert, @"nick_collision": alert, @"nick_too_fast": alert,
+                   @"accept_not": alert, @"nick_collision": alert, @"nick_too_fast": alert, @"need_registered_nick": alert,
                    @"save_nick": alert, @"unknown_mode": alert, @"user_not_in_channel": alert,
                    @"need_more_params": alert, @"users_dont_match": alert, @"users_disabled": alert,
                    @"invalid_operator_password": alert, @"flood_warning": alert, @"privs_needed": alert,
@@ -636,7 +638,7 @@ NSLock *__serializeLock = nil;
                    @"unparsed_line": msg, @"connecting_failed": msg, @"nickname_in_use": msg,
                    @"channel_invite": msg, @"motd_response": msg, @"socket_closed": msg,
                    @"channel_mode_list_change": msg, @"msg_services": msg,
-                   @"stats": msg, @"statslinkinfo": msg, @"statscommands": msg, @"statscline": msg, @"statsnline": msg, @"statsiline": msg, @"statskline": msg, @"statsqline": msg, @"statsyline": msg, @"statsbline": msg, @"statsgline": msg, @"statstline": msg, @"statseline": msg, @"statsvline": msg, @"statslline": msg, @"statsuptime": msg, @"statsoline": msg, @"statshline": msg, @"statssline": msg, @"statsuline": msg, @"statsdebug": msg, @"endofstats": msg,
+                   @"stats": msg, @"statslinkinfo": msg, @"statscommands": msg, @"statscline": msg, @"statsnline": msg, @"statsiline": msg, @"statskline": msg, @"statsqline": msg, @"statsyline": msg, @"statsbline": msg, @"statsgline": msg, @"statstline": msg, @"statseline": msg, @"statsvline": msg, @"statslline": msg, @"statsuptime": msg, @"statsoline": msg, @"statshline": msg, @"statssline": msg, @"statsuline": msg, @"statsdebug": msg, @"spamfilter": msg, @"endofstats": msg,
                    @"inviting_to_channel": msg, @"error": msg, @"too_fast": msg, @"no_bots": msg,
                    @"wallops": msg, @"logged_in_as": msg, @"sasl_fail": msg, @"sasl_too_long": msg,
                    @"sasl_aborted": msg, @"sasl_already": msg, @"you_are_operator": msg,

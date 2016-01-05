@@ -326,6 +326,7 @@
 		229C85461B50294C004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
 		22A19C60178FCCAC00772C60 /* UINavigationController+iPadSux.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */; };
 		22A1D0271778A86900F8A89C /* WhoisViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A1D0261778A86900F8A89C /* WhoisViewController.m */; };
+		22A1F1151C232B3A00AEC09A /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A1F1141C232B3A00AEC09A /* SafariServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F25178A317100529CDA /* WhoListTableViewController.m */; };
 		22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A35F28178A3F3500529CDA /* NamesListTableViewController.m */; };
 		22A363B219D0884D00500478 /* 1Password.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22A363AF19D0884D00500478 /* 1Password.xcassets */; };
@@ -730,6 +731,7 @@
 		22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+iPadSux.m"; sourceTree = "<group>"; };
 		22A1D0251778A86900F8A89C /* WhoisViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhoisViewController.h; sourceTree = "<group>"; };
 		22A1D0261778A86900F8A89C /* WhoisViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoisViewController.m; sourceTree = "<group>"; };
+		22A1F1141C232B3A00AEC09A /* SafariServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SafariServices.framework; path = System/Library/Frameworks/SafariServices.framework; sourceTree = SDKROOT; };
 		22A35F24178A316300529CDA /* WhoListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhoListTableViewController.h; sourceTree = "<group>"; };
 		22A35F25178A317100529CDA /* WhoListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoListTableViewController.m; sourceTree = "<group>"; };
 		22A35F27178A3F2B00529CDA /* NamesListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NamesListTableViewController.h; sourceTree = "<group>"; };
@@ -883,6 +885,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22A1F1151C232B3A00AEC09A /* SafariServices.framework in Frameworks */,
 				2245E3771B542D0200B763D7 /* AVKit.framework in Frameworks */,
 				229C85411B502920004964DE /* CoreMedia.framework in Frameworks */,
 				226EB6011B4C2E8600C432C7 /* AVFoundation.framework in Frameworks */,
@@ -1033,6 +1036,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22A1F1141C232B3A00AEC09A /* SafariServices.framework */,
 				2245E3761B542D0200B763D7 /* AVKit.framework */,
 				229C85401B502920004964DE /* CoreMedia.framework */,
 				226EB6001B4C2E8600C432C7 /* AVFoundation.framework */,
@@ -2243,7 +2247,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4292916c-0f74-473f-bfbf-4213126e7d04";
+				PROVISIONING_PROFILE = "9cfbabd4-fa1d-44bb-923f-62b8d6aa1cb4";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2464,7 +2468,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "47714bc4-dba0-4816-b6a5-c8552902c2cd";
+				PROVISIONING_PROFILE = "bcd5fb74-f9f1-4156-908a-ce8dcbec3456";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

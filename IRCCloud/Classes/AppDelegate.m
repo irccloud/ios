@@ -73,7 +73,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
     [[NSFileManager defaultManager] removeItemAtURL:caches error:nil];
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO), @"theme":@"dawn"}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO)}];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 0.8)}];
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"www.irccloud.com"]) {
         CLS_LOG(@"Migrating host");
@@ -287,20 +287,18 @@
 
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
     NSData *oldToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"];
-    if(![devToken isEqualToData:oldToken]) {
-        if(oldToken) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                CLS_LOG(@"Unregistering old APNs token");
-                NSDictionary *result = [_conn unregisterAPNs:oldToken session:_conn.session];
-                NSLog(@"Unregistration result: %@", result);
-            });
-        }
-        [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
+    if(oldToken && ![devToken isEqualToData:oldToken]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSDictionary *result = [_conn registerAPNs:devToken];
-            NSLog(@"Registration result: %@", result);
+            CLS_LOG(@"Unregistering old APNs token");
+            NSDictionary *result = [_conn unregisterAPNs:oldToken session:_conn.session];
+            NSLog(@"Unregistration result: %@", result);
         });
     }
+    [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSDictionary *result = [_conn registerAPNs:devToken];
+        NSLog(@"Registration result: %@", result);
+    });
 }
 
 - (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)err {
@@ -343,10 +341,6 @@
                 [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
                 _backlogFailedObserver = nil;
             }
-            if(_fetchHandler) {
-                _fetchHandler(UIBackgroundFetchResultNewData);
-            }
-            _fetchHandler = handler;
             [[NSNotificationCenter defaultCenter] removeObserver:self];
             
             _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
@@ -364,8 +358,7 @@
                     [[NotificationsDataSource sharedInstance] updateBadgeCount];
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                         [[NetworkConnection sharedInstance] serialize];
-                        _fetchHandler(UIBackgroundFetchResultNewData);
-                        _fetchHandler = nil;
+                        handler(UIBackgroundFetchResultNewData);
                     });
                 }
             }];
@@ -382,8 +375,7 @@
                     [self.mainViewController refresh];
                     NSLog(@"Backlog download failed for bid%i", bid);
                     [[NotificationsDataSource sharedInstance] updateBadgeCount];
-                    _fetchHandler(UIBackgroundFetchResultFailed);
-                    _fetchHandler = nil;
+                    handler(UIBackgroundFetchResultFailed);
                 }
             }];
 
@@ -598,10 +590,6 @@
         self.window.backgroundColor = [UIColor blackColor];
     }
     [[NotificationsDataSource sharedInstance] updateBadgeCount];
-}
-
--(void)applicationWillResignActive:(UIApplication *)application {
-    [_mainViewController dismissKeyboard];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {

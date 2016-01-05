@@ -14,13 +14,58 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+#import <AVFoundation/AVFoundation.h>
+#import <AVKit/AVKit.h>
+#import <MediaPlayer/MediaPlayer.h>
+#import <SafariServices/SafariServices.h>
 #import "EventsTableView.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
 #import "ColorFormatter.h"
 #import "AppDelegate.h"
 #import "FontAwesome.h"
+#import "URLHandler.h"
+#import "ImageViewController.h"
+#import "PastebinViewController.h"
+
+#if TARGET_IPHONE_SIMULATOR
+//Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
+@interface UIPreviewForceInteractionProgress : NSObject
+
+- (void)endInteraction:(BOOL)arg1;
+
+@end
+
+@interface UIPreviewInteractionController : NSObject
+
+@property (nonatomic, readonly) UIPreviewForceInteractionProgress *interactionProgressForPresentation;
+
+- (BOOL)startInteractivePreviewAtLocation:(CGPoint)point inView:(UIView *)view;
+- (void)cancelInteractivePreview;
+- (void)commitInteractivePreview;
+
+@end
+
+@interface _UIViewControllerPreviewSourceViewRecord : NSObject <UIViewControllerPreviewing>
+
+@property (nonatomic, readonly) UIPreviewInteractionController *previewInteractionController;
+
+@end
+
+void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation) {
+    _UIViewControllerPreviewSourceViewRecord *record = (_UIViewControllerPreviewSourceViewRecord *)previewer;
+    UIPreviewInteractionController *interactionController = record.previewInteractionController;
+    [interactionController startInteractivePreviewAtLocation:sourceLocation inView:record.sourceView];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [interactionController.interactionProgressForPresentation endInteraction:YES];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [interactionController commitInteractivePreview];
+            //[interactionController cancelInteractivePreview];
+        });
+    });
+}
+#endif
 
 int __timestampWidth;
 
@@ -150,6 +195,24 @@ int __timestampWidth;
 
 @implementation EventsTableView
 
+- (id)init {
+    self = [super initWithStyle:UITableViewStylePlain];
+    if (self) {
+        _lock = [[NSRecursiveLock alloc] init];
+        _ready = NO;
+        _formatter = [[NSDateFormatter alloc] init];
+        _formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+        _data = [[NSMutableArray alloc] init];
+        _expandedSectionEids = [[NSMutableDictionary alloc] init];
+        _collapsedEvents = [[CollapsedEvents alloc] init];
+        _unseenHighlightPositions = [[NSMutableArray alloc] init];
+        _buffer = nil;
+        _ignore = [[Ignore alloc] init];
+        _eidToOpen = -1;
+    }
+    return self;
+}
+
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
@@ -171,9 +234,19 @@ int __timestampWidth;
 - (void)viewDidLoad {
     _conn = [NetworkConnection sharedInstance];
     [super viewDidLoad];
-
+    
+    if(!_headerView) {
+        _headerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.tableView.frame.size.width,20)];
+        _headerView.autoresizesSubviews = YES;
+        UIActivityIndicatorView *a = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+        a.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
+        a.center = _headerView.center;
+        [a startAnimating];
+        [_headerView addSubview:a];
+    }
+    
     self.tableView.scrollsToTop = NO;
-    UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
+    lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
@@ -189,6 +262,96 @@ int __timestampWidth;
     
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.tableView.backgroundColor = [UIColor contentBackgroundColor];
+
+#if !(TARGET_IPHONE_SIMULATOR)
+    if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
+#endif
+        __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+#if !(TARGET_IPHONE_SIMULATOR)
+    }
+#endif
+
+#if TARGET_IPHONE_SIMULATOR
+    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
+    t.delegate = self;
+    [self.view addGestureRecognizer:t];
+#endif
+}
+
+#if TARGET_IPHONE_SIMULATOR
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.tableView]] != nil);
+}
+
+- (void)_test3DTouch:(UITapGestureRecognizer *)r {
+    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.tableView]);
+}
+#endif
+
+- (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+    EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]];
+    NSTextCheckingResult *r = [cell.message linkAtPoint:[self.tableView convertPoint:location toView:cell.message]];
+    NSURL *url = r.URL;
+    
+    if([URLHandler isImageURL:url]) {
+        previewingContext.sourceRect = cell.frame;
+        ImageViewController *i = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"ImageViewController"];
+        i.url = url;
+        i.preferredContentSize = self.view.window.bounds.size;
+        i.previewing = YES;
+        lp.enabled = NO;
+        lp.enabled = YES;
+        return i;
+    } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
+        PastebinViewController *pvc = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"PastebinViewController"];
+        [pvc setUrl:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pvc];
+        nc.navigationBarHidden = YES;
+        nc.preferredContentSize = self.view.window.bounds.size;
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        lp.enabled = NO;
+        lp.enabled = YES;
+        return nc;
+    } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"]) {
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+        if(NSClassFromString(@"AVPlayerViewController")) {
+            AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
+            player.player = [[AVPlayer alloc] initWithURL:url];
+            player.modalPresentationStyle = UIModalPresentationCurrentContext;
+            player.preferredContentSize = self.view.window.bounds.size;
+            return player;
+        } else {
+            MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
+            player.modalPresentationStyle = UIModalPresentationCurrentContext;
+            player.preferredContentSize = self.view.window.bounds.size;
+            return player;
+        }
+    } else if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
+        SFSafariViewController *s = [[SFSafariViewController alloc] initWithURL:url];
+        s.modalPresentationStyle = UIModalPresentationCurrentContext;
+        s.preferredContentSize = self.view.window.bounds.size;
+        return s;
+    }
+    
+    return nil;
+}
+
+- (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    if([viewControllerToCommit isKindOfClass:[ImageViewController class]]) {
+        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+        appDelegate.window.backgroundColor = [UIColor blackColor];
+        appDelegate.window.rootViewController = viewControllerToCommit;
+        [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
+        [UIApplication sharedApplication].statusBarHidden = YES;
+        [viewControllerToCommit didMoveToParentViewController:nil];
+    } else if([viewControllerToCommit isKindOfClass:[UINavigationController class]]) {
+        ((UINavigationController *)viewControllerToCommit).navigationBarHidden = NO;
+        [((UINavigationController *)viewControllerToCommit).topViewController didMoveToParentViewController:nil];
+        [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
+    } else {
+        [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+        [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -651,7 +814,9 @@ int __timestampWidth;
                 else
                     event.formattedMsg = @"";
                 if([_buffer.type isEqualToString:@"console"] && event.toChan && event.chan.length) {
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%@%c: %@", event.chan, 1, event.msg];
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c: %@", BOLD, event.chan, BOLD, event.msg];
+                } else if([_buffer.type isEqualToString:@"console"] && event.isSelf && event.nick.length) {
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c: %@", BOLD, event.nick, BOLD, event.msg];
                 } else {
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
                 }
@@ -703,6 +868,8 @@ int __timestampWidth;
 }
 
 -(void)updateTopUnread:(NSInteger)firstRow {
+    if(!_topUnreadView)
+        return;
     int highlights = 0;
     for(NSNumber *pos in _unseenHighlightPositions) {
         if([pos intValue] > firstRow)
@@ -776,6 +943,8 @@ int __timestampWidth;
 }
 
 -(void)updateUnread {
+    if(!_bottomUnreadView)
+        return;
     NSString *msg = @"";
     CGRect rect = _bottomUnreadView.frame;
     _bottomUnreadArrow.frame = CGRectMake(0,8,12,rect.size.height-12);
@@ -939,6 +1108,10 @@ int __timestampWidth;
         
         [_lock unlock];
     }
+}
+
+-(Buffer *)buffer {
+    return _buffer;
 }
 
 -(void)setBuffer:(Buffer *)buffer {
@@ -1231,9 +1404,9 @@ int __timestampWidth;
         }
         
         [self updateUnread];
-        [self scrollViewDidScroll:self.tableView];
         
         _ready = YES;
+        [self scrollViewDidScroll:self.tableView];
         [_lock unlock];
         
         if(_conn.state == kIRCCloudStateConnected) {
@@ -1628,7 +1801,7 @@ int __timestampWidth;
         }
     }
     
-    if(rows.count) {
+    if(rows.count && _topUnreadView) {
         if(_data.count) {
             if(lastRow < _data.count)
                 _buffer.savedScrollOffset = tableView.contentOffset.y - tableView.tableHeaderView.bounds.size.height;

@@ -333,7 +333,7 @@
 
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.textLabel.text = [_themes objectAtIndex:indexPath.row];
-    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] isEqualToString:[[_themes objectAtIndex:indexPath.row] lowercaseString]])
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] isEqualToString:[[_themes objectAtIndex:indexPath.row] lowercaseString]] || (![[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] && indexPath.row == 0))
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     else
         cell.accessoryType = UITableViewCellAccessoryNone;
@@ -425,7 +425,9 @@
         [prefs setObject:_mono.isOn?@"mono":@"sans" forKey:@"font"];
         [prefs setObject:[NSNumber numberWithBool:!_hideJoinPart.isOn] forKey:@"hideJoinPart"];
         [prefs setObject:[NSNumber numberWithBool:!_expandJoinPart.isOn] forKey:@"expandJoinPart"];
-        [prefs setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] forKey:@"theme"];
+        [prefs setObject:[NSNumber numberWithBool:_notifyAll.isOn] forKey:@"notifications-all"];
+        [prefs setObject:[NSNumber numberWithBool:!_showUnread.isOn] forKey:@"disableTrackUnread"];
+        [prefs setObject:[NSNumber numberWithBool:_markAsRead.isOn] forKey:@"enableReadOnSelect"];
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -637,6 +639,24 @@
         _mono.on = NO;
     }
 
+    if([[prefs objectForKey:@"notifications-all"] isKindOfClass:[NSNumber class]]) {
+        _notifyAll.on = [[prefs objectForKey:@"notifications-all"] boolValue];
+    } else {
+        _notifyAll.on = NO;
+    }
+    
+    if([[prefs objectForKey:@"disableTrackUnread"] isKindOfClass:[NSNumber class]]) {
+        _showUnread.on = ![[prefs objectForKey:@"disableTrackUnread"] boolValue];
+    } else {
+        _showUnread.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"enableReadOnSelect"] isKindOfClass:[NSNumber class]]) {
+        _markAsRead.on = [[prefs objectForKey:@"enableReadOnSelect"] boolValue];
+    } else {
+        _markAsRead.on = NO;
+    }
+    
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
@@ -689,6 +709,9 @@
     _mono = [[UISwitch alloc] init];
     _hideJoinPart = [[UISwitch alloc] init];
     _expandJoinPart = [[UISwitch alloc] init];
+    _notifyAll = [[UISwitch alloc] init];
+    _showUnread = [[UISwitch alloc] init];
+    _markAsRead = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -756,7 +779,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 7;
+    return 8;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -768,16 +791,18 @@
         case 2:
             return 10;
         case 3:
-            return ((_chromeInstalled)?4:3) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
+            return ((_chromeInstalled)?3:2) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
         case 4:
-            return 1;
+            return 4;
         case 5:
+            return 1;
+        case 6:
             if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
                 return [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"]?4:3;
             } else {
                 return 3;
             }
-        case 6:
+        case 7:
             return 4;
     }
     return 0;
@@ -794,10 +819,12 @@
         case 3:
             return @"Device";
         case 4:
-            return @"Font Size";
+            return @"Message Notifications";
         case 5:
-            return @"Photo Sharing";
+            return @"Font Size";
         case 6:
+            return @"Photo Sharing";
+        case 7:
             return @"About";
     }
     return nil;
@@ -808,7 +835,7 @@
     NSString *identifier = [NSString stringWithFormat:@"settingscell-%li-%li", (long)indexPath.section, (long)indexPath.row];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     
-    if(indexPath.section != 4) {
+    if(indexPath.section != 5) {
         if(!cell)
             cell = [[UITableViewCell alloc] initWithStyle:(indexPath.section == 2 && indexPath.row > 0)?UITableViewCellStyleSubtitle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
         
@@ -845,7 +872,7 @@
             switch(row) {
                 case 0:
                     cell.textLabel.text = @"Theme";
-                    cell.detailTextLabel.text = [[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] capitalizedString];
+                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]?[[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] capitalizedString]:@"Dawn";
                     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
                     break;
                 case 1:
@@ -900,28 +927,44 @@
                     cell.accessoryView = _autoCaps;
                     break;
                 case 2:
-                    cell.textLabel.text = @"Play Alert Sounds";
-                    cell.accessoryView = _notificationSound;
-                    break;
-                case 3:
                     if([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
                         cell.textLabel.text = @"Show Sidebars In Landscape";
                         cell.accessoryView = _tabletMode;
                         break;
                     }
-                case 4:
+                case 3:
                     cell.textLabel.text = @"Open URLs in Chrome";
                     cell.accessoryView = _chrome;
                     break;
             }
             break;
         case 4:
+            switch(row) {
+                case 0:
+                    cell.textLabel.text = @"Background Alert Sounds";
+                    cell.accessoryView = _notificationSound;
+                    break;
+                case 1:
+                    cell.textLabel.text = @"Notify On All Messages";
+                    cell.accessoryView = _notifyAll;
+                    break;
+                case 2:
+                    cell.textLabel.text = @"Show Unread Indicators";
+                    cell.accessoryView = _showUnread;
+                    break;
+                case 3:
+                    cell.textLabel.text = @"Mark As Read Automatically";
+                    cell.accessoryView = _markAsRead;
+                    break;
+            }
+            break;
+        case 5:
             if(!cell) {
                 cell = [[FontSizeCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
                 ((FontSizeCell *)cell).fontSize = _fontSize;
             }
             break;
-        case 5:
+        case 6:
             if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
                 if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"] && row > 0)
                     row++;
@@ -964,7 +1007,7 @@
                     break;
             }
             break;
-        case 6:
+        case 7:
             switch(row) {
                 case 0:
                     cell.textLabel.text = @"FAQ";
@@ -993,7 +1036,7 @@
     if(indexPath.section == 2 && indexPath.row == 0) {
         [self.navigationController pushViewController:[[ThemesViewController alloc] init] animated:YES];
     }
-    if(indexPath.section == 5) {
+    if(indexPath.section == 6) {
         NSInteger row = indexPath.row;
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
             if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"] && row > 0)
@@ -1018,16 +1061,16 @@
             [self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];
         }
     }
-    if(indexPath.section == 6 && indexPath.row == 0) {
+    if(indexPath.section == 7 && indexPath.row == 0) {
         [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];
     }
-    if(indexPath.section == 6 && indexPath.row == 1) {
+    if(indexPath.section == 7 && indexPath.row == 1) {
         [self.tableView endEditing:YES];
         [self dismissViewControllerAnimated:YES completion:^{
             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
         }];
     }
-    if(indexPath.section == 6 && indexPath.row == 2) {
+    if(indexPath.section == 7 && indexPath.row == 2) {
         [self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];
     }
 }
