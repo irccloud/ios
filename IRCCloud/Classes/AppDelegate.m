@@ -275,7 +275,7 @@
                           [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
                       }
                 }] resume];
-            } else if([userActivity.webpageURL.path hasPrefix:@"/#!/"]) {
+            } else if([userActivity.webpageURL.path isEqualToString:@"/"] && [userActivity.webpageURL.fragment hasPrefix:@"!/"]) {
                 NSString *url = [userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/#!/" withString:@"irc://"];
                 if([url hasPrefix:@"irc://ircs://"])
                     url = [url substringFromIndex:6];
