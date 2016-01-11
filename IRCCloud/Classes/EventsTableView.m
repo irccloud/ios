@@ -27,6 +27,7 @@
 #import "URLHandler.h"
 #import "ImageViewController.h"
 #import "PastebinViewController.h"
+#import "YouTubeViewController.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -309,6 +310,16 @@ int __timestampWidth;
         lp.enabled = YES;
         [_delegate dismissKeyboard];
         return i;
+    } else if([URLHandler isYouTubeURL:url]) {
+        previewingContext.sourceRect = cell.frame;
+        YouTubeViewController *y = [[YouTubeViewController alloc] initWithURL:url];
+        [y loadViewIfNeeded];
+        y.preferredContentSize = y.player.bounds.size;
+        y.toolbar.hidden = YES;
+        lp.enabled = NO;
+        lp.enabled = YES;
+        [_delegate dismissKeyboard];
+        return y;
     } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
         previewingContext.sourceRect = cell.frame;
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]];
@@ -356,6 +367,10 @@ int __timestampWidth;
         [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
         [UIApplication sharedApplication].statusBarHidden = YES;
         [viewControllerToCommit didMoveToParentViewController:nil];
+    } else if([viewControllerToCommit isKindOfClass:[YouTubeViewController class]]) {
+        viewControllerToCommit.modalPresentationStyle = UIModalPresentationCustom;
+        ((YouTubeViewController *)viewControllerToCommit).toolbar.hidden = NO;
+        [self.slidingViewController presentViewController:viewControllerToCommit animated:NO completion:nil];
     } else if([viewControllerToCommit isKindOfClass:[UINavigationController class]]) {
         ((UINavigationController *)viewControllerToCommit).navigationBarHidden = NO;
         [((UINavigationController *)viewControllerToCommit).topViewController didMoveToParentViewController:nil];

@@ -69,6 +69,11 @@
     return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GFYCAT(url)|| IS_GIPHY(url));
 }
 
++ (BOOL)isYouTubeURL:(NSURL *)url
+{
+    return IS_YOUTUBE(url);
+}
+
 - (void)launchURL:(NSURL *)url
 {
     NSLog(@"Launch: %@", url);

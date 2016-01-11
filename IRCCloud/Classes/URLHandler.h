@@ -21,6 +21,7 @@
 @property (nonatomic, copy) NSURL *appCallbackURL;
 
 + (BOOL)isImageURL:(NSURL *)url;
++ (BOOL)isYouTubeURL:(NSURL *)url;
 - (void)launchURL:(NSURL *)url;
 
 @end
