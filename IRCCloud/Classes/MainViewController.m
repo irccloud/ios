@@ -3583,7 +3583,7 @@ extern NSDictionary *emojiMap;
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     CLS_LOG(@"Image picker was cancelled");
-    [self.slidingViewController dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:nil];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -3606,7 +3606,7 @@ extern NSDictionary *emojiMap;
 
 -(void)fileUploadDidFail {
     CLS_LOG(@"File upload failed");
-    [self.slidingViewController dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:nil];
     _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the file. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
     [_alertView show];
     [self _hideConnectingView];
@@ -3614,7 +3614,7 @@ extern NSDictionary *emojiMap;
 
 -(void)fileUploadTooLarge {
     CLS_LOG(@"File upload too large");
-    [self.slidingViewController dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:nil];
     _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
     [_alertView show];
     [self _hideConnectingView];
