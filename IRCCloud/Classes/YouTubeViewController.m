@@ -189,7 +189,7 @@
             }
         };
     }
-    [self.view.window.rootViewController presentViewController:activityController animated:YES completion:nil];
+    [self presentViewController:activityController animated:YES completion:nil];
 }
 
 -(void)playerViewDidBecomeReady:(YTPlayerView *)playerView {
