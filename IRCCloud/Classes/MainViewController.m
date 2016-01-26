@@ -1810,14 +1810,10 @@ extern NSDictionary *emojiMap;
 
 -(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {
     if(expandingTextView.frame.size.height != height) {
-        CGRect frame = _serverStatusBar.frame;
-        frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
-        _serverStatusBar.frame = frame;
-        frame = _eventsView.bottomUnreadView.frame;
-        frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
-        _eventsView.bottomUnreadView.frame = frame;
-        _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
-        [self _updateEventsInsets];
+        CGRect frame = expandingTextView.frame;
+        frame.size.height = height;
+        expandingTextView.frame = frame;
+        [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     }
 }
 
@@ -2470,7 +2466,7 @@ extern NSDictionary *emojiMap;
             _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsZero;
             _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
             _eventsView.view.frame = CGRectMake(0,0,width, height + _kbSize.height);
-            _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
+            _bottomBar.frame = CGRectMake(0,height - _message.frame.size.height - 8,_eventsView.view.frame.size.width,_message.frame.size.height + 8);
             if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
                 _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
             else
