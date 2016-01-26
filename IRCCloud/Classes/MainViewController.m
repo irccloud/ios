@@ -3381,7 +3381,6 @@ extern NSDictionary *emojiMap;
         picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
     picker.delegate = (id)self;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
-        picker.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentViewController:picker animated:YES completion:nil];
     } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone]) {
         picker.modalPresentationStyle = UIModalPresentationFormSheet;
@@ -3546,38 +3545,33 @@ extern NSDictionary *emojiMap;
         }
     }
     
-    if((picker.sourceType == UIImagePickerControllerSourceTypeCamera && [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) || _popover) {
-        UINavigationController *nc = nil;
-        
-        if(fvc) {
-            nc = [[UINavigationController alloc] initWithRootViewController:fvc];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        }
-        
-        if(_popover) {
-            [_popover dismissPopoverAnimated:YES];
+    UINavigationController *nc = nil;
+    
+    if(fvc) {
+        nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    }
+    
+    if(_popover) {
+        [_popover dismissPopoverAnimated:YES];
+        if(nc)
+            [self presentViewController:nc animated:YES completion:nil];
+    } else {
+        [self dismissViewControllerAnimated:YES completion:^{
+            [self _resetStatusBar];
             if(nc)
                 [self presentViewController:nc animated:YES completion:nil];
-        } else {
-            [self dismissViewControllerAnimated:YES completion:^{
-                if(nc)
-                    [self presentViewController:nc animated:YES completion:nil];
-                [self _resetStatusBar];
-            }];
-        }
-    } else {
-        if(fvc) {
-            [picker setViewControllers:@[picker.viewControllers.firstObject, fvc] animated:YES];
-        } else {
-            [self.slidingViewController dismissViewControllerAnimated:YES completion:^{
-                [self _resetStatusBar];
-            }];
-        }
+        }];
     }
+    
+    if(!nc)
+        [self dismissViewControllerAnimated:YES completion:^{
+            [self _resetStatusBar];
+        }];
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
