@@ -2440,7 +2440,7 @@ extern NSDictionary *emojiMap;
             self.slidingViewController.underLeftViewController = nil;
             [self addChildViewController:_buffersView];
             _buffersView.view.frame = CGRectMake(0,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,[[UIDevice currentDevice] isBigPhone]?180:220,height + ([[UIDevice currentDevice] isBigPhone]?self.navigationController.navigationBar.frame.size.height:0));
-            _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height);
+            _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height + _kbSize.height);
             _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
             [_buffersView willMoveToParentViewController:self];
