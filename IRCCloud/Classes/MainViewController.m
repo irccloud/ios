@@ -1928,7 +1928,9 @@ extern NSDictionary *emojiMap;
         Server *s = [[ServersDataSource sharedInstance] getServer:[url.host intValue]];
         if(s != nil) {
             match = YES;
-            NSString *channel = [url.path substringFromIndex:1];
+            CFStringRef path = CFURLCopyPath((CFURLRef)url);
+            NSString *channel = [[(__bridge NSString *)path stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] substringFromIndex:1];
+            CFRelease(path);
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:channel server:s.cid];
             if([b.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:b.bid])
                 b = nil;
