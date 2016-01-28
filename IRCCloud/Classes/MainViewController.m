@@ -3274,6 +3274,10 @@ extern NSDictionary *emojiMap;
     return NO;
 }
 
+-(void)_setSelectedBuffer:(Buffer *)b {
+    _selectedBuffer = b;
+}
+
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     

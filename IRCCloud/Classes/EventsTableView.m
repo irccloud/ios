@@ -456,6 +456,7 @@ int __timestampWidth;
                 [_conn part:_buffer.name msg:nil cid:_buffer.cid];
             }]];
             [items addObject:[UIPreviewAction actionWithTitle:@"Invite to Channel" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                [((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController _setSelectedBuffer:_buffer];
                 UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", _server.name, _server.hostname, _server.port] message:@"Invite to channel" delegate:((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
                 alertView.tag = 4;
                 alertView.alertViewStyle = UIAlertViewStylePlainTextInput;

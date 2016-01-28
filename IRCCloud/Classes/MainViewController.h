@@ -97,4 +97,5 @@
 -(IBAction)globalMsgPressed:(id)sender;
 -(void)launchURL:(NSURL *)url;
 -(void)refresh;
+-(void)_setSelectedBuffer:(Buffer *)b;
 @end
