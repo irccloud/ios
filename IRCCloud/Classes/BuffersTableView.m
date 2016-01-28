@@ -609,7 +609,9 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
             e.modalPresentationStyle = UIModalPresentationCurrentContext;
             e.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
             lp.enabled = NO;
-            lp.enabled = YES;
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                lp.enabled = YES;
+            }];
             return e;
         }
     }
