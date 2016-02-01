@@ -17,6 +17,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <Twitter/Twitter.h>
+#import <SafariServices/SafariServices.h>
 #import "ImageViewController.h"
 #import "AppDelegate.h"
 #import "UIImage+animatedGIF.h"
@@ -168,8 +169,10 @@
 }
 
 -(void)fail {
-    if(self.view.window.rootViewController != self) {
-        NSLog(@"Not launching fallback URL as we're no longer the root view controller");
+    [_progressView removeFromSuperview];
+
+    if(_previewing || self.view.window.rootViewController != self) {
+        NSLog(@"Not launching fallback URL as we're not the root view controller");
         return;
     }
     if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
@@ -180,8 +183,26 @@
                                                                                                    @"irccloud://"
 #endif
                                                                                                    ]
-                                                                                     createNewTab:NO]))
-        [[UIApplication sharedApplication] openURL:_url];
+                                                                                     createNewTab:NO])) {
+        if([SFSafariViewController class] && [_url.scheme hasPrefix:@"http"]) {
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                UIApplication *app = [UIApplication sharedApplication];
+                AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+                MainViewController *mainViewController = [appDelegate mainViewController];
+                
+                [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
+
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+                    [UIApplication sharedApplication].statusBarHidden = NO;
+
+                    [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:_url] animated:YES completion:nil];
+                }];
+            }];
+        } else {
+            [[UIApplication sharedApplication] openURL:_url];
+        }
+    }
 }
 
 -(void)loadOembed:(NSString *)url {

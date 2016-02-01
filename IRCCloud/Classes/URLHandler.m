@@ -144,9 +144,8 @@
         appDelegate.window.rootViewController.view.alpha = 0;
         [UIView animateWithDuration:0.5f animations:^{
             appDelegate.window.rootViewController.view.alpha = 1;
-        } completion:^(BOOL finished){
-            [UIApplication sharedApplication].statusBarHidden = YES;
-        }];
+        } completion:nil];
+        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     }];
 }
 
@@ -166,6 +165,7 @@
                     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                     MainViewController *mainViewController = [appDelegate mainViewController];
                     [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+                    [UIApplication sharedApplication].statusBarHidden = NO;
                     
                     [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
                 }];
