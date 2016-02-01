@@ -1303,10 +1303,10 @@ int __timestampWidth;
     _buffer.scrolledUp = NO;
     _buffer.scrolledUpFrom = -1;
     if(_data.count) {
-        if(self.tableView.contentSize.height > (self.tableView.frame.size.height - self.tableView.contentInset.top))
+        if(self.tableView.contentSize.height > (self.tableView.frame.size.height - self.tableView.contentInset.top - self.tableView.contentInset.bottom))
             [self.tableView setContentOffset:CGPointMake(0, (self.tableView.contentSize.height - self.tableView.frame.size.height) + self.tableView.contentInset.bottom)];
         else
-            [self.tableView setContentOffset:CGPointMake(0, (-self.tableView.contentInset.top) + self.tableView.contentInset.bottom)];
+            [self.tableView setContentOffset:CGPointMake(0, -self.tableView.contentInset.top)];
         if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
             [self scrollViewDidScroll:self.tableView];
     }
