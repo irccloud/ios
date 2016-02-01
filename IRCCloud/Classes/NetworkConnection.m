@@ -1827,7 +1827,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [_oobQueue addObject:fetcher];
         if(_oobQueue.count == 1) {
             [_queue addOperationWithBlock:^{
-                [fetcher start];
+                @autoreleasepool {
+                    [fetcher start];
+                }
             }];
         } else {
             CLS_LOG(@"OOB Request has been queued");

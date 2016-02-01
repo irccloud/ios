@@ -278,7 +278,7 @@
     if(server) {
         if([isupport isKindOfClass:[NSDictionary class]]) {
             if(server.isupport)
-                [server.isupport setValuesForKeysWithDictionary:isupport];
+                [server.isupport addEntriesFromDictionary:isupport];
             else
                 server.isupport = isupport.mutableCopy;
         } else {
