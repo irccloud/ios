@@ -809,7 +809,8 @@
                 e = [[e subarrayWithRange:NSMakeRange(e.count - 50, 50)] mutableCopy];
             }
         }
-        [events setObject:e forKey:bid];
+        if(e && bid)
+            [events setObject:e forKey:bid];
     }
     
     @synchronized(self) {
