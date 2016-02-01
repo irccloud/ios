@@ -91,6 +91,7 @@
         decodeObject(_usermask);
         decodeObject(_mode);
         decodeObject(_isupport);
+        _isupport = _isupport.mutableCopy;
         decodeObject(_ignores);
         decodeObject(_CHANTYPES);
         decodeObject(_PREFIX);
@@ -277,6 +278,8 @@
     Server *server = [self getServer:cid];
     if(server) {
         if([isupport isKindOfClass:[NSDictionary class]]) {
+            if(![server.isupport isKindOfClass:[NSMutableDictionary class]])
+                server.isupport = server.isupport.mutableCopy;
             if(server.isupport)
                 [server.isupport addEntriesFromDictionary:isupport];
             else

@@ -576,9 +576,9 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 #endif
 
 #if TARGET_IPHONE_SIMULATOR
-    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
-    t.delegate = self;
-    [self.view addGestureRecognizer:t];
+    //UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
+    //t.delegate = self;
+    //[self.view addGestureRecognizer:t];
 #endif
 #endif
 }
