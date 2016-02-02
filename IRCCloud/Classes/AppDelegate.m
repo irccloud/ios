@@ -82,8 +82,6 @@
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"path"]) {
         IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
         IRCCLOUD_PATH = [[NSUserDefaults standardUserDefaults] objectForKey:@"path"];
-        if([IRCCLOUD_PATH isEqualToString:@"/websocket/5"])
-            [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:@"uploadsAvailable"];
     } else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"api.irccloud.com"]) {
         NSString *session = [NetworkConnection sharedInstance].session;
         if(session.length) {
