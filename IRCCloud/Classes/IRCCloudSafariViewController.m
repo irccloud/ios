@@ -27,11 +27,11 @@
 
 - (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
     return @[
-             [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDestructive handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+             [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                 [pb setValue:_url forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                 [pb setValue:_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
              }],
-             [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDestructive handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+             [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIApplication *app = [UIApplication sharedApplication];
                  AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                  MainViewController *mainViewController = [appDelegate mainViewController];
