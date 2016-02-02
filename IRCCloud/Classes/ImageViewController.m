@@ -42,6 +42,58 @@
     return self;
 }
 
+- (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
+    return @[
+             [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDestructive handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                 UIPasteboard *pb = [UIPasteboard generalPasteboard];
+                 [pb setValue:_url forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+             }],
+             [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDestructive handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                 UIApplication *app = [UIApplication sharedApplication];
+                 AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+                 MainViewController *mainViewController = [appDelegate mainViewController];
+                 
+                 UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:_imageView.image?@[_url,_imageView.image]:@[_url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                                                                                                                                                                                                                                                                  @"irccloud-enterprise://"
+#else
+                                                                                                                                                                                                                                                                                                                                                  @"irccloud://"
+#endif
+                                                                                                                                                                                                                                                                                                                                                  ]]:[[TUSafariActivity alloc] init]]];
+                 activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+                     if(completed) {
+                         if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                             activityType = [activityType substringFromIndex:25];
+                         if([activityType hasPrefix:@"com.apple."])
+                             activityType = [activityType substringFromIndex:10];
+                         [Answers logShareWithMethod:activityType contentName:nil contentType:_movieController?@"Animation":@"Image" contentId:nil customAttributes:nil];
+                     }
+                 };
+                 [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
+             }],
+             [UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDestructive handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                 if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
+                                                                                               withCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                                @"irccloud-enterprise://"
+#else
+                                                                                                                @"irccloud://"
+#endif
+                                                                                                                ]
+                                                                                                  createNewTab:NO])) {
+                     if([SFSafariViewController class] && [_url.scheme hasPrefix:@"http"]) {
+                         UIApplication *app = [UIApplication sharedApplication];
+                         AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+                         MainViewController *mainViewController = [appDelegate mainViewController];
+                         [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:_url] animated:YES completion:nil];
+                     } else {
+                         [[UIApplication sharedApplication] openURL:_url];
+                     }
+                 }
+             }]
+             ];
+}
+
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }

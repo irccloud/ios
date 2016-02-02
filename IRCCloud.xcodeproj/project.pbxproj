@@ -135,6 +135,8 @@
 		2236F64B16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
 		2237E13D16E1214A00CA188F /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
 		2237E13E16E1214A00CA188F /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
+		223C407C1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */; };
+		223C407D1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */; };
 		223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		223DA90D16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		2245E3771B542D0200B763D7 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2245E3761B542D0200B763D7 /* AVKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -637,6 +639,8 @@
 		2236F64916DD30E3007BE535 /* UsersTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersTableView.m; sourceTree = "<group>"; };
 		2237E13B16E1214A00CA188F /* ColorFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorFormatter.h; sourceTree = "<group>"; };
 		2237E13C16E1214A00CA188F /* ColorFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorFormatter.m; sourceTree = "<group>"; };
+		223C407A1C60FE880081B02B /* IRCCloudSafariViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudSafariViewController.h; sourceTree = "<group>"; };
+		223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudSafariViewController.m; sourceTree = "<group>"; };
 		223DA90A16DFC626006FF808 /* EventsTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsTableView.h; sourceTree = "<group>"; };
 		223DA90B16DFC626006FF808 /* EventsTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsTableView.m; sourceTree = "<group>"; };
 		2245E3761B542D0200B763D7 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
@@ -1199,6 +1203,8 @@
 				22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */,
 				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
+				223C407A1C60FE880081B02B /* IRCCloudSafariViewController.h */,
+				223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */,
 				224FCF341787288400FC3879 /* LicenseViewController.h */,
 				224FCF351787288400FC3879 /* LicenseViewController.m */,
 				228A05DB16D3E40E0029769C /* LoginSplashViewController.h */,
@@ -1908,6 +1914,7 @@
 				22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				225D977318AA995900065087 /* TUSafariActivity.m in Sources */,
 				225D977418AA995900065087 /* LicenseViewController.m in Sources */,
+				223C407D1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */,
 				225D977518AA995900065087 /* WhoListTableViewController.m in Sources */,
 				225D977618AA995900065087 /* NamesListTableViewController.m in Sources */,
 				228E2B8C18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */,
@@ -2002,6 +2009,7 @@
 				22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				2250176D1783434900066E71 /* TUSafariActivity.m in Sources */,
 				224FCF361787288400FC3879 /* LicenseViewController.m in Sources */,
+				223C407C1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */,
 				22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */,
 				22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */,
 				228E2B8A18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */,

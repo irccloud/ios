@@ -17,7 +17,6 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
-#import <SafariServices/SafariServices.h>
 #import "EventsTableView.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
@@ -30,6 +29,7 @@
 #import "YouTubeViewController.h"
 #import "EditConnectionViewController.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "IRCCloudSafariViewController.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -352,7 +352,7 @@ int __timestampWidth;
         }
     } else if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
         previewingContext.sourceRect = cell.frame;
-        SFSafariViewController *s = [[SFSafariViewController alloc] initWithURL:url];
+        IRCCloudSafariViewController *s = [[IRCCloudSafariViewController alloc] initWithURL:url];
         s.modalPresentationStyle = UIModalPresentationCurrentContext;
         s.preferredContentSize = self.view.window.bounds.size;
         [_delegate dismissKeyboard];
