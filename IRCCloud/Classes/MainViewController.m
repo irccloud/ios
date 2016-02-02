@@ -926,8 +926,6 @@ extern NSDictionary *emojiMap;
                     [NetworkConnection sharedInstance].session = [o objectForKey:@"cookie"];
                     [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                     [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
-                    if([IRCCLOUD_PATH isEqualToString:@"/websocket/5"])
-                        [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:@"uploadsAvailable"];
                     [[NSUserDefaults standardUserDefaults] synchronize];
                     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
