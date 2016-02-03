@@ -325,14 +325,12 @@ int __timestampWidth;
         return y;
     } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
         previewingContext.sourceRect = cell.frame;
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]]];
-        nc.navigationBarHidden = YES;
-        nc.preferredContentSize = self.view.window.bounds.size;
-        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        PastebinViewController *pvc = [[PastebinViewController alloc] initWithURL:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]];
+        pvc.preferredContentSize = self.view.window.bounds.size;
         lp.enabled = NO;
         lp.enabled = YES;
         [_delegate dismissKeyboard];
-        return nc;
+        return pvc;
     } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"]) {
         previewingContext.sourceRect = cell.frame;
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
@@ -378,6 +376,10 @@ int __timestampWidth;
         ((UINavigationController *)viewControllerToCommit).navigationBarHidden = NO;
         [((UINavigationController *)viewControllerToCommit).topViewController didMoveToParentViewController:nil];
         [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
+    } else if([viewControllerToCommit isKindOfClass:[PastebinViewController class]]) {
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:viewControllerToCommit];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        [self.slidingViewController presentViewController:nc animated:YES completion:nil];
     } else {
         [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
         [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
