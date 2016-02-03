@@ -155,6 +155,8 @@
     [UIView setAnimationDuration:0.25];
     _imageView.alpha = 1;
     [UIView commitAnimations];
+    if(!_previewing)
+        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [Answers logContentViewWithName:nil contentType:@"Image" contentId:nil customAttributes:nil];
 }
 
@@ -299,6 +301,8 @@
     _scrollView.userInteractionEnabled = NO;
     [_progressView removeFromSuperview];
     [_movieController play];
+    if(!_previewing)
+        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
 }
 
