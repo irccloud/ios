@@ -2461,8 +2461,6 @@ extern NSDictionary *emojiMap;
                 self.slidingViewController.underLeftViewController = _buffersView;
             if(!self.navigationItem.leftBarButtonItem)
                 self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
-            _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsZero;
-            _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
             _eventsView.view.frame = CGRectMake(0,0,width, height + _kbSize.height);
             _bottomBar.frame = CGRectMake(0,height - _message.frame.size.height - 8,_eventsView.view.frame.size.width,_message.frame.size.height + 8);
             if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
@@ -2502,7 +2500,6 @@ extern NSDictionary *emojiMap;
             frame.origin.x = _buffersView.tableView.frame.size.width;
             frame.size.width = width - _buffersView.tableView.frame.size.width;
             self.navigationController.navigationBar.frame = frame;
-            _buffersView.tableView.contentInset = UIEdgeInsetsZero;
             _borders.frame = CGRectMake(_buffersView.tableView.frame.size.width - 1, -self.navigationController.navigationBar.frame.size.height, _eventsView.tableView.frame.size.width + 2, height + self.navigationController.navigationBar.frame.size.height);
         }
 
@@ -2560,7 +2557,11 @@ extern NSDictionary *emojiMap;
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
     [_eventsView.tableView setContentInset:UIEdgeInsetsMake(0, 0, height, 0)];
     [_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(0, 0, height, 0)];
-    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
+        _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
+    }];
+
     if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top)) {
         if(diff > 0 || _buffer.scrolledUp)
             _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
@@ -2623,7 +2624,6 @@ extern NSDictionary *emojiMap;
                         frame.origin.x = 0;
                         frame.size.width = 220;
                         _usersView.view.frame = frame;
-                        _usersView.tableView.contentInset = UIEdgeInsetsZero;
                         self.slidingViewController.underRightViewController = _usersView;
                     }
                 } else {

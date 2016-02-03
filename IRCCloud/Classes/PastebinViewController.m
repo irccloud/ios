@@ -110,6 +110,8 @@
          ];
     }
     
+    NSLog(@"%@", items);
+    
     return items;
 }
 
