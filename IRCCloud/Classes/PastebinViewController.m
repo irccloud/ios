@@ -15,9 +15,11 @@
 //  limitations under the License.
 
 #import <MobileCoreServices/UTCoreTypes.h>
+#import <SafariServices/SafariServices.h>
 #import <Twitter/Twitter.h>
 #import "PastebinViewController.h"
 #import "NetworkConnection.h"
+#import "OpenInChromeController.h"
 #import "ARChromeActivity.h"
 #import "TUSafariActivity.h"
 #import "AppDelegate.h"
@@ -48,6 +50,67 @@
     }
     
     return self;
+}
+
+
+- (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
+    NSURL *url = [NSURL URLWithString:_url];
+    
+    NSMutableArray *items = @[
+                              [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                                  UIPasteboard *pb = [UIPasteboard generalPasteboard];
+                                  [pb setValue:_url forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                              }],
+                              [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                                  UIApplication *app = [UIApplication sharedApplication];
+                                  AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+                                  MainViewController *mainViewController = [appDelegate mainViewController];
+                                  
+                                  UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                                                                                                                                                                                                                                                                         @"irccloud-enterprise://"
+#else
+                                                                                                                                                                                                                                                                                                                                                         @"irccloud://"
+#endif
+                                                                                                                                                                                                                                                                                                                                                         ]]:[[TUSafariActivity alloc] init]]];
+                                  activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+                                      if(completed) {
+                                          if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                                              activityType = [activityType substringFromIndex:25];
+                                          if([activityType hasPrefix:@"com.apple."])
+                                              activityType = [activityType substringFromIndex:10];
+                                          [Answers logShareWithMethod:activityType contentName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
+                                      }
+                                  };
+                                  [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
+                              }]
+                              ].mutableCopy;
+    
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
+        [items addObject:[UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+            if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] openInChrome:url
+                                                                                                                          withCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                                                           @"irccloud-enterprise://"
+#else
+                                                                                                                                           @"irccloud://"
+#endif
+                                                                                                                                           ]
+                                                                                                                             createNewTab:NO])) {
+                if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
+                    UIApplication *app = [UIApplication sharedApplication];
+                    AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+                    MainViewController *mainViewController = [appDelegate mainViewController];
+                    [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
+                } else {
+                    [[UIApplication sharedApplication] openURL:url];
+                }
+            }
+        }]
+         ];
+    }
+    
+    return items;
 }
 
 -(void)viewWillAppear:(BOOL)animated {

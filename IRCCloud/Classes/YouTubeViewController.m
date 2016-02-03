@@ -18,7 +18,6 @@
 #import <SafariServices/SafariServices.h>
 #import "OpenInChromeController.h"
 #import "YouTubeViewController.h"
-#import "OpenInChromeController.h"
 #import "ARChromeActivity.h"
 #import "TUSafariActivity.h"
 #import "AppDelegate.h"
