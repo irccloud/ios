@@ -74,6 +74,8 @@
     NSString *_groupIndent;
     id<UIViewControllerPreviewing> __previewer;
     UILongPressGestureRecognizer *lp;
+    
+    NSUInteger _previewingRow;
 }
 @property (readonly) UITableView *tableView;
 @property (readonly) UIView *topUnreadView;

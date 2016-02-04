@@ -301,6 +301,7 @@ int __timestampWidth;
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]];
+    _previewingRow = [self.tableView indexPathForRowAtPoint:location].row;
     NSTextCheckingResult *r = [cell.message linkAtPoint:[self.tableView convertPoint:location toView:cell.message]];
     NSURL *url = r.URL;
     
@@ -311,7 +312,6 @@ int __timestampWidth;
         i.previewing = YES;
         lp.enabled = NO;
         lp.enabled = YES;
-        [_delegate dismissKeyboard];
         return i;
     } else if([URLHandler isYouTubeURL:url]) {
         previewingContext.sourceRect = cell.frame;
@@ -321,7 +321,6 @@ int __timestampWidth;
         y.toolbar.hidden = YES;
         lp.enabled = NO;
         lp.enabled = YES;
-        [_delegate dismissKeyboard];
         return y;
     } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
         previewingContext.sourceRect = cell.frame;
@@ -329,7 +328,6 @@ int __timestampWidth;
         pvc.preferredContentSize = self.view.window.bounds.size;
         lp.enabled = NO;
         lp.enabled = YES;
-        [_delegate dismissKeyboard];
         return pvc;
     } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"]) {
         previewingContext.sourceRect = cell.frame;
@@ -339,13 +337,11 @@ int __timestampWidth;
             player.player = [[AVPlayer alloc] initWithURL:url];
             player.modalPresentationStyle = UIModalPresentationCurrentContext;
             player.preferredContentSize = self.view.window.bounds.size;
-            [_delegate dismissKeyboard];
             return player;
         } else {
             MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
             player.modalPresentationStyle = UIModalPresentationCurrentContext;
             player.preferredContentSize = self.view.window.bounds.size;
-            [_delegate dismissKeyboard];
             return player;
         }
     } else if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
@@ -353,10 +349,10 @@ int __timestampWidth;
         IRCCloudSafariViewController *s = [[IRCCloudSafariViewController alloc] initWithURL:url];
         s.modalPresentationStyle = UIModalPresentationCurrentContext;
         s.preferredContentSize = self.view.window.bounds.size;
-        [_delegate dismissKeyboard];
         return s;
     }
     
+    _previewingRow = -1;
     return nil;
 }
 
@@ -1914,11 +1910,14 @@ int __timestampWidth;
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    NSLog(@"WOOF WOOF WOOF");
-    
     if(!_ready || !_buffer || _requestingBacklog || [UIApplication sharedApplication].applicationState != UIApplicationStateActive)
         return;
 
+    if(_previewingRow) {
+        EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_previewingRow inSection:0]];
+        __previewer.sourceRect = cell.frame;
+    }
+    
     UITableView *tableView = self.tableView;
     NSInteger firstRow = -1;
     NSInteger lastRow = -1;

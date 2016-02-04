@@ -56,7 +56,7 @@
 - (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
     NSURL *url = [NSURL URLWithString:_url];
     
-    NSMutableArray *items = @[
+    return @[
                               [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                                   UIPasteboard *pb = [UIPasteboard generalPasteboard];
                                   [pb setValue:_url forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
@@ -83,36 +83,27 @@
                                       }
                                   };
                                   [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
-                              }]
-                              ].mutableCopy;
-    
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
-        [items addObject:[UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-            if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] openInChrome:url
-                                                                                                                          withCallbackURL:[NSURL URLWithString:
+                              }],
+                              [UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                                  if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] openInChrome:url
+                                                                                                                                                withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
-                                                                                                                                           @"irccloud-enterprise://"
+                                                                                                                                                                 @"irccloud-enterprise://"
 #else
-                                                                                                                                           @"irccloud://"
+                                                                                                                                                                 @"irccloud://"
 #endif
-                                                                                                                                           ]
-                                                                                                                             createNewTab:NO])) {
-                if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
-                    UIApplication *app = [UIApplication sharedApplication];
-                    AppDelegate *appDelegate = (AppDelegate *)app.delegate;
-                    MainViewController *mainViewController = [appDelegate mainViewController];
-                    [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
-                } else {
-                    [[UIApplication sharedApplication] openURL:url];
-                }
-            }
-        }]
-         ];
-    }
-    
-    NSLog(@"%@", items);
-    
-    return items;
+                                                                                                                                                                 ]
+                                                                                                                                                   createNewTab:NO])) {
+                                      if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
+                                          UIApplication *app = [UIApplication sharedApplication];
+                                          AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+                                          MainViewController *mainViewController = [appDelegate mainViewController];
+                                          [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
+                                      } else {
+                                          [[UIApplication sharedApplication] openURL:url];
+                                      }
+                                  }
+                              }]                              ];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
