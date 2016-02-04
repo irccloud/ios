@@ -1914,6 +1914,8 @@ int __timestampWidth;
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    NSLog(@"WOOF WOOF WOOF");
+    
     if(!_ready || !_buffer || _requestingBacklog || [UIApplication sharedApplication].applicationState != UIApplicationStateActive)
         return;
 

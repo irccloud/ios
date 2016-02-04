@@ -278,12 +278,9 @@
     Server *server = [self getServer:cid];
     if(server) {
         if([isupport isKindOfClass:[NSDictionary class]]) {
-            if(![server.isupport isKindOfClass:[NSMutableDictionary class]])
-                server.isupport = server.isupport.mutableCopy;
-            if(server.isupport)
-                [server.isupport addEntriesFromDictionary:isupport];
-            else
-                server.isupport = isupport.mutableCopy;
+            NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:server.isupport];
+            [d addEntriesFromDictionary:isupport];
+            server.isupport = d;
         } else {
             server.isupport = [[NSMutableDictionary alloc] init];
         }
