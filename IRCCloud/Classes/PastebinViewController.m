@@ -103,7 +103,8 @@
                                           [[UIApplication sharedApplication] openURL:url];
                                       }
                                   }
-                              }]                              ];
+                              }]
+                              ];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
