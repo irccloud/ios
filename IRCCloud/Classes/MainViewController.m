@@ -1018,7 +1018,8 @@ extern NSDictionary *emojiMap;
                 }
             } else {
                 int reqid = e.reqId;
-                CLS_LOG(@"Removing expiration timer for reqid %i", e.reqId);
+                if(e.reqId > 0)
+                    CLS_LOG(@"Removing expiration timer for reqid %i", e.reqId);
                 for(Event *e in _pendingEvents) {
                     if(e.reqId == reqid) {
                         if(e.expirationTimer && [e.expirationTimer isValid])
@@ -3404,7 +3405,8 @@ extern NSDictionary *emojiMap;
     else {
         documentPicker.modalPresentationStyle = UIModalPresentationCurrentContext;
     }
-    [self presentViewController:documentPicker animated:YES completion:nil];
+    if(documentPicker)
+        [self presentViewController:documentPicker animated:YES completion:nil];
 }
 
 -(void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {

@@ -324,7 +324,7 @@ NSLock *__serializeLock = nil;
                     [_notifications updateBadgeCount];
                 }
             }
-            if(!backlog && !_resuming) {
+            if((!backlog && !_resuming) || event.reqId > 0) {
                 [self postObject:event forEvent:kIRCEventBufferMsg];
             }
         } else {
@@ -499,11 +499,9 @@ NSLock *__serializeLock = nil;
                        }
                    },
                    @"backlog_complete": ^(IRCCloudJSONObject *object) {
-                       if(_oobQueue.count == 0) {
-                           [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                               [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
-                           }];
-                       }
+                       [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                           [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
+                       }];
                    },
                    @"bad_channel_key": ^(IRCCloudJSONObject *object) {
                        if(!backlog && !_resuming)
@@ -613,7 +611,7 @@ NSLock *__serializeLock = nil;
                            [self postObject:object forEvent:kIRCEventRenameConversation];
                    },
                    @"status_changed": ^(IRCCloudJSONObject *object) {
-                       CLS_LOG(@"cid%i changed to status %@", object.cid, [object objectForKey:@"new_status"]);
+                       CLS_LOG(@"cid%i changed to status %@ (backlog: %i resuming: %i)", object.cid, [object objectForKey:@"new_status"], backlog, _resuming);
                        [_servers updateStatus:[object objectForKey:@"new_status"] failInfo:[object objectForKey:@"fail_info"] server:object.cid];
                        if(!backlog) {
                            if([[object objectForKey:@"new_status"] isEqualToString:@"disconnected"]) {
