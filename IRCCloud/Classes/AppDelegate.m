@@ -257,21 +257,23 @@
                 CLS_LOG(@"Opening verify-email from handoff");
                 [[[NSURLSession sharedSession] dataTaskWithURL:userActivity.webpageURL completionHandler:
                   ^(NSData *data, NSURLResponse *response, NSError *error) {
-                      if([(NSHTTPURLResponse *)response statusCode] == 200) {
-                          UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Confirmed" message:@"Your email address was successfully confirmed" preferredStyle:UIAlertControllerStyleAlert];
-                          [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
-                          [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
-                      } else {
-                          UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Confirmation Failed" message:@"Unable to confirm your email address.  Please try again shortly." preferredStyle:UIAlertControllerStyleAlert];
-                          [alert addAction:[UIAlertAction actionWithTitle:@"Send Again" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                              [[NetworkConnection sharedInstance] resendVerifyEmail];
-                              UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." preferredStyle:UIAlertControllerStyleAlert];
+                      [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                          if([(NSHTTPURLResponse *)response statusCode] == 200) {
+                              UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Confirmed" message:@"Your email address was successfully confirmed" preferredStyle:UIAlertControllerStyleAlert];
                               [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
                               [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
-                          }]];
-                          [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
-                          [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
-                      }
+                          } else {
+                              UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Confirmation Failed" message:@"Unable to confirm your email address.  Please try again shortly." preferredStyle:UIAlertControllerStyleAlert];
+                              [alert addAction:[UIAlertAction actionWithTitle:@"Send Again" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                                  [[NetworkConnection sharedInstance] resendVerifyEmail];
+                                  UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." preferredStyle:UIAlertControllerStyleAlert];
+                                  [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
+                                  [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
+                              }]];
+                              [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
+                              [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
+                          }
+                      }];
                 }] resume];
             } else if([userActivity.webpageURL.path isEqualToString:@"/"] && [userActivity.webpageURL.fragment hasPrefix:@"!/"]) {
                 NSString *url = [userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/#!/" withString:@"irc://"];

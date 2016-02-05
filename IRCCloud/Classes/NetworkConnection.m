@@ -613,6 +613,7 @@ NSLock *__serializeLock = nil;
                            [self postObject:object forEvent:kIRCEventRenameConversation];
                    },
                    @"status_changed": ^(IRCCloudJSONObject *object) {
+                       CLS_LOG(@"cid%i changed to status %@", object.cid, [object objectForKey:@"new_status"]);
                        [_servers updateStatus:[object objectForKey:@"new_status"] failInfo:[object objectForKey:@"fail_info"] server:object.cid];
                        if(!backlog) {
                            if([[object objectForKey:@"new_status"] isEqualToString:@"disconnected"]) {
@@ -621,8 +622,7 @@ NSLock *__serializeLock = nil;
                                    [_channels removeChannelForBuffer:c.bid];
                                }
                            }
-                           if(!_resuming)
-                               [self postObject:object forEvent:kIRCEventStatusChanged];
+                           [self postObject:object forEvent:kIRCEventStatusChanged];
                        }
                    },
                    @"buffer_msg": msg, @"buffer_me_msg": msg, @"wait": msg,
@@ -1402,6 +1402,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(int)disconnect:(int)cid msg:(NSString *)msg {
+    CLS_LOG(@"Disconnecting cid%i", cid);
     if(msg.length)
         return [self _sendRequest:@"disconnect" args:@{@"cid":@(cid), @"msg":msg}];
     else
@@ -1409,6 +1410,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(int)reconnect:(int)cid {
+    CLS_LOG(@"Reconnecting cid%i", cid);
     int reqid = [self _sendRequest:@"reconnect" args:@{@"cid":@(cid)}];
     if(reqid > 0) {
         Server *s = [_servers getServer:cid];

@@ -1171,61 +1171,65 @@ extern NSDictionary *emojiMap;
 
 -(void)backlogStarted:(NSNotification *)notification {
     if(!_connectingView.hidden) {
-        _connectingStatus.textColor = [UIColor navBarHeadingColor];
-        [_connectingStatus setText:@"Loading"];
-        _connectingActivity.hidden = YES;
-        [_connectingActivity stopAnimating];
-        _connectingProgress.progress = 0;
-        _connectingProgress.hidden = NO;
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            _connectingStatus.textColor = [UIColor navBarHeadingColor];
+            [_connectingStatus setText:@"Loading"];
+            _connectingActivity.hidden = YES;
+            [_connectingActivity stopAnimating];
+            _connectingProgress.progress = 0;
+            _connectingProgress.hidden = NO;
+        }];
     }
 }
 
 -(void)backlogProgress:(NSNotification *)notification {
     if(!_connectingView.hidden) {
-        [_connectingProgress setProgress:[notification.object floatValue] animated:YES];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [_connectingProgress setProgress:[notification.object floatValue] animated:YES];
+        }];
     }
 }
 
 -(void)backlogCompleted:(NSNotification *)notification {
-    if([notification.object bid] == 0) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [self _themeChanged];
-        }];
-    }
-    if([ServersDataSource sharedInstance].count < 1) {
-        [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
-        return;
-    }
-    [self _hideConnectingView];
-    if(_buffer && !_urlToOpen && _bidToOpen < 1 && _eidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
-        [self _updateTitleArea];
-        [self _updateServerStatus];
-        [self _updateUserListVisibility];
-        [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
-        [self _updateGlobalMsg];
-    } else {
-        [[NSNotificationCenter defaultCenter] removeObserver:_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
-        int bid = [BuffersDataSource sharedInstance].firstBid;
-        if(_buffer && _buffer.lastBuffer)
-            bid = _buffer.lastBuffer.bid;
-        
-        if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
-            if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
-                bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if([notification.object bid] == 0) {
+          [self _themeChanged];
         }
-        if(_bidToOpen > 0) {
-            CLS_LOG(@"backlog complete: BID to open: %i", _bidToOpen);
-            bid = _bidToOpen;
-            _bidToOpen = -1;
-        } else if(_eidToOpen > 0) {
-            bid = _buffer.bid;
+        if([ServersDataSource sharedInstance].count < 1) {
+            [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
+            return;
         }
-        [self bufferSelected:bid];
-        _eidToOpen = -1;
-        if(_urlToOpen)
-            [self launchURL:_urlToOpen];
-        [[NSNotificationCenter defaultCenter] addObserver:_eventsView selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
-    }
+        [self _hideConnectingView];
+        if(_buffer && !_urlToOpen && _bidToOpen < 1 && _eidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
+            [self _updateTitleArea];
+            [self _updateServerStatus];
+            [self _updateUserListVisibility];
+            [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
+            [self _updateGlobalMsg];
+        } else {
+            [[NSNotificationCenter defaultCenter] removeObserver:_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
+            int bid = [BuffersDataSource sharedInstance].firstBid;
+            if(_buffer && _buffer.lastBuffer)
+                bid = _buffer.lastBuffer.bid;
+            
+            if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
+                if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+                    bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
+            }
+            if(_bidToOpen > 0) {
+                CLS_LOG(@"backlog complete: BID to open: %i", _bidToOpen);
+                bid = _bidToOpen;
+                _bidToOpen = -1;
+            } else if(_eidToOpen > 0) {
+                bid = _buffer.bid;
+            }
+            [self bufferSelected:bid];
+            _eidToOpen = -1;
+            if(_urlToOpen)
+                [self launchURL:_urlToOpen];
+            [[NSNotificationCenter defaultCenter] addObserver:_eventsView selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
+        }
+    }];
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
