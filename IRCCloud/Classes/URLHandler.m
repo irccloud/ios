@@ -14,6 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <objc/message.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
@@ -76,6 +77,8 @@
 
 - (void)launchURL:(NSURL *)url
 {
+    if([[UIApplication sharedApplication] respondsToSelector:NSSelectorFromString(@"_deactivateReachability")])
+        objc_msgSend([UIApplication sharedApplication], NSSelectorFromString(@"_deactivateReachability"));
     NSLog(@"Launch: %@", url);
     UIApplication *app = [UIApplication sharedApplication];
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
