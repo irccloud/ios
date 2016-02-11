@@ -1290,6 +1290,7 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    _isShowingPreview = NO;
     [super viewWillAppear:animated];
     [self _resetStatusBar];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
