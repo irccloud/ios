@@ -63,8 +63,8 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [interactionController.interactionProgressForPresentation endInteraction:YES];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [interactionController commitInteractivePreview];
-            //[interactionController cancelInteractivePreview];
+            //[interactionController commitInteractivePreview];
+            [interactionController cancelInteractivePreview];
         });
     });
 }
@@ -278,6 +278,7 @@ int __timestampWidth;
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
 #endif
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+        [__previewer.previewingGestureRecognizerForFailureRelationship addTarget:self action:@selector(_3DTouchChanged:)];
 #if !(TARGET_IPHONE_SIMULATOR)
     }
 #endif
@@ -299,11 +300,20 @@ int __timestampWidth;
 }
 #endif
 
+-(void)_3DTouchChanged:(UIGestureRecognizer *)gesture {
+    if(gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled) {
+        MainViewController *mainViewController = [(AppDelegate *)([UIApplication sharedApplication].delegate) mainViewController];
+        mainViewController.isShowingPreview = NO;
+    }
+}
+
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+    MainViewController *mainViewController = [(AppDelegate *)([UIApplication sharedApplication].delegate) mainViewController];
     EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]];
     _previewingRow = [self.tableView indexPathForRowAtPoint:location].row;
     NSTextCheckingResult *r = [cell.message linkAtPoint:[self.tableView convertPoint:location toView:cell.message]];
     NSURL *url = r.URL;
+    mainViewController.isShowingPreview = YES;
     
     if([URLHandler isImageURL:url]) {
         previewingContext.sourceRect = cell.frame;
@@ -353,10 +363,13 @@ int __timestampWidth;
     }
     
     _previewingRow = -1;
+    mainViewController.isShowingPreview = NO;
     return nil;
 }
 
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    MainViewController *mainViewController = [(AppDelegate *)([UIApplication sharedApplication].delegate) mainViewController];
+    mainViewController.isShowingPreview = NO;
     if([viewControllerToCommit isKindOfClass:[ImageViewController class]]) {
         AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         appDelegate.window.backgroundColor = [UIColor blackColor];

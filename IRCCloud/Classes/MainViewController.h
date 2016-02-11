@@ -80,6 +80,7 @@
     UIPopoverController *_popover;
     NSTimeInterval _lastNotificationTime;
     BOOL __ignoreLayoutChanges;
+    BOOL _isShowingPreview;
     NSString *__currentTheme;
     
     id<UIViewControllerPreviewing> __previewer;
@@ -88,6 +89,7 @@
 @property (nonatomic) NSTimeInterval eidToOpen;
 @property (nonatomic) NSString *incomingDraft;
 @property (readonly) EventsTableView *eventsView;
+@property BOOL isShowingPreview;
 -(void)bufferSelected:(int)bid;
 -(void)sendButtonPressed:(id)sender;
 -(void)usersButtonPressed:(id)sender;
