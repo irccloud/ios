@@ -2570,8 +2570,10 @@ extern NSDictionary *emojiMap;
         [_eventsView.tableView setContentInset:UIEdgeInsetsMake(0, 0, height, 0)];
         [_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(0, 0, height, 0)];
 
-        if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top)) {
-            if(diff > 0 || _buffer.scrolledUp)
+        if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) {
+            if(_eventsView.tableView.contentOffset.y + diff + (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom) > _eventsView.tableView.contentSize.height)
+                [_eventsView _scrollToBottom];
+            else if(diff > 0 || _buffer.scrolledUp)
                 _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
             else if([[UIDevice currentDevice].systemVersion isEqualToString:@"8.1"]) //The last line seems to get eaten when the table is fully scrolled down on iOS 8.1
                 _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + fabs(diff));
