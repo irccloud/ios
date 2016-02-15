@@ -2808,6 +2808,7 @@ extern NSDictionary *emojiMap;
     [sheet addButtonWithTitle:@"Join a Channel"];
     [sheet addButtonWithTitle:@"Display Options"];
     [sheet addButtonWithTitle:@"Settings"];
+    [sheet addButtonWithTitle:@"Send Feedback"];
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
@@ -3950,6 +3951,69 @@ extern NSDictionary *emojiMap;
             [self _inviteToChannel];
         } else if([action isEqualToString:@"Join a Channel"]) {
             [self _joinAChannel];
+        } else if([action isEqualToString:@"Send Feedback"]) {
+#ifdef APPSTORE
+            NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+#else
+            NSString *version = [NSString stringWithFormat:@"%@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
+#endif
+            NSMutableString *report = [[NSMutableString alloc] initWithFormat:
+@"Briefly describe the issue below:\n\
+\n\
+\n\
+\n\
+==========\n\
+UID: %@\n\
+App Version: %@\n\
+OS Version: %@\n\
+Device type: %@\n",
+                                       [[NetworkConnection sharedInstance].userInfo objectForKey:@"id"],version,[UIDevice currentDevice].systemVersion,[UIDevice currentDevice].model];
+            
+            NSURL *caches = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
+            NSArray *folders = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[caches URLByAppendingPathComponent:@"com.crashlytics.data"] includingPropertiesForKeys:nil options:0 error:nil];
+            if(folders.count) {
+                folders = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[[folders[0] URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:@"active"] includingPropertiesForKeys:nil options:0 error:nil];
+                
+                if(folders.count) {
+                    SBJsonParser *parser = [[SBJsonParser alloc] init];
+                    NSArray *lines = [[NSString stringWithContentsOfURL:[folders[0] URLByAppendingPathComponent:@"log_a.clsrecord"] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
+                    if(lines.count) {
+                        [report appendString:@"==========\nConsole log:\n"];
+                        for(NSString *line in lines) {
+                            NSDictionary *dict = [parser objectWithString:line];
+                            NSString *msg = [[dict objectForKey:@"log"] objectForKey:@"msg"];
+                            NSInteger ti = [[[dict objectForKey:@"log"] objectForKey:@"time"] intValue] / 1000;
+                            NSInteger seconds = ti % 60;
+                            NSInteger minutes = (ti / 60) % 60;
+                            NSInteger hours = (ti / 3600);
+                            [report appendFormat:@"%02ld:%02ld:%02ld ", (long)hours, (long)minutes, (long)seconds];
+                            
+                            for (NSInteger i = 0; i < msg.length; i += 2) {
+                                NSString *hex = [msg substringWithRange:NSMakeRange(i, 2)];
+                                NSInteger decimalValue = 0;
+                                sscanf([hex UTF8String], "%x", &decimalValue);
+                                [report appendFormat:@"%c", decimalValue];
+                            }
+                            [report appendString:@"\n"];
+                        }
+                    }
+                }
+            }
+            
+            if(report.length) {
+                MFMailComposeViewController *mfmc = [[MFMailComposeViewController alloc] init];
+                mfmc.mailComposeDelegate = self;
+                [mfmc setToRecipients:@[@"team@irccloud.com"]];
+                [mfmc setSubject:@"IRCCloud for iOS"];
+                [mfmc setMessageBody:report isHTML:NO];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    mfmc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    mfmc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                [self presentViewController:mfmc animated:YES completion:^{
+                    [self _resetStatusBar];
+                }];
+            }
         }
         
         if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)
@@ -4013,5 +4077,9 @@ extern NSDictionary *emojiMap;
             [_alertView show];
         }
     }
+}
+
+-(void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 @end

@@ -244,6 +244,8 @@
 		225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
 		2264A30119659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
 		2264A30219659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
+		2265DC891C722E6B00382C7C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2265DC881C722E6B00382C7C /* MessageUI.framework */; };
+		2265DC8A1C722E7A00382C7C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2265DC881C722E6B00382C7C /* MessageUI.framework */; };
 		22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		22695F5616E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		226EB6011B4C2E8600C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
@@ -671,6 +673,7 @@
 		225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IRCCloud-Enterprise-Info.plist"; sourceTree = "<group>"; };
 		2264A2FF19659BB100DCFDDD /* URLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLHandler.h; sourceTree = "<group>"; };
 		2264A30019659BB100DCFDDD /* URLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLHandler.m; sourceTree = "<group>"; };
+		2265DC881C722E6B00382C7C /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollapsedEvents.h; sourceTree = "<group>"; };
 		22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollapsedEvents.m; sourceTree = "<group>"; };
 		226EB6001B4C2E8600C432C7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -869,6 +872,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2265DC8A1C722E7A00382C7C /* MessageUI.framework in Frameworks */,
 				2245E3781B542D0E00B763D7 /* AVKit.framework in Frameworks */,
 				229C85421B50292D004964DE /* CoreMedia.framework in Frameworks */,
 				226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */,
@@ -900,6 +904,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2265DC891C722E6B00382C7C /* MessageUI.framework in Frameworks */,
 				22A1F1151C232B3A00AEC09A /* SafariServices.framework in Frameworks */,
 				2245E3771B542D0200B763D7 /* AVKit.framework in Frameworks */,
 				229C85411B502920004964DE /* CoreMedia.framework in Frameworks */,
@@ -1051,6 +1056,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2265DC881C722E6B00382C7C /* MessageUI.framework */,
 				22A1F1141C232B3A00AEC09A /* SafariServices.framework */,
 				2245E3761B542D0200B763D7 /* AVKit.framework */,
 				229C85401B502920004964DE /* CoreMedia.framework */,
