@@ -99,6 +99,28 @@
         return;
     }
     
+    if([url.host hasSuffix:@"irccloud.com"] && [url.path isEqualToString:@"/invite"]) {
+        int port = 6667;
+        int ssl = 0;
+        NSString *host;
+        NSString *channel;
+        for(NSString *p in [url.query componentsSeparatedByString:@"&"]) {
+            NSArray *args = [p componentsSeparatedByString:@"="];
+            if(args.count == 2) {
+                if([args[0] isEqualToString:@"channel"])
+                    channel = args[1];
+                else if([args[0] isEqualToString:@"hostname"])
+                    host = args[1];
+                else if([args[0] isEqualToString:@"port"])
+                    port = [args[1] intValue];
+                else if([args[0] isEqualToString:@"ssl"])
+                    ssl = [args[1] intValue];
+            }
+        }
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"irc%@://%@:%i/%@",(ssl > 0)?@"s":@"",host,port,channel]];
+        NSLog(@"%@ : %@", [NSString stringWithFormat:@"irc%@://%@:%i/%@",(ssl > 0)?@"s":@"",host,port,channel], url);
+    }
+    
     if(![url.scheme hasPrefix:@"irc"]) {
         [mainViewController dismissKeyboard];
     }

@@ -281,6 +281,8 @@
                     url = [url substringFromIndex:6];
                 CLS_LOG(@"Opening URL from handoff: %@", url);
                 [self.mainViewController launchURL:[NSURL URLWithString:url]];
+            } else if([userActivity.webpageURL.path isEqualToString:@"/invite"]) {
+                [self launchURL:[NSURL URLWithString:[userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
             } else {
                 [[UIApplication sharedApplication] openURL:userActivity.webpageURL];
                 return NO;

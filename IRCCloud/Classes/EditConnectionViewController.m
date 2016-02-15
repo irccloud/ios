@@ -409,10 +409,8 @@ static NSString * const ServerHasSSLKey = @"ssl";
     if(_url) {
         int port = [_url.port intValue];
         int ssl = [_url.scheme hasSuffix:@"s"]?1:0;
-        if(port == 0 && ssl == 1)
-            port = 6697;
-        else
-            port = 6667;
+        if(port == 0)
+            port = (ssl == 1)?6697:6667;
         
         _server.text = _url.host;
         _port.text = [NSString stringWithFormat:@"%i", port];
