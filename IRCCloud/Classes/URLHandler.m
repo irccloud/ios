@@ -118,7 +118,6 @@
             }
         }
         url = [NSURL URLWithString:[NSString stringWithFormat:@"irc%@://%@:%i/%@",(ssl > 0)?@"s":@"",host,port,channel]];
-        NSLog(@"%@ : %@", [NSString stringWithFormat:@"irc%@://%@:%i/%@",(ssl > 0)?@"s":@"",host,port,channel], url);
     }
     
     if(![url.scheme hasPrefix:@"irc"]) {
