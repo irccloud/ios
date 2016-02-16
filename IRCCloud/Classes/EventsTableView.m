@@ -970,7 +970,9 @@ int __timestampWidth;
                 if([event.type hasPrefix:@"you_"])
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@"You"];
                 else
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c (%@)", BOLD, event.oldNick, CLEAR, event.hostmask];
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c", BOLD, event.oldNick, CLEAR];
+                if(event.hostmask && event.hostmask.length)
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" (%@)", event.hostmask];
                 if([event.type hasPrefix:@"you_"])
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
                 else
