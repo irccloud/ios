@@ -283,11 +283,10 @@
         
         void (^kicked_channel)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
             event.from = @"";
-            event.fromMode = nil;
             if(object) {
                 event.oldNick = [object objectForKey:@"nick"];
                 event.nick = [object objectForKey:@"kicker"];
-                event.hostmask = [object objectForKey:@"kicker_hostmask"];
+                event.fromMode = [object objectForKey:@"kicker_mode"];
             }
             event.color = [UIColor timestampColor];
             event.linkify = NO;

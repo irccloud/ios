@@ -970,16 +970,16 @@ int __timestampWidth;
                 if([event.type hasPrefix:@"you_"])
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@"You"];
                 else
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c", BOLD, event.oldNick, CLEAR];
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c (%@)", BOLD, event.oldNick, CLEAR, event.hostmask];
                 if([event.type hasPrefix:@"you_"])
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
                 else
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
                 if(event.hostmask && event.hostmask.length)
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %c%@%c (%@)", BOLD, event.nick, BOLD, event.hostmask];
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO]];
                 else
                     event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by the server %c%@%c", BOLD, event.nick, CLEAR];
-                if(event.msg.length > 0)
+                if(event.msg.length > 0 && ![event.msg isEqualToString:event.nick])
                     event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
             } else if([type isEqualToString:@"channel_mode_list_change"]) {
                 if(event.from.length == 0) {
