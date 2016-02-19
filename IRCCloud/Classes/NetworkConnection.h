@@ -131,7 +131,6 @@ typedef enum {
     NSString *_longestEventType;
     BOOL _resuming;
     BOOL _notifier;
-    BOOL backlog;
     NSTimeInterval _firstEID;
     NSString *_streamId;
     int _accrued;
@@ -166,6 +165,7 @@ typedef enum {
 @property NSString *session;
 @property NSDictionary *config;
 @property (readonly) BOOL ready;
+@property (readonly) NSOperationQueue *queue;
 
 +(NetworkConnection*)sharedInstance;
 +(void)sync;

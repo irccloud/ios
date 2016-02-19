@@ -3982,19 +3982,21 @@ Device type: %@\n",
                         for(NSString *line in lines) {
                             NSDictionary *dict = [parser objectWithString:line];
                             NSString *msg = [[dict objectForKey:@"log"] objectForKey:@"msg"];
-                            NSInteger ti = [[[dict objectForKey:@"log"] objectForKey:@"time"] intValue] / 1000;
-                            NSInteger seconds = ti % 60;
-                            NSInteger minutes = (ti / 60) % 60;
-                            NSInteger hours = (ti / 3600);
-                            [report appendFormat:@"%02ld:%02ld:%02ld ", (long)hours, (long)minutes, (long)seconds];
-                            
-                            for (NSInteger i = 0; i < msg.length; i += 2) {
-                                NSString *hex = [msg substringWithRange:NSMakeRange(i, 2)];
-                                NSInteger decimalValue = 0;
-                                sscanf([hex UTF8String], "%x", &decimalValue);
-                                [report appendFormat:@"%c", decimalValue];
+                            if(msg.length) {
+                                NSInteger ti = [[[dict objectForKey:@"log"] objectForKey:@"time"] intValue] / 1000;
+                                NSInteger seconds = ti % 60;
+                                NSInteger minutes = (ti / 60) % 60;
+                                NSInteger hours = (ti / 3600);
+                                [report appendFormat:@"%02ld:%02ld:%02ld ", (long)hours, (long)minutes, (long)seconds];
+                                
+                                for (NSInteger i = 0; i < msg.length; i += 2) {
+                                    NSString *hex = [msg substringWithRange:NSMakeRange(i, 2)];
+                                    NSInteger decimalValue = 0;
+                                    sscanf([hex UTF8String], "%x", &decimalValue);
+                                    [report appendFormat:@"%c", decimalValue];
+                                }
+                                [report appendString:@"\n"];
                             }
-                            [report appendString:@"\n"];
                         }
                     }
                 }
