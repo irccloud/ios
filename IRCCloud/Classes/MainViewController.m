@@ -3991,7 +3991,7 @@ Device type: %@\n",
                                 
                                 for (NSInteger i = 0; i < msg.length; i += 2) {
                                     NSString *hex = [msg substringWithRange:NSMakeRange(i, 2)];
-                                    NSInteger decimalValue = 0;
+                                    int decimalValue = 0;
                                     sscanf([hex UTF8String], "%x", &decimalValue);
                                     [report appendFormat:@"%c", decimalValue];
                                 }
