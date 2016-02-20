@@ -267,9 +267,9 @@
         };
         
         void (^unhandled_line)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
-            event.from = @"";
-            event.msg = @"";
             if(object) {
+                event.from = @"";
+                event.msg = @"";
                 if([object objectForKey:@"command"])
                     event.msg = [[object objectForKey:@"command"] stringByAppendingString:@" "];
                 if([object objectForKey:@"raw"])
