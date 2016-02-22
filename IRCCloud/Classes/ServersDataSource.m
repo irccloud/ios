@@ -306,7 +306,7 @@
     if([modes isKindOfClass:[NSString class]] && modes.length >= 5 && [modes characterAtIndex:0] != 'q') {
         Server *server = [self getServer:cid];
         if(server) {
-            if([[modes.lowercaseString substringToIndex:1] isEqualToString:@"y"]) {
+            if([modes.lowercaseString characterAtIndex:0] == 'y') {
                 server.MODE_OPER = [modes substringToIndex:1];
             } else {
                 server.MODE_OWNER = [modes substringToIndex:1];

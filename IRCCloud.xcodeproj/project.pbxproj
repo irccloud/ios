@@ -252,6 +252,7 @@
 		226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
 		2274F4A01756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
+		227C63BA1C7B8C4800B674D6 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A1F1141C232B3A00AEC09A /* SafariServices.framework */; };
 		227EA7BE17F0BE9A001E5E53 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
 		227EA7BF17F0BE9A001E5E53 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
 		227EA7C017F0BE9A001E5E53 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -872,6 +873,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				227C63BA1C7B8C4800B674D6 /* SafariServices.framework in Frameworks */,
 				2265DC8A1C722E7A00382C7C /* MessageUI.framework in Frameworks */,
 				2245E3781B542D0E00B763D7 /* AVKit.framework in Frameworks */,
 				229C85421B50292D004964DE /* CoreMedia.framework in Frameworks */,
@@ -2354,7 +2356,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "ec6f9a5b-b954-479b-b13d-647a8c2f5181";
+				PROVISIONING_PROFILE = "24fc607b-249c-4b9b-be7d-a0662d9f2989";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2597,7 +2599,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "48fb5fec-374a-4d21-be41-5603a9766783";
+				PROVISIONING_PROFILE = "a7430345-41c9-4d99-9052-b0a633fa2868";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
