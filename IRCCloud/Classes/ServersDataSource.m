@@ -303,10 +303,15 @@
 }
 
 -(void)updateUserModes:(NSString *)modes server:(int)cid {
-    if([modes isKindOfClass:[NSString class]] && modes.length == 5 && [modes characterAtIndex:0] != 'q') {
+    if([modes isKindOfClass:[NSString class]] && modes.length >= 5 && [modes characterAtIndex:0] != 'q') {
         Server *server = [self getServer:cid];
-        if(server)
-            server.MODE_OWNER = [modes substringToIndex:1];
+        if(server) {
+            if([[modes.lowercaseString substringToIndex:1] isEqualToString:@"y"]) {
+                server.MODE_OPER = [modes substringToIndex:1];
+            } else {
+                server.MODE_OWNER = [modes substringToIndex:1];
+            }
+        }
     }
 }
 
