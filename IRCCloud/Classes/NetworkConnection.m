@@ -818,8 +818,8 @@ volatile BOOL __socketPaused = NO;
                        }
                    },
                    @"isupport_params": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_servers updateUserModes:[object objectForKey:@"usermodes"] server:object.cid];
                        [_servers updateIsupport:[object objectForKey:@"params"] server:object.cid];
+                       [_servers updateUserModes:[object objectForKey:@"usermodes"] server:object.cid];
                    },
                    @"set_ignores": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        [_servers updateIgnores:[object objectForKey:@"masks"] server:object.cid];
