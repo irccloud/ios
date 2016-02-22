@@ -44,6 +44,7 @@ NSString *IRCCLOUD_PATH = @"/";
 #define TYPE_WWAN 2
 
 NSLock *__serializeLock = nil;
+volatile BOOL __socketPaused = NO;
 
 @interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
     SBJsonStreamParser *_parser;
@@ -418,6 +419,7 @@ NSLock *__serializeLock = nil;
                        }
                    },
                    @"oob_include": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       __socketPaused = YES;
                        _awayOverride = [[NSMutableDictionary alloc] init];
                        _reconnectTimestamp = -1;
                        CLS_LOG(@"oob_include, invalidating BIDs");
@@ -1513,6 +1515,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _resuming = NO;
         _ready = NO;
         _firstEID = 0;
+        __socketPaused = NO;
         
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
@@ -1614,6 +1617,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         CLS_LOG(@"Close Message: %@", aMessage);
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
+        __socketPaused = NO;
         if([self reachable] == kIRCCloudReachable && _reconnectTimestamp != 0) {
             [self fail];
         } else {
@@ -1631,6 +1635,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(socket == _socket) {
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
+        __socketPaused = NO;
         if([self reachable] && _reconnectTimestamp != 0) {
             [self fail];
         }
@@ -1643,6 +1648,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)webSocket:(WebSocket *)socket didReceiveTextMessage:(NSString*)aMessage {
     if(socket == _socket) {
         if(aMessage) {
+            while(__socketPaused) { //GCD uses a thread pool and can't guarantee NSLock will be locked and unlocked on the same thread, so here's an ugly hack instead
+                [NSThread sleepForTimeInterval:0.05];
+            }
             [_parser parse:[aMessage dataUsingEncoding:NSUTF8StringEncoding]];
         }
     } else {
@@ -1653,6 +1661,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 - (void)webSocket:(WebSocket *)socket didReceiveBinaryMessage: (NSData*) aMessage {
     if(socket == _socket) {
         if(aMessage) {
+            while(__socketPaused) {
+                [NSThread sleepForTimeInterval:0.05];
+            }
             [_parser parse:aMessage];
         }
     } else {
@@ -1884,6 +1895,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         });
         _numBuffers = 0;
         [_notifications updateBadgeCount];
+        __socketPaused = NO;
     }
     CLS_LOG(@"I downloaded %i events", _totalCount);
     [_oobQueue removeObject:fetcher];
@@ -1945,6 +1957,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     } else {
         CLS_LOG(@"Initial backlog download failed");
         [self disconnect];
+        __socketPaused = NO;
         _state = kIRCCloudStateDisconnected;
         _streamId = nil;
         [self fail];
