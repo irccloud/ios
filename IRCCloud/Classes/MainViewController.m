@@ -4004,17 +4004,24 @@ Device type: %@\n",
             
             if(report.length) {
                 MFMailComposeViewController *mfmc = [[MFMailComposeViewController alloc] init];
-                mfmc.mailComposeDelegate = self;
-                [mfmc setToRecipients:@[@"team@irccloud.com"]];
-                [mfmc setSubject:@"IRCCloud for iOS"];
-                [mfmc setMessageBody:report isHTML:NO];
-                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    mfmc.modalPresentationStyle = UIModalPresentationFormSheet;
-                else
-                    mfmc.modalPresentationStyle = UIModalPresentationCurrentContext;
-                [self presentViewController:mfmc animated:YES completion:^{
-                    [self _resetStatusBar];
-                }];
+                if(mfmc && [MFMailComposeViewController canSendMail]) {
+                    mfmc.mailComposeDelegate = self;
+                    [mfmc setToRecipients:@[@"team@irccloud.com"]];
+                    [mfmc setSubject:@"IRCCloud for iOS"];
+                    [mfmc setMessageBody:report isHTML:NO];
+                    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                        mfmc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    else
+                        mfmc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                    [self presentViewController:mfmc animated:YES completion:^{
+                        [self _resetStatusBar];
+                    }];
+                } else {
+                    UIPasteboard *pb = [UIPasteboard generalPasteboard];
+                    [pb setValue:report forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                    _alertView = [[UIAlertView alloc] initWithTitle:@"Email Unavailable" message:@"This device has no available email accounts.  The diagnostic report has been copied to the clipboard instead, please send it to team@irccloud.com." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                    [_alertView show];
+                }
             }
         }
         
