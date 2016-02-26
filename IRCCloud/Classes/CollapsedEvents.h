@@ -66,7 +66,7 @@ typedef enum {
 @property NSTimeInterval eid;
 @property kCollapsedEvent type;
 @property NSString *nick, *oldNick, *hostname, *msg, *fromMode, *fromNick, *targetMode, *chan;
-@property BOOL netsplit;
+@property BOOL netsplit, operIsLower;
 @property int count;
 -(NSComparisonResult)compare:(CollapsedEvent *)aEvent;
 -(BOOL)addMode:(NSString *)mode server:(Server *)server;

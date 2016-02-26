@@ -308,10 +308,8 @@
         if(server) {
             if([[modes.lowercaseString substringToIndex:1] isEqualToString:[server.isupport objectForKey:@"OWNER"]]) {
                 server.MODE_OWNER = [modes substringToIndex:1];
-                if([server.MODE_OWNER isEqualToString:server.MODE_OPER])
+                if([server.MODE_OWNER.lowercaseString isEqualToString:server.MODE_OPER.lowercaseString])
                     server.MODE_OPER = @"";
-            } else if([modes characterAtIndex:0] == 'y') {
-                server.MODE_OPER = [modes substringToIndex:1];
             }
         }
     }

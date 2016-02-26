@@ -126,6 +126,7 @@
 }
 -(void)copyModes:(CollapsedEvent *)from {
     [from _copyModes:_modes];
+    _operIsLower = from.operIsLower;
 }
 -(NSString *)modes:(BOOL)showSymbol mode_modes:(NSArray *)mode_modes {
     static NSString *mode_msgs[] = {
