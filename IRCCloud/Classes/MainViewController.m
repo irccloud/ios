@@ -2495,7 +2495,7 @@ extern NSDictionary *emojiMap;
         frame.origin.y = _eventsView.tableView.contentInset.top;
         frame.size.height = 32;
         _eventsView.topUnreadView.frame = frame;
-        frame.origin.y = _eventsView.tableView.frame.size.height - 32;
+        frame.origin.y = _bottomBar.frame.origin.y - 32;
         _eventsView.bottomUnreadView.frame = frame;
         float h = [@" " sizeWithAttributes:@{NSFontAttributeName:_nickCompletionView.font}].height + 12;
         _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);

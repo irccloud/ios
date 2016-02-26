@@ -1958,7 +1958,7 @@ int __timestampWidth;
             if(lastRow < _data.count)
                 _buffer.savedScrollOffset = tableView.contentOffset.y - tableView.tableHeaderView.bounds.size.height;
             
-            if(tableView.contentOffset.y >= (tableView.contentSize.height - tableView.bounds.size.height)) {
+            if(tableView.contentOffset.y >= (tableView.contentSize.height - (tableView.bounds.size.height - tableView.contentInset.top - tableView.contentInset.bottom))) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
                 _bottomUnreadView.alpha = 0;
