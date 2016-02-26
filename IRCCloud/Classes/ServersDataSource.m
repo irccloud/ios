@@ -313,6 +313,7 @@
             } else if([modes characterAtIndex:0] == 'y') {
                 server.MODE_OPER = [modes substringToIndex:1];
             }
+            NSLog(@"host: %@ modes: %@ oper: %@ owner: %@ isupport: %@", server.hostname, modes, server.MODE_OPER, server.MODE_OWNER, server.isupport);
         }
     }
 }

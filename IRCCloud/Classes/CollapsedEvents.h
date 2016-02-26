@@ -51,6 +51,7 @@ typedef enum {
     kCollapsedEvent _type;
     BOOL _modes[12];
     BOOL _netsplit;
+    BOOL _operIsLower;
     NSTimeInterval _eid;
     NSString *_nick;
     NSString *_oldNick;
