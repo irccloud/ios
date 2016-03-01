@@ -1284,6 +1284,7 @@ extern NSDictionary *emojiMap;
 
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
     _nickCompletionView.alpha = 0;
+    _atMention = NO;
     [UIView commitAnimations];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -1606,11 +1607,14 @@ extern NSDictionary *emojiMap;
         }
     }
     
+    if(_atMention)
+        nick = [NSString stringWithFormat:@"@%@", nick];
+
     if(!isChannel && ![text hasPrefix:@":"] && [text rangeOfString:@" "].location == NSNotFound)
         nick = [nick stringByAppendingString:@": "];
     else
         nick = [nick stringByAppendingString:@" "];
-
+    
     if(text.length == 0) {
         _message.text = nick;
     } else {
@@ -1627,7 +1631,7 @@ extern NSDictionary *emojiMap;
     NSMutableSet *suggestions_set = [[NSMutableSet alloc] init];
     NSMutableArray *suggestions = [[NSMutableArray alloc] init];
     
-    if(_message.text.length > 0) {
+    if(_message.text.length > 0 || [_message.text hasPrefix:@"@"]) {
         if(!_sortedChannels)
             _sortedChannels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
         if(!_sortedUsers)
@@ -1639,6 +1643,13 @@ extern NSDictionary *emojiMap;
         }
         if([text hasSuffix:@":"])
             text = [text substringToIndex:text.length - 1];
+        if([text hasPrefix:@"@"]) {
+            _atMention = YES;
+            force = YES;
+            text = [text substringFromIndex:1];
+        } else {
+            _atMention = NO;
+        }
         if(text.length > 1 || force) {
             if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text]) {
                 [suggestions_set addObject:_buffer.name.lowercaseString];
@@ -1657,7 +1668,7 @@ extern NSDictionary *emojiMap;
                 if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 && location != NSNotFound && location > 0) {
                     nick = [nick substringFromIndex:location];
                 }
-                if([nick hasPrefix:text] && ![suggestions_set containsObject:user.nick.lowercaseString]) {
+                if((text.length == 0 || [nick hasPrefix:text]) && ![suggestions_set containsObject:user.nick.lowercaseString]) {
                     [suggestions_set addObject:user.nick.lowercaseString];
                     [suggestions addObject:user.nick];
                 }
@@ -1694,6 +1705,7 @@ extern NSDictionary *emojiMap;
             _sortedChannels = nil;
             _sortedUsers = nil;
         }
+        _atMention = NO;
     } else {
         if(_nickCompletionView.alpha == 0) {
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:nil];

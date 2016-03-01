@@ -83,6 +83,7 @@
     BOOL __ignoreLayoutChanges;
     BOOL _isShowingPreview;
     NSString *__currentTheme;
+    BOOL _atMention;
     
     id<UIViewControllerPreviewing> __previewer;
 }
