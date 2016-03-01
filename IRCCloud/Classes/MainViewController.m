@@ -1645,7 +1645,6 @@ extern NSDictionary *emojiMap;
             text = [text substringToIndex:text.length - 1];
         if([text hasPrefix:@"@"]) {
             _atMention = YES;
-            force = YES;
             text = [text substringFromIndex:1];
         } else {
             _atMention = NO;
