@@ -828,6 +828,7 @@
     @synchronized(_events) {
         [_events removeAllObjects];
         [_events_sorted removeAllObjects];
+        CLS_LOG(@"EventsDataSource cleared");
     }
 }
 
@@ -836,6 +837,7 @@
     @synchronized(_events) {
         NSMutableArray *events = [_events objectForKey:@(event.bid)];
         if(!events) {
+            CLS_LOG(@"Creating new events storage for bid%i", event.bid);
             events = [[NSMutableArray alloc] init];
             [_events setObject:events forKey:@(event.bid)];
         }
@@ -943,6 +945,7 @@
     @synchronized(_events) {
         [_events removeObjectForKey:@(bid)];
         [_events_sorted removeObjectForKey:@(bid)];
+        CLS_LOG(@"Removing all events for bid%i", bid);
     }
 }
 
@@ -981,6 +984,7 @@
 }
 
 -(void)removeEventsBefore:(NSTimeInterval)min_eid buffer:(int)bid {
+    CLS_LOG(@"Removing events for bid%i older than %.0f", bid, min_eid);
     @synchronized(_events) {
         NSArray *events = [_events objectForKey:@(bid)];
         NSMutableArray *eventsToRemove = [[NSMutableArray alloc] init];

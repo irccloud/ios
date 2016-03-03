@@ -44,6 +44,7 @@
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
             }
         }
+        CLS_LOG(@"NotificationsDataSource initialized with %i items from cache", _notifications.count);
     }
     return self;
 }
@@ -71,6 +72,7 @@
 
 -(void)clear {
     @synchronized(_notifications) {
+        CLS_LOG(@"Clearing badge count");
         [_notifications removeAllObjects];
 #ifndef EXTENSION
         [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
@@ -95,6 +97,7 @@
     }
     //[[UIApplication sharedApplication] presentLocalNotificationNow:n];
 #endif
+    CLS_LOG(@"Got notification for bid%i eid%.0f, badge count is now %i", bid, eid, _notifications.count);
 }
 
 -(void)removeNotificationsForBID:(int)bid olderThan:(NSTimeInterval)eid {
@@ -112,6 +115,7 @@
             [_notifications removeObjectForKey:@(bid)];
     }
 #endif
+    CLS_LOG(@"Cleared notifications for bid%i older than eid%.0f, badge count is now %i", bid, eid, _notifications.count);
 }
 
 -(UILocalNotification *)getNotification:(NSTimeInterval)eid bid:(int)bid {
@@ -144,6 +148,7 @@
         if(!count)
             [[UIApplication sharedApplication] cancelAllLocalNotifications];
     }];
+    CLS_LOG(@"Setting iOS icon badge to %i", count);
 #endif
 }
 

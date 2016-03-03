@@ -1482,7 +1482,7 @@ extern NSDictionary *emojiMap;
                 [msg appendString:@"=== Buffers ===\n"];
                 NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:_buffer.cid];
                 for(Buffer *buffer in buffers) {
-                    [msg appendFormat:@"CID: %i BID: %i Name: %@ lastSeenEID: %f unread: %i\n", buffer.cid, buffer.bid, buffer.name, buffer.last_seen_eid, [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type]];
+                    [msg appendFormat:@"CID: %i BID: %i Name: %@ lastSeenEID: %f unread: %i highlight: %i\n", buffer.cid, buffer.bid, buffer.name, buffer.last_seen_eid, [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type], [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type]];
                     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid];
                     Event *e = [events firstObject];
                     [msg appendFormat:@"First event: %f %@\n", e.eid, e.type];

@@ -406,10 +406,13 @@ volatile BOOL __socketPaused = NO;
                            }];
                        }
                        _resuming = [[object objectForKey:@"resumed"] boolValue];
-                       if(!_resuming)
+                       if(!_resuming) {
+                           CLS_LOG(@"Socket was not resumed, clearing events");
                            [_events clear];
+                       }
                    },
                    @"backlog_cache_init": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       CLS_LOG(@"backlog_cache_init for bid%i", object.bid);
                        [_events removeEventsForBuffer:object.bid];
                    },
                    @"global_system_message": ^(IRCCloudJSONObject *object, BOOL backlog) {
