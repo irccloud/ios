@@ -778,7 +778,7 @@
         NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[`_]+$" options:NSRegularExpressionCaseInsensitive error:nil];
         NSString *normalizedNick = [r stringByReplacingMatchesInString:[nick lowercaseString] options:0 range:NSMakeRange(0, nick.length) withTemplate:@""];
         // remove |<anything> from the end
-        r = [NSRegularExpression regularExpressionWithPattern:@"|.*$" options:NSRegularExpressionCaseInsensitive error:nil];
+        r = [NSRegularExpression regularExpressionWithPattern:@"\\|.*$" options:NSRegularExpressionCaseInsensitive error:nil];
         normalizedNick = [r stringByReplacingMatchesInString:normalizedNick options:0 range:NSMakeRange(0, normalizedNick.length) withTemplate:@""];
         
         double hash = 0;
