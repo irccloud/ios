@@ -401,16 +401,12 @@ volatile BOOL __socketPaused = NO;
                        _streamId = [object objectForKey:@"streamid"];
                        _accrued = [[object objectForKey:@"accrued"] intValue];
                        _currentCount = 0;
-                       CLS_LOG(@"idle interval: %f clock offset: %f stream id: %@", _idleInterval, _clockOffset, _streamId);
+                       _resuming = [[object objectForKey:@"resumed"] boolValue];
+                       CLS_LOG(@"idle interval: %f clock offset: %f stream id: %@ resumed: %i", _idleInterval, _clockOffset, _streamId, _resuming);
                        if(_accrued > 0) {
                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
                            }];
-                       }
-                       _resuming = [[object objectForKey:@"resumed"] boolValue];
-                       if(!_resuming) {
-                           CLS_LOG(@"Socket was not resumed, clearing events");
-                           [_events clear];
                        }
                    },
                    @"backlog_cache_init": ^(IRCCloudJSONObject *object, BOOL backlog) {
