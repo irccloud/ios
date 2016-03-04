@@ -588,15 +588,15 @@ NSString *__current_theme;
         case 1:
             return [UIColor colorFromHexString:@"000000"]; //black
         case 2:
-            return [UIColor colorFromHexString:@"000080"]; //navy
+            return __color_theme_is_dark?[UIColor colorFromHexString:@"4682B4"]:[UIColor colorFromHexString:@"000080"]; //steelblue or navy
         case 3:
-            return [UIColor colorFromHexString:@"008000"]; //green
+            return __color_theme_is_dark?[UIColor colorFromHexString:@"32CD32"]:[UIColor colorFromHexString:@"008000"]; //limegreen or green
         case 4:
             return [UIColor colorFromHexString:@"FF0000"]; //red
         case 5:
-            return [UIColor colorFromHexString:@"800000"]; //maroon
+            return __color_theme_is_dark?[UIColor colorFromHexString:@"FA8072"]:[UIColor colorFromHexString:@"800000"]; //salmon or maroon
         case 6:
-            return [UIColor colorFromHexString:@"DA70D6"]; //purple (light = 800080) or orchird for dark
+            return __color_theme_is_dark?[UIColor colorFromHexString:@"DA70D6"]:[UIColor colorFromHexString:@"800080"]; //orchird or purple
         case 7:
             return [UIColor colorFromHexString:@"FFA500"]; //orange
         case 8:
@@ -604,11 +604,11 @@ NSString *__current_theme;
         case 9:
             return [UIColor colorFromHexString:@"00FF00"]; //lime
         case 10:
-            return [UIColor colorFromHexString:@"008080"]; //teal
+            return __color_theme_is_dark?[UIColor colorFromHexString:@"20B2AA"]:[UIColor colorFromHexString:@"008080"]; //lightseagreen or teal
         case 11:
             return [UIColor colorFromHexString:@"00FFFF"]; //cyan
         case 12:
-            return [UIColor colorFromHexString:@"00BFFF"]; //blue (light = 0000FF) or #00bfff for dark
+            return __color_theme_is_dark?[UIColor colorFromHexString:@"00BFFF"]:[UIColor colorFromHexString:@"0000FF"]; //deepskyblue or blue
         case 13:
             return [UIColor colorFromHexString:@"FF00FF"]; //magenta
         case 14:
