@@ -143,11 +143,12 @@
         count += [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
     }*/
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if([UIApplication sharedApplication].applicationIconBadgeNumber != count)
+            CLS_LOG(@"Setting iOS icon badge to %i", count);
         [UIApplication sharedApplication].applicationIconBadgeNumber = count;
         if(!count)
             [[UIApplication sharedApplication] cancelAllLocalNotifications];
     }];
-    CLS_LOG(@"Setting iOS icon badge to %i", count);
 #endif
 }
 

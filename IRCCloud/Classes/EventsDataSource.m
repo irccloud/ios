@@ -837,7 +837,6 @@
     @synchronized(_events) {
         NSMutableArray *events = [_events objectForKey:@(event.bid)];
         if(!events) {
-            CLS_LOG(@"Creating new events storage for bid%i", event.bid);
             events = [[NSMutableArray alloc] init];
             [_events setObject:events forKey:@(event.bid)];
         }
