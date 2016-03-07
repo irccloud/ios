@@ -3986,27 +3986,40 @@ Device type: %@\n",
                 folders = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[[folders[0] URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:@"active"] includingPropertiesForKeys:nil options:0 error:nil];
                 
                 if(folders.count) {
-                    SBJsonParser *parser = [[SBJsonParser alloc] init];
-                    NSArray *lines = [[NSString stringWithContentsOfURL:[folders[0] URLByAppendingPathComponent:@"log_a.clsrecord"] encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
-                    if(lines.count) {
+                    NSMutableArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:folders[0] includingPropertiesForKeys:nil options:0 error:nil].mutableCopy;
+                    if(files.count) {
+                        [files sortUsingComparator:^ (NSURL *a, NSURL *b) {
+                            id da = [[a resourceValuesForKeys:[NSArray arrayWithObject:NSURLAttributeModificationDateKey] error:nil] objectForKey:NSURLCreationDateKey];
+                            id db = [[b resourceValuesForKeys:[NSArray arrayWithObject:NSURLAttributeModificationDateKey] error:nil] objectForKey:NSURLCreationDateKey];
+                            return [da compare:db];
+                        }];
                         [report appendString:@"==========\nConsole log:\n"];
-                        for(NSString *line in lines) {
-                            NSDictionary *dict = [parser objectWithString:line];
-                            NSString *msg = [[dict objectForKey:@"log"] objectForKey:@"msg"];
-                            if(msg.length) {
-                                NSInteger ti = [[[dict objectForKey:@"log"] objectForKey:@"time"] intValue] / 1000;
-                                NSInteger seconds = ti % 60;
-                                NSInteger minutes = (ti / 60) % 60;
-                                NSInteger hours = (ti / 3600);
-                                [report appendFormat:@"%02ld:%02ld:%02ld ", (long)hours, (long)minutes, (long)seconds];
-                                
-                                for (NSInteger i = 0; i < msg.length; i += 2) {
-                                    NSString *hex = [msg substringWithRange:NSMakeRange(i, 2)];
-                                    int decimalValue = 0;
-                                    sscanf([hex UTF8String], "%x", &decimalValue);
-                                    [report appendFormat:@"%c", decimalValue];
+                        SBJsonParser *parser = [[SBJsonParser alloc] init];
+                        for(NSURL *file in files.reverseObjectEnumerator) {
+                            if([file.lastPathComponent hasPrefix:@"log_"] && [file.lastPathComponent hasSuffix:@".clsrecord"]) {
+                                NSArray *lines = [[NSString stringWithContentsOfURL:file encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
+                                if(lines.count) {
+                                    for(NSString *line in lines) {
+                                        NSDictionary *dict = [parser objectWithString:line];
+                                        NSString *msg = [[dict objectForKey:@"log"] objectForKey:@"msg"];
+                                        if(msg.length) {
+                                            NSInteger ti = [[[dict objectForKey:@"log"] objectForKey:@"time"] intValue] / 1000;
+                                            NSInteger seconds = ti % 60;
+                                            NSInteger minutes = (ti / 60) % 60;
+                                            NSInteger hours = (ti / 3600);
+                                            [report appendFormat:@"%02ld:%02ld:%02ld ", (long)hours, (long)minutes, (long)seconds];
+                                            
+                                            for (NSInteger i = 0; i < msg.length; i += 2) {
+                                                NSString *hex = [msg substringWithRange:NSMakeRange(i, 2)];
+                                                int decimalValue = 0;
+                                                sscanf([hex UTF8String], "%x", &decimalValue);
+                                                [report appendFormat:@"%c", decimalValue];
+                                            }
+                                            [report appendString:@"\n"];
+                                            break;
+                                        }
+                                    }
                                 }
-                                [report appendString:@"\n"];
                             }
                         }
                     }
