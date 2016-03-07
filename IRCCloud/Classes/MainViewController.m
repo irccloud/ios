@@ -4087,7 +4087,10 @@ Device type: %@\n",
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
             _alertView.tag = TAG_BAN;
             _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            if(_selectedUser.hostmask.length)
+                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            else
+                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
             [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
             [_alertView textFieldAtIndex:0].delegate = self;
             [_alertView show];
@@ -4096,7 +4099,10 @@ Device type: %@\n",
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
             _alertView.tag = TAG_IGNORE;
             _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            if(_selectedUser.hostmask.length)
+                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            else
+                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
             [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
             [_alertView textFieldAtIndex:0].delegate = self;
             [_alertView show];
