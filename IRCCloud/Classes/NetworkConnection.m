@@ -408,6 +408,15 @@ volatile BOOL __socketPaused = NO;
                                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
                            }];
                        }
+                       if(_highestEID > 0 && !_resuming) {
+                           CLS_LOG(@"Unable to resume socket, requesting a full OOB load");
+                           [_events clear];
+                           _highestEID = 0;
+                           _streamId = nil;
+                           [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
+                           _state = kIRCCloudStateDisconnected;
+                           [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
+                       }
                    },
                    @"backlog_cache_init": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        CLS_LOG(@"backlog_cache_init for bid%i", object.bid);
