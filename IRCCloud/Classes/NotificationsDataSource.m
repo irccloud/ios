@@ -93,11 +93,23 @@
     @synchronized(_notifications) {
         if(![_notifications objectForKey:@(bid)])
             [_notifications setObject:[[NSMutableArray alloc] init] forKey:@(bid)];
-        [[_notifications objectForKey:@(bid)] addObject:n];
+        
+        NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
+        BOOL found = NO;
+        for(UILocalNotification *n in ns) {
+            NSArray *d = [n.userInfo objectForKey:@"d"];
+            if([[d objectAtIndex:2] doubleValue] == eid) {
+                found = YES;
+                break;
+            }
+        }
+        if(!found) {
+            [[_notifications objectForKey:@(bid)] addObject:n];
+            CLS_LOG(@"Got notification for bid%i eid%.0f", bid, eid);
+            //[[UIApplication sharedApplication] presentLocalNotificationNow:n];
+        }
     }
-    //[[UIApplication sharedApplication] presentLocalNotificationNow:n];
 #endif
-    CLS_LOG(@"Got notification for bid%i eid%.0f", bid, eid);
 }
 
 -(void)removeNotificationsForBID:(int)bid olderThan:(NSTimeInterval)eid {
