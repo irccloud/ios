@@ -4016,7 +4016,6 @@ Device type: %@\n",
                                                 [report appendFormat:@"%c", decimalValue];
                                             }
                                             [report appendString:@"\n"];
-                                            break;
                                         }
                                     }
                                 }
