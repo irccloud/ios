@@ -63,8 +63,8 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [interactionController.interactionProgressForPresentation endInteraction:YES];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            //[interactionController commitInteractivePreview];
-            [interactionController cancelInteractivePreview];
+            [interactionController commitInteractivePreview];
+            //[interactionController cancelInteractivePreview];
         });
     });
 }
