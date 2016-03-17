@@ -491,6 +491,14 @@
 		22DB8D711C441C3000302271 /* YouTubeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB8D6F1C441C3000302271 /* YouTubeViewController.m */; };
 		22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
 		22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
+		22E9C0AB1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */; };
+		22E9C0AC1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */; };
+		22EE12841C9B20DF00E7AE8D /* Firefox.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12811C9B20DF00E7AE8D /* Firefox.png */; };
+		22EE12851C9B20DF00E7AE8D /* Firefox.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12811C9B20DF00E7AE8D /* Firefox.png */; };
+		22EE12861C9B20DF00E7AE8D /* Firefox@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */; };
+		22EE12871C9B20DF00E7AE8D /* Firefox@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */; };
+		22EE12881C9B20DF00E7AE8D /* Firefox@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */; };
+		22EE12891C9B20DF00E7AE8D /* Firefox@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */; };
 		22EEA94E18D0AC08007D5022 /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */; };
 		22EEA94F18D0AC4D007D5022 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
 		22EEA95118D0B117007D5022 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95018D0B117007D5022 /* Images.xcassets */; };
@@ -833,6 +841,11 @@
 		22DB8D6F1C441C3000302271 /* YouTubeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YouTubeViewController.m; sourceTree = "<group>"; };
 		22E442A3192AB85B00A6C687 /* ImgurLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImgurLoginViewController.h; sourceTree = "<group>"; };
 		22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImgurLoginViewController.m; sourceTree = "<group>"; };
+		22E9C0A71C9AF27800013456 /* OpenInFirefoxControllerObjC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInFirefoxControllerObjC.h; path = OpenInFirefoxClient/OpenInFirefoxControllerObjC.h; sourceTree = SOURCE_ROOT; };
+		22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OpenInFirefoxControllerObjC.m; path = OpenInFirefoxClient/OpenInFirefoxControllerObjC.m; sourceTree = SOURCE_ROOT; };
+		22EE12811C9B20DF00E7AE8D /* Firefox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Firefox.png; path = OpenInFirefoxClient/Firefox.png; sourceTree = SOURCE_ROOT; };
+		22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Firefox@2x.png"; path = "OpenInFirefoxClient/Firefox@2x.png"; sourceTree = SOURCE_ROOT; };
+		22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Firefox@3x.png"; path = "OpenInFirefoxClient/Firefox@3x.png"; sourceTree = SOURCE_ROOT; };
 		22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = EnterpriseImages.xcassets; sourceTree = "<group>"; };
 		22EEA95018D0B117007D5022 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		22EEA95318D0B198007D5022 /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
@@ -1108,6 +1121,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22EE12801C9B1DE000E7AE8D /* OpenInFirefoxClient */,
 				2236BD671BAA600900015753 /* FontAwesome.h */,
 				22C0F14B1B8F61AF001D109D /* YTPlayerView */,
 				22D649201B1E0719003BFD86 /* CSURITemplate */,
@@ -1404,6 +1418,18 @@
 			path = CSURITemplate;
 			sourceTree = SOURCE_ROOT;
 		};
+		22EE12801C9B1DE000E7AE8D /* OpenInFirefoxClient */ = {
+			isa = PBXGroup;
+			children = (
+				22EE12811C9B20DF00E7AE8D /* Firefox.png */,
+				22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */,
+				22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */,
+				22E9C0A71C9AF27800013456 /* OpenInFirefoxControllerObjC.h */,
+				22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */,
+			);
+			name = OpenInFirefoxClient;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1657,12 +1683,15 @@
 				225D979218AA995900065087 /* ARChromeActivity@2x~ipad.png in Resources */,
 				22A363B319D0884D00500478 /* 1Password.xcassets in Resources */,
 				225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */,
+				22EE12851C9B20DF00E7AE8D /* Firefox.png in Resources */,
 				225D979418AA995900065087 /* Safari.png in Resources */,
 				2236BD6B1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
+				22EE12891C9B20DF00E7AE8D /* Firefox@3x.png in Resources */,
 				225D979518AA995900065087 /* Safari@2x.png in Resources */,
 				2236BD6D1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
 				2236BD641BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				225D979618AA995900065087 /* Safari@2x~ipad.png in Resources */,
+				22EE12871C9B20DF00E7AE8D /* Firefox@2x.png in Resources */,
 				225D979718AA995900065087 /* Safari~ipad.png in Resources */,
 				22EEA95518D0B198007D5022 /* Icons.xcassets in Resources */,
 				225D979918AA995900065087 /* licenses.txt in Resources */,
@@ -1680,8 +1709,11 @@
 				228A057A16D3DABA0029769C /* InfoPlist.strings in Resources */,
 				22C0F1541B8F6829001D109D /* Assets in Resources */,
 				22988AAB19B12B6B006F4635 /* LoginSplashViewController.xib in Resources */,
+				22EE12841C9B20DF00E7AE8D /* Firefox.png in Resources */,
+				22EE12861C9B20DF00E7AE8D /* Firefox@2x.png in Resources */,
 				22C2E05A1B0E2E4800387B4B /* PastebinViewController.xib in Resources */,
 				2236F64216DC2EF6007BE535 /* MainViewController.xib in Resources */,
+				22EE12881C9B20DF00E7AE8D /* Firefox@3x.png in Resources */,
 				2236BD6C1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
 				2223C6AC1768D7150032544B /* ImageViewController.xib in Resources */,
@@ -1852,6 +1884,7 @@
 				225D974A18AA995900065087 /* HandshakeHeader.m in Sources */,
 				228E2B9218CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
 				22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
+				22E9C0AC1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */,
 				228E2B8618CF770D0011DEAB /* SBJsonStreamParser.m in Sources */,
 				225D974B18AA995900065087 /* MutableQueue.m in Sources */,
 				225D974C18AA995900065087 /* NSData+Base64.m in Sources */,
@@ -1947,6 +1980,7 @@
 				22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */,
 				228E2B9018CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
 				22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
+				22E9C0AB1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */,
 				228E2B8418CF770D0011DEAB /* SBJsonStreamParser.m in Sources */,
 				22B4286C16D831A800498507 /* MutableQueue.m in Sources */,
 				22B4286E16D831A800498507 /* NSData+Base64.m in Sources */,
@@ -2245,7 +2279,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "148ccca5-95c3-453f-9619-6bfdd6bba0fa";
+				PROVISIONING_PROFILE = "0099dc54-b329-4b3e-ba9b-268ec7e3f287";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2356,7 +2390,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "24fc607b-249c-4b9b-be7d-a0662d9f2989";
+				PROVISIONING_PROFILE = "0753de15-ec48-41e5-a903-7cae37301fa3";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2480,7 +2514,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "d547ae35-26cc-41e0-88e5-137961b98cab";
+				PROVISIONING_PROFILE = "3136f4c8-6c51-4c77-873a-339f49f6ecf0";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2599,7 +2633,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "a7430345-41c9-4d99-9052-b0a633fa2868";
+				PROVISIONING_PROFILE = "2a6c346b-3759-488e-b6a4-6e9c413c9893";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;

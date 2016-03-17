@@ -20,8 +20,7 @@
 #import "PastebinViewController.h"
 #import "NetworkConnection.h"
 #import "OpenInChromeController.h"
-#import "ARChromeActivity.h"
-#import "TUSafariActivity.h"
+#import "OpenInFirefoxControllerObjC.h"
 #import "AppDelegate.h"
 #import "PastebinEditorViewController.h"
 #import "UIColor+IRCCloud.h"
@@ -66,43 +65,25 @@
                                   AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                                   MainViewController *mainViewController = [appDelegate mainViewController];
                                   
-                                  UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
-#ifdef ENTERPRISE
-                                                                                                                                                                                                                                                                                                                                                         @"irccloud-enterprise://"
-#else
-                                                                                                                                                                                                                                                                                                                                                         @"irccloud://"
-#endif
-                                                                                                                                                                                                                                                                                                                                                         ]]:[[TUSafariActivity alloc] init]]];
-                                  activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-                                      if(completed) {
-                                          if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                                              activityType = [activityType substringFromIndex:25];
-                                          if([activityType hasPrefix:@"com.apple."])
-                                              activityType = [activityType substringFromIndex:10];
-                                          [Answers logShareWithMethod:activityType contentName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
-                                      }
-                                  };
+                                  UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[url] type:@"Pastebin"];
+                                  
                                   [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
                               }],
                               [UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-                                  if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] openInChrome:url
-                                                                                                                                                withCallbackURL:[NSURL URLWithString:
+                                  if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:url
+                                                                                                                                                                          withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
-                                                                                                                                                                 @"irccloud-enterprise://"
+                                                                                                                                                                                           @"irccloud-enterprise://"
 #else
-                                                                                                                                                                 @"irccloud://"
+                                                                                                                                                                                           @"irccloud://"
 #endif
-                                                                                                                                                                 ]
-                                                                                                                                                   createNewTab:NO])) {
-                                      if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
-                                          UIApplication *app = [UIApplication sharedApplication];
-                                          AppDelegate *appDelegate = (AppDelegate *)app.delegate;
-                                          MainViewController *mainViewController = [appDelegate mainViewController];
-                                          [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
-                                      } else {
-                                          [[UIApplication sharedApplication] openURL:url];
-                                      }
-                                  }
+                                                                                                                                                                                           ]
+                                                                                                                                                                             createNewTab:NO])
+                                      return;
+                                  else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:url])
+                                      return;
+                                  else
+                                      [[UIApplication sharedApplication] openURL:url];
                               }]
                               ];
 }
@@ -233,35 +214,11 @@
 
 -(IBAction)shareButtonPressed:(id)sender {
     if(NSClassFromString(@"UIActivityViewController")) {
-        UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[_url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
-#ifdef ENTERPRISE
-                                                                                                                                                                                                                                                                                                                                         @"irccloud-enterprise://"
-#else
-                                                                                                                                                                                                                                                                                                                                         @"irccloud://"
-#endif
-                                                                                                                                                                                                                                                                                                                                         ]]:[[TUSafariActivity alloc] init]]];
+        UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:_url]] type:@"Pastebin"];
+        
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
             activityController.popoverPresentationController.delegate = self;
             activityController.popoverPresentationController.barButtonItem = sender;
-            activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-                if(completed) {
-                    if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                        activityType = [activityType substringFromIndex:25];
-                    if([activityType hasPrefix:@"com.apple."])
-                        activityType = [activityType substringFromIndex:10];
-                    [Answers logShareWithMethod:activityType contentName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
-                }
-            };
-        } else {
-            activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
-                if(completed) {
-                    if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                        activityType = [activityType substringFromIndex:25];
-                    if([activityType hasPrefix:@"com.apple."])
-                        activityType = [activityType substringFromIndex:10];
-                    [Answers logShareWithMethod:activityType contentName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
-                }
-            };
         }
         [self presentViewController:activityController animated:YES completion:nil];
     }

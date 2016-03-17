@@ -23,5 +23,6 @@
 + (BOOL)isImageURL:(NSURL *)url;
 + (BOOL)isYouTubeURL:(NSURL *)url;
 - (void)launchURL:(NSURL *)url;
++ (UIActivityViewController *)activityControllerForItems:(NSArray *)items type:(NSString *)type;
 
 @end

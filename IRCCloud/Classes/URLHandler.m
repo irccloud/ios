@@ -24,15 +24,63 @@
 #import "MainViewController.h"
 #import "ImageViewController.h"
 #import "OpenInChromeController.h"
+#import "OpenInFirefoxControllerObjC.h"
 #import "PastebinViewController.h"
 #import "UIColor+IRCCloud.h"
 #import "config.h"
+#import "ARChromeActivity.h"
+#import "TUSafariActivity.h"
+
+@interface OpenInFirefoxActivity : UIActivity
+
+@end
+
+@implementation OpenInFirefoxActivity {
+    NSURL *_URL;
+}
+
+- (NSString *)activityType {
+    return NSStringFromClass([self class]);
+}
+
+- (NSString *)activityTitle {
+    return @"Open in Firefox";
+}
+
+- (UIImage *)activityImage {
+    return [UIImage imageNamed:@"Firefox"];
+}
+
+- (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
+    if([[OpenInFirefoxControllerObjC sharedInstance] isFirefoxInstalled]) {
+        for (id activityItem in activityItems) {
+            if ([activityItem isKindOfClass:[NSURL class]] && [[UIApplication sharedApplication] canOpenURL:activityItem]) {
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
+}
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
+    for (id activityItem in activityItems) {
+        if ([activityItem isKindOfClass:[NSURL class]]) {
+            _URL = activityItem;
+        }
+    }
+}
+
+- (void)performActivity {
+    BOOL completed = [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:_URL];
+    
+    [self activityDidFinish:completed];
+}
+
+@end
+
 
 @implementation URLHandler
-{
-    OpenInChromeController *_openInChromeController;
-    NSURL *_pendingURL;
-}
 
 #define HAS_IMAGE_SUFFIX(l) ([l hasSuffix:@"jpg"] || [l hasSuffix:@"jpeg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"] || [l hasSuffix:@"bmp"])
 
@@ -224,51 +272,69 @@
 
 - (void)openWebpage:(NSURL *)url
 {
-    if(!_openInChromeController) {
-        _openInChromeController = [[OpenInChromeController alloc] init];
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
+        if([[OpenInChromeController sharedInstance] openInChrome:url withCallbackURL:self.appCallbackURL createNewTab:NO])
+            return;
     }
-    BOOL shouldDisplayBrowser = ([[NSUserDefaults standardUserDefaults] objectForKey:@"useChrome"]
-                                 || ![_openInChromeController isChromeInstalled]);
-    BOOL useChrome = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
-    if(shouldDisplayBrowser) {
-        if(!(useChrome && [_openInChromeController openInChrome:url withCallbackURL:self.appCallbackURL createNewTab:NO])) {
-            if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    UIApplication *app = [UIApplication sharedApplication];
-                    AppDelegate *appDelegate = (AppDelegate *)app.delegate;
-                    MainViewController *mainViewController = [appDelegate mainViewController];
-                    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
-                    [UIApplication sharedApplication].statusBarHidden = NO;
-                    
-                    [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
-                }];
-            } else {
-                [[UIApplication sharedApplication] openURL:url];
-            }
-        }
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] isFirefoxInstalled]) {
+        if([[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:url])
+            return;
+    }
+    if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Safari"] && [SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            UIApplication *app = [UIApplication sharedApplication];
+            AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+            MainViewController *mainViewController = [appDelegate mainViewController];
+            [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+            [UIApplication sharedApplication].statusBarHidden = NO;
+            
+            [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
+        }];
     } else {
-        [self showBrowserChooserAlertPendingURL:url];
+        [[UIApplication sharedApplication] openURL:url];
     }
 }
 
-- (void)showBrowserChooserAlertPendingURL:(NSURL *)url
-{
-    _pendingURL = url;
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Choose A Browser"
-                                                    message:@"Would you prefer to open links in Safari or Chrome?"
-                                                   delegate:self
-                                          cancelButtonTitle:nil
-                                          otherButtonTitles:@"Chrome", @"Safari", nil];
-    [alert show];
++ (UIActivityViewController *)activityControllerForItems:(NSArray *)items type:(NSString *)type {
+    NSArray *activities;
+    
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
+        activities = @[[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                      @"irccloud-enterprise://"
+#else
+                                                                      @"irccloud://"
+#endif
+                                                                      ]]];
+    } else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] isFirefoxInstalled]) {
+        activities = @[[[OpenInFirefoxActivity alloc] init]];
+    } else {
+        activities = @[[[TUSafariActivity alloc] init]];
+    }
+    
+    UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:activities];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+            if(completed) {
+                if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                    activityType = [activityType substringFromIndex:25];
+                if([activityType hasPrefix:@"com.apple."])
+                    activityType = [activityType substringFromIndex:10];
+                [Answers logShareWithMethod:activityType contentName:nil contentType:type contentId:nil customAttributes:nil];
+            }
+        };
+    } else {
+        activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
+            if(completed) {
+                if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                    activityType = [activityType substringFromIndex:25];
+                if([activityType hasPrefix:@"com.apple."])
+                    activityType = [activityType substringFromIndex:10];
+                [Answers logShareWithMethod:activityType contentName:nil contentType:type contentId:nil customAttributes:nil];
+            }
+        };
+    }
+    return activityController;
 }
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    [[NSUserDefaults standardUserDefaults] setObject:@(buttonIndex == 0) forKey:@"useChrome"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    [self launchURL:_pendingURL];
-    _pendingURL = nil;
-}
-
 
 @end
