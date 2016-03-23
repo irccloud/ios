@@ -229,10 +229,15 @@
             UIApplication *app = [UIApplication sharedApplication];
             AppDelegate *appDelegate = (AppDelegate *)app.delegate;
             MainViewController *mainViewController = [appDelegate mainViewController];
-            [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
-            [UIApplication sharedApplication].statusBarHidden = NO;
             
-            [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:_url] animated:YES completion:nil];
+            [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
+            
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+                [UIApplication sharedApplication].statusBarHidden = NO;
+                
+                [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:_url] animated:YES completion:nil];
+            }];
         }];
     } else {
         [[UIApplication sharedApplication] openURL:_url];
