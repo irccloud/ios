@@ -208,9 +208,7 @@
     for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
         if(user.nick.length) {
             NSString *mode = user.mode.lowercaseString;
-            if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OPER:@"Y"])
-                [opers addObject:user];
-            else if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"])
+            if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && ([PREFIX objectForKey:s?s.MODE_OPER:@"Y"] || [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"]))
                 [opers addObject:user];
             else if([mode rangeOfString:s?s.MODE_OWNER.lowercaseString:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
                 [owners addObject:user];
