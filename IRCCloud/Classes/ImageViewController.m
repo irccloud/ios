@@ -426,6 +426,10 @@
                     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
                     
                     [_connection start];
+                } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
+                    [self loadVideo:[dict objectForKey:@"mp4"]];
+                    if([[dict objectForKey:@"looping"] intValue] == 1)
+                        _movieController.repeatMode = MPMovieRepeatModeOne;
                 } else {
                     NSLog(@"Invalid type from imgur");
                     [self fail];

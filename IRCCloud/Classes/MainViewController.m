@@ -441,12 +441,12 @@ extern NSDictionary *emojiMap;
                 }
                 if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
                     if(type == 1) {
-                        if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || [[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] != 1)
                             unread = 0;
                     } else {
-                        if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || [[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] != 1)
                             unread = 0;
-                        if(type == 2 && (![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1))
+                        if(type == 2 && (![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || [[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] != 1))
                             highlights = 0;
                     }
                 }
@@ -993,10 +993,10 @@ extern NSDictionary *emojiMap;
                         }
                         if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
                             if([b.type isEqualToString:@"channel"]) {
-                                if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || [[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] != 1)
                                     break;
                             } else {
-                                if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || [[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] != 1)
                                     break;
                             }
                         }
