@@ -1520,12 +1520,12 @@ float ColorFormatterCachedFontSize = 0.0f;
                 NSString *rest = @"";
                 if([url rangeOfString:@"://"].location != NSNotFound)
                     scheme = [[url componentsSeparatedByString:@"://"] objectAtIndex:0];
-                int start = (scheme.length?(scheme.length + 3):0);
+                NSInteger start = (scheme.length?(scheme.length + 3):0);
                 
-                for(int i = start; i < url.length; i++) {
+                for(NSInteger i = start; i < url.length; i++) {
                     char c = [url characterAtIndex:i];
                     if(c == ':') { //Search for @ credentials
-                        for(int j = i; j < url.length; j++) {
+                        for(NSInteger j = i; j < url.length; j++) {
                             char c = [url characterAtIndex:j];
                             if(c == '@') {
                                 j++;
