@@ -17,9 +17,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
-        _logo.center = CGPointMake(self.view.center.y, 39);
+        _logo.center = CGPointMake(self.view.center.y, 39 + [UIApplication sharedApplication].statusBarFrame.size.height);
     else
-        _logo.center = CGPointMake(self.view.center.x, 39);
+        _logo.center = CGPointMake(self.view.center.x, 39 + [UIApplication sharedApplication].statusBarFrame.size.height);
 }
 
 - (void)didReceiveMemoryWarning {

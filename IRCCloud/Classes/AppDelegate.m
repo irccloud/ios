@@ -131,9 +131,10 @@
     [Fabric with:@[CrashlyticsKit]];
 #endif
     
-    self.splashViewController = (SplashViewController*)self.window.rootViewController;
-    self.loginSplashViewController = [self.splashViewController.storyboard instantiateViewControllerWithIdentifier:@"LoginSplashViewController"];
-    self.mainViewController = [self.splashViewController.storyboard instantiateViewControllerWithIdentifier:@"MainViewController"];
+    self.splashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"SplashViewController"];
+    self.window.rootViewController = self.splashViewController;
+    self.loginSplashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"LoginSplashViewController"];
+    self.mainViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"MainViewController"];
     self.slideViewController = [[ECSlidingViewController alloc] init];
     self.slideViewController.view.backgroundColor = [UIColor blackColor];
     self.slideViewController.topViewController = [[UINavigationController alloc] initWithNavigationBarClass:[NavBarHax class] toolbarClass:nil];
