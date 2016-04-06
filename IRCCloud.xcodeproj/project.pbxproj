@@ -131,6 +131,8 @@
 		2236F64B16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
 		2237E13D16E1214A00CA188F /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
 		2237E13E16E1214A00CA188F /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
+		223C407C1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */; };
+		223C407D1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */; };
 		223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		223DA90D16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		2245E3771B542D0200B763D7 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2245E3761B542D0200B763D7 /* AVKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -236,12 +238,15 @@
 		225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
 		2264A30119659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
 		2264A30219659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
+		2265DC891C722E6B00382C7C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2265DC881C722E6B00382C7C /* MessageUI.framework */; };
+		2265DC8A1C722E7A00382C7C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2265DC881C722E6B00382C7C /* MessageUI.framework */; };
 		22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		22695F5616E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		226EB6011B4C2E8600C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
 		226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
 		2274F4A01756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
+		227C63BA1C7B8C4800B674D6 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A1F1141C232B3A00AEC09A /* SafariServices.framework */; };
 		227EA7BE17F0BE9A001E5E53 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
 		227EA7BF17F0BE9A001E5E53 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
 		227EA7C017F0BE9A001E5E53 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -476,8 +481,18 @@
 		22DB25391982DFFB0008728E /* ShareExtension Enterprise.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 22DB25371982DF2B0008728E /* ShareExtension Enterprise.appex */; };
 		22DB253F1982E3100008728E /* EnterpriseLogo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */; };
 		22DB25401982E3130008728E /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */; };
+		22DB8D701C441C3000302271 /* YouTubeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB8D6F1C441C3000302271 /* YouTubeViewController.m */; };
+		22DB8D711C441C3000302271 /* YouTubeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB8D6F1C441C3000302271 /* YouTubeViewController.m */; };
 		22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
 		22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
+		22E9C0AB1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */; };
+		22E9C0AC1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */; };
+		22EE12841C9B20DF00E7AE8D /* Firefox.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12811C9B20DF00E7AE8D /* Firefox.png */; };
+		22EE12851C9B20DF00E7AE8D /* Firefox.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12811C9B20DF00E7AE8D /* Firefox.png */; };
+		22EE12861C9B20DF00E7AE8D /* Firefox@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */; };
+		22EE12871C9B20DF00E7AE8D /* Firefox@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */; };
+		22EE12881C9B20DF00E7AE8D /* Firefox@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */; };
+		22EE12891C9B20DF00E7AE8D /* Firefox@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */; };
 		22EEA94E18D0AC08007D5022 /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */; };
 		22EEA94F18D0AC4D007D5022 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
 		22EEA95118D0B117007D5022 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95018D0B117007D5022 /* Images.xcassets */; };
@@ -627,6 +642,8 @@
 		2236F64916DD30E3007BE535 /* UsersTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersTableView.m; sourceTree = "<group>"; };
 		2237E13B16E1214A00CA188F /* ColorFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorFormatter.h; sourceTree = "<group>"; };
 		2237E13C16E1214A00CA188F /* ColorFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorFormatter.m; sourceTree = "<group>"; };
+		223C407A1C60FE880081B02B /* IRCCloudSafariViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudSafariViewController.h; sourceTree = "<group>"; };
+		223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudSafariViewController.m; sourceTree = "<group>"; };
 		223DA90A16DFC626006FF808 /* EventsTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsTableView.h; sourceTree = "<group>"; };
 		223DA90B16DFC626006FF808 /* EventsTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsTableView.m; sourceTree = "<group>"; };
 		2245E3761B542D0200B763D7 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
@@ -657,6 +674,7 @@
 		225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IRCCloud-Enterprise-Info.plist"; sourceTree = "<group>"; };
 		2264A2FF19659BB100DCFDDD /* URLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLHandler.h; sourceTree = "<group>"; };
 		2264A30019659BB100DCFDDD /* URLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLHandler.m; sourceTree = "<group>"; };
+		2265DC881C722E6B00382C7C /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollapsedEvents.h; sourceTree = "<group>"; };
 		22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollapsedEvents.m; sourceTree = "<group>"; };
 		226EB6001B4C2E8600C432C7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
@@ -812,8 +830,15 @@
 		22DB24F91982DF070008728E /* Info-Enterprise.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info-Enterprise.plist"; sourceTree = "<group>"; };
 		22DB25371982DF2B0008728E /* ShareExtension Enterprise.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "ShareExtension Enterprise.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		22DB253D1982E2890008728E /* IRCEnterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = IRCEnterprise.entitlements; path = ../IRCEnterprise.entitlements; sourceTree = "<group>"; };
+		22DB8D6E1C441C3000302271 /* YouTubeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YouTubeViewController.h; sourceTree = "<group>"; };
+		22DB8D6F1C441C3000302271 /* YouTubeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YouTubeViewController.m; sourceTree = "<group>"; };
 		22E442A3192AB85B00A6C687 /* ImgurLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImgurLoginViewController.h; sourceTree = "<group>"; };
 		22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImgurLoginViewController.m; sourceTree = "<group>"; };
+		22E9C0A71C9AF27800013456 /* OpenInFirefoxControllerObjC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInFirefoxControllerObjC.h; path = OpenInFirefoxClient/OpenInFirefoxControllerObjC.h; sourceTree = SOURCE_ROOT; };
+		22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OpenInFirefoxControllerObjC.m; path = OpenInFirefoxClient/OpenInFirefoxControllerObjC.m; sourceTree = SOURCE_ROOT; };
+		22EE12811C9B20DF00E7AE8D /* Firefox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Firefox.png; path = OpenInFirefoxClient/Firefox.png; sourceTree = SOURCE_ROOT; };
+		22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Firefox@2x.png"; path = "OpenInFirefoxClient/Firefox@2x.png"; sourceTree = SOURCE_ROOT; };
+		22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Firefox@3x.png"; path = "OpenInFirefoxClient/Firefox@3x.png"; sourceTree = SOURCE_ROOT; };
 		22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = EnterpriseImages.xcassets; sourceTree = "<group>"; };
 		22EEA95018D0B117007D5022 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		22EEA95318D0B198007D5022 /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
@@ -854,6 +879,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				227C63BA1C7B8C4800B674D6 /* SafariServices.framework in Frameworks */,
+				2265DC8A1C722E7A00382C7C /* MessageUI.framework in Frameworks */,
 				2245E3781B542D0E00B763D7 /* AVKit.framework in Frameworks */,
 				229C85421B50292D004964DE /* CoreMedia.framework in Frameworks */,
 				226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */,
@@ -885,6 +912,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2265DC891C722E6B00382C7C /* MessageUI.framework in Frameworks */,
 				22A1F1151C232B3A00AEC09A /* SafariServices.framework in Frameworks */,
 				2245E3771B542D0200B763D7 /* AVKit.framework in Frameworks */,
 				229C85411B502920004964DE /* CoreMedia.framework in Frameworks */,
@@ -1036,6 +1064,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2265DC881C722E6B00382C7C /* MessageUI.framework */,
 				22A1F1141C232B3A00AEC09A /* SafariServices.framework */,
 				2245E3761B542D0200B763D7 /* AVKit.framework */,
 				229C85401B502920004964DE /* CoreMedia.framework */,
@@ -1082,6 +1111,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22EE12801C9B1DE000E7AE8D /* OpenInFirefoxClient */,
 				2236BD671BAA600900015753 /* FontAwesome.h */,
 				22C0F14B1B8F61AF001D109D /* YTPlayerView */,
 				22D649201B1E0719003BFD86 /* CSURITemplate */,
@@ -1185,6 +1215,8 @@
 				22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */,
 				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
+				223C407A1C60FE880081B02B /* IRCCloudSafariViewController.h */,
+				223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */,
 				224FCF341787288400FC3879 /* LicenseViewController.h */,
 				224FCF351787288400FC3879 /* LicenseViewController.m */,
 				228A05DB16D3E40E0029769C /* LoginSplashViewController.h */,
@@ -1231,6 +1263,8 @@
 				22A35F25178A317100529CDA /* WhoListTableViewController.m */,
 				22A363BA19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.h */,
 				22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */,
+				22DB8D6E1C441C3000302271 /* YouTubeViewController.h */,
+				22DB8D6F1C441C3000302271 /* YouTubeViewController.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -1375,6 +1409,18 @@
 			);
 			path = CSURITemplate;
 			sourceTree = SOURCE_ROOT;
+		};
+		22EE12801C9B1DE000E7AE8D /* OpenInFirefoxClient */ = {
+			isa = PBXGroup;
+			children = (
+				22EE12811C9B20DF00E7AE8D /* Firefox.png */,
+				22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */,
+				22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */,
+				22E9C0A71C9AF27800013456 /* OpenInFirefoxControllerObjC.h */,
+				22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */,
+			);
+			name = OpenInFirefoxClient;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -1627,12 +1673,15 @@
 				22A363B319D0884D00500478 /* 1Password.xcassets in Resources */,
 				225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */,
 				22D268C31BF4F40800B682AE /* MainStoryboard.storyboard in Resources */,
+				22EE12851C9B20DF00E7AE8D /* Firefox.png in Resources */,
 				225D979418AA995900065087 /* Safari.png in Resources */,
 				2236BD6B1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
+				22EE12891C9B20DF00E7AE8D /* Firefox@3x.png in Resources */,
 				225D979518AA995900065087 /* Safari@2x.png in Resources */,
 				2236BD6D1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
 				2236BD641BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				225D979618AA995900065087 /* Safari@2x~ipad.png in Resources */,
+				22EE12871C9B20DF00E7AE8D /* Firefox@2x.png in Resources */,
 				225D979718AA995900065087 /* Safari~ipad.png in Resources */,
 				22EEA95518D0B198007D5022 /* Icons.xcassets in Resources */,
 				225D979918AA995900065087 /* licenses.txt in Resources */,
@@ -1648,6 +1697,9 @@
 			files = (
 				228A057A16D3DABA0029769C /* InfoPlist.strings in Resources */,
 				22C0F1541B8F6829001D109D /* Assets in Resources */,
+				22EE12841C9B20DF00E7AE8D /* Firefox.png in Resources */,
+				22EE12861C9B20DF00E7AE8D /* Firefox@2x.png in Resources */,
+				22EE12881C9B20DF00E7AE8D /* Firefox@3x.png in Resources */,
 				2236BD6C1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
 				22D268C21BF4F40800B682AE /* MainStoryboard.storyboard in Resources */,
@@ -1816,6 +1868,7 @@
 				225D974A18AA995900065087 /* HandshakeHeader.m in Sources */,
 				228E2B9218CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
 				22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
+				22E9C0AC1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */,
 				228E2B8618CF770D0011DEAB /* SBJsonStreamParser.m in Sources */,
 				225D974B18AA995900065087 /* MutableQueue.m in Sources */,
 				225D974C18AA995900065087 /* NSData+Base64.m in Sources */,
@@ -1828,6 +1881,7 @@
 				225D975118AA995900065087 /* IRCCloudJSONObject.m in Sources */,
 				225D975218AA995900065087 /* ServersDataSource.m in Sources */,
 				225D975318AA995900065087 /* NickCompletionView.m in Sources */,
+				22DB8D711C441C3000302271 /* YouTubeViewController.m in Sources */,
 				225D975418AA995900065087 /* NSURL+IDN.m in Sources */,
 				225D975518AA995900065087 /* BuffersDataSource.m in Sources */,
 				225D975618AA995900065087 /* ChannelsDataSource.m in Sources */,
@@ -1886,6 +1940,7 @@
 				22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				225D977318AA995900065087 /* TUSafariActivity.m in Sources */,
 				225D977418AA995900065087 /* LicenseViewController.m in Sources */,
+				223C407D1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */,
 				225D977518AA995900065087 /* WhoListTableViewController.m in Sources */,
 				225D977618AA995900065087 /* NamesListTableViewController.m in Sources */,
 				228E2B8C18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */,
@@ -1910,6 +1965,7 @@
 				22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */,
 				228E2B9018CF770D0011DEAB /* SBJsonStreamTokeniser.m in Sources */,
 				22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
+				22E9C0AB1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */,
 				228E2B8418CF770D0011DEAB /* SBJsonStreamParser.m in Sources */,
 				22B4286C16D831A800498507 /* MutableQueue.m in Sources */,
 				22B4286E16D831A800498507 /* NSData+Base64.m in Sources */,
@@ -1922,6 +1978,7 @@
 				22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */,
 				2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */,
 				22032A6F1884529700BE4A10 /* NickCompletionView.m in Sources */,
+				22DB8D701C441C3000302271 /* YouTubeViewController.m in Sources */,
 				2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */,
 				2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */,
 				2236F60216DBC021007BE535 /* ChannelsDataSource.m in Sources */,
@@ -1980,6 +2037,7 @@
 				22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				2250176D1783434900066E71 /* TUSafariActivity.m in Sources */,
 				224FCF361787288400FC3879 /* LicenseViewController.m in Sources */,
+				223C407C1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */,
 				22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */,
 				22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */,
 				228E2B8A18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */,
@@ -2207,7 +2265,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "14411653-6420-43fa-a790-16aef108c6ea";
+				PROVISIONING_PROFILE = "7a0c6c43-666d-4a89-b9fc-1f5c94c3b790";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2247,7 +2305,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "9cfbabd4-fa1d-44bb-923f-62b8d6aa1cb4";
+				PROVISIONING_PROFILE = "410d8a01-ce35-4f30-9d48-6be66d62e7ee";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2288,7 +2346,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "bffcd510-1d33-42cb-804c-462be8688b69";
+				PROVISIONING_PROFILE = "4332a2d9-7466-44f3-a544-adae7f68bf5d";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -2299,8 +2357,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -2318,7 +2374,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "ec6f9a5b-b954-479b-b13d-647a8c2f5181";
+				PROVISIONING_PROFILE = "3a91171c-5546-415a-9be7-c05dcc335e99";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2329,8 +2385,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -2351,7 +2405,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "4d56cace-eda3-4058-a813-efdff4da2422";
+				PROVISIONING_PROFILE = "b8371bd5-5cdb-4238-b151-2fccfc570213";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2442,7 +2496,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "89771964-a3a2-4789-944f-c258e917bbbb";
+				PROVISIONING_PROFILE = "17cf91d7-ebe4-45a8-96b6-10dac348da4e";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2468,7 +2522,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "bcd5fb74-f9f1-4156-908a-ce8dcbec3456";
+				PROVISIONING_PROFILE = "64c6f946-4670-4785-84b3-b89eda3b7e60";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2532,8 +2586,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "ShareExtension Enterprise.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2561,7 +2613,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "48fb5fec-374a-4d21-be41-5603a9766783";
+				PROVISIONING_PROFILE = "4c10426f-d4c7-4560-99e5-7845f2b05719";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2577,8 +2629,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "ShareExtension Enterprise.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2604,7 +2654,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "96230bc9-19db-411e-8fee-3abcc61ca13d";
+				PROVISIONING_PROFILE = "02583487-28fb-4a6a-9566-a5c041ba19d7";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2620,8 +2670,6 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = "ShareExtension Enterprise.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2648,7 +2696,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "0a5e6ac9-23ae-4f59-8eb2-48f9320abdfc";
+				PROVISIONING_PROFILE = "fb3f2e46-42bf-460d-9c54-a4e7dc3ac646";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -2721,7 +2769,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "785319c4-c591-4eb6-8a21-ff1d3d5e353f";
+				PROVISIONING_PROFILE = "5a6f3c6f-cd0e-4efd-b071-e130f5ef9715";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
@@ -2756,8 +2804,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -2779,7 +2825,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "af783787-ffcd-4c3b-ae61-c49275eab3f8";
+				PROVISIONING_PROFILE = "7862d29c-9583-4c70-b684-0e99de9b7e88";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;

@@ -17,7 +17,6 @@
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
-#import <SafariServices/SafariServices.h>
 #import "EventsTableView.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
@@ -27,6 +26,10 @@
 #import "URLHandler.h"
 #import "ImageViewController.h"
 #import "PastebinViewController.h"
+#import "YouTubeViewController.h"
+#import "EditConnectionViewController.h"
+#import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "IRCCloudSafariViewController.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -196,8 +199,9 @@ int __timestampWidth;
 @implementation EventsTableView
 
 - (id)init {
-    self = [super initWithStyle:UITableViewStylePlain];
+    self = [super init];
     if (self) {
+        _conn = [NetworkConnection sharedInstance];
         _lock = [[NSRecursiveLock alloc] init];
         _ready = NO;
         _formatter = [[NSDateFormatter alloc] init];
@@ -245,6 +249,13 @@ int __timestampWidth;
         [_headerView addSubview:a];
     }
     
+    if(!_tableView) {
+        _tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
+        _tableView.dataSource = self;
+        _tableView.delegate = self;
+        [self.view addSubview:_tableView];
+    }
+    
     self.tableView.scrollsToTop = NO;
     lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
@@ -267,6 +278,7 @@ int __timestampWidth;
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
 #endif
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+        [__previewer.previewingGestureRecognizerForFailureRelationship addTarget:self action:@selector(_3DTouchChanged:)];
 #if !(TARGET_IPHONE_SIMULATOR)
     }
 #endif
@@ -288,10 +300,20 @@ int __timestampWidth;
 }
 #endif
 
+-(void)_3DTouchChanged:(UIGestureRecognizer *)gesture {
+    if(gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled) {
+        MainViewController *mainViewController = [(AppDelegate *)([UIApplication sharedApplication].delegate) mainViewController];
+        mainViewController.isShowingPreview = NO;
+    }
+}
+
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+    MainViewController *mainViewController = [(AppDelegate *)([UIApplication sharedApplication].delegate) mainViewController];
     EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]];
+    _previewingRow = [self.tableView indexPathForRowAtPoint:location].row;
     NSTextCheckingResult *r = [cell.message linkAtPoint:[self.tableView convertPoint:location toView:cell.message]];
     NSURL *url = r.URL;
+    mainViewController.isShowingPreview = YES;
     
     if([URLHandler isImageURL:url]) {
         previewingContext.sourceRect = cell.frame;
@@ -302,7 +324,17 @@ int __timestampWidth;
         lp.enabled = NO;
         lp.enabled = YES;
         return i;
+    } else if([URLHandler isYouTubeURL:url]) {
+        previewingContext.sourceRect = cell.frame;
+        YouTubeViewController *y = [[YouTubeViewController alloc] initWithURL:url];
+        [y loadViewIfNeeded];
+        y.preferredContentSize = y.player.bounds.size;
+        y.toolbar.hidden = YES;
+        lp.enabled = NO;
+        lp.enabled = YES;
+        return y;
     } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
+        previewingContext.sourceRect = cell.frame;
         PastebinViewController *pvc = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"PastebinViewController"];
         [pvc setUrl:[NSURL URLWithString:[url.absoluteString substringFromIndex:15]]];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pvc];
@@ -311,8 +343,9 @@ int __timestampWidth;
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         lp.enabled = NO;
         lp.enabled = YES;
-        return nc;
+        return pvc;
     } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"]) {
+        previewingContext.sourceRect = cell.frame;
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         if(NSClassFromString(@"AVPlayerViewController")) {
             AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
@@ -327,31 +360,148 @@ int __timestampWidth;
             return player;
         }
     } else if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
-        SFSafariViewController *s = [[SFSafariViewController alloc] initWithURL:url];
+        previewingContext.sourceRect = cell.frame;
+        IRCCloudSafariViewController *s = [[IRCCloudSafariViewController alloc] initWithURL:url];
         s.modalPresentationStyle = UIModalPresentationCurrentContext;
         s.preferredContentSize = self.view.window.bounds.size;
         return s;
     }
     
+    _previewingRow = -1;
+    mainViewController.isShowingPreview = NO;
     return nil;
 }
 
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    MainViewController *mainViewController = [(AppDelegate *)([UIApplication sharedApplication].delegate) mainViewController];
+    mainViewController.isShowingPreview = NO;
     if([viewControllerToCommit isKindOfClass:[ImageViewController class]]) {
         AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         appDelegate.window.backgroundColor = [UIColor blackColor];
         appDelegate.window.rootViewController = viewControllerToCommit;
         [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
-        [UIApplication sharedApplication].statusBarHidden = YES;
+        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
         [viewControllerToCommit didMoveToParentViewController:nil];
+    } else if([viewControllerToCommit isKindOfClass:[YouTubeViewController class]]) {
+        viewControllerToCommit.modalPresentationStyle = UIModalPresentationCustom;
+        ((YouTubeViewController *)viewControllerToCommit).toolbar.hidden = NO;
+        [self.slidingViewController presentViewController:viewControllerToCommit animated:NO completion:nil];
     } else if([viewControllerToCommit isKindOfClass:[UINavigationController class]]) {
         ((UINavigationController *)viewControllerToCommit).navigationBarHidden = NO;
         [((UINavigationController *)viewControllerToCommit).topViewController didMoveToParentViewController:nil];
         [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
+    } else if([viewControllerToCommit isKindOfClass:[PastebinViewController class]]) {
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:viewControllerToCommit];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        [self.slidingViewController presentViewController:nc animated:YES completion:nil];
     } else {
         [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
         [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
     }
+}
+
+- (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
+    UIPreviewAction *deleteAction = [UIPreviewAction actionWithTitle:@"Delete" style:UIPreviewActionStyleDestructive handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+        NSString *title = [_buffer.type isEqualToString:@"console"]?@"Delete Connection":@"Clear History";
+        NSString *msg;
+        if([_buffer.type isEqualToString:@"console"]) {
+            msg = @"Are you sure you want to remove this connection?";
+        } else if([_buffer.type isEqualToString:@"channel"]) {
+            msg = [NSString stringWithFormat:@"Are you sure you want to clear your history in %@?", _buffer.name];
+        } else {
+            msg = [NSString stringWithFormat:@"Are you sure you want to clear your history with %@?", _buffer.name];
+        }
+        
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+            if([_buffer.type isEqualToString:@"console"]) {
+                [_conn deleteServer:_buffer.cid];
+            } else {
+                [_conn deleteBuffer:_buffer.bid cid:_buffer.cid];
+            }
+        }]];
+        
+        if(((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController.presentedViewController)
+            [((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController dismissViewControllerAnimated:NO completion:nil];
+
+        [((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController presentViewController:alert animated:YES completion:nil];
+    }];
+    
+    UIPreviewAction *archiveAction = [UIPreviewAction actionWithTitle:@"Archive" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+        [_conn archiveBuffer:_buffer.bid cid:_buffer.cid];
+    }];
+
+    UIPreviewAction *unarchiveAction = [UIPreviewAction actionWithTitle:@"Unarchive" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+        [_conn unarchiveBuffer:_buffer.bid cid:_buffer.cid];
+    }];
+    
+    NSMutableArray *items = [[NSMutableArray alloc] init];
+    
+    if([_buffer.type isEqualToString:@"console"]) {
+        if([_server.status isEqualToString:@"disconnected"]) {
+            [items addObject:[UIPreviewAction actionWithTitle:@"Reconnect" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                [_conn reconnect:_buffer.cid];
+            }]];
+            [items addObject:deleteAction];
+        } else {
+            [items addObject:[UIPreviewAction actionWithTitle:@"Disconnect" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                [_conn disconnect:_buffer.cid msg:nil];
+            }]];
+            
+        }
+        [items addObject:[UIPreviewAction actionWithTitle:@"Edit Connection" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+            EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            [ecv setServer:_buffer.cid];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            
+            if(((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController.presentedViewController)
+                [((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController dismissViewControllerAnimated:NO completion:nil];
+            
+            [((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController presentViewController:nc animated:YES completion:nil];
+        }]];
+    } else if([_buffer.type isEqualToString:@"channel"]) {
+        if([[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
+            [items addObject:[UIPreviewAction actionWithTitle:@"Leave" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                [_conn part:_buffer.name msg:nil cid:_buffer.cid];
+            }]];
+            [items addObject:[UIPreviewAction actionWithTitle:@"Invite to Channel" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                [((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController _setSelectedBuffer:_buffer];
+                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", _server.name, _server.hostname, _server.port] message:@"Invite to channel" delegate:((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
+                alertView.tag = 4;
+                alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+                [alertView textFieldAtIndex:0].delegate = ((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController;
+                [alertView textFieldAtIndex:0].placeholder = @"nickname";
+                [alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+                [alertView show];
+            }]];
+        } else {
+            [items addObject:[UIPreviewAction actionWithTitle:@"Rejoin" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                [_conn join:_buffer.name key:nil cid:_buffer.cid];
+            }]];
+            if(_buffer.archived) {
+                [items addObject:unarchiveAction];
+            } else {
+                [items addObject:archiveAction];
+            }
+            [items addObject:deleteAction];
+        }
+    } else {
+        if(_buffer.archived) {
+            [items addObject:unarchiveAction];
+        } else {
+            [items addObject:archiveAction];
+        }
+        [items addObject:deleteAction];
+    }
+    
+    return items;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -826,15 +976,17 @@ int __timestampWidth;
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@"You"];
                 else
                     event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c", BOLD, event.oldNick, CLEAR];
+                if(event.hostmask && event.hostmask.length)
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" (%@)", event.hostmask];
                 if([event.type hasPrefix:@"you_"])
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
                 else
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
                 if(event.hostmask && event.hostmask.length)
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %c%@%c (%@)", BOLD, event.nick, BOLD, event.hostmask];
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO]];
                 else
                     event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by the server %c%@%c", BOLD, event.nick, CLEAR];
-                if(event.msg.length > 0)
+                if(event.msg.length > 0 && ![event.msg isEqualToString:event.nick])
                     event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
             } else if([type isEqualToString:@"channel_mode_list_change"]) {
                 if(event.from.length == 0) {
@@ -1169,8 +1321,8 @@ int __timestampWidth;
     _buffer.scrolledUp = NO;
     _buffer.scrolledUpFrom = -1;
     if(_data.count) {
-        if(self.tableView.contentSize.height > (self.tableView.frame.size.height - self.tableView.contentInset.top))
-            [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentSize.height - self.tableView.frame.size.height)];
+        if(self.tableView.contentSize.height > (self.tableView.frame.size.height - self.tableView.contentInset.top - self.tableView.contentInset.bottom))
+            [self.tableView setContentOffset:CGPointMake(0, (self.tableView.contentSize.height - self.tableView.frame.size.height) + self.tableView.contentInset.bottom)];
         else
             [self.tableView setContentOffset:CGPointMake(0, -self.tableView.contentInset.top)];
         if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
@@ -1781,6 +1933,11 @@ int __timestampWidth;
     if(!_ready || !_buffer || _requestingBacklog || [UIApplication sharedApplication].applicationState != UIApplicationStateActive)
         return;
 
+    if(_previewingRow) {
+        EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_previewingRow inSection:0]];
+        __previewer.sourceRect = cell.frame;
+    }
+    
     UITableView *tableView = self.tableView;
     NSInteger firstRow = -1;
     NSInteger lastRow = -1;
@@ -1806,7 +1963,7 @@ int __timestampWidth;
             if(lastRow < _data.count)
                 _buffer.savedScrollOffset = tableView.contentOffset.y - tableView.tableHeaderView.bounds.size.height;
             
-            if(tableView.contentOffset.y >= (tableView.contentSize.height - tableView.bounds.size.height)) {
+            if(tableView.contentOffset.y >= (tableView.contentSize.height - (tableView.bounds.size.height - tableView.contentInset.top - tableView.contentInset.bottom))) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
                 _bottomUnreadView.alpha = 0;

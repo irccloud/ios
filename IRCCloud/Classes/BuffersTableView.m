@@ -298,12 +298,12 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                     }
                     if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
                         if(type == TYPE_CHANNEL) {
-                            if(![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            if([[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] != 1)
                                 unread = 0;
                         } else {
-                            if(![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            if([[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] != 1)
                                 unread = 0;
-                            if(type == TYPE_CONVERSATION && ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                            if(type == TYPE_CONVERSATION && [[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] != 1)
                                 highlights = 0;
                         }
                     }
@@ -576,9 +576,9 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 #endif
 
 #if TARGET_IPHONE_SIMULATOR
-    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
-    t.delegate = self;
-    [self.view addGestureRecognizer:t];
+    //UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
+    //t.delegate = self;
+    //[self.view addGestureRecognizer:t];
 #endif
 #endif
 }
@@ -609,7 +609,9 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
             e.modalPresentationStyle = UIModalPresentationCurrentContext;
             e.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
             lp.enabled = NO;
-            lp.enabled = YES;
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                lp.enabled = YES;
+            }];
             return e;
         }
     }
@@ -651,12 +653,12 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                 }
                 if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
                     if([b.type isEqualToString:@"channel"]) {
-                        if(![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                        if([[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] != 1)
                             unread = 0;
                     } else {
-                        if(![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                        if([[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] != 1)
                             unread = 0;
-                        if([b.type isEqualToString:@"conversation"] && ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                        if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] != 1)
                             highlights = 0;
                     }
                 }

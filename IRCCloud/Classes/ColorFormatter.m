@@ -1508,27 +1508,65 @@ float ColorFormatterCachedFontSize = 0.0f;
                 NSRange range = result.range;
                 if(range.location + range.length < output.length && [[output string] characterAtIndex:range.location + range.length - 1] != '/' && [[output string] characterAtIndex:range.location + range.length] == '/')
                     range.length++;
-                NSString *url = [NSURL IDNEncodedURL:[[output string] substringWithRange:result.range]];
+                NSString *url = [[output string] substringWithRange:result.range];
+                if([self unbalanced:url] || [url hasSuffix:@"."] || [url hasSuffix:@"?"] || [url hasSuffix:@"!"] || [url hasSuffix:@","]) {
+                    url = [url substringToIndex:url.length - 1];
+                    range.length--;
+                }
+
+                NSString *scheme = nil;
+                NSString *credentials = @"";
+                NSString *hostname = @"";
+                NSString *rest = @"";
+                if([url rangeOfString:@"://"].location != NSNotFound)
+                    scheme = [[url componentsSeparatedByString:@"://"] objectAtIndex:0];
+                NSInteger start = (scheme.length?(scheme.length + 3):0);
+                
+                for(NSInteger i = start; i < url.length; i++) {
+                    char c = [url characterAtIndex:i];
+                    if(c == ':') { //Search for @ credentials
+                        for(NSInteger j = i; j < url.length; j++) {
+                            char c = [url characterAtIndex:j];
+                            if(c == '@') {
+                                j++;
+                                credentials = [url substringWithRange:NSMakeRange(start, j - start)];
+                                i = j;
+                                start += credentials.length;
+                                break;
+                            } else if(c == '/') {
+                                break;
+                            }
+                        }
+                        if(credentials.length)
+                            continue;
+                    }
+                    if(c == ':' || c == '/' || i == url.length - 1) {
+                        if(i < url.length - 1) {
+                            hostname = [NSURL IDNEncodedHostname:[url substringWithRange:NSMakeRange(start, i - start)]];
+                            rest = [url substringFromIndex:i];
+                        } else {
+                            hostname = [NSURL IDNEncodedHostname:[url substringFromIndex:start]];
+                        }
+                        break;
+                    }
+                }
+                
+                if(!scheme) {
+                    if([url hasPrefix:@"irc."])
+                        scheme = @"irc";
+                    else
+                        scheme = @"http";
+                }
+                
+                url = [NSString stringWithFormat:@"%@://%@%@%@", scheme, credentials, hostname, rest];
                 
                 if([ipAddress evaluateWithObject:url]) {
                     continue;
                 }
                 
-                if([self unbalanced:url] || [url hasSuffix:@"."] || [url hasSuffix:@"?"] || [url hasSuffix:@"!"] || [url hasSuffix:@","]) {
-                    url = [url substringToIndex:url.length - 1];
-                    range.length--;
-                }
-                
                 CFStringRef safe_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, (CFStringRef)@"%#/?.;+", (CFStringRef)@"^", kCFStringEncodingUTF8);
 
                 url = [NSString stringWithString:(__bridge_transfer NSString *)safe_escaped];
-                
-                if([url rangeOfString:@"://"].location == NSNotFound) {
-                    if([url hasPrefix:@"irc."])
-                        url = [NSString stringWithFormat:@"irc://%@", url];
-                    else
-                        url = [NSString stringWithFormat:@"http://%@", url];
-                }
                 
                 [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:range URL:[NSURL URLWithString:url]]];
             }

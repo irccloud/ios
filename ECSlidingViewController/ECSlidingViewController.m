@@ -197,11 +197,17 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 }
 
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
-    return [self.topViewController supportedInterfaceOrientations];
+    if([self.topViewController isKindOfClass:[UINavigationController class]])
+        return [((UINavigationController *)self.topViewController).topViewController supportedInterfaceOrientations];
+    else
+        return [self.topViewController supportedInterfaceOrientations];
 }
 
 -(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
-    return [self.topViewController shouldAutorotateToInterfaceOrientation:orientation];
+    if([self.topViewController isKindOfClass:[UINavigationController class]])
+        return [((UINavigationController *)self.topViewController).topViewController shouldAutorotateToInterfaceOrientation:orientation];
+    else
+        return [self.topViewController shouldAutorotateToInterfaceOrientation:orientation];
 }
 
 - (BOOL)gestureRecognizerShouldBegin:(UIPanGestureRecognizer *)recognizer {

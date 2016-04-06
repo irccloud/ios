@@ -1,3 +1,4 @@
+
 //
 //  MainViewController.m
 //
@@ -47,6 +48,7 @@
 #import "OpenInChromeController.h"
 #import "ServerReorderViewController.h"
 #import "FontAwesome.h"
+#import "YouTubeViewController.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -85,8 +87,6 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 #define TAG_LOGOUT 8
 #define TAG_DELETE 9
 #define TAG_JOIN 10
-
-#define YTMARGIN 130
 
 extern NSDictionary *emojiMap;
 
@@ -316,6 +316,7 @@ extern NSDictionary *emojiMap;
     [self _themeChanged];
     [self connectivityChanged:nil];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self _updateEventsInsets];
     
     UISwipeGestureRecognizer *swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeBack:)];
     swipe.numberOfTouchesRequired = 2;
@@ -440,12 +441,12 @@ extern NSDictionary *emojiMap;
                 }
                 if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
                     if(type == 1) {
-                        if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || [[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] != 1)
                             unread = 0;
                     } else {
-                        if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1)
+                        if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || [[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] != 1)
                             unread = 0;
-                        if(type == 2 && (![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] == 1))
+                        if(type == 2 && (![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || [[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] intValue] != 1))
                             highlights = 0;
                     }
                 }
@@ -925,8 +926,6 @@ extern NSDictionary *emojiMap;
                     [NetworkConnection sharedInstance].session = [o objectForKey:@"cookie"];
                     [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                     [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
-                    if([IRCCLOUD_PATH isEqualToString:@"/websocket/5"])
-                        [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:@"uploadsAvailable"];
                     [[NSUserDefaults standardUserDefaults] synchronize];
                     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
@@ -994,10 +993,10 @@ extern NSDictionary *emojiMap;
                         }
                         if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
                             if([b.type isEqualToString:@"channel"]) {
-                                if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                if(![[prefs objectForKey:@"channel-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || [[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] != 1)
                                     break;
                             } else {
-                                if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || ![[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                                if(![[prefs objectForKey:@"buffer-enableTrackUnread"] isKindOfClass:[NSDictionary class]] || [[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] != 1)
                                     break;
                             }
                         }
@@ -1019,7 +1018,8 @@ extern NSDictionary *emojiMap;
                 }
             } else {
                 int reqid = e.reqId;
-                CLS_LOG(@"Removing expiration timer for reqid %i", e.reqId);
+                if(e.reqId > 0)
+                    CLS_LOG(@"Removing expiration timer for reqid %i", e.reqId);
                 for(Event *e in _pendingEvents) {
                     if(e.reqId == reqid) {
                         if(e.expirationTimer && [e.expirationTimer isValid])
@@ -1172,68 +1172,71 @@ extern NSDictionary *emojiMap;
 
 -(void)backlogStarted:(NSNotification *)notification {
     if(!_connectingView.hidden) {
-        _connectingStatus.textColor = [UIColor navBarHeadingColor];
-        [_connectingStatus setText:@"Loading"];
-        _connectingActivity.hidden = YES;
-        [_connectingActivity stopAnimating];
-        _connectingProgress.progress = 0;
-        _connectingProgress.hidden = NO;
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            _connectingStatus.textColor = [UIColor navBarHeadingColor];
+            [_connectingStatus setText:@"Loading"];
+            _connectingActivity.hidden = YES;
+            [_connectingActivity stopAnimating];
+            _connectingProgress.progress = 0;
+            _connectingProgress.hidden = NO;
+        }];
     }
 }
 
 -(void)backlogProgress:(NSNotification *)notification {
     if(!_connectingView.hidden) {
-        [_connectingProgress setProgress:[notification.object floatValue] animated:YES];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [_connectingProgress setProgress:[notification.object floatValue] animated:YES];
+        }];
     }
 }
 
 -(void)backlogCompleted:(NSNotification *)notification {
-    if([notification.object bid] == 0) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [self _themeChanged];
-        }];
-    }
-    if([ServersDataSource sharedInstance].count < 1) {
-        [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
-        return;
-    }
-    [self _hideConnectingView];
-    if(_buffer && !_urlToOpen && _bidToOpen < 1 && _eidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
-        [self _updateTitleArea];
-        [self _updateServerStatus];
-        [self _updateUserListVisibility];
-        [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
-        [self _updateGlobalMsg];
-    } else {
-        [[NSNotificationCenter defaultCenter] removeObserver:_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
-        int bid = [BuffersDataSource sharedInstance].firstBid;
-        if(_buffer && _buffer.lastBuffer)
-            bid = _buffer.lastBuffer.bid;
-        
-        if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
-            if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
-                bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if([notification.object bid] == 0) {
+          [self _themeChanged];
         }
-        if(_bidToOpen > 0) {
-            CLS_LOG(@"backlog complete: BID to open: %i", _bidToOpen);
-            bid = _bidToOpen;
-            _bidToOpen = -1;
-        } else if(_eidToOpen > 0) {
-            bid = _buffer.bid;
+        if([ServersDataSource sharedInstance].count < 1) {
+            [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
+            return;
         }
-        [self bufferSelected:bid];
-        _eidToOpen = -1;
-        if(_urlToOpen)
-            [self launchURL:_urlToOpen];
-        [[NSNotificationCenter defaultCenter] addObserver:_eventsView selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
-    }
+        [self _hideConnectingView];
+        if(_buffer && !_urlToOpen && _bidToOpen < 1 && _eidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
+            [self _updateTitleArea];
+            [self _updateServerStatus];
+            [self _updateUserListVisibility];
+            [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
+            [self _updateGlobalMsg];
+        } else {
+            [[NSNotificationCenter defaultCenter] removeObserver:_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
+            int bid = [BuffersDataSource sharedInstance].firstBid;
+            if(_buffer && _buffer.lastBuffer)
+                bid = _buffer.lastBuffer.bid;
+            
+            if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
+                if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+                    bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
+            }
+            if(_bidToOpen > 0) {
+                CLS_LOG(@"backlog complete: BID to open: %i", _bidToOpen);
+                bid = _bidToOpen;
+                _bidToOpen = -1;
+            } else if(_eidToOpen > 0) {
+                bid = _buffer.bid;
+            }
+            [self bufferSelected:bid];
+            _eidToOpen = -1;
+            if(_urlToOpen)
+                [self launchURL:_urlToOpen];
+            [[NSNotificationCenter defaultCenter] addObserver:_eventsView selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
+        }
+    }];
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
         [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
     
-    NSArray *rows = [_eventsView.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_eventsView.tableView.bounds, _eventsView.tableView.contentInset)];
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     int height = size.height;
     
@@ -1252,10 +1255,6 @@ extern NSDictionary *emojiMap;
 
         [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
         
-        if(((NSIndexPath *)[rows lastObject]).row < [_eventsView tableView:_eventsView.tableView numberOfRowsInSection:0])
-            [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-        else
-            [_eventsView _scrollToBottom];
         [_buffersView scrollViewDidScroll:_buffersView.tableView];
         [UIView commitAnimations];
         [self expandingTextViewDidChange:_message];
@@ -1272,7 +1271,6 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
-    NSArray *rows = [_eventsView.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_eventsView.tableView.bounds, _eventsView.tableView.contentInset)];
     _kbSize = CGSizeMake(0,0);
     
     [UIView beginAnimations:nil context:NULL];
@@ -1284,15 +1282,16 @@ extern NSDictionary *emojiMap;
     [self.slidingViewController updateUnderRightLayout];
     [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
 
-    [_eventsView.tableView scrollToRowAtIndexPath:[rows lastObject] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
     _nickCompletionView.alpha = 0;
+    _atMention = NO;
     [UIView commitAnimations];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    _isShowingPreview = NO;
     [super viewWillAppear:animated];
     [self _resetStatusBar];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
@@ -1483,7 +1482,7 @@ extern NSDictionary *emojiMap;
                 [msg appendString:@"=== Buffers ===\n"];
                 NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:_buffer.cid];
                 for(Buffer *buffer in buffers) {
-                    [msg appendFormat:@"CID: %i BID: %i Name: %@ lastSeenEID: %f unread: %i\n", buffer.cid, buffer.bid, buffer.name, buffer.last_seen_eid, [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type]];
+                    [msg appendFormat:@"CID: %i BID: %i Name: %@ lastSeenEID: %f unread: %i highlight: %i\n", buffer.cid, buffer.bid, buffer.name, buffer.last_seen_eid, [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type], [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type]];
                     NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid];
                     Event *e = [events firstObject];
                     [msg appendFormat:@"First event: %f %@\n", e.eid, e.type];
@@ -1608,11 +1607,14 @@ extern NSDictionary *emojiMap;
         }
     }
     
+    if(_atMention)
+        nick = [NSString stringWithFormat:@"@%@", nick];
+
     if(!isChannel && ![text hasPrefix:@":"] && [text rangeOfString:@" "].location == NSNotFound)
         nick = [nick stringByAppendingString:@": "];
     else
         nick = [nick stringByAppendingString:@" "];
-
+    
     if(text.length == 0) {
         _message.text = nick;
     } else {
@@ -1629,7 +1631,7 @@ extern NSDictionary *emojiMap;
     NSMutableSet *suggestions_set = [[NSMutableSet alloc] init];
     NSMutableArray *suggestions = [[NSMutableArray alloc] init];
     
-    if(_message.text.length > 0) {
+    if(_message.text.length > 0 || [_message.text hasPrefix:@"@"]) {
         if(!_sortedChannels)
             _sortedChannels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
         if(!_sortedUsers)
@@ -1641,6 +1643,12 @@ extern NSDictionary *emojiMap;
         }
         if([text hasSuffix:@":"])
             text = [text substringToIndex:text.length - 1];
+        if([text hasPrefix:@"@"]) {
+            _atMention = YES;
+            text = [text substringFromIndex:1];
+        } else {
+            _atMention = NO;
+        }
         if(text.length > 1 || force) {
             if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text]) {
                 [suggestions_set addObject:_buffer.name.lowercaseString];
@@ -1659,7 +1667,7 @@ extern NSDictionary *emojiMap;
                 if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 && location != NSNotFound && location > 0) {
                     nick = [nick substringFromIndex:location];
                 }
-                if([nick hasPrefix:text] && ![suggestions_set containsObject:user.nick.lowercaseString]) {
+                if((text.length == 0 || [nick hasPrefix:text]) && ![suggestions_set containsObject:user.nick.lowercaseString]) {
                     [suggestions_set addObject:user.nick.lowercaseString];
                     [suggestions addObject:user.nick];
                 }
@@ -1696,6 +1704,7 @@ extern NSDictionary *emojiMap;
             _sortedChannels = nil;
             _sortedUsers = nil;
         }
+        _atMention = NO;
     } else {
         if(_nickCompletionView.alpha == 0) {
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:nil];
@@ -1816,25 +1825,10 @@ extern NSDictionary *emojiMap;
 
 -(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {
     if(expandingTextView.frame.size.height != height) {
-        CGFloat diff = height - expandingTextView.frame.size.height;
-        CGRect frame = _eventsView.tableView.frame;
-        frame.size.height = self.view.frame.size.height - height - 8;
-        if(!_serverStatusBar.hidden)
-            frame.size.height -= _serverStatusBar.frame.size.height;
-        _eventsView.tableView.frame = frame;
-        frame = _serverStatusBar.frame;
-        frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
-        _serverStatusBar.frame = frame;
-        frame = _eventsView.bottomUnreadView.frame;
-        frame.origin.y = self.view.frame.size.height - height - 8 - frame.size.height;
-        _eventsView.bottomUnreadView.frame = frame;
-        _bottomBar.frame = CGRectMake(_bottomBar.frame.origin.x, self.view.frame.size.height - height - 8, _bottomBar.frame.size.width, height + 8);
-        if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top)) {
-            if(diff > 0 || _buffer.scrolledUp)
-                _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
-            else if([[UIDevice currentDevice].systemVersion isEqualToString:@"8.1"]) //The last line seems to get eaten when the table is fully scrolled down on iOS 8.1
-                _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + fabs(diff));
-        }
+        CGRect frame = expandingTextView.frame;
+        frame.size.height = height;
+        expandingTextView.frame = frame;
+        [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     }
 }
 
@@ -1925,235 +1919,14 @@ extern NSDictionary *emojiMap;
     }
 }
 
--(void)_YTWrapperTapped {
-    [UIView animateWithDuration:0.25 animations:^{
-        _YTWrapperView.alpha = 0;
-    } completion:^(BOOL finished) {
-        [_YTWrapperView removeFromSuperview];
-        _YTWrapperView = nil;
-    }];
-    [_ytActivity stopAnimating];
-    _ytActivity = nil;
-    [_ytPlayer stopVideo];
-    _ytPlayer = nil;
-    _ytURL = nil;
-}
-
--(void)_YTShare:(id)sender {
-    UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[_ytURL] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
-#ifdef ENTERPRISE
-                                                                                                                                                                                                                                                                                                                                     @"irccloud-enterprise://"
-#else
-                                                                                                                                                                                                                                                                                                                                     @"irccloud://"
-#endif
-                                                                                                                                                                                                                                                                                                                                     ]]:[[TUSafariActivity alloc] init]]];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        activityController.popoverPresentationController.delegate = self;
-        activityController.popoverPresentationController.barButtonItem = sender;
-        activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-            if(completed) {
-                if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                    activityType = [activityType substringFromIndex:25];
-                if([activityType hasPrefix:@"com.apple."])
-                    activityType = [activityType substringFromIndex:10];
-                [Answers logShareWithMethod:activityType contentName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
-            }
-        };
-    } else {
-        activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
-            if(completed) {
-                if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                    activityType = [activityType substringFromIndex:25];
-                if([activityType hasPrefix:@"com.apple."])
-                    activityType = [activityType substringFromIndex:10];
-                [Answers logShareWithMethod:activityType contentName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
-            }
-        };
-    }
-    [self presentViewController:activityController animated:YES completion:nil];
-}
-
--(void)playerViewDidBecomeReady:(YTPlayerView *)playerView {
-    [_ytActivity stopAnimating];
-    playerView.hidden = NO;
-}
-
--(void)playerView:(YTPlayerView *)playerView receivedError:(YTPlayerError)error {
-    if(!_YTWrapperView)
-        return;
-    
-    if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [[OpenInChromeController sharedInstance] openInChrome:_ytURL
-                                                                                  withCallbackURL:[NSURL URLWithString:
-#ifdef ENTERPRISE
-                                                                                                   @"irccloud-enterprise://"
-#else
-                                                                                                   @"irccloud://"
-#endif
-                                                                                                   ]
-                                                                                     createNewTab:NO]))
-        [[UIApplication sharedApplication] openURL:_ytURL];
-}
-
-- (void)_YTpanned:(UIPanGestureRecognizer *)recognizer {
-    CGRect frame = _ytPlayer.frame;
-    
-    switch(recognizer.state) {
-        case UIGestureRecognizerStateBegan:
-            if(fabs([recognizer velocityInView:self.view].y) > fabs([recognizer velocityInView:_YTWrapperView].x)) {
-            }
-            break;
-        case UIGestureRecognizerStateCancelled: {
-            frame.origin.y = 0;
-            [UIView animateWithDuration:0.25 animations:^{
-                _ytPlayer.frame = frame;
-            }];
-            _YTWrapperView.alpha = 1;
-            break;
-        }
-        case UIGestureRecognizerStateChanged:
-            frame.origin.y = (_YTWrapperView.bounds.size.height - frame.size.height) / 2 + [recognizer translationInView:_YTWrapperView].y;
-            _ytPlayer.frame = frame;
-            _YTWrapperView.alpha = 1 - (fabs([recognizer translationInView:_YTWrapperView].y) / self.view.frame.size.height / 2);
-            break;
-        case UIGestureRecognizerStateEnded:
-        {
-            if(fabs([recognizer translationInView:_YTWrapperView].y) > 100 || fabs([recognizer velocityInView:_YTWrapperView].y) > 1000) {
-                frame.origin.y = ([recognizer translationInView:_YTWrapperView].y > 0)?_YTWrapperView.bounds.size.height:-_YTWrapperView.bounds.size.height;
-                [UIView animateWithDuration:0.25 animations:^{
-                    _ytPlayer.frame = frame;
-                    _YTWrapperView.alpha = 0;
-                } completion:^(BOOL finished) {
-                    [self _YTWrapperTapped];
-                }];
-            } else {
-                frame.origin.y = (_YTWrapperView.bounds.size.height - frame.size.height) / 2;
-                [UIView animateWithDuration:0.25 animations:^{
-                    _ytPlayer.frame = frame;
-                    _YTWrapperView.alpha = 1;
-                }];
-            }
-            break;
-        }
-        default:
-            break;
-    }
-}
-
 -(void)launchURL:(NSURL *)url {
     if(self.presentedViewController)
         [self dismissViewControllerAnimated:NO completion:nil];
     
     if([url.host isEqualToString:@"youtu.be"] || [url.host hasSuffix:@"youtube.com"]) {
-        _ytURL = url;
-        _YTWrapperView = [[UIView alloc] initWithFrame:self.navigationController.view.bounds];
-        _YTWrapperView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.9];
-        _YTWrapperView.alpha = 0;
-        _YTWrapperView.autoresizesSubviews = YES;
-        UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_YTpanned:)];
-        [_YTWrapperView addGestureRecognizer:panGesture];
-        
-        UIToolbar *toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0,_YTWrapperView.bounds.size.height - 44,_YTWrapperView.bounds.size.width, 44)];
-        [toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-        [toolbar setShadowImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny];
-        [toolbar setBarStyle:UIBarStyleBlack];
-        toolbar.translucent = YES;
-        if(NSClassFromString(@"UIActivityViewController")) {
-            toolbar.items = @[
-                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(_YTShare:)],
-                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                              [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(_YTWrapperTapped)]
-                              ];
-        } else {
-            toolbar.items = @[
-                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                              [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(_YTWrapperTapped)]
-                              ];
-        }
-        toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
-        [_YTWrapperView addSubview:toolbar];
-        [self.navigationController.view addSubview:_YTWrapperView];
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_YTWrapperTapped)];
-        [_YTWrapperView addGestureRecognizer:tap];
-
-        NSString *videoID;
-        NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-        [params setObject:url.absoluteString forKey:@"origin"];
-        
-        if([url.host isEqualToString:@"youtu.be"]) {
-            videoID = [url.path substringFromIndex:1];
-        }
-        
-        for(NSString *param in [url.query componentsSeparatedByString:@"&"]) {
-            NSArray *kv = [param componentsSeparatedByString:@"="];
-            if(kv.count == 2) {
-                if([[kv objectAtIndex:0] isEqualToString:@"v"]) {
-                    videoID = [kv objectAtIndex:1];
-                } else if([[kv objectAtIndex:0] isEqualToString:@"t"]) {
-                    int start = 0;
-                    NSString *t = [kv objectAtIndex:1];
-                    int number = 0;
-                    for(int i = 0; i < t.length; i++) {
-                        switch([t characterAtIndex:i]) {
-                            case '0':
-                            case '1':
-                            case '2':
-                            case '3':
-                            case '4':
-                            case '5':
-                            case '6':
-                            case '7':
-                            case '8':
-                            case '9':
-                                number *= 10;
-                                number += [t characterAtIndex:i] - '0';
-                                break;
-                            case 'h':
-                                start += number * 60;
-                                number = 0;
-                                break;
-                            case 'm':
-                                start += number * 60;
-                                number = 0;
-                                break;
-                            case 's':
-                                start += number;
-                                number = 0;
-                                break;
-                            default:
-                                CLS_LOG(@"Unrecognized time separator: %c", [t characterAtIndex:i]);
-                                number = 0;
-                                break;
-                        }
-                    }
-                    start += number;
-                    [params setObject:@(start) forKey:@"start"];
-                } else {
-                    [params setObject:[kv objectAtIndex:1] forKey:[kv objectAtIndex:0]];
-                }
-            }
-        }
-        
-        int margin = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?YTMARGIN:0;
-        CGFloat width = _YTWrapperView.bounds.size.width - margin;
-        CGFloat height = (width / 16.0f) * 9.0f;
-        _ytPlayer = [[YTPlayerView alloc] initWithFrame:CGRectMake(margin/2, (_YTWrapperView.bounds.size.height - height) / 2.0f, width, height)];
-        _ytPlayer.backgroundColor = [UIColor blackColor];
-        _ytPlayer.webView.backgroundColor = [UIColor blackColor];
-        _ytPlayer.hidden = YES;
-        _ytPlayer.delegate = self;
-        [_ytPlayer loadWithVideoId:videoID playerVars:params];
-        [_YTWrapperView addSubview:_ytPlayer];
-        
-        _ytActivity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-        _ytActivity.center = _YTWrapperView.center;
-        _ytActivity.hidesWhenStopped = YES;
-        [_ytActivity startAnimating];
-        [_YTWrapperView addSubview:_ytActivity];
-
-        [UIView animateWithDuration:0.2 animations:^{
-            _YTWrapperView.alpha = 1;
-        }];
-        [Answers logContentViewWithName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
+        YouTubeViewController *yvc = [[YouTubeViewController alloc] initWithURL:url];
+        yvc.modalPresentationStyle = UIModalPresentationCustom;
+        [self presentViewController:yvc animated:NO completion:nil];
         return;
     }
     int port = [url.port intValue];
@@ -2166,7 +1939,9 @@ extern NSDictionary *emojiMap;
         Server *s = [[ServersDataSource sharedInstance] getServer:[url.host intValue]];
         if(s != nil) {
             match = YES;
-            NSString *channel = [url.path substringFromIndex:1];
+            CFStringRef path = CFURLCopyPath((CFURLRef)url);
+            NSString *channel = [[(__bridge NSString *)path stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] substringFromIndex:1];
+            CFRelease(path);
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:channel server:s.cid];
             if([b.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:b.bid])
                 b = nil;
@@ -2561,9 +2336,6 @@ extern NSDictionary *emojiMap;
         frame.size.height = _serverStatus.frame.size.height + 8;
         frame.origin.y = _bottomBar.frame.origin.y - frame.size.height;
         _serverStatusBar.frame = frame;
-        frame = _eventsView.view.frame;
-        frame.size.height = _serverStatusBar.frame.origin.y;
-        _eventsView.view.frame = frame;
         frame = _eventsView.bottomUnreadView.frame;
         frame.origin.y = _serverStatusBar.frame.origin.y - frame.size.height;
         _eventsView.bottomUnreadView.frame = frame;
@@ -2571,15 +2343,13 @@ extern NSDictionary *emojiMap;
             [_eventsView _scrollToBottom];
     } else {
         if(!_serverStatusBar.hidden) {
-            CGRect frame = _eventsView.view.frame;
-            frame.size.height += _serverStatusBar.frame.size.height;
-            _eventsView.view.frame = frame;
-            frame = _eventsView.bottomUnreadView.frame;
+            CGRect frame = _eventsView.bottomUnreadView.frame;
             frame.origin.y += _serverStatusBar.frame.size.height;
             _eventsView.bottomUnreadView.frame = frame;
             _serverStatusBar.hidden = YES;
         }
     }
+    [self _updateEventsInsets];
 }
 
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
@@ -2612,7 +2382,7 @@ extern NSDictionary *emojiMap;
             [self.slidingViewController resetTopView];
         }
         
-        int height = ((UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height) - _kbSize.height;
+        int height = ((UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height);
         int width = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
         
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
@@ -2673,13 +2443,15 @@ extern NSDictionary *emojiMap;
         if(sbheight)
             height -= 20;
         
+        height -= _kbSize.height;
+        
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
             self.navigationItem.leftBarButtonItem = nil;
             self.navigationItem.rightBarButtonItem = nil;
             self.slidingViewController.underLeftViewController = nil;
             [self addChildViewController:_buffersView];
             _buffersView.view.frame = CGRectMake(0,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,[[UIDevice currentDevice] isBigPhone]?180:220,height + ([[UIDevice currentDevice] isBigPhone]?self.navigationController.navigationBar.frame.size.height:0));
-            _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height - _bottomBar.frame.size.height);
+            _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height + _kbSize.height);
             _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
             _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
             [_buffersView willMoveToParentViewController:self];
@@ -2706,10 +2478,8 @@ extern NSDictionary *emojiMap;
                 self.slidingViewController.underLeftViewController = _buffersView;
             if(!self.navigationItem.leftBarButtonItem)
                 self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
-            _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsZero;
-            _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsZero;
-            _eventsView.view.frame = CGRectMake(0,0,width, height - _bottomBar.frame.size.height);
-            _bottomBar.frame = CGRectMake(0,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
+            _eventsView.view.frame = CGRectMake(0,0,width, height + _kbSize.height);
+            _bottomBar.frame = CGRectMake(0,height - _message.frame.size.height - 8,_eventsView.view.frame.size.width,_message.frame.size.height + 8);
             if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
                 _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
             else
@@ -2736,7 +2506,7 @@ extern NSDictionary *emojiMap;
         frame.origin.y = _eventsView.tableView.contentInset.top;
         frame.size.height = 32;
         _eventsView.topUnreadView.frame = frame;
-        frame.origin.y = _eventsView.tableView.frame.size.height - 32;
+        frame.origin.y = _bottomBar.frame.origin.y - 32;
         _eventsView.bottomUnreadView.frame = frame;
         float h = [@" " sizeWithAttributes:@{NSFontAttributeName:_nickCompletionView.font}].height + 12;
         _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
@@ -2747,7 +2517,6 @@ extern NSDictionary *emojiMap;
             frame.origin.x = _buffersView.tableView.frame.size.width;
             frame.size.width = width - _buffersView.tableView.frame.size.width;
             self.navigationController.navigationBar.frame = frame;
-            _buffersView.tableView.contentInset = UIEdgeInsetsZero;
             _borders.frame = CGRectMake(_buffersView.tableView.frame.size.width - 1, -self.navigationController.navigationBar.frame.size.height, _eventsView.tableView.frame.size.width + 2, height + self.navigationController.navigationBar.frame.size.height);
         }
 
@@ -2782,19 +2551,11 @@ extern NSDictionary *emojiMap;
         [self _updateUserListVisibility];
         [self _updateGlobalMsg];
         [self _updateMessageWidth];
+        [self _updateEventsInsets];
         
         UIView *v = self.navigationItem.titleView;
         self.navigationItem.titleView = nil;
         self.navigationItem.titleView = v;
-        
-        if(_YTWrapperView) {
-            int margin = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?YTMARGIN:0;
-            _YTWrapperView.frame = self.navigationController.view.bounds;
-            CGFloat width = _YTWrapperView.bounds.size.width - margin;
-            CGFloat height = (width / 16.0f) * 9.0f;
-            _ytPlayer.frame = CGRectMake(margin/2, (_YTWrapperView.bounds.size.height - height) / 2.0f, width, height);
-            
-        }
         
         [self performSelector:@selector(_monitorLayoutChanges) withObject:nil afterDelay:0.25];
     }
@@ -2804,6 +2565,31 @@ extern NSDictionary *emojiMap;
     _eventsView.view.hidden = NO;
     _eventActivity.alpha = 0;
     [_eventActivity stopAnimating];
+}
+
+-(void)_updateEventsInsets {
+    CGFloat height = _bottomBar.frame.size.height + _kbSize.height;
+    if(!_serverStatusBar.hidden)
+        height += _serverStatusBar.bounds.size.height;
+    CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
+        _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
+    }];
+
+    if(!_isShowingPreview) {
+        [_eventsView.tableView setContentInset:UIEdgeInsetsMake(0, 0, height, 0)];
+        [_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(0, 0, height, 0)];
+
+        if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) {
+            if(_eventsView.tableView.contentOffset.y + diff + (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom) > _eventsView.tableView.contentSize.height)
+                [_eventsView _scrollToBottom];
+            else if(diff > 0 || _buffer.scrolledUp)
+                _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
+            else if([[UIDevice currentDevice].systemVersion isEqualToString:@"8.1"]) //The last line seems to get eaten when the table is fully scrolled down on iOS 8.1
+                _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + fabs(diff));
+        }
+    }
 }
 
 -(void)refresh {
@@ -2860,7 +2646,6 @@ extern NSDictionary *emojiMap;
                         frame.origin.x = 0;
                         frame.size.width = 220;
                         _usersView.view.frame = frame;
-                        _usersView.tableView.contentInset = UIEdgeInsetsZero;
                         self.slidingViewController.underRightViewController = _usersView;
                     }
                 } else {
@@ -3034,6 +2819,7 @@ extern NSDictionary *emojiMap;
     [sheet addButtonWithTitle:@"Join a Channel"];
     [sheet addButtonWithTitle:@"Display Options"];
     [sheet addButtonWithTitle:@"Settings"];
+    [sheet addButtonWithTitle:@"Send Feedback"];
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
@@ -3509,6 +3295,10 @@ extern NSDictionary *emojiMap;
     return NO;
 }
 
+-(void)_setSelectedBuffer:(Buffer *)b {
+    _selectedBuffer = b;
+}
+
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
@@ -3612,7 +3402,6 @@ extern NSDictionary *emojiMap;
         picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
     picker.delegate = (id)self;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
-        picker.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentViewController:picker animated:YES completion:nil];
     } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone]) {
         picker.modalPresentationStyle = UIModalPresentationFormSheet;
@@ -3634,7 +3423,8 @@ extern NSDictionary *emojiMap;
     else {
         documentPicker.modalPresentationStyle = UIModalPresentationCurrentContext;
     }
-    [self presentViewController:documentPicker animated:YES completion:nil];
+    if(documentPicker)
+        [self presentViewController:documentPicker animated:YES completion:nil];
 }
 
 -(void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
@@ -3777,38 +3567,33 @@ extern NSDictionary *emojiMap;
         }
     }
     
-    if((picker.sourceType == UIImagePickerControllerSourceTypeCamera && [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) || _popover) {
-        UINavigationController *nc = nil;
-        
-        if(fvc) {
-            nc = [[UINavigationController alloc] initWithRootViewController:fvc];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        }
-        
-        if(_popover) {
-            [_popover dismissPopoverAnimated:YES];
+    UINavigationController *nc = nil;
+    
+    if(fvc) {
+        nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    }
+    
+    if(_popover) {
+        [_popover dismissPopoverAnimated:YES];
+        if(nc)
+            [self presentViewController:nc animated:YES completion:nil];
+    } else {
+        [self dismissViewControllerAnimated:YES completion:^{
+            [self _resetStatusBar];
             if(nc)
                 [self presentViewController:nc animated:YES completion:nil];
-        } else {
-            [self dismissViewControllerAnimated:YES completion:^{
-                if(nc)
-                    [self presentViewController:nc animated:YES completion:nil];
-                [self _resetStatusBar];
-            }];
-        }
-    } else {
-        if(fvc) {
-            [picker setViewControllers:@[picker.viewControllers.firstObject, fvc] animated:YES];
-        } else {
-            [self.slidingViewController dismissViewControllerAnimated:YES completion:^{
-                [self _resetStatusBar];
-            }];
-        }
+        }];
     }
+    
+    if(!nc)
+        [self dismissViewControllerAnimated:YES completion:^{
+            [self _resetStatusBar];
+        }];
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -3816,7 +3601,7 @@ extern NSDictionary *emojiMap;
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     CLS_LOG(@"Image picker was cancelled");
-    [self.slidingViewController dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:nil];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -3839,7 +3624,7 @@ extern NSDictionary *emojiMap;
 
 -(void)fileUploadDidFail {
     CLS_LOG(@"File upload failed");
-    [self.slidingViewController dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:nil];
     _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the file. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
     [_alertView show];
     [self _hideConnectingView];
@@ -3847,7 +3632,7 @@ extern NSDictionary *emojiMap;
 
 -(void)fileUploadTooLarge {
     CLS_LOG(@"File upload too large");
-    [self.slidingViewController dismissViewControllerAnimated:YES completion:nil];
+    [self dismissViewControllerAnimated:YES completion:nil];
     _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
     [_alertView show];
     [self _hideConnectingView];
@@ -4177,6 +3962,90 @@ extern NSDictionary *emojiMap;
             [self _inviteToChannel];
         } else if([action isEqualToString:@"Join a Channel"]) {
             [self _joinAChannel];
+        } else if([action isEqualToString:@"Send Feedback"]) {
+#ifdef APPSTORE
+            NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+#else
+            NSString *version = [NSString stringWithFormat:@"%@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
+#endif
+            NSMutableString *report = [[NSMutableString alloc] initWithFormat:
+@"Briefly describe the issue below:\n\
+\n\
+\n\
+\n\
+==========\n\
+UID: %@\n\
+App Version: %@\n\
+OS Version: %@\n\
+Device type: %@\n",
+                                       [[NetworkConnection sharedInstance].userInfo objectForKey:@"id"],version,[UIDevice currentDevice].systemVersion,[UIDevice currentDevice].model];
+            
+            NSURL *caches = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
+            NSArray *folders = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[caches URLByAppendingPathComponent:@"com.crashlytics.data"] includingPropertiesForKeys:nil options:0 error:nil];
+            if(folders.count) {
+                folders = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[[folders[0] URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:@"active"] includingPropertiesForKeys:nil options:0 error:nil];
+                
+                if(folders.count) {
+                    NSMutableArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:folders[0] includingPropertiesForKeys:nil options:0 error:nil].mutableCopy;
+                    if(files.count) {
+                        [files sortUsingComparator:^ (NSURL *a, NSURL *b) {
+                            id da = [[a resourceValuesForKeys:[NSArray arrayWithObject:NSURLAttributeModificationDateKey] error:nil] objectForKey:NSURLCreationDateKey];
+                            id db = [[b resourceValuesForKeys:[NSArray arrayWithObject:NSURLAttributeModificationDateKey] error:nil] objectForKey:NSURLCreationDateKey];
+                            return [da compare:db];
+                        }];
+                        [report appendString:@"==========\nConsole log:\n"];
+                        SBJsonParser *parser = [[SBJsonParser alloc] init];
+                        for(NSURL *file in files.reverseObjectEnumerator) {
+                            if([file.lastPathComponent hasPrefix:@"log_"] && [file.lastPathComponent hasSuffix:@".clsrecord"]) {
+                                NSArray *lines = [[NSString stringWithContentsOfURL:file encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
+                                if(lines.count) {
+                                    for(NSString *line in lines) {
+                                        NSDictionary *dict = [parser objectWithString:line];
+                                        NSString *msg = [[dict objectForKey:@"log"] objectForKey:@"msg"];
+                                        if(msg.length) {
+                                            NSInteger ti = [[[dict objectForKey:@"log"] objectForKey:@"time"] intValue] / 1000;
+                                            NSInteger seconds = ti % 60;
+                                            NSInteger minutes = (ti / 60) % 60;
+                                            NSInteger hours = (ti / 3600);
+                                            [report appendFormat:@"%02ld:%02ld:%02ld ", (long)hours, (long)minutes, (long)seconds];
+                                            
+                                            for (NSInteger i = 0; i < msg.length; i += 2) {
+                                                NSString *hex = [msg substringWithRange:NSMakeRange(i, 2)];
+                                                int decimalValue = 0;
+                                                sscanf([hex UTF8String], "%x", &decimalValue);
+                                                [report appendFormat:@"%c", decimalValue];
+                                            }
+                                            [report appendString:@"\n"];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if(report.length) {
+                MFMailComposeViewController *mfmc = [[MFMailComposeViewController alloc] init];
+                if(mfmc && [MFMailComposeViewController canSendMail]) {
+                    mfmc.mailComposeDelegate = self;
+                    [mfmc setToRecipients:@[@"team@irccloud.com"]];
+                    [mfmc setSubject:@"IRCCloud for iOS"];
+                    [mfmc setMessageBody:report isHTML:NO];
+                    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                        mfmc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    else
+                        mfmc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                    [self presentViewController:mfmc animated:YES completion:^{
+                        [self _resetStatusBar];
+                    }];
+                } else {
+                    UIPasteboard *pb = [UIPasteboard generalPasteboard];
+                    [pb setValue:report forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                    _alertView = [[UIAlertView alloc] initWithTitle:@"Email Unavailable" message:@"This device has no available email accounts.  The diagnostic report has been copied to the clipboard instead, please send it to team@irccloud.com." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                    [_alertView show];
+                }
+            }
         }
         
         if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)
@@ -4217,7 +4086,10 @@ extern NSDictionary *emojiMap;
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
             _alertView.tag = TAG_BAN;
             _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            if(_selectedUser.hostmask.length)
+                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            else
+                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
             [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
             [_alertView textFieldAtIndex:0].delegate = self;
             [_alertView show];
@@ -4226,7 +4098,10 @@ extern NSDictionary *emojiMap;
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
             _alertView.tag = TAG_IGNORE;
             _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            if(_selectedUser.hostmask.length)
+                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            else
+                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
             [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
             [_alertView textFieldAtIndex:0].delegate = self;
             [_alertView show];
@@ -4240,5 +4115,9 @@ extern NSDictionary *emojiMap;
             [_alertView show];
         }
     }
+}
+
+-(void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 @end

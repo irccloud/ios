@@ -27,7 +27,6 @@
     UISwitch *_symbols;
     UISwitch *_colors;
     UISwitch *_screen;
-    UISwitch *_chrome;
     UISwitch *_autoCaps;
     UISwitch *_emocodes;
     UISwitch *_saveToCameraRoll;
@@ -47,7 +46,6 @@
     int _emailreqid;
     BOOL _userinfosaved;
     BOOL _prefssaved;
-    BOOL _chromeInstalled;
     NSString *_oldTheme;
     UIAlertView *_alertView;
 }

@@ -62,7 +62,7 @@
         if([nameLeft compare:nameRight] == NSOrderedSame)
             return (_bid < aBuffer.bid)?NSOrderedAscending:NSOrderedDescending;
         else
-            return [nameLeft compare:nameRight];
+            return [nameLeft localizedStandardCompare:nameRight];
     }
 }
 -(NSString *)description {

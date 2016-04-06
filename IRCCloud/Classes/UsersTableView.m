@@ -207,24 +207,29 @@
     
     for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
         if(user.nick.length) {
-            if([user.mode rangeOfString:s?s.MODE_OPER:@"Y"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OPER:@"Y"])
+            NSString *mode = user.mode.lowercaseString;
+            if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && ([PREFIX objectForKey:s?s.MODE_OPER:@"Y"] || [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"]))
                 [opers addObject:user];
-            else if([user.mode rangeOfString:s?s.MODE_OWNER:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
+            else if([mode rangeOfString:s?s.MODE_OWNER.lowercaseString:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
                 [owners addObject:user];
-            else if([user.mode rangeOfString:s?s.MODE_ADMIN:@"a"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_ADMIN:@"a"])
+            else if([mode rangeOfString:s?s.MODE_ADMIN.lowercaseString:@"a"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_ADMIN:@"a"])
                 [admins addObject:user];
-            else if([user.mode rangeOfString:s?s.MODE_OP:@"o"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OP:@"o"])
+            else if([mode rangeOfString:s?s.MODE_OP.lowercaseString:@"o"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OP:@"o"])
                 [ops addObject:user];
-            else if([user.mode rangeOfString:s?s.MODE_HALFOP:@"h"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_HALFOP:@"h"])
+            else if([mode rangeOfString:s?s.MODE_HALFOP.lowercaseString:@"h"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_HALFOP:@"h"])
                 [halfops addObject:user];
-            else if([user.mode rangeOfString:s?s.MODE_VOICED:@"v"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_VOICED:@"v"])
+            else if([mode rangeOfString:s?s.MODE_VOICED.lowercaseString:@"v"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_VOICED:@"v"])
                 [voiced addObject:user];
             else
                 [members addObject:user];
         }
     }
     
-    [self _addUsersFromList:opers heading:@"Opers" symbol:[PREFIX objectForKey:s?s.MODE_OPER:@"Y"] groupColor:[UIColor opersGroupColor] borderColor:[UIColor opersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    NSString *operPrefix = [PREFIX objectForKey:s?s.MODE_OPER:@"Y"];
+    if(!operPrefix)
+        operPrefix = [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"];
+    
+    [self _addUsersFromList:opers heading:@"Opers" symbol:operPrefix groupColor:[UIColor opersGroupColor] borderColor:[UIColor opersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
     [self _addUsersFromList:owners heading:@"Owners" symbol:[PREFIX objectForKey:s?s.MODE_OWNER:@"q"] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
     [self _addUsersFromList:admins heading:@"Admins" symbol:[PREFIX objectForKey:s?s.MODE_ADMIN:@"a"] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
     [self _addUsersFromList:ops heading:@"Ops" symbol:[PREFIX objectForKey:s?s.MODE_OP:@"o"] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];

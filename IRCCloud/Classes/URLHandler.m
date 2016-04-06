@@ -14,6 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <objc/message.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AVKit/AVKit.h>
 #import <MediaPlayer/MediaPlayer.h>
@@ -23,14 +24,63 @@
 #import "MainViewController.h"
 #import "ImageViewController.h"
 #import "OpenInChromeController.h"
+#import "OpenInFirefoxControllerObjC.h"
 #import "PastebinViewController.h"
 #import "UIColor+IRCCloud.h"
+#import "config.h"
+#import "ARChromeActivity.h"
+#import "TUSafariActivity.h"
+
+@interface OpenInFirefoxActivity : UIActivity
+
+@end
+
+@implementation OpenInFirefoxActivity {
+    NSURL *_URL;
+}
+
+- (NSString *)activityType {
+    return NSStringFromClass([self class]);
+}
+
+- (NSString *)activityTitle {
+    return @"Open in Firefox";
+}
+
+- (UIImage *)activityImage {
+    return [UIImage imageNamed:@"Firefox"];
+}
+
+- (BOOL)canPerformWithActivityItems:(NSArray *)activityItems {
+    if([[OpenInFirefoxControllerObjC sharedInstance] isFirefoxInstalled]) {
+        for (id activityItem in activityItems) {
+            if ([activityItem isKindOfClass:[NSURL class]] && [[UIApplication sharedApplication] canOpenURL:activityItem]) {
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
+}
+
+- (void)prepareWithActivityItems:(NSArray *)activityItems {
+    for (id activityItem in activityItems) {
+        if ([activityItem isKindOfClass:[NSURL class]]) {
+            _URL = activityItem;
+        }
+    }
+}
+
+- (void)performActivity {
+    BOOL completed = [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:_URL];
+    
+    [self activityDidFinish:completed];
+}
+
+@end
+
 
 @implementation URLHandler
-{
-    OpenInChromeController *_openInChromeController;
-    NSURL *_pendingURL;
-}
 
 #define HAS_IMAGE_SUFFIX(l) ([l hasSuffix:@"jpg"] || [l hasSuffix:@"jpeg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"] || [l hasSuffix:@"bmp"])
 
@@ -66,11 +116,18 @@
 {
     NSString *l = [url.path lowercaseString];
     // Use pre-processor macros instead of variables so conditions are still evaluated lazily
-    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GFYCAT(url)|| IS_GIPHY(url));
+    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GFYCAT(url) || IS_GIPHY(url));
+}
+
++ (BOOL)isYouTubeURL:(NSURL *)url
+{
+    return IS_YOUTUBE(url);
 }
 
 - (void)launchURL:(NSURL *)url
 {
+    if([[UIApplication sharedApplication] respondsToSelector:NSSelectorFromString(@"_deactivateReachability")])
+        objc_msgSend([UIApplication sharedApplication], NSSelectorFromString(@"_deactivateReachability"));
     NSLog(@"Launch: %@", url);
     UIApplication *app = [UIApplication sharedApplication];
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
@@ -88,6 +145,27 @@
             [self launchURL:url];
         }];
         return;
+    }
+    
+    if([url.host hasSuffix:@"irccloud.com"] && [url.path isEqualToString:@"/invite"]) {
+        int port = 6667;
+        int ssl = 0;
+        NSString *host;
+        NSString *channel;
+        for(NSString *p in [url.query componentsSeparatedByString:@"&"]) {
+            NSArray *args = [p componentsSeparatedByString:@"="];
+            if(args.count == 2) {
+                if([args[0] isEqualToString:@"channel"])
+                    channel = args[1];
+                else if([args[0] isEqualToString:@"hostname"])
+                    host = args[1];
+                else if([args[0] isEqualToString:@"port"])
+                    port = [args[1] intValue];
+                else if([args[0] isEqualToString:@"ssl"])
+                    ssl = [args[1] intValue];
+            }
+        }
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"irc%@://%@:%i/%@",(ssl > 0)?@"s":@"",host,port,channel]];
     }
     
     if(![url.scheme hasPrefix:@"irc"]) {
@@ -126,6 +204,55 @@
         [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
     } else if(IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
+#ifdef FB_ACCESS_TOKEN
+    } else if([url.host.lowercaseString hasSuffix:@"facebook.com"] && ([url.path.lowercaseString isEqualToString:@"/video.php"] || (url.pathComponents.count > 3 && [url.pathComponents[2] isEqualToString:@"videos"]))) {
+        NSString *videoID = nil;
+        
+        if([url.path.lowercaseString isEqualToString:@"/video.php"]) {
+            for(NSString *p in [url.query componentsSeparatedByString:@"&"]) {
+                if([p hasPrefix:@"v="]) {
+                    videoID = [p substringFromIndex:2];
+                    break;
+                } else if([p hasPrefix:@"id="]) {
+                    videoID = [p substringFromIndex:3];
+                    break;
+                }
+            }
+        } else {
+            videoID = url.pathComponents[3];
+        }
+
+        if(videoID) {
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/v2.2/%@?fields=source&access_token=%s", videoID, FB_ACCESS_TOKEN]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+            [request setHTTPShouldHandleCookies:NO];
+            
+            [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                if (error) {
+                    NSLog(@"Error fetching Facebook. Error %li : %@", (long)error.code, error.userInfo);
+                    [self openWebpage:url];
+                } else {
+                    SBJsonParser *parser = [[SBJsonParser alloc] init];
+                    NSDictionary *dict = [parser objectWithData:data];
+                    
+                    if([[dict objectForKey:@"source"] length]) {
+                        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+                        if(NSClassFromString(@"AVPlayerViewController")) {
+                            AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
+                            player.player = [[AVPlayer alloc] initWithURL:[NSURL URLWithString:[dict objectForKey:@"source"]]];
+                            [mainViewController presentViewController:player animated:YES completion:nil];
+                        } else {
+                            MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:[NSURL URLWithString:[dict objectForKey:@"source"]]];
+                            [mainViewController presentMoviePlayerViewControllerAnimated:player];
+                        }
+                        [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
+                    } else {
+                        NSLog(@"Facebook failure");
+                        [self openWebpage:url];
+                    }
+                }
+            }];
+        }
+#endif
     } else {
         [self openWebpage:url];
     }
@@ -142,59 +269,76 @@
         [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:ivc.view];
         ivc.view.alpha = 0;
         [UIView animateWithDuration:0.5f animations:^{
-            ivc.view.alpha = 1;
-        } completion:^(BOOL finished){
-            [UIApplication sharedApplication].statusBarHidden = YES;
-        }];
+            appDelegate.window.rootViewController.view.alpha = 1;
+        } completion:nil];
     }];
 }
 
 - (void)openWebpage:(NSURL *)url
 {
-    if(!_openInChromeController) {
-        _openInChromeController = [[OpenInChromeController alloc] init];
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
+        if([[OpenInChromeController sharedInstance] openInChrome:url withCallbackURL:self.appCallbackURL createNewTab:NO])
+            return;
     }
-    BOOL shouldDisplayBrowser = ([[NSUserDefaults standardUserDefaults] objectForKey:@"useChrome"]
-                                 || ![_openInChromeController isChromeInstalled]);
-    BOOL useChrome = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
-    if(shouldDisplayBrowser) {
-        if(!(useChrome && [_openInChromeController openInChrome:url withCallbackURL:self.appCallbackURL createNewTab:NO])) {
-            if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    UIApplication *app = [UIApplication sharedApplication];
-                    AppDelegate *appDelegate = (AppDelegate *)app.delegate;
-                    MainViewController *mainViewController = [appDelegate mainViewController];
-                    [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
-                    
-                    [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
-                }];
-            } else {
-                [[UIApplication sharedApplication] openURL:url];
-            }
-        }
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] isFirefoxInstalled]) {
+        if([[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:url])
+            return;
+    }
+    if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Safari"] && [SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            UIApplication *app = [UIApplication sharedApplication];
+            AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+            MainViewController *mainViewController = [appDelegate mainViewController];
+            [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+            [UIApplication sharedApplication].statusBarHidden = NO;
+            
+            [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
+        }];
     } else {
-        [self showBrowserChooserAlertPendingURL:url];
+        [[UIApplication sharedApplication] openURL:url];
     }
 }
 
-- (void)showBrowserChooserAlertPendingURL:(NSURL *)url
-{
-    _pendingURL = url;
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Choose A Browser"
-                                                    message:@"Would you prefer to open links in Safari or Chrome?"
-                                                   delegate:self
-                                          cancelButtonTitle:nil
-                                          otherButtonTitles:@"Chrome", @"Safari", nil];
-    [alert show];
++ (UIActivityViewController *)activityControllerForItems:(NSArray *)items type:(NSString *)type {
+    NSArray *activities;
+    
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
+        activities = @[[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                      @"irccloud-enterprise://"
+#else
+                                                                      @"irccloud://"
+#endif
+                                                                      ]]];
+    } else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] isFirefoxInstalled]) {
+        activities = @[[[OpenInFirefoxActivity alloc] init]];
+    } else {
+        activities = @[[[TUSafariActivity alloc] init]];
+    }
+    
+    UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:activities];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+        activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+            if(completed) {
+                if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                    activityType = [activityType substringFromIndex:25];
+                if([activityType hasPrefix:@"com.apple."])
+                    activityType = [activityType substringFromIndex:10];
+                [Answers logShareWithMethod:activityType contentName:nil contentType:type contentId:nil customAttributes:nil];
+            }
+        };
+    } else {
+        activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
+            if(completed) {
+                if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                    activityType = [activityType substringFromIndex:25];
+                if([activityType hasPrefix:@"com.apple."])
+                    activityType = [activityType substringFromIndex:10];
+                [Answers logShareWithMethod:activityType contentName:nil contentType:type contentId:nil customAttributes:nil];
+            }
+        };
+    }
+    return activityController;
 }
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    [[NSUserDefaults standardUserDefaults] setObject:@(buttonIndex == 0) forKey:@"useChrome"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    [self launchURL:_pendingURL];
-    _pendingURL = nil;
-}
-
 
 @end

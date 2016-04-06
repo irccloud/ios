@@ -14,6 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <SafariServices/SafariServices.h>
 #import "SettingsViewController.h"
 #import "NetworkConnection.h"
 #import "LicenseViewController.h"
@@ -23,6 +24,69 @@
 #import "ImgurLoginViewController.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "ColorFormatter.h"
+#import "OpenInChromeController.h"
+#import "OpenInFirefoxControllerObjC.h"
+
+@interface BrowserViewController : UITableViewController {
+    NSMutableArray *_browsers;
+}
+@end
+
+@implementation BrowserViewController
+
+-(id)init {
+    self = [super initWithStyle:UITableViewStyleGrouped];
+    if (self) {
+        self.navigationItem.title = @"Browser";
+        _browsers = [[NSMutableArray alloc] init];
+        if([SFSafariViewController class])
+            [_browsers addObject:@"IRCCloud"];
+        [_browsers addObject:@"Safari"];
+        if([[OpenInChromeController sharedInstance] isChromeInstalled])
+            [_browsers addObject:@"Chrome"];
+        if([[OpenInFirefoxControllerObjC sharedInstance] isFirefoxInstalled])
+            [_browsers addObject:@"Firefox"];
+    }
+    return self;
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+#pragma mark - Table view data source
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
+    return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    return _browsers.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"imageservicecell"];
+    if(!cell)
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"imageservicecell"];
+    
+    cell.textLabel.text = [_browsers objectAtIndex:indexPath.row];
+    cell.accessoryType = [[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:[_browsers objectAtIndex:indexPath.row]]?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
+    
+    return cell;
+}
+
+#pragma mark - Table view delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    [[NSUserDefaults standardUserDefaults] setObject:[_browsers objectAtIndex:indexPath.row] forKey:@"browser"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [tableView reloadData];
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+@end
 
 @interface FontSizeCell : UITableViewCell {
     UILabel *_small;
@@ -372,8 +436,6 @@
         self.navigationItem.title = @"Settings";
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-        OpenInChromeController *c = [[OpenInChromeController alloc] init];
-        _chromeInstalled = [c isChromeInstalled];
         _oldTheme = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
     }
     return self;
@@ -438,7 +500,6 @@
         _prefsreqid = [[NetworkConnection sharedInstance] setPrefs:json];
         
         [[NSUserDefaults standardUserDefaults] setBool:_screen.on forKey:@"keepScreenOn"];
-        [[NSUserDefaults standardUserDefaults] setBool:_chrome.on forKey:@"useChrome"];
         [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
         [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
         [[NSUserDefaults standardUserDefaults] setBool:_notificationSound.on forKey:@"notificationSound"];
@@ -658,7 +719,6 @@
     }
     
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
-    _chrome.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
     _notificationSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"];
@@ -699,7 +759,6 @@
     _symbols = [[UISwitch alloc] init];
     _colors = [[UISwitch alloc] init];
     _screen = [[UISwitch alloc] init];
-    _chrome = [[UISwitch alloc] init];
     _autoCaps = [[UISwitch alloc] init];
     _emocodes = [[UISwitch alloc] init];
     _saveToCameraRoll = [[UISwitch alloc] init];
@@ -791,7 +850,7 @@
         case 2:
             return 10;
         case 3:
-            return ((_chromeInstalled)?3:2) + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
+            return 3 + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
         case 4:
             return 4;
         case 5:
@@ -927,14 +986,13 @@
                     cell.accessoryView = _autoCaps;
                     break;
                 case 2:
-                    if([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-                        cell.textLabel.text = @"Show Sidebars In Landscape";
-                        cell.accessoryView = _tabletMode;
-                        break;
-                    }
+                    cell.textLabel.text = @"Preferred Browser";
+                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"browser"];
+                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                    break;
                 case 3:
-                    cell.textLabel.text = @"Open URLs in Chrome";
-                    cell.accessoryView = _chrome;
+                    cell.textLabel.text = @"Show Sidebars In Landscape";
+                    cell.accessoryView = _tabletMode;
                     break;
             }
             break;
@@ -1035,6 +1093,9 @@
     [self.tableView endEditing:YES];
     if(indexPath.section == 2 && indexPath.row == 0) {
         [self.navigationController pushViewController:[[ThemesViewController alloc] init] animated:YES];
+    }
+    if(indexPath.section == 3 && indexPath.row == 2) {
+        [self.navigationController pushViewController:[[BrowserViewController alloc] init] animated:YES];
     }
     if(indexPath.section == 6) {
         NSInteger row = indexPath.row;

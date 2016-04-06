@@ -91,6 +91,7 @@
         decodeObject(_usermask);
         decodeObject(_mode);
         decodeObject(_isupport);
+        _isupport = _isupport.mutableCopy;
         decodeObject(_ignores);
         decodeObject(_CHANTYPES);
         decodeObject(_PREFIX);
@@ -277,10 +278,9 @@
     Server *server = [self getServer:cid];
     if(server) {
         if([isupport isKindOfClass:[NSDictionary class]]) {
-            if(server.isupport)
-                [server.isupport setValuesForKeysWithDictionary:isupport];
-            else
-                server.isupport = isupport.mutableCopy;
+            NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:server.isupport];
+            [d addEntriesFromDictionary:isupport];
+            server.isupport = d;
         } else {
             server.isupport = [[NSMutableDictionary alloc] init];
         }
@@ -303,10 +303,15 @@
 }
 
 -(void)updateUserModes:(NSString *)modes server:(int)cid {
-    if([modes isKindOfClass:[NSString class]] && modes.length == 5 && [modes characterAtIndex:0] != 'q') {
+    if([modes isKindOfClass:[NSString class]] && modes.length) {
         Server *server = [self getServer:cid];
-        if(server)
-            server.MODE_OWNER = [modes substringToIndex:1];
+        if(server) {
+            if([[modes.lowercaseString substringToIndex:1] isEqualToString:[server.isupport objectForKey:@"OWNER"]]) {
+                server.MODE_OWNER = [modes substringToIndex:1];
+                if([server.MODE_OWNER.lowercaseString isEqualToString:server.MODE_OPER.lowercaseString])
+                    server.MODE_OPER = @"";
+            }
+        }
     }
 }
 

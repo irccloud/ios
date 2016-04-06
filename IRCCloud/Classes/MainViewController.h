@@ -17,6 +17,7 @@
 
 #import <UIKit/UIKit.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import <MessageUI/MFMailComposeViewController.h>
 #import "BuffersTableView.h"
 #import "UsersTableView.h"
 #import "EventsTableView.h"
@@ -25,9 +26,8 @@
 #import "ImageUploader.h"
 #import "FileUploader.h"
 #import "FilesTableViewController.h"
-#import "YTPlayerView.h"
 
-@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,YTPlayerViewDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate> {
+@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate> {
     IBOutlet BuffersTableView *_buffersView;
     IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
@@ -80,12 +80,10 @@
     NSArray *_sortedChannels;
     UIPopoverController *_popover;
     NSTimeInterval _lastNotificationTime;
-    UIView *_YTWrapperView;
-    YTPlayerView *_ytPlayer;
-    NSURL *_ytURL;
-    UIActivityIndicatorView *_ytActivity;
     BOOL __ignoreLayoutChanges;
+    BOOL _isShowingPreview;
     NSString *__currentTheme;
+    BOOL _atMention;
     
     id<UIViewControllerPreviewing> __previewer;
 }
@@ -93,6 +91,7 @@
 @property (nonatomic) NSTimeInterval eidToOpen;
 @property (nonatomic) NSString *incomingDraft;
 @property (readonly) EventsTableView *eventsView;
+@property BOOL isShowingPreview;
 -(void)bufferSelected:(int)bid;
 -(void)sendButtonPressed:(id)sender;
 -(void)usersButtonPressed:(id)sender;
@@ -102,4 +101,5 @@
 -(IBAction)globalMsgPressed:(id)sender;
 -(void)launchURL:(NSURL *)url;
 -(void)refresh;
+-(void)_setSelectedBuffer:(Buffer *)b;
 @end

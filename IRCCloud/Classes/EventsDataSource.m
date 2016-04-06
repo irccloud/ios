@@ -267,9 +267,9 @@
         };
         
         void (^unhandled_line)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
-            event.from = @"";
-            event.msg = @"";
             if(object) {
+                event.from = @"";
+                event.msg = @"";
                 if([object objectForKey:@"command"])
                     event.msg = [[object objectForKey:@"command"] stringByAppendingString:@" "];
                 if([object objectForKey:@"raw"])
@@ -283,11 +283,10 @@
         
         void (^kicked_channel)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
             event.from = @"";
-            event.fromMode = nil;
             if(object) {
                 event.oldNick = [object objectForKey:@"nick"];
                 event.nick = [object objectForKey:@"kicker"];
-                event.hostmask = [object objectForKey:@"kicker_hostmask"];
+                event.fromMode = [object objectForKey:@"kicker_mode"];
             }
             event.color = [UIColor timestampColor];
             event.linkify = NO;
@@ -809,7 +808,8 @@
                 e = [[e subarrayWithRange:NSMakeRange(e.count - 50, 50)] mutableCopy];
             }
         }
-        [events setObject:e forKey:bid];
+        if(e && bid)
+            [events setObject:e forKey:bid];
     }
     
     @synchronized(self) {
@@ -828,6 +828,7 @@
     @synchronized(_events) {
         [_events removeAllObjects];
         [_events_sorted removeAllObjects];
+        CLS_LOG(@"EventsDataSource cleared");
     }
 }
 
@@ -943,6 +944,7 @@
     @synchronized(_events) {
         [_events removeObjectForKey:@(bid)];
         [_events_sorted removeObjectForKey:@(bid)];
+        CLS_LOG(@"Removing all events for bid%i", bid);
     }
 }
 
@@ -981,6 +983,7 @@
 }
 
 -(void)removeEventsBefore:(NSTimeInterval)min_eid buffer:(int)bid {
+    CLS_LOG(@"Removing events for bid%i older than %.0f", bid, min_eid);
     @synchronized(_events) {
         NSArray *events = [_events objectForKey:@(bid)];
         NSMutableArray *eventsToRemove = [[NSMutableArray alloc] init];

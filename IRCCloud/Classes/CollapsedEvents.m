@@ -37,32 +37,36 @@
     return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, modes: %@, msg: %@, netsplit: %i}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, [self modes:YES mode_modes:nil], _msg, _netsplit];
 }
 -(BOOL)addMode:(NSString *)mode server:(Server *)server {
-    if([mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound) {
+    if([mode rangeOfString:server?server.MODE_OPER.lowercaseString:@"y"].location != NSNotFound)
+        _operIsLower = YES;
+    mode = mode.lowercaseString;
+    
+    if([mode rangeOfString:server?server.MODE_OPER.lowercaseString:@"y"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeOper])
             _modes[kCollapsedModeDeOper] = false;
         else
             _modes[kCollapsedModeOper] = true;
-    } else if([mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_OWNER.lowercaseString:@"q"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeOwner])
             _modes[kCollapsedModeDeOwner] = false;
         else
             _modes[kCollapsedModeOwner] = true;
-    } else if([mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_ADMIN.lowercaseString:@"a"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeAdmin])
             _modes[kCollapsedModeDeAdmin] = false;
         else
             _modes[kCollapsedModeAdmin] = true;
-    } else if([mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_OP.lowercaseString:@"o"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeOp])
             _modes[kCollapsedModeDeOp] = false;
         else
             _modes[kCollapsedModeOp] = true;
-    } else if([mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_HALFOP.lowercaseString:@"h"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeHalfOp])
             _modes[kCollapsedModeDeHalfOp] = false;
         else
             _modes[kCollapsedModeHalfOp] = true;
-    } else if([mode rangeOfString:server?server.MODE_VOICED:@"v"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_VOICED.lowercaseString:@"v"].location != NSNotFound) {
         if(_modes[kCollapsedModeDeVoice])
             _modes[kCollapsedModeDeVoice] = false;
         else
@@ -76,32 +80,34 @@
     return YES;
 }
 -(BOOL)removeMode:(NSString *)mode server:(Server *)server {
-    if([mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound) {
+    mode = mode.lowercaseString;
+    
+    if([mode rangeOfString:server?server.MODE_OPER.lowercaseString:@"y"].location != NSNotFound) {
         if(_modes[kCollapsedModeOper])
             _modes[kCollapsedModeOper] = false;
         else
             _modes[kCollapsedModeDeOper] = true;
-    } else if([mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_OWNER.lowercaseString:@"q"].location != NSNotFound) {
         if(_modes[kCollapsedModeOwner])
             _modes[kCollapsedModeOwner] = false;
         else
             _modes[kCollapsedModeDeOwner] = true;
-    } else if([mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_ADMIN.lowercaseString:@"a"].location != NSNotFound) {
         if(_modes[kCollapsedModeAdmin])
             _modes[kCollapsedModeAdmin] = false;
         else
             _modes[kCollapsedModeDeAdmin] = true;
-    } else if([mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_OP.lowercaseString:@"o"].location != NSNotFound) {
         if(_modes[kCollapsedModeOp])
             _modes[kCollapsedModeOp] = false;
         else
             _modes[kCollapsedModeDeOp] = true;
-    } else if([mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_HALFOP.lowercaseString:@"h"].location != NSNotFound) {
         if(_modes[kCollapsedModeHalfOp])
             _modes[kCollapsedModeHalfOp] = false;
         else
             _modes[kCollapsedModeDeHalfOp] = true;
-    } else if([mode rangeOfString:server?server.MODE_VOICED:@"v"].location != NSNotFound) {
+    } else if([mode rangeOfString:server?server.MODE_VOICED.lowercaseString:@"v"].location != NSNotFound) {
         if(_modes[kCollapsedModeVoice])
             _modes[kCollapsedModeVoice] = false;
         else
@@ -120,6 +126,7 @@
 }
 -(void)copyModes:(CollapsedEvent *)from {
     [from _copyModes:_modes];
+    _operIsLower = from.operIsLower;
 }
 -(NSString *)modes:(BOOL)showSymbol mode_modes:(NSArray *)mode_modes {
     static NSString *mode_msgs[] = {
@@ -147,13 +154,13 @@
     NSString *output = nil;
     if(!mode_modes) {
         mode_modes = @[
-            @"+Y",
+            _operIsLower?@"+y":@"+Y",
             @"+q",
             @"+a",
             @"+o",
             @"+h",
             @"+v",
-            @"-Y",
+            _operIsLower?@"-y":@"-Y",
             @"-q",
             @"-a",
             @"-o",
@@ -685,7 +692,7 @@
         PREFIX = _server.PREFIX;
     
     if(!PREFIX || PREFIX.count == 0) {
-        PREFIX = @{_server?_server.MODE_OPER:@"Y":@"!",
+        PREFIX = @{_server?_server.MODE_OPER:@"y":@"!",
                    _server?_server.MODE_OWNER:@"q":@"~",
                    _server?_server.MODE_ADMIN:@"a":@"&",
                    _server?_server.MODE_OP:@"o":@"@",
@@ -694,12 +701,12 @@
     }
     
     NSDictionary *mode_colors = @{
-        _server?_server.MODE_OPER:@"Y":@"E7AA00",
-        _server?_server.MODE_OWNER:@"q":@"E7AA00",
-        _server?_server.MODE_ADMIN:@"a":@"6500A5",
-        _server?_server.MODE_OP:@"o":@"BA1719",
-        _server?_server.MODE_HALFOP:@"h":@"B55900",
-        _server?_server.MODE_VOICED:@"v":@"25B100"
+        _server?_server.MODE_OPER.lowercaseString:@"y":@"E7AA00",
+        _server?_server.MODE_OWNER.lowercaseString:@"q":@"E7AA00",
+        _server?_server.MODE_ADMIN.lowercaseString:@"a":@"6500A5",
+        _server?_server.MODE_OP.lowercaseString:@"o":@"BA1719",
+        _server?_server.MODE_HALFOP.lowercaseString:@"h":@"B55900",
+        _server?_server.MODE_VOICED.lowercaseString:@"v":@"25B100"
     };
     
     NSArray *light_colors = @[
@@ -771,7 +778,7 @@
         NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[`_]+$" options:NSRegularExpressionCaseInsensitive error:nil];
         NSString *normalizedNick = [r stringByReplacingMatchesInString:[nick lowercaseString] options:0 range:NSMakeRange(0, nick.length) withTemplate:@""];
         // remove |<anything> from the end
-        r = [NSRegularExpression regularExpressionWithPattern:@"|.*$" options:NSRegularExpressionCaseInsensitive error:nil];
+        r = [NSRegularExpression regularExpressionWithPattern:@"\\|.*$" options:NSRegularExpressionCaseInsensitive error:nil];
         normalizedNick = [r stringByReplacingMatchesInString:normalizedNick options:0 range:NSMakeRange(0, normalizedNick.length) withTemplate:@""];
         
         double hash = 0;
@@ -787,6 +794,8 @@
     if(mode.length) {
         if([mode rangeOfString:_server?_server.MODE_OPER:@"Y"].location != NSNotFound)
             mode = _server?_server.MODE_OPER:@"Y";
+        else if([mode rangeOfString:_server?_server.MODE_OPER.lowercaseString:@"y"].location != NSNotFound)
+            mode = _server?_server.MODE_OPER.lowercaseString:@"y";
         else if([mode rangeOfString:_server?_server.MODE_OWNER:@"q"].location != NSNotFound)
             mode = _server?_server.MODE_OWNER:@"q";
         else if([mode rangeOfString:_server?_server.MODE_ADMIN:@"a"].location != NSNotFound)
@@ -802,15 +811,15 @@
         
         if(showSymbol) {
             if([PREFIX objectForKey:mode]) {
-                if([mode_colors objectForKey:mode]) {
-                    [output appendFormat:@"%c%@%@%c ", COLOR_RGB, [mode_colors objectForKey:mode], [PREFIX objectForKey:mode], COLOR_RGB];
+                if([mode_colors objectForKey:mode.lowercaseString]) {
+                    [output appendFormat:@"%c%@%@%c ", COLOR_RGB, [mode_colors objectForKey:mode.lowercaseString], [PREFIX objectForKey:mode], COLOR_RGB];
                 } else {
                     [output appendFormat:@"%@ ", [PREFIX objectForKey:mode]];
                 }
             }
         } else {
-            if([mode_colors objectForKey:mode]) {
-                [output appendFormat:@"%c%@•%c ", COLOR_RGB, [mode_colors objectForKey:mode], COLOR_RGB];
+            if([mode_colors objectForKey:mode.lowercaseString]) {
+                [output appendFormat:@"%c%@•%c ", COLOR_RGB, [mode_colors objectForKey:mode.lowercaseString], COLOR_RGB];
             } else {
                 [output appendString:@"• "];
             }

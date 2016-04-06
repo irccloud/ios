@@ -17,11 +17,11 @@
 #import <AVFoundation/AVFoundation.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <Twitter/Twitter.h>
+#import <SafariServices/SafariServices.h>
 #import "ImageViewController.h"
 #import "AppDelegate.h"
 #import "UIImage+animatedGIF.h"
-#import "ARChromeActivity.h"
-#import "TUSafariActivity.h"
+#import "OpenInFirefoxControllerObjC.h"
 #import "config.h"
 
 @implementation ImageViewController
@@ -38,6 +38,40 @@
         _progressScale = 0;
     }
     return self;
+}
+
+- (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
+    return @[
+             [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                 UIPasteboard *pb = [UIPasteboard generalPasteboard];
+                 [pb setValue:_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+             }],
+             [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                 UIApplication *app = [UIApplication sharedApplication];
+                 AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+                 MainViewController *mainViewController = [appDelegate mainViewController];
+                 
+                 UIActivityViewController *activityController = [URLHandler activityControllerForItems:_imageView.image?@[_url,_imageView.image]:@[_url] type:_movieController?@"Animation":@"Image"];
+
+                 [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
+             }],
+             [UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                 if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:_url
+                                                                                                                                                         withCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                                                                                          @"irccloud-enterprise://"
+#else
+                                                                                                                                                                          @"irccloud://"
+#endif
+                                                                                                                                                                          ]
+                                                                                                                                                            createNewTab:NO])
+                     return;
+                 else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:_url])
+                     return;
+                 else
+                     [[UIApplication sharedApplication] openURL:_url];
+             }]
+             ];
 }
 
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
@@ -101,6 +135,8 @@
     [UIView setAnimationDuration:0.25];
     _imageView.alpha = 1;
     [UIView commitAnimations];
+    if(!_previewing)
+        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [Answers logContentViewWithName:nil contentType:@"Image" contentId:nil customAttributes:nil];
 }
 
@@ -167,20 +203,44 @@
 }
 
 -(void)fail {
-    if(self.view.window.rootViewController != self) {
-        NSLog(@"Not launching fallback URL as we're no longer the root view controller");
+    [_progressView removeFromSuperview];
+
+    if(_previewing || self.view.window.rootViewController != self) {
+        NSLog(@"Not launching fallback URL as we're not the root view controller");
         return;
     }
-    if(!([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome openInChrome:_url
-                                                                                  withCallbackURL:[NSURL URLWithString:
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
+        if([[OpenInChromeController sharedInstance] openInChrome:_url withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
-                                                                                                   @"irccloud-enterprise://"
+                                                                                       @"irccloud-enterprise://"
 #else
-                                                                                                   @"irccloud://"
+                                                                                       @"irccloud://"
 #endif
-                                                                                                   ]
-                                                                                     createNewTab:NO]))
+                                                                                       ] createNewTab:NO])
+            return;
+    }
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] isFirefoxInstalled]) {
+        if([[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:_url])
+            return;
+    }
+    if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Safari"] && [SFSafariViewController class] && [_url.scheme hasPrefix:@"http"]) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            UIApplication *app = [UIApplication sharedApplication];
+            AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+            MainViewController *mainViewController = [appDelegate mainViewController];
+            
+            [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
+            
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+                [UIApplication sharedApplication].statusBarHidden = NO;
+                
+                [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:_url] animated:YES completion:nil];
+            }];
+        }];
+    } else {
         [[UIApplication sharedApplication] openURL:_url];
+    }
 }
 
 -(void)loadOembed:(NSString *)url {
@@ -225,6 +285,8 @@
     _scrollView.userInteractionEnabled = NO;
     [_progressView removeFromSuperview];
     [_movieController play];
+    if(!_previewing)
+        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
 }
 
@@ -363,6 +425,10 @@
                     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
                     
                     [_connection start];
+                } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
+                    [self loadVideo:[dict objectForKey:@"mp4"]];
+                    if([[dict objectForKey:@"looping"] intValue] == 1)
+                        _movieController.repeatMode = MPMovieRepeatModeOne;
                 } else {
                     NSLog(@"Invalid type from imgur");
                     [self fail];
@@ -693,35 +759,11 @@
 
 -(IBAction)shareButtonPressed:(id)sender {
     if(NSClassFromString(@"UIActivityViewController")) {
-        UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:_imageView.image?@[_url,_imageView.image]:@[_url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
-#ifdef ENTERPRISE
-                                                                                                                                                                                                                                                                                                                                         @"irccloud-enterprise://"
-#else
-                                                                                                                                                                                                                                                                                                                                         @"irccloud://"
-#endif
-                                                                                                                                                                                                                                                                                                                                         ]]:[[TUSafariActivity alloc] init]]];
+        UIActivityViewController *activityController = [URLHandler activityControllerForItems:_imageView.image?@[_url,_imageView.image]:@[_url] type:_movieController?@"Animation":@"Image"];
+
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
             activityController.popoverPresentationController.delegate = self;
             activityController.popoverPresentationController.barButtonItem = sender;
-            activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-                if(completed) {
-                    if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                        activityType = [activityType substringFromIndex:25];
-                    if([activityType hasPrefix:@"com.apple."])
-                        activityType = [activityType substringFromIndex:10];
-                    [Answers logShareWithMethod:activityType contentName:nil contentType:_movieController?@"Animation":@"Image" contentId:nil customAttributes:nil];
-                }
-            };
-        } else {
-            activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
-                if(completed) {
-                    if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                        activityType = [activityType substringFromIndex:25];
-                    if([activityType hasPrefix:@"com.apple."])
-                        activityType = [activityType substringFromIndex:10];
-                    [Answers logShareWithMethod:activityType contentName:nil contentType:_movieController?@"Animation":@"Image" contentId:nil customAttributes:nil];
-                }
-            };
         }
         [self presentViewController:activityController animated:YES completion:nil];
         [_hideTimer invalidate];

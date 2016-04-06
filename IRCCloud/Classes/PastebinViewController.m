@@ -15,11 +15,12 @@
 //  limitations under the License.
 
 #import <MobileCoreServices/UTCoreTypes.h>
+#import <SafariServices/SafariServices.h>
 #import <Twitter/Twitter.h>
 #import "PastebinViewController.h"
 #import "NetworkConnection.h"
-#import "ARChromeActivity.h"
-#import "TUSafariActivity.h"
+#import "OpenInChromeController.h"
+#import "OpenInFirefoxControllerObjC.h"
 #import "AppDelegate.h"
 #import "PastebinEditorViewController.h"
 #import "UIColor+IRCCloud.h"
@@ -53,6 +54,43 @@
         
         _url = [_url substringToIndex:[_url rangeOfString:@"?"].location];
     }
+}
+
+
+- (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
+    NSURL *url = [NSURL URLWithString:_url];
+    
+    return @[
+                              [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                                  UIPasteboard *pb = [UIPasteboard generalPasteboard];
+                                  [pb setValue:_url forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                              }],
+                              [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                                  UIApplication *app = [UIApplication sharedApplication];
+                                  AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+                                  MainViewController *mainViewController = [appDelegate mainViewController];
+                                  
+                                  UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[url] type:@"Pastebin"];
+                                  
+                                  [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
+                              }],
+                              [UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                                  if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:url
+                                                                                                                                                                          withCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                                                                                                           @"irccloud-enterprise://"
+#else
+                                                                                                                                                                                           @"irccloud://"
+#endif
+                                                                                                                                                                                           ]
+                                                                                                                                                                             createNewTab:NO])
+                                      return;
+                                  else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:url])
+                                      return;
+                                  else
+                                      [[UIApplication sharedApplication] openURL:url];
+                              }]
+                              ];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -181,35 +219,11 @@
 
 -(IBAction)shareButtonPressed:(id)sender {
     if(NSClassFromString(@"UIActivityViewController")) {
-        UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:@[_url] applicationActivities:@[([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"] && [_chrome isChromeInstalled])?[[ARChromeActivity alloc] initWithCallbackURL:[NSURL URLWithString:
-#ifdef ENTERPRISE
-                                                                                                                                                                                                                                                                                                                                         @"irccloud-enterprise://"
-#else
-                                                                                                                                                                                                                                                                                                                                         @"irccloud://"
-#endif
-                                                                                                                                                                                                                                                                                                                                         ]]:[[TUSafariActivity alloc] init]]];
+        UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:_url]] type:@"Pastebin"];
+        
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
             activityController.popoverPresentationController.delegate = self;
             activityController.popoverPresentationController.barButtonItem = sender;
-            activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-                if(completed) {
-                    if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                        activityType = [activityType substringFromIndex:25];
-                    if([activityType hasPrefix:@"com.apple."])
-                        activityType = [activityType substringFromIndex:10];
-                    [Answers logShareWithMethod:activityType contentName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
-                }
-            };
-        } else {
-            activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
-                if(completed) {
-                    if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                        activityType = [activityType substringFromIndex:25];
-                    if([activityType hasPrefix:@"com.apple."])
-                        activityType = [activityType substringFromIndex:10];
-                    [Answers logShareWithMethod:activityType contentName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
-                }
-            };
         }
         [self presentViewController:activityController animated:YES completion:nil];
     }

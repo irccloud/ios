@@ -25,6 +25,7 @@
 #import "UsersDataSource.h"
 #import "EventsDataSource.h"
 #import "NotificationsDataSource.h"
+#import "Ignore.h"
 
 extern NSString *IRCCLOUD_HOST;
 extern NSString *IRCCLOUD_PATH;
@@ -131,7 +132,6 @@ typedef enum {
     NSString *_longestEventType;
     BOOL _resuming;
     BOOL _notifier;
-    BOOL backlog;
     NSTimeInterval _firstEID;
     NSString *_streamId;
     int _accrued;
@@ -152,6 +152,8 @@ typedef enum {
     
     int _keychainFailCount;
     NSTimeInterval _highestEID;
+    
+    Ignore *_ignore;
 }
 @property (readonly) kIRCCloudState state;
 @property NSDictionary *userInfo;
@@ -166,6 +168,7 @@ typedef enum {
 @property NSString *session;
 @property NSDictionary *config;
 @property (readonly) BOOL ready;
+@property (readonly) NSOperationQueue *queue;
 
 +(NetworkConnection*)sharedInstance;
 +(void)sync;

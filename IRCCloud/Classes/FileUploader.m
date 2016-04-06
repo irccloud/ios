@@ -101,7 +101,6 @@
     // Create the composition and tracks
     AVMutableComposition *composition = [AVMutableComposition composition];
     AVMutableCompositionTrack *videoTrack = [composition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-    AVMutableCompositionTrack *audioTrack = [composition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
     NSArray *assetVideoTracks = [asset tracksWithMediaType:AVMediaTypeVideo];
     if (assetVideoTracks.count <= 0)
     {
@@ -117,8 +116,13 @@
     [videoTrack insertTimeRange:assetVideoTrack.timeRange ofTrack:assetVideoTrack atTime:CMTimeMake(0, 1) error:nil];
     [videoTrack setPreferredTransform:assetVideoTrack.preferredTransform];
     
-    AVAssetTrack *assetAudioTrack = [[asset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0];
-    [audioTrack insertTimeRange:assetAudioTrack.timeRange ofTrack:assetAudioTrack atTime:CMTimeMake(0, 1) error:nil];
+    // Only add an audio track if the source video contains one
+    NSArray *assetAudioTracks = [asset tracksWithMediaType:AVMediaTypeAudio];
+    if(assetAudioTracks.count) {
+        AVMutableCompositionTrack *audioTrack = [composition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+        AVAssetTrack *assetAudioTrack = [assetAudioTracks firstObject];
+        [audioTrack insertTimeRange:assetAudioTrack.timeRange ofTrack:assetAudioTrack atTime:CMTimeMake(0, 1) error:nil];
+    }
     
     // Export to mp4
     NSString *exportPath = [NSString stringWithFormat:@"%@/%@.mp4", NSTemporaryDirectory(), uuidStr];
