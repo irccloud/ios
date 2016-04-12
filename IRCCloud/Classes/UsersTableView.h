@@ -29,12 +29,13 @@
     NSMutableArray *_sectionIndexes;
     NSMutableArray *_sectionSizes;
     Buffer *_buffer;
-    IBOutlet id<UsersTableViewDelegate> delegate;
+    UIViewController<UsersTableViewDelegate> *_delegate;
     NSTimer *_refreshTimer;
     UIFont *_headingFont;
     UIFont *_countFont;
     UIFont *_userFont;
 }
+@property UIViewController<UsersTableViewDelegate> *delegate;
 -(void)setBuffer:(Buffer *)buffer;
 -(void)refresh;
 @end

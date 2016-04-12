@@ -28,7 +28,7 @@
 @interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate> {
     NSMutableArray *_data;
     NSInteger _selectedRow;
-    IBOutlet UIViewController<BuffersTableViewDelegate> *_delegate;
+    UIViewController<BuffersTableViewDelegate> *_delegate;
     NSMutableDictionary *_expandedArchives;
     Buffer *_selectedBuffer;
     

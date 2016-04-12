@@ -208,11 +208,15 @@ extern NSDictionary *emojiMap;
     
     AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &alertSound);
     
-    if(!_buffersView)
+    if(!_buffersView) {
         _buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
-    
-    if(!_usersView)
+        _buffersView.delegate = self;
+    }
+
+    if(!_usersView) {
         _usersView = [[UsersTableView alloc] initWithStyle:UITableViewStylePlain];
+        _usersView.delegate = self;
+    }
     
     if(_swipeTip)
         _swipeTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
@@ -300,6 +304,7 @@ extern NSDictionary *emojiMap;
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
+    _message.autoresizingMask = UIViewAutoresizingNone;
     _nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectZero];
     _nickCompletionView.completionDelegate = self;
     _nickCompletionView.alpha = 0;
@@ -1846,11 +1851,8 @@ extern NSDictionary *emojiMap;
         _titleLabel.accessibilityValue = _titleLabel.text;
         self.navigationItem.title = _titleLabel.text;
         _topicLabel.hidden = NO;
-        _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
         _titleLabel.font = [UIFont boldSystemFontOfSize:18];
-        _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
         _topicLabel.text = [NSString stringWithFormat:@"%@:%i", s.hostname, s.port];
-        _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,4,16,16);
         _lock.hidden = NO;
         if(s.ssl > 0)
             _lock.text = FA_SHIELD;
@@ -1859,7 +1861,6 @@ extern NSDictionary *emojiMap;
         _lock.textColor = [UIColor navBarHeadingColor];
     } else {
         self.navigationItem.title = _titleLabel.text = _buffer.name;
-        _titleLabel.frame = CGRectMake(0,0,_titleView.frame.size.width,_titleView.frame.size.height);
         _titleLabel.font = [UIFont boldSystemFontOfSize:20];
         _titleLabel.accessibilityValue = _buffer.accessibilityValue;
         _topicLabel.hidden = YES;
@@ -1874,15 +1875,11 @@ extern NSDictionary *emojiMap;
                     lock = YES;
                 if([channel.topic_text isKindOfClass:[NSString class]] && channel.topic_text.length) {
                     _topicLabel.hidden = NO;
-                    _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
                     _titleLabel.font = [UIFont boldSystemFontOfSize:18];
-                    _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
                     _topicLabel.text = [channel.topic_text stripIRCFormatting];
                     _topicLabel.accessibilityLabel = @"Topic";
                     _topicLabel.accessibilityValue = _topicLabel.text;
-                    _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,4,16,_titleLabel.bounds.size.height-4);
                 } else {
-                    _lock.frame = CGRectMake((_titleView.frame.size.width - ceil([_titleLabel.text boundingRectWithSize:_titleLabel.bounds.size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _titleLabel.font} context:nil].size.width))/2 - 20,0,16,_titleLabel.bounds.size.height);
                     _topicLabel.hidden = YES;
                 }
             }
@@ -1895,9 +1892,7 @@ extern NSDictionary *emojiMap;
             _titleLabel.accessibilityLabel = @"Conversation with";
             self.navigationItem.title = _titleLabel.text = _buffer.name;
             _topicLabel.hidden = NO;
-            _titleLabel.frame = CGRectMake(0,2,_titleView.frame.size.width,20);
             _titleLabel.font = [UIFont boldSystemFontOfSize:18];
-            _topicLabel.frame = CGRectMake(0,20,_titleView.frame.size.width,18);
             if(_buffer.away_msg.length) {
                 _topicLabel.text = [NSString stringWithFormat:@"Away: %@", _buffer.away_msg];
             } else {
@@ -1917,6 +1912,15 @@ extern NSDictionary *emojiMap;
             }
         }
     }
+    if(_lock.hidden == NO && _lock.alpha == 1)
+        _titleOffsetXConstraint.constant = _lock.frame.size.width / 2;
+    else
+        _titleOffsetXConstraint.constant = 0;
+    if(_topicLabel.hidden == NO && _topicLabel.alpha == 1)
+        _titleOffsetYConstraint.constant = -6;
+    else
+        _titleOffsetYConstraint.constant = 0;
+    [_titleView setNeedsUpdateConstraints];
 }
 
 -(void)launchURL:(NSURL *)url {
@@ -2360,17 +2364,66 @@ extern NSDictionary *emojiMap;
     return YES;
 }
 
--(void)viewWillLayoutSubviews {
+/*-(void)viewWillLayoutSubviews {
     if(!__ignoreLayoutChanges) {
         __ignoreLayoutChanges = YES;
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
         }];
     }
-}
+}*/
 
 -(void)_monitorLayoutChanges {
     __ignoreLayoutChanges = NO;
+}
+
+-(void)transitionToSize:(CGSize)size {
+    NSLog(@"Transitioning to size: %f, %f", size.width, size.height);
+    self.navigationController.view.frame = self.slidingViewController.view.bounds;
+    [self.slidingViewController resetTopView];
+    
+    _eventsViewWidthConstraint.constant = size.width;
+    _bottomBarHeightConstraint.constant = _message.frame.size.height + 8;
+    
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
+        //Transition to iPad layout
+    } else {
+        _borders.hidden = YES;
+        if(!self.slidingViewController.underLeftViewController)
+            self.slidingViewController.underLeftViewController = _buffersView;
+        if(!self.navigationItem.leftBarButtonItem)
+            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
+        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))
+            _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
+        else
+            _landscapeView.transform = CGAffineTransformIdentity;
+        _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
+        [self.slidingViewController updateUnderLeftLayout];
+        [self.slidingViewController updateUnderRightLayout];
+    }
+    
+    CGRect frame = _titleView.frame;
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
+        frame.size.height = (size.width > size.height)?24:40;
+        _topicLabel.alpha = (size.width > size.height)?0:1;
+    }
+    frame.size.width = size.width - 128;
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && (size.width > size.height))
+        frame.size.width -= _buffersView.tableView.frame.size.width;
+    _connectingView.frame = _titleView.frame = frame;
+
+    [self _updateTitleArea];
+    [self _updateServerStatus];
+    [self _updateUserListVisibility];
+    [self _updateGlobalMsg];
+    [self _updateMessageWidth];
+    [self _updateEventsInsets];
+    
+    [self.view updateConstraints];
+    
+    UIView *v = self.navigationItem.titleView;
+    self.navigationItem.titleView = nil;
+    self.navigationItem.titleView = v;
 }
 
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
@@ -2443,7 +2496,9 @@ extern NSDictionary *emojiMap;
         if(sbheight)
             height -= 20;
         
-        height -= _kbSize.height;
+        [self transitionToSize:CGSizeMake(width, height)];
+
+        /*height -= _kbSize.height;
         
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
             self.navigationItem.leftBarButtonItem = nil;
@@ -2557,7 +2612,7 @@ extern NSDictionary *emojiMap;
         self.navigationItem.titleView = nil;
         self.navigationItem.titleView = v;
         
-        [self performSelector:@selector(_monitorLayoutChanges) withObject:nil afterDelay:0.25];
+        [self performSelector:@selector(_monitorLayoutChanges) withObject:nil afterDelay:0.25];*/
     }
 }
 
@@ -2568,6 +2623,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)_updateEventsInsets {
+    _bottomBarOffsetConstraint.constant = -_kbSize.height;
     CGFloat height = _bottomBar.frame.size.height + _kbSize.height;
     if(!_serverStatusBar.hidden)
         height += _serverStatusBar.bounds.size.height;
@@ -3763,6 +3819,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)uploadsButtonPressed:(id)sender {
+    NSLog(@"Quack %f", _titleOffsetYConstraint.constant);
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
         

@@ -220,6 +220,7 @@ int __timestampWidth;
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
+        _conn = [NetworkConnection sharedInstance];
         _lock = [[NSRecursiveLock alloc] init];
         _ready = NO;
         _formatter = [[NSDateFormatter alloc] init];
@@ -236,7 +237,6 @@ int __timestampWidth;
 }
 
 - (void)viewDidLoad {
-    _conn = [NetworkConnection sharedInstance];
     [super viewDidLoad];
     
     if(!_headerView) {

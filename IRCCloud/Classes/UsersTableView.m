@@ -269,9 +269,6 @@
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
 
-    if(!delegate)
-        delegate = (id<UsersTableViewDelegate>)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
-
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.view.backgroundColor = [UIColor usersDrawerBackgroundColor];
 
@@ -432,14 +429,14 @@
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     if([UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad)
-        [delegate dismissKeyboard];
+        [_delegate dismissKeyboard];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     NSUInteger idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
     if([[[_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
-        [delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+        [_delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
 }
 
 -(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
@@ -449,7 +446,7 @@
             if(indexPath.row < _data.count) {
                 NSUInteger idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
                 if([[[_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
-                    [delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+                    [_delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
             }
         }
     }
