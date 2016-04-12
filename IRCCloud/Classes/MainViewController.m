@@ -2382,13 +2382,24 @@ extern NSDictionary *emojiMap;
     self.navigationController.view.frame = self.slidingViewController.view.bounds;
     [self.slidingViewController resetTopView];
     
-    _eventsViewWidthConstraint.constant = size.width;
     _bottomBarHeightConstraint.constant = _message.frame.size.height + 8;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
-        //Transition to iPad layout
+        _borders.hidden = NO;
+        _eventsViewWidthConstraint.constant = self.view.frame.size.width - 222;
+        _eventsViewOffsetXConstraint.constant = 110;
+        self.navigationItem.leftBarButtonItem = nil;
+        self.navigationItem.rightBarButtonItem = nil;
+        self.slidingViewController.underLeftViewController = nil;
+        [self addChildViewController:_buffersView];
+        _buffersView.view.frame = CGRectMake(0,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,[[UIDevice currentDevice] isBigPhone]?180:220,size.height + ([[UIDevice currentDevice] isBigPhone]?self.navigationController.navigationBar.frame.size.height:0));
+        [_buffersView willMoveToParentViewController:self];
+        [_buffersView viewWillAppear:NO];
+        _buffersView.view.hidden = NO;
+        [self.view insertSubview:_buffersView.view atIndex:1];
     } else {
         _borders.hidden = YES;
+        _eventsViewWidthConstraint.constant = size.width;
         if(!self.slidingViewController.underLeftViewController)
             self.slidingViewController.underLeftViewController = _buffersView;
         if(!self.navigationItem.leftBarButtonItem)
@@ -2411,6 +2422,8 @@ extern NSDictionary *emojiMap;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && (size.width > size.height))
         frame.size.width -= _buffersView.tableView.frame.size.width;
     _connectingView.frame = _titleView.frame = frame;
+
+    [self.view updateConstraints];
 
     [self _updateTitleArea];
     [self _updateServerStatus];
@@ -2673,61 +2686,40 @@ extern NSDictionary *emojiMap;
     } else {
         if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"]) {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone]) {
-                self.navigationItem.rightBarButtonItem = nil;
-                CGRect frame = _eventsView.view.frame;
-                int width = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].bounds.size.height:[UIScreen mainScreen].bounds.size.width;
-                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
-                _eventsView.view.frame = frame;
-                frame = _bottomBar.frame;
-                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
-                _bottomBar.frame = frame;
-                frame = _serverStatusBar.frame;
-                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
-                _serverStatusBar.frame = frame;
+                if(self.slidingViewController.underRightViewController) {
+                    self.slidingViewController.underRightViewController = nil;
+                    [self addChildViewController:_usersView];
+                    [_usersView willMoveToParentViewController:self];
+                    [_usersView viewWillAppear:NO];
+                }
+                _usersView.view.frame = CGRectMake(self.view.frame.size.width - 220,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,220,self.view.frame.size.height + ([[UIDevice currentDevice] isBigPhone]?(self.navigationController.navigationBar.frame.size.height):0));
                 _usersView.view.hidden = NO;
-                frame = _borders.frame;
-                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width + 2;
-                _borders.frame = frame;
-                frame = _eventsView.topUnreadView.frame;
-                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
-                _eventsView.topUnreadView.frame = frame;
-                frame = _eventsView.bottomUnreadView.frame;
-                frame.size.width = width - _buffersView.view.bounds.size.width - _usersView.view.bounds.size.width;
-                _eventsView.bottomUnreadView.frame = frame;
+                if(_usersView.view.superview != self.view)
+                    [self.view insertSubview:_usersView.view atIndex:1];
+                _eventsViewWidthConstraint.constant = self.view.frame.size.width - 442;
+                _eventsViewOffsetXConstraint.constant = 0;
             } else {
                 if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
                     self.navigationItem.rightBarButtonItem = _usersButtonItem;
                     if(self.slidingViewController.underRightViewController == nil) {
+                        [_usersView.view removeFromSuperview];
+                        [_usersView removeFromParentViewController];
                         CGRect frame = _usersView.view.frame;
                         frame.origin.x = 0;
                         frame.size.width = 220;
                         _usersView.view.frame = frame;
                         self.slidingViewController.underRightViewController = _usersView;
                     }
+                    _usersView.view.hidden = NO;
                 } else {
                     self.navigationItem.rightBarButtonItem = nil;
                     self.slidingViewController.underRightViewController = nil;
+                    _usersView.view.hidden = YES;
                 }
-                CGRect frame = _eventsView.view.frame;
-                int width = ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].bounds.size.height:[UIScreen mainScreen].bounds.size.width;
-                frame.size.width = width - _buffersView.view.bounds.size.width;
-                _eventsView.view.frame = frame;
-                frame = _bottomBar.frame;
-                frame.size.width = width - _buffersView.view.bounds.size.width;
-                _bottomBar.frame = frame;
-                frame = _serverStatusBar.frame;
-                frame.size.width = width - _buffersView.view.bounds.size.width;
-                _serverStatusBar.frame = frame;
-                frame = _borders.frame;
-                frame.size.width = width - _buffersView.view.bounds.size.width + 2;
-                _borders.frame = frame;
-                frame = _eventsView.topUnreadView.frame;
-                frame.size.width = width - _buffersView.view.bounds.size.width;
-                _eventsView.topUnreadView.frame = frame;
-                frame = _eventsView.bottomUnreadView.frame;
-                frame.size.width = width - _buffersView.view.bounds.size.width;
-                _eventsView.bottomUnreadView.frame = frame;
+                _eventsViewWidthConstraint.constant = self.view.frame.size.width - 222;
+                _eventsViewOffsetXConstraint.constant = 110;
             }
+            [self.view updateConstraints];
             [self _updateMessageWidth];
         } else {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {

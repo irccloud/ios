@@ -557,15 +557,21 @@
                         <rect key="frame" x="0.0" y="64" width="768" height="960"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cZW-xP-lCa" userLabel="Borders">
-                                <rect key="frame" x="0.0" y="0.0" width="768" height="960"/>
+                            <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cZW-xP-lCa" userLabel="Borders">
+                                <rect key="frame" x="-1" y="0.0" width="770" height="960"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dM-P4-uec">
+                                    <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8dM-P4-uec">
                                         <rect key="frame" x="1" y="0.0" width="766" height="960"/>
                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                     </view>
                                 </subviews>
                                 <color key="backgroundColor" red="0.75294117650000003" green="0.82352941180000006" blue="1" alpha="1" colorSpace="deviceRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="bottom" secondItem="8dM-P4-uec" secondAttribute="bottom" id="FkN-yJ-LDf"/>
+                                    <constraint firstItem="8dM-P4-uec" firstAttribute="leading" secondItem="cZW-xP-lCa" secondAttribute="leading" constant="1" id="Nn7-7b-wiW"/>
+                                    <constraint firstAttribute="trailing" secondItem="8dM-P4-uec" secondAttribute="trailing" constant="1" id="ipl-No-ZdU"/>
+                                    <constraint firstItem="8dM-P4-uec" firstAttribute="top" secondItem="cZW-xP-lCa" secondAttribute="top" id="y63-KL-mpF"/>
+                                </constraints>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="t8Z-Pu-wcU">
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="960"/>
@@ -745,8 +751,10 @@
                             <constraint firstItem="9R7-ni-VzZ" firstAttribute="top" secondItem="t8Z-Pu-wcU" secondAttribute="bottom" id="FHj-D8-qMZ"/>
                             <constraint firstItem="QgU-LW-Wne" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" id="FKB-gP-fFL"/>
                             <constraint firstItem="SHL-y8-pfL" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" id="Fm9-oO-DP2"/>
+                            <constraint firstItem="9R7-ni-VzZ" firstAttribute="top" secondItem="cZW-xP-lCa" secondAttribute="bottom" id="GRR-In-OzF"/>
                             <constraint firstItem="SHL-y8-pfL" firstAttribute="top" secondItem="Me3-jh-nJf" secondAttribute="bottom" constant="11" id="IOG-wa-5mK"/>
                             <constraint firstItem="cdg-2x-04N" firstAttribute="top" secondItem="t8Z-Pu-wcU" secondAttribute="top" id="JUW-xp-JDU"/>
+                            <constraint firstItem="cZW-xP-lCa" firstAttribute="trailing" secondItem="t8Z-Pu-wcU" secondAttribute="trailing" constant="1" id="OvL-OY-vuO"/>
                             <constraint firstItem="Me3-jh-nJf" firstAttribute="centerX" secondItem="cMl-aC-QBW" secondAttribute="centerX" id="PWx-KW-Z4o"/>
                             <constraint firstItem="SHL-y8-pfL" firstAttribute="top" secondItem="biy-MM-eKX" secondAttribute="bottom" constant="11" id="QBo-mz-GlR"/>
                             <constraint firstItem="cdg-2x-04N" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" id="ReQ-JQ-9ec"/>
@@ -759,6 +767,8 @@
                             <constraint firstItem="9R7-ni-VzZ" firstAttribute="top" secondItem="t8Z-Pu-wcU" secondAttribute="bottom" id="dqd-bw-2pb"/>
                             <constraint firstItem="SHL-y8-pfL" firstAttribute="trailing" secondItem="t8Z-Pu-wcU" secondAttribute="trailing" id="ePV-pB-Yb0"/>
                             <constraint firstItem="t8Z-Pu-wcU" firstAttribute="top" secondItem="tjD-Mf-au6" secondAttribute="bottom" id="fDn-WZ-8Cc"/>
+                            <constraint firstItem="cZW-xP-lCa" firstAttribute="top" secondItem="tjD-Mf-au6" secondAttribute="bottom" id="lTh-PT-FM7"/>
+                            <constraint firstItem="cZW-xP-lCa" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" constant="-1" id="qV8-bf-c8R"/>
                             <constraint firstItem="cdg-2x-04N" firstAttribute="trailing" secondItem="t8Z-Pu-wcU" secondAttribute="trailing" id="sbk-sT-1h4"/>
                             <constraint firstItem="37K-X6-4EC" firstAttribute="centerX" secondItem="cMl-aC-QBW" secondAttribute="centerX" id="zCV-aa-mio"/>
                             <constraint firstItem="37K-X6-4EC" firstAttribute="centerY" secondItem="cMl-aC-QBW" secondAttribute="centerY" id="zTe-7S-eJo"/>
@@ -777,6 +787,7 @@
                         <outlet property="_connectingView" destination="HHq-2d-yEd" id="NH2-ao-sp5"/>
                         <outlet property="_eventActivity" destination="37K-X6-4EC" id="w6Q-8m-TGd"/>
                         <outlet property="_eventsView" destination="pci-6M-5ag" id="nMo-GO-grI"/>
+                        <outlet property="_eventsViewOffsetXConstraint" destination="7l1-52-cb7" id="5Qh-BK-tvR"/>
                         <outlet property="_eventsViewWidthConstraint" destination="Quf-Ug-9cF" id="W99-Oq-ZdB"/>
                         <outlet property="_fetchingFailed" destination="BHN-5W-niL" id="xfs-f1-XQH"/>
                         <outlet property="_globalMsg" destination="Lax-2l-YNN" id="VEd-hO-20y"/>
