@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15D21" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="QPs-Li-UDL">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10116" systemVersion="15E65" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="QPs-Li-UDL">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
@@ -682,7 +682,7 @@
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="37K-X6-4EC">
                                 <rect key="frame" x="374" y="470" width="20" height="20"/>
                             </activityIndicatorView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" text="Double-tap to quickly reply to the sender" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="biy-MM-eKX">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" ambiguous="YES" misplaced="YES" text="Double-tap to quickly reply to the sender" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="biy-MM-eKX">
                                 <rect key="frame" x="239" y="850" width="290" height="55"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="55" id="8Ck-Wn-AOK"/>
@@ -692,7 +692,7 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" text="Swipe with 2 fingers to return to the previous channel or conversation" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Me3-jh-nJf">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" ambiguous="YES" misplaced="YES" text="Swipe with 2 fingers to return to the previous channel or conversation" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Me3-jh-nJf">
                                 <rect key="frame" x="239" y="850" width="290" height="55"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="290" id="TRm-q9-E0j"/>
@@ -702,7 +702,7 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" text="Swipe left and right to quickly open and close the sidebars" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IOs-dt-XUa">
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" ambiguous="YES" misplaced="YES" text="Swipe left and right to quickly open and close the sidebars" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IOs-dt-XUa">
                                 <rect key="frame" x="239" y="850" width="290" height="55"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="55" id="DY5-aL-REE"/>
@@ -733,40 +733,37 @@
                                     <action selector="globalMsgPressed:" destination="eA9-ra-BSf" eventType="touchUpInside" id="aIf-92-OZB"/>
                                 </connections>
                             </view>
-                            <imageView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SHL-y8-pfL">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fW5-GL-Rkw">
                                 <rect key="frame" x="0.0" y="916" width="768" height="44"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="wNY-XK-npO"/>
+                                    <constraint firstAttribute="height" constant="44" id="SuG-V2-yni"/>
                                 </constraints>
-                            </imageView>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="fvC-nM-NHm" firstAttribute="trailing" secondItem="t8Z-Pu-wcU" secondAttribute="trailing" id="0Xd-4G-Etu"/>
-                            <constraint firstItem="SHL-y8-pfL" firstAttribute="bottom" secondItem="t8Z-Pu-wcU" secondAttribute="bottom" id="0xo-E1-LV4"/>
                             <constraint firstItem="t8Z-Pu-wcU" firstAttribute="centerX" secondItem="cMl-aC-QBW" secondAttribute="centerX" id="7l1-52-cb7"/>
                             <constraint firstItem="biy-MM-eKX" firstAttribute="centerX" secondItem="cMl-aC-QBW" secondAttribute="centerX" id="A4m-LD-gkQ"/>
                             <constraint firstItem="t8Z-Pu-wcU" firstAttribute="top" secondItem="tjD-Mf-au6" secondAttribute="bottom" id="DPQ-so-DiK"/>
                             <constraint firstItem="9R7-ni-VzZ" firstAttribute="top" secondItem="t8Z-Pu-wcU" secondAttribute="bottom" id="FHj-D8-qMZ"/>
                             <constraint firstItem="QgU-LW-Wne" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" id="FKB-gP-fFL"/>
-                            <constraint firstItem="SHL-y8-pfL" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" id="Fm9-oO-DP2"/>
                             <constraint firstItem="9R7-ni-VzZ" firstAttribute="top" secondItem="cZW-xP-lCa" secondAttribute="bottom" id="GRR-In-OzF"/>
-                            <constraint firstItem="SHL-y8-pfL" firstAttribute="top" secondItem="Me3-jh-nJf" secondAttribute="bottom" constant="11" id="IOG-wa-5mK"/>
+                            <constraint firstItem="fW5-GL-Rkw" firstAttribute="centerX" secondItem="t8Z-Pu-wcU" secondAttribute="centerX" id="IbI-A6-63q"/>
                             <constraint firstItem="cdg-2x-04N" firstAttribute="top" secondItem="t8Z-Pu-wcU" secondAttribute="top" id="JUW-xp-JDU"/>
                             <constraint firstItem="cZW-xP-lCa" firstAttribute="trailing" secondItem="t8Z-Pu-wcU" secondAttribute="trailing" constant="1" id="OvL-OY-vuO"/>
                             <constraint firstItem="Me3-jh-nJf" firstAttribute="centerX" secondItem="cMl-aC-QBW" secondAttribute="centerX" id="PWx-KW-Z4o"/>
-                            <constraint firstItem="SHL-y8-pfL" firstAttribute="top" secondItem="biy-MM-eKX" secondAttribute="bottom" constant="11" id="QBo-mz-GlR"/>
+                            <constraint firstItem="9R7-ni-VzZ" firstAttribute="top" secondItem="fW5-GL-Rkw" secondAttribute="bottom" id="QeJ-M1-Agt"/>
                             <constraint firstItem="cdg-2x-04N" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" id="ReQ-JQ-9ec"/>
-                            <constraint firstItem="SHL-y8-pfL" firstAttribute="top" secondItem="IOs-dt-XUa" secondAttribute="bottom" constant="11" id="Rhe-UT-hDo"/>
                             <constraint firstItem="QgU-LW-Wne" firstAttribute="trailing" secondItem="t8Z-Pu-wcU" secondAttribute="trailing" id="Scs-D8-1kC"/>
                             <constraint firstItem="fvC-nM-NHm" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" id="V6x-4l-7UT"/>
                             <constraint firstItem="scS-39-nDE" firstAttribute="trailing" secondItem="t8Z-Pu-wcU" secondAttribute="trailing" id="VZc-Pt-UES"/>
                             <constraint firstItem="scS-39-nDE" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" id="a6b-3K-IcD"/>
                             <constraint firstItem="IOs-dt-XUa" firstAttribute="centerX" secondItem="cMl-aC-QBW" secondAttribute="centerX" id="b2a-kk-F0b"/>
                             <constraint firstItem="9R7-ni-VzZ" firstAttribute="top" secondItem="t8Z-Pu-wcU" secondAttribute="bottom" id="dqd-bw-2pb"/>
-                            <constraint firstItem="SHL-y8-pfL" firstAttribute="trailing" secondItem="t8Z-Pu-wcU" secondAttribute="trailing" id="ePV-pB-Yb0"/>
                             <constraint firstItem="t8Z-Pu-wcU" firstAttribute="top" secondItem="tjD-Mf-au6" secondAttribute="bottom" id="fDn-WZ-8Cc"/>
+                            <constraint firstItem="fW5-GL-Rkw" firstAttribute="width" secondItem="t8Z-Pu-wcU" secondAttribute="width" id="kIm-8i-MUJ"/>
                             <constraint firstItem="cZW-xP-lCa" firstAttribute="top" secondItem="tjD-Mf-au6" secondAttribute="bottom" id="lTh-PT-FM7"/>
                             <constraint firstItem="cZW-xP-lCa" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" constant="-1" id="qV8-bf-c8R"/>
                             <constraint firstItem="cdg-2x-04N" firstAttribute="trailing" secondItem="t8Z-Pu-wcU" secondAttribute="trailing" id="sbk-sT-1h4"/>
@@ -778,9 +775,9 @@
                     <connections>
                         <outlet property="_2swipeTip" destination="Me3-jh-nJf" id="rVD-Gd-QtM"/>
                         <outlet property="_borders" destination="cZW-xP-lCa" id="P1s-GI-My9"/>
-                        <outlet property="_bottomBar" destination="SHL-y8-pfL" id="Hp1-kp-hLW"/>
-                        <outlet property="_bottomBarHeightConstraint" destination="wNY-XK-npO" id="Huy-pj-l6A"/>
-                        <outlet property="_bottomBarOffsetConstraint" destination="0xo-E1-LV4" id="ThZ-lh-lzm"/>
+                        <outlet property="_bottomBar" destination="fW5-GL-Rkw" id="hu4-zZ-MjF"/>
+                        <outlet property="_bottomBarHeightConstraint" destination="SuG-V2-yni" id="cDA-7s-7nQ"/>
+                        <outlet property="_bottomBarOffsetConstraint" destination="QeJ-M1-Agt" id="7eq-X7-HZw"/>
                         <outlet property="_connectingActivity" destination="noO-uJ-InE" id="TBn-cb-Nbt"/>
                         <outlet property="_connectingProgress" destination="C4l-48-oFb" id="4Dk-P7-4SL"/>
                         <outlet property="_connectingStatus" destination="Lgm-9B-bG7" id="JDh-bT-fUg"/>

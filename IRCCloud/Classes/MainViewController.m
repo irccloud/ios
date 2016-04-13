@@ -210,11 +210,13 @@ extern NSDictionary *emojiMap;
     
     if(!_buffersView) {
         _buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
+        _buffersView.view.autoresizingMask = UIViewAutoresizingFlexibleHeight;
         _buffersView.delegate = self;
     }
 
     if(!_usersView) {
         _usersView = [[UsersTableView alloc] initWithStyle:UITableViewStylePlain];
+        _usersView.view.autoresizingMask = UIViewAutoresizingFlexibleHeight;
         _usersView.delegate = self;
     }
     
@@ -304,12 +306,22 @@ extern NSDictionary *emojiMap;
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
-    _message.autoresizingMask = UIViewAutoresizingNone;
+    _message.translatesAutoresizingMaskIntoConstraints = NO;
+    _messageWidthConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:0.0f];
+    _messageHeightConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:36.0f];
+    [_message addConstraints:@[_messageWidthConstraint, _messageHeightConstraint]];
+
+    [_bottomBar addSubview:_message];
+    if(_bottomBar != nil) {
+        [_bottomBar addConstraints:@[
+                                 [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:44.0f],
+                                 [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-2.0f]
+                                 ]];
+    }
     _nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectZero];
     _nickCompletionView.completionDelegate = self;
     _nickCompletionView.alpha = 0;
     [self.view addSubview:_nickCompletionView];
-    [_bottomBar addSubview:_message];
 
     [self.navigationController.navigationBar addSubview:_connectingProgress];
     [_connectingProgress sizeToFit];
@@ -1781,17 +1793,13 @@ extern NSDictionary *emojiMap;
 
 -(void)_updateMessageWidth {
     if(_message.text.length > 0) {
-        CGRect frame = _message.frame;
-        frame.size.width = _bottomBar.frame.size.width - _sendBtn.frame.size.width - frame.origin.x - 16;
-        _message.frame = frame;
+        _messageWidthConstraint.constant = _eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - _message.frame.origin.x - 16;
         _sendBtn.enabled = YES;
         _sendBtn.alpha = 1;
         _settingsBtn.enabled = NO;
         _settingsBtn.alpha = 0;
     } else {
-        CGRect frame = _message.frame;
-        frame.size.width = _bottomBar.frame.size.width - _settingsBtn.frame.size.width - frame.origin.x - 8;
-        _message.frame = frame;
+        _messageWidthConstraint.constant = _eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 8;
         _sendBtn.enabled = NO;
         _sendBtn.alpha = 0;
         _settingsBtn.enabled = YES;
@@ -1800,6 +1808,8 @@ extern NSDictionary *emojiMap;
         [_message clearText];
         _message.delegate = self;
     }
+    [_message updateConstraints];
+    [_bottomBar updateConstraints];
 }
 
 -(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
@@ -1830,9 +1840,7 @@ extern NSDictionary *emojiMap;
 
 -(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {
     if(expandingTextView.frame.size.height != height) {
-        CGRect frame = expandingTextView.frame;
-        frame.size.height = height;
-        expandingTextView.frame = frame;
+        _messageHeightConstraint.constant = height;
         [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     }
 }
@@ -2364,22 +2372,9 @@ extern NSDictionary *emojiMap;
     return YES;
 }
 
-/*-(void)viewWillLayoutSubviews {
-    if(!__ignoreLayoutChanges) {
-        __ignoreLayoutChanges = YES;
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
-        }];
-    }
-}*/
-
--(void)_monitorLayoutChanges {
-    __ignoreLayoutChanges = NO;
-}
-
 -(void)transitionToSize:(CGSize)size {
     NSLog(@"Transitioning to size: %f, %f", size.width, size.height);
-    self.navigationController.view.frame = self.slidingViewController.view.bounds;
+    self.navigationController.view.frame = self.view.window.bounds;
     [self.slidingViewController resetTopView];
     
     _bottomBarHeightConstraint.constant = _message.frame.size.height + 8;
@@ -2400,6 +2395,7 @@ extern NSDictionary *emojiMap;
     } else {
         _borders.hidden = YES;
         _eventsViewWidthConstraint.constant = size.width;
+        _eventsViewOffsetXConstraint.constant = 0;
         if(!self.slidingViewController.underLeftViewController)
             self.slidingViewController.underLeftViewController = _buffersView;
         if(!self.navigationItem.leftBarButtonItem)
@@ -2439,10 +2435,21 @@ extern NSDictionary *emojiMap;
     self.navigationItem.titleView = v;
 }
 
+-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self transitionToSize:size];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        _eventsView.view.hidden = NO;
+        _eventActivity.alpha = 0;
+        [_eventActivity stopAnimating];
+        [self _updateMessageWidth];
+    }];
+}
+
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     @synchronized(self) {
         NSLog(@"Will animate rotation");
-        __ignoreLayoutChanges = YES;
         if(duration > 0) {
             [[UIApplication sharedApplication] setStatusBarHidden:([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) withAnimation:UIStatusBarAnimationNone];
             [self.slidingViewController resetTopView];
@@ -2456,7 +2463,7 @@ extern NSDictionary *emojiMap;
         else
             height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
 
-        CGRect frame = self.slidingViewController.view.frame;
+        /*CGRect frame = self.slidingViewController.view.frame;
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
             if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
                 frame.origin.y = _kbSize.height;
@@ -2470,7 +2477,7 @@ extern NSDictionary *emojiMap;
             frame.origin.x = 0;
             if(![UIApplication sharedApplication].statusBarHidden && [UIApplication sharedApplication].statusBarFrame.size.height > 20)
                 frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
-        }
+        }*/
 
         int sbheight = (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8 &&UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height);
         
@@ -2480,7 +2487,7 @@ extern NSDictionary *emojiMap;
         if(sbheight)
             height -= sbheight - 20;
         
-        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
+        /*if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
             frame.size.width = height;
             frame.size.height = width;
         } else {
@@ -2502,7 +2509,7 @@ extern NSDictionary *emojiMap;
             f.size.height = height;
             self.slidingViewController.view.frame = frame;
             self.navigationController.view.frame = f;
-        }
+        }*/
         
         height -= self.navigationController.navigationBar.frame.size.height;
 
@@ -2670,10 +2677,10 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)_updateUserListVisibility {
-    if(![NSThread currentThread].isMainThread) {
+    /*if(![NSThread currentThread].isMainThread) {
         [self performSelectorOnMainThread:@selector(_updateUserListVisibility) withObject:nil waitUntilDone:YES];
         return;
-    }
+    }*/
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             self.navigationItem.rightBarButtonItem = _usersButtonItem;
@@ -2684,7 +2691,7 @@ extern NSDictionary *emojiMap;
             self.slidingViewController.underRightViewController = nil;
         }
     } else {
-        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"]) {
+        if(self.view.bounds.size.width > self.view.bounds.size.height && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"]) {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone]) {
                 if(self.slidingViewController.underRightViewController) {
                     self.slidingViewController.underRightViewController = nil;
@@ -2719,8 +2726,6 @@ extern NSDictionary *emojiMap;
                 _eventsViewWidthConstraint.constant = self.view.frame.size.width - 222;
                 _eventsViewOffsetXConstraint.constant = 110;
             }
-            [self.view updateConstraints];
-            [self _updateMessageWidth];
         } else {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
                 self.navigationItem.rightBarButtonItem = _usersButtonItem;
@@ -2732,6 +2737,8 @@ extern NSDictionary *emojiMap;
             }
         }
     }
+    [self.view updateConstraints];
+    [self _updateMessageWidth];
 }
 
 -(void)showMentionTip {

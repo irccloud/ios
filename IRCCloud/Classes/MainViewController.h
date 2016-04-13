@@ -33,7 +33,7 @@
     IBOutlet UIProgressView *_connectingProgress;
     IBOutlet UILabel *_connectingStatus;
     IBOutlet UIActivityIndicatorView *_connectingActivity;
-    IBOutlet UIImageView *_bottomBar;
+    IBOutlet UIView *_bottomBar;
     IBOutlet UILabel *_serverStatus;
     IBOutlet UIView *_serverStatusBar;
     IBOutlet UIActivityIndicatorView *_eventActivity;
@@ -56,6 +56,8 @@
     IBOutlet NSLayoutConstraint *_bottomBarHeightConstraint;
     IBOutlet NSLayoutConstraint *_titleOffsetXConstraint;
     IBOutlet NSLayoutConstraint *_titleOffsetYConstraint;
+    NSLayoutConstraint *_messageHeightConstraint;
+    NSLayoutConstraint *_messageWidthConstraint;
     BuffersTableView *_buffersView;
     UsersTableView *_usersView;
     UIExpandingTextView *_message;
@@ -86,7 +88,6 @@
     NSArray *_sortedChannels;
     UIPopoverController *_popover;
     NSTimeInterval _lastNotificationTime;
-    BOOL __ignoreLayoutChanges;
     BOOL _isShowingPreview;
     NSString *__currentTheme;
     BOOL _atMention;
