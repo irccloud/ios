@@ -1027,7 +1027,7 @@ int __timestampWidth;
 -(void)updateTopUnread:(NSInteger)firstRow {
     if(!_topUnreadView)
         return;
-    int highlights = 20;
+    int highlights = 0;
     for(NSNumber *pos in _unseenHighlightPositions) {
         if([pos intValue] > firstRow)
             break;
