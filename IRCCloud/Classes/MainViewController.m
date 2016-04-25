@@ -288,15 +288,6 @@ extern NSDictionary *emojiMap;
     _menuBtn.accessibilityLabel = @"Channels list";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
     
-    [_swipeTip removeFromSuperview];
-    [self.slidingViewController.view addSubview:_swipeTip];
-
-    [_2swipeTip removeFromSuperview];
-    [self.slidingViewController.view addSubview:_2swipeTip];
-    
-    [_mentionTip removeFromSuperview];
-    [self.slidingViewController.view addSubview:_mentionTip];
-    
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(44,8,0,36)];
         _landscapeView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -344,8 +335,10 @@ extern NSDictionary *emojiMap;
     swipe.numberOfTouchesRequired = 2;
     swipe.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:swipe];
-    
+
+    [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
     [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
+    [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
     [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
 #if !(TARGET_IPHONE_SIMULATOR)
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
@@ -406,6 +399,8 @@ extern NSDictionary *emojiMap;
         if(old.size.width != new.size.width) {
             [_eventsView clearCachedHeights];
         }
+    } else {
+        NSLog(@"Change: %@", change);
     }
 }
 
@@ -2396,12 +2391,15 @@ extern NSDictionary *emojiMap;
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
-        [self addChildViewController:_buffersView];
+        if(_buffersView.view.superview != self.view) {
+            [self addChildViewController:_buffersView];
+            [_buffersView willMoveToParentViewController:self];
+            [_buffersView viewWillAppear:NO];
+            _buffersView.view.hidden = NO;
+            [self.view addSubview:_buffersView.view];
+            _buffersView.view.autoresizingMask = UIViewAutoresizingNone;
+        }
         _buffersView.view.frame = CGRectMake(0,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,[[UIDevice currentDevice] isBigPhone]?180:220,size.height + ([[UIDevice currentDevice] isBigPhone]?self.navigationController.navigationBar.frame.size.height:0));
-        [_buffersView willMoveToParentViewController:self];
-        [_buffersView viewWillAppear:NO];
-        _buffersView.view.hidden = NO;
-        [self.view insertSubview:_buffersView.view atIndex:1];
     } else {
         _borders.hidden = YES;
         _eventsViewWidthConstraint.constant = size.width;
@@ -2712,6 +2710,7 @@ extern NSDictionary *emojiMap;
                     [self addChildViewController:_usersView];
                     [_usersView willMoveToParentViewController:self];
                     [_usersView viewWillAppear:NO];
+                    _usersView.view.autoresizingMask = UIViewAutoresizingNone;
                 }
                 _usersView.view.frame = CGRectMake(self.view.frame.size.width - 220,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,220,self.view.frame.size.height + ([[UIDevice currentDevice] isBigPhone]?(self.navigationController.navigationBar.frame.size.height):0));
                 _usersView.view.hidden = NO;
