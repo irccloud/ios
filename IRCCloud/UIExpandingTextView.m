@@ -144,7 +144,13 @@
 
 -(void)setFrame:(CGRect)aframe
 {
-    CGRect backgroundFrame   = aframe;
+	[super setFrame:aframe];
+    [self layoutSubviews];
+}
+
+-(void)layoutSubviews {
+    [super layoutSubviews];
+    CGRect backgroundFrame   = self.frame;
     backgroundFrame.origin.y = 0;
     backgroundFrame.origin.x = 0;
     backgroundFrame.size.height  -= 8;
@@ -152,9 +158,8 @@
     backgroundFrame.origin.x -= 4;
     backgroundFrame.size.width += 4;
     CGRect textViewFrame = CGRectInset(backgroundFrame, kTextInsetX, 0);
-	internalTextView.frame   = textViewFrame;
+    internalTextView.frame   = textViewFrame;
     forceSizeUpdate = YES;
-	[super setFrame:aframe];
 }
 
 -(void)clearText

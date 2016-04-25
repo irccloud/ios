@@ -1808,14 +1808,20 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)_updateMessageWidth {
+    _message.animateHeightChange = NO;
     if(_message.text.length > 0) {
         _messageWidthConstraint.constant = _eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - _message.frame.origin.x - 16;
+        [self.view layoutIfNeeded];
         _sendBtn.enabled = YES;
         _sendBtn.alpha = 1;
         _settingsBtn.enabled = NO;
         _settingsBtn.alpha = 0;
+        _message.delegate = nil;
+        [_message setText:_message.text];
+        _message.delegate = self;
     } else {
         _messageWidthConstraint.constant = _eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 8;
+        [self.view layoutIfNeeded];
         _sendBtn.enabled = NO;
         _sendBtn.alpha = 0;
         _settingsBtn.enabled = YES;
@@ -1824,13 +1830,18 @@ extern NSDictionary *emojiMap;
         [_message clearText];
         _message.delegate = self;
     }
-    [_message updateConstraints];
-    [_bottomBar updateConstraints];
+    _message.animateHeightChange = YES;
+    _messageHeightConstraint.constant = _message.frame.size.height;
+    _bottomBarHeightConstraint.constant = _message.frame.size.height + 8;
+    [self _updateEventsInsets];
+    [self.view layoutIfNeeded];
 }
 
 -(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
+    [self.view layoutIfNeeded];
     [UIView beginAnimations:nil context:nil];
     [self _updateMessageWidth];
+    [self.view layoutIfNeeded];
     [UIView commitAnimations];
     if(_nickCompletionView.alpha == 1) {
         [self updateSuggestions:NO];
@@ -1856,7 +1867,9 @@ extern NSDictionary *emojiMap;
 
 -(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {
     if(expandingTextView.frame.size.height != height) {
+        [self.view layoutIfNeeded];
         _messageHeightConstraint.constant = height;
+        [self.view layoutIfNeeded];
         [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
     }
 }
@@ -2123,14 +2136,18 @@ extern NSDictionary *emojiMap;
             _eventActivity.alpha = 1;
             [_eventActivity startAnimating];
             NSString *draft = _buffer.draft;
+            /*_message.delegate = nil;
             [_message clearText];
+            _message.delegate = self;*/
             _buffer.draft = draft;
         } completion:^(BOOL finished){
             [_eventsView setBuffer:_buffer];
             [UIView animateWithDuration:0.1 animations:^{
                 _eventsView.view.alpha = 1;
                 _eventActivity.alpha = 0;
+                /*_message.delegate = nil;
                 _message.text = _buffer.draft;
+                _message.delegate = self;*/
             } completion:^(BOOL finished){
                 [_eventActivity stopAnimating];
             }];
@@ -2412,16 +2429,15 @@ extern NSDictionary *emojiMap;
         frame.size.width -= _buffersView.tableView.frame.size.width;
     _connectingView.frame = _titleView.frame = frame;
 
-    [self.view updateConstraints];
+    [self.view layoutIfNeeded];
 
     [self _updateTitleArea];
     [self _updateServerStatus];
     [self _updateUserListVisibility];
     [self _updateGlobalMsg];
-    [self _updateMessageWidth];
     [self _updateEventsInsets];
     
-    [self.view updateConstraints];
+    [self.view layoutIfNeeded];
     
     UIView *v = self.navigationItem.titleView;
     self.navigationItem.titleView = nil;
@@ -2432,14 +2448,11 @@ extern NSDictionary *emojiMap;
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        [_eventsView willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
         [self transitionToSize:size];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         _eventsView.view.hidden = NO;
         _eventActivity.alpha = 0;
         [_eventActivity stopAnimating];
-        [self _updateMessageWidth];
-        [_eventsView didRotateFromInterfaceOrientation:-1];
     }];
 }
 
@@ -2640,7 +2653,7 @@ extern NSDictionary *emojiMap;
 
 -(void)_updateEventsInsets {
     _bottomBarOffsetConstraint.constant = -_kbSize.height;
-    CGFloat height = _bottomBar.frame.size.height + _kbSize.height;
+    CGFloat height = _bottomBarHeightConstraint.constant + _kbSize.height;
     CGFloat top = 0;
     if(!_globalMsgContainer.hidden)
         top += _globalMsgContainer.frame.size.height;
@@ -2738,8 +2751,9 @@ extern NSDictionary *emojiMap;
             }
         }
     }
-    [self.view updateConstraints];
     [self _updateMessageWidth];
+    [_message updateConstraints];
+    [self.view layoutIfNeeded];
 }
 
 -(void)showMentionTip {
