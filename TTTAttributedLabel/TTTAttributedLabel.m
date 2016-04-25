@@ -268,6 +268,7 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
     _attributedText = [text copy];
     
     [self setNeedsFramesetter];
+    [self invalidateIntrinsicContentSize];
 }
 
 - (void)setNeedsFramesetter {
@@ -743,6 +744,7 @@ static inline NSAttributedString * NSAttributedStringBySettingColorFromContext(N
     }
         
     [super setText:[self.attributedText string]];
+    [self invalidateIntrinsicContentSize];
 }
 
 - (void)setText:(id)text
@@ -947,6 +949,10 @@ afterInheritingLabelAttributesAndConfiguringWithBlock:(NSMutableAttributedString
     CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(self.framesetter, rangeToSize, NULL, constraints, NULL);
     
     return CGSizeMake(ceilf(suggestedSize.width), ceilf(suggestedSize.height));
+}
+
+-(CGSize)intrinsicContentSize {
+    return [self sizeThatFits:CGSizeMake(self.frame.size.width, INT_MAX)];
 }
 
 #pragma mark - UIResponder

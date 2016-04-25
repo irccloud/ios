@@ -344,6 +344,9 @@ extern NSDictionary *emojiMap;
     swipe.numberOfTouchesRequired = 2;
     swipe.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:swipe];
+    
+    [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
+    [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
 #if !(TARGET_IPHONE_SIMULATOR)
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
 #endif
@@ -391,6 +394,19 @@ extern NSDictionary *emojiMap;
     if([viewControllerToCommit isKindOfClass:[UINavigationController class]])
         ((UINavigationController *)viewControllerToCommit).navigationBarHidden = NO;
     [self presentViewController:viewControllerToCommit animated:YES completion:nil];
+}
+
+- (void) observeValueForKeyPath:(NSString*)keyPath ofObject:(id)object change:(NSDictionary*)change context:(void*)context {
+    if (object == _eventsView.topUnreadView) {
+        if(![[change objectForKey:NSKeyValueChangeOldKey] isEqualToNumber:[change objectForKey:NSKeyValueChangeNewKey]])
+            [self _updateEventsInsets];
+    } else if(object == _eventsView.tableView.layer) {
+        CGRect old = [[change objectForKey:NSKeyValueChangeOldKey] CGRectValue];
+        CGRect new = [[change objectForKey:NSKeyValueChangeNewKey] CGRectValue];
+        if(old.size.width != new.size.width) {
+            [_eventsView clearCachedHeights];
+        }
+    }
 }
 
 - (void)swipeBack:(UISwipeGestureRecognizer *)sender {
@@ -2187,19 +2203,17 @@ extern NSDictionary *emojiMap;
         [s addAttribute:(NSString*)kCTParagraphStyleAttributeName value:(__bridge_transfer id)style range:NSMakeRange(0, [s length])];
 
         _globalMsg.attributedText = s;
-        
-        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(_globalMsg.attributedText));
-        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_bottomBar.frame.size.width,CGFLOAT_MAX), NULL);
-        _globalMsgContainer.frame = CGRectMake(_bottomBar.frame.origin.x, _eventsView.tableView.contentInset.top, _bottomBar.frame.size.width, suggestedSize.height + 4);
-        CFRelease(framesetter);
+        _topUnreadBarYOffsetConstraint.constant = _globalMsg.intrinsicContentSize.height + 12;
     } else {
         _globalMsgContainer.hidden = YES;
+        _topUnreadBarYOffsetConstraint.constant = 0;
     }
+    [self _updateEventsInsets];
 }
 
 -(IBAction)globalMsgPressed:(id)sender {
-    _globalMsgContainer.hidden = YES;
     [NetworkConnection sharedInstance].globalMsg = nil;
+    [self _updateGlobalMsg];
 }
 
 -(void)_updateServerStatus {
@@ -2333,33 +2347,12 @@ extern NSDictionary *emojiMap;
         } else {
             CLS_LOG(@"Unhandled server status: %@", s.status);
         }
-        CGRect frame = _serverStatusBar.frame;
-        frame.size.width = _eventsView.tableView.frame.size.width;
-        _serverStatusBar.frame = frame;
-        frame = _serverStatus.frame;
-        frame.origin.x = 8;
-        frame.origin.y = 4;
-        frame.size.width = _serverStatusBar.frame.size.width - 16;
-        frame.size.height = ceil([_serverStatus.text boundingRectWithSize:CGSizeMake(frame.size.width, INT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: _serverStatus.font} context:nil].size.height);
-        if(frame.size.height < 24)
-            frame.size.height = 24;
-        _serverStatus.frame = frame;
-        frame = _serverStatusBar.frame;
-        frame.size.height = _serverStatus.frame.size.height + 8;
-        frame.origin.y = _bottomBar.frame.origin.y - frame.size.height;
-        _serverStatusBar.frame = frame;
-        frame = _eventsView.bottomUnreadView.frame;
-        frame.origin.y = _serverStatusBar.frame.origin.y - frame.size.height;
-        _eventsView.bottomUnreadView.frame = frame;
-        if(!_buffer.scrolledUp)
-            [_eventsView _scrollToBottom];
+        _bottomUnreadBarYOffsetConstraint.constant = _serverStatus.intrinsicContentSize.height + 12;
     } else {
         if(!_serverStatusBar.hidden) {
-            CGRect frame = _eventsView.bottomUnreadView.frame;
-            frame.origin.y += _serverStatusBar.frame.size.height;
-            _eventsView.bottomUnreadView.frame = frame;
             _serverStatusBar.hidden = YES;
         }
+        _bottomUnreadBarYOffsetConstraint.constant = 0;
     }
     [self _updateEventsInsets];
 }
@@ -2433,17 +2426,20 @@ extern NSDictionary *emojiMap;
     UIView *v = self.navigationItem.titleView;
     self.navigationItem.titleView = nil;
     self.navigationItem.titleView = v;
+    self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
 }
 
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [_eventsView willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
         [self transitionToSize:size];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         _eventsView.view.hidden = NO;
         _eventActivity.alpha = 0;
         [_eventActivity stopAnimating];
         [self _updateMessageWidth];
+        [_eventsView didRotateFromInterfaceOrientation:-1];
     }];
 }
 
@@ -2645,6 +2641,11 @@ extern NSDictionary *emojiMap;
 -(void)_updateEventsInsets {
     _bottomBarOffsetConstraint.constant = -_kbSize.height;
     CGFloat height = _bottomBar.frame.size.height + _kbSize.height;
+    CGFloat top = 0;
+    if(!_globalMsgContainer.hidden)
+        top += _globalMsgContainer.frame.size.height;
+    if(_eventsView.topUnreadView.alpha > 0)
+        top += _eventsView.topUnreadView.frame.size.height;
     if(!_serverStatusBar.hidden)
         height += _serverStatusBar.bounds.size.height;
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
@@ -2654,8 +2655,8 @@ extern NSDictionary *emojiMap;
     }];
 
     if(!_isShowingPreview) {
-        [_eventsView.tableView setContentInset:UIEdgeInsetsMake(0, 0, height, 0)];
-        [_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(0, 0, height, 0)];
+        [_eventsView.tableView setContentInset:UIEdgeInsetsMake(top, 0, height, 0)];
+        [_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(top, 0, height, 0)];
 
         if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) {
             if(_eventsView.tableView.contentOffset.y + diff + (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom) > _eventsView.tableView.contentSize.height)

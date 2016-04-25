@@ -56,6 +56,8 @@
     IBOutlet NSLayoutConstraint *_bottomBarHeightConstraint;
     IBOutlet NSLayoutConstraint *_titleOffsetXConstraint;
     IBOutlet NSLayoutConstraint *_titleOffsetYConstraint;
+    IBOutlet NSLayoutConstraint *_topUnreadBarYOffsetConstraint;
+    IBOutlet NSLayoutConstraint *_bottomUnreadBarYOffsetConstraint;
     NSLayoutConstraint *_messageHeightConstraint;
     NSLayoutConstraint *_messageWidthConstraint;
     BuffersTableView *_buffersView;

@@ -246,7 +246,7 @@
                         }
                         [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
                     } else {
-                        NSLog(@"Facebook failure");
+                        NSLog(@"Facebook failure %@", dict);
                         [self openWebpage:url];
                     }
                 }

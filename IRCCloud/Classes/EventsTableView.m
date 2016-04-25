@@ -545,7 +545,14 @@ int __timestampWidth;
 
 -(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
     if(_ready && [UIApplication sharedApplication].statusBarOrientation != _lastOrientation) {
-        NSLog(@"Did rotate, clearing cached heights");
+        [self clearCachedHeights];
+    }
+    _lastOrientation = [UIApplication sharedApplication].statusBarOrientation;
+    [self updateUnread];
+}
+
+-(void)clearCachedHeights {
+    if(_ready) {
         if([_data count]) {
             [_lock lock];
             for(Event *e in _data) {
@@ -563,8 +570,6 @@ int __timestampWidth;
             _ready = YES;
         }
     }
-    _lastOrientation = [UIApplication sharedApplication].statusBarOrientation;
-    [self updateUnread];
 }
 
 - (IBAction)loadMoreBacklogButtonPressed:(id)sender {
@@ -1022,38 +1027,28 @@ int __timestampWidth;
 -(void)updateTopUnread:(NSInteger)firstRow {
     if(!_topUnreadView)
         return;
-    int highlights = 0;
+    int highlights = 20;
     for(NSNumber *pos in _unseenHighlightPositions) {
         if([pos intValue] > firstRow)
             break;
         highlights++;
     }
     NSString *msg = @"";
-    CGRect rect = _topUnreadView.frame;
-    _topUnreadArrow.frame = CGRectMake(0,8,12,rect.size.height-12);
     if(highlights) {
         if(highlights == 1)
             msg = @"mention and ";
         else
             msg = @"mentions and ";
         _topHighlightsCountView.count = [NSString stringWithFormat:@"%i", highlights];
-        CGSize size = [_topHighlightsCountView.count sizeWithAttributes:@{NSFontAttributeName:_topHighlightsCountView.font}];
-        size.width += 6;
-        size.height = rect.size.height - 12;
-        if(size.width < size.height)
-            size.width = size.height;
-        _topHighlightsCountView.frame = CGRectMake(16,6,size.width,size.height);
         _topHighlightsCountView.hidden = NO;
-        _topUnreadLabel.frame = CGRectMake(20+size.width,6,rect.size.width - size.width - 8 - 32, rect.size.height-12);
+        _topUnreadLabelXOffsetConstraint.constant = _topHighlightsCountView.intrinsicContentSize.width + 2;
     } else {
         _topHighlightsCountView.hidden = YES;
-        _topUnreadLabel.frame = CGRectMake(16,6,rect.size.width - 8 - 32, rect.size.height-12);
+        _topUnreadLabelXOffsetConstraint.constant = 0;
     }
     if(_lastSeenEidPos == 0 && firstRow < _data.count) {
         int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
         if(seconds < 0) {
-            _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
-            self.tableView.tableHeaderView = self.tableView.tableHeaderView;
             _topUnreadView.alpha = 0;
         } else {
             int minutes = seconds / 60;
@@ -1087,8 +1082,6 @@ int __timestampWidth;
         } else if(firstRow - _lastSeenEidPos > 0) {
             _topUnreadLabel.text = [msg stringByAppendingFormat:@"%li unread messages", (long)(firstRow - _lastSeenEidPos)];
         } else {
-            _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
-            self.tableView.tableHeaderView = self.tableView.tableHeaderView;
             _topUnreadView.alpha = 0;
         }
     }
@@ -1098,25 +1091,17 @@ int __timestampWidth;
     if(!_bottomUnreadView)
         return;
     NSString *msg = @"";
-    CGRect rect = _bottomUnreadView.frame;
-    _bottomUnreadArrow.frame = CGRectMake(0,8,12,rect.size.height-12);
     if(_newHighlights) {
         if(_newHighlights == 1)
             msg = @"mention";
         else
             msg = @"mentions";
         _bottomHighlightsCountView.count = [NSString stringWithFormat:@"%li", (long)_newHighlights];
-        CGSize size = [_bottomHighlightsCountView.count sizeWithAttributes:@{NSFontAttributeName:_bottomHighlightsCountView.font}];
-        size.width += 6;
-        size.height = rect.size.height - 12;
-        if(size.width < size.height)
-            size.width = size.height;
-        _bottomHighlightsCountView.frame = CGRectMake(16,6,size.width,size.height);
         _bottomHighlightsCountView.hidden = NO;
-        _bottomUnreadLabel.frame = CGRectMake(20+size.width,6,rect.size.width - size.width - 8, rect.size.height-12);
+        _bottomUnreadLabelXOffsetConstraint.constant = _bottomHighlightsCountView.intrinsicContentSize.width + 2;
     } else {
         _bottomHighlightsCountView.hidden = YES;
-        _bottomUnreadLabel.frame = CGRectMake(16,6,rect.size.width - 8, rect.size.height-12);
+        _bottomUnreadLabelXOffsetConstraint.constant = _bottomHighlightsCountView.intrinsicContentSize.width + 2;
     }
     if(_newMsgs - _newHighlights > 0) {
         if(_newHighlights)
