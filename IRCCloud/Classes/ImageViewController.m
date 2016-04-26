@@ -31,9 +31,10 @@
     long long _totalBytesReceived;
 }
 
-- (id)init {
-    self = [super init];
+- (id)initWithURL:(NSURL *)url {
+    self = [super initWithNibName:@"ImageViewController" bundle:nil];
     if (self) {
+        _url = url;
         _chrome = [[OpenInChromeController alloc] init];
         _progressScale = 0;
     }

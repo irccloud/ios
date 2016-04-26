@@ -261,8 +261,7 @@
 - (void)showImage:(NSURL *)url
 {
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
-    ImageViewController *ivc = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"ImageViewController"];
-    ivc.url = url;
+    ImageViewController *ivc = [[ImageViewController alloc] initWithURL:url];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         appDelegate.window.backgroundColor = [UIColor blackColor];
         appDelegate.window.rootViewController = ivc;

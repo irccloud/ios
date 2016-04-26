@@ -317,8 +317,7 @@ int __timestampWidth;
     
     if([URLHandler isImageURL:url]) {
         previewingContext.sourceRect = cell.frame;
-        ImageViewController *i = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"ImageViewController"];
-        i.url = url;
+        ImageViewController *i = [[ImageViewController alloc] initWithURL:url];
         i.preferredContentSize = self.view.window.bounds.size;
         i.previewing = YES;
         lp.enabled = NO;

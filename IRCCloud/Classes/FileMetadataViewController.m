@@ -291,8 +291,7 @@
     [self.tableView endEditing:YES];
     
     if(_imageView && _url && indexPath.section == 0) {
-        ImageViewController *ivc = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"ImageViewController"];
-        ivc.url = [NSURL URLWithString:_url];
+        ImageViewController *ivc = [[ImageViewController alloc] initWithURL:[NSURL URLWithString:_url]];
         AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         appDelegate.window.backgroundColor = [UIColor blackColor];
         appDelegate.window.rootViewController = ivc;

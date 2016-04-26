@@ -336,9 +336,15 @@ extern NSDictionary *emojiMap;
     swipe.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:swipe];
 
-    [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
+    if(_eventsView.topUnreadView.observationInfo) {
+        @try {
+            [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
+            [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+        } @catch(id anException) {
+            //Not registered yet
+        }
+    }
     [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
-    [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
     [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
 #if !(TARGET_IPHONE_SIMULATOR)
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
