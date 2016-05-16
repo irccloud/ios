@@ -31,7 +31,7 @@
     if(loginLogo) {
         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
         [animation setFromValue:@(_logo.layer.position.x)];
-        [animation setToValue:@(loginLogo.layer.position.x)];
+        [animation setToValue:@((self.view.bounds.size.width / 2) - 112)];
         [animation setDuration:0.4];
         [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.17 :.89 :.32 :1.28]];
         animation.removedOnCompletion = NO;

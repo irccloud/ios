@@ -148,6 +148,8 @@ NSString *__current_theme;
 }
 
 +(void)setTheme:(NSString *)theme {
+    NSLog(@"Setting theme: %@", theme);
+    
     if([theme isEqualToString:@"dawn"] || theme == nil) {
         __color_theme_is_dark = NO;
         
