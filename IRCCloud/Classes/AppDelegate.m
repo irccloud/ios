@@ -131,8 +131,10 @@
     [Fabric with:@[CrashlyticsKit]];
 #endif
     
-    self.loginSplashViewController = [[LoginSplashViewController alloc] initWithNibName:@"LoginSplashViewController" bundle:nil];
-    self.mainViewController = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
+    self.splashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"SplashViewController"];
+    self.window.rootViewController = self.splashViewController;
+    self.loginSplashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"LoginSplashViewController"];
+    self.mainViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"MainViewController"];
     self.slideViewController = [[ECSlidingViewController alloc] init];
     self.slideViewController.view.backgroundColor = [UIColor blackColor];
     self.slideViewController.topViewController = [[UINavigationController alloc] initWithNavigationBarClass:[NavBarHax class] toolbarClass:nil];
@@ -144,45 +146,9 @@
     }
 
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
-    self.window.rootViewController = [[UIViewController alloc] init];
-    
-    _animationView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].applicationFrame];
-    _animationView.backgroundColor = [UIColor colorWithRed:0.043 green:0.18 blue:0.376 alpha:1];
-    
-    _logo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"login_logo"]];
-    [_logo sizeToFit];
-    if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
-        _logo.center = CGPointMake(self.window.center.y, 39);
-    else
-        _logo.center = CGPointMake(self.window.center.x, 39);
-
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
-            _animationView.transform = self.window.rootViewController.view.transform;
-            if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
-                _animationView.frame = CGRectMake(20,0,_animationView.frame.size.height,_animationView.frame.size.width);
-            else
-                _animationView.frame = CGRectMake(0,0,_animationView.frame.size.height,_animationView.frame.size.width);
-        }
-    }
-    CGRect frame = _animationView.frame;
-    frame.origin.y -= [UIApplication sharedApplication].statusBarFrame.size.height;
-    frame.size.height += [UIApplication sharedApplication].statusBarFrame.size.height;
-    _animationView.frame = frame;
-    
-    frame = _logo.frame;
-    frame.origin.y += [UIApplication sharedApplication].statusBarFrame.size.height;
-    _logo.frame = frame;
-
-    [_animationView addSubview:_logo];
-    [self.window addSubview:_animationView];
-    [self.window makeKeyAndVisible];
 
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         _conn = [NetworkConnection sharedInstance];
-        [self.mainViewController loadView];
         [self.mainViewController viewDidLoad];
         NSString *session = [NetworkConnection sharedInstance].session;
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
@@ -195,36 +161,20 @@
             self.window.rootViewController = self.loginSplashViewController;
         }
         
-        [self.window addSubview:_animationView];
+        [self.window addSubview:self.splashViewController.view];
         
         if([NetworkConnection sharedInstance].session.length) {
-            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
-            [animation setFromValue:@(_logo.layer.position.x)];
-            [animation setToValue:@(_animationView.bounds.size.width + _logo.bounds.size.width)];
-            [animation setDuration:0.4];
-            [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.8 :-.3 :.8 :-.3]];
-            animation.removedOnCompletion = NO;
-            animation.fillMode = kCAFillModeForwards;
-            [_logo.layer addAnimation:animation forKey:nil];
+            [self.splashViewController animate:nil];
         } else {
             self.loginSplashViewController.logo.hidden = YES;
-            
-            CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
-            [animation setFromValue:@(_logo.layer.position.x)];
-            [animation setToValue:@(self.loginSplashViewController.logo.layer.position.x)];
-            [animation setDuration:0.4];
-            [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.17 :.89 :.32 :1.28]];
-            animation.removedOnCompletion = NO;
-            animation.fillMode = kCAFillModeForwards;
-            [_logo.layer addAnimation:animation forKey:nil];
+            [self.splashViewController animate:self.loginSplashViewController.logo];
         }
         
         [UIView animateWithDuration:0.25 delay:0.25 options:0 animations:^{
-            _animationView.backgroundColor = [UIColor clearColor];
+            self.splashViewController.view.backgroundColor = [UIColor clearColor];
         } completion:^(BOOL finished) {
             self.loginSplashViewController.logo.hidden = NO;
-            [_animationView removeFromSuperview];
-            _animationView = nil;
+            [self.splashViewController.view removeFromSuperview];
         }];
     }];
     

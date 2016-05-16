@@ -28,16 +28,16 @@
 @interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate> {
     NSMutableArray *_data;
     NSInteger _selectedRow;
-    IBOutlet UIViewController<BuffersTableViewDelegate> *_delegate;
+    UIViewController<BuffersTableViewDelegate> *_delegate;
     NSMutableDictionary *_expandedArchives;
     Buffer *_selectedBuffer;
     
-    IBOutlet UIControl *topUnreadIndicator;
-    IBOutlet UIView *topUnreadIndicatorColor;
-    IBOutlet UIView *topUnreadIndicatorBorder;
-    IBOutlet UIControl *bottomUnreadIndicator;
-    IBOutlet UIView *bottomUnreadIndicatorColor;
-    IBOutlet UIView *bottomUnreadIndicatorBorder;
+    UIControl *topUnreadIndicator;
+    UIView *topUnreadIndicatorColor;
+    UIView *topUnreadIndicatorBorder;
+    UIControl *bottomUnreadIndicator;
+    UIView *bottomUnreadIndicatorColor;
+    UIView *bottomUnreadIndicatorBorder;
 
     NSInteger _firstUnreadPosition;
 	NSInteger _lastUnreadPosition;

@@ -20,6 +20,7 @@
 #import "ECSlidingViewController.h"
 #import "NetworkConnection.h"
 #import "URLHandler.h"
+#import "SplashViewController.h"
 
 @class ViewController;
 
@@ -33,8 +34,6 @@
     void (^imageUploadCompletionHandler)();
     BOOL _movedToBackground;
     __block UIBackgroundTaskIdentifier _background_task;
-    UIView *_animationView;
-    UIImageView *_logo;
     void (^_fetchHandler)(UIBackgroundFetchResult);
     void (^_refreshHandler)(UIBackgroundFetchResult);
 }
@@ -44,6 +43,7 @@
 @property (strong, nonatomic) LoginSplashViewController *loginSplashViewController;
 @property (strong, nonatomic) MainViewController *mainViewController;
 @property (strong, nonatomic) ECSlidingViewController *slideViewController;
+@property (strong, nonatomic) SplashViewController *splashViewController;
 
 -(void)showLoginView;
 -(void)showMainView:(BOOL)animated;

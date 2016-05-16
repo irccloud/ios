@@ -27,12 +27,19 @@
 
 @implementation PastebinViewController
 
--(id)initWithURL:(NSURL *)url {
-    self = [super initWithNibName:@"PastebinViewController" bundle:nil];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_doneButtonPressed)];
-    _chrome = [[OpenInChromeController alloc] init];
-    _url = url.absoluteString;
+-(id)init {
+    self = [super init];
+    if(self) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_doneButtonPressed)];
+        _chrome = [[OpenInChromeController alloc] init];
+        
+    }
+    return self;
+}
 
+-(void)setUrl:(NSURL *)url {
+    _url = url.absoluteString;
+    
     if([_url rangeOfString:@"?"].location != NSNotFound) {
         NSString *query = [_url substringFromIndex:[_url rangeOfString:@"?"].location + 1];
         NSArray *args = [query componentsSeparatedByString:@"&"];
@@ -47,8 +54,6 @@
         
         _url = [_url substringToIndex:[_url rangeOfString:@"?"].location];
     }
-    
-    return self;
 }
 
 

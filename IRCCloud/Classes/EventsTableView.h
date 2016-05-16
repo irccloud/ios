@@ -43,6 +43,8 @@
     IBOutlet UILabel *_bottomUnreadArrow;
     IBOutlet UILabel *_bottomUnreadLabel;
     IBOutlet HighlightsCountView *_bottomHighlightsCountView;
+    IBOutlet NSLayoutConstraint *_topUnreadLabelXOffsetConstraint;
+    IBOutlet NSLayoutConstraint *_bottomUnreadLabelXOffsetConstraint;
     
     NSDateFormatter *_formatter;
     NSMutableArray *_data;
@@ -95,4 +97,5 @@
 -(void)scrollToBottom;
 -(void)clearLastSeenMarker;
 -(void)refresh;
+-(void)clearCachedHeights;
 @end

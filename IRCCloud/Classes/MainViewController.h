@@ -28,15 +28,12 @@
 #import "FilesTableViewController.h"
 
 @interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate> {
-    IBOutlet BuffersTableView *_buffersView;
-    IBOutlet UsersTableView *_usersView;
     IBOutlet EventsTableView *_eventsView;
-    UIExpandingTextView *_message;
     IBOutlet UIView *_connectingView;
     IBOutlet UIProgressView *_connectingProgress;
     IBOutlet UILabel *_connectingStatus;
     IBOutlet UIActivityIndicatorView *_connectingActivity;
-    IBOutlet UIImageView *_bottomBar;
+    IBOutlet UIView *_bottomBar;
     IBOutlet UILabel *_serverStatus;
     IBOutlet UIView *_serverStatusBar;
     IBOutlet UIActivityIndicatorView *_eventActivity;
@@ -53,6 +50,19 @@
     IBOutlet TTTAttributedLabel *_globalMsg;
     IBOutlet UILabel *_fetchingFailed;
     IBOutlet UIButton *_loadMoreBacklog;
+    IBOutlet NSLayoutConstraint *_eventsViewWidthConstraint;
+    IBOutlet NSLayoutConstraint *_eventsViewOffsetXConstraint;
+    IBOutlet NSLayoutConstraint *_bottomBarOffsetConstraint;
+    IBOutlet NSLayoutConstraint *_bottomBarHeightConstraint;
+    IBOutlet NSLayoutConstraint *_titleOffsetXConstraint;
+    IBOutlet NSLayoutConstraint *_titleOffsetYConstraint;
+    IBOutlet NSLayoutConstraint *_topUnreadBarYOffsetConstraint;
+    IBOutlet NSLayoutConstraint *_bottomUnreadBarYOffsetConstraint;
+    NSLayoutConstraint *_messageHeightConstraint;
+    NSLayoutConstraint *_messageWidthConstraint;
+    BuffersTableView *_buffersView;
+    UsersTableView *_usersView;
+    UIExpandingTextView *_message;
     UIButton *_menuBtn, *_sendBtn, *_settingsBtn, *_uploadsBtn;
     UIBarButtonItem *_usersButtonItem;
     Buffer *_buffer;
@@ -80,7 +90,6 @@
     NSArray *_sortedChannels;
     UIPopoverController *_popover;
     NSTimeInterval _lastNotificationTime;
-    BOOL __ignoreLayoutChanges;
     BOOL _isShowingPreview;
     NSString *__currentTheme;
     BOOL _atMention;

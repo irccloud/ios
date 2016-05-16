@@ -39,6 +39,7 @@
 
 -(void)setCount:(NSString *)count {
     _count = count;
+    [self invalidateIntrinsicContentSize];
     [self setNeedsDisplay];
 }
 
@@ -62,6 +63,18 @@
               withFont:_font];
 #pragma GCC diagnostic pop
     CGContextRestoreGState(ctx);
+}
+
+-(CGSize)intrinsicContentSize {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    CGSize size = [_count sizeWithFont:_font forWidth:INT_MAX lineBreakMode:NSLineBreakByClipping];
+#pragma GCC diagnostic pop
+    size.width += 6;
+    size.height += 6;
+    if(size.width < size.height)
+        size.width = size.height;
+    return size;
 }
 
 @end

@@ -313,7 +313,6 @@
 
 -(void)_updateFieldPositions {
     int offset = 0;
-    float left = (loginView.bounds.size.width - 288) / 2;
     if(name.alpha)
         offset = 1;
     
@@ -325,60 +324,17 @@
         username.background = [UIImage imageNamed:@"login_top_input"];
     
     if(sendAccessLink.alpha) {
-        username.frame = CGRectMake(left, 16 + 26, 288, 39);
+        usernameYOffset.constant = 16 + 26;
     } else {
-        username.frame = CGRectMake(left, 16 + (offset * 39), 288, 39);
+        usernameYOffset.constant = 16 + (offset * 39);
     }
 
-    name.frame = CGRectMake(left, 16, 288, 39);
-    host.frame = CGRectMake(left, 16, 288, 39);
-    password.frame = CGRectMake(left, 16 + ((offset + 1) * 39), 288, 38);
-    OnePassword.frame = CGRectMake(password.frame.origin.x + password.frame.size.width - 48, password.frame.origin.y, 48, password.frame.size.height);
-    hostHint.frame = CGRectMake(left, 16 + 39, 288, 32);
-    next.frame = CGRectMake(left, 16 + 39 + 32, 288, 40);
-    login.frame = signup.frame = CGRectMake(left, 16 + ((offset + 2) * 39) + 15, 288, 40);
-    status.frame = CGRectMake(left + 16, 16, loginView.bounds.size.width - left*2 - 32, 21);
-    activity.center = status.center;
-    CGRect frame = activity.frame;
-    frame.origin.y += 24;
-    activity.frame = frame;
-    sendAccessLink.frame = CGRectMake(left, 16 + 81, 288, 40);
-    enterEmailAddressHint.frame = CGRectMake(left, 16 + 80 + 50, 288, 40);
+    passwordYOffset.constant = 16 + ((offset + 1) * 39);
+    nextYOffset.constant = 16 + 39 + 32;
+    loginYOffset.constant = signupYOffset.constant = 16 + ((offset + 2) * 39) + 15;
+    sendAccessLinkYOffset.constant = 16 + 81;
     
     OnePassword.hidden = (login.alpha != 1 && signup.alpha != 1) || ![[OnePasswordExtension sharedExtension] isAppExtensionAvailable];
-    
-    float w = 0.0f;
-    for(UIView *v in notAProblem.subviews) {
-        [v sizeToFit];
-        v.frame = CGRectMake(w, 0, v.bounds.size.width, 20);
-        w += v.bounds.size.width + 2;
-    }
-    w -= 2;
-    notAProblem.frame = CGRectMake(left, 16 - 5, w, 20);
-    
-    w = 0.0f;
-    for(UIView *v in forgotPasswordHint.subviews) {
-        v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
-        w += v.bounds.size.width + 2;
-    }
-    w -= 2;
-    forgotPasswordHint.frame = CGRectMake(loginView.bounds.size.width / 2.0f - w / 2.0f, login.frame.origin.y + login.frame.size.height + 2, w, 32);
-    
-    w = 0.0f;
-    for(UIView *v in TOSHint.subviews) {
-        v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
-        w += v.bounds.size.width + 2;
-    }
-    w -= 2;
-    TOSHint.frame = CGRectMake(loginView.bounds.size.width / 2.0f - w / 2.0f, login.frame.origin.y + login.frame.size.height + 2, w, 32);
-    
-    w = 0.0f;
-    for(UIView *v in enterpriseLearnMore.subviews) {
-        v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
-        w += v.bounds.size.width + 2;
-    }
-    w -= 2;
-    enterpriseLearnMore.frame = CGRectMake(loginView.bounds.size.width / 2.0f - w / 2.0f, next.frame.origin.y + next.frame.size.height + 2, w, 32);
 }
 
 -(UIImageView *)logo {
@@ -387,6 +343,7 @@
 
 -(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
     self.view.frame = [UIScreen mainScreen].applicationFrame;
+    [self.view updateConstraints];
     float width = self.view.frame.size.width;
     float height = self.view.frame.size.height;
     if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
@@ -396,42 +353,15 @@
     
     if(_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         self.view.window.backgroundColor = [UIColor colorWithRed:68.0/255.0 green:128.0/255.0 blue:250.0/255.0 alpha:1];
-        loadingView.frame = loginView.frame = CGRectMake(0, 0, width, self.view.bounds.size.height);
+        loadingViewYOffset.constant = loginViewYOffset.constant = 0;
     } else {
         self.view.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
-        loginView.frame = CGRectMake(0, 119, width, height - 119);
-        loadingView.frame = CGRectMake(0, 78, width, height - 78);
-        version.frame = CGRectMake(0, height - 20 - _kbSize.height, width, 20);
+        loginViewYOffset.constant = 119;
+        loadingViewYOffset.constant = 78;
     }
 
-    logo.frame = CGRectMake(width / 2 - 112, 15, 48, 48);
-    IRC.frame = CGRectMake(logo.frame.origin.x + 48 + 14, 15, IRC.bounds.size.width, 48);
-    Cloud.frame = CGRectMake(IRC.frame.origin.x + IRC.bounds.size.width, 15, Cloud.bounds.size.width, 48);
-    float w = 0.0f;
-    for(UIView *v in signupHint.subviews) {
-        v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
-        w += v.bounds.size.width + 8;
-    }
-    w -= 8;
-    signupHint.frame = CGRectMake(width / 2.0f - w / 2.0f, 70, w, 32);
-    
-    w = 0.0f;
-    for(UIView *v in loginHint.subviews) {
-        v.frame = CGRectMake(w, 0, v.bounds.size.width, 32);
-        w += v.bounds.size.width + 8;
-    }
-    w -= 8;
-    loginHint.frame = CGRectMake(width / 2.0f - w / 2.0f, 70, w, 32);
-
-    enterpriseHint.frame = CGRectMake(0, 70, width, 32);
-    
-    if(signupHint.enabled) {
-        forgotPasswordLogin.frame = CGRectMake(logo.frame.origin.x + 17, 70, 65, 32);
-        forgotPasswordSignup.frame = CGRectMake(logo.frame.origin.x + 141, 70, 65, 32);
-    } else {
-        forgotPasswordLogin.center = CGPointMake(width / 2, forgotPasswordLogin.center.y);
-    }
     [self _updateFieldPositions];
+    [self.view updateConstraints];
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {

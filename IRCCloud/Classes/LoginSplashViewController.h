@@ -24,16 +24,25 @@
     IBOutlet UILabel *version;
     
     IBOutlet UIView *loginView;
+    IBOutlet NSLayoutConstraint *loginViewYOffset;
     IBOutlet UITextField *name;
     IBOutlet UITextField *username;
+    IBOutlet NSLayoutConstraint *usernameYOffset;
     IBOutlet UITextField *password;
+    IBOutlet NSLayoutConstraint *passwordYOffset;
     IBOutlet UITextField *host;
+    IBOutlet NSLayoutConstraint *hostYOffset;
     IBOutlet UIButton *login;
+    IBOutlet NSLayoutConstraint *loginYOffset;
     IBOutlet UIButton *signup;
+    IBOutlet NSLayoutConstraint *signupYOffset;
     IBOutlet UIButton *next;
+    IBOutlet NSLayoutConstraint *nextYOffset;
     IBOutlet UIButton *sendAccessLink;
+    IBOutlet NSLayoutConstraint *sendAccessLinkYOffset;
     
     IBOutlet UIView *loadingView;
+    IBOutlet NSLayoutConstraint *loadingViewYOffset;
     IBOutlet UILabel *status;
     IBOutlet UIActivityIndicatorView *activity;
     
