@@ -104,29 +104,27 @@
     [[EventsDataSource sharedInstance] reformat];
     
     if(IRCCLOUD_HOST.length < 1)
-        [NetworkConnection sharedInstance].session = nil;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+    [NetworkConnection sharedInstance].session = nil;
 #ifdef ENTERPRISE
-        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-        [d setObject:IRCCLOUD_HOST forKey:@"host"];
-        [d setObject:IRCCLOUD_PATH forKey:@"path"];
-        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
-        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
-        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
-        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] forKey:@"imageService"];
-        if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
-            [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] forKey:@"imgur_access_token"];
-        else
-            [d removeObjectForKey:@"imgur_access_token"];
-        if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"])
-            [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"] forKey:@"imgur_refresh_token"];
-        else
-            [d removeObjectForKey:@"imgur_refresh_token"];
-        [d synchronize];
-    }
+    [d setObject:IRCCLOUD_HOST forKey:@"host"];
+    [d setObject:IRCCLOUD_PATH forKey:@"path"];
+    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
+    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
+    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
+    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] forKey:@"imageService"];
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] forKey:@"imgur_access_token"];
+    else
+        [d removeObjectForKey:@"imgur_access_token"];
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"])
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"] forKey:@"imgur_refresh_token"];
+    else
+        [d removeObjectForKey:@"imgur_refresh_token"];
+    [d synchronize];
 #ifdef CRASHLYTICS_TOKEN
     [Fabric with:@[CrashlyticsKit]];
 #endif
@@ -654,19 +652,12 @@
 
 - (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)())completionHandler {
     NSURLSessionConfiguration *config;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-        config = [NSURLSessionConfiguration backgroundSessionConfiguration:identifier];
-#pragma GCC diagnostic pop
-    } else {
-        config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:identifier];
+    config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:identifier];
 #ifdef ENTERPRISE
-        config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
+    config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
 #else
-        config.sharedContainerIdentifier = @"group.com.irccloud.share";
+    config.sharedContainerIdentifier = @"group.com.irccloud.share";
 #endif
-    }
     config.HTTPCookieStorage = nil;
     config.URLCache = nil;
     config.requestCachePolicy = NSURLCacheStorageNotAllowed;
@@ -678,7 +669,7 @@
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
     _conn = [NetworkConnection sharedInstance];
     NSData *response = [NSData dataWithContentsOfURL:location];
-    if(session.configuration.identifier && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+    if(session.configuration.identifier) {
 #ifdef ENTERPRISE
         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else

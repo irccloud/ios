@@ -323,7 +323,7 @@ extern NSDictionary *emojiMap;
     _connectingProgress.progress = 0;
     [self _themeChanged];
     [self connectivityChanged:nil];
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
     [self _updateEventsInsets];
     
     UISwipeGestureRecognizer *swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeBack:)];
@@ -961,17 +961,15 @@ extern NSDictionary *emojiMap;
                     [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                     [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
                     [[NSUserDefaults standardUserDefaults] synchronize];
-                    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
-                        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-                        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-                        [d setObject:IRCCLOUD_HOST forKey:@"host"];
-                        [d setObject:IRCCLOUD_PATH forKey:@"path"];
-                        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
-                        [d synchronize];
-                    }
+                    [d setObject:IRCCLOUD_HOST forKey:@"host"];
+                    [d setObject:IRCCLOUD_PATH forKey:@"path"];
+                    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
+                    [d synchronize];
                     [[NetworkConnection sharedInstance] connect:NO];
                 } else {
                     CLS_LOG(@"Got an error, reconnecting: %@", o);
@@ -1268,9 +1266,6 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-    
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     int height = size.height;
     
@@ -1287,15 +1282,12 @@ extern NSDictionary *emojiMap;
         [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
         [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
 
-        [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+        [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
         
         [_buffersView scrollViewDidScroll:_buffersView.tableView];
         [UIView commitAnimations];
         [self expandingTextViewDidChange:_message];
     }
-    
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)
-        [self performSelector:@selector(_observeKeyboard) withObject:nil afterDelay:0.01];
 }
 
 -(void)_observeKeyboard {
@@ -1314,7 +1306,7 @@ extern NSDictionary *emojiMap;
 
     [self.slidingViewController updateUnderLeftLayout];
     [self.slidingViewController updateUnderRightLayout];
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
 
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
     _nickCompletionView.alpha = 0;
@@ -1356,7 +1348,7 @@ extern NSDictionary *emojiMap;
     } else {
         [self bufferSelected:_buffer.bid];
     }
-    if(!self.presentedViewController && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+    if(!self.presentedViewController) {
         self.navigationController.navigationBar.translucent = NO;
         self.edgesForExtendedLayout=UIRectEdgeNone;
     }
@@ -1367,16 +1359,12 @@ extern NSDictionary *emojiMap;
     
     NSString *session = [NetworkConnection sharedInstance].session;
     if(session.length) {
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
+        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
 #ifdef DEBUG
         NSLog(@"This is a debug build, skipping APNs registration");
 #else
         NSLog(@"APNs registration");
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-            [[UIApplication sharedApplication] registerForRemoteNotifications];
-        else
-            [[UIApplication sharedApplication] registerForRemoteNotificationTypes:(UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
 #endif
     }
     if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
@@ -1389,10 +1377,9 @@ extern NSDictionary *emojiMap;
         _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     }
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-        self.slidingViewController.view.autoresizesSubviews = NO;
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
-    [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
+    self.slidingViewController.view.autoresizesSubviews = NO;
+    [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
+    [_eventsView didRotate];
     
     _buffersView.tableView.scrollsToTop = YES;
     _usersView.tableView.scrollsToTop = YES;
@@ -1406,8 +1393,7 @@ extern NSDictionary *emojiMap;
     _doubleTapTimer = nil;
     _eidToOpen = -1;
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-        self.slidingViewController.view.autoresizesSubviews = YES;
+    self.slidingViewController.view.autoresizesSubviews = YES;
     [self.slidingViewController resetTopView];
     
     _buffersView.tableView.scrollsToTop = NO;
@@ -1416,14 +1402,13 @@ extern NSDictionary *emojiMap;
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
-    [_eventsView didRotateFromInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation];
+    [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
+    [_eventsView didRotate];
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-        self.slidingViewController.view.autoresizesSubviews = NO;
+    self.slidingViewController.view.autoresizesSubviews = NO;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -1849,10 +1834,8 @@ extern NSDictionary *emojiMap;
     } else {
         [self performSelectorOnMainThread:@selector(scheduleSuggestionsTimer) withObject:nil waitUntilDone:NO];
     }
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        [[self userActivity] setNeedsSave:YES];
-        [self userActivityWillSave:[self userActivity]];
-    }
+    [[self userActivity] setNeedsSave:YES];
+    [self userActivityWillSave:[self userActivity]];
     if(_buffer)
         _buffer.draft = expandingTextView.text;
     UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
@@ -1871,7 +1854,7 @@ extern NSDictionary *emojiMap;
         [self.view layoutIfNeeded];
         _messageHeightConstraint.constant = height;
         [self.view layoutIfNeeded];
-        [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+        [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
     }
 }
 
@@ -2106,22 +2089,20 @@ extern NSDictionary *emojiMap;
             [u setObject:@(bid) forKey:@"last_selected_bid"];
             [NetworkConnection sharedInstance].userInfo = [NSDictionary dictionaryWithDictionary:u];
         }
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-            NSUserActivity *activity = [self userActivity];
-            if(![activity.activityType hasSuffix:@".buffer"]) {
-                [activity invalidate];
+        NSUserActivity *activity = [self userActivity];
+        if(![activity.activityType hasSuffix:@".buffer"]) {
+            [activity invalidate];
 #ifdef ENTERPRISE
-                activity = [[NSUserActivity alloc] initWithActivityType: @"com.irccloud.enterprise.buffer"];
+            activity = [[NSUserActivity alloc] initWithActivityType: @"com.irccloud.enterprise.buffer"];
 #else
-                activity = [[NSUserActivity alloc] initWithActivityType: @"com.irccloud.buffer"];
+            activity = [[NSUserActivity alloc] initWithActivityType: @"com.irccloud.buffer"];
 #endif
-                activity.delegate = self;
-                [self setUserActivity:activity];
-            }
-            [activity setNeedsSave:YES];
-            [self userActivityWillSave:activity];
-            [activity becomeCurrent];
+            activity.delegate = self;
+            [self setUserActivity:activity];
         }
+        [activity setNeedsSave:YES];
+        [self userActivityWillSave:activity];
+        [activity becomeCurrent];
     } else {
         CLS_LOG(@"BID selected but not found: bid%i", bid);
     }
@@ -2458,201 +2439,6 @@ extern NSDictionary *emojiMap;
         _eventActivity.alpha = 0;
         [_eventActivity stopAnimating];
     }];
-}
-
--(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    @synchronized(self) {
-        NSLog(@"Will animate rotation");
-        if(duration > 0) {
-            [[UIApplication sharedApplication] setStatusBarHidden:([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) withAnimation:UIStatusBarAnimationNone];
-            [self.slidingViewController resetTopView];
-        }
-        
-        int height = ((UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height);
-        int width = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
-        
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-            height += [UIApplication sharedApplication].statusBarFrame.size.height;
-        else
-            height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
-
-        /*CGRect frame = self.slidingViewController.view.frame;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-            if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortraitUpsideDown)
-                frame.origin.y = _kbSize.height;
-            else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationPortrait)
-                frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
-            else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeRight)
-                frame.origin.x = _kbSize.height;
-            else if([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)
-                frame.origin.x = [UIApplication sharedApplication].statusBarFrame.size.width - 20;
-        } else {
-            frame.origin.x = 0;
-            if(![UIApplication sharedApplication].statusBarHidden && [UIApplication sharedApplication].statusBarFrame.size.height > 20)
-                frame.origin.y = [UIApplication sharedApplication].statusBarFrame.size.height - 20;
-        }*/
-
-        int sbheight = (([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8 &&UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height);
-        
-        if([UIApplication sharedApplication].statusBarHidden)
-            sbheight = 0;
-        
-        if(sbheight)
-            height -= sbheight - 20;
-        
-        /*if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-            frame.size.width = height;
-            frame.size.height = width;
-        } else {
-            frame.size.width = width;
-            frame.size.height = height;
-        }
-        
-        if(self.slidingViewController.view.frame.size.height != height || self.slidingViewController.view.frame.size.width != width || self.view.frame.size.width != width) {
-            CGRect f = self.navigationController.view.frame;
-            
-            if(f.origin.x == self.slidingViewController.anchorRightRevealAmount)
-                f.origin.x = self.slidingViewController.anchorRightRevealAmount;
-            else if(f.origin.x == -self.slidingViewController.anchorLeftRevealAmount)
-                f.origin.x = -self.slidingViewController.anchorLeftRevealAmount;
-            else
-                f.origin.x = 0;
-            f.origin.y = 0;
-            f.size.width = width;
-            f.size.height = height;
-            self.slidingViewController.view.frame = frame;
-            self.navigationController.view.frame = f;
-        }*/
-        
-        height -= self.navigationController.navigationBar.frame.size.height;
-
-        if(sbheight)
-            height -= 20;
-        
-        [self transitionToSize:CGSizeMake(width, height)];
-
-        /*height -= _kbSize.height;
-        
-        if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
-            self.navigationItem.leftBarButtonItem = nil;
-            self.navigationItem.rightBarButtonItem = nil;
-            self.slidingViewController.underLeftViewController = nil;
-            [self addChildViewController:_buffersView];
-            _buffersView.view.frame = CGRectMake(0,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,[[UIDevice currentDevice] isBigPhone]?180:220,height + ([[UIDevice currentDevice] isBigPhone]?self.navigationController.navigationBar.frame.size.height:0));
-            _eventsView.view.frame = CGRectMake(_buffersView.view.frame.size.width,0,width - ([[UIDevice currentDevice] isBigPhone]?300:440),height + _kbSize.height);
-            _bottomBar.frame = CGRectMake(_buffersView.view.frame.size.width,height - _bottomBar.frame.size.height,_eventsView.view.frame.size.width,_bottomBar.frame.size.height);
-            _borders.frame = CGRectMake(_buffersView.view.frame.size.width - 1,0,_eventsView.view.frame.size.width + 2,height);
-            [_buffersView willMoveToParentViewController:self];
-            [_buffersView viewWillAppear:NO];
-            _buffersView.view.hidden = NO;
-            [self.view insertSubview:_buffersView.view atIndex:1];
-            if(![[UIDevice currentDevice] isBigPhone] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
-                self.slidingViewController.underRightViewController = nil;
-                [self addChildViewController:_usersView];
-                _usersView.view.frame = CGRectMake(_eventsView.view.frame.origin.x + _eventsView.view.frame.size.width,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,220,height + ([[UIDevice currentDevice] isBigPhone]?(self.navigationController.navigationBar.frame.size.height):0));
-                [_usersView willMoveToParentViewController:self];
-                [_usersView viewWillAppear:NO];
-                _usersView.view.hidden = NO;
-                [self.view insertSubview:_usersView.view atIndex:1];
-            }
-            _borders.hidden = NO;
-            frame = _serverStatusBar.frame;
-            frame.origin.x = _buffersView.view.frame.size.width;
-            frame.size.width = _eventsView.view.frame.size.width;
-            _serverStatusBar.frame = frame;
-        } else {
-            _borders.hidden = YES;
-            if(!self.slidingViewController.underLeftViewController)
-                self.slidingViewController.underLeftViewController = _buffersView;
-            if(!self.navigationItem.leftBarButtonItem)
-                self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
-            _eventsView.view.frame = CGRectMake(0,0,width, height + _kbSize.height);
-            _bottomBar.frame = CGRectMake(0,height - _message.frame.size.height - 8,_eventsView.view.frame.size.width,_message.frame.size.height + 8);
-            if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
-                _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
-            else
-                _landscapeView.transform = CGAffineTransformIdentity;
-            _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
-            frame = _serverStatusBar.frame;
-            frame.origin.x = 0;
-            frame.size.width = _eventsView.view.frame.size.width;
-
-            _serverStatusBar.frame = frame;
-            [self.slidingViewController updateUnderLeftLayout];
-            [self.slidingViewController updateUnderRightLayout];
-        }
-        if(duration > 0) {
-            _eventsView.view.hidden = YES;
-            _eventActivity.center = _eventsView.tableView.center;
-            _eventActivity.alpha = 1;
-            [_eventActivity startAnimating];
-        }
-        _message.maximumNumberOfLines = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)?10:UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?4:6;
-        if(duration > 0)
-            _message.text = _message.text;
-        frame = _eventsView.view.frame;
-        frame.origin.y = _eventsView.tableView.contentInset.top;
-        frame.size.height = 32;
-        _eventsView.topUnreadView.frame = frame;
-        frame.origin.y = _bottomBar.frame.origin.y - 32;
-        _eventsView.bottomUnreadView.frame = frame;
-        float h = [@" " sizeWithAttributes:@{NSFontAttributeName:_nickCompletionView.font}].height + 12;
-        _nickCompletionView.frame = CGRectMake(_bottomBar.frame.origin.x + 8,_bottomBar.frame.origin.y - h - 20, _bottomBar.frame.size.width - 16, h);
-        _nickCompletionView.layer.cornerRadius = 5;
-        
-        if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-            frame = self.navigationController.navigationBar.frame;
-            frame.origin.x = _buffersView.tableView.frame.size.width;
-            frame.size.width = width - _buffersView.tableView.frame.size.width;
-            self.navigationController.navigationBar.frame = frame;
-            _borders.frame = CGRectMake(_buffersView.tableView.frame.size.width - 1, -self.navigationController.navigationBar.frame.size.height, _eventsView.tableView.frame.size.width + 2, height + self.navigationController.navigationBar.frame.size.height);
-        }
-
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-            frame = self.navigationController.navigationBar.frame;
-            frame.origin.y = 0;
-            frame.size.width = width - (([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))?_buffersView.view.frame.size.width:0);
-            frame.origin.y = sbheight - (sbheight > 20?20:0);
-            [self.navigationController.navigationBar setFrame:frame];
-        }
-        
-        frame = _titleView.frame;
-        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
-            frame.size.height = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?24:40;
-            _topicLabel.alpha = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?0:1;
-        }
-        frame.size.width = width - 128;
-        if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && UIInterfaceOrientationIsLandscape(toInterfaceOrientation))
-            frame.size.width -= _buffersView.tableView.frame.size.width;
-        _connectingView.frame = _titleView.frame = frame;
-
-        frame = _connectingProgress.frame;
-        frame.origin.x = 0;
-        frame.origin.y = self.navigationController.navigationBar.frame.size.height - frame.size.height;
-        frame.size.width = self.navigationController.navigationBar.frame.size.width;
-        _connectingProgress.frame = frame;
-        _connectingStatus.frame = _connectingView.bounds;
-        
-        self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
-        [self _updateTitleArea];
-        [self _updateServerStatus];
-        [self _updateUserListVisibility];
-        [self _updateGlobalMsg];
-        [self _updateMessageWidth];
-        [self _updateEventsInsets];
-        
-        UIView *v = self.navigationItem.titleView;
-        self.navigationItem.titleView = nil;
-        self.navigationItem.titleView = v;
-        
-        [self performSelector:@selector(_monitorLayoutChanges) withObject:nil afterDelay:0.25];*/
-    }
-}
-
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    _eventsView.view.hidden = NO;
-    _eventActivity.alpha = 0;
-    [_eventActivity stopAnimating];
 }
 
 -(void)_updateEventsInsets {
@@ -3203,51 +2989,36 @@ extern NSDictionary *emojiMap;
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
     _selectedUser = nil;
     _selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-        if([_selectedBuffer.type isEqualToString:@"console"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
-            if([s.status isEqualToString:@"disconnected"]) {
-                [alert addAction:[UIAlertAction actionWithTitle:@"Reconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                    [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid];
-                }]];
-                [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
-                    [self _deleteSelectedBuffer];
-                }]];
-            } else {
-                [alert addAction:[UIAlertAction actionWithTitle:@"Disconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                    [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil];
-                }]];
-            }
-            [alert addAction:[UIAlertAction actionWithTitle:@"Edit Connection" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [self _editConnection];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    if([_selectedBuffer.type isEqualToString:@"console"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
+        if([s.status isEqualToString:@"disconnected"]) {
+            [alert addAction:[UIAlertAction actionWithTitle:@"Reconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid];
             }]];
-        } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
-            if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
-                [alert addAction:[UIAlertAction actionWithTitle:@"Leave" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                    [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid];
-                }]];
-                [alert addAction:[UIAlertAction actionWithTitle:@"Invite to Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                    [self _inviteToChannel];
-                }]];
-            } else {
-                [alert addAction:[UIAlertAction actionWithTitle:@"Rejoin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                    [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid];
-                }]];
-                if(_selectedBuffer.archived) {
-                    [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                        [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
-                    }]];
-                } else {
-                    [alert addAction:[UIAlertAction actionWithTitle:@"Archive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                        [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
-                    }]];
-                }
-                [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
-                    [self _deleteSelectedBuffer];
-                }]];
-            }
+            [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
+                [self _deleteSelectedBuffer];
+            }]];
         } else {
+            [alert addAction:[UIAlertAction actionWithTitle:@"Disconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil];
+            }]];
+        }
+        [alert addAction:[UIAlertAction actionWithTitle:@"Edit Connection" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _editConnection];
+        }]];
+    } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
+        if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
+            [alert addAction:[UIAlertAction actionWithTitle:@"Leave" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid];
+            }]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Invite to Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [self _inviteToChannel];
+            }]];
+        } else {
+            [alert addAction:[UIAlertAction actionWithTitle:@"Rejoin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid];
+            }]];
             if(_selectedBuffer.archived) {
                 [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                     [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
@@ -3261,63 +3032,37 @@ extern NSDictionary *emojiMap;
                 [self _deleteSelectedBuffer];
             }]];
         }
-        [alert addAction:[UIAlertAction actionWithTitle:@"Mark All as Read" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self _markAllAsRead];
-        }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Add a Network" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self _addNetwork];
-        }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Join a Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self _joinAChannel];
-        }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Reorder" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self _reorder];
-        }]];
-
-        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
-        alert.popoverPresentationController.sourceRect = rect;
-        alert.popoverPresentationController.sourceView = _buffersView.tableView;
-        [self presentViewController:alert animated:YES completion:nil];
     } else {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
-        if([_selectedBuffer.type isEqualToString:@"console"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
-            if([s.status isEqualToString:@"disconnected"]) {
-                [sheet addButtonWithTitle:@"Reconnect"];
-                [sheet addButtonWithTitle:@"Delete"];
-            } else {
-                [sheet addButtonWithTitle:@"Join a Channel"];
-                [sheet addButtonWithTitle:@"Disconnect"];
-            }
-            [sheet addButtonWithTitle:@"Edit Connection"];
-        } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
-            if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
-                [sheet addButtonWithTitle:@"Leave"];
-                [sheet addButtonWithTitle:@"Invite to Channel"];
-            } else {
-                [sheet addButtonWithTitle:@"Rejoin"];
-                [sheet addButtonWithTitle:(_selectedBuffer.archived)?@"Unarchive":@"Archive"];
-                [sheet addButtonWithTitle:@"Delete"];
-            }
+        if(_selectedBuffer.archived) {
+            [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+            }]];
         } else {
-            if(_selectedBuffer.archived) {
-                [sheet addButtonWithTitle:@"Unarchive"];
-            } else {
-                [sheet addButtonWithTitle:@"Archive"];
-            }
-            [sheet addButtonWithTitle:@"Delete"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Archive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+            }]];
         }
-        [sheet addButtonWithTitle:@"Mark All As Read"];
-        [sheet addButtonWithTitle:@"Add A Network"];
-        [sheet addButtonWithTitle:@"Reorder"];
-        sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-            [self.view.window addSubview:_landscapeView];
-            [sheet showInView:_landscapeView];
-        } else {
-            [sheet showFromRect:rect inView:_buffersView.tableView animated:YES];
-        }
+        [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
+            [self _deleteSelectedBuffer];
+        }]];
     }
+    [alert addAction:[UIAlertAction actionWithTitle:@"Mark All as Read" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [self _markAllAsRead];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Add a Network" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [self _addNetwork];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Join a Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [self _joinAChannel];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Reorder" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [self _reorder];
+    }]];
+
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+    alert.popoverPresentationController.sourceRect = rect;
+    alert.popoverPresentationController.sourceView = _buffersView.tableView;
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect link:(NSString *)url {
@@ -3838,71 +3583,42 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)uploadsButtonPressed:(id)sender {
-    NSLog(@"Quack %f", _titleOffsetYConstraint.constant);
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-        
-        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-            [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                if(self.presentedViewController)
-                    [self dismissViewControllerAnimated:NO completion:nil];
-                [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
-            }]];
-        }
-        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-            [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                if(self.presentedViewController)
-                    [self dismissViewControllerAnimated:NO completion:nil];
-                [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
-            }]];
-        }
-        [alert addAction:[UIAlertAction actionWithTitle:@"Start a Pastebin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self _startPastebin];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+        [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            if(self.presentedViewController)
+                [self dismissViewControllerAnimated:NO completion:nil];
+            [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
         }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Pastebins" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self _showPastebins];
-        }]];
-        if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-            [alert addAction:[UIAlertAction actionWithTitle:@"File Uploads" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [self _showUploads];
-            }]];
-            [alert addAction:[UIAlertAction actionWithTitle:@"Choose Document" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                if(self.presentedViewController)
-                    [self dismissViewControllerAnimated:NO completion:nil];
-                [self _chooseFile];
-            }]];
-        }
-        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
-        alert.popoverPresentationController.sourceRect = CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height);
-        alert.popoverPresentationController.sourceView = self.view;
-        [self presentViewController:alert animated:YES completion:nil];
-    } else {
-        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-            UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo", @"Start a Pastebin", @"Pastebins", ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"File Uploads":nil, ([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Document":nil, nil];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-                [self.view.window addSubview:_landscapeView];
-                [sheet showInView:_landscapeView];
-            } else {
-                [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
-            }
-        } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8 && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-            UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Choose Photo or Video", @"File Uploads", @"Choose Document", @"Start a Pastebin", @"Pastebins", nil];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-                [self.view.window addSubview:_landscapeView];
-                [sheet showInView:_landscapeView];
-            } else {
-                [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
-            }
-        } else {
-            UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo", @"Start a Pastebin", @"Pastebins", [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]?@"File Uploads":nil, nil];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-                [self.view.window addSubview:_landscapeView];
-                [sheet showInView:_landscapeView];
-            } else {
-                [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view animated:YES];
-            }
-        }
     }
+    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+        [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            if(self.presentedViewController)
+                [self dismissViewControllerAnimated:NO completion:nil];
+            [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+        }]];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:@"Start a Pastebin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [self _startPastebin];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Pastebins" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [self _showPastebins];
+    }]];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+        [alert addAction:[UIAlertAction actionWithTitle:@"File Uploads" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _showUploads];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Choose Document" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            if(self.presentedViewController)
+                [self dismissViewControllerAnimated:NO completion:nil];
+            [self _chooseFile];
+        }]];
+    }
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+    alert.popoverPresentationController.sourceRect = CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height);
+    alert.popoverPresentationController.sourceView = self.view;
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {

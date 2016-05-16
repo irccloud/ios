@@ -316,27 +316,15 @@
     }
     
     UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:activities];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
-            if(completed) {
-                if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                    activityType = [activityType substringFromIndex:25];
-                if([activityType hasPrefix:@"com.apple."])
-                    activityType = [activityType substringFromIndex:10];
-                [Answers logShareWithMethod:activityType contentName:nil contentType:type contentId:nil customAttributes:nil];
-            }
-        };
-    } else {
-        activityController.completionHandler = ^(NSString *activityType, BOOL completed) {
-            if(completed) {
-                if([activityType hasPrefix:@"com.apple.UIKit.activity."])
-                    activityType = [activityType substringFromIndex:25];
-                if([activityType hasPrefix:@"com.apple."])
-                    activityType = [activityType substringFromIndex:10];
-                [Answers logShareWithMethod:activityType contentName:nil contentType:type contentId:nil customAttributes:nil];
-            }
-        };
-    }
+    activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+        if(completed) {
+            if([activityType hasPrefix:@"com.apple.UIKit.activity."])
+                activityType = [activityType substringFromIndex:25];
+            if([activityType hasPrefix:@"com.apple."])
+                activityType = [activityType substringFromIndex:10];
+            [Answers logShareWithMethod:activityType contentName:nil contentType:type contentId:nil customAttributes:nil];
+        }
+    };
     return activityController;
 }
 

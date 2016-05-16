@@ -150,7 +150,7 @@
 #else
     host.hidden = YES;
 #endif
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:self.view.bounds.size];
 }
 
 -(void)hideLoginView {
@@ -196,12 +196,12 @@
     enterpriseLearnMore.alpha = 1;
     hostHint.alpha = 1;
 #endif
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:self.view.bounds.size];
     if(_accessLink && IRCCLOUD_HOST.length) {
         _gotCredentialsFromPasswordManager = YES;
         [self _loginWithAccessLink];
 #ifndef ENTERPRISE
-    } else if ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+    } else {
         [self performSelector:@selector(_promptForSWC) withObject:nil afterDelay:0.1];
 #endif
     }
@@ -259,16 +259,14 @@
             [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
             [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
             [[NSUserDefaults standardUserDefaults] synchronize];
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
-                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-                [d setObject:IRCCLOUD_HOST forKey:@"host"];
-                [d setObject:IRCCLOUD_PATH forKey:@"path"];
-                [d synchronize];
-            }
+            [d setObject:IRCCLOUD_HOST forKey:@"host"];
+            [d setObject:IRCCLOUD_PATH forKey:@"path"];
+            [d synchronize];
             loginHint.alpha = 0;
             signupHint.alpha = 0;
             enterpriseHint.alpha = 0;
@@ -296,7 +294,7 @@
 
 -(void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:self.view.bounds.size];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -341,16 +339,7 @@
     return logo;
 }
 
--(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    self.view.frame = [UIScreen mainScreen].applicationFrame;
-    [self.view updateConstraints];
-    float width = self.view.frame.size.width;
-    float height = self.view.frame.size.height;
-    if(UIInterfaceOrientationIsLandscape(toInterfaceOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        width = self.view.frame.size.height;
-        height = self.view.frame.size.width;
-    }
-    
+-(void)transitionToSize:(CGSize)size {
     if(_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         self.view.window.backgroundColor = [UIColor colorWithRed:68.0/255.0 green:128.0/255.0 blue:250.0/255.0 alpha:1];
         loadingViewYOffset.constant = loginViewYOffset.constant = 0;
@@ -359,9 +348,16 @@
         loginViewYOffset.constant = 119;
         loadingViewYOffset.constant = 78;
     }
-
+    
     [self _updateFieldPositions];
-    [self.view updateConstraints];
+}
+
+-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self transitionToSize:size];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+    }];
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
@@ -370,7 +366,7 @@
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     _kbSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:self.view.bounds.size];
     [UIView commitAnimations];
 }
 
@@ -380,7 +376,7 @@
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     _kbSize = CGSizeZero;
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:self.view.bounds.size];
     [UIView commitAnimations];
 }
 
@@ -412,7 +408,7 @@
     notAProblem.alpha = 0;
     sendAccessLink.alpha = 0;
     enterEmailAddressHint.alpha = 0;
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:self.view.bounds.size];
     if(sender)
         [UIView commitAnimations];
     [self textFieldChanged:name];
@@ -434,7 +430,7 @@
     notAProblem.alpha = 0;
     sendAccessLink.alpha = 0;
     enterEmailAddressHint.alpha = 0;
-    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:self.view.bounds.size];
     if(sender)
         [UIView commitAnimations];
     [self textFieldChanged:username];
@@ -635,7 +631,7 @@
                         enterpriseHint.alpha = 1;
                     login.alpha = 1;
                     forgotPasswordHint.alpha = 1;
-                    [self willAnimateRotationToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+                    [self transitionToSize:self.view.bounds.size];
                 }
                 [UIView beginAnimations:nil context:nil];
                 loginView.alpha = 1;
@@ -692,23 +688,21 @@
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
                 [[NSUserDefaults standardUserDefaults] synchronize];
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
-                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-                    [d setObject:IRCCLOUD_HOST forKey:@"host"];
-                    [d setObject:IRCCLOUD_PATH forKey:@"path"];
-                    [d synchronize];
-                }
+                [d setObject:IRCCLOUD_HOST forKey:@"host"];
+                [d setObject:IRCCLOUD_PATH forKey:@"path"];
+                [d synchronize];
 #ifndef ENTERPRISE
                 if(name.alpha) {
                     [Answers logSignUpWithMethod:@"email" success:@YES customAttributes:nil];
                 } else {
                     [Answers logLoginWithMethod:@"email" success:@YES customAttributes:nil];
                 }
-                if(!_gotCredentialsFromPasswordManager && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
+                if(!_gotCredentialsFromPasswordManager) {
                     SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)(username.text), (__bridge CFStringRef)(password.text), ^(CFErrorRef error) {
                         if (error != NULL) {
                             NSLog(@"Unable to save shared credentials: %@", error);

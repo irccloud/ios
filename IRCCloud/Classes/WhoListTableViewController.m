@@ -140,30 +140,21 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     _selectedRow = [_data objectAtIndex:[indexPath row]];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-        
-        [alert addAction:[UIAlertAction actionWithTitle:@"Send a message" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:0];
-        }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Whois" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:1];
-        }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Copy hostmask" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:2];
-        }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
-        alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
-        alert.popoverPresentationController.sourceView = self.view;
-        [self.navigationController presentViewController:alert animated:YES completion:nil];
-    } else {
-        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Send a message", "Whois", "Copy hostmask", nil];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-            [sheet showInView:self.view];
-        } else {
-            [sheet showFromRect:[self.tableView rectForRowAtIndexPath:indexPath] inView:self.view animated:YES];
-        }
-    }
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Send a message" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:0];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Whois" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:1];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Copy hostmask" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:2];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+    alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
+    alert.popoverPresentationController.sourceView = self.view;
+    [self.navigationController presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {

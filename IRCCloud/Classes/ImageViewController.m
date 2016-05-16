@@ -87,15 +87,8 @@
     return _imageView;
 }
 
--(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    int height = ((UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.width:[UIScreen mainScreen].applicationFrame.size.height);
-    int width = (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8)?[UIScreen mainScreen].applicationFrame.size.height:[UIScreen mainScreen].applicationFrame.size.width;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8)
-        height += [UIApplication sharedApplication].statusBarFrame.size.height;
-    else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] == 7)
-        height += UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?[UIApplication sharedApplication].statusBarFrame.size.width:[UIApplication sharedApplication].statusBarFrame.size.height;
-
-    _scrollView.frame = CGRectMake(0,0,width,height);
+-(void)transitionToSize:(CGSize)size {
+    _scrollView.frame = CGRectMake(0,0,size.width,size.height);
     if(_imageView.image) {
         [_imageView sizeToFit];
         CGRect frame = _imageView.frame;
@@ -110,6 +103,14 @@
     
     if(_movieController)
         _movieController.view.frame = _scrollView.bounds;
+}
+
+-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self transitionToSize:size];
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+    }];
 }
 
 -(void)_setImage:(UIImage *)img {
@@ -636,7 +637,7 @@
     [self.view addGestureRecognizer:panGesture];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
-    [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:self.view.bounds.size];
     [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
     
     if(_previewing)
@@ -728,16 +729,14 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self willRotateToInterfaceOrientation:[UIApplication sharedApplication].statusBarOrientation duration:0];
+    [self transitionToSize:self.view.bounds.size];
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-        NSUserActivity *activity = [self userActivity];
-        [activity invalidate];
-        activity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
-        activity.webpageURL = [NSURL URLWithString:[_url.absoluteString stringByReplacingCharactersInRange:NSMakeRange(0, _url.scheme.length) withString:_url.scheme.lowercaseString]];
-        [self setUserActivity:activity];
-        [activity becomeCurrent];
-    }
+    NSUserActivity *activity = [self userActivity];
+    [activity invalidate];
+    activity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
+    activity.webpageURL = [NSURL URLWithString:[_url.absoluteString stringByReplacingCharactersInRange:NSMakeRange(0, _url.scheme.length) withString:_url.scheme.lowercaseString]];
+    [self setUserActivity:activity];
+    [activity becomeCurrent];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -762,10 +761,8 @@
     if(NSClassFromString(@"UIActivityViewController")) {
         UIActivityViewController *activityController = [URLHandler activityControllerForItems:_imageView.image?@[_url,_imageView.image]:@[_url] type:_movieController?@"Animation":@"Image"];
 
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-            activityController.popoverPresentationController.delegate = self;
-            activityController.popoverPresentationController.barButtonItem = sender;
-        }
+        activityController.popoverPresentationController.delegate = self;
+        activityController.popoverPresentationController.barButtonItem = sender;
         [self presentViewController:activityController animated:YES completion:nil];
         [_hideTimer invalidate];
         _hideTimer = nil;

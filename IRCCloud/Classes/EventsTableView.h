@@ -98,4 +98,5 @@
 -(void)clearLastSeenMarker;
 -(void)refresh;
 -(void)clearCachedHeights;
+-(void)didRotate;
 @end

@@ -32,15 +32,11 @@
 
 -(void)_authorize {
     NSUserDefaults *d;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        d = [NSUserDefaults standardUserDefaults];
-    } else {
 #ifdef ENTERPRISE
-        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-    }
 
 #ifdef IMGUR_KEY
     NSUserDefaults *d2 = [NSUserDefaults standardUserDefaults];
@@ -188,15 +184,11 @@
 -(void)_upload:(UIImage *)img {
     _response = [[NSMutableData alloc] init];
     NSUserDefaults *d;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        d = [NSUserDefaults standardUserDefaults];
-    } else {
 #ifdef ENTERPRISE
-        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-    }
     int size = [[d objectForKey:@"photoSize"] intValue];
     NSData *data = UIImageJPEGRepresentation((size != -1)?[self image:img scaledCopyOfSize:CGSizeMake(size,size)]:img, 0.8);
     CFStringRef data_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[data base64EncodedString], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
@@ -222,19 +214,12 @@
     [request setHTTPBody:[[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
     NSURLSession *session;
     NSURLSessionConfiguration *config;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-        config = [NSURLSessionConfiguration backgroundSessionConfiguration:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
-#pragma GCC diagnostic pop
-    } else {
-        config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+    config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
 #ifdef ENTERPRISE
-        config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
+    config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
 #else
-        config.sharedContainerIdentifier = @"group.com.irccloud.share";
+    config.sharedContainerIdentifier = @"group.com.irccloud.share";
 #endif
-    }
     config.HTTPCookieStorage = nil;
     config.URLCache = nil;
     config.requestCachePolicy = NSURLCacheStorageNotAllowed;
@@ -315,15 +300,11 @@
     [[NSFileManager defaultManager] removeItemAtURL:location error:nil];
     [self connectionDidFinishLoading:_connection];
     NSUserDefaults *d;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        d = [NSUserDefaults standardUserDefaults];
-    } else {
 #ifdef ENTERPRISE
-        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-    }
     NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
     [uploadtasks removeObjectForKey:session.configuration.identifier];
     [d setObject:uploadtasks forKey:@"uploadtasks"];
@@ -332,15 +313,11 @@
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     NSUserDefaults *d;
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 8) {
-        d = [NSUserDefaults standardUserDefaults];
-    } else {
 #ifdef ENTERPRISE
-        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-    }
     NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
     [uploadtasks removeObjectForKey:session.configuration.identifier];
     [d setObject:uploadtasks forKey:@"uploadtasks"];

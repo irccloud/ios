@@ -79,22 +79,20 @@
                 [[NSUserDefaults standardUserDefaults] setObject:value forKey:[NSString stringWithFormat:@"imgur_%@", name]];
             }
             [[NSUserDefaults standardUserDefaults] synchronize];
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
 #ifdef ENTERPRISE
-                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+            NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-                if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
-                    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] forKey:@"imgur_access_token"];
-                else
-                    [d removeObjectForKey:@"imgur_access_token"];
-                if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"])
-                    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"] forKey:@"imgur_refresh_token"];
-                else
-                    [d removeObjectForKey:@"imgur_refresh_token"];
-                [d synchronize];
-            }
+            if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
+                [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] forKey:@"imgur_access_token"];
+            else
+                [d removeObjectForKey:@"imgur_access_token"];
+            if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"])
+                [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"] forKey:@"imgur_refresh_token"];
+            else
+                [d removeObjectForKey:@"imgur_refresh_token"];
+            [d synchronize];
             [self.navigationController popViewControllerAnimated:YES];
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             return NO;

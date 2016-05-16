@@ -535,14 +535,19 @@ int __timestampWidth;
         [self scrollViewDidScroll:self.tableView];
 }
 
--(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    if(_data.count && _buffer.scrolledUp)
-        _bottomRow = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row];
-    else
-        _bottomRow = -1;
+-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        if(_data.count && _buffer.scrolledUp)
+            _bottomRow = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row];
+        else
+            _bottomRow = -1;
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self didRotate];
+    }];
 }
 
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
+-(void)didRotate {
     if(_ready && [UIApplication sharedApplication].statusBarOrientation != _lastOrientation) {
         [self clearCachedHeights];
     }

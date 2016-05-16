@@ -198,11 +198,8 @@
 -(void)_YTShare:(id)sender {
     if(NSClassFromString(@"UIActivityViewController")) {
         UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[_url] type:@"Youtube"];
-        
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
-            activityController.popoverPresentationController.delegate = self;
-            activityController.popoverPresentationController.barButtonItem = sender;
-        }
+        activityController.popoverPresentationController.delegate = self;
+        activityController.popoverPresentationController.barButtonItem = sender;
         [self presentViewController:activityController animated:YES completion:nil];
     }
 }
