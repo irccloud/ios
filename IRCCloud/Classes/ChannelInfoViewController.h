@@ -29,5 +29,5 @@
     BOOL _topicChanged;
     int offset;
 }
--(id)initWithBid:(int)bid;
+-(id)initWithChannel:(Channel *)channel;
 @end

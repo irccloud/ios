@@ -24,10 +24,10 @@
 
 @implementation ChannelInfoViewController
 
--(id)initWithBid:(int)bid {
+-(id)initWithChannel:(Channel *)channel {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
-        _channel = [[ChannelsDataSource sharedInstance] channelForBuffer:bid];
+        _channel = channel;
         _modeHints = [[NSMutableArray alloc] init];
         _topicChanged = NO;
     }
@@ -205,6 +205,8 @@
             }
         }
     }
+    if(_channel.bid == -1)
+        self.navigationItem.rightBarButtonItem = nil;
     [self.tableView reloadData];
 }
 

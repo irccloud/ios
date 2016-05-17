@@ -378,7 +378,7 @@ extern NSDictionary *emojiMap;
     if(CGRectContainsPoint(_titleView.frame, [_titleView convertPoint:location fromView:self.navigationController.view])) {
         if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             previewingContext.sourceRect = [self.navigationController.view convertRect:_titleView.frame fromView:self.navigationController.navigationBar];
-            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
+            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithChannel:[[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             nc.navigationBarHidden = YES;
@@ -515,6 +515,7 @@ extern NSDictionary *emojiMap;
 
 - (void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
+    Channel *c;
     Buffer *b = nil;
     IRCCloudJSONObject *o = nil;
     ChannelModeListTableViewController *cmltv = nil;
@@ -549,7 +550,29 @@ extern NSDictionary *emojiMap;
         }
             break;
         case kIRCEventChannelTopicIs:
-            [self titleAreaPressed:nil];
+            o = notification.object;
+            b = [[BuffersDataSource sharedInstance] getBufferWithName:[o objectForKey:@"chan"] server:o.cid];
+            if(b) {
+                c = [[ChannelsDataSource sharedInstance] channelForBuffer:b.bid];
+            } else {
+                c = [[Channel alloc] init];
+                c.cid = o.cid;
+                c.bid = -1;
+                c.name = [o objectForKey:@"chan"];
+                c.topic_author = [o objectForKey:@"author"]?[o objectForKey:@"author"]:[o objectForKey:@"server"];
+                c.topic_time = [[o objectForKey:@"time"] doubleValue];
+                c.topic_text = [o objectForKey:@"text"];
+            }
+            if(c) {
+                ChannelInfoViewController *cvc = [[ChannelInfoViewController alloc] initWithChannel:c];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cvc];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                [self presentViewController:nc animated:YES completion:nil];
+            }
             break;
         case kIRCEventChannelInit:
         case kIRCEventChannelTopic:
@@ -3090,7 +3113,7 @@ extern NSDictionary *emojiMap;
         [[NetworkConnection sharedInstance] connect:NO];
     } else {
         if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithBid:_buffer.bid];
+            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithChannel:[[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
