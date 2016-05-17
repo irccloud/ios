@@ -1334,6 +1334,7 @@ extern NSDictionary *emojiMap;
 - (void)viewWillAppear:(BOOL)animated {
     _isShowingPreview = NO;
     [super viewWillAppear:animated];
+    [_eventsView viewWillAppear:animated];
     [self _resetStatusBar];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -1402,6 +1403,7 @@ extern NSDictionary *emojiMap;
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    [_eventsView viewWillDisappear:animated];
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
     [_doubleTapTimer invalidate];
@@ -1417,6 +1419,7 @@ extern NSDictionary *emojiMap;
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+    [_eventsView viewDidAppear:animated];
     [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
     [_eventsView didRotate];
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
