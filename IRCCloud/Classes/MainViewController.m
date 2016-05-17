@@ -2452,7 +2452,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)_updateEventsInsets {
-    _bottomBarOffsetConstraint.constant = -_kbSize.height;
+    _bottomBarOffsetConstraint.constant = _kbSize.height;
     CGFloat height = _bottomBarHeightConstraint.constant + _kbSize.height;
     CGFloat top = 0;
     if(!_globalMsgContainer.hidden)
