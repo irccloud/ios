@@ -2391,8 +2391,8 @@ extern NSDictionary *emojiMap;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
         _borders.hidden = NO;
-        _eventsViewWidthConstraint.constant = self.view.frame.size.width - 222;
-        _eventsViewOffsetXConstraint.constant = 110;
+        _eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
+        _eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
@@ -2404,7 +2404,7 @@ extern NSDictionary *emojiMap;
             [self.view addSubview:_buffersView.view];
             _buffersView.view.autoresizingMask = UIViewAutoresizingNone;
         }
-        _buffersView.view.frame = CGRectMake(0,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,[[UIDevice currentDevice] isBigPhone]?180:220,size.height + ([[UIDevice currentDevice] isBigPhone]?self.navigationController.navigationBar.frame.size.height:0));
+        _buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,size.height);
     } else {
         _borders.hidden = YES;
         _eventsViewWidthConstraint.constant = size.width;
@@ -2522,7 +2522,7 @@ extern NSDictionary *emojiMap;
                     [_usersView viewWillAppear:NO];
                     _usersView.view.autoresizingMask = UIViewAutoresizingNone;
                 }
-                _usersView.view.frame = CGRectMake(self.view.frame.size.width - 220,[[UIDevice currentDevice] isBigPhone]?(-self.navigationController.navigationBar.frame.size.height):0,220,self.view.frame.size.height + ([[UIDevice currentDevice] isBigPhone]?(self.navigationController.navigationBar.frame.size.height):0));
+                _usersView.view.frame = CGRectMake(self.view.frame.size.width - 220,0,220,self.view.frame.size.height);
                 _usersView.view.hidden = NO;
                 if(_usersView.view.superview != self.view)
                     [self.view insertSubview:_usersView.view atIndex:1];
@@ -2546,8 +2546,8 @@ extern NSDictionary *emojiMap;
                     self.slidingViewController.underRightViewController = nil;
                     _usersView.view.hidden = YES;
                 }
-                _eventsViewWidthConstraint.constant = self.view.frame.size.width - 222;
-                _eventsViewOffsetXConstraint.constant = 110;
+                _eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
+                _eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
             }
         } else {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
