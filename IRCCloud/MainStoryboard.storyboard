@@ -944,8 +944,6 @@
                         <outlet property="_bottomBarHeightConstraint" destination="SuG-V2-yni" id="cDA-7s-7nQ"/>
                         <outlet property="_bottomBarOffsetConstraint" destination="QeJ-M1-Agt" id="7eq-X7-HZw"/>
                         <outlet property="_bottomUnreadBarYOffsetConstraint" destination="J0Y-Xk-O0Z" id="mmJ-qK-vvJ"/>
-                        <outlet property="_connectingActivity" destination="noO-uJ-InE" id="TBn-cb-Nbt"/>
-                        <outlet property="_connectingProgress" destination="C4l-48-oFb" id="4Dk-P7-4SL"/>
                         <outlet property="_connectingStatus" destination="Lgm-9B-bG7" id="JDh-bT-fUg"/>
                         <outlet property="_connectingView" destination="HHq-2d-yEd" id="NH2-ao-sp5"/>
                         <outlet property="_eventActivity" destination="37K-X6-4EC" id="w6Q-8m-TGd"/>
@@ -1045,19 +1043,11 @@
                             <nil key="highlightedColor"/>
                             <size key="shadowOffset" width="0.0" height="0.0"/>
                         </label>
-                        <progressView hidden="YES" opaque="NO" contentMode="scaleToFill" fixedFrame="YES" progressViewStyle="bar" translatesAutoresizingMaskIntoConstraints="NO" id="C4l-48-oFb">
-                            <rect key="frame" x="0.0" y="0.0" width="0.0" height="3"/>
-                        </progressView>
-                        <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" hidesWhenStopped="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="noO-uJ-InE">
-                            <rect key="frame" x="282" y="30" width="20" height="20"/>
-                        </activityIndicatorView>
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstItem="noO-uJ-InE" firstAttribute="top" secondItem="Lgm-9B-bG7" secondAttribute="bottom" id="7kP-ll-9J8"/>
                         <constraint firstItem="Lgm-9B-bG7" firstAttribute="leading" secondItem="HHq-2d-yEd" secondAttribute="leading" id="A49-Jb-UIn"/>
                         <constraint firstItem="Lgm-9B-bG7" firstAttribute="centerY" secondItem="HHq-2d-yEd" secondAttribute="centerY" id="Dbe-gW-oI5"/>
-                        <constraint firstItem="noO-uJ-InE" firstAttribute="centerX" secondItem="HHq-2d-yEd" secondAttribute="centerX" id="Hyy-i3-6fD"/>
                         <constraint firstItem="Lgm-9B-bG7" firstAttribute="centerX" secondItem="HHq-2d-yEd" secondAttribute="centerX" id="uY4-vm-4f7"/>
                         <constraint firstAttribute="trailing" secondItem="Lgm-9B-bG7" secondAttribute="trailing" id="w1L-4c-oHW"/>
                     </constraints>

@@ -30,9 +30,7 @@
 @interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate> {
     IBOutlet EventsTableView *_eventsView;
     IBOutlet UIView *_connectingView;
-    IBOutlet UIProgressView *_connectingProgress;
     IBOutlet UILabel *_connectingStatus;
-    IBOutlet UIActivityIndicatorView *_connectingActivity;
     IBOutlet UIView *_bottomBar;
     IBOutlet UILabel *_serverStatus;
     IBOutlet UIView *_serverStatusBar;
@@ -58,6 +56,7 @@
     IBOutlet NSLayoutConstraint *_titleOffsetYConstraint;
     IBOutlet NSLayoutConstraint *_topUnreadBarYOffsetConstraint;
     IBOutlet NSLayoutConstraint *_bottomUnreadBarYOffsetConstraint;
+    UIProgressView *_connectingProgress;
     NSLayoutConstraint *_messageHeightConstraint;
     NSLayoutConstraint *_messageWidthConstraint;
     BuffersTableView *_buffersView;

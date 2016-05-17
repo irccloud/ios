@@ -314,9 +314,12 @@ extern NSDictionary *emojiMap;
     _nickCompletionView.alpha = 0;
     [self.view addSubview:_nickCompletionView];
 
-    [self.navigationController.navigationBar addSubview:_connectingProgress];
+    _connectingProgress = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
     [_connectingProgress sizeToFit];
-    [_connectingActivity removeFromSuperview];
+    _connectingProgress.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    _connectingProgress.frame = CGRectMake(0,self.navigationController.navigationBar.bounds.size.height - _connectingProgress.bounds.size.height,self.navigationController.navigationBar.bounds.size.width,_connectingProgress.bounds.size.height);
+    [self.navigationController.navigationBar addSubview:_connectingProgress];
+    
     _connectingStatus.font = [UIFont boldSystemFontOfSize:20];
     self.navigationItem.titleView = _titleView;
     _connectingProgress.hidden = YES;
@@ -1146,8 +1149,6 @@ extern NSDictionary *emojiMap;
         case kIRCCloudStateConnecting:
             [self _showConnectingView];
             _connectingStatus.text = @"Connecting";
-            [_connectingActivity startAnimating];
-            _connectingActivity.hidden = NO;
             _connectingProgress.progress = 0;
             _connectingProgress.hidden = YES;
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
@@ -1157,8 +1158,6 @@ extern NSDictionary *emojiMap;
             if([NetworkConnection sharedInstance].reconnectTimestamp > 0) {
                 int seconds = (int)([NetworkConnection sharedInstance].reconnectTimestamp - [[NSDate date] timeIntervalSince1970]) + 1;
                 [_connectingStatus setText:[NSString stringWithFormat:@"Reconnecting in 0:%02i", seconds]];
-                _connectingActivity.hidden = NO;
-                [_connectingActivity startAnimating];
                 _connectingProgress.progress = 0;
                 _connectingProgress.hidden = YES;
                 [self performSelector:@selector(connectivityChanged:) withObject:nil afterDelay:1];
@@ -1173,13 +1172,11 @@ extern NSDictionary *emojiMap;
                 } else {
                     _connectingStatus.text = @"Offline";
                 }
-                _connectingActivity.hidden = YES;
                 _connectingProgress.progress = 0;
                 _connectingProgress.hidden = YES;
             }
             break;
         case kIRCCloudStateConnected:
-            [_connectingActivity stopAnimating];
             for(Event *e in [_pendingEvents copy]) {
                 if(e.reqId == -1 && (([[NSDate date] timeIntervalSince1970] - (e.eid/1000000) - [NetworkConnection sharedInstance].clockOffset) < 60)) {
                     [e.expirationTimer invalidate];
@@ -1207,8 +1204,6 @@ extern NSDictionary *emojiMap;
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             _connectingStatus.textColor = [UIColor navBarHeadingColor];
             [_connectingStatus setText:@"Loading"];
-            _connectingActivity.hidden = YES;
-            [_connectingActivity stopAnimating];
             _connectingProgress.progress = 0;
             _connectingProgress.hidden = NO;
         }];
@@ -3254,8 +3249,6 @@ extern NSDictionary *emojiMap;
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url {
     [self _showConnectingView];
     _connectingStatus.text = @"Uploading";
-    [_connectingActivity startAnimating];
-    _connectingActivity.hidden = NO;
     _connectingProgress.progress = 0;
     _connectingProgress.hidden = YES;
     FileUploader *u = [[FileUploader alloc] init];
@@ -3300,8 +3293,6 @@ extern NSDictionary *emojiMap;
         }
         [self _showConnectingView];
         _connectingStatus.text = @"Uploading";
-        [_connectingActivity startAnimating];
-        _connectingActivity.hidden = NO;
         _connectingProgress.progress = 0;
         _connectingProgress.hidden = YES;
         if((!img || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
@@ -3436,8 +3427,6 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)fileUploadProgress:(float)progress {
-    [_connectingActivity stopAnimating];
-    _connectingActivity.hidden = YES;
     _connectingProgress.hidden = NO;
     [_connectingProgress setProgress:progress animated:YES];
 }
@@ -3469,8 +3458,6 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)imageUploadProgress:(float)progress {
-    [_connectingActivity stopAnimating];
-    _connectingActivity.hidden = YES;
     _connectingProgress.hidden = NO;
     [_connectingProgress setProgress:progress animated:YES];
 }
