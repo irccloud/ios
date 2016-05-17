@@ -18,7 +18,7 @@
 
 @protocol FileUploaderDelegate<NSObject>
 -(void)fileUploadProgress:(float)progress;
--(void)fileUploadDidFail;
+-(void)fileUploadDidFail:(NSString *)reason;
 -(void)fileUploadDidFinish;
 -(void)fileUploadWasCancelled;
 -(void)fileUploadTooLarge;

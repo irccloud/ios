@@ -724,11 +724,19 @@
                             o = n.object;
                             if(_finalizeUploadReqid && [[o objectForKey:@"_reqid"] intValue] == _finalizeUploadReqid) {
                                 CLS_LOG(@"IRCCloud upload failed");
-                                [self.mainViewController fileUploadDidFail];
+                                [self.mainViewController fileUploadDidFail:[o objectForKey:@"message"]];
                                 [[NSNotificationCenter defaultCenter] removeObserver:_IRCEventObserver];
                                 UILocalNotification *alert = [[UILocalNotification alloc] init];
                                 alert.fireDate = [NSDate date];
-                                alert.alertBody = @"Unable to share image. Please try again shortly.";
+                                if([[o objectForKey:@"message"] isEqualToString:@"upload_limit_reached"]) {
+                                    alert.alertBody = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
+                                } else if([[o objectForKey:@"message"] isEqualToString:@"upload_already_exists"]) {
+                                    alert.alertBody = @"You’ve already uploaded this file";
+                                } else if([[o objectForKey:@"message"] isEqualToString:@"banned_content"]) {
+                                    alert.alertBody = @"Banned content";
+                                } else {
+                                    alert.alertBody = @"Failed to upload file. Please try again shortly.";
+                                }
                                 [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                                 if(imageUploadCompletionHandler)
                                     imageUploadCompletionHandler();

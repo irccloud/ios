@@ -74,7 +74,7 @@
         case kIRCEventFailureMsg:
             o = notification.object;
             if(_reqid && [[o objectForKey:@"_reqid"] intValue] == _reqid) {
-                [_delegate fileUploadDidFail];
+                [_delegate fileUploadDidFail:[o objectForKey:@"message"]];
                 [[NSNotificationCenter defaultCenter] removeObserver:self];
             }
             break;
@@ -143,11 +143,11 @@
                 break;
             case AVAssetExportSessionStatusFailed:
                 NSLog(@"Export failed: %@", [[exportSession error] localizedDescription]);
-                [_delegate fileUploadDidFail];
+                [_delegate fileUploadDidFail:[[exportSession error] localizedDescription]];
                 break;
             case AVAssetExportSessionStatusCancelled:
                 NSLog(@"Export canceled");
-                [_delegate fileUploadDidFail];
+                [_delegate fileUploadDidFail:@"Export cancelled"];
                 break;
             default:
                 break;
@@ -470,7 +470,7 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
     CLS_LOG(@"Error: %@", error);
-    [_delegate fileUploadDidFail];
+    [_delegate fileUploadDidFail:error.localizedDescription];
 }
 
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection {
@@ -490,11 +490,11 @@
                 _reqid = [[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename?_filename:@"" originalFilename:_originalFilename?_originalFilename:@""];
             }
         } else {
-            [_delegate fileUploadDidFail];
+            [_delegate fileUploadDidFail:[d objectForKey:@"message"]];
         }
     } else {
         CLS_LOG(@"UPLOAD: Invalid JSON response: %@", [[NSString alloc] initWithData:_response encoding:NSUTF8StringEncoding]);
-        [_delegate fileUploadDidFail];
+        [_delegate fileUploadDidFail:nil];
     }
 }
 
@@ -559,7 +559,7 @@
         CLS_LOG(@"Upload error: %@", error);
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [_delegate fileUploadDidFail];
+            [_delegate fileUploadDidFail:error.localizedDescription];
         }];
     }
     [session finishTasksAndInvalidate];

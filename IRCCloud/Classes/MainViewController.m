@@ -3431,10 +3431,20 @@ extern NSDictionary *emojiMap;
     [_connectingProgress setProgress:progress animated:YES];
 }
 
--(void)fileUploadDidFail {
-    CLS_LOG(@"File upload failed");
+-(void)fileUploadDidFail:(NSString *)reason {
+    CLS_LOG(@"File upload failed: %@", reason);
+    NSString *msg;
+    if([reason isEqualToString:@"upload_limit_reached"]) {
+        msg = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
+    } else if([reason isEqualToString:@"upload_already_exists"]) {
+        msg = @"You’ve already uploaded this file";
+    } else if([reason isEqualToString:@"banned_content"]) {
+        msg = @"Banned content";
+    } else {
+        msg = @"Failed to upload file. Please try again shortly.";
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
-    _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the file. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+    _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
     [_alertView show];
     [self _hideConnectingView];
 }

@@ -345,9 +345,21 @@
     }
 }
 
--(void)fileUploadDidFail {
-    NSLog(@"File upload failed");
-    UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"Unable to upload file to IRCCloud. Please try again later." preferredStyle:UIAlertControllerStyleAlert];
+-(void)fileUploadDidFail:(NSString *)reason {
+    NSLog(@"File upload failed: %@", reason);
+    
+    NSString *msg;
+    if([reason isEqualToString:@"upload_limit_reached"]) {
+        msg = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
+    } else if([reason isEqualToString:@"upload_already_exists"]) {
+        msg = @"You’ve already uploaded this file";
+    } else if([reason isEqualToString:@"banned_content"]) {
+        msg = @"Banned content";
+    } else {
+        msg= @"Failed to upload file. Please try again shortly.";
+    }
+
+    UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:msg preferredStyle:UIAlertControllerStyleAlert];
     [c addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
         [self cancel];
         [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
