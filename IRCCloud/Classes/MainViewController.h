@@ -81,7 +81,6 @@
     UIAlertView *_alertView;
     IRCCloudJSONObject *_alertObject;
     SystemSoundID alertSound;
-    UIView *_landscapeView;
     CGSize _kbSize;
     NickCompletionView *_nickCompletionView;
     NSTimer *_nickCompletionTimer;

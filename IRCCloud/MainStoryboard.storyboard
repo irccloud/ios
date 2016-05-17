@@ -1029,7 +1029,6 @@
                         <outlet property="_topUnreadLabel" destination="2eF-8l-jgk" id="2gY-fj-9rU"/>
                         <outlet property="_topUnreadLabelXOffsetConstraint" destination="L3L-aJ-TBg" id="3jc-vB-Mfk"/>
                         <outlet property="_topUnreadView" destination="fvC-nM-NHm" id="5aR-Ab-DI7"/>
-                        <outlet property="view" destination="t8Z-Pu-wcU" id="trB-hB-AYk"/>
                     </connections>
                 </tableViewController>
                 <view opaque="NO" contentMode="scaleToFill" id="HHq-2d-yEd" userLabel="Loading View" customClass="UIControl">

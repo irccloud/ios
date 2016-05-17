@@ -158,6 +158,8 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)viewDidLoad {
+    [super viewDidLoad];
+    [_eventsView viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -288,12 +290,7 @@ extern NSDictionary *emojiMap;
     _menuBtn.accessibilityLabel = @"Channels list";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
     
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(44,8,0,36)];
-        _landscapeView = [[UIView alloc] initWithFrame:CGRectZero];
-    } else {
-        _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(44,8,0,36)];
-    }
+    _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(44,8,0,36)];
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
@@ -2413,11 +2410,6 @@ extern NSDictionary *emojiMap;
             self.slidingViewController.underLeftViewController = _buffersView;
         if(!self.navigationItem.leftBarButtonItem)
             self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
-        if(UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))
-            _landscapeView.transform = ([UIApplication sharedApplication].statusBarOrientation == UIInterfaceOrientationLandscapeLeft)?CGAffineTransformMakeRotation(-M_PI/2):CGAffineTransformMakeRotation(M_PI/2);
-        else
-            _landscapeView.transform = CGAffineTransformIdentity;
-        _landscapeView.frame = [UIScreen mainScreen].applicationFrame;
         [self.slidingViewController updateUnderLeftLayout];
         [self.slidingViewController updateUnderRightLayout];
     }
@@ -2702,8 +2694,7 @@ extern NSDictionary *emojiMap;
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-        [self.view.window addSubview:_landscapeView];
-        [sheet showInView:_landscapeView];
+        [sheet showInView:self.view];
     } else {
         [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _settingsBtn.frame.origin.x, _bottomBar.frame.origin.y,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height) inView:self.view animated:YES];
     }
@@ -2863,8 +2854,7 @@ extern NSDictionary *emojiMap;
     }
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-        [self.view.window addSubview:_landscapeView];
-        [sheet showInView:_landscapeView];
+        [sheet showInView:self.view];
     } else {
         if(_selectedEvent)
             [sheet showFromRect:rect inView:_eventsView.tableView animated:NO];
@@ -3642,7 +3632,6 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    [_landscapeView removeFromSuperview];
     [_message resignFirstResponder];
     if(self.presentedViewController)
         [self dismissViewControllerAnimated:NO completion:nil];

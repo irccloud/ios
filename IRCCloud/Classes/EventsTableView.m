@@ -240,7 +240,7 @@ int __timestampWidth;
     [super viewDidLoad];
     
     if(!_headerView) {
-        _headerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.tableView.frame.size.width,20)];
+        _headerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,_tableView.frame.size.width,20)];
         _headerView.autoresizesSubviews = YES;
         UIActivityIndicatorView *a = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
         a.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
@@ -256,11 +256,11 @@ int __timestampWidth;
         [self.view addSubview:_tableView];
     }
     
-    self.tableView.scrollsToTop = NO;
+    _tableView.scrollsToTop = NO;
     lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
-    [self.tableView addGestureRecognizer:lp];
+    [_tableView addGestureRecognizer:lp];
     _topUnreadView.backgroundColor = [UIColor unreadBlueColor];
     _bottomUnreadView.backgroundColor = [UIColor unreadBlueColor];
     [_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)] forState:UIControlStateNormal];
@@ -271,13 +271,13 @@ int __timestampWidth;
     _backlogFailedButton.titleLabel.shadowOffset = CGSizeMake(0, 1);
     [_backlogFailedButton.titleLabel setFont:[UIFont fontWithName:@"Helvetica-Bold" size:14.0]];
     
-    self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    self.tableView.backgroundColor = [UIColor contentBackgroundColor];
+    _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+    _tableView.backgroundColor = [UIColor contentBackgroundColor];
 
 #if !(TARGET_IPHONE_SIMULATOR)
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
 #endif
-        __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
+        __previewer = [self registerForPreviewingWithDelegate:self sourceView:_tableView];
         [__previewer.previewingGestureRecognizerForFailureRelationship addTarget:self action:@selector(_3DTouchChanged:)];
 #if !(TARGET_IPHONE_SIMULATOR)
     }
@@ -292,11 +292,14 @@ int __timestampWidth;
 
 #if TARGET_IPHONE_SIMULATOR
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.tableView]] != nil);
+    if([gestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]])
+        return YES;
+    else
+        return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:_tableView]] != nil);
 }
 
 - (void)_test3DTouch:(UITapGestureRecognizer *)r {
-    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.tableView]);
+    WFSimulate3DTouchPreview(__previewer, [r locationInView:_tableView]);
 }
 #endif
 
@@ -309,9 +312,9 @@ int __timestampWidth;
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     MainViewController *mainViewController = [(AppDelegate *)([UIApplication sharedApplication].delegate) mainViewController];
-    EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]];
-    _previewingRow = [self.tableView indexPathForRowAtPoint:location].row;
-    NSTextCheckingResult *r = [cell.message linkAtPoint:[self.tableView convertPoint:location toView:cell.message]];
+    EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[_tableView indexPathForRowAtPoint:location]];
+    _previewingRow = [_tableView indexPathForRowAtPoint:location].row;
+    NSTextCheckingResult *r = [cell.message linkAtPoint:[_tableView convertPoint:location toView:cell.message]];
     NSURL *url = r.URL;
     mainViewController.isShowingPreview = YES;
     
@@ -522,7 +525,7 @@ int __timestampWidth;
     [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if(_data.count && _buffer.scrolledUp) {
-        _bottomRow = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row];
+        _bottomRow = [[[_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)] lastObject] row];
         if(_bottomRow >= _data.count)
             _bottomRow = _data.count - 1;
     } else {
@@ -532,14 +535,14 @@ int __timestampWidth;
 
 -(void)drawerClosed:(NSNotification *)n {
     if(self.slidingViewController.underLeftViewController)
-        [self scrollViewDidScroll:self.tableView];
+        [self scrollViewDidScroll:_tableView];
 }
 
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         if(_data.count && _buffer.scrolledUp)
-            _bottomRow = [[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row];
+            _bottomRow = [[[_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)] lastObject] row];
         else
             _bottomRow = -1;
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
@@ -564,9 +567,9 @@ int __timestampWidth;
             }
             [_lock unlock];
             _ready = NO;
-            [self.tableView reloadData];
-            if(_bottomRow >= 0 && _bottomRow < [self.tableView numberOfRowsInSection:0]) {
-                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+            [_tableView reloadData];
+            if(_bottomRow >= 0 && _bottomRow < [_tableView numberOfRowsInSection:0]) {
+                [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
                 _bottomRow = -1;
             } else {
                 [self _scrollToBottom];
@@ -581,14 +584,14 @@ int __timestampWidth;
         _requestingBacklog = YES;
         [_conn cancelPendingBacklogRequests];
         [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
-        self.tableView.tableHeaderView = _headerView;
+        _tableView.tableHeaderView = _headerView;
     }
 }
 
 - (void)backlogFailed:(NSNotification *)notification {
     if(_buffer && [notification.object bid] == _buffer.bid) {
         _requestingBacklog = NO;
-        self.tableView.tableHeaderView = _backlogFailedView;
+        _tableView.tableHeaderView = _backlogFailedView;
         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Unable to download chat history. Please try again shortly.");
     }
 }
@@ -597,7 +600,7 @@ int __timestampWidth;
     if(_buffer && [notification.object bid] == _buffer.bid) {
         if([[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid] == nil) {
             NSLog(@"This buffer contains no events, switching to backlog failed header view");
-            self.tableView.tableHeaderView = _backlogFailedView;
+            _tableView.tableHeaderView = _backlogFailedView;
             return;
         }
         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Download complete.");
@@ -609,8 +612,8 @@ int __timestampWidth;
                 NSLog(@"Table was scrolled up, adjusting scroll offset");
                 [_lock lock];
                 int row = 0;
-                NSInteger toprow = [self.tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
-                if(self.tableView.tableHeaderView != nil)
+                NSInteger toprow = [_tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
+                if(_tableView.tableHeaderView != nil)
                     row++;
                 for(Event *event in _data) {
                     if((event.rowType == ROW_LASTSEENEID && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type] == 0) || event.rowType == ROW_BACKLOG) {
@@ -778,7 +781,7 @@ int __timestampWidth;
         if(_minEid == 0)
             _minEid = event.eid;
         if(event.eid == _buffer.min_eid) {
-            self.tableView.tableHeaderView = nil;
+            _tableView.tableHeaderView = nil;
         }
         if(event.eid < _earliestEid || _earliestEid == 0)
             _earliestEid = event.eid;
@@ -811,7 +814,7 @@ int __timestampWidth;
                     }
                     [_lock unlock];
                     if(!backlog)
-                        [self.tableView reloadData];
+                        [_tableView reloadData];
                     return;
                 }
 
@@ -1013,7 +1016,7 @@ int __timestampWidth;
         [self _addItem:event eid:eid];
         
         if(!backlog) {
-            [self.tableView reloadData];
+            [_tableView reloadData];
             if(!_buffer.scrolledUp) {
                 [self scrollToBottom];
                 [self _scrollToBottom];
@@ -1022,7 +1025,7 @@ int __timestampWidth;
                 if(event.isHighlight)
                     _newHighlights++;
                 [self updateUnread];
-                [self scrollViewDidScroll:self.tableView];
+                [self scrollViewDidScroll:_tableView];
             }
         }
     }
@@ -1267,8 +1270,8 @@ int __timestampWidth;
         NSLog(@"Table was scrolled up, adjusting scroll offset");
         [_lock lock];
         int row = 0;
-        NSInteger toprow = [self.tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
-        if(self.tableView.tableHeaderView != nil)
+        NSInteger toprow = [_tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
+        if(_tableView.tableHeaderView != nil)
             row++;
         for(Event *event in _data) {
             if((event.rowType == ROW_LASTSEENEID && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type] == 0) || event.rowType == ROW_BACKLOG) {
@@ -1310,12 +1313,12 @@ int __timestampWidth;
     _buffer.scrolledUp = NO;
     _buffer.scrolledUpFrom = -1;
     if(_data.count) {
-        if(self.tableView.contentSize.height > (self.tableView.frame.size.height - self.tableView.contentInset.top - self.tableView.contentInset.bottom))
-            [self.tableView setContentOffset:CGPointMake(0, (self.tableView.contentSize.height - self.tableView.frame.size.height) + self.tableView.contentInset.bottom)];
+        if(_tableView.contentSize.height > (_tableView.frame.size.height - _tableView.contentInset.top - _tableView.contentInset.bottom))
+            [_tableView setContentOffset:CGPointMake(0, (_tableView.contentSize.height - _tableView.frame.size.height) + _tableView.contentInset.bottom)];
         else
-            [self.tableView setContentOffset:CGPointMake(0, -self.tableView.contentInset.top)];
+            [_tableView setContentOffset:CGPointMake(0, -_tableView.contentInset.top)];
         if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
-            [self scrollViewDidScroll:self.tableView];
+            [self scrollViewDidScroll:_tableView];
     }
     [_lock unlock];
 }
@@ -1332,7 +1335,7 @@ int __timestampWidth;
             _groupIndent = @"  ";
         else
             _groupIndent = @"    ";
-        self.tableView.backgroundColor = [UIColor contentBackgroundColor];
+        _tableView.backgroundColor = [UIColor contentBackgroundColor];
         _headerView.backgroundColor = [UIColor contentBackgroundColor];
         _backlogFailedView.backgroundColor = [UIColor contentBackgroundColor];
         
@@ -1355,7 +1358,7 @@ int __timestampWidth;
         [_lock lock];
         [_scrollTimer invalidate];
         _ready = NO;
-        NSInteger oldPosition = (_requestingBacklog && _data.count && [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)].count)?[[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] objectAtIndex: 0] row]:-1;
+        NSInteger oldPosition = (_requestingBacklog && _data.count && [_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)].count)?[[[_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)] objectAtIndex: 0] row]:-1;
         NSTimeInterval backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
         if(backlogEid < 1)
             backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
@@ -1371,8 +1374,8 @@ int __timestampWidth;
         
         if(!_buffer) {
             [_lock unlock];
-            self.tableView.tableHeaderView = nil;
-            [self.tableView reloadData];
+            _tableView.tableHeaderView = nil;
+            [_tableView reloadData];
             return;
         }
 
@@ -1393,26 +1396,26 @@ int __timestampWidth;
         if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
             if(_buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _conn.ready) {
                 CLS_LOG(@"No data after refresh, requesting more backlog");
-                self.tableView.tableHeaderView = _headerView;
+                _tableView.tableHeaderView = _headerView;
                 _requestingBacklog = YES;
                 [_conn cancelPendingBacklogRequests];
                 [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
             } else {
-                self.tableView.tableHeaderView = nil;
+                _tableView.tableHeaderView = nil;
             }
         } else if(events.count) {
             [_ignore setIgnores:_server.ignores];
             _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
             if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
-                self.tableView.tableHeaderView = _headerView;
+                _tableView.tableHeaderView = _headerView;
             } else {
-                self.tableView.tableHeaderView = nil;
+                _tableView.tableHeaderView = nil;
             }
             for(Event *e in events) {
                 [self insertEvent:e backlog:true nextIsGrouped:false];
             }
         } else {
-            self.tableView.tableHeaderView = nil;
+            _tableView.tableHeaderView = nil;
         }
         
         if(backlogEid > 0) {
@@ -1474,9 +1477,9 @@ int __timestampWidth;
         } else {
             _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
         }
-        self.tableView.tableHeaderView = self.tableView.tableHeaderView;
+        _tableView.tableHeaderView = _tableView.tableHeaderView;
         
-        [self.tableView reloadData];
+        [_tableView reloadData];
         if(_requestingBacklog && backlogEid > 0 && _buffer.scrolledUp) {
             int markerPos = -1;
             for(Event *e in _data) {
@@ -1484,15 +1487,15 @@ int __timestampWidth;
                     break;
                 markerPos++;
             }
-            if(markerPos < [self.tableView numberOfRowsInSection:0])
-                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+            if(markerPos < [_tableView numberOfRowsInSection:0])
+                [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
         } else if(_eidToOpen > 0) {
             if(_eidToOpen <= _maxEid) {
                 int i = 0;
                 for(Event *e in _data) {
                     if(e.eid == _eidToOpen) {
-                        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-                        _buffer.scrolledUpFrom = [[_data objectAtIndex:[[[self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)] lastObject] row]] eid];
+                        [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                        _buffer.scrolledUpFrom = [[_data objectAtIndex:[[[_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)] lastObject] row]] eid];
                         break;
                     }
                     i++;
@@ -1503,8 +1506,8 @@ int __timestampWidth;
                     _buffer.scrolledUpFrom = -1;
             }
         } else if(_buffer.scrolledUp && _buffer.savedScrollOffset > 0) {
-            if((_buffer.savedScrollOffset + self.tableView.tableHeaderView.bounds.size.height) < self.tableView.contentSize.height - self.tableView.bounds.size.height) {
-                self.tableView.contentOffset = CGPointMake(0, (_buffer.savedScrollOffset + self.tableView.tableHeaderView.bounds.size.height));
+            if((_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height) < _tableView.contentSize.height - _tableView.bounds.size.height) {
+                _tableView.contentOffset = CGPointMake(0, (_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height));
             } else {
                 [self _scrollToBottom];
                 [self scrollToBottom];
@@ -1514,7 +1517,7 @@ int __timestampWidth;
             [self scrollToBottom];
         }
         
-        NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
+        NSArray *rows = [_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)];
         if(_data.count && rows.count) {
             NSInteger firstRow = [[rows objectAtIndex:0] row];
             NSInteger lastRow = [[rows lastObject] row];
@@ -1547,7 +1550,7 @@ int __timestampWidth;
         [self updateUnread];
         
         _ready = YES;
-        [self scrollViewDidScroll:self.tableView];
+        [self scrollViewDidScroll:_tableView];
         [_lock unlock];
         
         if(_conn.state == kIRCCloudStateConnected) {
@@ -1560,7 +1563,7 @@ int __timestampWidth;
             [[NetworkConnection sharedInstance] scheduleIdleTimer];
         }
         
-        [self.tableView flashScrollIndicators];
+        [_tableView flashScrollIndicators];
     }
 }
 
@@ -1614,7 +1617,7 @@ int __timestampWidth;
     }
     e.links = links;
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
+    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
     e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
     
     CGMutablePathRef path = CGPathCreateMutable();
@@ -1651,7 +1654,7 @@ int __timestampWidth;
             return e.height;
         } else if(e.height == 0 && e.formatted) {
             CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-            CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
+            CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
             e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
             
             CGMutablePathRef path = CGPathCreateMutable();
@@ -1701,7 +1704,7 @@ int __timestampWidth;
         [self _format:e];
         if(e.formatted) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [self.tableView reloadData];
+                [_tableView reloadData];
             }];
             CLS_LOG(@"Event was formatted during cellForRowAtIndexPath, reloading table heights");
         }
@@ -1888,13 +1891,13 @@ int __timestampWidth;
             [UIView setAnimationDuration:0.1];
             _topUnreadView.alpha = 0;
             [UIView commitAnimations];
-            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_lastSeenEidPos+1 inSection:0] atScrollPosition: UITableViewScrollPositionTop animated: YES];
-            [self scrollViewDidScroll:self.tableView];
+            [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_lastSeenEidPos+1 inSection:0] atScrollPosition: UITableViewScrollPositionTop animated: YES];
+            [self scrollViewDidScroll:_tableView];
             [self _sendHeartbeat];
         } else {
-            if(self.tableView.tableHeaderView == _backlogFailedView)
+            if(_tableView.tableHeaderView == _backlogFailedView)
                 [self loadMoreBacklogButtonPressed:nil];
-            [self.tableView setContentOffset:CGPointMake(0,0) animated:YES];
+            [_tableView setContentOffset:CGPointMake(0,0) animated:YES];
         }
     }
 }
@@ -1906,7 +1909,7 @@ int __timestampWidth;
         _bottomUnreadView.alpha = 0;
         [UIView commitAnimations];
         if(_data.count)
-            [self.tableView setContentOffset:CGPointMake(0, self.tableView.contentSize.height - self.tableView.frame.size.height) animated:YES];
+            [_tableView setContentOffset:CGPointMake(0, _tableView.contentSize.height - _tableView.frame.size.height) animated:YES];
         _buffer.scrolledUp = NO;
         _buffer.scrolledUpFrom = -1;
     }
@@ -1923,11 +1926,11 @@ int __timestampWidth;
         return;
 
     if(_previewingRow) {
-        EventsTableCell *cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_previewingRow inSection:0]];
+        EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_previewingRow inSection:0]];
         __previewer.sourceRect = cell.frame;
     }
     
-    UITableView *tableView = self.tableView;
+    UITableView *tableView = _tableView;
     NSInteger firstRow = -1;
     NSInteger lastRow = -1;
     NSArray *rows = [tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(tableView.bounds, tableView.contentInset)];
@@ -2011,7 +2014,7 @@ int __timestampWidth;
                     _buffer.scrolledUpFrom = [[_data lastObject] eid];
                     _buffer.scrolledUp = YES;
                 }
-                _buffer.savedScrollOffset = self.tableView.contentOffset.y - self.tableView.tableHeaderView.bounds.size.height;
+                _buffer.savedScrollOffset = _tableView.contentOffset.y - _tableView.tableHeaderView.bounds.size.height;
                 [self refresh];
             }
         } else if(indexPath.row < _data.count) {
@@ -2041,15 +2044,15 @@ int __timestampWidth;
         }
     }
     [_lock unlock];
-    [self.tableView reloadData];
+    [_tableView reloadData];
 }
 
 -(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
     if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-        NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
+        NSIndexPath *indexPath = [_tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:_tableView]];
         if(indexPath) {
             if(indexPath.row < _data.count) {
-                EventsTableCell *c = (EventsTableCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+                EventsTableCell *c = (EventsTableCell *)[_tableView cellForRowAtIndexPath:indexPath];
                 NSURL *url = [c.message linkAtPoint:[gestureRecognizer locationInView:c.message]].URL;
                 if(url) {
                     if([url.scheme hasPrefix:@"irc"] && [url.host intValue] > 0 && url.path && url.path.length > 1) {
@@ -2064,7 +2067,7 @@ int __timestampWidth;
                         url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@%@", [url.scheme substringFromIndex:15], url.host, url.path]];
                     }
                 }
-                [_delegate rowLongPressed:[_data objectAtIndex:indexPath.row] rect:[self.tableView rectForRowAtIndexPath:indexPath] link:url.absoluteString];
+                [_delegate rowLongPressed:[_data objectAtIndex:indexPath.row] rect:[_tableView rectForRowAtIndexPath:indexPath] link:url.absoluteString];
             }
         }
     }
