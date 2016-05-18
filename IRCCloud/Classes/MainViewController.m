@@ -2386,9 +2386,9 @@ extern NSDictionary *emojiMap;
 
 -(void)transitionToSize:(CGSize)size {
     NSLog(@"Transitioning to size: %f, %f", size.width, size.height);
-    self.navigationController.view.frame = self.view.window.bounds;
-    [self.slidingViewController resetTopView];
-    
+    self.navigationController.view.frame = CGRectMake(0,0,size.width,size.height + [UIApplication sharedApplication].statusBarFrame.size.height);
+    self.navigationController.view.layer.position = self.navigationController.view.center;
+
     _bottomBarHeightConstraint.constant = _message.frame.size.height + 8;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
