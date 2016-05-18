@@ -92,16 +92,6 @@ extern NSDictionary *emojiMap;
 
 @implementation MainViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        _cidToOpen = -1;
-        _bidToOpen = -1;
-        _pendingEvents = [[NSMutableArray alloc] init];
-    }
-    return self;
-}
-
 - (void)_themeChanged {
     if(![__currentTheme isEqualToString:[UIColor currentTheme]]) {
         __currentTheme = [UIColor currentTheme];
@@ -160,6 +150,10 @@ extern NSDictionary *emojiMap;
 - (void)viewDidLoad {
     [super viewDidLoad];
     [_eventsView viewDidLoad];
+    _cidToOpen = -1;
+    _bidToOpen = -1;
+    _pendingEvents = [[NSMutableArray alloc] init];
+
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self

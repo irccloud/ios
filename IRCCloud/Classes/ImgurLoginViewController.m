@@ -12,7 +12,7 @@
 @implementation ImgurLoginViewController
 
 - (id)init {
-    self = [super initWithNibName:nil bundle:nil];
+    self = [super init];
     if (self) {
         self.navigationItem.title = @"Login to Imgur";
     }

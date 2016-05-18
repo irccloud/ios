@@ -24,14 +24,6 @@
 
 @implementation LoginSplashViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        _kbSize = CGSizeZero;
-    }
-    return self;
-}
-
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     return ![touch.view isKindOfClass:[UIControl class]];
 }
@@ -39,6 +31,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    _kbSize = CGSizeZero;
+
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard:)];
     tap.delegate = self;
     tap.cancelsTouchesInView = NO;
