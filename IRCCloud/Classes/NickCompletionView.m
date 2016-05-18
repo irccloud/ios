@@ -17,20 +17,24 @@
     if (self) {
         _selection = -1;
         _scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
+        _scrollView.translatesAutoresizingMaskIntoConstraints = NO;
+        _scrollView.layer.masksToBounds = YES;
+        _scrollView.layer.cornerRadius = 4;
         [self addSubview:_scrollView];
+        [self addConstraints:@[
+                               [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0f constant:1.0f],
+                               [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeading multiplier:1.0f constant:1.0f],
+                               [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTrailing multiplier:1.0f constant:1.0f],
+                               [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeWidth multiplier:1.0f constant:-2.0f],
+                               [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeHeight multiplier:1.0f constant:-3.0f]
+                               ]];
         [self setSuggestions:@[]];
     }
     return self;
 }
 
--(void)setFrame:(CGRect)frame {
-    [super setFrame:frame];
-    _scrollView.frame = CGRectMake(1, 1, frame.size.width - 2, frame.size.height - 3);
-    _scrollView.layer.masksToBounds = YES;
-    _scrollView.layer.cornerRadius = 4;
-    _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-    self.backgroundColor = [UIColor bufferBorderColor];
-    _scrollView.backgroundColor = [UIColor bufferBackgroundColor];
+-(CGSize)intrinsicContentSize {
+    return CGSizeMake(self.bounds.size.width, 36);
 }
 
 -(void)setSuggestions:(NSArray *)suggestions {
@@ -63,6 +67,9 @@
     }
     [_scrollView setContentSize:CGSizeMake(x,_scrollView.frame.size.height)];
     _selection = -1;
+    _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    self.backgroundColor = [UIColor bufferBorderColor];
+    _scrollView.backgroundColor = [UIColor bufferBackgroundColor];
 }
 
 -(NSString *)suggestion {

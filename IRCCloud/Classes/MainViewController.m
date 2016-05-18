@@ -301,9 +301,17 @@ extern NSDictionary *emojiMap;
                                  ]];
     }
     _nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectZero];
+    _nickCompletionView.translatesAutoresizingMaskIntoConstraints = NO;
     _nickCompletionView.completionDelegate = self;
     _nickCompletionView.alpha = 0;
     [self.view addSubview:_nickCompletionView];
+    if(self.view != nil) {
+        [self.view addConstraints:@[
+                                    [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:_eventsView.tableView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f],
+                                    [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:_eventsView.tableView attribute:NSLayoutAttributeWidth multiplier:1.0f constant:-20.0f],
+                                     [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_eventsView.bottomUnreadView attribute:NSLayoutAttributeTop multiplier:1.0f constant:-6.0f]
+                                     ]];
+    }
 
     _connectingProgress = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
     [_connectingProgress sizeToFit];
