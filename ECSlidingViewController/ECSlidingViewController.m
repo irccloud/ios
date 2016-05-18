@@ -129,12 +129,11 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   _underLeftViewController = theUnderLeftViewController;
   
   if (_underLeftViewController) {
-    [self addChildViewController:self.underLeftViewController];
-    [self.underLeftViewController didMoveToParentViewController:self];
-    
     _underLeftViewController.view.hidden = YES;
     [self.view insertSubview:_underLeftViewController.view belowSubview:self.topView];
     [self updateUnderLeftLayout];
+    [self addChildViewController:self.underLeftViewController];
+    [self.underLeftViewController didMoveToParentViewController:self];
   }
 }
 
@@ -147,12 +146,11 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   _underRightViewController = theUnderRightViewController;
   
   if (_underRightViewController) {
-    [self addChildViewController:self.underRightViewController];
-    [self.underRightViewController didMoveToParentViewController:self];
-    
     _underRightViewController.view.hidden = YES;
     [self.view insertSubview:_underRightViewController.view belowSubview:self.topView];
     [self updateUnderRightLayout];
+    [self addChildViewController:self.underRightViewController];
+    [self.underRightViewController didMoveToParentViewController:self];
   }
 }
 

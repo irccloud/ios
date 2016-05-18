@@ -325,7 +325,7 @@ extern NSDictionary *emojiMap;
     _connectingProgress.progress = 0;
     [self _themeChanged];
     [self connectivityChanged:nil];
-    [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
+    [self updateLayout];
     [self _updateEventsInsets];
     
     UISwipeGestureRecognizer *swipe = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeBack:)];
@@ -1299,7 +1299,7 @@ extern NSDictionary *emojiMap;
         [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
         [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
 
-        [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
+        [self updateLayout];
         
         [_buffersView scrollViewDidScroll:_buffersView.tableView];
         [UIView commitAnimations];
@@ -1323,7 +1323,7 @@ extern NSDictionary *emojiMap;
 
     [self.slidingViewController updateUnderLeftLayout];
     [self.slidingViewController updateUnderRightLayout];
-    [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
+    [self updateLayout];
 
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
     _nickCompletionView.alpha = 0;
@@ -1396,7 +1396,7 @@ extern NSDictionary *emojiMap;
     }
     
     self.slidingViewController.view.autoresizesSubviews = NO;
-    [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
+    [self updateLayout];
     [_eventsView didRotate];
     
     _buffersView.tableView.scrollsToTop = YES;
@@ -1422,7 +1422,7 @@ extern NSDictionary *emojiMap;
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [_eventsView viewDidAppear:animated];
-    [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
+    [self updateLayout];
     [_eventsView didRotate];
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
@@ -1874,7 +1874,7 @@ extern NSDictionary *emojiMap;
         [self.view layoutIfNeeded];
         _messageHeightConstraint.constant = height;
         [self.view layoutIfNeeded];
-        [self transitionToSize:[UIScreen mainScreen].applicationFrame.size];
+        [self updateLayout];
     }
 }
 
@@ -2384,9 +2384,14 @@ extern NSDictionary *emojiMap;
     return YES;
 }
 
+-(void)updateLayout {
+    CGSize size = [UIScreen mainScreen].applicationFrame.size;
+    [self transitionToSize:size];
+}
+
 -(void)transitionToSize:(CGSize)size {
     NSLog(@"Transitioning to size: %f, %f", size.width, size.height);
-    self.navigationController.view.frame = CGRectMake(0,0,size.width,size.height + [UIApplication sharedApplication].statusBarFrame.size.height);
+    self.navigationController.view.frame = self.slidingViewController.view.bounds;
     self.navigationController.view.layer.position = self.navigationController.view.center;
 
     _bottomBarHeightConstraint.constant = _message.frame.size.height + 8;
