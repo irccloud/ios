@@ -154,6 +154,8 @@ extern NSDictionary *emojiMap;
     _bidToOpen = -1;
     _pendingEvents = [[NSMutableArray alloc] init];
 
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -197,7 +199,7 @@ extern NSDictionary *emojiMap;
                                                  name:ECSlidingViewUnderRightWillDisappear object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(viewWillLayoutSubviews)
+                                             selector:@selector(updateLayout)
                                                  name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
     [super viewDidLoad];
     [self addChildViewController:_eventsView];
