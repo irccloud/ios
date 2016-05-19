@@ -20,12 +20,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="login_logo" translatesAutoresizingMaskIntoConstraints="NO" id="iqP-3p-GfM">
-                                <rect key="frame" x="360" y="39" width="48" height="48"/>
+                                <rect key="frame" x="360" y="48" width="48" height="48"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="0.15686274510000001" green="0.3411764706" blue="0.67843137249999996" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
-                            <constraint firstItem="iqP-3p-GfM" firstAttribute="top" secondItem="FQR-3t-1qH" secondAttribute="bottom" constant="19" id="1mV-Wb-AWt"/>
+                            <constraint firstItem="iqP-3p-GfM" firstAttribute="top" secondItem="Gte-0B-Dsy" secondAttribute="top" constant="48" id="TkB-wB-RPw"/>
                             <constraint firstItem="iqP-3p-GfM" firstAttribute="centerX" secondItem="Gte-0B-Dsy" secondAttribute="centerX" id="lEU-td-xT0"/>
                         </constraints>
                     </view>
@@ -101,14 +101,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" image="login_logo" translatesAutoresizingMaskIntoConstraints="NO" id="sfr-SS-1jI">
-                                <rect key="frame" x="272" y="15" width="48" height="48"/>
+                                <rect key="frame" x="272" y="48" width="48" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="EgP-kr-Ryh"/>
                                     <constraint firstAttribute="width" constant="48" id="Fu8-gd-2du"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="70" placeholderIntrinsicHeight="infinite" text="IRC" textAlignment="right" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="70" translatesAutoresizingMaskIntoConstraints="NO" id="Hgu-D2-Mph">
-                                <rect key="frame" x="334" y="15" width="70" height="48"/>
+                                <rect key="frame" x="334" y="48" width="70" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="PHw-Q2-KdF"/>
                                 </constraints>
@@ -117,7 +117,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="120" placeholderIntrinsicHeight="infinite" text="Cloud" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="120" translatesAutoresizingMaskIntoConstraints="NO" id="KFZ-UT-EG5">
-                                <rect key="frame" x="404" y="15" width="120" height="48"/>
+                                <rect key="frame" x="404" y="48" width="120" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="kqu-oJ-dEp"/>
                                 </constraints>
@@ -126,7 +126,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="320" placeholderIntrinsicHeight="32" text="Enterprise Edition" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="320" translatesAutoresizingMaskIntoConstraints="NO" id="iSf-t4-0KQ">
-                                <rect key="frame" x="224" y="71" width="320" height="32"/>
+                                <rect key="frame" x="224" y="112" width="320" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="320" id="Itp-RM-P45"/>
                                     <constraint firstAttribute="height" constant="32" id="UNl-kc-ZYN"/>
@@ -136,7 +136,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lUW-Yp-Apz" customClass="UIControl">
-                                <rect key="frame" x="302" y="71" width="65" height="32"/>
+                                <rect key="frame" x="302" y="112" width="65" height="32"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Login" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="65" translatesAutoresizingMaskIntoConstraints="NO" id="g3i-pB-ttr">
                                         <rect key="frame" x="0.0" y="5" width="65" height="22"/>
@@ -158,7 +158,7 @@
                                 </connections>
                             </view>
                             <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RjR-3c-mm2" customClass="UIControl">
-                                <rect key="frame" x="402" y="71" width="65" height="32"/>
+                                <rect key="frame" x="402" y="112" width="65" height="32"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign Up" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="65" translatesAutoresizingMaskIntoConstraints="NO" id="2IH-5B-3G7">
                                         <rect key="frame" x="1" y="5" width="64" height="22"/>
@@ -179,7 +179,7 @@
                                 </connections>
                             </view>
                             <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vjV-1j-Hve" customClass="UIControl">
-                                <rect key="frame" x="292" y="71" width="184" height="32"/>
+                                <rect key="frame" x="292" y="112" width="184" height="32"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="150" placeholderIntrinsicHeight="infinite" text="Need an account?" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="150" translatesAutoresizingMaskIntoConstraints="NO" id="Qgw-oW-fa6">
                                         <rect key="frame" x="0.0" y="0.0" width="150" height="32"/>
@@ -210,7 +210,7 @@
                                 </connections>
                             </view>
                             <view autoresizesSubviews="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lmN-wO-9gf" customClass="UIControl">
-                                <rect key="frame" x="276" y="71" width="216" height="32"/>
+                                <rect key="frame" x="276" y="112" width="216" height="32"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="210" placeholderIntrinsicHeight="infinite" text="Already have an account?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="210" translatesAutoresizingMaskIntoConstraints="NO" id="RQO-72-9Fj">
                                         <rect key="frame" x="0.0" y="0.0" width="210" height="32"/>
@@ -241,7 +241,7 @@
                                 </connections>
                             </view>
                             <view autoresizesSubviews="NO" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zTV-Zl-uPd" userLabel="Loading View">
-                                <rect key="frame" x="0.0" y="119" width="768" height="905"/>
+                                <rect key="frame" x="0.0" y="160" width="768" height="864"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Loading" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="320" translatesAutoresizingMaskIntoConstraints="NO" id="2LD-X7-x0T">
                                         <rect key="frame" x="0.0" y="30" width="768" height="21"/>
@@ -267,7 +267,7 @@
                                 </constraints>
                             </view>
                             <view autoresizesSubviews="NO" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mJM-f8-v0Q" userLabel="Login View">
-                                <rect key="frame" x="0.0" y="119" width="768" height="905"/>
+                                <rect key="frame" x="0.0" y="160" width="768" height="864"/>
                                 <subviews>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Name" minimumFontSize="17" background="login_top_input" translatesAutoresizingMaskIntoConstraints="NO" id="zZw-jo-Si9">
                                         <rect key="frame" x="242" y="16" width="285" height="39"/>
@@ -603,20 +603,20 @@
                             <constraint firstItem="zTV-Zl-uPd" firstAttribute="bottom" secondItem="uLz-Jv-72R" secondAttribute="bottom" id="7bO-V0-F24"/>
                             <constraint firstItem="mJM-f8-v0Q" firstAttribute="leading" secondItem="uLz-Jv-72R" secondAttribute="leading" id="9dt-Nl-5iT"/>
                             <constraint firstItem="sfr-SS-1jI" firstAttribute="leading" secondItem="uLz-Jv-72R" secondAttribute="centerX" constant="-112" id="Bbd-DV-aee"/>
-                            <constraint firstItem="zTV-Zl-uPd" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="119" id="CFl-aC-swv"/>
+                            <constraint firstItem="zTV-Zl-uPd" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="160" id="CFl-aC-swv"/>
                             <constraint firstItem="zTV-Zl-uPd" firstAttribute="leading" secondItem="uLz-Jv-72R" secondAttribute="leading" id="DMO-28-jKq"/>
                             <constraint firstItem="lSc-2u-RsF" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" id="DPI-D4-Hu9"/>
-                            <constraint firstItem="mJM-f8-v0Q" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="top" constant="119" id="Fwf-sH-qhq"/>
+                            <constraint firstItem="mJM-f8-v0Q" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="top" constant="160" id="Fwf-sH-qhq"/>
                             <constraint firstItem="iSf-t4-0KQ" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" id="GYI-n1-Fjj"/>
                             <constraint firstItem="KFZ-UT-EG5" firstAttribute="leading" secondItem="Hgu-D2-Mph" secondAttribute="trailing" id="IDQ-Hy-lUM"/>
                             <constraint firstItem="mJM-f8-v0Q" firstAttribute="bottom" secondItem="uLz-Jv-72R" secondAttribute="bottom" id="IfR-z4-Crh"/>
                             <constraint firstItem="RjR-3c-mm2" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" constant="50" id="Ldx-lT-XCq"/>
                             <constraint firstItem="lmN-wO-9gf" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" id="QVN-Lj-9tW"/>
                             <constraint firstAttribute="trailing" secondItem="zTV-Zl-uPd" secondAttribute="trailing" id="SNJ-Xf-riH"/>
-                            <constraint firstItem="sfr-SS-1jI" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="15" id="TaT-bV-ldV"/>
+                            <constraint firstItem="sfr-SS-1jI" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="48" id="TaT-bV-ldV"/>
                             <constraint firstItem="mJM-f8-v0Q" firstAttribute="trailing" secondItem="uLz-Jv-72R" secondAttribute="trailing" id="YnH-T3-zCB"/>
                             <constraint firstItem="lSc-2u-RsF" firstAttribute="bottom" secondItem="mJM-f8-v0Q" secondAttribute="bottom" constant="-8" id="Z8b-xm-FVb"/>
-                            <constraint firstItem="Hgu-D2-Mph" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="15" id="c3C-hj-GfH"/>
+                            <constraint firstItem="Hgu-D2-Mph" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="48" id="c3C-hj-GfH"/>
                             <constraint firstItem="lmN-wO-9gf" firstAttribute="bottom" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="-16" id="d8U-Iu-tpj"/>
                             <constraint firstItem="lmN-wO-9gf" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" id="dku-oB-aHS"/>
                             <constraint firstItem="vjV-1j-Hve" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" id="eJH-0f-Zoo"/>
@@ -624,7 +624,7 @@
                             <constraint firstItem="vjV-1j-Hve" firstAttribute="bottom" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="-16" id="mlJ-oj-AMt"/>
                             <constraint firstItem="RjR-3c-mm2" firstAttribute="bottom" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="-16" id="n5u-rA-hYy"/>
                             <constraint firstItem="lUW-Yp-Apz" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" constant="-50" id="sQe-lu-zaH"/>
-                            <constraint firstItem="KFZ-UT-EG5" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="15" id="twl-9Z-wcj"/>
+                            <constraint firstItem="KFZ-UT-EG5" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="48" id="twl-9Z-wcj"/>
                         </constraints>
                     </view>
                     <connections>
