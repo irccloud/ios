@@ -27,16 +27,6 @@
 
 @implementation PastebinViewController
 
--(id)init {
-    self = [super init];
-    if(self) {
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_doneButtonPressed)];
-        _chrome = [[OpenInChromeController alloc] init];
-        
-    }
-    return self;
-}
-
 -(void)setUrl:(NSURL *)url {
     _url = url.absoluteString;
     
@@ -106,6 +96,8 @@
 -(void)viewDidLoad {
     [super viewDidLoad];
     
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_doneButtonPressed)];
+    _chrome = [[OpenInChromeController alloc] init];
     self.navigationController.navigationBar.clipsToBounds = YES;
     self.automaticallyAdjustsScrollViewInsets = NO;
 
