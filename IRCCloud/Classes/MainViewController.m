@@ -3913,6 +3913,10 @@ Device type: %@\n",
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltDownPressed:) discoverabilityTitle:@"Switch to next channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltUpPressed:) discoverabilityTitle:@"Switch to previous unread channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltDownPressed:) discoverabilityTitle:@"Switch to next unread channel"],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate action:@selector(onAltUpPressed:)],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate action:@selector(onAltDownPressed:)],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltUpPressed:)],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltDownPressed:)],
              [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:) discoverabilityTitle:@"Complete nicknames and channels"],
              ];
 }
