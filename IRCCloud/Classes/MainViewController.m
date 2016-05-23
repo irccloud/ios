@@ -3908,6 +3908,7 @@ Device type: %@\n",
 }
 
 -(NSArray<UIKeyCommand *> *)keyCommands {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
     return @[
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltUpPressed:) discoverabilityTitle:@"Switch to previous channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltDownPressed:) discoverabilityTitle:@"Switch to next channel"],
@@ -3919,6 +3920,19 @@ Device type: %@\n",
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltDownPressed:)],
              [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:) discoverabilityTitle:@"Complete nicknames and channels"],
              ];
+    } else {
+        return @[
+            [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltUpPressed:)],
+            [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltDownPressed:)],
+            [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltUpPressed:)],
+            [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltDownPressed:)],
+            [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate action:@selector(onAltUpPressed:)],
+            [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate action:@selector(onAltDownPressed:)],
+            [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltUpPressed:)],
+            [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltDownPressed:)],
+            [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:)],
+        ];
+    }
 }
 
 -(void)onAltUpPressed:(UIKeyCommand *)sender {

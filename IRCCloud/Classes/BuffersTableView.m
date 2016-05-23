@@ -1143,7 +1143,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.tableView reloadData];
                 [self _updateUnreadIndicators];
-                if(_selectedRow) {
+                if(_selectedRow != -1) {
                     NSArray *a = [self.tableView indexPathsForVisibleRows];
                     if([[a objectAtIndex:0] row] > _selectedRow || [[a lastObject] row] < _selectedRow)
                         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
