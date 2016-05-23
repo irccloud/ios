@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+#import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import "NetworkConnection.h"
 #import "SBJson.h"
 #import "HandshakeHeader.h"
@@ -494,6 +494,8 @@ volatile BOOL __socketPaused = NO;
                        buffer.deferred = [[object objectForKey:@"deferred"] intValue];
                        buffer.timeout = [[object objectForKey:@"timeout"] intValue];
                        buffer.valid = YES;
+                       if(buffer.timeout)
+                           [[EventsDataSource sharedInstance] removeEventsForBuffer:buffer.bid];
                        [_notifications removeNotificationsForBID:buffer.bid olderThan:buffer.last_seen_eid];
                        if(!backlog && !_resuming)
                            [self postObject:buffer forEvent:kIRCEventMakeBuffer];
@@ -1510,6 +1512,23 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             else
                 url = [url stringByAppendingFormat:@"&notifier=1"];
         }
+
+        SCNetworkReachabilityFlags flags;
+        BOOL success = SCNetworkReachabilityGetFlags(_reachability, &flags);
+        if(success && flags & kSCNetworkReachabilityFlagsIsWWAN) {
+            CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
+            int limit = 50;
+            if([telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyGPRS] || [telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyEdge]) {
+                limit = 25;
+            } else if ([telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyLTE]) {
+                limit = 100;
+            }
+            if([url rangeOfString:@"?"].location == NSNotFound)
+                url = [url stringByAppendingFormat:@"?limit=%i", limit];
+            else
+                url = [url stringByAppendingFormat:@"&limit=%i", limit];
+        }
+        
         CLS_LOG(@"Connecting: %@", url);
         _notifier = notifier;
         _state = kIRCCloudStateConnecting;
