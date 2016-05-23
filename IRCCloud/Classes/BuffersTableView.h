@@ -61,4 +61,8 @@
 -(IBAction)topUnreadIndicatorClicked:(id)sender;
 -(IBAction)bottomUnreadIndicatorClicked:(id)sender;
 -(void)refresh;
+-(void)next;
+-(void)prev;
+-(void)nextUnread;
+-(void)prevUnread;
 @end

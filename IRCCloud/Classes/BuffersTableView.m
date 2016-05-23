@@ -1143,6 +1143,11 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.tableView reloadData];
                 [self _updateUnreadIndicators];
+                if(_selectedRow) {
+                    NSArray *a = [self.tableView indexPathsForVisibleRows];
+                    if([[a objectAtIndex:0] row] > _selectedRow || [[a lastObject] row] < _selectedRow)
+                        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+                }
             }];
         } else {
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
@@ -1206,6 +1211,74 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                     [_delegate bufferLongPressed:[[[_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
             }
         }
+    }
+}
+
+-(void)next {
+    NSDictionary *d;
+    NSInteger row = _selectedRow + 1;
+    
+    do {
+        if(row < _data.count)
+            d = [_data objectAtIndex:row];
+        else
+            d = nil;
+        row++;
+    } while(d && ([[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+    
+    if(d) {
+        [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+    }
+}
+
+-(void)prev {
+    NSDictionary *d;
+    NSInteger row = _selectedRow - 1;
+    
+    do {
+        if(row >= 0)
+            d = [_data objectAtIndex:row];
+        else
+            d = nil;
+        row--;
+    } while(d && ([[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+    
+    if(d) {
+        [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+    }
+}
+
+-(void)nextUnread {
+    NSDictionary *d;
+    NSInteger row = _selectedRow + 1;
+    
+    do {
+        if(row < _data.count)
+            d = [_data objectAtIndex:row];
+        else
+            d = nil;
+        row++;
+    } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+    
+    if(d) {
+        [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+    }
+}
+
+-(void)prevUnread {
+    NSDictionary *d;
+    NSInteger row = _selectedRow - 1;
+    
+    do {
+        if(row >= 0)
+            d = [_data objectAtIndex:row];
+        else
+            d = nil;
+        row--;
+    } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+    
+    if(d) {
+        [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
     }
 }
 

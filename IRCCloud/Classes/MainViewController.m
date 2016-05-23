@@ -1767,37 +1767,6 @@ extern NSDictionary *emojiMap;
     }
 }
 
--(BOOL)expandingTextView:(UIExpandingTextView *)expandingTextView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    if([text isEqualToString:@"\t"]) {
-        if(_nickCompletionView.count == 0)
-            [self updateSuggestions:YES];
-        if(_nickCompletionView.count > 0) {
-            int s = _nickCompletionView.selection;
-            if(s == -1 || s == _nickCompletionView.count - 1)
-                s = 0;
-            else
-                s++;
-            [_nickCompletionView setSelection:s];
-            text = _message.text;
-            if(text.length == 0) {
-                _message.text = [_nickCompletionView suggestion];
-            } else {
-                while(text.length > 0 && [text characterAtIndex:text.length - 1] != ' ') {
-                    text = [text substringToIndex:text.length - 1];
-                }
-                text = [text stringByAppendingString:[_nickCompletionView suggestion]];
-                _message.text = text;
-            }
-            if([text rangeOfString:@" "].location == NSNotFound)
-                _message.text = [_message.text stringByAppendingString:@":"];
-        }
-        return NO;
-    } else {
-        _nickCompletionView.selection = -1;
-    }
-    return YES;
-}
-
 -(void)_updateSuggestionsTimer {
     _nickCompletionTimer = nil;
     [self updateSuggestions:NO];
@@ -2413,7 +2382,7 @@ extern NSDictionary *emojiMap;
             [self.view addSubview:_buffersView.view];
             _buffersView.view.autoresizingMask = UIViewAutoresizingNone;
         }
-        _buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,size.height);
+        _buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,self.view.frame.size.height);
     } else {
         _borders.hidden = YES;
         _eventsViewWidthConstraint.constant = size.width;
@@ -3932,5 +3901,60 @@ Device type: %@\n",
 
 -(void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+-(BOOL)canBecomeFirstResponder {
+    return YES;
+}
+
+-(NSArray<UIKeyCommand *> *)keyCommands {
+    return @[
+             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltUpPressed:) discoverabilityTitle:@"Switch to previous channel"],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltDownPressed:) discoverabilityTitle:@"Switch to next channel"],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltUpPressed:) discoverabilityTitle:@"Switch to previous unread channel"],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltDownPressed:) discoverabilityTitle:@"Switch to next unread channel"],
+             [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:) discoverabilityTitle:@"Complete nicknames and channels"],
+             ];
+}
+
+-(void)onAltUpPressed:(UIKeyCommand *)sender {
+    [_buffersView prev];
+}
+
+-(void)onAltDownPressed:(UIKeyCommand *)sender {
+    [_buffersView next];
+}
+
+-(void)onShiftAltUpPressed:(UIKeyCommand *)sender {
+    [_buffersView prevUnread];
+}
+
+-(void)onShiftAltDownPressed:(UIKeyCommand *)sender {
+    [_buffersView nextUnread];
+}
+
+-(void)onTabPressed:(UIKeyCommand *)sender {
+    if(_nickCompletionView.count == 0)
+        [self updateSuggestions:YES];
+    if(_nickCompletionView.count > 0) {
+        int s = _nickCompletionView.selection;
+        if(s == -1 || s == _nickCompletionView.count - 1)
+            s = 0;
+        else
+            s++;
+        [_nickCompletionView setSelection:s];
+        NSString *text = _message.text;
+        if(text.length == 0) {
+            _message.text = [_nickCompletionView suggestion];
+        } else {
+            while(text.length > 0 && [text characterAtIndex:text.length - 1] != ' ') {
+                text = [text substringToIndex:text.length - 1];
+            }
+            text = [text stringByAppendingString:[_nickCompletionView suggestion]];
+            _message.text = text;
+        }
+        if([text rangeOfString:@" "].location == NSNotFound)
+            _message.text = [_message.text stringByAppendingString:@":"];
+    }
 }
 @end
