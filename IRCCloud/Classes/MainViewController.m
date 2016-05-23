@@ -199,7 +199,7 @@ extern NSDictionary *emojiMap;
                                                  name:ECSlidingViewUnderRightWillDisappear object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updateLayout)
+                                             selector:@selector(statusBarFrameWillChange:)
                                                  name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
     [super viewDidLoad];
     [self addChildViewController:_eventsView];
@@ -2355,8 +2355,20 @@ extern NSDictionary *emojiMap;
     return YES;
 }
 
+-(void)statusBarFrameWillChange:(NSNotification *)n {
+    CGSize size = [UIScreen mainScreen].applicationFrame.size;
+    CGRect newFrame = [[n.userInfo objectForKey:UIApplicationStatusBarFrameUserInfoKey] CGRectValue];
+    if(newFrame.size.width == size.width) {
+        [UIView animateWithDuration:0.25f animations:^{
+            self.slidingViewController.view.frame = CGRectMake(0,0,size.width,size.height + ((newFrame.size.height > 0)?20:0));
+            [self transitionToSize:size];
+        }];
+    }
+}
+
 -(void)updateLayout {
     CGSize size = [UIScreen mainScreen].applicationFrame.size;
+    self.slidingViewController.view.frame = CGRectMake(0,0,size.width,size.height + (([UIApplication sharedApplication].statusBarFrame.size.height > 0)?20:0));
     [self transitionToSize:size];
 }
 
