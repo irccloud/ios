@@ -2104,24 +2104,24 @@ extern NSDictionary *emojiMap;
     _eventsView.eidToOpen = _eidToOpen;
     if(changed) {
         [UIView animateWithDuration:0.1 animations:^{
-            _eventsView.view.alpha = 0;
+            _eventsView.tableView.alpha = 0;
             _eventsView.topUnreadView.alpha = 0;
             _eventsView.bottomUnreadView.alpha = 0;
             _eventActivity.alpha = 1;
             [_eventActivity startAnimating];
             NSString *draft = _buffer.draft;
-            /*_message.delegate = nil;
+            _message.delegate = nil;
             [_message clearText];
-            _message.delegate = self;*/
+            _message.delegate = self;
             _buffer.draft = draft;
         } completion:^(BOOL finished){
             [_eventsView setBuffer:_buffer];
             [UIView animateWithDuration:0.1 animations:^{
-                _eventsView.view.alpha = 1;
+                _eventsView.tableView.alpha = 1;
                 _eventActivity.alpha = 0;
-                /*_message.delegate = nil;
+                _message.delegate = nil;
                 _message.text = _buffer.draft;
-                _message.delegate = self;*/
+                _message.delegate = self;
             } completion:^(BOOL finished){
                 [_eventActivity stopAnimating];
             }];
@@ -2447,7 +2447,7 @@ extern NSDictionary *emojiMap;
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [self transitionToSize:size];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        _eventsView.view.hidden = NO;
+        _eventsView.tableView.hidden = NO;
         _eventActivity.alpha = 0;
         [_eventActivity stopAnimating];
     }];
@@ -2560,10 +2560,6 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)showMentionTip {
-    _mentionTip.center = self.slidingViewController.view.center;
-    CGRect frame = _mentionTip.frame;
-    frame.origin.y = [UIScreen mainScreen].applicationFrame.size.height - frame.size.height - 40;
-    _mentionTip.frame = frame;
     [_mentionTip.superview bringSubviewToFront:_mentionTip];
 
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"mentionTip"]) {
@@ -2597,10 +2593,6 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)showSwipeTip {
-    _swipeTip.center = self.slidingViewController.view.center;
-    CGRect frame = _swipeTip.frame;
-    frame.origin.y = [UIScreen mainScreen].applicationFrame.size.height - frame.size.height - 40;
-    _swipeTip.frame = frame;
     [_swipeTip.superview bringSubviewToFront:_swipeTip];
     
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"swipeTip"]) {
@@ -2620,10 +2612,6 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)showTwoSwipeTip {
-    _2swipeTip.center = self.slidingViewController.view.center;
-    CGRect frame = _2swipeTip.frame;
-    frame.origin.y = [UIScreen mainScreen].applicationFrame.size.height - frame.size.height - 40;
-    _2swipeTip.frame = frame;
     [_2swipeTip.superview bringSubviewToFront:_2swipeTip];
     
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"twoSwipeTip"]) {

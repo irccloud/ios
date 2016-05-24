@@ -811,15 +811,15 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                 [self performSelectorInBackground:@selector(refresh) withObject:nil];
             break;
         case kIRCEventHeartbeatEcho:
-            @synchronized(_data) {
-                NSDictionary *seenEids = [o objectForKey:@"seenEids"];
-                for(NSNumber *cid in seenEids.allKeys) {
-                    NSDictionary *eids = [seenEids objectForKey:cid];
-                    for(NSNumber *bid in eids.allKeys) {
-                        [self refreshBuffer:[_buffers getBuffer:[bid intValue]]];
-                    }
+        {
+            NSDictionary *seenEids = [o objectForKey:@"seenEids"];
+            for(NSNumber *cid in seenEids.allKeys) {
+                NSDictionary *eids = [seenEids objectForKey:cid];
+                for(NSNumber *bid in eids.allKeys) {
+                    [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[_buffers getBuffer:[bid intValue]]];
                 }
             }
+        }
             break;
         case kIRCEventBufferMsg:
             if(e) {
