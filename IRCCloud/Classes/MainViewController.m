@@ -350,13 +350,10 @@ extern NSDictionary *emojiMap;
     }
     [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
     [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
-#if !(TARGET_IPHONE_SIMULATOR)
+
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
-#endif
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.navigationController.view];
-#if !(TARGET_IPHONE_SIMULATOR)
     }
-#endif
     
 #if TARGET_IPHONE_SIMULATOR
     UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
@@ -367,7 +364,11 @@ extern NSDictionary *emojiMap;
 
 #if TARGET_IPHONE_SIMULATOR
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.navigationController.view]] != nil);
+    if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
+        return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.navigationController.view]] != nil);
+    } else {
+        return YES;
+    }
 }
 
 - (void)_test3DTouch:(UITapGestureRecognizer *)r {
@@ -2374,7 +2375,14 @@ extern NSDictionary *emojiMap;
 
 -(void)transitionToSize:(CGSize)size {
     NSLog(@"Transitioning to size: %f, %f", size.width, size.height);
+    CGPoint center = self.slidingViewController.view.center;
+    if(self.slidingViewController.underLeftShowing)
+        center.x += _buffersView.tableView.frame.size.width;
+    if(self.slidingViewController.underRightShowing)
+        center.x -= _buffersView.tableView.frame.size.width;
+    
     self.navigationController.view.frame = self.slidingViewController.view.bounds;
+    self.navigationController.view.center = center;
     self.navigationController.view.layer.position = self.navigationController.view.center;
 
     _bottomBarHeightConstraint.constant = _message.frame.size.height + 8;
@@ -2395,6 +2403,7 @@ extern NSDictionary *emojiMap;
             _buffersView.view.autoresizingMask = UIViewAutoresizingNone;
         }
         _buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,self.view.frame.size.height);
+        self.navigationController.view.center = self.slidingViewController.view.center;
     } else {
         _borders.hidden = YES;
         _eventsViewWidthConstraint.constant = size.width;

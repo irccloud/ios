@@ -567,13 +567,9 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
 
 #ifndef EXTENSION
-#if !(TARGET_IPHONE_SIMULATOR)
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
-#endif
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
-#if !(TARGET_IPHONE_SIMULATOR)
     }
-#endif
 
 #if TARGET_IPHONE_SIMULATOR
     //UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];

@@ -274,14 +274,10 @@ int __timestampWidth;
     _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     _tableView.backgroundColor = [UIColor contentBackgroundColor];
 
-#if !(TARGET_IPHONE_SIMULATOR)
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
-#endif
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:_tableView];
         [__previewer.previewingGestureRecognizerForFailureRelationship addTarget:self action:@selector(_3DTouchChanged:)];
-#if !(TARGET_IPHONE_SIMULATOR)
     }
-#endif
 
 #if TARGET_IPHONE_SIMULATOR
     UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
