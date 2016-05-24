@@ -2015,7 +2015,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     //TODO: check the above result, and retry if it fails
 	NSURLResponse *response = nil;
 	NSError *error = nil;
-    NSString *body = [NSString stringWithFormat:@"session=%@", self.session];
+    NSString *body = [NSString stringWithFormat:@"session=%@", session];
     
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
