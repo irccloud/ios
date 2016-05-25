@@ -287,7 +287,6 @@
                 event.oldNick = [object objectForKey:@"nick"];
                 event.nick = [object objectForKey:@"kicker"];
                 event.fromMode = [object objectForKey:@"kicker_mode"];
-                event.hostmask = [object objectForKey:@"kicker_hostmask"];
             }
             event.color = [UIColor timestampColor];
             event.linkify = NO;
