@@ -2357,20 +2357,27 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)statusBarFrameWillChange:(NSNotification *)n {
-    CGSize size = [UIScreen mainScreen].applicationFrame.size;
     CGRect newFrame = [[n.userInfo objectForKey:UIApplicationStatusBarFrameUserInfoKey] CGRectValue];
-    if(newFrame.size.width == size.width) {
+    if(newFrame.size.width == [UIApplication sharedApplication].statusBarFrame.size.width) {
         [UIView animateWithDuration:0.25f animations:^{
-            self.slidingViewController.view.frame = CGRectMake(0,0,size.width,size.height + ((newFrame.size.height > 0)?20:0));
-            [self transitionToSize:size];
+            [self updateLayout:newFrame.size.height];
         }];
     }
 }
 
 -(void)updateLayout {
-    CGSize size = [UIScreen mainScreen].applicationFrame.size;
-    self.slidingViewController.view.frame = CGRectMake(0,0,size.width,size.height + (([UIApplication sharedApplication].statusBarFrame.size.height > 0)?20:0));
-    [self transitionToSize:size];
+    [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
+}
+
+-(void)updateLayout:(float)sbHeight {
+    CGRect frame = self.slidingViewController.view.frame;
+    frame.origin.y = (sbHeight - 20);
+    frame.size = self.slidingViewController.view.window.bounds.size;
+    if(sbHeight > 20)
+        frame.size.height -= sbHeight;
+    
+    self.slidingViewController.view.frame = frame;
+    [self transitionToSize:frame.size];
 }
 
 -(void)transitionToSize:(CGSize)size {
