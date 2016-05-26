@@ -2358,7 +2358,7 @@ extern NSDictionary *emojiMap;
 
 -(void)statusBarFrameWillChange:(NSNotification *)n {
     CGRect newFrame = [[n.userInfo objectForKey:UIApplicationStatusBarFrameUserInfoKey] CGRectValue];
-    if(newFrame.size.width == [UIApplication sharedApplication].statusBarFrame.size.width) {
+    if(newFrame.size.width > 0 && newFrame.size.width == [UIApplication sharedApplication].statusBarFrame.size.width) {
         [UIView animateWithDuration:0.25f animations:^{
             [self updateLayout:newFrame.size.height];
         }];
