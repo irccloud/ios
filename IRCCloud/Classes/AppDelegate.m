@@ -325,7 +325,6 @@
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
-    
     if([userInfo objectForKey:@"d"]) {
         int cid = [[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue];
         int bid = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
@@ -414,6 +413,29 @@
     } else {
         handler(UIBackgroundFetchResultNoData);
     }
+}
+
+- (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forRemoteNotification:(NSDictionary *)userInfo withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
+    NSLog(@"Action: %@ Info: %@ response: %@", identifier, userInfo, responseInfo);
+    NSDictionary *result;
+    
+    if([identifier isEqualToString:@"reply"]) {
+        result = [[NetworkConnection sharedInstance] sayAsync:[responseInfo objectForKey:UIUserNotificationActionResponseTypedTextKey]
+                                                  to:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]
+                                                 cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+    } else if([identifier isEqualToString:@"join"]) {
+        result = [[NetworkConnection sharedInstance] sayAsync:[NSString stringWithFormat:@"/join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]]
+                                                  to:@""
+                                                 cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+    } else if([identifier isEqualToString:@"accept"]) {
+        result = [[NetworkConnection sharedInstance] sayAsync:[NSString stringWithFormat:@"/accept %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]]
+                                                  to:@""
+                                                 cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+    }
+    
+    NSLog(@"Result: %@", result);
+    
+    completionHandler();
 }
 
 - (void)application:(UIApplication *)application performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult result))completionHandler {

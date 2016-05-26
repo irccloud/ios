@@ -1251,6 +1251,39 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
+-(NSDictionary *)sayAsync:(NSString *)message to:(NSString *)to cid:(int)cid {
+    CFStringRef message_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)message, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    CFStringRef to_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)to, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    
+    NSData *data;
+    NSURLResponse *response = nil;
+    NSError *error = nil;
+    NSString *body = [NSString stringWithFormat:@"msg=%@&to=%@&cid=%i", message_escaped, to_escaped, cid];
+    if(self.session.length)
+        body = [body stringByAppendingFormat:@"&session=%@", self.session];
+
+    CFRelease(message_escaped);
+    CFRelease(to_escaped);
+    
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/say", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    if(self.session.length)
+        [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
+    
+    return [[[SBJsonParser alloc] init] objectWithData:data];
+}
+
 -(int)say:(NSString *)message to:(NSString *)to cid:(int)cid {
     if(to)
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":to}];
@@ -1287,6 +1320,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         return [self _sendRequest:@"join" args:@{@"cid":@(cid), @"channel":channel}];
     }
 }
+
 -(int)part:(NSString *)channel msg:(NSString *)msg cid:(int)cid {
     if(msg.length) {
         return [self _sendRequest:@"part" args:@{@"cid":@(cid), @"channel":channel, @"msg":msg}];

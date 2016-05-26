@@ -1380,7 +1380,50 @@ extern NSDictionary *emojiMap;
     
     NSString *session = [NetworkConnection sharedInstance].session;
     if(session.length) {
-        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
+            UIMutableUserNotificationAction *replyAction = [[UIMutableUserNotificationAction alloc] init];
+            replyAction.identifier = @"reply";
+            replyAction.title = @"Reply";
+            replyAction.activationMode = UIUserNotificationActivationModeBackground;
+            replyAction.authenticationRequired = YES;
+            replyAction.behavior = UIUserNotificationActionBehaviorTextInput;
+            
+            UIMutableUserNotificationAction *joinAction = [[UIMutableUserNotificationAction alloc] init];
+            joinAction.identifier = @"join";
+            joinAction.title = @"Join";
+            joinAction.activationMode = UIUserNotificationActivationModeBackground;
+            joinAction.authenticationRequired = YES;
+            
+            UIMutableUserNotificationAction *acceptAction = [[UIMutableUserNotificationAction alloc] init];
+            acceptAction.identifier = @"accept";
+            acceptAction.title = @"Accept";
+            acceptAction.activationMode = UIUserNotificationActivationModeBackground;
+            acceptAction.authenticationRequired = YES;
+            
+            UIMutableUserNotificationCategory *buffer_msg = [[UIMutableUserNotificationCategory alloc] init];
+            buffer_msg.identifier = @"buffer_msg";
+            [buffer_msg setActions:@[replyAction] forContext:UIUserNotificationActionContextDefault];
+            [buffer_msg setActions:@[replyAction] forContext:UIUserNotificationActionContextMinimal];
+            
+            UIMutableUserNotificationCategory *buffer_me_msg = [[UIMutableUserNotificationCategory alloc] init];
+            buffer_me_msg.identifier = @"buffer_me_msg";
+            [buffer_me_msg setActions:@[replyAction] forContext:UIUserNotificationActionContextDefault];
+            [buffer_me_msg setActions:@[replyAction] forContext:UIUserNotificationActionContextMinimal];
+            
+            UIMutableUserNotificationCategory *invite = [[UIMutableUserNotificationCategory alloc] init];
+            invite.identifier = @"channel_invite";
+            [invite setActions:@[joinAction] forContext:UIUserNotificationActionContextDefault];
+            [invite setActions:@[joinAction] forContext:UIUserNotificationActionContextMinimal];
+
+            UIMutableUserNotificationCategory *callerid = [[UIMutableUserNotificationCategory alloc] init];
+            callerid.identifier = @"callerid";
+            [callerid setActions:@[acceptAction] forContext:UIUserNotificationActionContextDefault];
+            [callerid setActions:@[acceptAction] forContext:UIUserNotificationActionContextMinimal];
+            
+            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:[NSSet setWithObjects:buffer_msg, buffer_me_msg, invite, callerid, nil]]];
+        } else {
+            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
+        }
 #ifdef DEBUG
         NSLog(@"This is a debug build, skipping APNs registration");
 #else
