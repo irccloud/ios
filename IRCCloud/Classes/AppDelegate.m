@@ -420,12 +420,11 @@
 }
 
 - (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forRemoteNotification:(NSDictionary *)userInfo withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
-    CLS_LOG(@"Remote notification action: %@ Info: %@ response: %@", identifier, userInfo, responseInfo);
     NSDictionary *result;
     
     if([identifier isEqualToString:@"reply"]) {
         result = [[NetworkConnection sharedInstance] POSTsay:[responseInfo objectForKey:UIUserNotificationActionResponseTypedTextKey]
-                                                  to:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]
+                                                          to:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-key"] hasSuffix:@"CH"]?2:0]
                                                  cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
     } else if([identifier isEqualToString:@"join"]) {
         result = [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"/join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]]
@@ -445,7 +444,6 @@
             if(b) {
                 [self.mainViewController bufferSelected:b.bid];
             } else {
-                NSLog(@"MVC: %@", self.mainViewController);
                 self.mainViewController.cidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue];
                 self.mainViewController.bufferToOpen = [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1];
             }
