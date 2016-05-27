@@ -4002,6 +4002,8 @@ Device type: %@\n",
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltUpPressed:)],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltDownPressed:)],
              [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:) discoverabilityTitle:@"Complete nicknames and channels"],
+             [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(onCmdRPressed:) discoverabilityTitle:@"Mark channel as read"],
+             [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftCmdRPressed:) discoverabilityTitle:@"Mark all channels as read"],
              ];
     } else {
         return @[
@@ -4014,6 +4016,8 @@ Device type: %@\n",
             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltUpPressed:)],
             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltDownPressed:)],
             [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:)],
+            [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(onCmdRPressed:) discoverabilityTitle:@"Mark channel as read"],
+            [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftCmdRPressed:) discoverabilityTitle:@"Mark all channels as read"],
         ];
     }
 }
@@ -4057,5 +4061,14 @@ Device type: %@\n",
         if([text rangeOfString:@" "].location == NSNotFound)
             _message.text = [_message.text stringByAppendingString:@":"];
     }
+}
+
+-(void)onCmdRPressed:(UIKeyCommand *)sender {
+    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:[[EventsDataSource sharedInstance] lastEidForBuffer:_buffer.bid]];
+    _buffer.last_seen_eid = [[EventsDataSource sharedInstance] lastEidForBuffer:_buffer.bid];
+}
+
+-(void)onShiftCmdRPressed:(UIKeyCommand *)sender {
+    [self _markAllAsRead];
 }
 @end
