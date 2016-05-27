@@ -92,6 +92,15 @@ extern NSDictionary *emojiMap;
 
 @implementation MainViewController
 
+-(instancetype)initWithCoder:(NSCoder *)aDecoder {
+    if(self = [super initWithCoder:aDecoder]) {
+        _cidToOpen = -1;
+        _bidToOpen = -1;
+        _pendingEvents = [[NSMutableArray alloc] init];
+    }
+    return self;
+}
+
 - (void)_themeChanged {
     if(![__currentTheme isEqualToString:[UIColor currentTheme]]) {
         __currentTheme = [UIColor currentTheme];
@@ -150,9 +159,6 @@ extern NSDictionary *emojiMap;
 - (void)viewDidLoad {
     [super viewDidLoad];
     [_eventsView viewDidLoad];
-    _cidToOpen = -1;
-    _bidToOpen = -1;
-    _pendingEvents = [[NSMutableArray alloc] init];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
@@ -1253,7 +1259,7 @@ extern NSDictionary *emojiMap;
             return;
         }
         [self _hideConnectingView];
-        if(_buffer && !_urlToOpen && _bidToOpen < 1 && _eidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
+        if(_buffer && !_urlToOpen && _bidToOpen < 1 && _eidToOpen < 1 && _cidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
             [self _updateTitleArea];
             [self _updateServerStatus];
             [self _updateUserListVisibility];
@@ -1275,6 +1281,13 @@ extern NSDictionary *emojiMap;
                 _bidToOpen = -1;
             } else if(_eidToOpen > 0) {
                 bid = _buffer.bid;
+            } else if(_cidToOpen > 0 && _bufferToOpen) {
+                Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_bufferToOpen server:_cidToOpen];
+                if(b) {
+                    bid = b.bid;
+                    _cidToOpen = -1;
+                    _bufferToOpen = nil;
+                }
             }
             [self bufferSelected:bid];
             _eidToOpen = -1;
@@ -1391,7 +1404,7 @@ extern NSDictionary *emojiMap;
             UIMutableUserNotificationAction *joinAction = [[UIMutableUserNotificationAction alloc] init];
             joinAction.identifier = @"join";
             joinAction.title = @"Join";
-            joinAction.activationMode = UIUserNotificationActivationModeBackground;
+            joinAction.activationMode = UIUserNotificationActivationModeForeground;
             joinAction.authenticationRequired = YES;
             
             UIMutableUserNotificationAction *acceptAction = [[UIMutableUserNotificationAction alloc] init];

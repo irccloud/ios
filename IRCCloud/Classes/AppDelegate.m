@@ -438,7 +438,18 @@
     }
 
     if([[result objectForKey:@"success"] intValue] == 1) {
-        AudioServicesPlaySystemSound(1001);
+        if([identifier isEqualToString:@"reply"]) {
+            AudioServicesPlaySystemSound(1001);
+        } else if([identifier isEqualToString:@"join"]) {
+            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1] server:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+            if(b) {
+                [self.mainViewController bufferSelected:b.bid];
+            } else {
+                NSLog(@"MVC: %@", self.mainViewController);
+                self.mainViewController.cidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue];
+                self.mainViewController.bufferToOpen = [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1];
+            }
+        }
     } else {
         CLS_LOG(@"Failed: %@", result);
         UILocalNotification *alert = [[UILocalNotification alloc] init];

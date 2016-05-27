@@ -94,9 +94,11 @@
     
     id<UIViewControllerPreviewing> __previewer;
 }
+@property (nonatomic) int cidToOpen;
 @property (nonatomic) int bidToOpen;
 @property (nonatomic) NSTimeInterval eidToOpen;
 @property (nonatomic) NSString *incomingDraft;
+@property (nonatomic) NSString *bufferToOpen;
 @property (readonly) EventsTableView *eventsView;
 @property BOOL isShowingPreview;
 -(void)bufferSelected:(int)bid;
