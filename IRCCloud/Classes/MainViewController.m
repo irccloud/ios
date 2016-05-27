@@ -4016,8 +4016,8 @@ Device type: %@\n",
             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltUpPressed:)],
             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltDownPressed:)],
             [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:)],
-            [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(onCmdRPressed:) discoverabilityTitle:@"Mark channel as read"],
-            [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftCmdRPressed:) discoverabilityTitle:@"Mark all channels as read"],
+            [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(onCmdRPressed:)],
+            [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftCmdRPressed:)],
         ];
     }
 }
