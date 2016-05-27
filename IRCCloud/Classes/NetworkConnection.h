@@ -189,7 +189,7 @@ typedef enum {
 -(void)cancelPendingBacklogRequests;
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid;
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid;
--(NSDictionary *)sayAsync:(NSString *)message to:(NSString *)to cid:(int)cid;
+-(NSDictionary *)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid;
 -(int)say:(NSString *)message to:(NSString *)to cid:(int)cid;
 -(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid;
 -(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids;
@@ -223,7 +223,7 @@ typedef enum {
 -(NSDictionary *)requestPassword:(NSString *)email token:(NSString *)token;
 -(int)resendVerifyEmail;
 -(int)changeEmail:(NSString *)email password:(NSString *)password;
--(int)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename;
+-(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename;
 -(NSDictionary *)getFiles:(int)page;
 -(int)deleteFile:(NSString *)fileID;
 -(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension;

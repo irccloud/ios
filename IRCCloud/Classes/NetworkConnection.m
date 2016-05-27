@@ -952,30 +952,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password token:(NSString *)token {
-	NSData *data;
-	NSURLResponse *response = nil;
-	NSError *error = nil;
-    
-    CFStringRef email_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)email, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-    CFStringRef password_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)password, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-#endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/login", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:token forHTTPHeaderField:@"x-auth-formtoken"];
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[NSString stringWithFormat:@"email=%@&password=%@&token=%@", email_escaped, password_escaped, token] dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    CFRelease(email_escaped);
-    CFRelease(password_escaped);
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-#endif
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [self _postRequest:@"/chat/login" args:@{@"email":email, @"password":password, @"token":token}];
 }
 
 -(NSDictionary *)login:(NSURL *)accessLink {
@@ -998,62 +975,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token impression:(NSString *)impression {
-	NSData *data;
-	NSURLResponse *response = nil;
-	NSError *error = nil;
-    
-    CFStringRef realname_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)realname, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-    CFStringRef email_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)email, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-    CFStringRef password_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)password, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-#endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/signup", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:token forHTTPHeaderField:@"x-auth-formtoken"];
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[NSString stringWithFormat:@"realname=%@&email=%@&password=%@&token=%@&ios_impression=%@", realname_escaped, email_escaped, password_escaped, token,(impression!=nil)?impression:@""] dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    if(realname_escaped != NULL)
-        CFRelease(realname_escaped);
-    
-    if(email_escaped != NULL)
-        CFRelease(email_escaped);
-    
-    if(password_escaped != NULL)
-        CFRelease(password_escaped);
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-#endif
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [self _postRequest:@"/chat/signup" args:@{@"realname":realname, @"email":email, @"password":password, @"token":token, @"ios_impression":impression}];
 }
 
 -(NSDictionary *)requestPassword:(NSString *)email token:(NSString *)token {
-	NSData *data;
-	NSURLResponse *response = nil;
-	NSError *error = nil;
-    
-    CFStringRef email_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)email, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-#endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/request-access-link", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:token forHTTPHeaderField:@"x-auth-formtoken"];
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[[NSString stringWithFormat:@"email=%@&token=%@&mobile=1", email_escaped, token] dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    CFRelease(email_escaped);
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-#endif
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [self _postRequest:@"/chat/request-access-link" args:@{@"email":email, @"mobile":@"1", @"token":token}];
 }
 
 //From: http://stackoverflow.com/questions/1305225/best-way-to-serialize-a-nsdata-into-an-hexadeximal-string
@@ -1078,23 +1004,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #if defined(DEBUG) || defined(EXTENSION)
     return nil;
 #else
-	NSData *data;
-	NSURLResponse *response = nil;
-	NSError *error = nil;
-    NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], self.session];
-    
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-register", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [self _postRequest:@"/apn-register" args:@{@"device_id":[self dataToHex:token]}];
 #endif
 }
 
@@ -1102,23 +1012,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifdef EXTENSION
     return nil;
 #else
-	NSData *data;
-	NSURLResponse *response = nil;
-	NSError *error = nil;
-    NSString *body = [NSString stringWithFormat:@"device_id=%@&session=%@", [self dataToHex:token], session];
-    
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/apn-unregister", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:[NSString stringWithFormat:@"session=%@",session] forHTTPHeaderField:@"Cookie"];
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [self _postRequest:@"/apn-unregister" args:@{@"device_id":[self dataToHex:token], @"session":session}];
 #endif
 }
 
@@ -1126,53 +1020,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifdef EXTENSION
     return nil;
 #else
-    CFStringRef idfa_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)idfa, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-    CFStringRef referrer_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)referrer, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-    
-    NSData *data;
-    NSURLResponse *response = nil;
-    NSError *error = nil;
-    NSString *body = [NSString stringWithFormat:@"idfa=%@&referrer=%@", idfa_escaped, referrer_escaped];
-    if(self.session.length)
-        body = [body stringByAppendingFormat:@"&session=%@", self.session];
-
-    CFRelease(idfa_escaped);
-    CFRelease(referrer_escaped);
-    
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/ios-impressions", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    if(self.session.length)
-        [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [self _postRequest:@"/chat/ios-impressions" args:@{@"idfa":idfa, @"referrer":referrer}];
 #endif
 }
 
 -(NSDictionary *)requestAuthToken {
-	NSData *data;
-	NSURLResponse *response = nil;
-	NSError *error = nil;
-    
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-#endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/auth-formtoken", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setHTTPMethod:@"POST"];
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-#endif
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [self _postRequest:@"/chat/auth-formtoken" args:@{}];
 }
 
 -(NSDictionary *)requestConfiguration {
@@ -1251,27 +1104,35 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
--(NSDictionary *)sayAsync:(NSString *)message to:(NSString *)to cid:(int)cid {
-    CFStringRef message_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)message, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-    CFStringRef to_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)to, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+-(NSDictionary *)_postRequest:(NSString *)path args:(NSDictionary *)args {
+    CFStringRef escaped = NULL;
+    NSMutableString *body = [[NSMutableString alloc] init];
+    
+    for (NSString *key in args.allKeys) {
+        if(body.length)
+            [body appendString:@"&"];
+        escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[args objectForKey:key], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+        [body appendFormat:@"%@=%@",key,escaped];
+        CFRelease(escaped);
+    }
     
     NSData *data;
     NSURLResponse *response = nil;
     NSError *error = nil;
-    NSString *body = [NSString stringWithFormat:@"msg=%@&to=%@&cid=%i", message_escaped, to_escaped, cid];
-    if(self.session.length)
-        body = [body stringByAppendingFormat:@"&session=%@", self.session];
-
-    CFRelease(message_escaped);
-    CFRelease(to_escaped);
+    if(self.session.length && ![args objectForKey:@"session"])
+        [body appendFormat:@"&session=%@", self.session];
     
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/say", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, path]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    if(self.session.length)
+    if([args objectForKey:@"token"])
+        [request setValue:[args objectForKey:@"token"] forHTTPHeaderField:@"x-auth-formtoken"];
+    if([args objectForKey:@"session"])
+        [request setValue:[NSString stringWithFormat:@"session=%@",[args objectForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
+    else if(self.session.length)
         [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
@@ -1282,6 +1143,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #endif
     
     return [[[SBJsonParser alloc] init] objectWithData:data];
+
+}
+
+-(NSDictionary *)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid {
+    return [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":to, @"cid":[@(cid) stringValue]}];
 }
 
 -(int)say:(NSString *)message to:(NSString *)to cid:(int)cid {
@@ -1464,8 +1330,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"reorder-connections" args:@{@"cids":cids}];
 }
 
--(int)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename {
-    return [self _sendRequest:@"upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename}];
+-(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename {
+    return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename}];
 }
 
 -(int)deleteFile:(NSString *)fileID {
@@ -2046,26 +1912,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)_logout:(NSString *)session {
     NSLog(@"Unregister result: %@", [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] session:session]);
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
-    //TODO: check the above result, and retry if it fails
-	NSURLResponse *response = nil;
-	NSError *error = nil;
-    NSString *body = [NSString stringWithFormat:@"session=%@", session];
-    
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
-#endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/logout", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    [request setValue:[NSString stringWithFormat:@"session=%@", session] forHTTPHeaderField:@"Cookie"];
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-#endif
+    [self _postRequest:@"/chat/logout" args:@{@"session":session}];
 }
 
 -(void)logout {

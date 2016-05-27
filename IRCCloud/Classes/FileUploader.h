@@ -34,7 +34,6 @@
     NSObject<FileUploaderDelegate> *_delegate;
     NSObject<FileUploaderMetadataDelegate> *_metadatadelegate;
     int _bid;
-    int _reqid;
     BOOL _filenameSet;
     BOOL _finished;
     BOOL _cancelled;

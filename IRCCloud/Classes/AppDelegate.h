@@ -30,7 +30,6 @@
     id _backlogCompletedObserver;
     id _backlogFailedObserver;
     id _IRCEventObserver;
-    int _finalizeUploadReqid;
     void (^imageUploadCompletionHandler)();
     BOOL _movedToBackground;
     __block UIBackgroundTaskIdentifier _background_task;

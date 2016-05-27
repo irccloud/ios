@@ -415,25 +415,49 @@
     }
 }
 
+-(void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
+    [self application:application handleActionWithIdentifier:[notification.userInfo objectForKey:@"identifier"] forRemoteNotification:[notification.userInfo objectForKey:@"userInfo"] withResponseInfo:[notification.userInfo objectForKey:@"responseInfo"] completionHandler:completionHandler];
+}
+
 - (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forRemoteNotification:(NSDictionary *)userInfo withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
-    NSLog(@"Action: %@ Info: %@ response: %@", identifier, userInfo, responseInfo);
+    CLS_LOG(@"Remote notification action: %@ Info: %@ response: %@", identifier, userInfo, responseInfo);
     NSDictionary *result;
     
     if([identifier isEqualToString:@"reply"]) {
-        result = [[NetworkConnection sharedInstance] sayAsync:[responseInfo objectForKey:UIUserNotificationActionResponseTypedTextKey]
+        result = [[NetworkConnection sharedInstance] POSTsay:[responseInfo objectForKey:UIUserNotificationActionResponseTypedTextKey]
                                                   to:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]
                                                  cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
     } else if([identifier isEqualToString:@"join"]) {
-        result = [[NetworkConnection sharedInstance] sayAsync:[NSString stringWithFormat:@"/join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]]
+        result = [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"/join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]]
                                                   to:@""
                                                  cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
     } else if([identifier isEqualToString:@"accept"]) {
-        result = [[NetworkConnection sharedInstance] sayAsync:[NSString stringWithFormat:@"/accept %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]]
+        result = [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"/accept %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]]
                                                   to:@""
                                                  cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
     }
-    
-    NSLog(@"Result: %@", result);
+
+    if([[result objectForKey:@"success"] intValue] == 1) {
+        AudioServicesPlaySystemSound(1001);
+    } else {
+        CLS_LOG(@"Failed: %@", result);
+        UILocalNotification *alert = [[UILocalNotification alloc] init];
+        alert.fireDate = [NSDate date];
+        if([identifier isEqualToString:@"reply"]) {
+            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0] server:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+            if(b)
+                b.draft = [responseInfo objectForKey:UIUserNotificationActionResponseTypedTextKey];
+            alert.alertBody = [NSString stringWithFormat:@"Failed to send message to %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
+        } else if([identifier isEqualToString:@"join"]) {
+            alert.alertBody = [NSString stringWithFormat:@"Failed to join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]];
+        } else if([identifier isEqualToString:@"accept"]) {
+            alert.alertBody = [NSString stringWithFormat:@"Failed to add %@ to accept list", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
+        }
+        alert.soundName = @"a.caf";
+        alert.category = @"retry";
+        alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"responseInfo":responseInfo, @"d":[userInfo objectForKey:@"d"]};
+        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+    }
     
     completionHandler();
 }
@@ -708,140 +732,52 @@
             CLS_LOG(@"Invalid JSON response: %@", [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding]);
         } else if([[r objectForKey:@"success"] intValue] == 1) {
             if([[dict objectForKey:@"service"] isEqualToString:@"irccloud"]) {
-                _IRCEventObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudEventNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-                    Buffer *b = nil;
-                    IRCCloudJSONObject *o = nil;
-                    kIRCEvent event = [[n.userInfo objectForKey:kIRCCloudEventKey] intValue];
-                    switch(event) {
-                        case kIRCEventSuccess:
-                            o = n.object;
-                            if(_finalizeUploadReqid && [[o objectForKey:@"_reqid"] intValue] == _finalizeUploadReqid) {
-                                CLS_LOG(@"IRCCloud upload successful");
-                                b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
-                                if(b) {
-                                    NSString *msg = [dict objectForKey:@"msg"];
-                                    if(msg.length)
-                                        msg = [msg stringByAppendingString:@" "];
-                                    else
-                                        msg = @"";
-                                    msg = [msg stringByAppendingFormat:@"%@", [[o objectForKey:@"file"] objectForKey:@"url"]];
-                                    [[NetworkConnection sharedInstance] say:msg to:b.name cid:b.cid];
-                                    [self.mainViewController fileUploadDidFinish];
-                                    [[NSNotificationCenter defaultCenter] removeObserver:_IRCEventObserver];
-                                    UILocalNotification *alert = [[UILocalNotification alloc] init];
-                                    alert.fireDate = [NSDate date];
-                                    alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                                    [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                                    AudioServicesPlaySystemSound(1001);
-                                    if(imageUploadCompletionHandler)
-                                        imageUploadCompletionHandler();
-                                    if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
-                                        CLS_LOG(@"background transfer session successfully completed, disconnecting websocket");
-                                        [_conn disconnect];
-                                    }
-                                }
-                            }
-                            break;
-                        case kIRCEventFailureMsg:
-                            o = n.object;
-                            if(_finalizeUploadReqid && [[o objectForKey:@"_reqid"] intValue] == _finalizeUploadReqid) {
-                                CLS_LOG(@"IRCCloud upload failed");
-                                [self.mainViewController fileUploadDidFail:[o objectForKey:@"message"]];
-                                [[NSNotificationCenter defaultCenter] removeObserver:_IRCEventObserver];
-                                UILocalNotification *alert = [[UILocalNotification alloc] init];
-                                alert.fireDate = [NSDate date];
-                                if([[o objectForKey:@"message"] isEqualToString:@"upload_limit_reached"]) {
-                                    alert.alertBody = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
-                                } else if([[o objectForKey:@"message"] isEqualToString:@"upload_already_exists"]) {
-                                    alert.alertBody = @"You’ve already uploaded this file";
-                                } else if([[o objectForKey:@"message"] isEqualToString:@"banned_content"]) {
-                                    alert.alertBody = @"Banned content";
-                                } else {
-                                    alert.alertBody = @"Failed to upload file. Please try again shortly.";
-                                }
-                                [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                                if(imageUploadCompletionHandler)
-                                    imageUploadCompletionHandler();
-                                if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
-                                    CLS_LOG(@"background transfer session failed, disconnecting websocket");
-                                    [_conn disconnect];
-                                }
-                            }
-                            break;
-                        default:
-                            break;
+                CLS_LOG(@"Finalizing IRCCloud upload");
+                NSDictionary *o = [[NetworkConnection sharedInstance] finalizeUpload:[r objectForKey:@"id"] filename:[dict objectForKey:@"filename"] originalFilename:[dict objectForKey:@"original_filename"]];
+                if([[r objectForKey:@"success"] intValue] == 1) {
+                    CLS_LOG(@"IRCCloud upload successful");
+                    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
+                    if(b) {
+                        NSString *msg = [dict objectForKey:@"msg"];
+                        if(msg.length)
+                            msg = [msg stringByAppendingString:@" "];
+                        else
+                            msg = @"";
+                        msg = [msg stringByAppendingFormat:@"%@", [[o objectForKey:@"file"] objectForKey:@"url"]];
+                        [[NetworkConnection sharedInstance] POSTsay:msg to:b.name cid:b.cid];
+                        [self.mainViewController fileUploadDidFinish];
+                        AudioServicesPlaySystemSound(1001);
+                        if(imageUploadCompletionHandler)
+                            imageUploadCompletionHandler();
                     }
-                }];
-                
-                if(_conn.state != kIRCCloudStateConnected) {
-                    [[NSNotificationCenter defaultCenter] removeObserver:self];
-                    _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
-                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-                        NSLog(@"Finalizing IRCCloud upload");
-                        _finalizeUploadReqid = [[NetworkConnection sharedInstance] finalizeUpload:[r objectForKey:@"id"] filename:[dict objectForKey:@"filename"] originalFilename:[dict objectForKey:@"original_filename"]];
-                    }];
-                    _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
-                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-                        if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
-                            CLS_LOG(@"Backlog failed during background transfer callback, disconnecting websocket");
-                            [_conn disconnect];
-                        }
-                    }];
-                    CLS_LOG(@"Connecting websocket for background transfer callback");
-                    [_conn connect:YES];
                 } else {
-                    CLS_LOG(@"Finalizing IRCCloud upload");
-                    _finalizeUploadReqid = [[NetworkConnection sharedInstance] finalizeUpload:[r objectForKey:@"id"] filename:[dict objectForKey:@"filename"] originalFilename:[dict objectForKey:@"original_filename"]];
+                    CLS_LOG(@"IRCCloud upload failed");
+                    [self.mainViewController fileUploadDidFail:[o objectForKey:@"message"]];
+                    [[NSNotificationCenter defaultCenter] removeObserver:_IRCEventObserver];
+                    UILocalNotification *alert = [[UILocalNotification alloc] init];
+                    alert.fireDate = [NSDate date];
+                    if([[o objectForKey:@"message"] isEqualToString:@"upload_limit_reached"]) {
+                        alert.alertBody = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
+                    } else if([[o objectForKey:@"message"] isEqualToString:@"upload_already_exists"]) {
+                        alert.alertBody = @"You’ve already uploaded this file";
+                    } else if([[o objectForKey:@"message"] isEqualToString:@"banned_content"]) {
+                        alert.alertBody = @"Banned content";
+                    } else {
+                        alert.alertBody = @"Failed to upload file. Please try again shortly.";
+                    }
+                    [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                    if(imageUploadCompletionHandler)
+                        imageUploadCompletionHandler();
                 }
             } else if([[dict objectForKey:@"service"] isEqualToString:@"imgur"]) {
                 NSString *link = [[[r objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
                 
                 if([dict objectForKey:@"msg"]) {
-                    if(_conn.state != kIRCCloudStateConnected) {
-                        [[NSNotificationCenter defaultCenter] removeObserver:self];
-                        _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-                            [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
-                            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
-                            [_conn say:[NSString stringWithFormat:@"%@ %@",[dict objectForKey:@"msg"],link] to:b.name cid:b.cid];
-                            UILocalNotification *alert = [[UILocalNotification alloc] init];
-                            alert.fireDate = [NSDate date];
-                            alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                            [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                            AudioServicesPlaySystemSound(1001);
-                            if(imageUploadCompletionHandler)
-                                imageUploadCompletionHandler();
-                            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
-                                CLS_LOG(@"Backlog completed during background transfer callback, disconnecting websocket");
-                                [_conn disconnect];
-                            }
-                        }];
-                        _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-                            [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-                            UILocalNotification *alert = [[UILocalNotification alloc] init];
-                            alert.fireDate = [NSDate date];
-                            alert.alertBody = @"Unable to share image. Please try again shortly.";
-                            [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                            if(imageUploadCompletionHandler)
-                                imageUploadCompletionHandler();
-                            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive && _background_task == UIBackgroundTaskInvalid) {
-                                CLS_LOG(@"Backlog failed during background transfer callback, disconnecting websocket");
-                                [_conn disconnect];
-                            }
-                        }];
-                        [_conn connect:YES];
-                    } else {
-                        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
-                        [_conn say:[NSString stringWithFormat:@"%@ %@",[dict objectForKey:@"msg"],link] to:b.name cid:b.cid];
-                        UILocalNotification *alert = [[UILocalNotification alloc] init];
-                        alert.fireDate = [NSDate date];
-                        alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                        AudioServicesPlaySystemSound(1001);
-                        if(imageUploadCompletionHandler)
-                            imageUploadCompletionHandler();
-                    }
+                    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
+                    [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"%@ %@",[dict objectForKey:@"msg"],link] to:b.name cid:b.cid];
+                    AudioServicesPlaySystemSound(1001);
+                    if(imageUploadCompletionHandler)
+                        imageUploadCompletionHandler();
                 } else {
                     if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
                         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];

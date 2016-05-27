@@ -1400,6 +1400,12 @@ extern NSDictionary *emojiMap;
             acceptAction.activationMode = UIUserNotificationActivationModeBackground;
             acceptAction.authenticationRequired = YES;
             
+            UIMutableUserNotificationAction *retryAction = [[UIMutableUserNotificationAction alloc] init];
+            retryAction.identifier = @"retry";
+            retryAction.title = @"Try Again";
+            retryAction.activationMode = UIUserNotificationActivationModeBackground;
+            retryAction.authenticationRequired = YES;
+            
             UIMutableUserNotificationCategory *buffer_msg = [[UIMutableUserNotificationCategory alloc] init];
             buffer_msg.identifier = @"buffer_msg";
             [buffer_msg setActions:@[replyAction] forContext:UIUserNotificationActionContextDefault];
@@ -1420,7 +1426,12 @@ extern NSDictionary *emojiMap;
             [callerid setActions:@[acceptAction] forContext:UIUserNotificationActionContextDefault];
             [callerid setActions:@[acceptAction] forContext:UIUserNotificationActionContextMinimal];
             
-            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:[NSSet setWithObjects:buffer_msg, buffer_me_msg, invite, callerid, nil]]];
+            UIMutableUserNotificationCategory *retry = [[UIMutableUserNotificationCategory alloc] init];
+            callerid.identifier = @"retry";
+            [callerid setActions:@[retryAction] forContext:UIUserNotificationActionContextDefault];
+            [callerid setActions:@[retryAction] forContext:UIUserNotificationActionContextMinimal];
+            
+            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:[NSSet setWithObjects:buffer_msg, buffer_me_msg, invite, callerid, retry, nil]]];
         } else {
             [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
         }

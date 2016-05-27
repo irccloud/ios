@@ -30,8 +30,7 @@
     _msg = message;
     _filenameSet = YES;
     if(_finished && _id.length) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-        _reqid = [[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename originalFilename:_originalFilename];
+        [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename originalFilename:_originalFilename]];
     } else {
         if(_backgroundID)
             [self _updateBackgroundUploadMetadata];
@@ -50,36 +49,20 @@
         [_delegate fileUploadWasCancelled];
 }
 
-- (void)handleEvent:(NSNotification *)notification {
-    Buffer *b = nil;
-    IRCCloudJSONObject *o = nil;
-    kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-    switch(event) {
-        case kIRCEventSuccess:
-            o = notification.object;
-            if(_reqid && [[o objectForKey:@"_reqid"] intValue] == _reqid) {
-                b = [[BuffersDataSource sharedInstance] getBuffer:_bid];
-                if(b) {
-                    if(_msg.length)
-                        _msg = [_msg stringByAppendingString:@" "];
-                    else
-                        _msg = @"";
-                    _msg = [_msg stringByAppendingFormat:@"%@", [[o objectForKey:@"file"] objectForKey:@"url"]];
-                    [[NetworkConnection sharedInstance] say:_msg to:b.name cid:b.cid];
-                    [_delegate fileUploadDidFinish];
-                }
-                [[NSNotificationCenter defaultCenter] removeObserver:self];
-            }
-            break;
-        case kIRCEventFailureMsg:
-            o = notification.object;
-            if(_reqid && [[o objectForKey:@"_reqid"] intValue] == _reqid) {
-                [_delegate fileUploadDidFail:[o objectForKey:@"message"]];
-                [[NSNotificationCenter defaultCenter] removeObserver:self];
-            }
-            break;
-        default:
-            break;
+- (void)handleResult:(NSDictionary *)result {
+    if([[result objectForKey:@"success"] intValue] == 1) {
+        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:_bid];
+        if(b) {
+            if(_msg.length)
+                _msg = [_msg stringByAppendingString:@" "];
+            else
+                _msg = @"";
+            _msg = [_msg stringByAppendingFormat:@"%@", [[result objectForKey:@"file"] objectForKey:@"url"]];
+            [[NetworkConnection sharedInstance] POSTsay:_msg to:b.name cid:b.cid];
+            [_delegate fileUploadDidFinish];
+        }
+    } else {
+        [_delegate fileUploadDidFail:[result objectForKey:@"message"]];
     }
 }
 
@@ -486,8 +469,7 @@
             _id = [d objectForKey:@"id"];
             _finished = YES;
             if(_filenameSet) {
-                [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-                _reqid = [[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename?_filename:@"" originalFilename:_originalFilename?_originalFilename:@""];
+                [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename?_filename:@"" originalFilename:_originalFilename?_originalFilename:@""]];
             }
         } else {
             [_delegate fileUploadDidFail:[d objectForKey:@"message"]];
