@@ -536,22 +536,19 @@ int __timestampWidth;
 
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    _ready = NO;
+    _tableView.hidden = YES;
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         if(_data.count && _buffer.scrolledUp)
             _bottomRow = [[[_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)] lastObject] row];
         else
             _bottomRow = -1;
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        [self didRotate];
-    }];
-}
-
--(void)didRotate {
-    if(_ready && [UIApplication sharedApplication].statusBarOrientation != _lastOrientation) {
+        _ready = YES;
         [self clearCachedHeights];
-    }
-    _lastOrientation = [UIApplication sharedApplication].statusBarOrientation;
-    [self updateUnread];
+        [self updateUnread];
+        _tableView.hidden = NO;
+    }];
 }
 
 -(void)clearCachedHeights {
@@ -1261,7 +1258,8 @@ int __timestampWidth;
     [_scrollTimer invalidate];
     _scrollTimer = nil;
     _requestingBacklog = NO;
-    _bottomRow = -1;
+    if(buffer != _buffer)
+        _bottomRow = -1;
     if(_buffer && _buffer.scrolledUp) {
         NSLog(@"Table was scrolled up, adjusting scroll offset");
         [_lock lock];

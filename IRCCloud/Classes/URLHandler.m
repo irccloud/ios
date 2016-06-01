@@ -265,6 +265,7 @@
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         appDelegate.window.backgroundColor = [UIColor blackColor];
         appDelegate.window.rootViewController = ivc;
+        appDelegate.slideViewController.view.frame = appDelegate.window.bounds;
         [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:ivc.view];
         ivc.view.alpha = 0;
         [UIView animateWithDuration:0.5f animations:^{

@@ -346,17 +346,6 @@ extern NSDictionary *emojiMap;
     swipe.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:swipe];
 
-    if(_eventsView.topUnreadView.observationInfo) {
-        @try {
-            [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
-            [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
-        } @catch(id anException) {
-            //Not registered yet
-        }
-    }
-    [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
-    [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
-
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.navigationController.view];
     }
@@ -413,7 +402,7 @@ extern NSDictionary *emojiMap;
     } else if(object == _eventsView.tableView.layer) {
         CGRect old = [[change objectForKey:NSKeyValueChangeOldKey] CGRectValue];
         CGRect new = [[change objectForKey:NSKeyValueChangeNewKey] CGRectValue];
-        if(old.size.width != new.size.width) {
+        if(new.size.height > 0 && old.size.width != new.size.width) {
             [_eventsView clearCachedHeights];
         }
     } else {
@@ -1467,10 +1456,19 @@ extern NSDictionary *emojiMap;
     
     self.slidingViewController.view.autoresizesSubviews = NO;
     [self updateLayout];
-    [_eventsView didRotate];
     
     _buffersView.tableView.scrollsToTop = YES;
     _usersView.tableView.scrollsToTop = YES;
+    if(_eventsView.topUnreadView.observationInfo) {
+        @try {
+            [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
+            [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+        } @catch(id anException) {
+            //Not registered yet
+        }
+    }
+    [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
+    [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -1487,13 +1485,21 @@ extern NSDictionary *emojiMap;
     
     _buffersView.tableView.scrollsToTop = NO;
     _usersView.tableView.scrollsToTop = NO;
+
+    if(_eventsView.topUnreadView.observationInfo) {
+        @try {
+            [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
+            [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+        } @catch(id anException) {
+            //Not registered yet
+        }
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [_eventsView viewDidAppear:animated];
     [self updateLayout];
-    [_eventsView didRotate];
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -2440,11 +2446,13 @@ extern NSDictionary *emojiMap;
     CGRect frame = self.slidingViewController.view.frame;
     frame.origin.y = (sbHeight - 20);
     frame.size = self.slidingViewController.view.window.bounds.size;
-    if(sbHeight > 20)
-        frame.size.height -= sbHeight;
-    
-    self.slidingViewController.view.frame = frame;
-    [self transitionToSize:frame.size];
+    if(frame.size.width > 0 && frame.size.height > 0) {
+        if(sbHeight > 20)
+            frame.size.height -= sbHeight;
+        
+        self.slidingViewController.view.frame = frame;
+        [self transitionToSize:frame.size];
+    }
 }
 
 -(void)transitionToSize:(CGSize)size {
@@ -2517,13 +2525,32 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    if(_eventsView.topUnreadView.observationInfo) {
+        @try {
+            [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
+            [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+        } @catch(id anException) {
+            //Not registered yet
+        }
+    }
+    _eventActivity.alpha = 1;
+    [_eventActivity startAnimating];
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [self transitionToSize:size];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        _eventsView.tableView.hidden = NO;
         _eventActivity.alpha = 0;
         [_eventActivity stopAnimating];
+        if(_eventsView.topUnreadView.observationInfo) {
+            @try {
+                [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
+                [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+            } @catch(id anException) {
+                //Not registered yet
+            }
+        }
+        [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
+        [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
     }];
 }
 
