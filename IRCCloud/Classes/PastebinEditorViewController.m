@@ -188,7 +188,7 @@
             break;
         case kIRCEventBufferMsg:
             e = notification.object;
-            if(e.bid == _buffer.bid && (e.reqId == _sayreqid || (e.isSelf && [e.from isEqualToString:_buffer.name]))) {
+            if(_sqyreqid > 0 && e.bid == _buffer.bid && (e.reqId == _sayreqid || (e.isSelf && [e.from isEqualToString:_buffer.name]))) {
                 _buffer.draft = @"";
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [self.tableView endEditing:YES];
