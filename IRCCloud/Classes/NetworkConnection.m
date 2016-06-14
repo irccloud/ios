@@ -812,10 +812,14 @@ volatile BOOL __socketPaused = NO;
                            [self postObject:object forEvent:kIRCEventSelfBack];
                    },
                    @"self_details": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_events addJSONObject:object];
+                       Event *e = [_events addJSONObject:object];
                        [_servers updateUsermask:[object objectForKey:@"usermask"] server:object.bid];
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventSelfDetails];
+                       if(!backlog && !_resuming) {
+                           [self postObject:e forEvent:kIRCEventSelfDetails];
+                           e = [_events event:e.eid + 1 buffer:e.bid];
+                           if(e)
+                               [self postObject:e forEvent:kIRCEventSelfDetails];
+                       }
                    },
                    @"user_mode": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        [_events addJSONObject:object];

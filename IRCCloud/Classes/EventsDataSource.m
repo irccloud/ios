@@ -127,6 +127,7 @@
     }
     return self;
 }
+
 -(void)encodeWithCoder:(NSCoder *)aCoder {
     encodeInt(_cid);
     encodeInt(_bid);
@@ -461,11 +462,24 @@
                               event.isSelf = NO;
                           },
                           @"self_details":^(Event *event, IRCCloudJSONObject *object) {
-                              event.from = @"";
-                              if(object)
-                                  event.msg = [NSString stringWithFormat:@"Your hostmask: %c%@%c", BOLD, [object objectForKey:@"usermask"], BOLD];
                               event.bgColor = [UIColor statusBackgroundColor];
                               event.linkify = NO;
+                              if(object) {
+                                  event.from = @"";
+                                  if([[object objectForKey:@"user"] length]) {
+                                      event.msg = [NSString stringWithFormat:@"Your hostmask: %c%@%c", BOLD, [object objectForKey:@"usermask"], BOLD];
+                                      if([object objectForKey:@"server_realname"]) {
+                                          Event *e1 = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:event]];
+                                          e1.eid++;
+                                          e1.msg = [NSString stringWithFormat:@"Your name: %c%@%c", BOLD, [object objectForKey:@"server_realname"], BOLD];
+                                          e1.linkify = YES;
+                                          [self addEvent:e1];
+                                      }
+                                  } else if([object objectForKey:@"server_realname"]) {
+                                      event.msg = [NSString stringWithFormat:@"Your name: %c%@%c", BOLD, [object objectForKey:@"server_realname"], BOLD];
+                                      event.linkify = YES;
+                                  }
+                              }
                               event.monospace = YES;
                           },
                           @"myinfo":^(Event *event, IRCCloudJSONObject *object) {

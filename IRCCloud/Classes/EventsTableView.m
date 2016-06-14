@@ -752,7 +752,6 @@ BOOL __monospacePref = NO;
         case kIRCEventQuit:
         case kIRCEventKick:
         case kIRCEventChannelMode:
-        case kIRCEventSelfDetails:
         case kIRCEventUserMode:
         case kIRCEventUserChannelMode:
             o = notification.object;
@@ -762,6 +761,7 @@ BOOL __monospacePref = NO;
                     [self insertEvent:e backlog:NO nextIsGrouped:NO];
             }
             break;
+        case kIRCEventSelfDetails:
         case kIRCEventBufferMsg:
             e = notification.object;
             if(e.bid == _buffer.bid) {
