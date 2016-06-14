@@ -30,6 +30,7 @@
 #import "EditConnectionViewController.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "IRCCloudSafariViewController.h"
+#import "AvatarsDataSource.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -83,6 +84,7 @@ BOOL __norealnamePref = NO;
 BOOL __monospacePref = NO;
 
 @interface EventsTableCell : UITableViewCell {
+    UIImageView *_avatar;
     UILabel *_timestamp;
     TTTAttributedLabel *_message;
     TTTAttributedLabel *_nickname;
@@ -98,6 +100,7 @@ BOOL __monospacePref = NO;
 @property float timestampPosition;
 @property (readonly) UILabel *timestamp, *accessory;
 @property (readonly) TTTAttributedLabel *message, *nickname, *realname;
+@property (readonly) UIImageView *avatar;
 @end
 
 @implementation EventsTableCell
@@ -109,6 +112,9 @@ BOOL __monospacePref = NO;
         
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         self.backgroundColor = [UIColor contentBackgroundColor];
+        
+        _avatar = [[UIImageView alloc] init];
+        [self.contentView addSubview:_avatar];
         
         _timestamp = [[UILabel alloc] init];
         _timestamp.backgroundColor = [UIColor clearColor];
@@ -187,6 +193,11 @@ BOOL __monospacePref = NO;
         frame.origin.y = 4;
         frame.size.height -= 6;
         frame.size.width -= 12;
+        if(!__chatOneLinePref) {
+            _avatar.frame = CGRectMake(frame.origin.x,frame.origin.y + ((_nickname.attributedText.length)?8:0),_avatar.frame.size.width,_avatar.frame.size.height);
+            frame.origin.x += _avatar.frame.size.width + 6;
+            frame.size.width -= _avatar.frame.size.width + 6;
+        }
         if(_type == ROW_MESSAGE && !__chatOneLinePref && _nickname.attributedText.length) {
             frame.origin.y += 4;
             frame.size.height -= 4;
@@ -217,7 +228,12 @@ BOOL __monospacePref = NO;
         _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition - _timestamp.frame.size.height + 4, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && frame.size.height < 0);
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
-        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 6):0), frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
+        if(__chatOneLinePref && !_avatar.hidden) {
+            _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y,_avatar.frame.size.width,_avatar.frame.size.height);
+            frame.origin.x += _avatar.frame.size.width + 4;
+            frame.size.width -= _avatar.frame.size.width + 4;
+        }
+        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, frame.size.height);
     } else {
         if(_type == ROW_BACKLOG) {
             frame.origin.y = frame.size.height / 2;
@@ -1695,8 +1711,9 @@ BOOL __monospacePref = NO;
         links = mutableLinks;
     }
     e.links = links;
+    float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(16+4):(32+6));
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
+    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
     e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
     
     CGMutablePathRef path = CGPathCreateMutable();
@@ -1758,11 +1775,10 @@ BOOL __monospacePref = NO;
             CFRelease(path);
             CFRelease(framesetter);
             
-            if(!__chatOneLinePref && e.isHeader) {
+            if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
                 framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formattedNick));
                 suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(CGFLOAT_MAX,CGFLOAT_MAX), NULL);
                 e.height += ceilf(suggestedSize.height) + 8;
-                e.timestampPosition += ceilf(suggestedSize.height) + 8;
                 CFRelease(framesetter);
             }
             return e.height;
@@ -1795,9 +1811,18 @@ BOOL __monospacePref = NO;
     if(e.isHeader) {
         cell.realname.text = ([e.realname isEqualToString:e.from] || __norealnamePref)?nil:e.realname;
         cell.nickname.text = e.formattedNick;
+        cell.avatar.hidden = __avatarsOffPref;
     } else {
         cell.realname.text = nil;
         cell.nickname.text = nil;
+        cell.avatar.hidden = !(__chatOneLinePref && !__avatarsOffPref);
+    }
+    float avatarHeight = __avatarsOffPref?0:(__chatOneLinePref?16:32);
+    cell.avatar.frame = CGRectMake(0,0,avatarHeight,avatarHeight);
+    if(e.from.length && !__avatarsOffPref) {
+        cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight];
+    } else {
+        cell.avatar.image = nil;
     }
     cell.realname.textColor = [UIColor timestampColor];
     cell.timestamp.font = cell.realname.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];

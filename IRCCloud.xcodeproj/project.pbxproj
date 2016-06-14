@@ -489,6 +489,8 @@
 		22DB8D711C441C3000302271 /* YouTubeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB8D6F1C441C3000302271 /* YouTubeViewController.m */; };
 		22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
 		22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
+		22E54AE01D10593B00891FE4 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
+		22E54AE11D10593B00891FE4 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
 		22E9C0AB1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */; };
 		22E9C0AC1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */; };
 		22EB4CF41CCEE298004F9CFC /* ImageViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22EB4CF31CCEE296004F9CFC /* ImageViewController.xib */; };
@@ -843,6 +845,8 @@
 		22DB8D6F1C441C3000302271 /* YouTubeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YouTubeViewController.m; sourceTree = "<group>"; };
 		22E442A3192AB85B00A6C687 /* ImgurLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImgurLoginViewController.h; sourceTree = "<group>"; };
 		22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImgurLoginViewController.m; sourceTree = "<group>"; };
+		22E54ADE1D10593B00891FE4 /* AvatarsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AvatarsDataSource.h; sourceTree = "<group>"; };
+		22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AvatarsDataSource.m; sourceTree = "<group>"; };
 		22E9C0A71C9AF27800013456 /* OpenInFirefoxControllerObjC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInFirefoxControllerObjC.h; path = OpenInFirefoxClient/OpenInFirefoxControllerObjC.h; sourceTree = SOURCE_ROOT; };
 		22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OpenInFirefoxControllerObjC.m; path = OpenInFirefoxClient/OpenInFirefoxControllerObjC.m; sourceTree = SOURCE_ROOT; };
 		22EB4CF31CCEE296004F9CFC /* ImageViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = ImageViewController.xib; path = Classes/ImageViewController.xib; sourceTree = "<group>"; };
@@ -1187,6 +1191,8 @@
 			children = (
 				228A05AE16D3DB7B0029769C /* AppDelegate.h */,
 				228A05AF16D3DB7B0029769C /* AppDelegate.m */,
+				22E54ADE1D10593B00891FE4 /* AvatarsDataSource.h */,
+				22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */,
 				2236F5FC16DA8928007BE535 /* BuffersDataSource.h */,
 				2236F5FD16DA8928007BE535 /* BuffersDataSource.m */,
 				2236F60416DBCA85007BE535 /* BuffersTableView.h */,
@@ -1934,6 +1940,7 @@
 				225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */,
 				228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */,
 				225D976418AA995900065087 /* UIExpandingTextView.m in Sources */,
+				22E54AE11D10593B00891FE4 /* AvatarsDataSource.m in Sources */,
 				22C2E0591B0E2E4800387B4B /* PastebinViewController.m in Sources */,
 				223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				225D976518AA995900065087 /* UIExpandingTextViewInternal.m in Sources */,
@@ -2031,6 +2038,7 @@
 				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
 				228E2BA218CF770D0011DEAB /* SBJsonWriter.m in Sources */,
 				22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
+				22E54AE01D10593B00891FE4 /* AvatarsDataSource.m in Sources */,
 				22C2E0581B0E2E4800387B4B /* PastebinViewController.m in Sources */,
 				223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				22D430A81725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,

@@ -26,6 +26,7 @@
 #import "ColorFormatter.h"
 #import "OpenInChromeController.h"
 #import "OpenInFirefoxControllerObjC.h"
+#import "AvatarsDataSource.h"
 
 @interface BrowserViewController : UITableViewController {
     NSMutableArray *_browsers;
@@ -523,6 +524,7 @@
             [ColorFormatter loadFonts];
         }
         [[EventsDataSource sharedInstance] clearFormattingCache];
+        [[AvatarsDataSource sharedInstance] clear];
     }
 }
 

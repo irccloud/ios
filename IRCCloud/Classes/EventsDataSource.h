@@ -80,7 +80,7 @@
 @property (nonatomic, copy) NSDictionary *ops,*entities;
 @property (nonatomic, strong) UIColor *color, *bgColor;
 @property (nonatomic, copy) NSAttributedString *formatted, *formattedNick;
-@property (nonatomic, assign) float height, timestampPosition;
+@property (nonatomic, assign) float height, timestampPosition, avatarHeight;
 @property (nonatomic, strong) NSArray *links;
 @property (nonatomic, strong) NSTimer *expirationTimer;
 -(NSComparisonResult)compare:(Event *)aEvent;

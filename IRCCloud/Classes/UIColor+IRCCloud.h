@@ -111,4 +111,5 @@
 +(UIColor *)selectedArchivedBufferBackgroundColor;
 +(UIColor *)socketClosedBackgroundColor;
 +(NSString *)currentTheme;
++(NSString *)colorForNick:(NSString *)nick;
 @end

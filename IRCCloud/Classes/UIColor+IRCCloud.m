@@ -147,6 +147,85 @@ NSString *__current_theme;
     return [UIColor colorWithHue:hue saturation:(2*saturation)/(light+saturation) brightness:light+saturation alpha:alpha];
 }
 
++(NSString *)colorForNick:(NSString *)nick {
+    NSArray *light_colors = @[
+                              @"b22222",
+                              @"d2691e",
+                              @"ff9166",
+                              @"fa8072",
+                              @"ff8c00",
+                              @"228b22",
+                              @"808000",
+                              @"b7b05d",
+                              @"8ebd2e",
+                              @"2ebd2e",
+                              @"82b482",
+                              @"37a467",
+                              @"57c8a1",
+                              @"1da199",
+                              @"579193",
+                              @"008b8b",
+                              @"00bfff",
+                              @"4682b4",
+                              @"1e90ff",
+                              @"4169e1",
+                              @"6a5acd",
+                              @"7b68ee",
+                              @"9400d3",
+                              @"8b008b",
+                              @"ba55d3",
+                              @"ff00ff",
+                              @"ff1493",
+                              ];
+    NSArray *dark_colors = @[
+                             @"deb887",
+                             @"ffd700",
+                             @"ff9166",
+                             @"fa8072",
+                             @"ff8c00",
+                             @"00ff00",
+                             @"ffff00",
+                             @"bdb76b",
+                             @"9acd32",
+                             @"32cd32",
+                             @"8fbc8f",
+                             @"3cb371",
+                             @"66cdaa",
+                             @"20b2aa",
+                             @"40e0d0",
+                             @"00ffff",
+                             @"00bfff",
+                             @"87ceeb",
+                             @"339cff",
+                             @"6495ed",
+                             @"b2a9e5",
+                             @"ff69b4",
+                             @"da70d6",
+                             @"ee82ee",
+                             @"d68fff",
+                             @"ff00ff",
+                             @"ffb6c1"
+                             ];
+    NSArray *colors = __color_theme_is_dark?dark_colors:light_colors;
+    
+    // Normalise a bit
+    // typically ` and _ are used on the end alone
+    NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[`_]+$" options:NSRegularExpressionCaseInsensitive error:nil];
+    NSString *normalizedNick = [r stringByReplacingMatchesInString:[nick lowercaseString] options:0 range:NSMakeRange(0, nick.length) withTemplate:@""];
+    // remove |<anything> from the end
+    r = [NSRegularExpression regularExpressionWithPattern:@"\\|.*$" options:NSRegularExpressionCaseInsensitive error:nil];
+    normalizedNick = [r stringByReplacingMatchesInString:normalizedNick options:0 range:NSMakeRange(0, normalizedNick.length) withTemplate:@""];
+    
+    double hash = 0;
+    int32_t lHash = 0;
+    for(int i = 0; i < normalizedNick.length; i++) {
+        hash = [normalizedNick characterAtIndex:i] + (double)(lHash << 6) + (double)(lHash << 16) - hash;
+        lHash = [[NSNumber numberWithDouble:hash] intValue];
+    }
+        
+    return [colors objectAtIndex:llabs([[NSNumber numberWithDouble:hash] longLongValue] % (int)(colors.count))];
+}
+
 +(void)setTheme:(NSString *)theme {
     NSLog(@"Setting theme: %@", theme);
     

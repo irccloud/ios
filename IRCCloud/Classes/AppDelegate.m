@@ -26,6 +26,7 @@
 #import "config.h"
 #import "URLHandler.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "AvatarsDataSource.h"
 
 //From: http://stackoverflow.com/a/19313559
 @interface NavBarHax : UINavigationBar
@@ -681,6 +682,7 @@
         if([ColorFormatter shouldClearFontCache]) {
             [ColorFormatter clearFontCache];
             [[EventsDataSource sharedInstance] clearFormattingCache];
+            [[AvatarsDataSource sharedInstance] clear];
             [ColorFormatter loadFonts];
         }
         _conn.reconnectTimestamp = -1;
