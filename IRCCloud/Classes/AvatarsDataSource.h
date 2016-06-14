@@ -25,7 +25,7 @@
 @property (nonatomic, assign) int bid;
 @property (nonatomic, copy) NSString *nick;
 @property (nonatomic, readonly) NSTimeInterval lastAccessTime;
--(UIImage *)getImage:(int)size;
+-(UIImage *)getImage:(int)size isSelf:(BOOL)isSelf;
 @end
 
 @interface AvatarsDataSource : NSObject {

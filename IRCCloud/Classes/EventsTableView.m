@@ -1757,8 +1757,9 @@ BOOL __monospacePref = NO;
             [self _format:e];
             return e.height;
         } else if(e.height == 0 && e.formatted) {
+            float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(16+4):(32+6));
             CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-            CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
+            CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
             e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
             
             CGMutablePathRef path = CGPathCreateMutable();
@@ -1820,7 +1821,7 @@ BOOL __monospacePref = NO;
     float avatarHeight = __avatarsOffPref?0:(__chatOneLinePref?16:32);
     cell.avatar.frame = CGRectMake(0,0,avatarHeight,avatarHeight);
     if(e.from.length && !__avatarsOffPref) {
-        cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight];
+        cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
     } else {
         cell.avatar.image = nil;
     }

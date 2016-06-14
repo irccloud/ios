@@ -26,13 +26,13 @@
     return self;
 }
 
--(UIImage *)getImage:(int)size {
+-(UIImage *)getImage:(int)size isSelf:(BOOL)isSelf {
     _lastAccessTime = [[NSDate date] timeIntervalSince1970];
     if(![_images objectForKey:@(size)]) {
         UIFont *font = [UIFont fontWithName:@"SourceSansPro-Regular" size:size * 0.6];
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0);
         CGContextRef ctx = UIGraphicsGetCurrentContext();
-        UIColor *color = [UIColor colorFromHexString:[UIColor colorForNick:_nick]];
+        UIColor *color = isSelf?[UIColor messageTextColor]:[UIColor colorFromHexString:[UIColor colorForNick:_nick]];
         if([UIColor isDarkTheme]) {
             CGContextSetFillColorWithColor(ctx, color.CGColor);
             CGContextFillEllipseInRect(ctx,CGRectMake(0,0,size,size));
@@ -46,7 +46,11 @@
             CGContextFillEllipseInRect(ctx,CGRectMake(2,2,size-4,size-4));
         }
         
-        NSString *text = [[_nick substringToIndex:1] uppercaseString];
+        NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[_\\W]+" options:NSRegularExpressionCaseInsensitive error:nil];
+        NSString *text = [r stringByReplacingMatchesInString:[_nick uppercaseString] options:0 range:NSMakeRange(0, _nick.length) withTemplate:@""];
+        if(!text.length)
+            text = [_nick uppercaseString];
+        text = [text substringToIndex:1];
         CGSize textSize = [text sizeWithAttributes:@{NSFontAttributeName:font, NSForegroundColorAttributeName:[UIColor contentBackgroundColor]}];
         CGPoint p = CGPointMake((size / 2) - (textSize.width / 2),(size / 2) - (textSize.height / 2));
         [text drawAtPoint:p withAttributes:@{NSFontAttributeName:font, NSForegroundColorAttributeName:[UIColor contentBackgroundColor]}];
