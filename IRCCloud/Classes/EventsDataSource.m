@@ -90,6 +90,7 @@
         decodeObject(_oldNick);
         decodeObject(_server);
         decodeObject(_diff);
+        decodeObject(_realname);
         decodeBool(_isHighlight);
         decodeBool(_isSelf);
         decodeBool(_toChan);
@@ -139,6 +140,7 @@
     encodeObject(_oldNick);
     encodeObject(_server);
     encodeObject(_diff);
+    encodeObject(_realname);
     encodeBool(_isHighlight);
     encodeBool(_isSelf);
     encodeBool(_toChan);
@@ -881,6 +883,9 @@
         event.nick = [object objectForKey:@"newnick"];
     else
         event.nick = [object objectForKey:@"nick"];
+    event.realname = [object objectForKey:@"from_realname"];
+    if([event.realname isKindOfClass:[NSNull class]])
+        event.realname = nil;
     event.oldNick = [object objectForKey:@"oldnick"];
     event.server = [object objectForKey:@"server"];
     event.diff = [object objectForKey:@"diff"];
@@ -1075,8 +1080,10 @@
             NSArray *events = [_events objectForKey:bid];
             for(Event *e in events) {
                 e.formatted = nil;
+                e.formattedNick = nil;
                 e.timestamp = nil;
                 e.height = 0;
+                e.isHeader = NO;
             }
         }
     }
@@ -1095,8 +1102,10 @@
                 else
                     e.bgColor = [UIColor contentBackgroundColor];
                 e.formatted = nil;
+                e.formattedNick = nil;
                 e.timestamp = nil;
                 e.height = 0;
+                e.isHeader = NO;
                 void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:e.type];
                 if(formatter)
                     formatter(e, nil);

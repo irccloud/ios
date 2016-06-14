@@ -71,10 +71,22 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 #endif
 
 int __timestampWidth;
+BOOL __24hrPref = NO;
+BOOL __secondsPref = NO;
+BOOL __timeLeftPref = NO;
+BOOL __nickColorsPref = NO;
+BOOL __hideJoinPartPref = NO;
+BOOL __expandJoinPartPref = NO;
+BOOL __avatarsOffPref = NO;
+BOOL __chatOneLinePref = NO;
+BOOL __norealnamePref = NO;
+BOOL __monospacePref = NO;
 
 @interface EventsTableCell : UITableViewCell {
     UILabel *_timestamp;
     TTTAttributedLabel *_message;
+    TTTAttributedLabel *_nickname;
+    TTTAttributedLabel *_realname;
     int _type;
     UIView *_socketClosedBar;
     UILabel *_accessory;
@@ -84,9 +96,8 @@ int __timestampWidth;
 }
 @property int type;
 @property float timestampPosition;
-@property (readonly) UILabel *timestamp;
-@property (readonly) TTTAttributedLabel *message;
-@property (readonly) UILabel *accessory;
+@property (readonly) UILabel *timestamp, *accessory;
+@property (readonly) TTTAttributedLabel *message, *nickname, *realname;
 @end
 
 @implementation EventsTableCell
@@ -105,6 +116,25 @@ int __timestampWidth;
         _timestamp.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:_timestamp];
 
+        _nickname = [[TTTAttributedLabel alloc] init];
+        _nickname.verticalAlignment = TTTAttributedLabelVerticalAlignmentTop;
+        _nickname.numberOfLines = 1;
+        _nickname.lineBreakMode = NSLineBreakByTruncatingTail;
+        _nickname.backgroundColor = [UIColor clearColor];
+        _nickname.textColor = [UIColor messageTextColor];
+        _nickname.dataDetectorTypes = UIDataDetectorTypeNone;
+        [self.contentView addSubview:_nickname];
+        
+        _realname = [[TTTAttributedLabel alloc] init];
+        _realname.verticalAlignment = TTTAttributedLabelVerticalAlignmentTop;
+        _realname.numberOfLines = 1;
+        _realname.lineBreakMode = NSLineBreakByTruncatingTail;
+        _realname.backgroundColor = [UIColor clearColor];
+        _realname.textColor = [UIColor timestampColor];
+        _realname.font = [ColorFormatter timestampFont];
+        _realname.dataDetectorTypes = UIDataDetectorTypeNone;
+        [self.contentView addSubview:_realname];
+        
         _message = [[TTTAttributedLabel alloc] init];
         _message.verticalAlignment = TTTAttributedLabelVerticalAlignmentTop;
         _message.numberOfLines = 0;
@@ -157,6 +187,19 @@ int __timestampWidth;
         frame.origin.y = 4;
         frame.size.height -= 6;
         frame.size.width -= 12;
+        if(_type == ROW_MESSAGE && !__chatOneLinePref && _nickname.attributedText.length) {
+            frame.origin.y += 4;
+            frame.size.height -= 4;
+            [_nickname sizeToFit];
+            _nickname.frame = CGRectMake(frame.origin.x, frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
+            [_realname sizeToFit];
+            _realname.frame = CGRectMake(frame.origin.x + _nickname.frame.size.width + 6, frame.origin.y, _realname.frame.size.width, _realname.frame.size.height);
+            frame.origin.y += _nickname.frame.size.height + 4;
+            frame.size.height -= _nickname.frame.size.height + 4;
+            _nickname.hidden = _realname.hidden = NO;
+        } else {
+            _nickname.hidden = _realname.hidden = YES;
+        }
         if(_type == ROW_SOCKETCLOSED) {
             frame.size.height -= 26;
             _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, frame.size.width + 12, 26);
@@ -168,12 +211,13 @@ int __timestampWidth;
             _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         } else {
             _socketClosedBar.hidden = YES;
-            _accessory.frame = CGRectMake(frame.origin.x + 4 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
+            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         }
         [_timestamp sizeToFit];
-        _timestamp.frame = CGRectMake(frame.origin.x, frame.origin.y + _timestampPosition - _timestamp.frame.size.height + 4, __timestampWidth, _timestamp.frame.size.height);
+        _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition - _timestamp.frame.size.height + 4, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && frame.size.height < 0);
-        _message.frame = CGRectMake(frame.origin.x + 6 + __timestampWidth, frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
+        _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
+        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 6):0), frame.origin.y, frame.size.width - 6 - __timestampWidth, frame.size.height);
     } else {
         if(_type == ROW_BACKLOG) {
             frame.origin.y = frame.size.height / 2;
@@ -183,6 +227,7 @@ int __timestampWidth;
             frame.origin.x = (frame.size.width - width) / 2;
             frame.size.width = width;
         }
+        _timestamp.textAlignment = NSTextAlignmentCenter;
         _timestamp.frame = frame;
         _timestamp.hidden = NO;
         _message.hidden = YES;
@@ -766,9 +811,8 @@ int __timestampWidth;
 
 - (void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped {
     @synchronized(self) {
-        BOOL shouldExpand = NO;
         BOOL colors = NO;
-        if(!event.isSelf && [_conn prefs] && [[[_conn prefs] objectForKey:@"nick-colors"] intValue] > 0)
+        if(!event.isSelf && __nickColorsPref)
             colors = YES;
         
         if(_minEid == 0)
@@ -787,48 +831,24 @@ int __timestampWidth;
 
         if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"] || [type isEqualToString:@"connecting_cancelled"]) {
             _collapsedEvents.showChan = ![_buffer.type isEqualToString:@"channel"];
-            NSDictionary *prefs = _conn.prefs;
-            if(prefs) {
-                NSDictionary *hiddenMap;
-                
-                if([_buffer.type isEqualToString:@"channel"]) {
-                    hiddenMap = [prefs objectForKey:@"channel-hideJoinPart"];
-                } else {
-                    hiddenMap = [prefs objectForKey:@"buffer-hideJoinPart"];
-                }
-                
-                if(([_conn prefs] && [[[_conn prefs] objectForKey:@"hideJoinPart"] boolValue]) || (hiddenMap && [[hiddenMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
-                    [_lock lock];
-                    for(Event *e in _data) {
-                        if(e.eid == event.eid) {
-                            [_data removeObject:e];
-                            break;
-                        }
+            if(__hideJoinPartPref) {
+                [_lock lock];
+                for(Event *e in _data) {
+                    if(e.eid == event.eid) {
+                        [_data removeObject:e];
+                        break;
                     }
-                    [_lock unlock];
-                    if(!backlog)
-                        [_tableView reloadData];
-                    return;
                 }
-
-                NSDictionary *expandMap;
-                
-                if([_buffer.type isEqualToString:@"channel"]) {
-                    expandMap = [prefs objectForKey:@"channel-expandJoinPart"];
-                } else if([_buffer.type isEqualToString:@"console"]) {
-                    expandMap = [prefs objectForKey:@"buffer-expandDisco"];
-                } else {
-                    expandMap = [prefs objectForKey:@"buffer-expandJoinPart"];
-                }
-                
-                if(([_conn prefs] && [[[_conn prefs] objectForKey:@"expandJoinPart"] boolValue]) || (expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
-                    shouldExpand = YES;
+                [_lock unlock];
+                if(!backlog)
+                    [_tableView reloadData];
+                return;
             }
             
             [_formatter setDateFormat:@"DDD"];
             NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
             
-            if(shouldExpand)
+            if(__expandJoinPartPref)
                 [_expandedSectionEids removeAllObjects];
             
             if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"] || [event.type isEqualToString:@"connecting_cancelled"]) {
@@ -845,7 +865,7 @@ int __timestampWidth;
                 }
             }
             
-            if(_currentCollapsedEid == -1 || ![[_formatter stringFromDate:date] isEqualToString:_lastCollpasedDay] || shouldExpand) {
+            if(_currentCollapsedEid == -1 || ![[_formatter stringFromDate:date] isEqualToString:_lastCollpasedDay] || __expandJoinPartPref) {
                 [_collapsedEvents clear];
                 _currentCollapsedEid = eid;
                 _lastCollpasedDay = [_formatter stringFromDate:date];
@@ -939,7 +959,7 @@ int __timestampWidth;
             [_collapsedEvents clear];
 
             if(!event.formatted.length || !event.formattedMsg.length) {
-                if([event.from length]) {
+                if(__chatOneLinePref && [event.from length]) {
                     event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.msg];
                 } else {
                     event.formattedMsg = event.msg;
@@ -1003,10 +1023,10 @@ int __timestampWidth;
             }
         }
         
+        [self _addItem:event eid:eid];
         if(!event.formatted && event.formattedMsg.length > 0) {
             [self _format:event];
         }
-        [self _addItem:event eid:eid];
         
         if(!backlog) {
             [_tableView reloadData];
@@ -1127,12 +1147,12 @@ int __timestampWidth;
         NSString *lastDay = nil;
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
         if(!e.timestamp) {
-            if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]) {
-                if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
-                    [_formatter setDateFormat:@"H:mm:ss"];
+            if(__24hrPref) {
+                if(__secondsPref)
+                    [_formatter setDateFormat:@"HH:mm:ss"];
                 else
-                    [_formatter setDateFormat:@"H:mm"];
-            } else if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue]) {
+                    [_formatter setDateFormat:@"HH:mm"];
+            } else if(__secondsPref) {
                 [_formatter setDateFormat:@"h:mm:ss a"];
             } else {
                 [_formatter setDateFormat:@"h:mm a"];
@@ -1240,8 +1260,23 @@ int __timestampWidth;
             d.timestamp = [_formatter stringFromDate:date];
             d.bgColor = [UIColor timestampBackgroundColor];
             d.day = e.day;
-            [_data insertObject:d atIndex:insertPos];
+            [_data insertObject:d atIndex:insertPos++];
         }
+        
+        if(insertPos > 0) {
+            Event *prev = [_data objectAtIndex:insertPos - 1];
+            if(![prev.from isEqualToString:e.from])
+                e.isHeader = YES;
+        }
+        
+        if(insertPos < _data.count - 1) {
+            Event *next = [_data objectAtIndex:insertPos - 1];
+            if([next.from isEqualToString:e.from])
+                e.isHeader = NO;
+        }
+        
+        if(e.groupEid > 0)
+            e.isHeader = NO;
         
         [_lock unlock];
     }
@@ -1325,7 +1360,55 @@ int __timestampWidth;
 
 - (void)refresh {
     @synchronized(self) {
-        if([[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"])
+        __24hrPref = NO;
+        __secondsPref = NO;
+        __timeLeftPref = NO;
+        __nickColorsPref = NO;
+        __hideJoinPartPref = NO;
+        __expandJoinPartPref = NO;
+        __avatarsOffPref = NO;
+        __chatOneLinePref = NO;
+        __norealnamePref = NO;
+        __monospacePref = NO;
+        NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+        if(prefs) {
+            __monospacePref = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
+            __nickColorsPref = [[prefs objectForKey:@"nick-colors"] boolValue];
+            __secondsPref = [[prefs objectForKey:@"time-seconds"] boolValue];
+            __24hrPref = [[prefs objectForKey:@"time-24hr"] boolValue];
+            __timeLeftPref = [[prefs objectForKey:@"time-left"] boolValue];
+            __avatarsOffPref = [[prefs objectForKey:@"avatars-off"] boolValue];
+            __chatOneLinePref = [[prefs objectForKey:@"chat-oneline"] boolValue];
+            if(!__chatOneLinePref)
+                __timeLeftPref = NO;
+            __norealnamePref = [[prefs objectForKey:@"chat-norealname"] boolValue];
+
+            NSDictionary *hiddenMap;
+            
+            if([_buffer.type isEqualToString:@"channel"]) {
+                hiddenMap = [prefs objectForKey:@"channel-hideJoinPart"];
+            } else {
+                hiddenMap = [prefs objectForKey:@"buffer-hideJoinPart"];
+            }
+            
+            if([[prefs objectForKey:@"hideJoinPart"] boolValue] || (hiddenMap && [[hiddenMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+                __hideJoinPartPref = YES;
+            }
+            
+            NSDictionary *expandMap;
+            
+            if([_buffer.type isEqualToString:@"channel"]) {
+                expandMap = [prefs objectForKey:@"channel-expandJoinPart"];
+            } else if([_buffer.type isEqualToString:@"console"]) {
+                expandMap = [prefs objectForKey:@"buffer-expandDisco"];
+            } else {
+                expandMap = [prefs objectForKey:@"buffer-expandJoinPart"];
+            }
+            
+            if([[prefs objectForKey:@"expandJoinPart"] boolValue] || (expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
+                __expandJoinPartPref = YES;
+        }
+        if(__monospacePref)
             _groupIndent = @"  ";
         else
             _groupIndent = @"    ";
@@ -1375,11 +1458,11 @@ int __timestampWidth;
 
         if(_conn.state == kIRCCloudStateConnected)
             [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
-        UIFont *f = [[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"]?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
+        UIFont *f = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
         __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
-        if([_conn prefs] && [[[_conn prefs] objectForKey:@"time-seconds"] boolValue])
+        if(__secondsPref)
             __timestampWidth += [@":88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
-        if(!([_conn prefs] && [[[_conn prefs] objectForKey:@"time-24hr"] boolValue]))
+        if(!__24hrPref)
             __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:f}].width;
         __timestampWidth += 4;
         
@@ -1582,7 +1665,9 @@ int __timestampWidth;
 - (void)_format:(Event *)e {
     NSArray *links;
     [_lock lock];
-    e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:[[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"] || e.monospace linkify:e.linkify server:_server links:&links];
+    if(e.from.length)
+        e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf)] defaultColor:e.color mono:__monospacePref || e.monospace linkify:NO server:nil links:nil];
+    e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
     if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
         NSMutableArray *mutableLinks = links.mutableCopy;
         for(int i = 0; i < mutableLinks.count; i++) {
@@ -1627,6 +1712,14 @@ int __timestampWidth;
     CFRelease(frame);
     CFRelease(path);
     CFRelease(framesetter);
+    
+    if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
+        framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formattedNick));
+        suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(CGFLOAT_MAX,CGFLOAT_MAX), NULL);
+        e.height += ceilf(suggestedSize.height) + 8;
+        CFRelease(framesetter);
+    }
+
     [_lock unlock];
 }
 
@@ -1664,6 +1757,14 @@ int __timestampWidth;
             CFRelease(frame);
             CFRelease(path);
             CFRelease(framesetter);
+            
+            if(!__chatOneLinePref && e.isHeader) {
+                framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formattedNick));
+                suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(CGFLOAT_MAX,CGFLOAT_MAX), NULL);
+                e.height += ceilf(suggestedSize.height) + 8;
+                e.timestampPosition += ceilf(suggestedSize.height) + 8;
+                CFRelease(framesetter);
+            }
             return e.height;
         }
     }
@@ -1691,7 +1792,15 @@ int __timestampWidth;
     cell.backgroundView = nil;
     cell.backgroundColor = nil;
     cell.contentView.backgroundColor = e.bgColor;
-    cell.timestamp.font = [[_conn.prefs objectForKey:@"font"] isEqualToString:@"mono"]?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
+    if(e.isHeader) {
+        cell.realname.text = ([e.realname isEqualToString:e.from] || __norealnamePref)?nil:e.realname;
+        cell.nickname.text = e.formattedNick;
+    } else {
+        cell.realname.text = nil;
+        cell.nickname.text = nil;
+    }
+    cell.realname.textColor = [UIColor timestampColor];
+    cell.timestamp.font = cell.realname.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
     cell.message.font = [ColorFormatter timestampFont];
     cell.message.delegate = self;
     if(!e.formatted && e.formattedMsg.length > 0) {
