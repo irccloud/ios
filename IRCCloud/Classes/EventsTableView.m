@@ -175,7 +175,7 @@ BOOL __monospacePref = NO;
 - (void)layoutSubviews {
 	[super layoutSubviews];
 	
-	CGRect frame = [self.contentView bounds];
+	CGRect frame = self.contentView.bounds;
     _topBorder.frame = CGRectMake(0,0,frame.size.width, 1);
     _bottomBorder.frame = CGRectMake(0,frame.size.height - 3,frame.size.width, 3);
     if(_type == ROW_TIMESTAMP) {
@@ -213,7 +213,7 @@ BOOL __monospacePref = NO;
         }
         if(_type == ROW_SOCKETCLOSED) {
             frame.size.height -= 26;
-            _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, frame.size.width + 12, 26);
+            _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, self.contentView.bounds.size.width, 26);
             _socketClosedBar.hidden = NO;
             _socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
             _accessory.frame = CGRectMake(frame.origin.x + 4 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
@@ -1464,6 +1464,8 @@ BOOL __monospacePref = NO;
         [_collapsedEvents clear];
         _collapsedEvents.server = _server;
         [_unseenHighlightPositions removeAllObjects];
+        _hiddenAvatarRow = -1;
+        _stickyAvatar.hidden = YES;
         
         if(!_buffer) {
             [_lock unlock];
@@ -1803,7 +1805,7 @@ BOOL __monospacePref = NO;
         [self refresh];
         return cell;
     }
-    Event *e = [_data objectAtIndex:[indexPath row]];
+    Event *e = [_data objectAtIndex:indexPath.row];
     [_lock unlock];
     cell.type = e.rowType;
     cell.backgroundView = nil;
@@ -1812,7 +1814,7 @@ BOOL __monospacePref = NO;
     if(e.isHeader) {
         cell.realname.text = ([e.realname isEqualToString:e.from] || __norealnamePref)?nil:e.realname;
         cell.nickname.text = e.formattedNick;
-        cell.avatar.hidden = __avatarsOffPref;
+        cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
     } else {
         cell.realname.text = nil;
         cell.nickname.text = nil;
@@ -2051,8 +2053,15 @@ BOOL __monospacePref = NO;
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(!_ready || !_buffer || _requestingBacklog || [UIApplication sharedApplication].applicationState != UIApplicationStateActive)
+    if(!_ready || !_buffer || _requestingBacklog || [UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+        _stickyAvatar.hidden = YES;
+        if(_hiddenAvatarRow != -1) {
+            int last = _hiddenAvatarRow;
+            _hiddenAvatarRow = -1;
+            [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+        }
         return;
+    }
 
     if(_previewingRow) {
         EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_previewingRow inSection:0]];
@@ -2066,6 +2075,13 @@ BOOL __monospacePref = NO;
     if(rows.count) {
         firstRow = [[rows objectAtIndex:0] row];
         lastRow = [[rows lastObject] row];
+    } else {
+        _stickyAvatar.hidden = YES;
+        if(_hiddenAvatarRow != -1) {
+            int last = _hiddenAvatarRow;
+            _hiddenAvatarRow = -1;
+            [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+        }
     }
     
     if(tableView.tableHeaderView == _headerView && _minEid > 0 && _buffer && _buffer.bid != -1 && (_buffer.scrolledUp || (_data.count && firstRow == 0 && lastRow == _data.count - 1))) {
@@ -2075,6 +2091,12 @@ BOOL __monospacePref = NO;
             [_conn cancelPendingBacklogRequests];
             [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Downloading more chat history");
+            _stickyAvatar.hidden = YES;
+            if(_hiddenAvatarRow != -1) {
+                int last = _hiddenAvatarRow;
+                _hiddenAvatarRow = -1;
+                [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+            }
             return;
         }
     }
@@ -2115,6 +2137,54 @@ BOOL __monospacePref = NO;
             
             if(tableView.tableHeaderView != _headerView && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && firstRow > 0 && lastRow < _data.count && _conn.state == kIRCCloudStateConnected)
                 tableView.tableHeaderView = _headerView;
+        }
+    }
+    
+    if(rows.count && !__chatOneLinePref && !__avatarsOffPref && scrollView.contentOffset.y > _headerView.frame.size.height) {
+        int offset = ((_topUnreadView.alpha == 0)?0:_topUnreadView.bounds.size.height);
+        int i = firstRow;
+        CGRect rect;
+        NSIndexPath *topIndexPath;
+        do {
+            topIndexPath = [NSIndexPath indexPathForRow:i++ inSection:0];
+            rect = [_tableView convertRect:[_tableView rectForRowAtIndexPath:topIndexPath] toView:_tableView.superview];
+        } while(i < _data.count && rect.origin.y + rect.size.height <= offset - 1);
+        Event *e = [_data objectAtIndex:firstRow];
+        if(e.groupEid < 1 && e.from.length) {
+            for(i = firstRow; i < _data.count - 1; i++) {
+                e = [_data objectAtIndex:i];
+                Event *e1 = [_data objectAtIndex:i+1];
+                if([e.from isEqualToString:e1.from] && e1.groupEid < 1 && !e1.isHeader)
+                    rect = [_tableView convertRect:[_tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:i+1 inSection:0]] toView:_tableView.superview];
+                else
+                    break;
+            }
+            _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - 36;
+            if(_stickyAvatarYOffsetConstraint.constant > offset + 12)
+                _stickyAvatarYOffsetConstraint.constant = offset + 12;
+            if(_hiddenAvatarRow != topIndexPath.row) {
+                _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:32 isSelf:e.isSelf];
+                _stickyAvatar.hidden = NO;
+                int last = _hiddenAvatarRow;
+                _hiddenAvatarRow = topIndexPath.row;
+                if(last != -1)
+                    [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+                [_tableView reloadRowsAtIndexPaths:@[topIndexPath] withRowAnimation:UITableViewRowAnimationNone];
+            }
+        } else {
+            _stickyAvatar.hidden = YES;
+            if(_hiddenAvatarRow != -1) {
+                int last = _hiddenAvatarRow;
+                _hiddenAvatarRow = -1;
+                [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
+            }
+        }
+    } else {
+        _stickyAvatar.hidden = YES;
+        if(_hiddenAvatarRow != -1) {
+            int last = _hiddenAvatarRow;
+            _hiddenAvatarRow = -1;
+            [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
         }
     }
 }

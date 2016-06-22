@@ -45,6 +45,9 @@
     IBOutlet HighlightsCountView *_bottomHighlightsCountView;
     IBOutlet NSLayoutConstraint *_topUnreadLabelXOffsetConstraint;
     IBOutlet NSLayoutConstraint *_bottomUnreadLabelXOffsetConstraint;
+    IBOutlet NSLayoutConstraint *_stickyAvatarYOffsetConstraint;
+    IBOutlet UIImageView *_stickyAvatar;
+    int _hiddenAvatarRow;
     
     NSDateFormatter *_formatter;
     NSMutableArray *_data;
