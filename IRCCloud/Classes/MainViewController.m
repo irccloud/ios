@@ -708,6 +708,8 @@ extern NSDictionary *emojiMap;
                 msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
             else if([type isEqualToString:@"user_on_channel"])
                 msg = [NSString stringWithFormat:@"%@ is already a member of %@", [o objectForKey:@"nick"], [o objectForKey:@"channel"]];
+            else if([type isEqualToString:@"nickname_in_use"])
+                msg = [NSString stringWithFormat:@"%@ is already in use", [o objectForKey:@"nick"]];
             else if([type isEqualToString:@"no_nick_given"])
                 msg = [NSString stringWithFormat:@"No nickname given"];
             else if([type isEqualToString:@"silence"]) {
@@ -2177,6 +2179,7 @@ extern NSDictionary *emojiMap;
     _eventsView.eidToOpen = _eidToOpen;
     if(changed) {
         [UIView animateWithDuration:0.1 animations:^{
+            _eventsView.stickyAvatar.alpha = 0;
             _eventsView.tableView.alpha = 0;
             _eventsView.topUnreadView.alpha = 0;
             _eventsView.bottomUnreadView.alpha = 0;
@@ -2190,6 +2193,7 @@ extern NSDictionary *emojiMap;
         } completion:^(BOOL finished){
             [_eventsView setBuffer:_buffer];
             [UIView animateWithDuration:0.1 animations:^{
+                _eventsView.stickyAvatar.alpha = 1;
                 _eventsView.tableView.alpha = 1;
                 _eventActivity.alpha = 0;
                 _message.delegate = nil;

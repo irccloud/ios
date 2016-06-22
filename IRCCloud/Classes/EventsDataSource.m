@@ -53,6 +53,9 @@
             return NO;
     }
 
+    return [self isMessage];
+}
+-(BOOL)isMessage {
     return ([_type isEqualToString:@"buffer_msg"]
             ||[_type isEqualToString:@"buffer_me_msg"]
             ||[_type isEqualToString:@"notice"]

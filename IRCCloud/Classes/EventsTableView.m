@@ -82,6 +82,8 @@ BOOL __avatarsOffPref = NO;
 BOOL __chatOneLinePref = NO;
 BOOL __norealnamePref = NO;
 BOOL __monospacePref = NO;
+float __smallAvatarHeight;
+float __largeAvatarHeight;
 
 @interface EventsTableCell : UITableViewCell {
     UIImageView *_avatar;
@@ -975,7 +977,7 @@ BOOL __monospacePref = NO;
             [_collapsedEvents clear];
 
             if(!event.formatted.length || !event.formattedMsg.length) {
-                if(__chatOneLinePref && [event.from length]) {
+                if((__chatOneLinePref || ![event isMessage]) && [event.from length]) {
                     event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.msg];
                 } else {
                     event.formattedMsg = event.msg;
@@ -983,7 +985,7 @@ BOOL __monospacePref = NO;
             }
         }
         
-        if(event.ignoreMask.length && ([type isEqualToString:@"buffer_msg"] || [type isEqualToString:@"buffer_me_msg"] || [type isEqualToString:@"callerid"] ||[type isEqualToString:@"channel_invite"] ||[type isEqualToString:@"wallops"] ||[type isEqualToString:@"notice"])) {
+        if(event.ignoreMask.length && [event isMessage]) {
             if((!_buffer || ![_buffer.type isEqualToString:@"conversation"]) && [_ignore match:event.ignoreMask]) {
                 if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0)
                     [self sendHeartbeat];
@@ -1000,7 +1002,7 @@ BOOL __monospacePref = NO;
             } else if([type isEqualToString:@"buffer_me_msg"]) {
                 event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.msg];
             } else if([type isEqualToString:@"notice"]) {
-                if(event.from.length)
+                if(event.from.length && __chatOneLinePref)
                     event.formattedMsg = [NSString stringWithFormat:@"%@ ", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors]];
                 else
                     event.formattedMsg = @"";
@@ -1281,18 +1283,16 @@ BOOL __monospacePref = NO;
         
         if(insertPos > 0) {
             Event *prev = [_data objectAtIndex:insertPos - 1];
-            if(![prev.from isEqualToString:e.from])
-                e.isHeader = YES;
+            e.isHeader = (e.groupEid < 1 && [e isMessage] && ![prev.from isEqualToString:e.from]);
         }
         
         if(insertPos < _data.count - 1) {
             Event *next = [_data objectAtIndex:insertPos - 1];
+            if(![e isMessage])
+                next.isHeader = (next.groupEid < 1 && [next isMessage]);
             if([next.from isEqualToString:e.from])
                 e.isHeader = NO;
         }
-        
-        if(e.groupEid > 0)
-            e.isHeader = NO;
         
         [_lock unlock];
     }
@@ -1466,6 +1466,8 @@ BOOL __monospacePref = NO;
         [_unseenHighlightPositions removeAllObjects];
         _hiddenAvatarRow = -1;
         _stickyAvatar.hidden = YES;
+        __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + 3;
+        __largeAvatarHeight = __smallAvatarHeight * 2;
         
         if(!_buffer) {
             [_lock unlock];
@@ -1713,7 +1715,7 @@ BOOL __monospacePref = NO;
         links = mutableLinks;
     }
     e.links = links;
-    float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(16+4):(32+6));
+    float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(__smallAvatarHeight+4):(__largeAvatarHeight+6));
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
     CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
     e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
@@ -1759,7 +1761,7 @@ BOOL __monospacePref = NO;
             [self _format:e];
             return e.height;
         } else if(e.height == 0 && e.formatted) {
-            float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(16+4):(32+6));
+            float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(__smallAvatarHeight+4):(__largeAvatarHeight+6));
             CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
             CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
             e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
@@ -1791,9 +1793,9 @@ BOOL __monospacePref = NO;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    EventsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"eventscell"];
+    EventsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"eventscell-%i", indexPath.row]];
     if(!cell)
-        cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"eventscell"];
+        cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"eventscell-%i", indexPath.row]];
     [_lock lock];
     if([indexPath row] >= _data.count) {
         CLS_LOG(@"Requested out of bounds row, refreshing");
@@ -1820,7 +1822,7 @@ BOOL __monospacePref = NO;
         cell.nickname.text = nil;
         cell.avatar.hidden = !(__chatOneLinePref && !__avatarsOffPref);
     }
-    float avatarHeight = __avatarsOffPref?0:(__chatOneLinePref?16:32);
+    float avatarHeight = __avatarsOffPref?0:(__chatOneLinePref?__smallAvatarHeight:__largeAvatarHeight);
     cell.avatar.frame = CGRectMake(0,0,avatarHeight,avatarHeight);
     if(e.from.length && !__avatarsOffPref) {
         cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
@@ -2056,9 +2058,9 @@ BOOL __monospacePref = NO;
     if(!_ready || !_buffer || _requestingBacklog || [UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
         _stickyAvatar.hidden = YES;
         if(_hiddenAvatarRow != -1) {
-            int last = _hiddenAvatarRow;
+            EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+            cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
             _hiddenAvatarRow = -1;
-            [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
         }
         return;
     }
@@ -2078,9 +2080,9 @@ BOOL __monospacePref = NO;
     } else {
         _stickyAvatar.hidden = YES;
         if(_hiddenAvatarRow != -1) {
-            int last = _hiddenAvatarRow;
+            EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+            cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
             _hiddenAvatarRow = -1;
-            [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
         }
     }
     
@@ -2093,9 +2095,9 @@ BOOL __monospacePref = NO;
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Downloading more chat history");
             _stickyAvatar.hidden = YES;
             if(_hiddenAvatarRow != -1) {
-                int last = _hiddenAvatarRow;
+                EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+                cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
                 _hiddenAvatarRow = -1;
-                [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
             }
             return;
         }
@@ -2150,7 +2152,7 @@ BOOL __monospacePref = NO;
             rect = [_tableView convertRect:[_tableView rectForRowAtIndexPath:topIndexPath] toView:_tableView.superview];
         } while(i < _data.count && rect.origin.y + rect.size.height <= offset - 1);
         Event *e = [_data objectAtIndex:firstRow];
-        if(e.groupEid < 1 && e.from.length) {
+        if(e.groupEid < 1 && e.from.length && [e isMessage]) {
             for(i = firstRow; i < _data.count - 1; i++) {
                 e = [_data objectAtIndex:i];
                 Event *e1 = [_data objectAtIndex:i+1];
@@ -2159,32 +2161,34 @@ BOOL __monospacePref = NO;
                 else
                     break;
             }
-            _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - 36;
+            _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + 4);
             if(_stickyAvatarYOffsetConstraint.constant > offset + 12)
                 _stickyAvatarYOffsetConstraint.constant = offset + 12;
             if(_hiddenAvatarRow != topIndexPath.row) {
-                _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:32 isSelf:e.isSelf];
+                _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                 _stickyAvatar.hidden = NO;
-                int last = _hiddenAvatarRow;
+                if(_hiddenAvatarRow != -1) {
+                    EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+                    cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
+                }
+                EventsTableCell *cell = [_tableView cellForRowAtIndexPath:topIndexPath];
+                cell.avatar.hidden = YES;
                 _hiddenAvatarRow = topIndexPath.row;
-                if(last != -1)
-                    [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
-                [_tableView reloadRowsAtIndexPaths:@[topIndexPath] withRowAnimation:UITableViewRowAnimationNone];
             }
         } else {
             _stickyAvatar.hidden = YES;
             if(_hiddenAvatarRow != -1) {
-                int last = _hiddenAvatarRow;
+                EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+                cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
                 _hiddenAvatarRow = -1;
-                [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
             }
         }
     } else {
         _stickyAvatar.hidden = YES;
         if(_hiddenAvatarRow != -1) {
-            int last = _hiddenAvatarRow;
+            EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+            cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
             _hiddenAvatarRow = -1;
-            [_tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:last inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
         }
     }
 }

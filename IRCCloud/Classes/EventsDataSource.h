@@ -85,6 +85,7 @@
 @property (nonatomic, strong) NSTimer *expirationTimer;
 -(NSComparisonResult)compare:(Event *)aEvent;
 -(BOOL)isImportant:(NSString *)bufferType;
+-(BOOL)isMessage;
 -(NSString *)ignoreMask;
 @end
 

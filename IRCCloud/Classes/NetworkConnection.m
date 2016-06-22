@@ -304,23 +304,27 @@ volatile BOOL __socketPaused = NO;
         Buffer *b = [_buffers getBuffer:object.bid];
         if(b) {
             Event *event = [_events addJSONObject:object];
-            if((!backlog || _resuming || [[_oobQueue firstObject] bid] == -1) && event.eid > _highestEID) {
-                _highestEID = event.eid;
-            }
-            if(event.eid > b.last_seen_eid && [event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"])) {
-                BOOL show = YES;
-                [_ignore setIgnores:[_servers getServer:event.cid].ignores];
-                if([_ignore match:event.ignoreMask] || [[[[self prefs] objectForKey:@"buffer-disableTrackUnread"] objectForKey:@(b.bid)] integerValue]) {
-                    show = NO;
+            if(event.eid == -1) {
+                alert(object,backlog);
+            } else {
+                if((!backlog || _resuming || [[_oobQueue firstObject] bid] == -1) && event.eid > _highestEID) {
+                    _highestEID = event.eid;
                 }
-                
-                if(show && ![_notifications getNotification:event.eid bid:event.bid]) {
-                    [_notifications notify:nil cid:event.cid bid:event.bid eid:event.eid];
-                    [_notifications updateBadgeCount];
+                if(event.eid > b.last_seen_eid && [event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"])) {
+                    BOOL show = YES;
+                    [_ignore setIgnores:[_servers getServer:event.cid].ignores];
+                    if([_ignore match:event.ignoreMask] || [[[[self prefs] objectForKey:@"buffer-disableTrackUnread"] objectForKey:@(b.bid)] integerValue]) {
+                        show = NO;
+                    }
+                    
+                    if(show && ![_notifications getNotification:event.eid bid:event.bid]) {
+                        [_notifications notify:nil cid:event.cid bid:event.bid eid:event.eid];
+                        [_notifications updateBadgeCount];
+                    }
                 }
-            }
-            if((!backlog && !_resuming) || event.reqId > 0) {
-                [self postObject:event forEvent:kIRCEventBufferMsg];
+                if((!backlog && !_resuming) || event.reqId > 0) {
+                    [self postObject:event forEvent:kIRCEventBufferMsg];
+                }
             }
         } else {
             CLS_LOG(@"Event recieved for invalid BID, reconnecting!");
