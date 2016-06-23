@@ -744,9 +744,19 @@
         _avatarsOff.on = YES;
     }
     
-    if(_oneLine.on && _avatarsOff.on)
-        _timeLeft.on = YES;
-    
+    if(_oneLine.on) {
+        _noRealName.enabled = YES;
+        if(_avatarsOff.on) {
+            _timeLeft.enabled = NO;
+            _timeLeft.on = YES;
+        } else {
+            _timeLeft.enabled = YES;
+        }
+    } else {
+        _noRealName.enabled = NO;
+        _timeLeft.enabled = YES;
+    }
+
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
@@ -813,7 +823,19 @@
                             [cell.contentView addSubview:_highlights];
                         }, @"style":@(UITableViewCellStyleDefault)}
                         ]},
-              @{@"title":@"Message Layout", @"items":[self _messageLayoutItems]},
+              @{@"title":@"Message Layout", @"items":@[
+                         @{@"title":@"Nicknames on Separate Line", @"accessory":_oneLine},
+                         @{@"title":@"Show Real Names", @"accessory":_noRealName},
+                         @{@"title":@"Right Hand Side Timestamps", @"accessory":_timeLeft},
+                         @{@"title":@"User Icons", @"accessory":_avatarsOff},
+                         @{@"title":@"24-Hour Clock", @"accessory":_24hour},
+                         @{@"title":@"Show Seconds", @"accessory":_seconds},
+                         @{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."},
+                         @{@"title":@"Colourise Nicknames", @"accessory":_colors},
+                         @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
+                         @{@"title":@"Show joins, parts, quits", @"accessory":_hideJoinPart},
+                         @{@"title":@"Collapse joins, parts, quits", @"accessory":_expandJoinPart},
+                         ]},
               @{@"title":@"Device", @"items":device},
               @{@"title":@"Notifications", @"items":@[
                         @{@"title":@"Background Alert Sounds", @"accessory":_notificationSound},
@@ -843,24 +865,6 @@
               ];
     
     [self.tableView reloadData];
-}
-
-- (NSMutableArray *)_messageLayoutItems {
-    NSMutableArray *a = [[NSMutableArray alloc] init];
-    [a addObject:@{@"title":@"24-Hour Clock", @"accessory":_24hour}];
-    [a addObject:@{@"title":@"Show Seconds", @"accessory":_seconds}];
-    [a addObject:@{@"title":@"Nicknames on Separate Line", @"accessory":_oneLine}];
-    if(_oneLine.on)
-        [a addObject:@{@"title":@"Show Real Names", @"accessory":_noRealName}];
-    if(!(_avatarsOff.on && _oneLine.on))
-        [a addObject:@{@"title":@"Right Hand Side Timestamps", @"accessory":_timeLeft}];
-    [a addObject:@{@"title":@"User Icons", @"accessory":_avatarsOff}];
-    [a addObject:@{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."}];
-    [a addObject:@{@"title":@"Colourise Nicknames", @"accessory":_colors}];
-    [a addObject:@{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"}];
-    [a addObject:@{@"title":@"Show joins, parts, quits", @"accessory":_hideJoinPart}];
-    [a addObject:@{@"title":@"Collapse joins, parts, quits", @"accessory":_expandJoinPart}];
-    return a;
 }
 
 - (void)viewDidLoad {
@@ -942,10 +946,18 @@
 }
 
 -(void)oneLineToggled:(id)sender {
-    NSMutableArray *data = [_data mutableCopy];
-    [data setObject:@{@"title":@"Message Layout", @"items":[self _messageLayoutItems]} atIndexedSubscript:2];
-    _data = data;
-    [self.tableView reloadData];
+    if(_oneLine.on) {
+        _noRealName.enabled = YES;
+        if(_avatarsOff.on) {
+            _timeLeft.enabled = NO;
+            _timeLeft.on = YES;
+        } else {
+            _timeLeft.enabled = YES;
+        }
+    } else {
+        _noRealName.enabled = NO;
+        _timeLeft.enabled = YES;
+    }
 }
 
 -(void)sliderChanged:(UISlider *)slider {
