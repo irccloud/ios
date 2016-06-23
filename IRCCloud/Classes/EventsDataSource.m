@@ -23,6 +23,7 @@
 #import "ChannelsDataSource.h"
 #import "UsersDataSource.h"
 #import "Ignore.h"
+#import "NetworkConnection.h"
 
 @implementation Event
 -(NSComparisonResult)compare:(Event *)aEvent {
@@ -113,6 +114,7 @@
         decodeObject(_chan);
         decodeObject(_entities);
         decodeFloat(_timestampPosition);
+        decodeDouble(_serverTime);
         if(_rowType == ROW_TIMESTAMP)
             _bgColor = [UIColor timestampBackgroundColor];
         else if(_rowType == ROW_LASTSEENEID)
@@ -172,6 +174,14 @@
         encodeObject(_bgColor);
     encodeObject(_entities);
     encodeFloat(_timestampPosition);
+    encodeDouble(_serverTime);
+}
+
+-(NSTimeInterval)time {
+    if(_serverTime > 0)
+        return _serverTime / 1000;
+    else
+        return (_eid / 1000000) + [NetworkConnection sharedInstance].clockOffset;
 }
 @end
 
@@ -929,6 +939,7 @@
     event.pending = NO;
     event.monospace = NO;
     event.entities = [object objectForKey:@"entities"];
+    event.serverTime = [[object objectForKey:@"server_time"] doubleValue];
     
     void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:object.type];
     if(formatter)

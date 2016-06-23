@@ -870,7 +870,7 @@ float __largeAvatarHeight;
             }
             
             [_formatter setDateFormat:@"DDD"];
-            NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
+            NSDate *date = [NSDate dateWithTimeIntervalSince1970:event.time];
             
             if(__expandJoinPartPref)
                 [_expandedSectionEids removeAllObjects];
@@ -1170,7 +1170,7 @@ float __largeAvatarHeight;
         [_lock lock];
         NSInteger insertPos = -1;
         NSString *lastDay = nil;
-        NSDate *date = [NSDate dateWithTimeIntervalSince1970:eid/1000000];
+        NSDate *date = [NSDate dateWithTimeIntervalSince1970:e.time];
         if(!e.timestamp) {
             if(__24hrPref) {
                 if(__secondsPref)
@@ -1187,7 +1187,7 @@ float __largeAvatarHeight;
         }
         if(!e.day) {
             [_formatter setDateFormat:@"DDD"];
-            e.day = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:eid/1000000]];
+            e.day = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:e.time]];
         }
         if(e.groupMsg && !e.formattedMsg) {
             e.formattedMsg = e.groupMsg;
