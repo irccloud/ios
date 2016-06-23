@@ -45,6 +45,7 @@
     NSString *_formattedMsg;
     NSAttributedString *_formatted;
     NSAttributedString *_formattedNick;
+    NSAttributedString *_formattedRealname;
     NSString *_realname;
     BOOL _isHighlight;
     BOOL _isSelf;
@@ -63,6 +64,7 @@
     BOOL _monospace;
     float _height;
     NSArray *_links;
+    NSArray *_realnameLinks;
     NSString *_to;
     NSString *_command;
     NSString *_day;
@@ -79,9 +81,9 @@
 @property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader;
 @property (nonatomic, copy) NSDictionary *ops,*entities;
 @property (nonatomic, strong) UIColor *color, *bgColor;
-@property (nonatomic, copy) NSAttributedString *formatted, *formattedNick;
+@property (nonatomic, copy) NSAttributedString *formatted, *formattedNick, *formattedRealname;
 @property (nonatomic, assign) float height, timestampPosition, avatarHeight;
-@property (nonatomic, strong) NSArray *links;
+@property (nonatomic, strong) NSArray *links, *realnameLinks;
 @property (nonatomic, strong) NSTimer *expirationTimer;
 -(NSComparisonResult)compare:(Event *)aEvent;
 -(BOOL)isImportant:(NSString *)bufferType;

@@ -130,6 +130,7 @@ float __largeAvatarHeight;
         _nickname.lineBreakMode = NSLineBreakByTruncatingTail;
         _nickname.backgroundColor = [UIColor clearColor];
         _nickname.textColor = [UIColor messageTextColor];
+        _nickname.baselineAdjustment = UIBaselineAdjustmentNone;
         _nickname.dataDetectorTypes = UIDataDetectorTypeNone;
         [self.contentView addSubview:_nickname];
         
@@ -140,6 +141,7 @@ float __largeAvatarHeight;
         _realname.backgroundColor = [UIColor clearColor];
         _realname.textColor = [UIColor timestampColor];
         _realname.font = [ColorFormatter timestampFont];
+        _realname.baselineAdjustment = UIBaselineAdjustmentNone;
         _realname.dataDetectorTypes = UIDataDetectorTypeNone;
         [self.contentView addSubview:_realname];
         
@@ -206,7 +208,7 @@ float __largeAvatarHeight;
             [_nickname sizeToFit];
             _nickname.frame = CGRectMake(frame.origin.x, frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
             [_realname sizeToFit];
-            _realname.frame = CGRectMake(frame.origin.x + _nickname.frame.size.width + 6, frame.origin.y, _realname.frame.size.width, _realname.frame.size.height);
+            _realname.frame = CGRectMake(frame.origin.x + _nickname.frame.size.width + 6, frame.origin.y + _nickname.frame.size.height - _realname.frame.size.height, frame.size.width - (frame.origin.x + _nickname.frame.size.width + 6), _realname.frame.size.height);
             frame.origin.y += _nickname.frame.size.height + 4;
             frame.size.height -= _nickname.frame.size.height + 4;
             _nickname.hidden = _realname.hidden = NO;
@@ -1687,6 +1689,11 @@ float __largeAvatarHeight;
     [_lock lock];
     if(e.from.length)
         e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf)] defaultColor:e.color mono:__monospacePref || e.monospace linkify:NO server:nil links:nil];
+    if(e.realname.length) {
+        e.formattedRealname = [ColorFormatter format:e.realname defaultColor:[UIColor timestampColor] mono:__monospacePref || e.monospace linkify:YES server:_server links:&links];
+        e.realnameLinks = links;
+        links = nil;
+    }
     e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
     if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
         NSMutableArray *mutableLinks = links.mutableCopy;
@@ -1814,7 +1821,7 @@ float __largeAvatarHeight;
     cell.backgroundColor = nil;
     cell.contentView.backgroundColor = e.bgColor;
     if(e.isHeader) {
-        cell.realname.text = ([e.realname isEqualToString:e.from] || __norealnamePref)?nil:e.realname;
+        cell.realname.text = ([e.realname isEqualToString:e.from] || __norealnamePref)?nil:e.formattedRealname;
         cell.nickname.text = e.formattedNick;
         cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
     } else {
@@ -1929,6 +1936,33 @@ float __largeAvatarHeight;
                     NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
                     if(u)
                         [cell.message addLinkToURL:u withRange:result.range];
+                }
+            }
+        }
+        @catch (NSException *exception) {
+            NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
+        }
+    }
+    if(e.realnameLinks.count) {
+        cell.realname.linkAttributes = _linkAttributes;
+        cell.realname.delegate = self;
+        @try {
+            for(NSTextCheckingResult *result in e.realnameLinks) {
+                if(result.resultType == NSTextCheckingTypeLink) {
+                    if(result.URL)
+                        [cell.realname addLinkWithTextCheckingResult:result];
+                } else {
+                    NSString *url = [[e.formattedRealname attributedSubstringFromRange:result.range] string];
+                    if(![url hasPrefix:@"irc"]) {
+                        CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                        if(url_escaped != NULL) {
+                            url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
+                            CFRelease(url_escaped);
+                        }
+                    }
+                    NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
+                    if(u)
+                        [cell.realname addLinkToURL:u withRange:result.range];
                 }
             }
         }

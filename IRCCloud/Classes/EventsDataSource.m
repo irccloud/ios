@@ -1098,6 +1098,7 @@
             for(Event *e in events) {
                 e.formatted = nil;
                 e.formattedNick = nil;
+                e.formattedRealname = nil;
                 e.timestamp = nil;
                 e.height = 0;
                 e.isHeader = NO;
@@ -1120,6 +1121,7 @@
                     e.bgColor = [UIColor contentBackgroundColor];
                 e.formatted = nil;
                 e.formattedNick = nil;
+                e.formattedRealname = nil;
                 e.timestamp = nil;
                 e.height = 0;
                 e.isHeader = NO;
