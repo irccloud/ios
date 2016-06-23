@@ -604,6 +604,7 @@ float __largeAvatarHeight;
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     _ready = NO;
     _tableView.hidden = YES;
+    _stickyAvatar.hidden = YES;
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         if(_data.count && _buffer.scrolledUp)
             _bottomRow = [[[_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)] lastObject] row];
@@ -613,6 +614,7 @@ float __largeAvatarHeight;
         _ready = YES;
         [self clearCachedHeights];
         [self updateUnread];
+        [self scrollViewDidScroll:_tableView];
         _tableView.hidden = NO;
     }];
 }
