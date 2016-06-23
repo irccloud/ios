@@ -1887,31 +1887,33 @@ float __largeAvatarHeight;
     cell.accessibilityHint = nil;
     cell.accessibilityElementsHidden = NO;
 
-    if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
-        if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
-            if(e.groupEid == e.eid + 1) {
-                cell.accessory.text = FA_MINUS_SQUARE_O;
-                cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
-                cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status messages heading. at %@", e.timestamp];
-                cell.accessibilityHint = @"Collapses this group";
+    if(cell.accessory.hidden) {
+        if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
+            if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
+                if(e.groupEid == e.eid + 1) {
+                    cell.accessory.text = FA_MINUS_SQUARE_O;
+                    cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
+                    cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status messages heading. at %@", e.timestamp];
+                    cell.accessibilityHint = @"Collapses this group";
+                } else {
+                    cell.accessory.text = FA_ANGLE_RIGHT;
+                    cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
+                    cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status message. at %@", e.timestamp];
+                    cell.accessibilityHint = @"Collapses this group";
+                }
             } else {
-                cell.accessory.text = FA_ANGLE_RIGHT;
-                cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
-                cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status message. at %@", e.timestamp];
-                cell.accessibilityHint = @"Collapses this group";
+                cell.accessory.text = FA_PLUS_SQUARE_O;
+                cell.accessibilityLabel = [NSString stringWithFormat:@"Collapsed status messages. at %@", e.timestamp];
+                cell.accessibilityHint = @"Expands this group";
             }
+            cell.accessory.hidden = NO;
+        } else if(e.rowType == ROW_FAILED) {
+            cell.accessory.hidden = NO;
+            cell.accessory.text = FA_EXCLAMATION_TRIANGLE;
+            cell.accessory.textColor = [UIColor networkErrorColor];
         } else {
-            cell.accessory.text = FA_PLUS_SQUARE_O;
-            cell.accessibilityLabel = [NSString stringWithFormat:@"Collapsed status messages. at %@", e.timestamp];
-            cell.accessibilityHint = @"Expands this group";
+            cell.accessory.hidden = YES;
         }
-        cell.accessory.hidden = NO;
-    } else if(e.rowType == ROW_FAILED) {
-        cell.accessory.hidden = NO;
-        cell.accessory.text = FA_EXCLAMATION_TRIANGLE;
-        cell.accessory.textColor = [UIColor networkErrorColor];
-    } else {
-        cell.accessory.hidden = YES;
     }
     
     if(cell.message.text != e.formatted) {
@@ -2190,27 +2192,39 @@ float __largeAvatarHeight;
         } while(i < _data.count && rect.origin.y + rect.size.height <= offset - 1);
         Event *e = [_data objectAtIndex:firstRow];
         if(e.groupEid < 1 && e.from.length && [e isMessage]) {
+            float groupHeight = rect.size.height;
             for(i = firstRow; i < _data.count - 1; i++) {
                 e = [_data objectAtIndex:i];
                 Event *e1 = [_data objectAtIndex:i+1];
-                if([e.from isEqualToString:e1.from] && e1.groupEid < 1 && !e1.isHeader)
+                if([e.from isEqualToString:e1.from] && e1.groupEid < 1 && !e1.isHeader) {
                     rect = [_tableView convertRect:[_tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:i+1 inSection:0]] toView:_tableView.superview];
-                else
+                    groupHeight += rect.size.height;
+                } else {
                     break;
+                }
             }
-            _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + 4);
-            if(_stickyAvatarYOffsetConstraint.constant > offset + 12)
-                _stickyAvatarYOffsetConstraint.constant = offset + 12;
-            if(_hiddenAvatarRow != topIndexPath.row) {
-                _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
-                _stickyAvatar.hidden = NO;
+            if(!e.isHeader || groupHeight > __largeAvatarHeight + 14) {
+                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + 4);
+                if(_stickyAvatarYOffsetConstraint.constant > offset + 12)
+                    _stickyAvatarYOffsetConstraint.constant = offset + 12;
+                if(_hiddenAvatarRow != topIndexPath.row) {
+                    _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
+                    _stickyAvatar.hidden = NO;
+                    if(_hiddenAvatarRow != -1) {
+                        EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
+                        cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
+                    }
+                    EventsTableCell *cell = [_rowCache objectForKey:@(topIndexPath.row)];
+                    cell.avatar.hidden = YES;
+                    _hiddenAvatarRow = topIndexPath.row;
+                }
+            } else {
+                _stickyAvatar.hidden = YES;
                 if(_hiddenAvatarRow != -1) {
                     EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
                     cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
+                    _hiddenAvatarRow = -1;
                 }
-                EventsTableCell *cell = [_rowCache objectForKey:@(topIndexPath.row)];
-                cell.avatar.hidden = YES;
-                _hiddenAvatarRow = topIndexPath.row;
             }
         } else {
             _stickyAvatar.hidden = YES;
