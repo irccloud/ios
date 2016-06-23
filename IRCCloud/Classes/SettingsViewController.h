@@ -48,5 +48,6 @@
     BOOL _prefssaved;
     NSString *_oldTheme;
     UIAlertView *_alertView;
+    NSArray *_data;
 }
 @end

@@ -558,7 +558,7 @@
     _email.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _name.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _highlights.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    [self.tableView reloadData];
+    [self refresh];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -722,6 +722,103 @@
     _notificationSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"];
     _tabletMode.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"];
     _fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
+    
+    NSString *imageSize;
+    switch([[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue]) {
+        case 512:
+            imageSize = @"Small";
+            break;
+        case 1024:
+            imageSize = @"Medium";
+            break;
+        case 2048:
+            imageSize = @"Large";
+            break;
+        default:
+            imageSize = @"Original";
+            break;
+    }
+    
+    NSMutableArray *device = [[NSMutableArray alloc] init];
+    [device addObject:@{@"title":@"Prevent Auto-Lock", @"accessory":_screen}];
+    [device addObject:@{@"title":@"Auto-capitalization", @"accessory":_autoCaps}];
+    [device addObject:@{@"title":@"Preferred Browser", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"], @"selected":^{ [self.navigationController pushViewController:[[BrowserViewController alloc] init] animated:YES]; }}];
+    if([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
+        [device addObject:@{@"title":@"Show Sidebars In Landscape", @"accessory":_tabletMode}];
+    }
+    
+    NSMutableArray *photos = [[NSMutableArray alloc] init];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+        [photos addObject:@{@"title":@"Image Service", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"], @"selected":^{[self.navigationController pushViewController:[[ImageServiceViewController alloc] init] animated:YES];}}];
+    }
+    if(![[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"] || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"]) {
+        [photos addObject:@{@"title":@"Imgur.com Account", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"]?[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"]:@"", @"selected":^{
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
+        }}];
+    }
+    [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":_saveToCameraRoll}];
+    [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
+    
+    _data = @[
+              @{@"title":@"Account", @"items":@[
+                        @{@"title":@"Email Address", @"accessory":_email},
+                        @{@"title":@"Full Name", @"accessory":_name},
+                        @{@"title":@"Auto Away", @"accessory":_autoaway},
+                        ]},
+              @{@"title":@"Highlight Words", @"items":@[
+                        @{@"configure":^(UITableViewCell *cell) {
+                            cell.textLabel.text = nil;
+                            [_highlights removeFromSuperview];
+                            _highlights.frame = CGRectInset(cell.contentView.bounds, 4, 4);
+                            [cell.contentView addSubview:_highlights];
+                        }, @"style":@(UITableViewCellStyleDefault)}
+                        ]},
+              @{@"title":@"Display", @"items":@[
+                        @{@"title":@"Theme", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]?[[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] capitalizedString]:@"Dawn", @"selected":^{ [self.navigationController pushViewController:[[ThemesViewController alloc] init] animated:YES]; }},
+                        @{@"title":@"24-hour Clock", @"accessory":_24hour},
+                        @{@"title":@"Show Seconds", @"accessory":_seconds},
+                        @{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."},
+                        @{@"title":@"Colourise Nicknames", @"accessory":_colors},
+                        @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
+                        @{@"title":@"Ask to Pastebin", @"accessory":_pastebin},
+                        @{@"title":@"Monospace Font", @"accessory":_mono},
+                        @{@"title":@"Show joins, parts, quits", @"accessory":_hideJoinPart},
+                        @{@"title":@"Collapse joins, parts, quits", @"accessory":_expandJoinPart},
+                        ]},
+              @{@"title":@"Device", @"items":device},
+              @{@"title":@"Notifications", @"items":@[
+                        @{@"title":@"Background Alert Sounds", @"accessory":_notificationSound},
+                        @{@"title":@"Notify On All Messages", @"accessory":_notifyAll},
+                        @{@"title":@"Show Unread Indicators", @"accessory":_showUnread},
+                        @{@"title":@"Mark As Read Automatically", @"accessory":_markAsRead}
+                        ]},
+              @{@"title":@"Font Size", @"items":@[
+                        @{@"special":^UITableViewCell *(UITableViewCell *cell, NSString *identifier) {
+                            if(!cell) {
+                                cell = [[FontSizeCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
+                                ((FontSizeCell *)cell).fontSize = _fontSize;
+                            }
+                            return cell;
+                        }}
+                        ]},
+              @{@"title":@"Photo Sharing", @"items":photos},
+              @{@"title":@"About", @"items":@[
+                        @{@"title":@"FAQ", @"selected":^{[(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];}},
+                        @{@"title":@"Feedback Channel", @"selected":^{[self dismissViewControllerAnimated:YES completion:^{
+                            [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
+                        }];}},
+                        @{@"title":@"Open-Source Licenses", @"selected":^{[self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];}},
+                        @{@"title":@"Version", @"subtitle":_version}
+                        ]}
+              ];
+    
+    [self.tableView reloadData];
 }
 
 - (void)viewDidLoad {
@@ -836,251 +933,41 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 8;
+    return _data.count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    switch(section) {
-        case 0:
-            return 3;
-        case 1:
-            return 1;
-        case 2:
-            return 10;
-        case 3:
-            return 3 + (([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad)?1:0);
-        case 4:
-            return 4;
-        case 5:
-            return 1;
-        case 6:
-            if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-                return [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"]?4:3;
-            } else {
-                return 3;
-            }
-        case 7:
-            return 4;
-    }
-    return 0;
+    return [(NSArray *)[[_data objectAtIndex:section] objectForKey:@"items"] count];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    switch (section) {
-        case 0:
-            return @"Account";
-        case 1:
-            return @"Highlight Words";
-        case 2:
-            return @"Display";
-        case 3:
-            return @"Device";
-        case 4:
-            return @"Message Notifications";
-        case 5:
-            return @"Font Size";
-        case 6:
-            return @"Photo Sharing";
-        case 7:
-            return @"About";
-    }
-    return nil;
+    return [[_data objectAtIndex:section] objectForKey:@"title"];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSUInteger row = indexPath.row;
     NSString *identifier = [NSString stringWithFormat:@"settingscell-%li-%li", (long)indexPath.section, (long)indexPath.row];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
+    NSDictionary *item = [[[_data objectAtIndex:indexPath.section] objectForKey:@"items"] objectAtIndex:indexPath.row];
     
-    if(indexPath.section != 5) {
-        if(!cell)
-            cell = [[UITableViewCell alloc] initWithStyle:(indexPath.section == 2 && indexPath.row > 0)?UITableViewCellStyleSubtitle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
-        
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.accessoryView = nil;
-        cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.detailTextLabel.text = nil;
+    if([item objectForKey:@"special"]) {
+        UITableViewCell *(^special)(UITableViewCell *cell, NSString *identifier) = [item objectForKey:@"special"];
+        return special(cell,identifier);
     }
 
-    switch(indexPath.section) {
-        case 0:
-            switch(row) {
-                case 0:
-                    cell.textLabel.text = @"Email Address";
-                    cell.accessoryView = _email;
-                    break;
-                case 1:
-                    cell.textLabel.text = @"Full Name";
-                    cell.accessoryView = _name;
-                    break;
-                case 2:
-                    cell.textLabel.text = @"Auto Away";
-                    cell.accessoryView = _autoaway;
-                    break;
-            }
-            break;
-        case 1:
-            cell.textLabel.text = nil;
-            [_highlights removeFromSuperview];
-            _highlights.frame = CGRectInset(cell.contentView.bounds, 4, 4);
-            [cell.contentView addSubview:_highlights];
-            break;
-        case 2:
-            switch(row) {
-                case 0:
-                    cell.textLabel.text = @"Theme";
-                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]?[[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] capitalizedString]:@"Dawn";
-                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    break;
-                case 1:
-                    cell.textLabel.text = @"24-hour Clock";
-                    cell.accessoryView = _24hour;
-                    break;
-                case 2:
-                    cell.textLabel.text = @"Show Seconds";
-                    cell.accessoryView = _seconds;
-                    break;
-                case 3:
-                    cell.textLabel.text = @"Usermode Symbols";
-                    cell.accessoryView = _symbols;
-                    cell.detailTextLabel.text = @"@, +, etc.";
-                    break;
-                case 4:
-                    cell.textLabel.text = @"Colourise Nicknames";
-                    cell.accessoryView = _colors;
-                    break;
-                case 5:
-                    cell.textLabel.text = @"Convert :emocodes: to Emoji";
-                    cell.detailTextLabel.text = @":thumbsup: → 👍";
-                    cell.accessoryView = _emocodes;
-                    break;
-                case 6:
-                    cell.textLabel.text = @"Ask to Pastebin";
-                    cell.accessoryView = _pastebin;
-                    cell.detailTextLabel.text = @"Before sending multi-line messages";
-                    break;
-                case 7:
-                    cell.textLabel.text = @"Monospace Font";
-                    cell.accessoryView = _mono;
-                    break;
-                case 8:
-                    cell.textLabel.text = @"Show joins, parts, quits";
-                    cell.accessoryView = _hideJoinPart;
-                    break;
-                case 9:
-                    cell.textLabel.text = @"Collapse joins, parts, quits";
-                    cell.accessoryView = _expandJoinPart;
-                    break;
-            }
-            break;
-        case 3:
-            switch(row) {
-                case 0:
-                    cell.textLabel.text = @"Prevent Auto-Lock";
-                    cell.accessoryView = _screen;
-                    break;
-                case 1:
-                    cell.textLabel.text = @"Auto-capitalization";
-                    cell.accessoryView = _autoCaps;
-                    break;
-                case 2:
-                    cell.textLabel.text = @"Preferred Browser";
-                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"browser"];
-                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    break;
-                case 3:
-                    cell.textLabel.text = @"Show Sidebars In Landscape";
-                    cell.accessoryView = _tabletMode;
-                    break;
-            }
-            break;
-        case 4:
-            switch(row) {
-                case 0:
-                    cell.textLabel.text = @"Background Alert Sounds";
-                    cell.accessoryView = _notificationSound;
-                    break;
-                case 1:
-                    cell.textLabel.text = @"Notify On All Messages";
-                    cell.accessoryView = _notifyAll;
-                    break;
-                case 2:
-                    cell.textLabel.text = @"Show Unread Indicators";
-                    cell.accessoryView = _showUnread;
-                    break;
-                case 3:
-                    cell.textLabel.text = @"Mark As Read Automatically";
-                    cell.accessoryView = _markAsRead;
-                    break;
-            }
-            break;
-        case 5:
-            if(!cell) {
-                cell = [[FontSizeCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
-                ((FontSizeCell *)cell).fontSize = _fontSize;
-            }
-            break;
-        case 6:
-            if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-                if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"] && row > 0)
-                    row++;
-            } else {
-                row++;
-            }
-            switch (row) {
-                case 0:
-                    cell.textLabel.text = @"Image Service";
-                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"];
-                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    break;
-                case 1:
-                    cell.textLabel.text = @"Imgur.com Account";
-                    cell.detailTextLabel.text = [[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"];
-                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    break;
-                case 2:
-                    cell.textLabel.text = @"Save to Camera Roll";
-                    cell.accessoryView = _saveToCameraRoll;
-                    break;
-                case 3:
-                    cell.textLabel.text = @"Image Size";
-                    int size = [[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue];
-                    switch(size) {
-                        case 512:
-                            cell.detailTextLabel.text = @"Small";
-                            break;
-                        case 1024:
-                            cell.detailTextLabel.text = @"Medium";
-                            break;
-                        case 2048:
-                            cell.detailTextLabel.text = @"Large";
-                            break;
-                        case -1:
-                            cell.detailTextLabel.text = @"Original";
-                            break;
-                    }
-                    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                    break;
-            }
-            break;
-        case 7:
-            switch(row) {
-                case 0:
-                    cell.textLabel.text = @"FAQ";
-                    break;
-                case 1:
-                    cell.textLabel.text = @"Feedback Channel";
-                    break;
-                case 2:
-                    cell.textLabel.text = @"Open-Source Licenses";
-                    break;
-                case 3:
-                    cell.textLabel.text = @"Version";
-                    cell.detailTextLabel.text = _version;
-                    break;
-            }
-            break;
+    if(!cell)
+        cell = [[UITableViewCell alloc] initWithStyle:([item objectForKey:@"subtitle"])?UITableViewCellStyleSubtitle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
+    
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    cell.textLabel.text = [item objectForKey:@"title"];
+    cell.accessoryView = [item objectForKey:@"accessory"];
+    cell.accessoryType = [item objectForKey:@"value"]?UITableViewCellAccessoryDisclosureIndicator:UITableViewCellAccessoryNone;
+    cell.detailTextLabel.text = [item objectForKey:@"value"]?[item objectForKey:@"value"]:[item objectForKey:@"subtitle"];
+    
+    if([item objectForKey:@"configure"]) {
+        void (^configure)(UITableViewCell *cell) = [item objectForKey:@"configure"];
+        configure(cell);
     }
+    
     return cell;
 }
 
@@ -1089,48 +976,11 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
-    if(indexPath.section == 2 && indexPath.row == 0) {
-        [self.navigationController pushViewController:[[ThemesViewController alloc] init] animated:YES];
-    }
-    if(indexPath.section == 3 && indexPath.row == 2) {
-        [self.navigationController pushViewController:[[BrowserViewController alloc] init] animated:YES];
-    }
-    if(indexPath.section == 6) {
-        NSInteger row = indexPath.row;
-        if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-            if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"] && row > 0)
-                row++;
-        } else {
-            row++;
-        }
+    NSDictionary *item = [[[_data objectAtIndex:indexPath.section] objectForKey:@"items"] objectAtIndex:indexPath.row];
 
-        if(row == 0) {
-            [self.navigationController pushViewController:[[ImageServiceViewController alloc] init] animated:YES];
-        }
-        if(row == 1) {
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
-        }
-        if(row == 3) {
-            [self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];
-        }
-    }
-    if(indexPath.section == 7 && indexPath.row == 0) {
-        [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];
-    }
-    if(indexPath.section == 7 && indexPath.row == 1) {
-        [self.tableView endEditing:YES];
-        [self dismissViewControllerAnimated:YES completion:^{
-            [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
-        }];
-    }
-    if(indexPath.section == 7 && indexPath.row == 2) {
-        [self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];
+    if([item objectForKey:@"selected"]) {
+        void (^selected)(void) = [item objectForKey:@"selected"];
+        selected();
     }
 }
 
