@@ -744,6 +744,9 @@
         _avatarsOff.on = YES;
     }
     
+    if(_oneLine.on && _avatarsOff.on)
+        _timeLeft.on = YES;
+    
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
@@ -810,18 +813,7 @@
                             [cell.contentView addSubview:_highlights];
                         }, @"style":@(UITableViewCellStyleDefault)}
                         ]},
-              @{@"title":@"Message Layout", @"items":@[
-                        @{@"title":@"24-Hour Clock", @"accessory":_24hour},
-                        @{@"title":@"Show Seconds", @"accessory":_seconds},
-                        @{@"title":@"Nicknames on Separate Line", @"accessory":_oneLine},
-                        _oneLine.on?@{@"title":@"Show Real Names", @"accessory":_noRealName}:@{@"title":@"Right Hand Side Timestamps", @"accessory":_timeLeft},
-                        @{@"title":@"User Icons", @"accessory":_avatarsOff},
-                        @{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."},
-                        @{@"title":@"Colourise Nicknames", @"accessory":_colors},
-                        @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
-                        @{@"title":@"Show joins, parts, quits", @"accessory":_hideJoinPart},
-                        @{@"title":@"Collapse joins, parts, quits", @"accessory":_expandJoinPart},
-                        ]},
+              @{@"title":@"Message Layout", @"items":[self _messageLayoutItems]},
               @{@"title":@"Device", @"items":device},
               @{@"title":@"Notifications", @"items":@[
                         @{@"title":@"Background Alert Sounds", @"accessory":_notificationSound},
@@ -851,6 +843,24 @@
               ];
     
     [self.tableView reloadData];
+}
+
+- (NSMutableArray *)_messageLayoutItems {
+    NSMutableArray *a = [[NSMutableArray alloc] init];
+    [a addObject:@{@"title":@"24-Hour Clock", @"accessory":_24hour}];
+    [a addObject:@{@"title":@"Show Seconds", @"accessory":_seconds}];
+    [a addObject:@{@"title":@"Nicknames on Separate Line", @"accessory":_oneLine}];
+    if(_oneLine.on)
+        [a addObject:@{@"title":@"Show Real Names", @"accessory":_noRealName}];
+    if(!(_avatarsOff.on && _oneLine.on))
+        [a addObject:@{@"title":@"Right Hand Side Timestamps", @"accessory":_timeLeft}];
+    [a addObject:@{@"title":@"User Icons", @"accessory":_avatarsOff}];
+    [a addObject:@{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."}];
+    [a addObject:@{@"title":@"Colourise Nicknames", @"accessory":_colors}];
+    [a addObject:@{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"}];
+    [a addObject:@{@"title":@"Show joins, parts, quits", @"accessory":_hideJoinPart}];
+    [a addObject:@{@"title":@"Collapse joins, parts, quits", @"accessory":_expandJoinPart}];
+    return a;
 }
 
 - (void)viewDidLoad {
@@ -903,6 +913,7 @@
     _noRealName = [[UISwitch alloc] init];
     _timeLeft = [[UISwitch alloc] init];
     _avatarsOff = [[UISwitch alloc] init];
+    [_avatarsOff addTarget:self action:@selector(oneLineToggled:) forControlEvents:UIControlEventValueChanged];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -932,9 +943,7 @@
 
 -(void)oneLineToggled:(id)sender {
     NSMutableArray *data = [_data mutableCopy];
-    NSMutableArray *layout = [[[_data objectAtIndex:2] objectForKey:@"items"] mutableCopy];
-    [layout setObject:_oneLine.on?@{@"title":@"Show Real Names", @"accessory":_noRealName}:@{@"title":@"Right Hand Side Timestamps", @"accessory":_timeLeft} atIndexedSubscript:3];
-    [data setObject:@{@"title":@"Message Layout", @"items":layout} atIndexedSubscript:2];
+    [data setObject:@{@"title":@"Message Layout", @"items":[self _messageLayoutItems]} atIndexedSubscript:2];
     _data = data;
     [self.tableView reloadData];
 }

@@ -192,23 +192,24 @@ float __largeAvatarHeight;
         _topBorder.hidden = _bottomBorder.hidden = YES;
     }
     
-    if(_type == ROW_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED) {
+    if(_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED) {
         frame.origin.x = 6;
         frame.origin.y = 4;
         frame.size.height -= 6;
         frame.size.width -= 12;
-        if(!__chatOneLinePref) {
-            _avatar.frame = CGRectMake(frame.origin.x,frame.origin.y + ((_nickname.attributedText.length)?8:0),_avatar.frame.size.width,_avatar.frame.size.height);
+        [_timestamp sizeToFit];
+        if(!__chatOneLinePref&& !__avatarsOffPref) {
+            _avatar.frame = CGRectMake(frame.origin.x,frame.origin.y + ((_nickname.attributedText.length)?8:0),__largeAvatarHeight,__largeAvatarHeight);
             frame.origin.x += _avatar.frame.size.width + 6;
             frame.size.width -= _avatar.frame.size.width + 6;
         }
-        if(_type == ROW_MESSAGE && !__chatOneLinePref && _nickname.attributedText.length) {
+        if((_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE) && !__chatOneLinePref && _nickname.attributedText.length) {
             frame.origin.y += 4;
             frame.size.height -= 4;
             [_nickname sizeToFit];
-            _nickname.frame = CGRectMake(frame.origin.x, frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
+            _nickname.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(_timestamp.frame.size.width+12):0), frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
             [_realname sizeToFit];
-            _realname.frame = CGRectMake(frame.origin.x + _nickname.frame.size.width + 6, frame.origin.y + _nickname.frame.size.height - _realname.frame.size.height, frame.size.width - (frame.origin.x + _nickname.frame.size.width + 6), _realname.frame.size.height);
+            _realname.frame = CGRectMake(_nickname.frame.origin.x + _nickname.frame.size.width + 6, frame.origin.y + _nickname.frame.size.height - _realname.frame.size.height, frame.size.width - (frame.origin.x + _nickname.frame.size.width + 6), _realname.frame.size.height);
             frame.origin.y += _nickname.frame.size.height + 4;
             frame.size.height -= _nickname.frame.size.height + 4;
             _nickname.hidden = _realname.hidden = NO;
@@ -232,8 +233,8 @@ float __largeAvatarHeight;
         _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition - _timestamp.frame.size.height + 4, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && frame.size.height < 0);
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
-        if(__chatOneLinePref && !_avatar.hidden) {
-            _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y,_avatar.frame.size.width,_avatar.frame.size.height);
+        if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
+            _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y,__smallAvatarHeight,__smallAvatarHeight);
             frame.origin.x += _avatar.frame.size.width + 4;
             frame.size.width -= _avatar.frame.size.width + 4;
         }
@@ -1006,6 +1007,7 @@ float __largeAvatarHeight;
                     event.formattedMsg = [NSString stringWithFormat:@"%@ by the server %c%@%c", event.msg, BOLD, event.server, CLEAR];
             } else if([type isEqualToString:@"buffer_me_msg"]) {
                 event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.msg];
+                event.rowType = ROW_ME_MESSAGE;
             } else if([type isEqualToString:@"notice"]) {
                 if(event.from.length && __chatOneLinePref)
                     event.formattedMsg = [NSString stringWithFormat:@"%@ ", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors]];
@@ -1293,7 +1295,7 @@ float __largeAvatarHeight;
         }
         
         if(insertPos < _data.count - 1) {
-            Event *next = [_data objectAtIndex:insertPos - 1];
+            Event *next = [_data objectAtIndex:insertPos + 1];
             if(![e isMessage]) {
                 next.isHeader = (next.groupEid < 1 && [next isMessage]);
                 next.height = 0;
@@ -1405,7 +1407,7 @@ float __largeAvatarHeight;
             __timeLeftPref = [[prefs objectForKey:@"time-left"] boolValue];
             __avatarsOffPref = [[prefs objectForKey:@"avatars-off"] boolValue];
             __chatOneLinePref = [[prefs objectForKey:@"chat-oneline"] boolValue];
-            if(!__chatOneLinePref)
+            if(!__chatOneLinePref && !__avatarsOffPref)
                 __timeLeftPref = NO;
             __norealnamePref = [[prefs objectForKey:@"chat-norealname"] boolValue];
 
@@ -1739,7 +1741,7 @@ float __largeAvatarHeight;
         } else if([e.type isEqualToString:@"buffer_me_msg"]) {
             e.accessibilityLabel = [NSString stringWithFormat:@"Action at %@", e.timestamp];
             e.accessibilityValue = [NSString stringWithFormat:@"%@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
-        } else if(e.rowType == ROW_MESSAGE) {
+        } else if(e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE) {
             NSMutableString *s = [[[ColorFormatter format:e.formattedMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] mutableCopy];
             if(s.length > 1) {
                 [s replaceOccurrencesOfString:@"→" withString:@"" options:0 range:NSMakeRange(0, 1)];
@@ -1755,7 +1757,7 @@ float __largeAvatarHeight;
             e.accessibilityValue = s;
         }
 
-        if((e.rowType == ROW_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
+        if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
             NSMutableString *s = [[[ColorFormatter format:e.formattedMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] mutableCopy];
             [s replaceOccurrencesOfString:@"→" withString:@"." options:0 range:NSMakeRange(0, s.length)];
             [s replaceOccurrencesOfString:@"←" withString:@"." options:0 range:NSMakeRange(0, s.length)];
@@ -1810,7 +1812,7 @@ float __largeAvatarHeight;
     Event *e = [_data objectAtIndex:indexPath.row];
     [_lock unlock];
     @synchronized (e) {
-        if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
+        if(e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
             if(e.formatted != nil && e.height > 0) {
                 return e.height;
             } else if(!e.formatted && e.formattedMsg.length > 0) {
@@ -1854,12 +1856,13 @@ float __largeAvatarHeight;
     } else {
         cell.realname.text = nil;
         cell.nickname.text = nil;
-        cell.avatar.hidden = !(__chatOneLinePref && !__avatarsOffPref);
+        cell.avatar.hidden = !((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref);
     }
-    float avatarHeight = __avatarsOffPref?0:(__chatOneLinePref?__smallAvatarHeight:__largeAvatarHeight);
-    cell.avatar.frame = CGRectMake(0,0,avatarHeight,avatarHeight);
+    float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
     if(e.from.length && !__avatarsOffPref) {
         cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
+    } else if(e.rowType == ROW_ME_MESSAGE && !__avatarsOffPref && e.nick.length) {
+        cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.nick bid:e.bid] getImage:__smallAvatarHeight isSelf:e.isSelf];
     } else {
         cell.avatar.image = nil;
     }
@@ -1884,7 +1887,7 @@ float __largeAvatarHeight;
     cell.accessibilityHint = nil;
     cell.accessibilityElementsHidden = NO;
 
-    if((e.rowType == ROW_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
+    if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
         if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
             if(e.groupEid == e.eid + 1) {
                 cell.accessory.text = FA_MINUS_SQUARE_O;
