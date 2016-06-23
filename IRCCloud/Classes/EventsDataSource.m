@@ -412,7 +412,9 @@
                               }
                           },
                           @"nickname_in_use":^(Event *event, IRCCloudJSONObject *object) {
-                              event.from = [object objectForKey:@"nick"];
+                              if(object) {
+                                  event.from = [object objectForKey:@"nick"];
+                              }
                               event.msg = @"is already in use";
                               event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
