@@ -2251,7 +2251,6 @@ float __largeAvatarHeight;
             }
         } else if(indexPath.row < _data.count) {
             Event *e = [_data objectAtIndex:indexPath.row];
-            NSLog(@"E: %@ H: %f", e.msg, e.height);
             if([e.type isEqualToString:@"channel_invite"])
                 [_conn join:e.oldNick key:nil cid:e.cid];
             else if([e.type isEqualToString:@"callerid"])
