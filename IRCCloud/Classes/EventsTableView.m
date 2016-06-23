@@ -1875,7 +1875,6 @@ float __largeAvatarHeight;
         }
     }
     cell.timestampPosition = e.timestampPosition;
-    cell.message.text = e.formatted;
     cell.accessory.font = [ColorFormatter awesomeFont];
     cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
     cell.accessibilityLabel = e.accessibilityLabel;
@@ -1909,60 +1908,64 @@ float __largeAvatarHeight;
     } else {
         cell.accessory.hidden = YES;
     }
-    if(e.links.count) {
-        if(e.pending || [e.color isEqual:[UIColor timestampColor]])
-            cell.message.linkAttributes = _lightLinkAttributes;
-        else
-            cell.message.linkAttributes = _linkAttributes;
-        @try {
-            for(NSTextCheckingResult *result in e.links) {
-                if(result.resultType == NSTextCheckingTypeLink) {
-                    if(result.URL)
-                        [cell.message addLinkWithTextCheckingResult:result];
-                } else {
-                    NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
-                    if(![url hasPrefix:@"irc"]) {
-                        CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                        if(url_escaped != NULL) {
-                            url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
-                            CFRelease(url_escaped);
+    
+    if(cell.message.text != e.formatted) {
+        cell.message.text = e.formatted;
+        if(e.links.count) {
+            if(e.pending || [e.color isEqual:[UIColor timestampColor]])
+                cell.message.linkAttributes = _lightLinkAttributes;
+            else
+                cell.message.linkAttributes = _linkAttributes;
+            @try {
+                for(NSTextCheckingResult *result in e.links) {
+                    if(result.resultType == NSTextCheckingTypeLink) {
+                        if(result.URL)
+                            [cell.message addLinkWithTextCheckingResult:result];
+                    } else {
+                        NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
+                        if(![url hasPrefix:@"irc"]) {
+                            CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                            if(url_escaped != NULL) {
+                                url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
+                                CFRelease(url_escaped);
+                            }
                         }
+                        NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
+                        if(u)
+                            [cell.message addLinkToURL:u withRange:result.range];
                     }
-                    NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
-                    if(u)
-                        [cell.message addLinkToURL:u withRange:result.range];
                 }
             }
-        }
-        @catch (NSException *exception) {
-            NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
-        }
-    }
-    if(e.realnameLinks.count) {
-        cell.realname.linkAttributes = _linkAttributes;
-        cell.realname.delegate = self;
-        @try {
-            for(NSTextCheckingResult *result in e.realnameLinks) {
-                if(result.resultType == NSTextCheckingTypeLink) {
-                    if(result.URL)
-                        [cell.realname addLinkWithTextCheckingResult:result];
-                } else {
-                    NSString *url = [[e.formattedRealname attributedSubstringFromRange:result.range] string];
-                    if(![url hasPrefix:@"irc"]) {
-                        CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                        if(url_escaped != NULL) {
-                            url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
-                            CFRelease(url_escaped);
-                        }
-                    }
-                    NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
-                    if(u)
-                        [cell.realname addLinkToURL:u withRange:result.range];
-                }
+            @catch (NSException *exception) {
+                NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
             }
         }
-        @catch (NSException *exception) {
-            NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
+        if(e.realnameLinks.count) {
+            cell.realname.linkAttributes = _linkAttributes;
+            cell.realname.delegate = self;
+            @try {
+                for(NSTextCheckingResult *result in e.realnameLinks) {
+                    if(result.resultType == NSTextCheckingTypeLink) {
+                        if(result.URL)
+                            [cell.realname addLinkWithTextCheckingResult:result];
+                    } else {
+                        NSString *url = [[e.formattedRealname attributedSubstringFromRange:result.range] string];
+                        if(![url hasPrefix:@"irc"]) {
+                            CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                            if(url_escaped != NULL) {
+                                url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
+                                CFRelease(url_escaped);
+                            }
+                        }
+                        NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
+                        if(u)
+                            [cell.realname addLinkToURL:u withRange:result.range];
+                    }
+                }
+            }
+            @catch (NSException *exception) {
+                NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
+            }
         }
     }
     if(e.rowType == ROW_LASTSEENEID)
