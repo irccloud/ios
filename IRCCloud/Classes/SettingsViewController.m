@@ -491,6 +491,10 @@
         [prefs setObject:[NSNumber numberWithBool:_notifyAll.isOn] forKey:@"notifications-all"];
         [prefs setObject:[NSNumber numberWithBool:!_showUnread.isOn] forKey:@"disableTrackUnread"];
         [prefs setObject:[NSNumber numberWithBool:_markAsRead.isOn] forKey:@"enableReadOnSelect"];
+        [prefs setObject:[NSNumber numberWithBool:!_oneLine.isOn] forKey:@"chat-oneline"];
+        [prefs setObject:[NSNumber numberWithBool:!_noRealName.isOn] forKey:@"chat-norealname"];
+        [prefs setObject:[NSNumber numberWithBool:!_timeLeft.isOn] forKey:@"time-left"];
+        [prefs setObject:[NSNumber numberWithBool:!_avatarsOff.isOn] forKey:@"avatars-off"];
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -716,6 +720,30 @@
         _markAsRead.on = NO;
     }
     
+    if([[prefs objectForKey:@"chat-oneline"] isKindOfClass:[NSNumber class]]) {
+        _oneLine.on = ![[prefs objectForKey:@"chat-oneline"] boolValue];
+    } else {
+        _oneLine.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"chat-norealname"] isKindOfClass:[NSNumber class]]) {
+        _noRealName.on = ![[prefs objectForKey:@"chat-norealname"] boolValue];
+    } else {
+        _noRealName.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"time-left"] isKindOfClass:[NSNumber class]]) {
+        _timeLeft.on = ![[prefs objectForKey:@"time-left"] boolValue];
+    } else {
+        _timeLeft.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"avatars-off"] isKindOfClass:[NSNumber class]]) {
+        _avatarsOff.on = ![[prefs objectForKey:@"avatars-off"] boolValue];
+    } else {
+        _avatarsOff.on = YES;
+    }
+    
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
@@ -740,12 +768,15 @@
     }
     
     NSMutableArray *device = [[NSMutableArray alloc] init];
+    [device addObject:@{@"title":@"Theme", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]?[[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] capitalizedString]:@"Dawn", @"selected":^{ [self.navigationController pushViewController:[[ThemesViewController alloc] init] animated:YES]; }}];
+    [device addObject:@{@"title":@"Monospace Font", @"accessory":_mono}];
     [device addObject:@{@"title":@"Prevent Auto-Lock", @"accessory":_screen}];
     [device addObject:@{@"title":@"Auto-capitalization", @"accessory":_autoCaps}];
     [device addObject:@{@"title":@"Preferred Browser", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"], @"selected":^{ [self.navigationController pushViewController:[[BrowserViewController alloc] init] animated:YES]; }}];
     if([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
         [device addObject:@{@"title":@"Show Sidebars In Landscape", @"accessory":_tabletMode}];
     }
+    [device addObject:@{@"title":@"Ask to Pastebin", @"accessory":_pastebin}];
     
     NSMutableArray *photos = [[NSMutableArray alloc] init];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
@@ -779,15 +810,15 @@
                             [cell.contentView addSubview:_highlights];
                         }, @"style":@(UITableViewCellStyleDefault)}
                         ]},
-              @{@"title":@"Display", @"items":@[
-                        @{@"title":@"Theme", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]?[[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] capitalizedString]:@"Dawn", @"selected":^{ [self.navigationController pushViewController:[[ThemesViewController alloc] init] animated:YES]; }},
-                        @{@"title":@"24-hour Clock", @"accessory":_24hour},
+              @{@"title":@"Message Layout", @"items":@[
+                        @{@"title":@"24-Hour Clock", @"accessory":_24hour},
                         @{@"title":@"Show Seconds", @"accessory":_seconds},
+                        @{@"title":@"Nicknames on Separate Line", @"accessory":_oneLine},
+                        _oneLine.on?@{@"title":@"Show Real Names", @"accessory":_noRealName}:@{@"title":@"Right Hand Side Timestamps", @"accessory":_timeLeft},
+                        @{@"title":@"User Icons", @"accessory":_avatarsOff},
                         @{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."},
                         @{@"title":@"Colourise Nicknames", @"accessory":_colors},
                         @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
-                        @{@"title":@"Ask to Pastebin", @"accessory":_pastebin},
-                        @{@"title":@"Monospace Font", @"accessory":_mono},
                         @{@"title":@"Show joins, parts, quits", @"accessory":_hideJoinPart},
                         @{@"title":@"Collapse joins, parts, quits", @"accessory":_expandJoinPart},
                         ]},
@@ -809,10 +840,11 @@
                         ]},
               @{@"title":@"Photo Sharing", @"items":photos},
               @{@"title":@"About", @"items":@[
-                        @{@"title":@"FAQ", @"selected":^{[(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];}},
                         @{@"title":@"Feedback Channel", @"selected":^{[self dismissViewControllerAnimated:YES completion:^{
                             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
                         }];}},
+                        @{@"title":@"FAQ", @"selected":^{[(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];}},
+                        @{@"title":@"Version History", @"selected":^{[(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://github.com/irccloud/ios/releases"]];}},
                         @{@"title":@"Open-Source Licenses", @"selected":^{[self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];}},
                         @{@"title":@"Version", @"subtitle":_version}
                         ]}
@@ -866,6 +898,11 @@
     _notifyAll = [[UISwitch alloc] init];
     _showUnread = [[UISwitch alloc] init];
     _markAsRead = [[UISwitch alloc] init];
+    _oneLine = [[UISwitch alloc] init];
+    [_oneLine addTarget:self action:@selector(oneLineToggled:) forControlEvents:UIControlEventValueChanged];
+    _noRealName = [[UISwitch alloc] init];
+    _timeLeft = [[UISwitch alloc] init];
+    _avatarsOff = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -891,6 +928,15 @@
     [_fontSize addTarget:self action:@selector(sliderChanged:) forControlEvents:UIControlEventValueChanged];
 
     [self refresh];
+}
+
+-(void)oneLineToggled:(id)sender {
+    NSMutableArray *data = [_data mutableCopy];
+    NSMutableArray *layout = [[[_data objectAtIndex:2] objectForKey:@"items"] mutableCopy];
+    [layout setObject:_oneLine.on?@{@"title":@"Show Real Names", @"accessory":_noRealName}:@{@"title":@"Right Hand Side Timestamps", @"accessory":_timeLeft} atIndexedSubscript:3];
+    [data setObject:@{@"title":@"Message Layout", @"items":layout} atIndexedSubscript:2];
+    _data = data;
+    [self.tableView reloadData];
 }
 
 -(void)sliderChanged:(UISlider *)slider {

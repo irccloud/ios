@@ -39,6 +39,10 @@
     UISwitch *_notifyAll;
     UISwitch *_showUnread;
     UISwitch *_markAsRead;
+    UISwitch *_oneLine;
+    UISwitch *_noRealName;
+    UISwitch *_timeLeft;
+    UISwitch *_avatarsOff;
     NSString *_version;
     UISlider *_fontSize;
     int _userinforeqid;
