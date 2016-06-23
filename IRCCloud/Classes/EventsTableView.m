@@ -1828,9 +1828,9 @@ float __largeAvatarHeight;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    EventsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"eventscell-%i", indexPath.row]];
+    EventsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"eventscell-%li", (long)indexPath.row]];
     if(!cell)
-        cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"eventscell-%i", indexPath.row]];
+        cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"eventscell-%li", (long)indexPath.row]];
     [_rowCache setObject:cell forKey:@(indexPath.row)];
     [_lock lock];
     if([indexPath row] >= _data.count) {
@@ -2183,7 +2183,7 @@ float __largeAvatarHeight;
     
     if(rows.count && !__chatOneLinePref && !__avatarsOffPref && scrollView.contentOffset.y > _headerView.frame.size.height) {
         int offset = ((_topUnreadView.alpha == 0)?0:_topUnreadView.bounds.size.height);
-        int i = firstRow;
+        NSUInteger i = firstRow;
         CGRect rect;
         NSIndexPath *topIndexPath;
         do {

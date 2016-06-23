@@ -223,7 +223,7 @@ NSString *__current_theme;
         lHash = [[NSNumber numberWithDouble:hash] intValue];
     }
         
-    return [colors objectAtIndex:llabs([[NSNumber numberWithDouble:hash] longLongValue] % (int)(colors.count))];
+    return [colors objectAtIndex:(NSUInteger)llabs([[NSNumber numberWithDouble:hash] longLongValue] % (int)(colors.count))];
 }
 
 +(void)setTheme:(NSString *)theme {

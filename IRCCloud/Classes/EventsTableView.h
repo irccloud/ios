@@ -47,7 +47,6 @@
     IBOutlet NSLayoutConstraint *_bottomUnreadLabelXOffsetConstraint;
     IBOutlet NSLayoutConstraint *_stickyAvatarYOffsetConstraint;
     IBOutlet UIImageView *_stickyAvatar;
-    int _hiddenAvatarRow;
     
     NSDateFormatter *_formatter;
     NSMutableArray *_data;
@@ -80,6 +79,7 @@
     UILongPressGestureRecognizer *lp;
     
     NSUInteger _previewingRow;
+    NSUInteger _hiddenAvatarRow;
     NSMutableDictionary *_rowCache;
 }
 @property (readonly) UITableView *tableView;
