@@ -80,6 +80,7 @@
     UILongPressGestureRecognizer *lp;
     
     NSUInteger _previewingRow;
+    NSMutableDictionary *_rowCache;
 }
 @property (readonly) UITableView *tableView;
 @property (readonly) UIView *topUnreadView;

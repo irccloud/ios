@@ -303,6 +303,7 @@ float __largeAvatarHeight;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _rowCache = [[NSMutableDictionary alloc] init];
     
     if(!_headerView) {
         _headerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,_tableView.frame.size.width,20)];
@@ -1286,14 +1287,19 @@ float __largeAvatarHeight;
         if(insertPos > 0) {
             Event *prev = [_data objectAtIndex:insertPos - 1];
             e.isHeader = (e.groupEid < 1 && [e isMessage] && ![prev.from isEqualToString:e.from]);
+            e.height = 0;
         }
         
         if(insertPos < _data.count - 1) {
             Event *next = [_data objectAtIndex:insertPos - 1];
-            if(![e isMessage])
+            if(![e isMessage]) {
                 next.isHeader = (next.groupEid < 1 && [next isMessage]);
-            if([next.from isEqualToString:e.from])
+                next.height = 0;
+            }
+            if([next.from isEqualToString:e.from]) {
                 e.isHeader = NO;
+                e.height = 0;
+            }
         }
         
         [_lock unlock];
@@ -1470,6 +1476,7 @@ float __largeAvatarHeight;
         _stickyAvatar.hidden = YES;
         __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + 3;
         __largeAvatarHeight = __smallAvatarHeight * 2;
+        [_rowCache removeAllObjects];
         
         if(!_buffer) {
             [_lock unlock];
@@ -1685,44 +1692,85 @@ float __largeAvatarHeight;
 }
 
 - (void)_format:(Event *)e {
-    NSArray *links;
-    [_lock lock];
-    if(e.from.length)
-        e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf)] defaultColor:e.color mono:__monospacePref || e.monospace linkify:NO server:nil links:nil];
-    if(e.realname.length) {
-        e.formattedRealname = [ColorFormatter format:e.realname defaultColor:[UIColor timestampColor] mono:__monospacePref || e.monospace linkify:YES server:_server links:&links];
-        e.realnameLinks = links;
-        links = nil;
-    }
-    e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
-    if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
-        NSMutableArray *mutableLinks = links.mutableCopy;
-        for(int i = 0; i < mutableLinks.count; i++) {
-            NSTextCheckingResult *r = [mutableLinks objectAtIndex:i];
-            if(r.resultType == NSTextCheckingTypeLink) {
-                for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
-                    NSString *url = [_file_url_template relativeStringWithVariables:@{@"id":[file objectForKey:@"id"]} error:nil];
-                    if(([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] || [[file objectForKey:@"mime_type"] hasPrefix:@"video/"]) && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
-                        NSString *extension = [file objectForKey:@"extension"];
-                        if(!extension.length)
-                            extension = [@"." stringByAppendingString:[[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
-                        r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", url, [[file objectForKey:@"mime_type"] substringToIndex:5], extension]]];
-                        [mutableLinks setObject:r atIndexedSubscript:i];
+    @synchronized (e) {
+        NSArray *links;
+        [_lock lock];
+        if(e.from.length)
+            e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf)] defaultColor:e.color mono:__monospacePref || e.monospace linkify:NO server:nil links:nil];
+        if(e.realname.length) {
+            e.formattedRealname = [ColorFormatter format:e.realname defaultColor:[UIColor timestampColor] mono:__monospacePref || e.monospace linkify:YES server:_server links:&links];
+            e.realnameLinks = links;
+            links = nil;
+        }
+        e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
+        if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
+            NSMutableArray *mutableLinks = links.mutableCopy;
+            for(int i = 0; i < mutableLinks.count; i++) {
+                NSTextCheckingResult *r = [mutableLinks objectAtIndex:i];
+                if(r.resultType == NSTextCheckingTypeLink) {
+                    for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
+                        NSString *url = [_file_url_template relativeStringWithVariables:@{@"id":[file objectForKey:@"id"]} error:nil];
+                        if(([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] || [[file objectForKey:@"mime_type"] hasPrefix:@"video/"]) && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
+                            NSString *extension = [file objectForKey:@"extension"];
+                            if(!extension.length)
+                                extension = [@"." stringByAppendingString:[[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
+                            r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", url, [[file objectForKey:@"mime_type"] substringToIndex:5], extension]]];
+                            [mutableLinks setObject:r atIndexedSubscript:i];
+                        }
                     }
-                }
-                for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
-                    NSString *url = [_paste_url_template relativeStringWithVariables:@{@"id":[paste objectForKey:@"id"]} error:nil];
-                    if(([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
-                        r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", url, [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
-                        [mutableLinks setObject:r atIndexedSubscript:i];
+                    for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
+                        NSString *url = [_paste_url_template relativeStringWithVariables:@{@"id":[paste objectForKey:@"id"]} error:nil];
+                        if(([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
+                            r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", url, [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
+                            [mutableLinks setObject:r atIndexedSubscript:i];
+                        }
                     }
                 }
             }
+            links = mutableLinks;
         }
-        links = mutableLinks;
+        e.links = links;
+
+        if(e.from.length && e.msg.length) {
+            e.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];
+            e.accessibilityValue = [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+        } else if([e.type isEqualToString:@"buffer_me_msg"]) {
+            e.accessibilityLabel = [NSString stringWithFormat:@"Action at %@", e.timestamp];
+            e.accessibilityValue = [NSString stringWithFormat:@"%@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
+        } else if(e.rowType == ROW_MESSAGE) {
+            NSMutableString *s = [[[ColorFormatter format:e.formattedMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] mutableCopy];
+            if(s.length > 1) {
+                [s replaceOccurrencesOfString:@"→" withString:@"" options:0 range:NSMakeRange(0, 1)];
+                [s replaceOccurrencesOfString:@"←" withString:@"" options:0 range:NSMakeRange(0, 1)];
+                [s replaceOccurrencesOfString:@"⇐" withString:@"" options:0 range:NSMakeRange(0, 1)];
+                [s replaceOccurrencesOfString:@"•" withString:@"" options:0 range:NSMakeRange(0, s.length)];
+                [s replaceOccurrencesOfString:@"↔" withString:@"" options:0 range:NSMakeRange(0, 1)];
+                
+                if([e.type hasSuffix:@"nickchange"])
+                    [s replaceOccurrencesOfString:@"→" withString:@"changed their nickname to" options:0 range:NSMakeRange(0, s.length)];
+            }
+            e.accessibilityLabel = [NSString stringWithFormat:@"Status message at %@", e.timestamp];
+            e.accessibilityValue = s;
+        }
+
+        if((e.rowType == ROW_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
+            NSMutableString *s = [[[ColorFormatter format:e.formattedMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] mutableCopy];
+            [s replaceOccurrencesOfString:@"→" withString:@"." options:0 range:NSMakeRange(0, s.length)];
+            [s replaceOccurrencesOfString:@"←" withString:@"." options:0 range:NSMakeRange(0, s.length)];
+            [s replaceOccurrencesOfString:@"⇐" withString:@"." options:0 range:NSMakeRange(0, s.length)];
+            [s replaceOccurrencesOfString:@"•" withString:@"." options:0 range:NSMakeRange(0, s.length)];
+            [s replaceOccurrencesOfString:@"↔" withString:@"." options:0 range:NSMakeRange(0, s.length)];
+            if([s rangeOfString:@"."].location != NSNotFound)
+                [s replaceCharactersInRange:[s rangeOfString:@"."] withString:@""];
+            e.accessibilityValue = s;
+        }
+        [self _calculateHeight:e];
+        [_lock unlock];
     }
-    e.links = links;
-    float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(__smallAvatarHeight+4):(__largeAvatarHeight+6));
+}
+
+- (void)_calculateHeight:(Event *)e {
+    float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(__smallAvatarHeight+4):(__largeAvatarHeight+4));
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
     CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
     e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
@@ -1730,11 +1778,11 @@ float __largeAvatarHeight;
     CGMutablePathRef path = CGPathCreateMutable();
     CGPathAddRect(path, NULL, CGRectMake(0,0,suggestedSize.width,suggestedSize.height));
     CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
-
+    
     NSArray *lines = (__bridge NSArray *)CTFrameGetLines(frame);
     CGPoint origins[[lines count]];
     CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), origins);
-
+    
     e.timestampPosition = suggestedSize.height - origins[0].y;
     
     CFRelease(frame);
@@ -1747,8 +1795,6 @@ float __largeAvatarHeight;
         e.height += ceilf(suggestedSize.height) + 8;
         CFRelease(framesetter);
     }
-
-    [_lock unlock];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -1761,39 +1807,17 @@ float __largeAvatarHeight;
     }
     Event *e = [_data objectAtIndex:indexPath.row];
     [_lock unlock];
-    if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
-        if(e.formatted != nil && e.height > 0) {
-            return e.height;
-        } else if(!e.formatted && e.formattedMsg.length > 0) {
-            [self _format:e];
-            return e.height;
-        } else if(e.height == 0 && e.formatted) {
-            float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(__smallAvatarHeight+4):(__largeAvatarHeight+6));
-            CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-            CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
-            e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
-            
-            CGMutablePathRef path = CGPathCreateMutable();
-            CGPathAddRect(path, NULL, CGRectMake(0,0,suggestedSize.width,suggestedSize.height));
-            CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
-            
-            NSArray *lines = (__bridge NSArray *)CTFrameGetLines(frame);
-            CGPoint origins[[lines count]];
-            CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), origins);
-            
-            e.timestampPosition = suggestedSize.height - origins[0].y;
-            
-            CFRelease(frame);
-            CFRelease(path);
-            CFRelease(framesetter);
-            
-            if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
-                framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formattedNick));
-                suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(CGFLOAT_MAX,CGFLOAT_MAX), NULL);
-                e.height += ceilf(suggestedSize.height) + 8;
-                CFRelease(framesetter);
+    @synchronized (e) {
+        if(e.rowType == ROW_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
+            if(e.formatted != nil && e.height > 0) {
+                return e.height;
+            } else if(!e.formatted && e.formattedMsg.length > 0) {
+                [self _format:e];
+                return e.height;
+            } else if(e.height == 0 && e.formatted) {
+                [self _calculateHeight:e];
+                return e.height;
             }
-            return e.height;
         }
     }
     return 26;
@@ -1803,6 +1827,7 @@ float __largeAvatarHeight;
     EventsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"eventscell-%i", indexPath.row]];
     if(!cell)
         cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"eventscell-%i", indexPath.row]];
+    [_rowCache setObject:cell forKey:@(indexPath.row)];
     [_lock lock];
     if([indexPath row] >= _data.count) {
         CLS_LOG(@"Requested out of bounds row, refreshing");
@@ -1821,7 +1846,7 @@ float __largeAvatarHeight;
     cell.backgroundColor = nil;
     cell.contentView.backgroundColor = e.bgColor;
     if(e.isHeader) {
-        cell.realname.text = ([e.realname isEqualToString:e.from] || __norealnamePref)?nil:e.formattedRealname;
+        cell.realname.text = ([e.realname.lowercaseString isEqualToString:e.from.lowercaseString] || __norealnamePref)?nil:e.formattedRealname;
         cell.nickname.text = e.formattedNick;
         cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
     } else {
@@ -1853,32 +1878,11 @@ float __largeAvatarHeight;
     cell.message.text = e.formatted;
     cell.accessory.font = [ColorFormatter awesomeFont];
     cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
-    cell.accessibilityLabel = nil;
-    cell.accessibilityValue = nil;
+    cell.accessibilityLabel = e.accessibilityLabel;
+    cell.accessibilityValue = e.accessibilityValue;
     cell.accessibilityHint = nil;
     cell.accessibilityElementsHidden = NO;
 
-    if(e.from.length && e.msg.length) {
-        cell.accessibilityLabel = [NSString stringWithFormat:@"Message from %@ at %@", e.from, e.timestamp];
-        cell.accessibilityValue = [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
-    } else if([e.type isEqualToString:@"buffer_me_msg"]) {
-        cell.accessibilityLabel = [NSString stringWithFormat:@"Action at %@", e.timestamp];
-        cell.accessibilityValue = [NSString stringWithFormat:@"%@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
-    } else if(e.rowType == ROW_MESSAGE) {
-        NSMutableString *s = [[[ColorFormatter format:e.formattedMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] mutableCopy];
-        if(s.length > 1) {
-            [s replaceOccurrencesOfString:@"→" withString:@"" options:0 range:NSMakeRange(0, 1)];
-            [s replaceOccurrencesOfString:@"←" withString:@"" options:0 range:NSMakeRange(0, 1)];
-            [s replaceOccurrencesOfString:@"⇐" withString:@"" options:0 range:NSMakeRange(0, 1)];
-            [s replaceOccurrencesOfString:@"•" withString:@"" options:0 range:NSMakeRange(0, s.length)];
-            [s replaceOccurrencesOfString:@"↔" withString:@"" options:0 range:NSMakeRange(0, 1)];
-            
-            if([e.type hasSuffix:@"nickchange"])
-                [s replaceOccurrencesOfString:@"→" withString:@"changed their nickname to" options:0 range:NSMakeRange(0, s.length)];
-        }
-        cell.accessibilityLabel = [NSString stringWithFormat:@"Status message at %@", e.timestamp];
-        cell.accessibilityValue = s;
-    }
     if((e.rowType == ROW_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
         if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
             if(e.groupEid == e.eid + 1) {
@@ -1898,15 +1902,6 @@ float __largeAvatarHeight;
             cell.accessibilityHint = @"Expands this group";
         }
         cell.accessory.hidden = NO;
-        NSMutableString *s = [[[ColorFormatter format:e.formattedMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] mutableCopy];
-        [s replaceOccurrencesOfString:@"→" withString:@"." options:0 range:NSMakeRange(0, s.length)];
-        [s replaceOccurrencesOfString:@"←" withString:@"." options:0 range:NSMakeRange(0, s.length)];
-        [s replaceOccurrencesOfString:@"⇐" withString:@"." options:0 range:NSMakeRange(0, s.length)];
-        [s replaceOccurrencesOfString:@"•" withString:@"." options:0 range:NSMakeRange(0, s.length)];
-        [s replaceOccurrencesOfString:@"↔" withString:@"." options:0 range:NSMakeRange(0, s.length)];
-        if([s rangeOfString:@"."].location != NSNotFound)
-            [s replaceCharactersInRange:[s rangeOfString:@"."] withString:@""];
-        cell.accessibilityValue = s;
     } else if(e.rowType == ROW_FAILED) {
         cell.accessory.hidden = NO;
         cell.accessory.text = FA_EXCLAMATION_TRIANGLE;
@@ -2092,7 +2087,7 @@ float __largeAvatarHeight;
     if(!_ready || !_buffer || _requestingBacklog || [UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
         _stickyAvatar.hidden = YES;
         if(_hiddenAvatarRow != -1) {
-            EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+            EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
             cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
             _hiddenAvatarRow = -1;
         }
@@ -2114,7 +2109,7 @@ float __largeAvatarHeight;
     } else {
         _stickyAvatar.hidden = YES;
         if(_hiddenAvatarRow != -1) {
-            EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+            EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
             cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
             _hiddenAvatarRow = -1;
         }
@@ -2129,7 +2124,7 @@ float __largeAvatarHeight;
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Downloading more chat history");
             _stickyAvatar.hidden = YES;
             if(_hiddenAvatarRow != -1) {
-                EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+                EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
                 cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
                 _hiddenAvatarRow = -1;
             }
@@ -2202,17 +2197,17 @@ float __largeAvatarHeight;
                 _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                 _stickyAvatar.hidden = NO;
                 if(_hiddenAvatarRow != -1) {
-                    EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+                    EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
                     cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
                 }
-                EventsTableCell *cell = [_tableView cellForRowAtIndexPath:topIndexPath];
+                EventsTableCell *cell = [_rowCache objectForKey:@(topIndexPath.row)];
                 cell.avatar.hidden = YES;
                 _hiddenAvatarRow = topIndexPath.row;
             }
         } else {
             _stickyAvatar.hidden = YES;
             if(_hiddenAvatarRow != -1) {
-                EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+                EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
                 cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
                 _hiddenAvatarRow = -1;
             }
@@ -2220,7 +2215,7 @@ float __largeAvatarHeight;
     } else {
         _stickyAvatar.hidden = YES;
         if(_hiddenAvatarRow != -1) {
-            EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:_hiddenAvatarRow inSection:0]];
+            EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
             cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
             _hiddenAvatarRow = -1;
         }
@@ -2256,6 +2251,7 @@ float __largeAvatarHeight;
             }
         } else if(indexPath.row < _data.count) {
             Event *e = [_data objectAtIndex:indexPath.row];
+            NSLog(@"E: %@ H: %f", e.msg, e.height);
             if([e.type isEqualToString:@"channel_invite"])
                 [_conn join:e.oldNick key:nil cid:e.cid];
             else if([e.type isEqualToString:@"callerid"])
