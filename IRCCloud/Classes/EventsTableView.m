@@ -1485,6 +1485,9 @@ float __largeAvatarHeight;
             backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
 
         [_data removeAllObjects];
+        @synchronized (_rowCache) {
+            [_rowCache removeAllObjects];
+        }
         _minEid = _maxEid = _earliestEid = _newMsgs = _newHighlights = 0;
         _lastSeenEidPos = -1;
         _currentCollapsedEid = 0;
@@ -1496,7 +1499,6 @@ float __largeAvatarHeight;
         _stickyAvatar.hidden = YES;
         __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + 3;
         __largeAvatarHeight = __smallAvatarHeight * 2;
-        [_rowCache removeAllObjects];
         
         if(!_buffer) {
             [_lock unlock];
@@ -1696,7 +1698,9 @@ float __largeAvatarHeight;
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-    [_rowCache removeAllObjects];
+    @synchronized (_rowCache) {
+        [_rowCache removeAllObjects];
+    }
 }
 
 #pragma mark - Table view data source
@@ -1845,175 +1849,176 @@ float __largeAvatarHeight;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    EventsTableCell *cell = [_rowCache objectForKey:@(indexPath.row)];
-    if(!cell)
-        cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-    [_rowCache setObject:cell forKey:@(indexPath.row)];
-    [_lock lock];
-    if([indexPath row] >= _data.count) {
-        CLS_LOG(@"Requested out of bounds row, refreshing");
-        cell.type = ROW_MESSAGE;
-        cell.message.text = @"";
-        cell.timestamp.text = @"";
-        cell.accessory.hidden = YES;
+    @synchronized (_rowCache) {
+        EventsTableCell *cell = [_rowCache objectForKey:@(indexPath.row)];
+        if(!cell)
+            cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
+        [_rowCache setObject:cell forKey:@(indexPath.row)];
+        [_lock lock];
+        if([indexPath row] >= _data.count) {
+            CLS_LOG(@"Requested out of bounds row, refreshing");
+            cell.type = ROW_MESSAGE;
+            cell.message.text = @"";
+            cell.timestamp.text = @"";
+            cell.accessory.hidden = YES;
+            [_lock unlock];
+            [self refresh];
+            return cell;
+        }
+        Event *e = [_data objectAtIndex:indexPath.row];
         [_lock unlock];
-        [self refresh];
+        cell.type = e.rowType;
+        cell.backgroundView = nil;
+        cell.backgroundColor = nil;
+        cell.contentView.backgroundColor = e.bgColor;
+        if(e.isHeader) {
+            cell.realname.text = ([e.realname.lowercaseString isEqualToString:e.from.lowercaseString] || __norealnamePref)?nil:e.formattedRealname;
+            cell.nickname.text = e.formattedNick;
+            cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
+        } else {
+            cell.realname.text = nil;
+            cell.nickname.text = nil;
+            cell.avatar.hidden = !((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref);
+        }
+        float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
+        if(e.from.length && !__avatarsOffPref) {
+            cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
+        } else if(e.rowType == ROW_ME_MESSAGE && !__avatarsOffPref && e.nick.length) {
+            cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.nick bid:e.bid] getImage:__smallAvatarHeight isSelf:e.isSelf];
+        } else {
+            cell.avatar.image = nil;
+        }
+        cell.realname.textColor = [UIColor timestampColor];
+        cell.timestamp.font = cell.realname.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
+        cell.message.font = [ColorFormatter timestampFont];
+        cell.message.delegate = self;
+        if(!e.formatted && e.formattedMsg.length > 0) {
+            [self _format:e];
+            if(e.formatted) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [_tableView reloadData];
+                }];
+                CLS_LOG(@"Event was formatted during cellForRowAtIndexPath, reloading table heights");
+            }
+        }
+        cell.timestampPosition = e.timestampPosition;
+        cell.accessory.font = [ColorFormatter awesomeFont];
+        cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
+        cell.accessibilityLabel = e.accessibilityLabel;
+        cell.accessibilityValue = e.accessibilityValue;
+        cell.accessibilityHint = nil;
+        cell.accessibilityElementsHidden = NO;
+
+        if(cell.message.text != e.formatted) {
+            cell.message.text = e.formatted;
+            
+            if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
+                if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
+                    if(e.groupEid == e.eid + 1) {
+                        cell.accessory.text = FA_MINUS_SQUARE_O;
+                        cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
+                        cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status messages heading. at %@", e.timestamp];
+                        cell.accessibilityHint = @"Collapses this group";
+                    } else {
+                        cell.accessory.text = FA_ANGLE_RIGHT;
+                        cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
+                        cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status message. at %@", e.timestamp];
+                        cell.accessibilityHint = @"Collapses this group";
+                    }
+                } else {
+                    cell.accessory.text = FA_PLUS_SQUARE_O;
+                    cell.accessibilityLabel = [NSString stringWithFormat:@"Collapsed status messages. at %@", e.timestamp];
+                    cell.accessibilityHint = @"Expands this group";
+                }
+                cell.accessory.hidden = NO;
+            } else if(e.rowType == ROW_FAILED) {
+                cell.accessory.hidden = NO;
+                cell.accessory.text = FA_EXCLAMATION_TRIANGLE;
+                cell.accessory.textColor = [UIColor networkErrorColor];
+            } else {
+                cell.accessory.hidden = YES;
+            }
+
+            if(e.links.count) {
+                if(e.pending || [e.color isEqual:[UIColor timestampColor]])
+                    cell.message.linkAttributes = _lightLinkAttributes;
+                else
+                    cell.message.linkAttributes = _linkAttributes;
+                @try {
+                    for(NSTextCheckingResult *result in e.links) {
+                        if(result.resultType == NSTextCheckingTypeLink) {
+                            if(result.URL)
+                                [cell.message addLinkWithTextCheckingResult:result];
+                        } else {
+                            NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
+                            if(![url hasPrefix:@"irc"]) {
+                                CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                                if(url_escaped != NULL) {
+                                    url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
+                                    CFRelease(url_escaped);
+                                }
+                            }
+                            NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
+                            if(u)
+                                [cell.message addLinkToURL:u withRange:result.range];
+                        }
+                    }
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
+                }
+            }
+            if(e.realnameLinks.count) {
+                cell.realname.linkAttributes = _linkAttributes;
+                cell.realname.delegate = self;
+                @try {
+                    for(NSTextCheckingResult *result in e.realnameLinks) {
+                        if(result.resultType == NSTextCheckingTypeLink) {
+                            if(result.URL)
+                                [cell.realname addLinkWithTextCheckingResult:result];
+                        } else {
+                            NSString *url = [[e.formattedRealname attributedSubstringFromRange:result.range] string];
+                            if(![url hasPrefix:@"irc"]) {
+                                CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                                if(url_escaped != NULL) {
+                                    url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
+                                    CFRelease(url_escaped);
+                                }
+                            }
+                            NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
+                            if(u)
+                                [cell.realname addLinkToURL:u withRange:result.range];
+                        }
+                    }
+                }
+                @catch (NSException *exception) {
+                    NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
+                }
+            }
+        }
+        if(e.rowType == ROW_LASTSEENEID)
+            cell.timestamp.text = @"New Messages";
+        else
+            cell.timestamp.text = e.timestamp;
+        if(e.rowType == ROW_TIMESTAMP) {
+            cell.timestamp.textColor = [UIColor messageTextColor];
+        } else if(e.isHighlight && !e.isSelf) {
+            cell.timestamp.textColor = [UIColor highlightTimestampColor];
+        } else if(e.rowType == ROW_FAILED || [e.bgColor isEqual:[UIColor errorBackgroundColor]]) {
+            cell.timestamp.textColor = [UIColor networkErrorColor];
+        } else {
+            cell.timestamp.textColor = [UIColor timestampColor];
+        }
+        if(e.rowType == ROW_BACKLOG) {
+            cell.timestamp.backgroundColor = [UIColor backlogDividerColor];
+            cell.accessibilityElementsHidden = YES;
+        } else if(e.rowType == ROW_LASTSEENEID) {
+            cell.timestamp.backgroundColor = [UIColor contentBackgroundColor];
+        } else {
+            cell.timestamp.backgroundColor = [UIColor clearColor];
+        }
         return cell;
     }
-    Event *e = [_data objectAtIndex:indexPath.row];
-    [_lock unlock];
-    cell.type = e.rowType;
-    cell.backgroundView = nil;
-    cell.backgroundColor = nil;
-    cell.contentView.backgroundColor = e.bgColor;
-    if(e.isHeader) {
-        cell.realname.text = ([e.realname.lowercaseString isEqualToString:e.from.lowercaseString] || __norealnamePref)?nil:e.formattedRealname;
-        cell.nickname.text = e.formattedNick;
-        cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
-    } else {
-        cell.realname.text = nil;
-        cell.nickname.text = nil;
-        cell.avatar.hidden = !((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref);
-    }
-    float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
-    if(e.from.length && !__avatarsOffPref) {
-        cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
-    } else if(e.rowType == ROW_ME_MESSAGE && !__avatarsOffPref && e.nick.length) {
-        cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.nick bid:e.bid] getImage:__smallAvatarHeight isSelf:e.isSelf];
-    } else {
-        cell.avatar.image = nil;
-    }
-    cell.realname.textColor = [UIColor timestampColor];
-    cell.timestamp.font = cell.realname.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
-    cell.message.font = [ColorFormatter timestampFont];
-    cell.message.delegate = self;
-    if(!e.formatted && e.formattedMsg.length > 0) {
-        [self _format:e];
-        if(e.formatted) {
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [_tableView reloadData];
-            }];
-            CLS_LOG(@"Event was formatted during cellForRowAtIndexPath, reloading table heights");
-        }
-    }
-    cell.timestampPosition = e.timestampPosition;
-    cell.accessory.font = [ColorFormatter awesomeFont];
-    cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
-    cell.accessibilityLabel = e.accessibilityLabel;
-    cell.accessibilityValue = e.accessibilityValue;
-    cell.accessibilityHint = nil;
-    cell.accessibilityElementsHidden = NO;
-
-    if(cell.accessory.hidden) {
-        if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
-            if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
-                if(e.groupEid == e.eid + 1) {
-                    cell.accessory.text = FA_MINUS_SQUARE_O;
-                    cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
-                    cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status messages heading. at %@", e.timestamp];
-                    cell.accessibilityHint = @"Collapses this group";
-                } else {
-                    cell.accessory.text = FA_ANGLE_RIGHT;
-                    cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
-                    cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status message. at %@", e.timestamp];
-                    cell.accessibilityHint = @"Collapses this group";
-                }
-            } else {
-                cell.accessory.text = FA_PLUS_SQUARE_O;
-                cell.accessibilityLabel = [NSString stringWithFormat:@"Collapsed status messages. at %@", e.timestamp];
-                cell.accessibilityHint = @"Expands this group";
-            }
-            cell.accessory.hidden = NO;
-        } else if(e.rowType == ROW_FAILED) {
-            cell.accessory.hidden = NO;
-            cell.accessory.text = FA_EXCLAMATION_TRIANGLE;
-            cell.accessory.textColor = [UIColor networkErrorColor];
-        } else {
-            cell.accessory.hidden = YES;
-        }
-    }
-    
-    if(cell.message.text != e.formatted) {
-        cell.message.text = e.formatted;
-        if(e.links.count) {
-            if(e.pending || [e.color isEqual:[UIColor timestampColor]])
-                cell.message.linkAttributes = _lightLinkAttributes;
-            else
-                cell.message.linkAttributes = _linkAttributes;
-            @try {
-                for(NSTextCheckingResult *result in e.links) {
-                    if(result.resultType == NSTextCheckingTypeLink) {
-                        if(result.URL)
-                            [cell.message addLinkWithTextCheckingResult:result];
-                    } else {
-                        NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
-                        if(![url hasPrefix:@"irc"]) {
-                            CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                            if(url_escaped != NULL) {
-                                url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
-                                CFRelease(url_escaped);
-                            }
-                        }
-                        NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
-                        if(u)
-                            [cell.message addLinkToURL:u withRange:result.range];
-                    }
-                }
-            }
-            @catch (NSException *exception) {
-                NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
-            }
-        }
-        if(e.realnameLinks.count) {
-            cell.realname.linkAttributes = _linkAttributes;
-            cell.realname.delegate = self;
-            @try {
-                for(NSTextCheckingResult *result in e.realnameLinks) {
-                    if(result.resultType == NSTextCheckingTypeLink) {
-                        if(result.URL)
-                            [cell.realname addLinkWithTextCheckingResult:result];
-                    } else {
-                        NSString *url = [[e.formattedRealname attributedSubstringFromRange:result.range] string];
-                        if(![url hasPrefix:@"irc"]) {
-                            CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                            if(url_escaped != NULL) {
-                                url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
-                                CFRelease(url_escaped);
-                            }
-                        }
-                        NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
-                        if(u)
-                            [cell.realname addLinkToURL:u withRange:result.range];
-                    }
-                }
-            }
-            @catch (NSException *exception) {
-                NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
-            }
-        }
-    }
-    if(e.rowType == ROW_LASTSEENEID)
-        cell.timestamp.text = @"New Messages";
-    else
-        cell.timestamp.text = e.timestamp;
-    if(e.rowType == ROW_TIMESTAMP) {
-        cell.timestamp.textColor = [UIColor messageTextColor];
-    } else if(e.isHighlight && !e.isSelf) {
-        cell.timestamp.textColor = [UIColor highlightTimestampColor];
-    } else if(e.rowType == ROW_FAILED || [e.bgColor isEqual:[UIColor errorBackgroundColor]]) {
-        cell.timestamp.textColor = [UIColor networkErrorColor];
-    } else {
-        cell.timestamp.textColor = [UIColor timestampColor];
-    }
-    if(e.rowType == ROW_BACKLOG) {
-        cell.timestamp.backgroundColor = [UIColor backlogDividerColor];
-        cell.accessibilityElementsHidden = YES;
-    } else if(e.rowType == ROW_LASTSEENEID) {
-        cell.timestamp.backgroundColor = [UIColor contentBackgroundColor];
-    } else {
-        cell.timestamp.backgroundColor = [UIColor clearColor];
-    }
-    return cell;
 }
 
 - (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {
