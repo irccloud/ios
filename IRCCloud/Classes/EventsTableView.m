@@ -1292,7 +1292,7 @@ float __largeAvatarHeight;
         
         if(insertPos > 0) {
             Event *prev = [_data objectAtIndex:insertPos - 1];
-            e.isHeader = (e.groupEid < 1 && [e isMessage] && ![prev.from isEqualToString:e.from]);
+            e.isHeader = (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from]));
             e.height = 0;
         }
         
@@ -1303,7 +1303,7 @@ float __largeAvatarHeight;
                 next.height = 0;
                 [_rowCache removeObjectForKey:@(insertPos + 1)];
             }
-            if([next.from isEqualToString:e.from]) {
+            if([next.type isEqualToString:e.type] && [next.from isEqualToString:e.from]) {
                 e.isHeader = NO;
                 e.height = 0;
             }
@@ -1704,9 +1704,9 @@ float __largeAvatarHeight;
         NSArray *links;
         [_lock lock];
         if(e.from.length)
-            e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf)] defaultColor:e.color mono:__monospacePref || e.monospace linkify:NO server:nil links:nil];
+            e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf)] defaultColor:e.color mono:__monospacePref linkify:NO server:nil links:nil];
         if([e.realname isKindOfClass:[NSString class]] && e.realname.length) {
-            e.formattedRealname = [ColorFormatter format:e.realname defaultColor:[UIColor timestampColor] mono:__monospacePref || e.monospace linkify:YES server:_server links:&links];
+            e.formattedRealname = [ColorFormatter format:e.realname defaultColor:[UIColor timestampColor] mono:__monospacePref linkify:YES server:_server links:&links];
             e.realnameLinks = links;
             links = nil;
         }

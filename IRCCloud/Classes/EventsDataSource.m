@@ -65,7 +65,7 @@
             ||[_type isEqualToString:@"wallops"]);
 }
 -(NSString *)description {
-    return [NSString stringWithFormat:@"{cid: %i, bid: %i, eid: %f, group: %f, type: %@, msg: %@}", _cid, _bid, _eid, _groupEid, _type, _msg];
+    return [NSString stringWithFormat:@"{cid: %i, bid: %i, eid: %f, group: %f, type: %@, from: %@, msg: %@, self: %i, header: %i}", _cid, _bid, _eid, _groupEid, _type, _from, _msg, _isSelf, _isHeader];
 }
 -(NSString *)ignoreMask {
     if(!_ignoreMask) {
