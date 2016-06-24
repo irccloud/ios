@@ -91,6 +91,7 @@
     BOOL _isShowingPreview;
     NSString *__currentTheme;
     BOOL _atMention;
+    NSString *_bugReport;
     
     id<UIViewControllerPreviewing> __previewer;
 }

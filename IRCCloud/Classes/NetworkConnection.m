@@ -468,6 +468,7 @@ volatile BOOL __socketPaused = NO;
                        [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];
+                       CLS_LOG(@"Prefs: %@", [self prefs]);
                        [self postObject:object forEvent:kIRCEventUserInfo];
                    },
                    @"backlog_starts": ^(IRCCloudJSONObject *object, BOOL backlog) {

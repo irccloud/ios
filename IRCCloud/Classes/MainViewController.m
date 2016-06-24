@@ -87,6 +87,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 #define TAG_LOGOUT 8
 #define TAG_DELETE 9
 #define TAG_JOIN 10
+#define TAG_BUGREPORT 11
 
 extern NSDictionary *emojiMap;
 
@@ -3309,6 +3310,13 @@ extern NSDictionary *emojiMap;
                     [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/join %@",[alertView textFieldAtIndex:0].text] to:nil cid:_selectedBuffer.cid];
             }
             break;
+        case TAG_BUGREPORT:
+            if([title isEqualToString:@"Copy to Clipboard"]) {
+                UIPasteboard *pb = [UIPasteboard generalPasteboard];
+                [pb setValue:_bugReport forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+            }
+            _bugReport = nil;
+            break;
     }
     _alertView = nil;
 }
@@ -3878,7 +3886,11 @@ App Version: %@\n\
 OS Version: %@\n\
 Device type: %@\n",
                                        [[NetworkConnection sharedInstance].userInfo objectForKey:@"id"],version,[UIDevice currentDevice].systemVersion,[UIDevice currentDevice].model];
-            
+            [report appendString:@"==========\nPrefs:\n"];
+            [report appendFormat:@"%@\n", [[NetworkConnection sharedInstance] prefs]];
+            [report appendString:@"==========\nNSUserDefaults:\n"];
+            [report appendFormat:@"%@\n", [NSUserDefaults standardUserDefaults].dictionaryRepresentation];
+
             NSURL *caches = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
             NSArray *folders = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[caches URLByAppendingPathComponent:@"com.crashlytics.data"] includingPropertiesForKeys:nil options:0 error:nil];
             if(folders.count) {
@@ -3939,9 +3951,9 @@ Device type: %@\n",
                         [self _resetStatusBar];
                     }];
                 } else {
-                    UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                    [pb setValue:report forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-                    _alertView = [[UIAlertView alloc] initWithTitle:@"Email Unavailable" message:@"This device has no available email accounts.  The diagnostic report has been copied to the clipboard instead, please send it to team@irccloud.com." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                    _bugReport = report;
+                    _alertView = [[UIAlertView alloc] initWithTitle:@"Email Unavailable" message:@"Email is not configured on this device.  Please copy the report to the clipboard and send it to team@irccloud.com." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:@"Copy to Clipboard", nil];
+                    _alertView.tag = TAG_BUGREPORT;
                     [_alertView show];
                 }
             }
