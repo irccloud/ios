@@ -1009,8 +1009,19 @@ float __largeAvatarHeight;
                 event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.msg];
                 event.rowType = ROW_ME_MESSAGE;
             } else if([type isEqualToString:@"notice"]) {
-                if(event.from.length && __chatOneLinePref)
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ ", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors]];
+                Server *s = [[ServersDataSource sharedInstance] getServer:event.cid];
+                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OPER]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO],BOLD];
+                else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OWNER]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Owners" mode:s.MODE_OWNER colorize:NO],BOLD];
+                else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_ADMIN]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Admins" mode:s.MODE_ADMIN colorize:NO],BOLD];
+                else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OP]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Ops" mode:s.MODE_OP colorize:NO],BOLD];
+                else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_HALFOP]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Half Ops" mode:s.MODE_HALFOP colorize:NO],BOLD];
+                else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_VOICED]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Voiced" mode:s.MODE_VOICED colorize:NO],BOLD];
                 else
                     event.formattedMsg = @"";
                 if([_buffer.type isEqualToString:@"console"] && event.toChan && event.chan.length) {
@@ -1020,19 +1031,8 @@ float __largeAvatarHeight;
                 } else {
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
                 }
-                Server *s = [[ServersDataSource sharedInstance] getServer:event.cid];
-                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OPER]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO], event.formattedMsg];
-                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OWNER]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Owners" mode:s.MODE_OWNER colorize:NO], event.formattedMsg];
-                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_ADMIN]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Admins" mode:s.MODE_ADMIN colorize:NO], event.formattedMsg];
-                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OP]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Ops" mode:s.MODE_OP colorize:NO], event.formattedMsg];
-                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_HALFOP]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Half Ops" mode:s.MODE_HALFOP colorize:NO], event.formattedMsg];
-                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_VOICED]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Voiced" mode:s.MODE_VOICED colorize:NO], event.formattedMsg];
+                if(event.from.length && __chatOneLinePref)
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.formattedMsg];
             } else if([type isEqualToString:@"kicked_channel"]) {
                 event.formattedMsg = @"← ";
                 if([event.type hasPrefix:@"you_"])
@@ -1795,7 +1795,7 @@ float __largeAvatarHeight;
 }
 
 - (void)_calculateHeight:(Event *)e {
-    float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(__smallAvatarHeight+4):(__largeAvatarHeight+4));
+    float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(__smallAvatarHeight+2):(__largeAvatarHeight+4));
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
     CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
     e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
