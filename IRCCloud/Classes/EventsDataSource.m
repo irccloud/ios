@@ -263,8 +263,10 @@
             if(object) {
                 event.chan = [object objectForKey:@"target"];
                 event.nick = [object objectForKey:@"target"];
-                if([[object objectForKey:@"op_only"] intValue] == 1)
-                    event.msg = [NSString stringWithFormat:@"%c(Ops)%c %@", BOLD, BOLD, event.msg];
+                if([[object objectForKey:@"statusmsg"] isKindOfClass:[NSString class]])
+                    event.targetMode = [object objectForKey:@"statusmsg"];
+                else
+                    event.targetMode = nil;
             }
             event.monospace = YES;
             event.isHighlight = NO;
@@ -953,7 +955,7 @@
     if(event.isHighlight)
         event.bgColor = [UIColor highlightBackgroundColor];
 
-    if(event.isSelf && event.rowType != ROW_SOCKETCLOSED)
+    if(event.isSelf && event.rowType != ROW_SOCKETCLOSED && ![event.type isEqualToString:@"notice"])
         event.bgColor = [UIColor selfBackgroundColor];
     
     return event;

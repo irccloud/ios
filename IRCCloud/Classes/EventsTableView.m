@@ -1020,6 +1020,19 @@ float __largeAvatarHeight;
                 } else {
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
                 }
+                Server *s = [[ServersDataSource sharedInstance] getServer:event.cid];
+                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OPER]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO], event.formattedMsg];
+                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OWNER]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Owners" mode:s.MODE_OWNER colorize:NO], event.formattedMsg];
+                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_ADMIN]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Admins" mode:s.MODE_ADMIN colorize:NO], event.formattedMsg];
+                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OP]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Ops" mode:s.MODE_OP colorize:NO], event.formattedMsg];
+                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_HALFOP]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Half Ops" mode:s.MODE_HALFOP colorize:NO], event.formattedMsg];
+                if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_VOICED]])
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@",[_collapsedEvents formatNick:@"Voiced" mode:s.MODE_VOICED colorize:NO], event.formattedMsg];
             } else if([type isEqualToString:@"kicked_channel"]) {
                 event.formattedMsg = @"← ";
                 if([event.type hasPrefix:@"you_"])

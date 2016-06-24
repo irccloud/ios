@@ -22,13 +22,15 @@
     self = [super init];
     if(self) {
         _images = [[NSMutableDictionary alloc] init];
+        _selfImages = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
 
 -(UIImage *)getImage:(int)size isSelf:(BOOL)isSelf {
     _lastAccessTime = [[NSDate date] timeIntervalSince1970];
-    if(![_images objectForKey:@(size)]) {
+    NSMutableDictionary *images = isSelf?_selfImages:_images;
+    if(![images objectForKey:@(size)]) {
         UIFont *font = [UIFont fontWithName:@"SourceSansPro-Regular" size:size * 0.6];
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0);
         CGContextRef ctx = UIGraphicsGetCurrentContext();
@@ -55,10 +57,10 @@
         CGPoint p = CGPointMake((size / 2) - (textSize.width / 2),(size / 2) - (textSize.height / 2));
         [text drawAtPoint:p withAttributes:@{NSFontAttributeName:font, NSForegroundColorAttributeName:[UIColor contentBackgroundColor]}];
         
-        [_images setObject:UIGraphicsGetImageFromCurrentImageContext() forKey:@(size)];
+        [images setObject:UIGraphicsGetImageFromCurrentImageContext() forKey:@(size)];
         UIGraphicsEndImageContext();
     }
-    return [_images objectForKey:@(size)];
+    return [images objectForKey:@(size)];
 }
 @end
 

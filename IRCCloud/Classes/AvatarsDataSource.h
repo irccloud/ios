@@ -20,6 +20,7 @@
     int _bid;
     NSString *_nick;
     NSMutableDictionary *_images;
+    NSMutableDictionary *_selfImages;
     NSTimeInterval _lastAccessTime;
 }
 @property (nonatomic, assign) int bid;
