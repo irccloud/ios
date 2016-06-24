@@ -912,8 +912,9 @@
         event.nick = [object objectForKey:@"newnick"];
     else
         event.nick = [object objectForKey:@"nick"];
-    event.realname = [object objectForKey:@"from_realname"];
-    if([event.realname isKindOfClass:[NSNull class]])
+    if([[object objectForKey:@"from_realname"] isKindOfClass:[NSString class]])
+        event.realname = [object objectForKey:@"from_realname"];
+    else
         event.realname = nil;
     event.oldNick = [object objectForKey:@"oldnick"];
     event.server = [object objectForKey:@"server"];

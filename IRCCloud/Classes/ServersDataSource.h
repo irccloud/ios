@@ -27,6 +27,7 @@
     int _ssl;
     NSString *_realname;
     NSString *_server_pass;
+    NSString *_server_realname;
     NSString *_nickserv_pass;
     NSString *_join_commands;
     NSDictionary *_fail_info;
@@ -41,7 +42,7 @@
     NSString *_MODE_OPER, *_MODE_OWNER, *_MODE_ADMIN, *_MODE_OP, *_MODE_HALFOP, *_MODE_VOICED;
 }
 @property (nonatomic, assign) int cid, port, ssl, order;
-@property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED;
+@property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname;
 @property (nonatomic, copy) NSDictionary *fail_info, *PREFIX;
 @property (nonatomic, copy) NSMutableDictionary *isupport;
 @property (nonatomic, copy) NSArray *ignores;

@@ -284,6 +284,7 @@ volatile BOOL __socketPaused = NO;
         server.status = [object objectForKey:@"status"];
         server.ssl = [[object objectForKey:@"ssl"] intValue];
         server.realname = [object objectForKey:@"realname"];
+        server.server_realname = [object objectForKey:@"server_realname"];
         server.server_pass = [object objectForKey:@"server_pass"];
         server.nickserv_pass = [object objectForKey:@"nickserv_pass"];
         server.join_commands = [object objectForKey:@"join_commands"];
@@ -817,7 +818,10 @@ volatile BOOL __socketPaused = NO;
                    },
                    @"self_details": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        Event *e = [_events addJSONObject:object];
-                       [_servers updateUsermask:[object objectForKey:@"usermask"] server:object.bid];
+                       Server *s = [_servers getServer:e.cid];
+                       if([object objectForKey:@"server_realname"])
+                           s.server_realname = [object objectForKey:@"server_realname"];
+                       s.usermask = [object objectForKey:@"usermask"];
                        if(!backlog && !_resuming) {
                            [self postObject:e forEvent:kIRCEventSelfDetails];
                            e = [_events event:e.eid + 1 buffer:e.bid];

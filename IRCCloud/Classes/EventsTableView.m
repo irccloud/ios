@@ -1267,6 +1267,8 @@ float __largeAvatarHeight;
             return;
         }
         
+        [_rowCache removeObjectForKey:@(insertPos)];
+
         if(eid > _buffer.last_seen_eid && e.isHighlight) {
             [_unseenHighlightPositions addObject:@(insertPos)];
             [_unseenHighlightPositions sortUsingSelector:@selector(compare:)];
@@ -1299,6 +1301,7 @@ float __largeAvatarHeight;
             if(![e isMessage]) {
                 next.isHeader = (next.groupEid < 1 && [next isMessage]);
                 next.height = 0;
+                [_rowCache removeObjectForKey:@(insertPos + 1)];
             }
             if([next.from isEqualToString:e.from]) {
                 e.isHeader = NO;
@@ -1680,6 +1683,7 @@ float __largeAvatarHeight;
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+    [_rowCache removeAllObjects];
 }
 
 #pragma mark - Table view data source
@@ -1701,7 +1705,7 @@ float __largeAvatarHeight;
         [_lock lock];
         if(e.from.length)
             e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf)] defaultColor:e.color mono:__monospacePref || e.monospace linkify:NO server:nil links:nil];
-        if(e.realname.length) {
+        if([e.realname isKindOfClass:[NSString class]] && e.realname.length) {
             e.formattedRealname = [ColorFormatter format:e.realname defaultColor:[UIColor timestampColor] mono:__monospacePref || e.monospace linkify:YES server:_server links:&links];
             e.realnameLinks = links;
             links = nil;
@@ -1828,9 +1832,9 @@ float __largeAvatarHeight;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    EventsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:[NSString stringWithFormat:@"eventscell-%li", (long)indexPath.row]];
+    EventsTableCell *cell = [_rowCache objectForKey:@(indexPath.row)];
     if(!cell)
-        cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"eventscell-%li", (long)indexPath.row]];
+        cell = [[EventsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
     [_rowCache setObject:cell forKey:@(indexPath.row)];
     [_lock lock];
     if([indexPath row] >= _data.count) {

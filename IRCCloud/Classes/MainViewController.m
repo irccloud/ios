@@ -1680,6 +1680,9 @@ extern NSDictionary *emojiMap;
                 e.isHighlight = NO;
                 e.reqId = -1;
                 e.pending = YES;
+                Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                if(s)
+                    e.realname = s.server_realname;
                 [_eventsView scrollToBottom];
                 [[EventsDataSource sharedInstance] addEvent:e];
                 [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
