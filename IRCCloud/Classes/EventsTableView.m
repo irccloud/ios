@@ -1872,7 +1872,7 @@ float __largeAvatarHeight;
         cell.backgroundColor = nil;
         cell.contentView.backgroundColor = e.bgColor;
         if(e.isHeader) {
-            cell.realname.text = ([e.realname.lowercaseString isEqualToString:e.from.lowercaseString] || __norealnamePref)?nil:e.formattedRealname;
+            cell.realname.text = (([e.realname isKindOfClass:[NSString class]] && [e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) || __norealnamePref)?nil:e.formattedRealname;
             cell.nickname.text = e.formattedNick;
             cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
         } else {
