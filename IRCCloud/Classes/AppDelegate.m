@@ -465,7 +465,10 @@
         }
         alert.soundName = @"a.caf";
         alert.category = @"retry";
-        alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"responseInfo":responseInfo, @"d":[userInfo objectForKey:@"d"]};
+        if(responseInfo)
+            alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"responseInfo":responseInfo, @"d":[userInfo objectForKey:@"d"]};
+        else
+            alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"d":[userInfo objectForKey:@"d"]};
         [[UIApplication sharedApplication] scheduleLocalNotification:alert];
     }
     
