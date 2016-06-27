@@ -43,9 +43,9 @@
             [color getHue:&h saturation:&s brightness:&b alpha:&a];
             
             CGContextSetFillColorWithColor(ctx, [UIColor colorWithHue:h saturation:s brightness:b * 0.8 alpha:a].CGColor);
-            CGContextFillEllipseInRect(ctx,CGRectMake(2,4,size-4,size-4));
+            CGContextFillEllipseInRect(ctx,CGRectMake(0.5,2,size-1,size-2));
             CGContextSetFillColorWithColor(ctx, color.CGColor);
-            CGContextFillEllipseInRect(ctx,CGRectMake(2,2,size-4,size-4));
+            CGContextFillEllipseInRect(ctx,CGRectMake(0.5,1,size-1,size-2));
         }
         
         NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[_\\W]+" options:NSRegularExpressionCaseInsensitive error:nil];
