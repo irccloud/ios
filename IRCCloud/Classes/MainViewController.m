@@ -242,7 +242,7 @@ extern NSDictionary *emojiMap;
     [_uploadsBtn setImage:[[UIImage imageNamed:@"upload_arrow"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [_uploadsBtn addTarget:self action:@selector(uploadsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_uploadsBtn sizeToFit];
-    _uploadsBtn.frame = CGRectMake(5,2,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
+    _uploadsBtn.frame = CGRectMake(9,2,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
     _uploadsBtn.accessibilityLabel = @"Uploads";
     [_bottomBar addSubview:_uploadsBtn];
 
@@ -268,7 +268,7 @@ extern NSDictionary *emojiMap;
     _settingsBtn.accessibilityLabel = @"Menu";
     _settingsBtn.enabled = NO;
     _settingsBtn.alpha = 0;
-    _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 20,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
+    _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 24,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
     [_bottomBar addSubview:_settingsBtn];
     
     self.slidingViewController.view.frame = [UIScreen mainScreen].applicationFrame;
@@ -293,7 +293,7 @@ extern NSDictionary *emojiMap;
     _menuBtn.accessibilityLabel = @"Channels list";
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
     
-    _message = [[UIExpandingTextView alloc] initWithFrame:CGRectMake(44,8,0,36)];
+    _message = [[UIExpandingTextView alloc] initWithFrame:CGRectZero];
     _message.delegate = self;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
@@ -305,7 +305,7 @@ extern NSDictionary *emojiMap;
     [_bottomBar addSubview:_message];
     if(_bottomBar != nil) {
         [_bottomBar addConstraints:@[
-                                 [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:44.0f],
+                                 [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:50.0f],
                                  [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-2.0f]
                                  ]];
     }
@@ -1877,7 +1877,7 @@ extern NSDictionary *emojiMap;
         [_message setText:_message.text];
         _message.delegate = self;
     } else {
-        _messageWidthConstraint.constant = _eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 8;
+        _messageWidthConstraint.constant = _eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 16;
         [self.view layoutIfNeeded];
         _sendBtn.enabled = NO;
         _sendBtn.alpha = 0;
