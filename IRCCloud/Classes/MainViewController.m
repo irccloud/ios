@@ -935,12 +935,13 @@ extern NSDictionary *emojiMap;
         case kIRCEventOpenBuffer:
             o = notification.object;
             _bufferToOpen = [o objectForKey:@"name"];
-            _cidToOpen = o.cid;
-            b = [[BuffersDataSource sharedInstance] getBufferWithName:_bufferToOpen server:_cidToOpen];
+            b = [[BuffersDataSource sharedInstance] getBufferWithName:_bufferToOpen server:o.cid];
             if(b != nil && ![[b.name lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
                 [self bufferSelected:b.bid];
                 _bufferToOpen = nil;
                 _cidToOpen = -1;
+            } else {
+                _cidToOpen = o.cid;
             }
             break;
         case kIRCEventUserInfo:
@@ -2142,6 +2143,7 @@ extern NSDictionary *emojiMap;
             }
             _incomingDraft = nil;
         }
+        _cidToOpen = -1;
         _bidToOpen = -1;
         _eidToOpen = -1;
         _bufferToOpen = nil;
