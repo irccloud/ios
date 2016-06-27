@@ -711,7 +711,7 @@
                                 </connections>
                             </tableView>
                             <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="48" placeholderIntrinsicHeight="48" translatesAutoresizingMaskIntoConstraints="NO" id="WXm-cx-Mj2">
-                                <rect key="frame" x="6" y="0.0" width="48" height="48"/>
+                                <rect key="frame" x="10" y="0.0" width="48" height="48"/>
                             </imageView>
                             <view alpha="0.0" contentMode="scaleToFill" placeholderIntrinsicWidth="768" placeholderIntrinsicHeight="32" translatesAutoresizingMaskIntoConstraints="NO" id="fvC-nM-NHm" userLabel="Top Unread View" customClass="UIControl">
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="32"/>
@@ -931,7 +931,7 @@
                             <constraint firstItem="t8Z-Pu-wcU" firstAttribute="top" secondItem="tjD-Mf-au6" secondAttribute="bottom" id="fDn-WZ-8Cc"/>
                             <constraint firstItem="fW5-GL-Rkw" firstAttribute="top" secondItem="IOs-dt-XUa" secondAttribute="bottom" constant="32" id="j0S-ub-unD"/>
                             <constraint firstItem="fW5-GL-Rkw" firstAttribute="width" secondItem="t8Z-Pu-wcU" secondAttribute="width" id="kIm-8i-MUJ"/>
-                            <constraint firstItem="WXm-cx-Mj2" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" constant="6" id="lLW-ey-6EA"/>
+                            <constraint firstItem="WXm-cx-Mj2" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" constant="10" id="lLW-ey-6EA"/>
                             <constraint firstItem="cZW-xP-lCa" firstAttribute="top" secondItem="tjD-Mf-au6" secondAttribute="bottom" id="lTh-PT-FM7"/>
                             <constraint firstItem="cZW-xP-lCa" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" constant="-1" id="qV8-bf-c8R"/>
                             <constraint firstItem="cdg-2x-04N" firstAttribute="trailing" secondItem="t8Z-Pu-wcU" secondAttribute="trailing" id="sbk-sT-1h4"/>

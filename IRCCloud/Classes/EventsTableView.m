@@ -83,7 +83,7 @@ BOOL __chatOneLinePref = NO;
 BOOL __norealnamePref = NO;
 BOOL __monospacePref = NO;
 float __smallAvatarHeight;
-float __largeAvatarHeight;
+float __largeAvatarHeight = 32;
 
 @interface EventsTableCell : UITableViewCell {
     UIImageView *_avatar;
@@ -114,9 +114,6 @@ float __largeAvatarHeight;
         
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         self.backgroundColor = [UIColor contentBackgroundColor];
-        
-        _avatar = [[UIImageView alloc] init];
-        [self.contentView addSubview:_avatar];
         
         _timestamp = [[UILabel alloc] init];
         _timestamp.backgroundColor = [UIColor clearColor];
@@ -164,6 +161,9 @@ float __largeAvatarHeight;
         _accessory.textColor = [UIColor expandCollapseIndicatorColor];
         [self.contentView addSubview:_accessory];
 
+        _avatar = [[UIImageView alloc] init];
+        [self.contentView addSubview:_avatar];
+
         _topBorder = [[UIView alloc] initWithFrame:CGRectZero];
         _topBorder.hidden = YES;
         [self.contentView addSubview:_topBorder];
@@ -198,10 +198,10 @@ float __largeAvatarHeight;
         frame.size.height -= 6;
         frame.size.width -= 12;
         [_timestamp sizeToFit];
-        if(!__chatOneLinePref&& !__avatarsOffPref) {
-            _avatar.frame = CGRectMake(frame.origin.x,frame.origin.y + ((_nickname.attributedText.length)?8:0),__largeAvatarHeight,__largeAvatarHeight);
-            frame.origin.x += _avatar.frame.size.width + 6;
-            frame.size.width -= _avatar.frame.size.width + 6;
+        if(!__chatOneLinePref && !__avatarsOffPref) {
+            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + ((_nickname.attributedText.length)?8:0),__largeAvatarHeight,__largeAvatarHeight);
+            frame.origin.x += _avatar.frame.size.width + 13;
+            frame.size.width -= _avatar.frame.size.width + 17;
         }
         if((_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE) && !__chatOneLinePref && _nickname.attributedText.length) {
             frame.origin.y += 4;
@@ -233,12 +233,10 @@ float __largeAvatarHeight;
         _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition - _timestamp.frame.size.height + 4, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && frame.size.height < 0);
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
+        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, frame.size.height);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y,__smallAvatarHeight,__smallAvatarHeight);
-            frame.origin.x += _avatar.frame.size.width + 4;
-            frame.size.width -= _avatar.frame.size.width + 4;
         }
-        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, frame.size.height);
     } else {
         if(_type == ROW_BACKLOG) {
             frame.origin.y = frame.size.height / 2;
@@ -1498,7 +1496,6 @@ float __largeAvatarHeight;
         _hiddenAvatarRow = -1;
         _stickyAvatar.hidden = YES;
         __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + 3;
-        __largeAvatarHeight = __smallAvatarHeight * 2;
         
         if(!_buffer) {
             [_lock unlock];
@@ -1727,7 +1724,10 @@ float __largeAvatarHeight;
             e.realnameLinks = links;
             links = nil;
         }
-        e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
+        if((e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE))
+            e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"      %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
+        else
+            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
         if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
             NSMutableArray *mutableLinks = links.mutableCopy;
             for(int i = 0; i < mutableLinks.count; i++) {
@@ -1795,7 +1795,7 @@ float __largeAvatarHeight;
 }
 
 - (void)_calculateHeight:(Event *)e {
-    float avatarWidth = __avatarsOffPref?0:(__chatOneLinePref?(__smallAvatarHeight+2):(__largeAvatarHeight+4));
+    float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+14);
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
     CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
     e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
