@@ -193,13 +193,13 @@ float __largeAvatarHeight = 32;
     }
     
     if(_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED) {
-        frame.origin.x = 6;
+        frame.origin.x = (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?6:16;
         frame.origin.y = 4;
         frame.size.height -= 6;
-        frame.size.width -= 12;
+        frame.size.width -= frame.origin.x + 6;
         [_timestamp sizeToFit];
         if(!__chatOneLinePref && !__avatarsOffPref) {
-            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + ((_nickname.attributedText.length)?8:0),__largeAvatarHeight,__largeAvatarHeight);
+            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + ((_nickname.attributedText.length)?4:0),__largeAvatarHeight,__largeAvatarHeight);
             frame.origin.x += _avatar.frame.size.width + 13;
             frame.size.width -= _avatar.frame.size.width + 17;
         }
@@ -1797,7 +1797,7 @@ float __largeAvatarHeight = 32;
 - (void)_calculateHeight:(Event *)e {
     float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+14);
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - 12 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
+    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - ((__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?10:20) - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
     e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
     
     CGMutablePathRef path = CGPathCreateMutable();
@@ -1819,6 +1819,8 @@ float __largeAvatarHeight = 32;
         suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(CGFLOAT_MAX,CGFLOAT_MAX), NULL);
         e.height += ceilf(suggestedSize.height) + 8;
         CFRelease(framesetter);
+        if(e.height < __largeAvatarHeight + 12)
+            e.height = __largeAvatarHeight + 12;
     }
 }
 
@@ -2227,8 +2229,8 @@ float __largeAvatarHeight = 32;
             }
             if(!e.isHeader || groupHeight > __largeAvatarHeight + 14) {
                 _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + 4);
-                if(_stickyAvatarYOffsetConstraint.constant > offset + 12)
-                    _stickyAvatarYOffsetConstraint.constant = offset + 12;
+                if(_stickyAvatarYOffsetConstraint.constant > offset + 8)
+                    _stickyAvatarYOffsetConstraint.constant = offset + 8;
                 if(_hiddenAvatarRow != topIndexPath.row) {
                     _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                     _stickyAvatar.hidden = NO;
