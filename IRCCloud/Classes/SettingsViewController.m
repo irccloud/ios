@@ -491,10 +491,6 @@
         [prefs setObject:[NSNumber numberWithBool:_notifyAll.isOn] forKey:@"notifications-all"];
         [prefs setObject:[NSNumber numberWithBool:!_showUnread.isOn] forKey:@"disableTrackUnread"];
         [prefs setObject:[NSNumber numberWithBool:_markAsRead.isOn] forKey:@"enableReadOnSelect"];
-        [prefs setObject:[NSNumber numberWithBool:!_oneLine.isOn] forKey:@"chat-oneline"];
-        [prefs setObject:[NSNumber numberWithBool:!_noRealName.isOn] forKey:@"chat-norealname"];
-        [prefs setObject:[NSNumber numberWithBool:!_timeLeft.isOn] forKey:@"time-left"];
-        [prefs setObject:[NSNumber numberWithBool:!_avatarsOff.isOn] forKey:@"avatars-off"];
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -510,6 +506,10 @@
         [[NSUserDefaults standardUserDefaults] setBool:_notificationSound.on forKey:@"notificationSound"];
         [[NSUserDefaults standardUserDefaults] setBool:_tabletMode.on forKey:@"tabletMode"];
         [[NSUserDefaults standardUserDefaults] setFloat:_fontSize.value forKey:@"fontSize"];
+        [[NSUserDefaults standardUserDefaults] setBool:!_oneLine.isOn forKey:@"chat-oneline"];
+        [[NSUserDefaults standardUserDefaults] setBool:!_noRealName.isOn forKey:@"chat-norealname"];
+        [[NSUserDefaults standardUserDefaults] setBool:!_timeLeft.isOn forKey:@"time-left"];
+        [[NSUserDefaults standardUserDefaults] setBool:!_avatarsOff.isOn forKey:@"avatars-off"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -720,26 +720,26 @@
         _markAsRead.on = NO;
     }
     
-    if([[prefs objectForKey:@"chat-oneline"] isKindOfClass:[NSNumber class]]) {
-        _oneLine.on = ![[prefs objectForKey:@"chat-oneline"] boolValue];
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"chat-oneline"]) {
+        _oneLine.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"chat-oneline"];
     } else {
         _oneLine.on = YES;
     }
     
-    if([[prefs objectForKey:@"chat-norealname"] isKindOfClass:[NSNumber class]]) {
-        _noRealName.on = ![[prefs objectForKey:@"chat-norealname"] boolValue];
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"chat-norealname"]) {
+        _noRealName.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"chat-norealname"];
     } else {
         _noRealName.on = YES;
     }
     
-    if([[prefs objectForKey:@"time-left"] isKindOfClass:[NSNumber class]]) {
-        _timeLeft.on = ![[prefs objectForKey:@"time-left"] boolValue];
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"time-left"]) {
+        _timeLeft.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"time-left"];
     } else {
         _timeLeft.on = YES;
     }
     
-    if([[prefs objectForKey:@"avatars-off"] isKindOfClass:[NSNumber class]]) {
-        _avatarsOff.on = ![[prefs objectForKey:@"avatars-off"] boolValue];
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"avatars-off"]) {
+        _avatarsOff.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"avatars-off"];
     } else {
         _avatarsOff.on = YES;
     }

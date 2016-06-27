@@ -1417,12 +1417,12 @@ float __largeAvatarHeight = 32;
             __nickColorsPref = [[prefs objectForKey:@"nick-colors"] boolValue];
             __secondsPref = [[prefs objectForKey:@"time-seconds"] boolValue];
             __24hrPref = [[prefs objectForKey:@"time-24hr"] boolValue];
-            __timeLeftPref = [[prefs objectForKey:@"time-left"] boolValue];
-            __avatarsOffPref = [[prefs objectForKey:@"avatars-off"] boolValue];
-            __chatOneLinePref = [[prefs objectForKey:@"chat-oneline"] boolValue];
+            __timeLeftPref = [[NSUserDefaults standardUserDefaults] boolForKey:@"time-left"];
+            __avatarsOffPref = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatars-off"];
+            __chatOneLinePref = [[NSUserDefaults standardUserDefaults] boolForKey:@"chat-oneline"];
             if(!__chatOneLinePref && !__avatarsOffPref)
                 __timeLeftPref = NO;
-            __norealnamePref = [[prefs objectForKey:@"chat-norealname"] boolValue];
+            __norealnamePref = [[NSUserDefaults standardUserDefaults] boolForKey:@"chat-norealname"];
 
             NSDictionary *hiddenMap;
             

@@ -450,7 +450,7 @@
             }
         }
     } else {
-        CLS_LOG(@"Failed: %@", result);
+        CLS_LOG(@"Failed: %@ %@", identifier, result);
         UILocalNotification *alert = [[UILocalNotification alloc] init];
         alert.fireDate = [NSDate date];
         if([identifier isEqualToString:@"reply"]) {
