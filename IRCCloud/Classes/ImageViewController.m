@@ -137,7 +137,7 @@
     [UIView setAnimationDuration:0.25];
     _imageView.alpha = 1;
     [UIView commitAnimations];
-    if(!_previewing)
+    if([UIApplication sharedApplication].delegate.window.rootViewController == self)
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [Answers logContentViewWithName:nil contentType:@"Image" contentId:nil customAttributes:nil];
 }
@@ -287,7 +287,7 @@
     _scrollView.userInteractionEnabled = NO;
     [_progressView removeFromSuperview];
     [_movieController play];
-    if(!_previewing)
+    if([UIApplication sharedApplication].delegate.window.rootViewController == self)
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
 }
@@ -507,8 +507,10 @@
             }
         }];
         return;
-    } else if([url.path hasPrefix:@"/wiki/File:"]) {
-        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@%@", url.scheme, url.host, url.port,[[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", [url.path substringFromIndex:6]] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+    } else if([url.path hasPrefix:@"/wiki/"] && [url.absoluteString containsString:@"/File:"]) {
+        NSString *title = [url.absoluteString substringFromIndex:[url.absoluteString rangeOfString:@"/File:"].location + 1];
+        NSLog(@"Wiki title: %@", title);
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@%@", url.scheme, url.host, url.port,[[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", title] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
         [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
@@ -634,7 +636,7 @@
     [_scrollView addGestureRecognizer:doubleTap];
     
     UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panned:)];
-    [self.view addGestureRecognizer:panGesture];
+    [_scrollView addGestureRecognizer:panGesture];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     [self transitionToSize:self.view.bounds.size];
@@ -676,7 +678,7 @@
     if(_previewing)
         return;
     
-    if (_scrollView.zoomScale <= _scrollView.minimumZoomScale || _movieController) {
+    if (_scrollView.zoomScale <= _scrollView.minimumZoomScale || _movieController || !_imageView.image) {
         CGRect frame = _scrollView.frame;
         
         switch(recognizer.state) {
@@ -689,6 +691,7 @@
                 frame.origin.y = 0;
                 [UIView animateWithDuration:0.25 animations:^{
                     _scrollView.frame = frame;
+                    _progressView.center = _scrollView.center;
                     self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
                 }];
                 [self _showToolbar];
@@ -698,14 +701,20 @@
             case UIGestureRecognizerStateChanged:
                 frame.origin.y = [recognizer translationInView:self.view].y;
                 _scrollView.frame = frame;
+                _progressView.center = _scrollView.center;
                 self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1-(fabs([recognizer translationInView:self.view].y) / self.view.frame.size.height / 2)];
                 break;
             case UIGestureRecognizerStateEnded:
             {
                 if(fabs([recognizer translationInView:self.view].y) > 100 || fabs([recognizer velocityInView:self.view].y) > 1000) {
                     frame.origin.y = ([recognizer translationInView:self.view].y > 0)?frame.size.height:-frame.size.height;
+                    [_hideTimer invalidate];
+                    _hideTimer = nil;
+                    [_connection cancel];
+                    _connection = nil;
                     [UIView animateWithDuration:0.25 animations:^{
                         _scrollView.frame = frame;
+                        _progressView.center = _scrollView.center;
                         self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0];
                     } completion:^(BOOL finished) {
                         [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
@@ -716,6 +725,7 @@
                     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
                     [UIView animateWithDuration:0.25 animations:^{
                         _scrollView.frame = frame;
+                        _progressView.center = _scrollView.center;
                         self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
                     }];
                 }
@@ -742,6 +752,8 @@
 - (void)viewDidDisappear:(BOOL)animated {
     if(_movieController)
         [_movieController stop];
+    [_hideTimer invalidate];
+    _hideTimer = nil;
 }
 
 -(IBAction)viewTapped:(id)sender {
@@ -770,6 +782,8 @@
 }
 
 -(IBAction)doneButtonPressed:(id)sender {
+    [_hideTimer invalidate];
+    _hideTimer = nil;
     [_connection cancel];
     _connection = nil;
     [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
