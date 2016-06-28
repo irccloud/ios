@@ -659,6 +659,7 @@ float ColorFormatterCachedFontSize = 0.0f;
                      @"aquarius":@"♒️",
                      @"+1":@"👍",
                      @"thumbsup":@"👍",
+                     @"like":@"👍",
                      @"man":@"👨",
                      @"necktie":@"👔",
                      @"eyes":@"👀",
@@ -1058,7 +1059,8 @@ float ColorFormatterCachedFontSize = 0.0f;
                      @"_(":@"😭",
                      @";)":@"😉",
                      @";p":@"😜",
-                     @"simple_smile":@":)"};
+                     @"simple_smile":@":)",
+                     @"slightly_smiling_face":@":)"};
     
     static NSRegularExpression *_pattern;
     if(!_pattern) {
