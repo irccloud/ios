@@ -1794,9 +1794,11 @@ float __largeAvatarHeight = 32;
 }
 
 - (void)_calculateHeight:(Event *)e {
-    float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+14);
+    float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+17);
+    float estimatedWidth = _tableView.frame.size.width - 4 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0);
+    estimatedWidth -= (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?12:22;
     CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(_tableView.frame.size.width - 6 - ((__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?10:20) - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0),CGFLOAT_MAX), NULL);
+    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(estimatedWidth,CGFLOAT_MAX), NULL);
     e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
     
     CGMutablePathRef path = CGPathCreateMutable();
