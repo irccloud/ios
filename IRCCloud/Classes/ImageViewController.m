@@ -114,6 +114,8 @@
 }
 
 -(void)_setImage:(UIImage *)img {
+    [_scrollView removeGestureRecognizer:_panGesture];
+    [self.view addGestureRecognizer:_panGesture];
     _imageView.image = img;
     _imageView.frame = CGRectMake(0,0,img.size.width,img.size.height);
     CGFloat xScale = _scrollView.bounds.size.width / _imageView.frame.size.width;
@@ -285,6 +287,8 @@
     _movieController.view.frame = _scrollView.bounds;
     [_scrollView addSubview:_movieController.view];
     _scrollView.userInteractionEnabled = NO;
+    [_scrollView removeGestureRecognizer:_panGesture];
+    [self.view addGestureRecognizer:_panGesture];
     [_progressView removeFromSuperview];
     [_movieController play];
     if([UIApplication sharedApplication].delegate.window.rootViewController == self)
@@ -635,8 +639,8 @@
     [doubleTap setNumberOfTapsRequired:2];
     [_scrollView addGestureRecognizer:doubleTap];
     
-    UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panned:)];
-    [_scrollView addGestureRecognizer:panGesture];
+    _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panned:)];
+    [_scrollView addGestureRecognizer:_panGesture];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     [self transitionToSize:self.view.bounds.size];

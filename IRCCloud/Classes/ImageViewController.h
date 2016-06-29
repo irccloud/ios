@@ -31,6 +31,7 @@
     float _progressScale;
     NSURLConnection *_connection;
     BOOL _previewing;
+    UIPanGestureRecognizer *_panGesture;
 }
 @property BOOL previewing;
 -(id)initWithURL:(NSURL *)url;
