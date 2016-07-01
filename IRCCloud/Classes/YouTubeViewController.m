@@ -192,7 +192,10 @@
         [self.presentingViewController dismissViewControllerAnimated:NO completion:nil];
     }];
     [_activity stopAnimating];
+    _player.delegate = nil;
+    _player.webView.delegate = nil;
     [_player stopVideo];
+    [_player.webView stopLoading];
 }
 
 -(void)_YTShare:(id)sender {
