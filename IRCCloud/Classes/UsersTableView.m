@@ -141,7 +141,7 @@
          @"color":headingColor,
          @"bgColor":groupColor,
          @"count":@(users.count),
-         @"countColor":[UIColor whiteColor],
+         @"countColor":headingColor,
          @"symbol":symbol,
          @"borderColor":borderColor
          }];
