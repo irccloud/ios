@@ -132,17 +132,18 @@
     [self refresh];
 }
 
-- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor data:(NSMutableArray *)data sectionTitles:(NSMutableArray *)sectionTitles sectionIndexes:(NSMutableArray *)sectionIndexes sectionSizes:(NSMutableArray *)sectionSizes {
+- (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor headingColor:(UIColor *)headingColor data:(NSMutableArray *)data sectionTitles:(NSMutableArray *)sectionTitles sectionIndexes:(NSMutableArray *)sectionIndexes sectionSizes:(NSMutableArray *)sectionSizes {
     if(users.count && symbol) {
         unichar lastChar = 0;
         [data addObject:@{
          @"type":@TYPE_HEADING,
          @"text":heading,
-         @"color":[UIColor whiteColor],
-         @"bgColor":borderColor,
+         @"color":headingColor,
+         @"bgColor":groupColor,
          @"count":@(users.count),
          @"countColor":[UIColor whiteColor],
-         @"symbol":symbol
+         @"symbol":symbol,
+         @"borderColor":borderColor
          }];
         NSUInteger size = data.count;
         for(User *user in users) {
@@ -229,14 +230,14 @@
     if(!operPrefix)
         operPrefix = [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"];
     
-    [self _addUsersFromList:opers heading:@"Opers" symbol:operPrefix groupColor:[UIColor opersGroupColor] borderColor:[UIColor opersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
-    [self _addUsersFromList:owners heading:@"Owners" symbol:[PREFIX objectForKey:s?s.MODE_OWNER:@"q"] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
-    [self _addUsersFromList:admins heading:@"Admins" symbol:[PREFIX objectForKey:s?s.MODE_ADMIN:@"a"] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
-    [self _addUsersFromList:ops heading:@"Ops" symbol:[PREFIX objectForKey:s?s.MODE_OP:@"o"] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
-    [self _addUsersFromList:halfops heading:@"Half Ops" symbol:[PREFIX objectForKey:s?s.MODE_HALFOP:@"h"] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
-    [self _addUsersFromList:voiced heading:@"Voiced" symbol:[PREFIX objectForKey:s?s.MODE_VOICED:@"v"] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:opers heading:@"Opers" symbol:operPrefix groupColor:[UIColor opersGroupColor] borderColor:[UIColor opersBorderColor] headingColor:[UIColor opersHeadingColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:owners heading:@"Owners" symbol:[PREFIX objectForKey:s?s.MODE_OWNER:@"q"] groupColor:[UIColor ownersGroupColor] borderColor:[UIColor ownersBorderColor] headingColor:[UIColor ownersHeadingColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:admins heading:@"Admins" symbol:[PREFIX objectForKey:s?s.MODE_ADMIN:@"a"] groupColor:[UIColor adminsGroupColor] borderColor:[UIColor adminsBorderColor] headingColor:[UIColor adminsHeadingColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:ops heading:@"Ops" symbol:[PREFIX objectForKey:s?s.MODE_OP:@"o"] groupColor:[UIColor opsGroupColor] borderColor:[UIColor opsBorderColor] headingColor:[UIColor opsHeadingColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:halfops heading:@"Half Ops" symbol:[PREFIX objectForKey:s?s.MODE_HALFOP:@"h"] groupColor:[UIColor halfopsGroupColor] borderColor:[UIColor halfopsBorderColor] headingColor:[UIColor halfopsHeadingColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
+    [self _addUsersFromList:voiced heading:@"Voiced" symbol:[PREFIX objectForKey:s?s.MODE_VOICED:@"v"] groupColor:[UIColor voicedGroupColor] borderColor:[UIColor voicedBorderColor] headingColor:[UIColor voicedHeadingColor] data:data sectionTitles:nil sectionIndexes:nil sectionSizes:nil];
     [sectionIndexes addObject:@(0)];
-    [self _addUsersFromList:members heading:@"Members" symbol:@"" groupColor:[UIColor membersGroupColor] borderColor:[UIColor membersBorderColor] data:data sectionTitles:sectionTitles sectionIndexes:sectionIndexes sectionSizes:sectionSizes];
+    [self _addUsersFromList:members heading:@"Members" symbol:@"" groupColor:[UIColor membersGroupColor] borderColor:[UIColor membersBorderColor] headingColor:[UIColor membersHeadingColor] data:data sectionTitles:sectionTitles sectionIndexes:sectionIndexes sectionSizes:sectionSizes];
     if(sectionSizes.count == 0)
         [sectionSizes addObject:@(data.count)];
     

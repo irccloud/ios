@@ -41,6 +41,13 @@ UIColor *__opsBorderColor;
 UIColor *__halfopsBorderColor;
 UIColor *__voicedBorderColor;
 UIColor *__membersBorderColor;
+UIColor *__opersHeadingColor;
+UIColor *__ownersHeadingColor;
+UIColor *__adminsHeadingColor;
+UIColor *__opsHeadingColor;
+UIColor *__halfopsHeadingColor;
+UIColor *__voicedHeadingColor;
+UIColor *__membersHeadingColor;
 UIColor *__memberListTextColor;
 UIColor *__memberListAwayTextColor;
 UIColor *__timestampColor;
@@ -306,6 +313,14 @@ NSString *__current_theme;
         __voicedGroupColor = [UIColor colorWithRed:0.957 green:1 blue:0.929 alpha:1];
         __membersGroupColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
         
+        __opersHeadingColor = [UIColor colorWithRed:0.878 green:0.137 blue:0.02 alpha:1];
+        __ownersHeadingColor = [UIColor colorWithRed:0.906 green:0.667 blue:0 alpha:1];
+        __adminsHeadingColor = [UIColor colorWithRed:0.396 green:0 blue:0.647 alpha:1];
+        __opsHeadingColor = [UIColor colorWithRed:0.729 green:0.09 blue:0.098 alpha:1];
+        __halfopsHeadingColor = [UIColor colorWithRed:0.71 green:0.349 blue:0 alpha:1];
+        __voicedHeadingColor = [UIColor colorWithRed:0.145 green:0.694 blue:0 alpha:1];
+        __membersHeadingColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+
         [[UITableView appearance] setBackgroundColor:[UIColor colorWithRed:0.937 green:0.937 blue:0.957 alpha:1]];
         [[UITableView appearance] setSeparatorColor:nil];
         [[UITableViewCell appearance] setBackgroundColor:[UIColor whiteColor]];
@@ -510,6 +525,14 @@ NSString *__current_theme;
         __voicedGroupColor = [UIColor colorWithHue:94.0/360.0 saturation:0.25 lightness:0.16 alpha:1.0];
         __membersGroupColor = [UIColor colorWithHue:217.0/360.0 saturation:0.30 lightness:0.15 alpha:1.0];
         
+        __opersHeadingColor = [UIColor colorWithRed:0.992 green:0.745 blue:0.706 alpha:1];
+        __ownersHeadingColor = [UIColor colorWithRed:1 green:0.922 blue:0.706 alpha:1];
+        __adminsHeadingColor = [UIColor colorWithRed:0.784 green:0.447 blue:1 alpha:1];
+        __opsHeadingColor = [UIColor colorWithRed:0.957 green:0.663 blue:0.667 alpha:1];
+        __halfopsHeadingColor = [UIColor colorWithRed:1 green:0.749 blue:0.51 alpha:1];
+        __voicedHeadingColor = [UIColor colorWithRed:0.6 green:1 blue:0.494 alpha:1];
+        __membersHeadingColor = [UIColor colorWithRed:0.533 green:0.698 blue:0.867 alpha:1];
+        
         [[UITableView appearance] setBackgroundColor:color_background7];
         [[UITableView appearance] setSeparatorColor:color_border11];
         [[UITableViewCell appearance] setBackgroundColor:color_background6];
@@ -604,6 +627,27 @@ NSString *__current_theme;
 }
 +(UIColor *)membersBorderColor {
     return __membersBorderColor;
+}
++(UIColor *)opersHeadingColor {
+    return __opersHeadingColor;
+}
++(UIColor *)ownersHeadingColor {
+    return __ownersHeadingColor;
+}
++(UIColor *)adminsHeadingColor {
+    return __adminsHeadingColor;
+}
++(UIColor *)opsHeadingColor {
+    return __opsHeadingColor;
+}
++(UIColor *)halfopsHeadingColor {
+    return __halfopsHeadingColor;
+}
++(UIColor *)voicedHeadingColor {
+    return __voicedHeadingColor;
+}
++(UIColor *)membersHeadingColor {
+    return __membersHeadingColor;
 }
 +(UIColor *)memberListTextColor {
     return __memberListTextColor;

@@ -42,6 +42,13 @@
 +(UIColor *)halfopsBorderColor;
 +(UIColor *)voicedBorderColor;
 +(UIColor *)membersBorderColor;
++(UIColor *)opersHeadingColor;
++(UIColor *)ownersHeadingColor;
++(UIColor *)adminsHeadingColor;
++(UIColor *)opsHeadingColor;
++(UIColor *)halfopsHeadingColor;
++(UIColor *)voicedHeadingColor;
++(UIColor *)membersHeadingColor;
 +(UIColor *)memberListTextColor;
 +(UIColor *)memberListAwayTextColor;
 +(UIColor *)timestampColor;
