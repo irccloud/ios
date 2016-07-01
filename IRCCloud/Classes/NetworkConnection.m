@@ -464,14 +464,22 @@ volatile BOOL __socketPaused = NO;
                            });
                            [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"theme"] forKey:@"theme"];
                        }
-                       if([p objectForKey:@"time-left"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"time-left"])
+                       if([p objectForKey:@"time-left"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"time-left"]) {
                            [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"time-left"] forKey:@"time-left"];
-                       if([p objectForKey:@"avatars-off"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"avatars-off"])
+                           [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
+                       }
+                       if([p objectForKey:@"avatars-off"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"avatars-off"]) {
                            [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"avatars-off"] forKey:@"avatars-off"];
-                       if([p objectForKey:@"chat-oneline"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"chat-oneline"])
+                           [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
+                       }
+                       if([p objectForKey:@"chat-oneline"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"chat-oneline"]) {
                            [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"chat-oneline"] forKey:@"chat-oneline"];
-                       if([p objectForKey:@"chat-norealname"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"chat-norealname"])
+                           [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
+                       }
+                       if([p objectForKey:@"chat-norealname"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"chat-norealname"]) {
                            [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"chat-norealname"] forKey:@"chat-norealname"];
+                           [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
+                       }
 
                        [[NSUserDefaults standardUserDefaults] synchronize];
                        [_events reformat];

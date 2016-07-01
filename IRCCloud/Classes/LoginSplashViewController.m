@@ -252,6 +252,7 @@
             [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
             [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
             [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
             [[NSUserDefaults standardUserDefaults] synchronize];
 #ifdef ENTERPRISE
             NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
@@ -681,6 +682,7 @@
                 [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                 [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+                [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
                 [[NSUserDefaults standardUserDefaults] synchronize];
 #ifdef ENTERPRISE
                 NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];

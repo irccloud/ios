@@ -88,6 +88,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 #define TAG_DELETE 9
 #define TAG_JOIN 10
 #define TAG_BUGREPORT 11
+#define TAG_WELCOME_3_0 12
 
 extern NSDictionary *emojiMap;
 
@@ -1507,6 +1508,14 @@ extern NSDictionary *emojiMap;
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     self.slidingViewController.view.autoresizesSubviews = NO;
+    
+    if(![[NSUserDefaults standardUserDefaults] boolForKey:@"greeting_3.0"]) {
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Welcome to IRCCloud 3.0" message:@"We’ve updated the default message layout. We hope you like it, but you can switch back in your settings." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:@"Settings", @"Release Notes", nil];
+        alert.tag = TAG_WELCOME_3_0;
+        [alert show];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -3316,6 +3325,20 @@ extern NSDictionary *emojiMap;
                 [pb setValue:_bugReport forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
             }
             _bugReport = nil;
+            break;
+        case TAG_WELCOME_3_0:
+            if([title isEqualToString:@"Settings"]) {
+                SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                [self presentViewController:nc animated:YES completion:nil];
+            } else if([title isEqualToString:@"Release Notes"]) {
+                [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://github.com/irccloud/ios/releases"]];
+            }
             break;
     }
     _alertView = nil;
