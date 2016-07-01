@@ -948,6 +948,13 @@ extern NSDictionary *emojiMap;
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [ColorFormatter loadFonts];
                 [self _themeChanged];
+                if(![[NSUserDefaults standardUserDefaults] boolForKey:@"greeting_3.0"]) {
+                    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Welcome to IRCCloud 3.0" message:@"We’ve updated the default message layout. We hope you like it, but you can switch back in your settings." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:@"Settings", @"Release Notes", nil];
+                    alert.tag = TAG_WELCOME_3_0;
+                    [alert show];
+                }
             }];
         }
         case kIRCEventPart:
@@ -1508,14 +1515,6 @@ extern NSDictionary *emojiMap;
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     self.slidingViewController.view.autoresizesSubviews = NO;
-    
-    if(![[NSUserDefaults standardUserDefaults] boolForKey:@"greeting_3.0"]) {
-        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Welcome to IRCCloud 3.0" message:@"We’ve updated the default message layout. We hope you like it, but you can switch back in your settings." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:@"Settings", @"Release Notes", nil];
-        alert.tag = TAG_WELCOME_3_0;
-        [alert show];
-    }
 }
 
 - (void)didReceiveMemoryWarning {
