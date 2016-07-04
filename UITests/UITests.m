@@ -44,7 +44,7 @@
 
 - (void)testAshScreenshots {
     XCUIApplication *app = [[XCUIApplication alloc] init];
-    app.launchArguments = @[@"-theme", @"ash"];
+    app.launchArguments = @[@"-theme", @"ash", @"-mono"];
     [Snapshot setupSnapshot:app];
     [app launch];
     [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
