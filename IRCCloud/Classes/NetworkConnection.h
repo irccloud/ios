@@ -136,6 +136,7 @@ typedef enum {
     NSString *_streamId;
     int _accrued;
     BOOL _ready;
+    BOOL _mock;
     
     kIRCCloudState _state;
     NSDictionary *_userInfo;
@@ -161,7 +162,7 @@ typedef enum {
 @property NSTimeInterval idleInterval;
 @property NSTimeInterval reconnectTimestamp;
 @property NSTimeInterval highestEID;
-@property BOOL notifier, reachabilityValid;
+@property BOOL notifier, reachabilityValid, mock;
 @property (readonly) kIRCCloudReachability reachable;
 @property NSString *globalMsg;
 @property int failCount;

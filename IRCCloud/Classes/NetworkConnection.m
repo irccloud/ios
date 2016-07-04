@@ -259,6 +259,7 @@ volatile BOOL __socketPaused = NO;
     }
     
     CLS_LOG(@"%@", _userAgent);
+        
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -1395,6 +1396,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)connect:(BOOL)notifier {
     @synchronized(self) {
+        if(_mock) {
+            _reconnectTimestamp = -1;
+            _state = kIRCCloudStateConnected;
+            _ready = YES;
+            return;
+        }
+        
         if(IRCCLOUD_HOST.length < 1) {
             CLS_LOG(@"Not connecting, no host");
             return;
@@ -2002,6 +2010,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSString *)session {
+    if(_mock)
+        return @"__mock_session__";
+    
     if(_session) {
         _keychainFailCount = 0;
         return _session;
