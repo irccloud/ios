@@ -1,0 +1,11 @@
+Chat on IRC from anywhere, and never miss a message.
+
+• Stay connected when you're on the move. No need to rely on constant data access, we keep your IRC connection running on our servers.
+• Your entire chat history is fully synced to the cloud so you can catch up at your leisure.
+• Get push notifications for mentions and private messages.
+• Upload and share photos, videos and files straight from your device.
+• Full support for iPhone and iPad.
+• Choose from 8 colourful themes.
+• Monospace font option.
+
+Join our #feedback channel on irc.irccloud.com for feedback and suggestions to help us improve this app. You can also email us at team@irccloud.com or find us on Twitter: @irccloud
