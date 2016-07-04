@@ -8,3 +8,6 @@ IRCCloud/InfoPlist.h
 /*.mobileprovision
 /*.ipa
 infer-out/
+Preview.html
+IRCCloud.app.dSYM.zip
+fastlane/report.xml
