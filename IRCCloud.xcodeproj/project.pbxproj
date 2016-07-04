@@ -643,10 +643,6 @@
 		228A057916D3DABA0029769C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		228A057B16D3DABA0029769C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		228A057D16D3DABA0029769C /* IRCCloud-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IRCCloud-Prefix.pch"; sourceTree = "<group>"; };
-		228A059E16D3DABB0029769C /* IRCCloudTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "IRCCloudTests-Info.plist"; sourceTree = "<group>"; };
-		228A05A016D3DABB0029769C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		228A05A216D3DABB0029769C /* IRCCloudTests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IRCCloudTests.h; sourceTree = "<group>"; };
-		228A05A316D3DABB0029769C /* IRCCloudTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IRCCloudTests.m; sourceTree = "<group>"; };
 		228A05AE16D3DB7B0029769C /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		228A05AF16D3DB7B0029769C /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		228A05C916D3DCB60029769C /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
@@ -989,7 +985,6 @@
 			isa = PBXGroup;
 			children = (
 				228A057516D3DABA0029769C /* IRCCloud */,
-				228A059C16D3DABB0029769C /* IRCCloudTests */,
 				221034E8197EFBAF00AB414F /* ShareExtension */,
 				22CE2ADD1D2AA660001397C0 /* UITests */,
 				228A056E16D3DABA0029769C /* Frameworks */,
@@ -1092,25 +1087,6 @@
 				2223C6AF1768F36F0032544B /* UIImage+animatedGIF.h */,
 				2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */,
 				22B4284A16D831A800498507 /* WebSocket */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		228A059C16D3DABB0029769C /* IRCCloudTests */ = {
-			isa = PBXGroup;
-			children = (
-				228A05A216D3DABB0029769C /* IRCCloudTests.h */,
-				228A05A316D3DABB0029769C /* IRCCloudTests.m */,
-				228A059D16D3DABB0029769C /* Supporting Files */,
-			);
-			path = IRCCloudTests;
-			sourceTree = "<group>";
-		};
-		228A059D16D3DABB0029769C /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				228A059E16D3DABB0029769C /* IRCCloudTests-Info.plist */,
-				228A059F16D3DABB0029769C /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -2120,14 +2096,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				228A057916D3DABA0029769C /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		228A059F16D3DABB0029769C /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				228A05A016D3DABB0029769C /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
