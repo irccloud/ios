@@ -20,7 +20,7 @@ Make sure all devices are added to the ad-hoc profile
 ```
 fastlane ios beta
 ```
-Submit a new Beta Build to Fabric
+Build and archive an ad-hoc release
 
 ----
 

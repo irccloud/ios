@@ -1413,6 +1413,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             return;
         }
         
+        [_idleTimer invalidate];
+        _idleTimer = nil;
+
         if(_socket) {
             CLS_LOG(@"Discarding previous socket");
             WebSocket *s = _socket;
