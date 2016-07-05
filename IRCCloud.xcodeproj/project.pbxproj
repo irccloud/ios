@@ -2145,7 +2145,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "b080cdb3-e92d-4bee-9be8-39c796d13de3";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.IRCCloud.ShareExtension_development)";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2184,7 +2184,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "99bff919-338b-428d-8ca2-f276be911d5f";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.IRCCloud.ShareExtension_adhoc)";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2224,7 +2224,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "4332a2d9-7466-44f3-a544-adae7f68bf5d";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.IRCCloud.ShareExtension_appstore)";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -2251,7 +2251,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "3a91171c-5546-415a-9be7-c05dcc335e99";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.enterprise_development)";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2281,7 +2281,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "b8371bd5-5cdb-4238-b151-2fccfc570213";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.enterprise_adhoc)";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2371,7 +2371,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "327005e5-e30d-4e18-a936-4e9ad374d990";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.IRCCloud_development)";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -2396,7 +2396,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "b20450e2-db0b-429d-99dd-33e4801c5173";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.IRCCloud_adhoc)";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2534,7 +2534,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "4c10426f-d4c7-4560-99e5-7845f2b05719";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.enterprise.ShareExtension_development)";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2574,7 +2574,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "02583487-28fb-4a6a-9566-a5c041ba19d7";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.enterprise.ShareExtension_adhoc)";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2615,7 +2615,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE = "fb3f2e46-42bf-460d-9c54-a4e7dc3ac646";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.enterprise.ShareExtension_appstore)";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -2687,7 +2687,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "5a6f3c6f-cd0e-4efd-b071-e130f5ef9715";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.IRCCloud_appstore)";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
@@ -2718,7 +2718,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE = "7862d29c-9583-4c70-b684-0e99de9b7e88";
+				PROVISIONING_PROFILE = "$(sigh_com.irccloud.enterprise_appstore)";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;

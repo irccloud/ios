@@ -11,6 +11,16 @@ sudo gem install fastlane
 fastlane ios checkcerts
 ```
 Check all certs and provisioning profiles from github
+### ios updateadhoc
+```
+fastlane ios updateadhoc
+```
+Make sure all devices are added to the ad-hoc profile
+### ios beta
+```
+fastlane ios beta
+```
+Submit a new Beta Build to Fabric
 
 ----
 
