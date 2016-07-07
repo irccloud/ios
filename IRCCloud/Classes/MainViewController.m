@@ -1390,8 +1390,8 @@ extern NSDictionary *emojiMap;
     [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
     [self.slidingViewController resetTopView];
     
-#if !TARGET_IPHONE_SIMULATOR
     NSString *session = [NetworkConnection sharedInstance].session;
+#if !TARGET_IPHONE_SIMULATOR
     if(session.length) {
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
             UIMutableUserNotificationAction *replyAction = [[UIMutableUserNotificationAction alloc] init];
