@@ -1693,8 +1693,11 @@ extern NSDictionary *emojiMap;
                 Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
                 if(s)
                     e.realname = s.server_realname;
-                [_eventsView scrollToBottom];
-                [self performSelectorInBackground:@selector(_insertPendingMessage:) withObject:e];
+                [[EventsDataSource sharedInstance] addEvent:e];
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [_eventsView scrollToBottom];
+                    [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
+                }];
             }
             e.to = _buffer.name;
             e.command = _message.text;
@@ -1708,11 +1711,6 @@ extern NSDictionary *emojiMap;
             CLS_LOG(@"Sending message with reqid %i", e.reqId);
         }
     }
-}
-
--(void)_insertPendingMessage:(Event *)e {
-    [[EventsDataSource sharedInstance] addEvent:e];
-    [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
 }
 
 -(void)_sendRequestDidExpire:(NSTimer *)timer {

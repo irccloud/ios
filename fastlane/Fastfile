@@ -44,7 +44,7 @@ platform :ios do
 
   desc "Build and archive an ad-hoc release"
   lane :beta do
-    gym(scheme: "IRCCloud", export_method: "ad-hoc", clean: true)
+    gym(scheme: "IRCCloud", export_method: "ad-hoc", clean: true, configuration: "Release")
   end
 
   #desc "Deploy a new version to the App Store"
