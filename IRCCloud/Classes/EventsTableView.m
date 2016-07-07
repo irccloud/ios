@@ -241,6 +241,11 @@ float __largeAvatarHeight = 32;
             frame.origin.y = frame.size.height / 2;
             frame.size.height = 1;
         } else if(_type == ROW_LASTSEENEID) {
+            if(!__avatarsOffPref && !__chatOneLinePref) {
+                frame.origin.x += __largeAvatarHeight + 16;
+                frame.size.width -= __largeAvatarHeight + 16;
+                self.contentView.frame = frame;
+            }
             int width = [_timestamp.text sizeWithAttributes:@{NSFontAttributeName:_timestamp.font}].width + 12;
             frame.origin.x = (frame.size.width - width) / 2;
             frame.size.width = width;
@@ -1302,13 +1307,15 @@ float __largeAvatarHeight = 32;
         
         if(insertPos > 0) {
             Event *prev = [_data objectAtIndex:insertPos - 1];
+            if(prev.rowType == ROW_LASTSEENEID)
+                prev = [_data objectAtIndex:insertPos - 2];
             e.isHeader = (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from]));
             e.height = 0;
         }
         
         if(insertPos < _data.count - 1) {
             Event *next = [_data objectAtIndex:insertPos + 1];
-            if(![e isMessage]) {
+            if(![e isMessage] && e.rowType != ROW_LASTSEENEID) {
                 next.isHeader = (next.groupEid < 1 && [next isMessage]);
                 next.height = 0;
                 [_rowCache removeObjectForKey:@(insertPos + 1)];
@@ -2216,19 +2223,26 @@ float __largeAvatarHeight = 32;
             rect = [_tableView convertRect:[_tableView rectForRowAtIndexPath:topIndexPath] toView:_tableView.superview];
         } while(i < _data.count && rect.origin.y + rect.size.height <= offset - 1);
         Event *e = [_data objectAtIndex:firstRow];
-        if(e.groupEid < 1 && e.from.length && [e isMessage]) {
+        if((e.groupEid < 1 && e.from.length && [e isMessage]) || e.rowType == ROW_LASTSEENEID) {
             float groupHeight = rect.size.height;
-            for(i = firstRow; i < _data.count - 1; i++) {
+            for(i = firstRow; i < _data.count - 1 && i < firstRow + 4; i++) {
                 e = [_data objectAtIndex:i];
-                Event *e1 = [_data objectAtIndex:i+1];
+                if(e.rowType == ROW_LASTSEENEID)
+                    e = [_data objectAtIndex:i-1];
+                int next = i+1;
+                Event *e1 = [_data objectAtIndex:next];
+                if(e1.rowType == ROW_LASTSEENEID) {
+                    next++;
+                    e1 = [_data objectAtIndex:next];
+                }
                 if([e.from isEqualToString:e1.from] && e1.groupEid < 1 && !e1.isHeader) {
-                    rect = [_tableView convertRect:[_tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:i+1 inSection:0]] toView:_tableView.superview];
+                    rect = [_tableView convertRect:[_tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:next inSection:0]] toView:_tableView.superview];
                     groupHeight += rect.size.height;
                 } else {
                     break;
                 }
             }
-            if(!e.isHeader || groupHeight > __largeAvatarHeight + 14) {
+            if(!(((Event *)[_data objectAtIndex:firstRow]).rowType == ROW_LASTSEENEID && groupHeight == 26) && (!e.isHeader || groupHeight > __largeAvatarHeight + 14)) {
                 _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + 4);
                 if(_stickyAvatarYOffsetConstraint.constant > offset + 8)
                     _stickyAvatarYOffsetConstraint.constant = offset + 8;
