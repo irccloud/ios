@@ -1390,6 +1390,7 @@ extern NSDictionary *emojiMap;
     [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
     [self.slidingViewController resetTopView];
     
+#if !TARGET_IPHONE_SIMULATOR
     NSString *session = [NetworkConnection sharedInstance].session;
     if(session.length) {
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
@@ -1454,6 +1455,7 @@ extern NSDictionary *emojiMap;
         [[UIApplication sharedApplication] registerForRemoteNotifications];
 #endif
     }
+#endif
     if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
         [[NetworkConnection sharedInstance] connect:NO];
     }
