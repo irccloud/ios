@@ -39,6 +39,7 @@ platform :ios do
   desc "Make sure all devices are added to the ad-hoc profile"
   lane :updateadhoc do
     match(type: "adhoc", force_for_new_devices: true, app_identifier: "com.irccloud.IRCCloud")
+    match(type: "adhoc", force_for_new_devices: true, app_identifier: "com.irccloud.IRCCloud.ShareExtension")
   end
 
   desc "Build and archive an ad-hoc release"
