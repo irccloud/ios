@@ -236,7 +236,7 @@
         e.cid = 1; e.bid = 5; e.eid = 1467301136888600.000000; e.type = @"buffer_msg"; e.from = @"Charlie"; e.msg = @"He's probably trying to decode the backdoor too"; e.isSelf = 0;
         [events addEvent:e];
         e = [[Event alloc] init];
-        e.cid = 1; e.bid = 5; e.eid = 1467301155906677.000000; e.type = @"buffer_msg"; e.from = @"Don"; e.msg = @"You know; e.what if he's not trying to hack Augie; e.he's just trying to find him?"; e.isSelf = 0;
+        e.cid = 1; e.bid = 5; e.eid = 1467301155906677.000000; e.type = @"buffer_msg"; e.from = @"Don"; e.msg = @"You know, what if he's not trying to hack Augie, he's just trying to find him?"; e.isSelf = 0;
         [events addEvent:e];
         e = [[Event alloc] init];
         e.cid = 1; e.bid = 5; e.eid = 1467301177623729.000000; e.type = @"buffer_msg"; e.from = @"Amita"; e.fromMode = @"o"; e.msg = @"IRC! Internet Relay Chat. It's how hackers talk when they don't want to be overheard."; e.isSelf = 1;
@@ -251,10 +251,10 @@
         e.cid = 1; e.bid = 5; e.eid = 1467301302890124.000000; e.type = @"buffer_msg"; e.from = @"Amita"; e.fromMode = @"o"; e.msg = @"You can't see them until a boat cuts through the water leaving a wake."; e.isSelf = 1;
         [events addEvent:e];
         e = [[Event alloc] init];
-        e.cid = 1; e.bid = 5; e.eid = 1467301330768637.000000; e.type = @"buffer_msg"; e.from = @"Amita"; e.fromMode = @"o"; e.msg = @"If two boats meet in the middle of the ocean to swap illegal drugs; e.you have to catch them in real time; e.otherwise there's no evidence of a meeting left behind."; e.isSelf = 1;
+        e.cid = 1; e.bid = 5; e.eid = 1467301330768637.000000; e.type = @"buffer_msg"; e.from = @"Amita"; e.fromMode = @"o"; e.msg = @"If two boats meet in the middle of the ocean to swap illegal drugs, you have to catch them in real time, otherwise there's no evidence of a meeting left behind."; e.isSelf = 1;
         [events addEvent:e];
         e = [[Event alloc] init];
-        e.cid = 1; e.bid = 5; e.eid = 1467301343923062.000000; e.type = @"buffer_msg"; e.from = @"Charlie"; e.msg = @"No names; e.no accounts; e.no records of exchange."; e.isSelf = 0;
+        e.cid = 1; e.bid = 5; e.eid = 1467301343923062.000000; e.type = @"buffer_msg"; e.from = @"Charlie"; e.msg = @"No names, no accounts, no records of exchange."; e.isSelf = 0;
         [events addEvent:e];
 
     }
