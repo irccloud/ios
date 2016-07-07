@@ -26,9 +26,9 @@
     [Snapshot setupSnapshot:app];
     [app launch];
     [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
-    [Snapshot snapshot:@"Dawn-Portrait" waitForLoadingIndicator:YES];
+    [Snapshot snapshot:@"Dawn-Portrait" waitForLoadingIndicator:NO];
     [XCUIDevice sharedDevice].orientation = UIDeviceOrientationLandscapeLeft;
-    [Snapshot snapshot:@"Dawn-Landscape" waitForLoadingIndicator:YES];
+    [Snapshot snapshot:@"Dawn-Landscape" waitForLoadingIndicator:NO];
 }
 
 - (void)testDuskScreenshots {
@@ -37,9 +37,9 @@
     [Snapshot setupSnapshot:app];
     [app launch];
     [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
-    [Snapshot snapshot:@"Dusk-Portrait" waitForLoadingIndicator:YES];
+    [Snapshot snapshot:@"Dusk-Portrait" waitForLoadingIndicator:NO];
     [XCUIDevice sharedDevice].orientation = UIDeviceOrientationLandscapeLeft;
-    [Snapshot snapshot:@"Dusk-Landscape" waitForLoadingIndicator:YES];
+    [Snapshot snapshot:@"Dusk-Landscape" waitForLoadingIndicator:NO];
 }
 
 - (void)testAshScreenshots {
@@ -48,8 +48,8 @@
     [Snapshot setupSnapshot:app];
     [app launch];
     [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
-    [Snapshot snapshot:@"Ash-Portrait" waitForLoadingIndicator:YES];
+    [Snapshot snapshot:@"Ash-Portrait" waitForLoadingIndicator:NO];
     [XCUIDevice sharedDevice].orientation = UIDeviceOrientationLandscapeLeft;
-    [Snapshot snapshot:@"Ash-Landscape" waitForLoadingIndicator:YES];
+    [Snapshot snapshot:@"Ash-Landscape" waitForLoadingIndicator:NO];
 }
 @end
