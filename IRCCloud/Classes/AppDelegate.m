@@ -320,21 +320,23 @@
             self.window.rootViewController = self.loginSplashViewController;
         }
         
-        [self.window addSubview:self.splashViewController.view];
-        
-        if([NetworkConnection sharedInstance].session.length) {
-            [self.splashViewController animate:nil];
-        } else {
-            self.loginSplashViewController.logo.hidden = YES;
-            [self.splashViewController animate:self.loginSplashViewController.logo];
+        if(![[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
+            [self.window addSubview:self.splashViewController.view];
+            
+            if([NetworkConnection sharedInstance].session.length) {
+                [self.splashViewController animate:nil];
+            } else {
+                self.loginSplashViewController.logo.hidden = YES;
+                [self.splashViewController animate:self.loginSplashViewController.logo];
+            }
+            
+            [UIView animateWithDuration:0.25 delay:0.25 options:0 animations:^{
+                self.splashViewController.view.backgroundColor = [UIColor clearColor];
+            } completion:^(BOOL finished) {
+                self.loginSplashViewController.logo.hidden = NO;
+                [self.splashViewController.view removeFromSuperview];
+            }];
         }
-        
-        [UIView animateWithDuration:0.25 delay:0.25 options:0 animations:^{
-            self.splashViewController.view.backgroundColor = [UIColor clearColor];
-        } completion:^(BOOL finished) {
-            self.loginSplashViewController.logo.hidden = NO;
-            [self.splashViewController.view removeFromSuperview];
-        }];
     }];
     
     return YES;
