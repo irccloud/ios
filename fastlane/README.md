@@ -20,7 +20,7 @@ Make sure all devices are added to the ad-hoc profile
 ```
 fastlane ios beta
 ```
-Build and archive an ad-hoc release
+Build and upload an ad-hoc release to Crashlytics
 
 ----
 

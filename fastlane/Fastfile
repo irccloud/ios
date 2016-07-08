@@ -42,9 +42,23 @@ platform :ios do
     match(type: "adhoc", force_for_new_devices: true, app_identifier: "com.irccloud.IRCCloud.ShareExtension")
   end
 
-  desc "Build and archive an ad-hoc release"
+  desc "Build and upload an ad-hoc release to Crashlytics"
   lane :beta do
+    match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud")
+    match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud.ShareExtension")
+    
+    root_directory = "#{File.expand_path(File.dirname(__FILE__))}/../"
+    CRASHLYTICS_TOKEN=Fastlane::Actions.sh_control_output("grep CRASHLYTICS_TOKEN #{root_directory}IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'",print_command_output: false).strip
+    CRASHLYTICS_SECRET=Fastlane::Actions.sh_control_output("grep CRASHLYTICS_SECRET #{root_directory}IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'",print_command_output: false).strip
+
+    raise "Missing Crashlytics API key" unless CRASHLYTICS_TOKEN != ''
+    raise "Missing Crashlytics API secret" unless CRASHLYTICS_SECRET != ''
+
+    notes = prompt(text: "Release Notes: ", multi_line_end_keyword: "$")
+
     gym(scheme: "IRCCloud", export_method: "ad-hoc", clean: true, configuration: "Release")
+
+    crashlytics(api_token: CRASHLYTICS_TOKEN, build_secret: CRASHLYTICS_SECRET, groups: ["irccloud"], notes: notes)
   end
 
   #desc "Deploy a new version to the App Store"
