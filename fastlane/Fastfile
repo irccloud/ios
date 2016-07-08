@@ -58,7 +58,7 @@ platform :ios do
 
     gym(scheme: "IRCCloud", export_method: "ad-hoc", clean: true, configuration: "Release")
 
-    crashlytics(api_token: CRASHLYTICS_TOKEN, build_secret: CRASHLYTICS_SECRET, groups: ["irccloud"], notes: notes)
+    crashlytics(api_token: CRASHLYTICS_TOKEN, build_secret: CRASHLYTICS_SECRET, groups: ["irccloud","ios-testers","ios-public-beta"], notes: notes)
   end
 
   #desc "Deploy a new version to the App Store"
