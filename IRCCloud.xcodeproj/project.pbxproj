@@ -29,6 +29,7 @@
 		1A5703491A74145B00D58225 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; };
 		1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */; };
 		1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */; };
+		1ADCE22E1D2FCD78000B379F /* UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADCE22D1D2FCD78000B379F /* UITests.swift */; };
 		2200DB4718B7EDF100343583 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
 		2200DB4C18B7F1FD00343583 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
 		2200DB4F18BCF9D100343583 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
@@ -352,7 +353,6 @@
 		22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22C8DCF31A801A4500199371 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8DCF21A801A4500199371 /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22C8DCF41A801A6300199371 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8DCF21A801A4500199371 /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		22CE2ADF1D2AA662001397C0 /* UITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE2ADE1D2AA662001397C0 /* UITests.m */; };
 		22CE2AE91D2AAA36001397C0 /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22CE2AE81D2AAA36001397C0 /* SnapshotHelper.swift */; };
 		22D268C21BF4F40800B682AE /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22D268C11BF4F40800B682AE /* MainStoryboard.storyboard */; };
 		22D268C31BF4F40800B682AE /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22D268C11BF4F40800B682AE /* MainStoryboard.storyboard */; };
@@ -540,6 +540,7 @@
 		1A5703471A74145400D58225 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = EnterpriseLogo.xcassets; sourceTree = "<group>"; };
 		1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Logo.xcassets; sourceTree = "<group>"; };
+		1ADCE22D1D2FCD78000B379F /* UITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITests.swift; sourceTree = "<group>"; };
 		2200DB4618B7EDF100343583 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		2200DB4B18B7F1FD00343583 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		2200DB4D18B81BEB00343583 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
@@ -756,7 +757,6 @@
 		22C8CDF51B01372100F637D2 /* SSZipArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
 		22C8DCF21A801A4500199371 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		22CE2ADC1D2AA65A001397C0 /* UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		22CE2ADE1D2AA662001397C0 /* UITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = UITests.m; sourceTree = "<group>"; };
 		22CE2AE01D2AA662001397C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		22CE2AE71D2AA9E3001397C0 /* UITests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UITests-Bridging-Header.h"; sourceTree = "<group>"; };
 		22CE2AE81D2AAA36001397C0 /* SnapshotHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SnapshotHelper.swift; sourceTree = "<group>"; };
@@ -1334,7 +1334,7 @@
 			isa = PBXGroup;
 			children = (
 				22CE2AE81D2AAA36001397C0 /* SnapshotHelper.swift */,
-				22CE2ADE1D2AA662001397C0 /* UITests.m */,
+				1ADCE22D1D2FCD78000B379F /* UITests.swift */,
 				22CE2AE01D2AA662001397C0 /* Info.plist */,
 				22CE2AE71D2AA9E3001397C0 /* UITests-Bridging-Header.h */,
 			);
@@ -1984,7 +1984,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22CE2ADF1D2AA662001397C0 /* UITests.m in Sources */,
+				1ADCE22E1D2FCD78000B379F /* UITests.swift in Sources */,
 				22CE2AE91D2AAA36001397C0 /* SnapshotHelper.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
