@@ -16,11 +16,6 @@ Check all certs and provisioning profiles from github
 fastlane ios push
 ```
 Build and push to ITC
-### ios pushenterprise
-```
-fastlane ios pushenterprise
-```
-Build and push Enterprise to ITC
 ### ios screenshots
 ```
 fastlane ios screenshots
