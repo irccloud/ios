@@ -50,7 +50,7 @@ platform :ios do
     end
     
     # Build an ipa
-    gym(scheme: scheme)
+    gym(scheme: scheme, configuration: "AppStore")
     
     # Reset the build number
     if options[:build]
