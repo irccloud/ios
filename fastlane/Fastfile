@@ -32,7 +32,7 @@ platform :ios do
     end
   end
 
-  desc "Build and push to ITC"
+  desc "Build and push to iTunes Connect"
   lane :push do |options|
     if options[:enterprise]
         ipa = "IRCEnterprise.ipa"
@@ -41,12 +41,27 @@ platform :ios do
         ipa = "IRCCloud.ipa"
         scheme = "IRCCloud"
     end
+    
+    # Set a build number manually if provided
+    # TODO pull this from the Info.plist
+    default_build_number = "GIT_VERSION"
+    if options[:build]
+        increment_build_number(build_number: options[:build])
+    end
+    
+    # Build an ipa
     gym(scheme: scheme)
+    
+    # Reset the build number
+    if options[:build]
+        increment_build_number(build_number: default_build_number)
+    end
+    
+    # Upload to iTunes Connect
     deliver(
         ipa: ipa,
         skip_metadata: true,
-        skip_screenshots: true,
-        build_number: options[:build]
+        skip_screenshots: true
     )
   end
   
