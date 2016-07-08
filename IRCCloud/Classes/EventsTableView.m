@@ -2229,7 +2229,7 @@ float __largeAvatarHeight = 32;
                 e = [_data objectAtIndex:i];
                 if(e.rowType == ROW_LASTSEENEID)
                     e = [_data objectAtIndex:i-1];
-                int next = i+1;
+                NSUInteger next = i+1;
                 Event *e1 = [_data objectAtIndex:next];
                 if(e1.rowType == ROW_LASTSEENEID) {
                     next++;
