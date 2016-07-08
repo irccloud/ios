@@ -27,33 +27,25 @@ func takeScreenshotTheme(theme: String, mono: Bool = false) {
     setupSnapshot(app)
     app.launch()
     
-//    let window = app.windows.elementBoundByIndex(0)
-//    
-//    if (
-//        theme == "dawn" ||
-//        window.horizontalSizeClass == .Compact
-//    ) {
+    if (theme == "dawn" || UIDevice().userInterfaceIdiom != .Pad) {
         sleep(SCREENSHOT_DELAY)
         snapshot(String(format: "%@-Portrait", theme), waitForLoadingIndicator: false)
-//    }
-    XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft;
-//    if (
-//        window.horizontalSizeClass == .Regular && (
-//            theme == "dawn" ||
-//            window.verticalSizeClass == .Regular
-//        )
-//    ) {
+    }
+    if (theme == "dawn" && (UIDevice().userInterfaceIdiom == .Pad || UIScreen().nativeScale > 2.0)) {
+        XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft;
         sleep(SCREENSHOT_DELAY)
         snapshot(String(format: "%@-Landscape", theme), waitForLoadingIndicator: false)
-//    }
+    }
 }
 
 func testAshScreenshots () {
     takeScreenshotTheme("ash", mono: true)
 }
+    
 func testDawnScreenshots () {
     takeScreenshotTheme("dawn")
 }
+    
 func testDuskScreenshots () {
     takeScreenshotTheme("dusk")
 }
