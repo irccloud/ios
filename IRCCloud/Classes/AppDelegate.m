@@ -99,6 +99,7 @@
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"useChrome"];
     }
     
+#ifdef DEBUG
     if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:[[NSBundle mainBundle] bundleIdentifier]];
         
@@ -258,6 +259,7 @@
         [events addEvent:e];
 
     }
+#endif
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     [ColorFormatter loadFonts];
