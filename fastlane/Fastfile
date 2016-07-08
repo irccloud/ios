@@ -42,6 +42,30 @@ platform :ios do
     gym(scheme: "IRCCloud Enterprise")
     deliver(ipa: "IRCEnterprise.ipa", skip_metadata: true, skip_screenshots: true)
   end
+  
+  desc "Take screenshots"
+  lane :screenshots do
+    snapshot(clear_previous_screenshots: true, devices: [], skip_open_summary: true)
+    for device in [
+      "iPhone 6",
+      "iPhone 5",
+      "iPhone 4s",
+      "iPad Retina",
+      "iPad Pro",
+      "iPhone 6 Plus"
+    ] do
+      snapshot(
+        devices: [device],
+        launch_arguments: ["-FASTLANE_SNAPSHOT_DEVICE \"#{device}\""],
+        skip_open_summary: true
+      )
+    end
+    notification(
+      subtitle: "screenshots",
+      message: "iOS screenshots complete",
+      activate: "com.googlecode.iterm2"
+    )
+  end
 
   desc "Upload metadata"
   lane :metadata do

@@ -27,11 +27,24 @@ func takeScreenshotTheme(theme: String, mono: Bool = false) {
     setupSnapshot(app)
     app.launch()
     
-    if (theme == "dawn" || UIDevice().userInterfaceIdiom != .Pad) {
+    let isPhone = UIDevice().userInterfaceIdiom == .Phone
+    let isPad = UIDevice().userInterfaceIdiom == .Pad
+    let args = app.launchArguments
+    var isBigPhone = false
+    if (
+        args[args.endIndex-2] == "-FASTLANE_SNAPSHOT_DEVICE" &&
+        args[args.endIndex-1] == "\"iPhone 6 Plus\""
+    ) {
+        isBigPhone = true
+    }
+    let isDawn = theme == "dawn"
+    print(isPhone, isPad, isBigPhone, isDawn, args)
+    
+    if (isDawn || isPhone) {
         sleep(SCREENSHOT_DELAY)
         snapshot(String(format: "%@-Portrait", theme), waitForLoadingIndicator: false)
     }
-    if (theme == "dawn" && (UIDevice().userInterfaceIdiom == .Pad || UIScreen().nativeScale > 2.0)) {
+    if (isPad || (isDawn && isBigPhone)) {
         XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft;
         sleep(SCREENSHOT_DELAY)
         snapshot(String(format: "%@-Landscape", theme), waitForLoadingIndicator: false)

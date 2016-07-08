@@ -21,6 +21,11 @@ Build and push to ITC
 fastlane ios pushenterprise
 ```
 Build and push Enterprise to ITC
+### ios screenshots
+```
+fastlane ios screenshots
+```
+Take screenshots
 ### ios metadata
 ```
 fastlane ios metadata
