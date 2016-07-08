@@ -22,42 +22,50 @@
     self.continueAfterFailure = NO;
 }
 
-- (void)testDawnScreenshots {
+- (void)takeScreenshotTheme:(NSString *)theme mono:(BOOL)mono {
+    [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
+    
     XCUIApplication *app = [[XCUIApplication alloc] init];
-    app.launchArguments = @[@"-theme", @"dawn"];
+    if (mono) {
+        app.launchArguments = @[@"-theme", theme];
+    } else {
+        app.launchArguments = @[@"-theme", theme, @"-mono"];
+    }
     [Snapshot setupSnapshot:app];
     [app launch];
-    [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
-    [NSThread sleepForTimeInterval:SCREENSHOT_DELAY];
-    [Snapshot snapshot:@"Dawn-Portrait" waitForLoadingIndicator:NO];
+    
+    // XCUIElement *window = [app.windows elementBoundByIndex:0];
+    
+    // if (
+    //     [theme isEqual: @"dawn"] ||
+    //     window.horizontalSizeClass == UIUserInterfaceSizeClassCompact
+    // ) {
+        [NSThread sleepForTimeInterval:SCREENSHOT_DELAY];
+        [Snapshot snapshot:[NSString stringWithFormat:@"%@-Portrait", theme]
+                  waitForLoadingIndicator:NO];
+    // }
     [XCUIDevice sharedDevice].orientation = UIDeviceOrientationLandscapeLeft;
-    [NSThread sleepForTimeInterval:SCREENSHOT_DELAY];
-    [Snapshot snapshot:@"Dawn-Landscape" waitForLoadingIndicator:NO];
-}
-
-- (void)testDuskScreenshots {
-    XCUIApplication *app = [[XCUIApplication alloc] init];
-    app.launchArguments = @[@"-theme", @"dusk"];
-    [Snapshot setupSnapshot:app];
-    [app launch];
-    [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
-    [NSThread sleepForTimeInterval:SCREENSHOT_DELAY];
-    [Snapshot snapshot:@"Dusk-Portrait" waitForLoadingIndicator:NO];
-    [XCUIDevice sharedDevice].orientation = UIDeviceOrientationLandscapeLeft;
-    [NSThread sleepForTimeInterval:SCREENSHOT_DELAY];
-    [Snapshot snapshot:@"Dusk-Landscape" waitForLoadingIndicator:NO];
+    // if (
+    //     window.horizontalSizeClass == UIUserInterfaceSizeClassRegular && (
+    //         [theme isEqual: @"dawn"] ||
+    //         window.verticalSizeClass == UIUserInterfaceSizeClassRegular
+    //     )
+    // ) {
+        [NSThread sleepForTimeInterval:SCREENSHOT_DELAY];
+        [Snapshot snapshot:[NSString stringWithFormat:@"%@-Landscape", theme]
+                  waitForLoadingIndicator:NO];
+    // }
 }
 
 - (void)testAshScreenshots {
-    XCUIApplication *app = [[XCUIApplication alloc] init];
-    app.launchArguments = @[@"-theme", @"ash", @"-mono"];
-    [Snapshot setupSnapshot:app];
-    [app launch];
-    [XCUIDevice sharedDevice].orientation = UIDeviceOrientationPortrait;
-    [NSThread sleepForTimeInterval:SCREENSHOT_DELAY];
-    [Snapshot snapshot:@"Ash-Portrait" waitForLoadingIndicator:NO];
-    [XCUIDevice sharedDevice].orientation = UIDeviceOrientationLandscapeLeft;
-    [NSThread sleepForTimeInterval:SCREENSHOT_DELAY];
-    [Snapshot snapshot:@"Ash-Landscape" waitForLoadingIndicator:NO];
+    [self takeScreenshotTheme:@"ash" mono:YES];
+}
+
+- (void)testDawnScreenshots {
+    [self takeScreenshotTheme:@"dawn" mono:NO];
+}
+
+- (void)testDuskScreenshots {
+    [self takeScreenshotTheme:@"dusk" mono:NO];
 }
 @end
