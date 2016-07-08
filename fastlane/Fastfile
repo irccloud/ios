@@ -45,7 +45,11 @@ platform :ios do
   
   desc "Take screenshots"
   lane :screenshots do
-    snapshot(clear_previous_screenshots: true, devices: [], skip_open_summary: true)
+    snapshot(
+        clear_previous_screenshots: true,
+        skip_open_summary: true,
+        devices: []
+    )
     for device in [
       "iPhone 6",
       "iPhone 5",
@@ -55,9 +59,10 @@ platform :ios do
       "iPhone 6 Plus"
     ] do
       snapshot(
+        clear_previous_screenshots: false,
+        skip_open_summary: true,
         devices: [device],
         launch_arguments: ["-FASTLANE_SNAPSHOT_DEVICE \"#{device}\""],
-        skip_open_summary: true
       )
     end
     notification(
