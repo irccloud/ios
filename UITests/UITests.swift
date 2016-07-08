@@ -42,12 +42,12 @@ func takeScreenshotTheme(theme: String, mono: Bool = false) {
     
     if (isDawn || isPhone) {
         sleep(SCREENSHOT_DELAY)
-        snapshot(String(format: "%@-Portrait", theme), waitForLoadingIndicator: false)
+        snapshot("\(theme)-Portrait", waitForLoadingIndicator: false)
     }
     if (isPad || (isDawn && isBigPhone)) {
         XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft;
         sleep(SCREENSHOT_DELAY)
-        snapshot(String(format: "%@-Landscape", theme), waitForLoadingIndicator: false)
+        snapshot("\(theme)-Landscape", waitForLoadingIndicator: false)
     }
 }
 
