@@ -6,9 +6,9 @@ sudo gem install fastlane
 ```
 # Available Actions
 ## iOS
-### ios checkcerts
+### ios certs
 ```
-fastlane ios checkcerts
+fastlane ios certs
 ```
 Check all certs and provisioning profiles from github
 ### ios updateadhoc

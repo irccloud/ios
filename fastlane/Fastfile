@@ -21,13 +21,14 @@ platform :ios do
   end
   
   desc "Check all certs and provisioning profiles from github"
-  lane :checkcerts do
+  lane :certs do
     app_root = "com.irccloud."
     for type in ["appstore", "adhoc", "development"] do
-      for app in ["IRCCloud", "enterprise"] do
-        match(type: type, app_identifier: "#{app_root}#{app}", readonly: true)
-        match(type: type, app_identifier: "#{app_root}#{app}.ShareExtension", readonly: true)
-      end
+      match(type: type, app_identifier: "#{app_root}IRCCloud")
+      match(type: type, app_identifier: "#{app_root}IRCCloud.ShareExtension")
+      match(type: type, app_identifier: "#{app_root}enterprise")
+      match(type: type, app_identifier: "#{app_root}enterprise.ShareExtension")
+      match(type: type, app_identifier: "#{app_root}UITests")
     end
   end
 
