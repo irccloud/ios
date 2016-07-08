@@ -27,25 +27,25 @@ func takeScreenshotTheme(theme: String, mono: Bool = false) {
     setupSnapshot(app)
     app.launch()
     
-    // let window = app.windows.elementBoundByIndex(0)
-    
-    // if (
-    //     theme == "dawn" ||
-    //     window.horizontalSizeClass == .Compact
-    // ) {
+//    let window = app.windows.elementBoundByIndex(0)
+//    
+//    if (
+//        theme == "dawn" ||
+//        window.horizontalSizeClass == .Compact
+//    ) {
         sleep(SCREENSHOT_DELAY)
         snapshot(String(format: "%@-Portrait", theme), waitForLoadingIndicator: false)
-    // }
+//    }
     XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft;
-    // if (
-    //     window.horizontalSizeClass == .Regular && (
-    //         theme == "dawn" ||
-    //         window.verticalSizeClass == .Regular
-    //     )
-    // ) {
+//    if (
+//        window.horizontalSizeClass == .Regular && (
+//            theme == "dawn" ||
+//            window.verticalSizeClass == .Regular
+//        )
+//    ) {
         sleep(SCREENSHOT_DELAY)
         snapshot(String(format: "%@-Landscape", theme), waitForLoadingIndicator: false)
-    // }
+//    }
 }
 
 func testAshScreenshots () {
