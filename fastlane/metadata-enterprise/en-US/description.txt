@@ -1,0 +1,13 @@
+This app lets you connect to an organisation's self-hosted IRCCloud install for Enterprise. If you access your account on irccloud.com this app is not for you.
+
+Chat on IRC from anywhere, and never miss a message.
+
+• Stay connected when you're on the move. No need to rely on constant data access, your IRC connection is kept running on your enterprise servers.
+• Your entire chat history is fully synced with your enterprise install so you can catch up at your leisure.
+• Get push notifications for mentions and private messages.
+• Upload and share photos, videos and files straight from your device.
+• Full support for iPhone and iPad.
+• Choose from 8 colourful themes.
+• Monospace font option.
+
+Join our #feedback channel on irc.irccloud.com for feedback and suggestions to help us improve this app. You can also email us at enterprise@irccloud.com or find us on Twitter: @irccloud

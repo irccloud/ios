@@ -95,8 +95,20 @@ platform :ios do
   end
 
   desc "Upload metadata"
-  lane :metadata do
-    deliver(skip_binary_upload: true)
+  lane :metadata do |options|
+    if options[:enterprise]
+        metadata_path = "./fastlane/metadata-enterprise"
+        app_identifier = "com.irccloud.enterprise"
+    else
+        metadata_path = "./fastlane/metadata"
+        app_identifier = "com.irccloud.IRCCloud"
+    end
+    deliver(
+        app_identifier: app_identifier,
+        skip_binary_upload: true,
+        metadata_path: metadata_path,
+        automatic_release: true
+    )
   end
 
   #desc "Runs all the tests"

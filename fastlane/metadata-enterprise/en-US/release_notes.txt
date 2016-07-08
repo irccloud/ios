@@ -1,0 +1,22 @@
+Welcome to version 3.0!
+
+You can now choose all the new layout options available on the web: user icons, nicknames on their own line, visible realnames, timestamps on the right. Customise away!
+
+Also, long-awaited multitasking support on iPad is here, and the app now beautifully scales to all screen sizes (including the iPad Pro).
+
+Other changes included in this update:
+
+• Added keyboard shortcuts for switching channels and marking conversations as read
+• Respond to highlights, PMs, and channel invites directly from Notification Center
+• ZNC server time extension support
+• Fixed browser fallback when the image viewer fails
+• Fixed /topic showing the wrong channel topic
+• Fixed the pastebin editor closing unexpectedly
+• Fixed unexpected private message switching
+• Improved loading animated GIFs from imgur URLs
+• Improved kick message and hostmask formatting
+• Improved error messages when file uploads fail
+• Support for opening URLs in Firefox
+• Improved support for channel mode +y
+• Improved URL encoding and link detection
+• Stability improvements, crashes and bug fixes
