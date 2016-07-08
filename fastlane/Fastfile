@@ -32,6 +32,22 @@ platform :ios do
     end
   end
 
+  desc "Build and push to ITC"
+  lane :push do
+    gym(scheme: "IRCCloud")
+    deliver(ipa: "IRCCloud.ipa", skip_metadata: true, skip_screenshots: true)
+  end
+  desc "Build and push Enterprise to ITC"
+  lane :pushenterprise do
+    gym(scheme: "IRCCloud Enterprise")
+    deliver(ipa: "IRCEnterprise.ipa", skip_metadata: true, skip_screenshots: true)
+  end
+
+  desc "Upload metadata"
+  lane :metadata do
+    deliver(skip_binary_upload: true)
+  end
+
   #desc "Runs all the tests"
   #lane :test do
   #  scan

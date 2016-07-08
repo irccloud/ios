@@ -11,6 +11,21 @@ sudo gem install fastlane
 fastlane ios certs
 ```
 Check all certs and provisioning profiles from github
+### ios push
+```
+fastlane ios push
+```
+Build and push to ITC
+### ios pushenterprise
+```
+fastlane ios pushenterprise
+```
+Build and push Enterprise to ITC
+### ios metadata
+```
+fastlane ios metadata
+```
+Upload metadata
 ### ios updateadhoc
 ```
 fastlane ios updateadhoc
