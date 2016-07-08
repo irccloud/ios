@@ -38,11 +38,16 @@ func takeScreenshotTheme(theme: String, mono: Bool = false) {
         isBigPhone = true
     }
     let isDawn = theme == "dawn"
-    print(isPhone, isPad, isBigPhone, isDawn, args)
     
     if (isDawn || isPhone) {
         sleep(SCREENSHOT_DELAY)
         snapshot("\(theme)-Portrait", waitForLoadingIndicator: false)
+//        //Disabled for now, this crashes on our layout
+//        if (isDawn && isPhone) {
+//            app.buttons["Channel members list"].tap()
+//            sleep(SCREENSHOT_DELAY)
+//            snapshot("\(theme)-Portrait-Members", waitForLoadingIndicator: false)
+//        }
     }
     if (isPad || (isDawn && isBigPhone)) {
         XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft;
