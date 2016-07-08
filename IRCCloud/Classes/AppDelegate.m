@@ -322,7 +322,9 @@
             self.window.rootViewController = self.loginSplashViewController;
         }
         
+#ifdef DEBUG
         if(![[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
+#endif
             [self.window addSubview:self.splashViewController.view];
             
             if([NetworkConnection sharedInstance].session.length) {
@@ -338,7 +340,9 @@
                 self.loginSplashViewController.logo.hidden = NO;
                 [self.splashViewController.view removeFromSuperview];
             }];
+#ifdef DEBUG
         }
+#endif
     }];
     
     return YES;

@@ -1517,6 +1517,11 @@ extern NSDictionary *emojiMap;
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     self.slidingViewController.view.autoresizesSubviews = NO;
+#ifdef DEBUG
+    if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"] && [[NSProcessInfo processInfo].arguments containsObject:@"-memberlist"]) {
+        [self.slidingViewController anchorTopViewTo:ECLeft];
+    }
+#endif
 }
 
 - (void)didReceiveMemoryWarning {

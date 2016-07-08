@@ -18,11 +18,14 @@ override func setUp() {
     XCUIDevice().orientation = UIDeviceOrientation.Portrait
 }
 
-func takeScreenshotTheme(theme: String, mono: Bool = false) {
+  func takeScreenshotTheme(theme: String, mono: Bool = false, memberlist: Bool = false) {
     let app = XCUIApplication()
     app.launchArguments = ["-theme", theme]
     if (mono) {
         app.launchArguments += ["-mono"]
+    }
+    if (memberlist) {
+        app.launchArguments += ["-memberlist"]
     }
     setupSnapshot(app)
     app.launch()
@@ -39,20 +42,19 @@ func takeScreenshotTheme(theme: String, mono: Bool = false) {
     }
     let isDawn = theme == "dawn"
     
-    if (isDawn || isPhone) {
+    if (memberlist) {
         sleep(SCREENSHOT_DELAY)
-        snapshot("\(theme)-Portrait", waitForLoadingIndicator: false)
-//        //Disabled for now, this crashes on our layout
-//        if (isDawn && isPhone) {
-//            app.buttons["Channel members list"].tap()
-//            sleep(SCREENSHOT_DELAY)
-//            snapshot("\(theme)-Portrait-Members", waitForLoadingIndicator: false)
-//        }
-    }
-    if (isPad || (isDawn && isBigPhone)) {
-        XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft;
-        sleep(SCREENSHOT_DELAY)
-        snapshot("\(theme)-Landscape", waitForLoadingIndicator: false)
+        snapshot("\(theme)-Portrait-Members", waitForLoadingIndicator: false)
+    } else {
+        if (isDawn || isPhone) {
+            sleep(SCREENSHOT_DELAY)
+            snapshot("\(theme)-Portrait", waitForLoadingIndicator: false)
+        }
+        if (isPad || (isDawn && isBigPhone)) {
+            XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft;
+            sleep(SCREENSHOT_DELAY)
+            snapshot("\(theme)-Landscape", waitForLoadingIndicator: false)
+        }
     }
 }
 
@@ -62,6 +64,12 @@ func testAshScreenshots () {
     
 func testDawnScreenshots () {
     takeScreenshotTheme("dawn")
+}
+    
+func testDawnMembersScreenshots () {
+    if (UIDevice().userInterfaceIdiom == .Phone) {
+        takeScreenshotTheme("dawn", memberlist: true)
+    }
 }
     
 func testDuskScreenshots () {
