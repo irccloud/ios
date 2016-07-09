@@ -285,6 +285,7 @@
                                         </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="textFieldChanged:" destination="thh-5b-esU" eventType="editingChanged" id="nW1-qf-Sh0"/>
+                                            <outlet property="delegate" destination="thh-5b-esU" id="wTb-04-ngq"/>
                                         </connections>
                                     </textField>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Email address" minimumFontSize="17" background="login_top_input" translatesAutoresizingMaskIntoConstraints="NO" id="YDn-hm-4nv">
@@ -303,6 +304,7 @@
                                         </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="textFieldChanged:" destination="thh-5b-esU" eventType="editingChanged" id="whT-rY-wTA"/>
+                                            <outlet property="delegate" destination="thh-5b-esU" id="sZP-Zq-aqX"/>
                                         </connections>
                                     </textField>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Password" minimumFontSize="17" background="login_bottom_input" translatesAutoresizingMaskIntoConstraints="NO" id="J5j-oJ-a2d">
@@ -321,6 +323,7 @@
                                         </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="textFieldChanged:" destination="thh-5b-esU" eventType="editingChanged" id="OX3-tt-PJe"/>
+                                            <outlet property="delegate" destination="thh-5b-esU" id="nfh-ga-0h2"/>
                                         </connections>
                                     </textField>
                                     <textField opaque="NO" clipsSubviews="YES" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="Host" minimumFontSize="17" background="login_only_input" translatesAutoresizingMaskIntoConstraints="NO" id="Pgp-x3-8jk">
@@ -339,6 +342,7 @@
                                         </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="textFieldChanged:" destination="thh-5b-esU" eventType="editingChanged" id="NaS-IK-ESx"/>
+                                            <outlet property="delegate" destination="thh-5b-esU" id="Tz4-Z7-4TU"/>
                                         </connections>
                                     </textField>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="320" placeholderIntrinsicHeight="32" text="e.g. irccloud.yourcompany.com" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="320" translatesAutoresizingMaskIntoConstraints="NO" id="TTY-xf-Jla">
@@ -599,7 +603,6 @@
                         <color key="backgroundColor" red="0.043137254899999998" green="0.18039215689999999" blue="0.37647058820000001" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
                             <constraint firstItem="Hgu-D2-Mph" firstAttribute="leading" secondItem="sfr-SS-1jI" secondAttribute="trailing" constant="14" id="6zi-kR-k0M"/>
-                            <constraint firstItem="iSf-t4-0KQ" firstAttribute="bottom" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="-16" id="7JP-vo-sA0"/>
                             <constraint firstItem="zTV-Zl-uPd" firstAttribute="bottom" secondItem="uLz-Jv-72R" secondAttribute="bottom" id="7bO-V0-F24"/>
                             <constraint firstItem="mJM-f8-v0Q" firstAttribute="leading" secondItem="uLz-Jv-72R" secondAttribute="leading" id="9dt-Nl-5iT"/>
                             <constraint firstItem="sfr-SS-1jI" firstAttribute="leading" secondItem="uLz-Jv-72R" secondAttribute="centerX" constant="-112" id="Bbd-DV-aee"/>
@@ -611,20 +614,20 @@
                             <constraint firstItem="KFZ-UT-EG5" firstAttribute="leading" secondItem="Hgu-D2-Mph" secondAttribute="trailing" id="IDQ-Hy-lUM"/>
                             <constraint firstItem="mJM-f8-v0Q" firstAttribute="bottom" secondItem="uLz-Jv-72R" secondAttribute="bottom" id="IfR-z4-Crh"/>
                             <constraint firstItem="RjR-3c-mm2" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" constant="50" id="Ldx-lT-XCq"/>
+                            <constraint firstItem="iSf-t4-0KQ" firstAttribute="top" secondItem="sfr-SS-1jI" secondAttribute="bottom" constant="16" id="MqC-ah-T8D"/>
                             <constraint firstItem="lmN-wO-9gf" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" id="QVN-Lj-9tW"/>
+                            <constraint firstItem="lUW-Yp-Apz" firstAttribute="top" secondItem="sfr-SS-1jI" secondAttribute="bottom" constant="16" id="SFg-8Y-u4v"/>
                             <constraint firstAttribute="trailing" secondItem="zTV-Zl-uPd" secondAttribute="trailing" id="SNJ-Xf-riH"/>
                             <constraint firstItem="sfr-SS-1jI" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="48" id="TaT-bV-ldV"/>
                             <constraint firstItem="mJM-f8-v0Q" firstAttribute="trailing" secondItem="uLz-Jv-72R" secondAttribute="trailing" id="YnH-T3-zCB"/>
                             <constraint firstItem="lSc-2u-RsF" firstAttribute="bottom" secondItem="mJM-f8-v0Q" secondAttribute="bottom" constant="-8" id="Z8b-xm-FVb"/>
                             <constraint firstItem="Hgu-D2-Mph" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="48" id="c3C-hj-GfH"/>
-                            <constraint firstItem="lmN-wO-9gf" firstAttribute="bottom" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="-16" id="d8U-Iu-tpj"/>
-                            <constraint firstItem="lmN-wO-9gf" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" id="dku-oB-aHS"/>
                             <constraint firstItem="vjV-1j-Hve" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" id="eJH-0f-Zoo"/>
-                            <constraint firstItem="lUW-Yp-Apz" firstAttribute="bottom" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="-16" id="gCv-ou-j6L"/>
-                            <constraint firstItem="vjV-1j-Hve" firstAttribute="bottom" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="-16" id="mlJ-oj-AMt"/>
-                            <constraint firstItem="RjR-3c-mm2" firstAttribute="bottom" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="-16" id="n5u-rA-hYy"/>
+                            <constraint firstItem="lmN-wO-9gf" firstAttribute="top" secondItem="sfr-SS-1jI" secondAttribute="bottom" constant="16" id="g1E-qO-b56"/>
+                            <constraint firstItem="RjR-3c-mm2" firstAttribute="top" secondItem="sfr-SS-1jI" secondAttribute="bottom" constant="16" id="m74-2T-28g"/>
                             <constraint firstItem="lUW-Yp-Apz" firstAttribute="centerX" secondItem="uLz-Jv-72R" secondAttribute="centerX" constant="-50" id="sQe-lu-zaH"/>
                             <constraint firstItem="KFZ-UT-EG5" firstAttribute="top" secondItem="uLz-Jv-72R" secondAttribute="topMargin" constant="48" id="twl-9Z-wcj"/>
+                            <constraint firstItem="vjV-1j-Hve" firstAttribute="top" secondItem="sfr-SS-1jI" secondAttribute="bottom" constant="16" id="uvR-r6-2ZG"/>
                         </constraints>
                     </view>
                     <connections>

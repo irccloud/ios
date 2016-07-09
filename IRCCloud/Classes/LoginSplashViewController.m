@@ -337,7 +337,7 @@
 -(void)transitionToSize:(CGSize)size {
     if(_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         self.view.window.backgroundColor = [UIColor colorWithRed:68.0/255.0 green:128.0/255.0 blue:250.0/255.0 alpha:1];
-        loadingViewYOffset.constant = loginViewYOffset.constant = 0;
+        loadingViewYOffset.constant = loginViewYOffset.constant = logo.frame.origin.y + logo.frame.size.height + 16;
     } else {
         self.view.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
         loginViewYOffset.constant = 160;
@@ -351,6 +351,7 @@
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [self transitionToSize:size];
+        [self.view layoutIfNeeded];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
     }];
 }
@@ -362,6 +363,7 @@
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     _kbSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     [self transitionToSize:self.view.bounds.size];
+    [self.view layoutIfNeeded];
     [UIView commitAnimations];
 }
 
@@ -372,6 +374,7 @@
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
     _kbSize = CGSizeZero;
     [self transitionToSize:self.view.bounds.size];
+    [self.view layoutIfNeeded];
     [UIView commitAnimations];
 }
 
@@ -776,6 +779,10 @@
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
     if(textField == username)
         [password becomeFirstResponder];
+    else if(textField == name)
+        [username becomeFirstResponder];
+    else if(textField == host)
+        [self nextButtonPressed:host];
     else
         [self loginButtonPressed:textField];
     return YES;
