@@ -2242,7 +2242,7 @@ float __largeAvatarHeight = 32;
                     break;
                 }
             }
-            if(!(((Event *)[_data objectAtIndex:firstRow]).rowType == ROW_LASTSEENEID && groupHeight == 26) && (!e.isHeader || groupHeight > __largeAvatarHeight + 14)) {
+            if(e.from.length && !(((Event *)[_data objectAtIndex:firstRow]).rowType == ROW_LASTSEENEID && groupHeight == 26) && (!e.isHeader || groupHeight > __largeAvatarHeight + 14)) {
                 _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + 4);
                 if(_stickyAvatarYOffsetConstraint.constant > offset + 8)
                     _stickyAvatarYOffsetConstraint.constant = offset + 8;

@@ -86,6 +86,9 @@
 }
 
 -(Avatar *)getAvatar:(NSString *)nick bid:(int)bid {
+    if(!nick.length)
+        return nil;
+    
     if(![_avatars objectForKey:@(bid)]) {
         [_avatars setObject:[[NSMutableDictionary alloc] init] forKey:@(bid)];
     }
