@@ -1971,7 +1971,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, nil]);
     _session = nil;
     [self disconnect];
-    [self performSelectorInBackground:@selector(_logout:) withObject:s];
+    if(s)
+        [self performSelectorInBackground:@selector(_logout:) withObject:s];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"host"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"path"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];

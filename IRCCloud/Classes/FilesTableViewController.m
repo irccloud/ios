@@ -248,43 +248,43 @@
 }
 
 -(void)_loadMore {
-    NSDictionary *d = [[NetworkConnection sharedInstance] getFiles:++_pages];
-    if([[d objectForKey:@"success"] boolValue]) {
-        CLS_LOG(@"Loaded file list for page %i", _pages);
-        if(_files)
-            _files = [_files arrayByAddingObjectsFromArray:[d objectForKey:@"files"]];
-        else
-            _files = [d objectForKey:@"files"];
-        
-        _canLoadMore = _files.count < [[d objectForKey:@"total"] intValue];
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            self.tableView.tableFooterView = _canLoadMore?_footerView:nil;
-            if(!_files.count) {
-                CLS_LOG(@"File list is empty");
+    @synchronized (_files) {
+        NSDictionary *d = [[NetworkConnection sharedInstance] getFiles:++_pages];
+        if([[d objectForKey:@"success"] boolValue]) {
+            CLS_LOG(@"Loaded file list for page %i", _pages);
+            if(_files)
+                _files = [_files arrayByAddingObjectsFromArray:[d objectForKey:@"files"]];
+            else
+                _files = [d objectForKey:@"files"];
+            _canLoadMore = _files.count < [[d objectForKey:@"total"] intValue];
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                self.tableView.tableFooterView = _canLoadMore?_footerView:nil;
+                if(!_files.count) {
+                    CLS_LOG(@"File list is empty");
+                    UILabel *fail = [[UILabel alloc] init];
+                    fail.text = @"\nYou haven't uploaded any files yet.\n";
+                    fail.numberOfLines = 3;
+                    fail.textAlignment = NSTextAlignmentCenter;
+                    fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+                    [fail sizeToFit];
+                    self.tableView.tableFooterView = fail;
+                }
+            }];
+        } else {
+            CLS_LOG(@"Failed to load file list for page %i: %@", _pages, d);
+            _canLoadMore = NO;
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 UILabel *fail = [[UILabel alloc] init];
-                fail.text = @"\nYou haven't uploaded any files yet.\n";
-                fail.numberOfLines = 3;
+                fail.text = @"\nUnable to load files.\nPlease try again later.\n";
+                fail.numberOfLines = 4;
                 fail.textAlignment = NSTextAlignmentCenter;
                 fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
                 [fail sizeToFit];
                 self.tableView.tableFooterView = fail;
-            }
-        }];
-    } else {
-        CLS_LOG(@"Failed to load file list for page %i: %@", _pages, d);
-        _canLoadMore = NO;
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            UILabel *fail = [[UILabel alloc] init];
-            fail.text = @"\nUnable to load files.\nPlease try again later.\n";
-            fail.numberOfLines = 4;
-            fail.textAlignment = NSTextAlignmentCenter;
-            fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-            [fail sizeToFit];
-            self.tableView.tableFooterView = fail;
-        }];
-        return;
+            }];
+            return;
+        }
     }
-
     for(NSDictionary *d in _files) {
         NSString *fileID = [d objectForKey:@"id"];
         if(![_thumbnails objectForKey:fileID]) {
@@ -411,23 +411,25 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        _reqid = [[NetworkConnection sharedInstance] deleteFile:[[_files objectAtIndex:indexPath.row] objectForKey:@"id"]];
-        [_thumbnails removeObjectForKey:[[_files objectAtIndex:indexPath.row] objectForKey:@"id"]];
-        NSMutableArray *a = _files.mutableCopy;
-        [a removeObjectAtIndex:indexPath.row];
-        _files = [NSArray arrayWithArray:a];
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-        if(!_files.count) {
-            UILabel *fail = [[UILabel alloc] init];
-            fail.text = @"\nYou haven't uploaded any files yet.\n";
-            fail.numberOfLines = 3;
-            fail.textAlignment = NSTextAlignmentCenter;
-            fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-            [fail sizeToFit];
-            self.tableView.tableFooterView = fail;
+    @synchronized (_files) {
+        if (editingStyle == UITableViewCellEditingStyleDelete) {
+            _reqid = [[NetworkConnection sharedInstance] deleteFile:[[_files objectAtIndex:indexPath.row] objectForKey:@"id"]];
+            [_thumbnails removeObjectForKey:[[_files objectAtIndex:indexPath.row] objectForKey:@"id"]];
+            NSMutableArray *a = _files.mutableCopy;
+            [a removeObjectAtIndex:indexPath.row];
+            _files = [NSArray arrayWithArray:a];
+            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+            if(!_files.count) {
+                UILabel *fail = [[UILabel alloc] init];
+                fail.text = @"\nYou haven't uploaded any files yet.\n";
+                fail.numberOfLines = 3;
+                fail.textAlignment = NSTextAlignmentCenter;
+                fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+                [fail sizeToFit];
+                self.tableView.tableFooterView = fail;
+            }
+            [self scrollViewDidScroll:self.tableView];
         }
-        [self scrollViewDidScroll:self.tableView];
     }
 }
 
