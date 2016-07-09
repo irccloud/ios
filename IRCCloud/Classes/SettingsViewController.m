@@ -485,7 +485,14 @@
         [prefs setObject:[NSNumber numberWithBool:_colors.isOn] forKey:@"nick-colors"];
         [prefs setObject:[NSNumber numberWithBool:!_emocodes.isOn] forKey:@"emoji-disableconvert"];
         [prefs setObject:[NSNumber numberWithBool:!_pastebin.isOn] forKey:@"pastebin-disableprompt"];
-        [prefs setObject:_mono.isOn?@"mono":@"sans" forKey:@"font"];
+        if([prefs objectForKey:@"font"]) {
+            if(_mono.isOn)
+                [prefs setObject:@"mono" forKey:@"font"];
+            else if([[prefs objectForKey:@"font"] isEqualToString:@"mono"])
+                [prefs setObject:@"sans" forKey:@"font"];
+        } else {
+            [prefs setObject:_mono.isOn?@"mono":@"sans" forKey:@"font"];
+        }
         [prefs setObject:[NSNumber numberWithBool:!_hideJoinPart.isOn] forKey:@"hideJoinPart"];
         [prefs setObject:[NSNumber numberWithBool:!_expandJoinPart.isOn] forKey:@"expandJoinPart"];
         [prefs setObject:[NSNumber numberWithBool:_notifyAll.isOn] forKey:@"notifications-all"];
