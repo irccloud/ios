@@ -443,7 +443,7 @@ volatile BOOL __socketPaused = NO;
                        [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       _userInfo = object.dictionary;
+                       _userInfo = [object.dictionary copy];
                        if([[_userInfo objectForKey:@"uploads_disabled"] intValue] == 1 && [[_userInfo objectForKey:@"id"] intValue] != 11694)
                            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"uploadsAvailable"];
                        else

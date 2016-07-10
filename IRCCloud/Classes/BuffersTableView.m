@@ -868,172 +868,178 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return _data.count;
+    @synchronized(_data) {
+        return _data.count;
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER) {
-        return 46;
-    } else {
-        return 40;
+    @synchronized(_data) {
+       if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER) {
+            return 46;
+        } else {
+            return 40;
+        }
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    BOOL selected = (indexPath.row == _selectedRow);
-    BuffersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bufferscell"];
-    if(!cell) {
-        cell = [[BuffersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"bufferscell"];
-    }
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-    NSString *status = [row objectForKey:@"status"];
-    cell.type = [[row objectForKey:@"type"] intValue];
-    cell.label.text = [row objectForKey:@"name"];
-    cell.activity.hidden = YES;
-    cell.activity.activityIndicatorViewStyle = [UIColor isDarkTheme]?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
-    cell.accessibilityValue = [row objectForKey:@"hint"];
-    cell.highlightColor = [UIColor bufferHighlightColor];
-    cell.border.backgroundColor = [UIColor bufferBorderColor];
-    cell.contentView.backgroundColor = [UIColor bufferBackgroundColor];
-    cell.icon.font = _awesomeFont;
-
-    if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
-        if([[row objectForKey:@"archived"] intValue])
-            cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
-        else
-            cell.unreadIndicator.backgroundColor = selected?[UIColor selectedBufferBorderColor]:[UIColor unreadBlueColor];
-        cell.unreadIndicator.hidden = NO;
-        cell.label.font = _boldFont;
-        cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", unread"];
-    } else {
-        if(cell.type == TYPE_SERVER) {
-            if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
-                cell.unreadIndicator.backgroundColor = [UIColor failedServerBorderColor];
-            else
-                cell.unreadIndicator.backgroundColor = [UIColor serverBorderColor];
-            cell.unreadIndicator.hidden = NO;
-        } else {
-            cell.unreadIndicator.hidden = YES;
+    @synchronized(_data) {
+        BOOL selected = (indexPath.row == _selectedRow);
+        BuffersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bufferscell"];
+        if(!cell) {
+            cell = [[BuffersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"bufferscell"];
         }
-        cell.label.font = _normalFont;
-    }
-    if([[row objectForKey:@"highlights"] intValue]) {
-        cell.highlights.hidden = NO;
-        cell.highlights.count = [NSString stringWithFormat:@"%@",[row objectForKey:@"highlights"]];
-        cell.accessibilityValue = [cell.accessibilityValue stringByAppendingFormat:@", %@ highlights", [row objectForKey:@"highlights"]];
-    } else {
-        cell.highlights.hidden = YES;
-    }
-    switch(cell.type) {
-        case TYPE_SERVER:
-            cell.accessibilityLabel = @"Network";
-            if([[row objectForKey:@"ssl"] intValue])
-                cell.icon.text = FA_SHIELD;
+        NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+        NSString *status = [row objectForKey:@"status"];
+        cell.type = [[row objectForKey:@"type"] intValue];
+        cell.label.text = [row objectForKey:@"name"];
+        cell.activity.hidden = YES;
+        cell.activity.activityIndicatorViewStyle = [UIColor isDarkTheme]?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
+        cell.accessibilityValue = [row objectForKey:@"hint"];
+        cell.highlightColor = [UIColor bufferHighlightColor];
+        cell.border.backgroundColor = [UIColor bufferBorderColor];
+        cell.contentView.backgroundColor = [UIColor bufferBackgroundColor];
+        cell.icon.font = _awesomeFont;
+
+        if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
+            if([[row objectForKey:@"archived"] intValue])
+                cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
             else
-                cell.icon.text = FA_GLOBE;
-            cell.icon.hidden = NO;
-            if(selected) {
-                cell.highlightColor = [UIColor selectedBufferHighlightColor];
-                cell.icon.textColor = cell.label.textColor = [UIColor selectedBufferTextColor];
-                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count]) {
-                    cell.icon.tintColor = cell.label.textColor = [UIColor networkErrorColor];
-                    cell.unreadIndicator.backgroundColor = cell.bgColor = cell.highlightColor = [UIColor networkErrorBackgroundColor];
-                } else {
-                    cell.bgColor = [UIColor selectedBufferBackgroundColor];
-                }
-            } else {
+                cell.unreadIndicator.backgroundColor = selected?[UIColor selectedBufferBorderColor]:[UIColor unreadBlueColor];
+            cell.unreadIndicator.hidden = NO;
+            cell.label.font = _boldFont;
+            cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", unread"];
+        } else {
+            if(cell.type == TYPE_SERVER) {
                 if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
-                    cell.icon.textColor = cell.label.textColor = [UIColor ownersBorderColor];
-                else if(![status isEqualToString:@"connected_ready"])
-                    cell.icon.textColor = cell.label.textColor = [UIColor inactiveBufferTextColor];
-                else if([[row objectForKey:@"unread"] intValue])
-                    cell.icon.textColor = cell.label.textColor = [UIColor unreadBufferTextColor];
+                    cell.unreadIndicator.backgroundColor = [UIColor failedServerBorderColor];
                 else
-                    cell.icon.textColor = cell.label.textColor = [UIColor bufferTextColor];
-                if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
-                    cell.bgColor = cell.highlightColor = [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
-                else
-                    cell.bgColor = [UIColor serverBackgroundColor];
-            }
-            if(![status isEqualToString:@"connected_ready"] && ![status isEqualToString:@"quitting"] && ![status isEqualToString:@"disconnected"]) {
-                [cell.activity startAnimating];
-                cell.activity.hidden = NO;
-                cell.activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+                    cell.unreadIndicator.backgroundColor = [UIColor serverBorderColor];
+                cell.unreadIndicator.hidden = NO;
             } else {
-                [cell.activity stopAnimating];
-                cell.activity.hidden = YES;
+                cell.unreadIndicator.hidden = YES;
             }
-            break;
-        case TYPE_CHANNEL:
-        case TYPE_CONVERSATION:
-            if(cell.type == TYPE_CONVERSATION)
-                cell.accessibilityLabel = @"Conversation with";
-            else
-                cell.accessibilityLabel = @"Channel";
-            if([[row objectForKey:@"key"] intValue]) {
-                cell.icon.text = FA_LOCK;
+            cell.label.font = _normalFont;
+        }
+        if([[row objectForKey:@"highlights"] intValue]) {
+            cell.highlights.hidden = NO;
+            cell.highlights.count = [NSString stringWithFormat:@"%@",[row objectForKey:@"highlights"]];
+            cell.accessibilityValue = [cell.accessibilityValue stringByAppendingFormat:@", %@ highlights", [row objectForKey:@"highlights"]];
+        } else {
+            cell.highlights.hidden = YES;
+        }
+        switch(cell.type) {
+            case TYPE_SERVER:
+                cell.accessibilityLabel = @"Network";
+                if([[row objectForKey:@"ssl"] intValue])
+                    cell.icon.text = FA_SHIELD;
+                else
+                    cell.icon.text = FA_GLOBE;
                 cell.icon.hidden = NO;
-            } else {
-                cell.icon.text = nil;
-                cell.icon.hidden = YES;
-            }
-            if(selected) {
-                cell.label.textColor = [UIColor selectedBufferTextColor];
-                if([[row objectForKey:@"archived"] intValue]) {
-                    cell.bgColor = [UIColor selectedArchivedBufferBackgroundColor];
-                    cell.highlightColor = [UIColor selectedArchivedBufferHighlightColor];
-                    cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", archived"];
-                } else {
-                    cell.icon.textColor = cell.label.textColor = [UIColor selectedBufferTextColor];
-                    cell.bgColor = [UIColor selectedBufferBackgroundColor];
+                if(selected) {
                     cell.highlightColor = [UIColor selectedBufferHighlightColor];
-                }
-            } else {
-                if([[row objectForKey:@"archived"] intValue]) {
-                    cell.label.textColor = (cell.type == TYPE_CHANNEL)?[UIColor archivedChannelTextColor]:[UIColor archivedBufferTextColor];
-                    cell.bgColor = [UIColor bufferBackgroundColor];
-                    cell.highlightColor = [UIColor archivedBufferHighlightColor];
-                    cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", archived"];
+                    cell.icon.textColor = cell.label.textColor = [UIColor selectedBufferTextColor];
+                    if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count]) {
+                        cell.icon.tintColor = cell.label.textColor = [UIColor networkErrorColor];
+                        cell.unreadIndicator.backgroundColor = cell.bgColor = cell.highlightColor = [UIColor networkErrorBackgroundColor];
+                    } else {
+                        cell.bgColor = [UIColor selectedBufferBackgroundColor];
+                    }
                 } else {
-                    if([[row objectForKey:@"joined"] intValue] == 0 || ![status isEqualToString:@"connected_ready"])
+                    if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
+                        cell.icon.textColor = cell.label.textColor = [UIColor ownersBorderColor];
+                    else if(![status isEqualToString:@"connected_ready"])
                         cell.icon.textColor = cell.label.textColor = [UIColor inactiveBufferTextColor];
                     else if([[row objectForKey:@"unread"] intValue])
                         cell.icon.textColor = cell.label.textColor = [UIColor unreadBufferTextColor];
                     else
                         cell.icon.textColor = cell.label.textColor = [UIColor bufferTextColor];
-                    cell.bgColor = [UIColor bufferBackgroundColor];
+                    if([status isEqualToString:@"waiting_to_retry"] || [status isEqualToString:@"pool_unavailable"] || [(NSDictionary *)[row objectForKey:@"fail_info"] count])
+                        cell.bgColor = cell.highlightColor = [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
+                    else
+                        cell.bgColor = [UIColor serverBackgroundColor];
                 }
-            }
-            if([[row objectForKey:@"timeout"] intValue]) {
-                [cell.activity startAnimating];
-                cell.activity.hidden = NO;
-                cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
-            } else {
-                [cell.activity stopAnimating];
-                cell.activity.hidden = YES;
-            }
-            break;
-        case TYPE_ARCHIVES_HEADER:
-            cell.icon.text = nil;
-            cell.icon.hidden = YES;
-            if([_expandedArchives objectForKey:[row objectForKey:@"cid"]]) {
-                cell.label.textColor = [UIColor blackColor];
-                cell.bgColor = [UIColor timestampColor];
-                cell.accessibilityHint = @"Hides archive list";
-            } else {
-                cell.label.textColor = [UIColor archivesHeadingTextColor];
+                if(![status isEqualToString:@"connected_ready"] && ![status isEqualToString:@"quitting"] && ![status isEqualToString:@"disconnected"]) {
+                    [cell.activity startAnimating];
+                    cell.activity.hidden = NO;
+                    cell.activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+                } else {
+                    [cell.activity stopAnimating];
+                    cell.activity.hidden = YES;
+                }
+                break;
+            case TYPE_CHANNEL:
+            case TYPE_CONVERSATION:
+                if(cell.type == TYPE_CONVERSATION)
+                    cell.accessibilityLabel = @"Conversation with";
+                else
+                    cell.accessibilityLabel = @"Channel";
+                if([[row objectForKey:@"key"] intValue]) {
+                    cell.icon.text = FA_LOCK;
+                    cell.icon.hidden = NO;
+                } else {
+                    cell.icon.text = nil;
+                    cell.icon.hidden = YES;
+                }
+                if(selected) {
+                    cell.label.textColor = [UIColor selectedBufferTextColor];
+                    if([[row objectForKey:@"archived"] intValue]) {
+                        cell.bgColor = [UIColor selectedArchivedBufferBackgroundColor];
+                        cell.highlightColor = [UIColor selectedArchivedBufferHighlightColor];
+                        cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", archived"];
+                    } else {
+                        cell.icon.textColor = cell.label.textColor = [UIColor selectedBufferTextColor];
+                        cell.bgColor = [UIColor selectedBufferBackgroundColor];
+                        cell.highlightColor = [UIColor selectedBufferHighlightColor];
+                    }
+                } else {
+                    if([[row objectForKey:@"archived"] intValue]) {
+                        cell.label.textColor = (cell.type == TYPE_CHANNEL)?[UIColor archivedChannelTextColor]:[UIColor archivedBufferTextColor];
+                        cell.bgColor = [UIColor bufferBackgroundColor];
+                        cell.highlightColor = [UIColor archivedBufferHighlightColor];
+                        cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", archived"];
+                    } else {
+                        if([[row objectForKey:@"joined"] intValue] == 0 || ![status isEqualToString:@"connected_ready"])
+                            cell.icon.textColor = cell.label.textColor = [UIColor inactiveBufferTextColor];
+                        else if([[row objectForKey:@"unread"] intValue])
+                            cell.icon.textColor = cell.label.textColor = [UIColor unreadBufferTextColor];
+                        else
+                            cell.icon.textColor = cell.label.textColor = [UIColor bufferTextColor];
+                        cell.bgColor = [UIColor bufferBackgroundColor];
+                    }
+                }
+                if([[row objectForKey:@"timeout"] intValue]) {
+                    [cell.activity startAnimating];
+                    cell.activity.hidden = NO;
+                    cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
+                } else {
+                    [cell.activity stopAnimating];
+                    cell.activity.hidden = YES;
+                }
+                break;
+            case TYPE_ARCHIVES_HEADER:
+                cell.icon.text = nil;
+                cell.icon.hidden = YES;
+                if([_expandedArchives objectForKey:[row objectForKey:@"cid"]]) {
+                    cell.label.textColor = [UIColor blackColor];
+                    cell.bgColor = [UIColor timestampColor];
+                    cell.accessibilityHint = @"Hides archive list";
+                } else {
+                    cell.label.textColor = [UIColor archivesHeadingTextColor];
+                    cell.bgColor = [UIColor bufferBackgroundColor];
+                    cell.accessibilityHint = @"Shows archive list";
+                }
+                break;
+            case TYPE_JOIN_CHANNEL:
+                cell.label.textColor = [UIColor colorWithRed:0.361 green:0.69 blue:0 alpha:1];
                 cell.bgColor = [UIColor bufferBackgroundColor];
-                cell.accessibilityHint = @"Shows archive list";
-            }
-            break;
-        case TYPE_JOIN_CHANNEL:
-            cell.label.textColor = [UIColor colorWithRed:0.361 green:0.69 blue:0 alpha:1];
-            cell.bgColor = [UIColor bufferBackgroundColor];
-            cell.icon.text = nil;
-            cell.icon.hidden = YES;
-            break;
+                cell.icon.text = nil;
+                cell.icon.hidden = YES;
+                break;
+        }
+        return cell;
     }
-    return cell;
 }
 
 /*
@@ -1083,37 +1089,39 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    if(indexPath.row >= _data.count)
-        return;
-    
-    if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER) {
-        if([_expandedArchives objectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]])
-            [_expandedArchives removeObjectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
-        else
-            [_expandedArchives setObject:@YES forKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
-        [self performSelectorInBackground:@selector(refresh) withObject:nil];
-#ifndef EXTENSION
-    } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
-        [_delegate dismissKeyboard];
-        Server *s = [_servers getServer:[[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
-        _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-        _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-        _alertView.tag = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
-        [_alertView textFieldAtIndex:0].placeholder = @"#example";
-        [_alertView textFieldAtIndex:0].text = @"#";
-        [_alertView textFieldAtIndex:0].delegate = self;
-        [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-        [_alertView show];
-#endif
-    } else {
-#ifndef EXTENSION
-        _selectedRow = indexPath.row;
-#endif
-        [self.tableView reloadData];
-        [self _updateUnreadIndicators];
-        if(_delegate)
-            [_delegate bufferSelected:[[[_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue]];
+    @synchronized(_data) {
+        [tableView deselectRowAtIndexPath:indexPath animated:NO];
+        if(indexPath.row >= _data.count)
+            return;
+        
+        if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER) {
+            if([_expandedArchives objectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]])
+                [_expandedArchives removeObjectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
+            else
+                [_expandedArchives setObject:@YES forKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
+            [self performSelectorInBackground:@selector(refresh) withObject:nil];
+    #ifndef EXTENSION
+        } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
+            [_delegate dismissKeyboard];
+            Server *s = [_servers getServer:[[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
+            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            _alertView.tag = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
+            [_alertView textFieldAtIndex:0].placeholder = @"#example";
+            [_alertView textFieldAtIndex:0].text = @"#";
+            [_alertView textFieldAtIndex:0].delegate = self;
+            [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+            [_alertView show];
+    #endif
+        } else {
+    #ifndef EXTENSION
+            _selectedRow = indexPath.row;
+    #endif
+            [self.tableView reloadData];
+            [self _updateUnreadIndicators];
+            if(_delegate)
+                [_delegate bufferSelected:[[[_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue]];
+        }
     }
 }
 
@@ -1156,125 +1164,139 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 }
 
 -(IBAction)topUnreadIndicatorClicked:(id)sender {
-    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
-    if(rows.count) {
-        NSInteger first = [[rows objectAtIndex:0] row] - 1;
-        NSInteger pos = 0;
-        
-        for(NSInteger i = first; i >= 0; i--) {
-            NSDictionary *d = [_data objectAtIndex:i];
-            if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
-                pos = i - 1;
-                break;
+    @synchronized(_data) {
+        NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
+        if(rows.count) {
+            NSInteger first = [[rows objectAtIndex:0] row] - 1;
+            NSInteger pos = 0;
+            
+            for(NSInteger i = first; i >= 0; i--) {
+                NSDictionary *d = [_data objectAtIndex:i];
+                if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
+                    pos = i - 1;
+                    break;
+                }
             }
-        }
 
-        if(pos < 0)
-            pos = 0;
-        
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+            if(pos < 0)
+                pos = 0;
+            
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        }
     }
 }
 
 -(IBAction)bottomUnreadIndicatorClicked:(id)sender {
-    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
-    if(rows.count) {
-        NSInteger last = [[rows lastObject] row] + 1;
-        NSInteger pos = _data.count - 1;
-        
-        for(NSInteger i = last; i  < _data.count; i++) {
-            NSDictionary *d = [_data objectAtIndex:i];
-            if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
-                pos = i + 1;
-                break;
+    @synchronized(_data) {
+        NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
+        if(rows.count) {
+            NSInteger last = [[rows lastObject] row] + 1;
+            NSInteger pos = _data.count - 1;
+            
+            for(NSInteger i = last; i  < _data.count; i++) {
+                NSDictionary *d = [_data objectAtIndex:i];
+                if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
+                    pos = i + 1;
+                    break;
+                }
             }
-        }
 
-        if(pos > _data.count - 1)
-            pos = _data.count - 1;
-        
-        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+            if(pos > _data.count - 1)
+                pos = _data.count - 1;
+            
+            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+        }
     }
 }
 
 -(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
-    if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-        NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
-        if(indexPath) {
-            if(indexPath.row < _data.count) {
-                int type = [[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue];
-                if(type == TYPE_SERVER || type == TYPE_CHANNEL || type == TYPE_CONVERSATION)
-                    [_delegate bufferLongPressed:[[[_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+    @synchronized(_data) {
+        if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+            NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
+            if(indexPath) {
+                if(indexPath.row < _data.count) {
+                    int type = [[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue];
+                    if(type == TYPE_SERVER || type == TYPE_CHANNEL || type == TYPE_CONVERSATION)
+                        [_delegate bufferLongPressed:[[[_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+                }
             }
         }
     }
 }
 
 -(void)next {
-    NSDictionary *d;
-    NSInteger row = _selectedRow + 1;
-    
-    do {
-        if(row < _data.count)
-            d = [_data objectAtIndex:row];
-        else
-            d = nil;
-        row++;
-    } while(d && ([[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
-    
-    if(d) {
-        [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+    @synchronized(_data) {
+        NSDictionary *d;
+        NSInteger row = _selectedRow + 1;
+        
+        do {
+            if(row < _data.count)
+                d = [_data objectAtIndex:row];
+            else
+                d = nil;
+            row++;
+        } while(d && ([[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+        
+        if(d) {
+            [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+        }
     }
 }
 
 -(void)prev {
-    NSDictionary *d;
-    NSInteger row = _selectedRow - 1;
-    
-    do {
-        if(row >= 0)
-            d = [_data objectAtIndex:row];
-        else
-            d = nil;
-        row--;
-    } while(d && ([[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
-    
-    if(d) {
-        [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+    @synchronized(_data) {
+        NSDictionary *d;
+        NSInteger row = _selectedRow - 1;
+        
+        do {
+            if(row >= 0)
+                d = [_data objectAtIndex:row];
+            else
+                d = nil;
+            row--;
+        } while(d && ([[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+        
+        if(d) {
+            [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+        }
     }
 }
 
 -(void)nextUnread {
-    NSDictionary *d;
-    NSInteger row = _selectedRow + 1;
-    
-    do {
-        if(row < _data.count)
-            d = [_data objectAtIndex:row];
-        else
-            d = nil;
-        row++;
-    } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
-    
-    if(d) {
-        [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+    @synchronized(_data) {
+        NSDictionary *d;
+        NSInteger row = _selectedRow + 1;
+        
+        do {
+            if(row < _data.count)
+                d = [_data objectAtIndex:row];
+            else
+                d = nil;
+            row++;
+        } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+        
+        if(d) {
+            [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+        }
     }
 }
 
 -(void)prevUnread {
-    NSDictionary *d;
-    NSInteger row = _selectedRow - 1;
-    
-    do {
-        if(row >= 0)
-            d = [_data objectAtIndex:row];
-        else
-            d = nil;
-        row--;
-    } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
-    
-    if(d) {
-        [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+    @synchronized(_data) {
+        NSDictionary *d;
+        NSInteger row = _selectedRow - 1;
+        
+        do {
+            if(row >= 0)
+                d = [_data objectAtIndex:row];
+            else
+                d = nil;
+            row--;
+        } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+        
+        if(d) {
+            [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+        }
     }
 }
 

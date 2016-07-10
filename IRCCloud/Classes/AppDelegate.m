@@ -72,6 +72,7 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    _conn = [NetworkConnection sharedInstance];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
     [[NSFileManager defaultManager] removeItemAtURL:caches error:nil];
@@ -309,7 +310,6 @@
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
 
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _conn = [NetworkConnection sharedInstance];
         [self.mainViewController viewDidLoad];
         NSString *session = [NetworkConnection sharedInstance].session;
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
@@ -558,9 +558,6 @@
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 NSLog(@"Preloading backlog for bid%i from notification", bid);
                 [[NetworkConnection sharedInstance] requestBacklogForBuffer:bid server:cid];
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    [[NetworkConnection sharedInstance] serialize];
-                });
             });
         } else {
             handler(UIBackgroundFetchResultNoData);
