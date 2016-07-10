@@ -1889,9 +1889,6 @@ extern NSDictionary *emojiMap;
         _sendBtn.alpha = 1;
         _settingsBtn.enabled = NO;
         _settingsBtn.alpha = 0;
-        _message.delegate = nil;
-        [_message setText:_message.text];
-        _message.delegate = self;
     } else {
         _messageWidthConstraint.constant = _eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 16;
         [self.view layoutIfNeeded];
