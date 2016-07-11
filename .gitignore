@@ -9,8 +9,7 @@ IRCCloud/InfoPlist.h
 /*.ipa
 infer-out/
 Preview.html
-IRCCloud.app.dSYM.zip
-IRCEnterprise.app.dSYM.zip
+/*.dSYM.zip
 fastlane/report.xml
 fastlane/.env
 screenshots/
