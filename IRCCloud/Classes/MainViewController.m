@@ -2767,6 +2767,8 @@ extern NSDictionary *emojiMap;
 -(IBAction)settingsButtonPressed:(id)sender {
     [self dismissKeyboard];
     _selectedBuffer = _buffer;
+    _selectedUser = nil;
+    _selectedEvent = nil;
     User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     if([_buffer.type isEqualToString:@"console"]) {
@@ -2792,6 +2794,7 @@ extern NSDictionary *emojiMap;
             [sheet addButtonWithTitle:@"Delete"];
         }
     } else {
+        [sheet addButtonWithTitle:@"Whois"];
         if(_buffer.archived) {
             [sheet addButtonWithTitle:@"Unarchive"];
         } else {
@@ -3898,6 +3901,15 @@ extern NSDictionary *emojiMap;
             [self _inviteToChannel];
         } else if([action isEqualToString:@"Join a Channel"]) {
             [self _joinAChannel];
+        } else if([action isEqualToString:@"Whois"]) {
+            if(_selectedUser && _selectedUser.nick.length > 0) {
+                if(_selectedUser.parted)
+                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
+                else
+                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:_selectedUser.ircserver.length?_selectedUser.ircserver:_selectedUser.nick cid:_buffer.cid];
+            } else if([_buffer.type isEqualToString:@"conversation"]) {
+                [[NetworkConnection sharedInstance] whois:_buffer.name server:_buffer.name cid:_buffer.cid];
+            }
         } else if([action isEqualToString:@"Send Feedback"]) {
 #ifdef APPSTORE
             NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
@@ -4001,13 +4013,6 @@ Device type: %@\n",
                 [self bufferSelected:b.bid];
             } else {
                 [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:_buffer.cid];
-            }
-        } else if([action isEqualToString:@"Whois"]) {
-            if(_selectedUser && _selectedUser.nick.length > 0) {
-                if(_selectedUser.parted)
-                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
-                else
-                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:_selectedUser.ircserver.length?_selectedUser.ircserver:_selectedUser.nick cid:_buffer.cid];
             }
         } else if([action isEqualToString:@"Op"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
