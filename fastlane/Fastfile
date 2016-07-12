@@ -132,8 +132,6 @@ platform :ios do
   lane :beta do
     match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud")
     match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud.ShareExtension")
-    match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.enterprise")
-    match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.enterprise.ShareExtension")
     
     root_directory = "#{File.expand_path(File.dirname(__FILE__))}/../"
     CRASHLYTICS_TOKEN=Fastlane::Actions.sh_control_output("grep CRASHLYTICS_TOKEN #{root_directory}IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'",print_command_output: false).strip
