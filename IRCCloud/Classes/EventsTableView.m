@@ -220,7 +220,7 @@ float __largeAvatarHeight = 32;
             _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, self.contentView.bounds.size.width, 26);
             _socketClosedBar.hidden = NO;
             _socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
-            _accessory.frame = CGRectMake(frame.origin.x + 4 + __timestampWidth, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
+            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
         } else if(_type == ROW_FAILED) {
             frame.size.width -= 20;
             _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
