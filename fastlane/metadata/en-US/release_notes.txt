@@ -1,3 +1,13 @@
+This is mainly a quick bug fix update for version 3.0.
+
+• Added whois to the gear menu when viewing a PM
+• Improved in-app handling for imgur links
+• Fixed overriding the "legacy" font setting on the web when saving settings
+• Fixed text entry when using international keyboards
+• Fixed a crash when signing up for a new account
+• Fixed position of expand/collapse icon when displaying disconnect messages
+• Other stability improvements, and minor fixes
+
 Welcome to version 3.0!
 
 You can now choose all the new layout options available on the web: user icons, nicknames on their own line, visible realnames, timestamps on the right. Customise away!
