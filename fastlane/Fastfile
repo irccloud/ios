@@ -132,6 +132,8 @@ platform :ios do
   lane :beta do
     match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud")
     match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud.ShareExtension")
+    match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.enterprise")
+    match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.enterprise.ShareExtension")
     
     root_directory = "#{File.expand_path(File.dirname(__FILE__))}/../"
     CRASHLYTICS_TOKEN=Fastlane::Actions.sh_control_output("grep CRASHLYTICS_TOKEN #{root_directory}IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'",print_command_output: false).strip
@@ -143,8 +145,10 @@ platform :ios do
     notes = prompt(text: "Release Notes: ", multi_line_end_keyword: "$")
 
     gym(scheme: "IRCCloud", export_method: "ad-hoc", clean: true, configuration: "Release")
-
     crashlytics(api_token: CRASHLYTICS_TOKEN, build_secret: CRASHLYTICS_SECRET, groups: ["irccloud","ios-testers","ios-public-beta"], notes: notes)
+
+    gym(scheme: "IRCCloud Enterprise", export_method: "ad-hoc", clean: true, configuration: "Release")
+    crashlytics(api_token: CRASHLYTICS_TOKEN, build_secret: CRASHLYTICS_SECRET, groups: ["irccloud","ios-enterprise"], notes: notes)
   end
 
   #desc "Deploy a new version to the App Store"
