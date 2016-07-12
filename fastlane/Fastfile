@@ -103,7 +103,10 @@ platform :ios do
         metadata_path = "./fastlane/metadata"
         app_identifier = "com.irccloud.IRCCloud"
     end
+    
+    app_version = options[:app_version] || get_version_number()
     deliver(
+        app_version: app_version,
         app_identifier: app_identifier,
         skip_binary_upload: true,
         metadata_path: metadata_path,
