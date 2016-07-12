@@ -104,11 +104,14 @@ platform :ios do
         app_identifier = "com.irccloud.IRCCloud"
     end
     
+    skip_screenshots = !options[:screenshots]
+    
     app_version = options[:app_version] || get_version_number()
     deliver(
         app_version: app_version,
         app_identifier: app_identifier,
         skip_binary_upload: true,
+        skip_screenshots: skip_screenshots,
         metadata_path: metadata_path,
         automatic_release: true
     )
