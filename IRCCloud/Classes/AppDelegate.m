@@ -72,7 +72,9 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    _conn = [NetworkConnection sharedInstance];
+#ifdef CRASHLYTICS_TOKEN
+    [Fabric with:@[CrashlyticsKit]];
+#endif
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
     [[NSFileManager defaultManager] removeItemAtURL:caches error:nil];
@@ -100,6 +102,7 @@
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"useChrome"];
     }
     
+    _conn = [NetworkConnection sharedInstance];
 #ifdef DEBUG
     if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:[[NSBundle mainBundle] bundleIdentifier]];
@@ -289,9 +292,6 @@
     else
         [d removeObjectForKey:@"imgur_refresh_token"];
     [d synchronize];
-#ifdef CRASHLYTICS_TOKEN
-    [Fabric with:@[CrashlyticsKit]];
-#endif
     
     self.splashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"SplashViewController"];
     self.window.rootViewController = self.splashViewController;
