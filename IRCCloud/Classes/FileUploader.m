@@ -50,7 +50,7 @@
 }
 
 - (void)handleResult:(NSDictionary *)result {
-    if([[result objectForKey:@"success"] intValue] == 1) {
+    if([[result objectForKey:@"success"] intValue] == 1 && [[result objectForKey:@"file"] objectForKey:@"url"]) {
         CLS_LOG(@"Finalize success: %@", result);
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:_bid];
         if(b) {
