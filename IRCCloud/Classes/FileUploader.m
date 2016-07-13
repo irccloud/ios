@@ -51,6 +51,7 @@
 
 - (void)handleResult:(NSDictionary *)result {
     if([[result objectForKey:@"success"] intValue] == 1) {
+        CLS_LOG(@"Finalize success: %@", result);
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:_bid];
         if(b) {
             if(_msg.length)
@@ -62,6 +63,7 @@
             [_delegate fileUploadDidFinish];
         }
     } else {
+        CLS_LOG(@"Finalize failed: %@", result);
         [_delegate fileUploadDidFail:[result objectForKey:@"message"]];
     }
 }
