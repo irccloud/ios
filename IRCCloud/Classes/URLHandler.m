@@ -114,11 +114,13 @@
 
 #define IS_WIKI(url) ([url.path.lowercaseString hasPrefix:@"/wiki/"] && HAS_IMAGE_SUFFIX(url.absoluteString.lowercaseString))
 
+#define IS_TWIMG(url) ([url.host.lowercaseString hasSuffix:@".twimg.com"] && [url.path.lowercaseString hasPrefix:@"/media/"] && [url.path rangeOfString:@":"].location != NSNotFound && HAS_IMAGE_SUFFIX([url.path substringToIndex:[url.path rangeOfString:@":"].location].lowercaseString))
+
 + (BOOL)isImageURL:(NSURL *)url
 {
     NSString *l = [url.path lowercaseString];
     // Use pre-processor macros instead of variables so conditions are still evaluated lazily
-    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GFYCAT(url) || IS_GIPHY(url) || IS_WIKI(url));
+    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GFYCAT(url) || IS_GIPHY(url) || IS_WIKI(url) || IS_TWIMG(url));
 }
 
 + (BOOL)isYouTubeURL:(NSURL *)url
