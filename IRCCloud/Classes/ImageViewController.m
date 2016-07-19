@@ -376,12 +376,11 @@
 
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
-            NSLog(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
+            CLS_LOG(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
             [self fail];
         } else {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
             NSDictionary *dict = [parser objectWithData:data];
-            CLS_LOG(@"Imgur response: %@", dict);
             if([[dict objectForKey:@"success"] intValue]) {
                 dict = [dict objectForKey:@"data"];
                 if([[dict objectForKey:@"type"] hasPrefix:@"image/"] && [[dict objectForKey:@"animated"] intValue] == 0) {
@@ -394,23 +393,23 @@
                     if([[dict objectForKey:@"looping"] intValue] == 1)
                         _movieController.repeatMode = MPMovieRepeatModeOne;
                 } else {
-                    NSLog(@"Invalid type from imgur");
+                    CLS_LOG(@"Invalid type from imgur: %@", dict);
                     [self fail];
                 }
             } else {
-                NSLog(@"Imgur failure");
+                CLS_LOG(@"Imgur failure: %@", dict);
                 [self fail];
             }
         }
     }];
 }
 
--(void)loadImgurGallery:(NSString *)galleryID {
+-(void)loadImgur:(NSString *)ID type:(NSString *)type {
 #ifdef MASHAPE_KEY
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://imgur-apiv3.p.mashape.com/3/gallery/%@", galleryID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://imgur-apiv3.p.mashape.com/3/%@/%@", type, ID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setValue:@MASHAPE_KEY forHTTPHeaderField:@"X-Mashape-Authorization"];
 #else
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.imgur.com/3/gallery/%@", galleryID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.imgur.com/3/%@/%@", type, ID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
 #endif
     [request setHTTPShouldHandleCookies:NO];
 #ifdef IMGUR_KEY
@@ -419,30 +418,34 @@
     
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
-            NSLog(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
+            CLS_LOG(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
             [self fail];
         } else {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
             NSDictionary *dict = [parser objectWithData:data];
             if([[dict objectForKey:@"success"] intValue]) {
                 dict = [dict objectForKey:@"data"];
-                if([[dict objectForKey:@"images_count"] intValue] == 1)
+                if([[dict objectForKey:@"images_count"] intValue] == 1) {
                     dict = [[dict objectForKey:@"images"] objectAtIndex:0];
-                if([[dict objectForKey:@"type"] hasPrefix:@"image/"] && [[dict objectForKey:@"animated"] intValue] == 0) {
-                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"link"]]];
-                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-                    
-                    [_connection start];
-                } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
-                    [self loadVideo:[dict objectForKey:@"mp4"]];
-                    if([[dict objectForKey:@"looping"] intValue] == 1)
-                        _movieController.repeatMode = MPMovieRepeatModeOne;
+                    if([[dict objectForKey:@"type"] hasPrefix:@"image/"] && [[dict objectForKey:@"animated"] intValue] == 0) {
+                        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"link"]]];
+                        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+                        
+                        [_connection start];
+                    } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
+                        [self loadVideo:[dict objectForKey:@"mp4"]];
+                        if([[dict objectForKey:@"looping"] intValue] == 1)
+                            _movieController.repeatMode = MPMovieRepeatModeOne;
+                    } else {
+                        CLS_LOG(@"Invalid type from imgur: %@", dict);
+                        [self fail];
+                    }
                 } else {
-                    NSLog(@"Invalid type from imgur");
+                    CLS_LOG(@"Too many images from imgur: %@", dict);
                     [self fail];
                 }
             } else {
-                NSLog(@"Imgur failure");
+                CLS_LOG(@"Imgur failure: %@", dict);
                 [self fail];
             }
         }
@@ -467,13 +470,15 @@
         if([imageID rangeOfString:@"/"].location == NSNotFound) {
             [self loadImgurImage:imageID];
         } else if([imageID hasPrefix:@"gallery/"]) {
-            [self loadImgurGallery:[imageID substringFromIndex:8]];
+            [self loadImgur:[imageID substringFromIndex:8] type:@"gallery"];
+        } else if([imageID hasPrefix:@"a/"]) {
+            [self loadImgur:[imageID substringFromIndex:2] type:@"album"];
         } else {
             [self fail];
         }
         return;
-    } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"] && ([url.path hasSuffix:@".gifv"] || [url.path hasSuffix:@".webm"])) {
-        [self loadImgurImage:[url.path substringToIndex:url.path.length - 5]];
+    } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"]) {
+        [self loadImgurImage:[url.path substringToIndex:[url.path rangeOfString:@"."].location]];
         return;
     } else if([[url.host lowercaseString] hasSuffix:@"gfycat.com"]) {
         [self loadGfycat:url.path];
