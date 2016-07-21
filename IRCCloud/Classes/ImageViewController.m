@@ -465,7 +465,7 @@
             url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?dl=1", url.absoluteString]];
     } else if(([[url.host lowercaseString] isEqualToString:@"d.pr"] || [[url.host lowercaseString] isEqualToString:@"droplr.com"]) && [url.path hasPrefix:@"/i/"] && ![url.path hasSuffix:@"+"]) {
         url = [NSURL URLWithString:[NSString stringWithFormat:@"https://droplr.com%@+", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-    } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"]) {
+    } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) {
         NSString *imageID = [url.path substringFromIndex:1];
         if([imageID rangeOfString:@"/"].location == NSNotFound) {
             [self loadImgurImage:imageID];
