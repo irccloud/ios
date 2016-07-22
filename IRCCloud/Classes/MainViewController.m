@@ -3838,8 +3838,10 @@ extern NSDictionary *emojiMap;
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Mention"]) {
-            [self showMentionTip];
-            [self _mention];
+            [self.slidingViewController resetTopViewWithAnimations:nil onComplete:^{
+                [self showMentionTip];
+                [self _mention];
+            }];
         } else if([action isEqualToString:@"Edit Connection"]) {
             [self _editConnection];
         } else if([action isEqualToString:@"Settings"]) {
