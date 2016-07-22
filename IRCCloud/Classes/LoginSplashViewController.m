@@ -332,7 +332,7 @@
     loginYOffset.constant = signupYOffset.constant = 16 + ((offset + 2) * 39) + 15;
     sendAccessLinkYOffset.constant = 16 + 81;
     
-    OnePassword.hidden = (login.alpha != 1 && signup.alpha != 1) || ![[OnePasswordExtension sharedExtension] isAppExtensionAvailable];
+    OnePassword.hidden = _authURL || (login.alpha != 1 && signup.alpha != 1) || ![[OnePasswordExtension sharedExtension] isAppExtensionAvailable];
 }
 
 -(UIImageView *)logo {
