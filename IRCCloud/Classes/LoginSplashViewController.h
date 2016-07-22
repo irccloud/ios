@@ -65,6 +65,7 @@
     NSURL *_accessLink;
     NSString *_impression;
     BOOL _gotCredentialsFromPasswordManager;
+    NSString *_authURL;
 }
 @property NSURL *accessLink;
 @property (nonatomic) NSString *impression;

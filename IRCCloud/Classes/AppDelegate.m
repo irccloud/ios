@@ -28,6 +28,14 @@
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "AvatarsDataSource.h"
 
+#ifdef DEBUG
+@implementation NSURLRequest(CertificateHack)
++ (BOOL)allowsAnyHTTPSCertificateForHost:(NSString *)host {
+    return YES;
+}
+@end
+#endif
+
 //From: http://stackoverflow.com/a/19313559
 @interface NavBarHax : UINavigationBar
 
@@ -991,5 +999,4 @@
     }
     [session finishTasksAndInvalidate];
 }
-
 @end

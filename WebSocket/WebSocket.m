@@ -1138,6 +1138,12 @@ WebSocketWaitingState waitingState;
     return self.config.timeout;
 }
 
+#ifdef DEBUG
+- (void)socket:(GCDAsyncSocket *)sock didReceiveTrust:(SecTrustRef)trust completionHandler:(void (^)(BOOL))completionHandler {
+    completionHandler(YES);
+}
+#endif
+
 - (void)socket:(GCDAsyncSocket*)aSocket didConnectToHost:(NSString *)aHost port:(UInt16)aPort {
     //start TLS if this is a secure websocket
     if (self.config.isSecure) {

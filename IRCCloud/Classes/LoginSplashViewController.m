@@ -21,6 +21,7 @@
 #import "AppDelegate.h"
 #import "OnePasswordExtension.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "SamlLoginViewController.h"
 
 @implementation LoginSplashViewController
 
@@ -297,6 +298,7 @@
     [username resignFirstResponder];
     [password resignFirstResponder];
     [host resignFirstResponder];
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
 }
 
 -(void)viewDidDisappear:(BOOL)animated {
@@ -308,6 +310,9 @@
     int offset = 0;
     if(name.alpha)
         offset = 1;
+    
+    if(_authURL)
+        offset = -2;
     
     if(name.alpha > 0)
         username.background = [UIImage imageNamed:@"login_mid_input"];
@@ -598,10 +603,28 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] requestConfiguration];
         if(result) {
-            if([[result objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
-                enterpriseHint.text = [[result objectForKey:@"enterprise"] objectForKey:@"fullname"];
+            if([[result objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]]) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    enterpriseHint.text = [[result objectForKey:@"enterprise"] objectForKey:@"fullname"];
+                });
+            }
             if(![[result objectForKey:@"auth_mechanism"] isEqualToString:@"internal"])
                 signupHint.enabled = NO;
+            
+            if([[result objectForKey:@"auth_mechanism"] isEqualToString:@"saml"]) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [login setTitle:[NSString stringWithFormat:@"Login with %@", [result objectForKey:@"saml_provider"]] forState:UIControlStateNormal];
+                    login.enabled = YES;
+                });
+                _authURL = [NSString stringWithFormat:@"https://%@/saml/auth", IRCCLOUD_HOST];
+                signupHint.enabled = NO;
+            } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [login setTitle:@"Login" forState:UIControlStateNormal];
+                    login.enabled = NO;
+                });
+                _authURL = nil;
+            }
         } else {
             IRCCLOUD_HOST = nil;
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -621,14 +644,16 @@
                     next.alpha = 0;
                     enterpriseLearnMore.alpha = 0;
                     
-                    username.alpha = 1;
-                    password.alpha = 1;
+                    if(!_authURL) {
+                        username.alpha = 1;
+                        password.alpha = 1;
+                        forgotPasswordHint.alpha = 1;
+                    }
                     if(signupHint.enabled)
                         signupHint.alpha = 1;
                     else
                         enterpriseHint.alpha = 1;
                     login.alpha = 1;
-                    forgotPasswordHint.alpha = 1;
                     [self transitionToSize:self.view.bounds.size];
                 }
                 [UIView beginAnimations:nil context:nil];
@@ -650,6 +675,12 @@
 }
 
 -(IBAction)loginButtonPressed:(id)sender {
+    if(_authURL) {
+        SamlLoginViewController *c = [[SamlLoginViewController alloc] initWithURL:_authURL];
+        c.navigationItem.title = login.titleLabel.text;
+        [self presentViewController:[[UINavigationController alloc] initWithRootViewController:c] animated:YES completion:nil];
+        return;
+    }
     [username resignFirstResponder];
     [password resignFirstResponder];
     [UIView beginAnimations:nil context:nil];

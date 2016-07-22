@@ -318,6 +318,8 @@
 		22B4287C16D831A800498507 /* WebSocketFragment.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286316D831A800498507 /* WebSocketFragment.m */; };
 		22B4287E16D831A800498507 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
 		22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		22BB94AA1D425A4F00BFB6F0 /* SamlLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */; };
+		22BB94AB1D425D3800BFB6F0 /* SamlLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */; };
 		22C0F1511B8F61D9001D109D /* YTPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C0F14E1B8F61D8001D109D /* YTPlayerView.m */; };
 		22C0F1521B8F61D9001D109D /* YTPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C0F14E1B8F61D8001D109D /* YTPlayerView.m */; };
 		22C0F1541B8F6829001D109D /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 22C0F1531B8F6829001D109D /* Assets */; };
@@ -736,6 +738,8 @@
 		22B4288416D846BF00498507 /* IRCCloudJSONObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudJSONObject.h; sourceTree = "<group>"; };
 		22B4288516D846BF00498507 /* IRCCloudJSONObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudJSONObject.m; sourceTree = "<group>"; };
 		22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = "ShareExtension Enterprise.entitlements"; path = "../ShareExtension Enterprise.entitlements"; sourceTree = "<group>"; };
+		22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SamlLoginViewController.m; sourceTree = "<group>"; };
+		22BB94A91D425A4E00BFB6F0 /* SamlLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SamlLoginViewController.h; sourceTree = "<group>"; };
 		22C0F14D1B8F61D8001D109D /* YTPlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YTPlayerView.h; path = YTPlayerView/YTPlayerView.h; sourceTree = SOURCE_ROOT; };
 		22C0F14E1B8F61D8001D109D /* YTPlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YTPlayerView.m; path = YTPlayerView/YTPlayerView.m; sourceTree = SOURCE_ROOT; };
 		22C0F1531B8F6829001D109D /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Assets; path = YTPlayerView/Assets; sourceTree = SOURCE_ROOT; };
@@ -1166,6 +1170,8 @@
 				221390FD1B115CD000ECF001 /* PastebinEditorViewController.m */,
 				22C2E0551B0E2E4800387B4B /* PastebinViewController.h */,
 				22C2E0561B0E2E4800387B4B /* PastebinViewController.m */,
+				22BB94A91D425A4E00BFB6F0 /* SamlLoginViewController.h */,
+				22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */,
 				2293907919D754D600A73946 /* ServerMapTableViewController.h */,
 				2293907A19D754D600A73946 /* ServerMapTableViewController.m */,
 				22462B5018906B03009EF986 /* ServerReorderViewController.h */,
@@ -1809,6 +1815,7 @@
 				225D974D18AA995900065087 /* WebSocket.m in Sources */,
 				225D974E18AA995900065087 /* WebSocketConnectConfig.m in Sources */,
 				225D974F18AA995900065087 /* WebSocketFragment.m in Sources */,
+				22BB94AB1D425D3800BFB6F0 /* SamlLoginViewController.m in Sources */,
 				225D975018AA995900065087 /* WebSocketMessage.m in Sources */,
 				228E2B9818CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m in Sources */,
 				225D975118AA995900065087 /* IRCCloudJSONObject.m in Sources */,
@@ -1907,6 +1914,7 @@
 				22B4287016D831A800498507 /* WebSocket.m in Sources */,
 				22B4287A16D831A800498507 /* WebSocketConnectConfig.m in Sources */,
 				22B4287C16D831A800498507 /* WebSocketFragment.m in Sources */,
+				22BB94AA1D425A4F00BFB6F0 /* SamlLoginViewController.m in Sources */,
 				22B4287E16D831A800498507 /* WebSocketMessage.m in Sources */,
 				228E2B9618CF770D0011DEAB /* SBJsonStreamWriterAccumulator.m in Sources */,
 				22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */,
