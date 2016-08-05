@@ -2992,7 +2992,9 @@ extern NSDictionary *emojiMap;
     if(_doubleTapTimer) {
         [_doubleTapTimer invalidate];
         _doubleTapTimer = nil;
-        [self _mention];
+        [self.slidingViewController resetTopViewWithAnimations:nil onComplete:^{
+            [self _mention];
+        }];
     } else {
         _doubleTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_userTapped) userInfo:nil repeats:NO];
     }
