@@ -1955,7 +1955,7 @@ float __largeAvatarHeight = 32;
                 }
             }
             if(cell.realname.text.length && e.realnameLinks.count) {
-                cell.realname.linkAttributes = _linkAttributes;
+                cell.realname.linkAttributes = _lightLinkAttributes;
                 cell.realname.linkDelegate = self;
                 @try {
                     for(NSTextCheckingResult *result in e.realnameLinks) {
