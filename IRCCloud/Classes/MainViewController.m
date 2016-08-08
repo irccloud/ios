@@ -2279,15 +2279,11 @@ extern NSDictionary *emojiMap;
         
         NSMutableAttributedString *s = (NSMutableAttributedString *)[ColorFormatter format:msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil];
         
-        CTTextAlignment alignment = kCTCenterTextAlignment;
-        CTParagraphStyleSetting paragraphStyle;
-        paragraphStyle.spec = kCTParagraphStyleSpecifierAlignment;
-        paragraphStyle.valueSize = sizeof(CTTextAlignment);
-        paragraphStyle.value = &alignment;
-        
-        CTParagraphStyleRef style = CTParagraphStyleCreate((const CTParagraphStyleSetting*) &paragraphStyle, 1);
-        [s addAttribute:(NSString*)kCTParagraphStyleAttributeName value:(__bridge_transfer id)style range:NSMakeRange(0, [s length])];
+        NSMutableParagraphStyle *p = [[NSMutableParagraphStyle alloc] init];
+        p.alignment = NSTextAlignmentCenter;
+        [s addAttribute:NSParagraphStyleAttributeName value:p range:NSMakeRange(0, [s length])];
 
+        _globalMsg.textColor = [UIColor messageTextColor];
         _globalMsg.attributedText = s;
         _topUnreadBarYOffsetConstraint.constant = _globalMsg.intrinsicContentSize.height + 12;
     } else {

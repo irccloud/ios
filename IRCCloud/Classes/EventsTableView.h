@@ -18,11 +18,11 @@
 #import "BuffersDataSource.h"
 #import "EventsDataSource.h"
 #import "CollapsedEvents.h"
-#import "TTTAttributedLabel.h"
 #import "NetworkConnection.h"
 #import "HighlightsCountView.h"
 #import "Ignore.h"
 #import "CSURITemplate.h"
+#import "LinkLabel.h"
 
 @protocol EventsTableViewDelegate<NSObject>
 -(void)rowSelected:(Event *)event;
@@ -30,7 +30,7 @@
 -(void)dismissKeyboard;
 @end
 
-@interface EventsTableView : UIViewController<TTTAttributedLabelDelegate,UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate,UITableViewDataSource,UITableViewDelegate> {
+@interface EventsTableView : UIViewController<LinkLabelDelegate,UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate,UITableViewDataSource,UITableViewDelegate> {
     IBOutlet UITableView *_tableView;
     IBOutlet UIView *_headerView;
     IBOutlet UIView *_backlogFailedView;

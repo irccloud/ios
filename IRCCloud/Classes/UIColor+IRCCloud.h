@@ -119,4 +119,6 @@
 +(UIColor *)socketClosedBackgroundColor;
 +(NSString *)currentTheme;
 +(NSString *)colorForNick:(NSString *)nick;
++(NSDictionary *)linkAttributes;
++(NSDictionary *)lightLinkAttributes;
 @end

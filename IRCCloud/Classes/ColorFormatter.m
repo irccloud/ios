@@ -15,9 +15,8 @@
 //  limitations under the License.
 
 
-#import <CoreText/CoreText.h>
 #import "ColorFormatter.h"
-#import "TTTAttributedLabel.h"
+#import "LinkLabel.h"
 #import "UIColor+IRCCloud.h"
 #import "NSURL+IDN.h"
 #import "NetworkConnection.h"
@@ -1211,7 +1210,6 @@ float ColorFormatterCachedFontSize = 0.0f;
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
     UIColor *fgColor = nil, *bgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
-    CGFloat lineSpacing = 6;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
     
     if(!Courier) {
@@ -1303,7 +1301,7 @@ float ColorFormatterCachedFontSize = 0.0f;
                     underline = i;
                 } else {
                     [attributes addObject:@{
-                     (NSString *)kCTUnderlineStyleAttributeName:@1,
+                     NSUnderlineStyleAttributeName:@1,
                      @"start":@(underline),
                      @"length":@(i - underline)
                      }];
@@ -1317,7 +1315,7 @@ float ColorFormatterCachedFontSize = 0.0f;
                 if(fg != -1) {
                     if(fgColor)
                         [attributes addObject:@{
-                         (NSString *)kCTForegroundColorAttributeName:(__bridge id)[fgColor CGColor],
+                         NSForegroundColorAttributeName:fgColor,
                          @"start":@(fg),
                          @"length":@(i - fg)
                          }];
@@ -1326,7 +1324,7 @@ float ColorFormatterCachedFontSize = 0.0f;
                 if(bg != -1) {
                     if(bgColor)
                         [attributes addObject:@{
-                         (NSString *)kTTTBackgroundFillColorAttributeName:(__bridge id)[bgColor CGColor],
+                         NSBackgroundColorAttributeName:bgColor,
                          @"start":@(bg),
                          @"length":@(i - bg)
                          }];
@@ -1386,7 +1384,7 @@ float ColorFormatterCachedFontSize = 0.0f;
             case CLEAR:
                 if(fg != -1) {
                     [attributes addObject:@{
-                     (NSString *)kCTForegroundColorAttributeName:(__bridge id)[fgColor CGColor],
+                     NSForegroundColorAttributeName:fgColor,
                      @"start":@(fg),
                      @"length":@(i - fg)
                      }];
@@ -1394,7 +1392,7 @@ float ColorFormatterCachedFontSize = 0.0f;
                 }
                 if(bg != -1) {
                     [attributes addObject:@{
-                     (NSString *)kTTTBackgroundFillColorAttributeName:(__bridge id)[bgColor CGColor],
+                     NSBackgroundColorAttributeName:bgColor,
                      @"start":@(bg),
                      @"length":@(i - bg)
                      }];
@@ -1414,7 +1412,7 @@ float ColorFormatterCachedFontSize = 0.0f;
                     [self setFont:italicFont start:italics length:(i - italics) attributes:attributes];
                 } else if(underline != -1) {
                     [attributes addObject:@{
-                     (NSString *)kCTUnderlineStyleAttributeName:@1,
+                     NSUnderlineStyleAttributeName:@1,
                      @"start":@(underline),
                      @"length":@(i - underline)
                      }];
@@ -1430,19 +1428,16 @@ float ColorFormatterCachedFontSize = 0.0f;
     
     NSMutableAttributedString *output = [[NSMutableAttributedString alloc] initWithString:text];
     [output addAttributes:@{NSFontAttributeName:font} range:NSMakeRange(0, text.length)];
-    [output addAttributes:@{(NSString *)kCTForegroundColorAttributeName:(__bridge id)[color CGColor]} range:NSMakeRange(0, text.length)];
+    [output addAttributes:@{(NSString *)NSForegroundColorAttributeName:color} range:NSMakeRange(0, text.length)];
 
     for(NSNumber *i in arrowIndex) {
         [output addAttributes:@{NSFontAttributeName:arrowFont} range:NSMakeRange([i intValue], 1)];
     }
     
-    CTParagraphStyleSetting paragraphStyle;
-    paragraphStyle.spec = kCTParagraphStyleSpecifierLineSpacing;
-    paragraphStyle.valueSize = sizeof(CGFloat);
-    paragraphStyle.value = &lineSpacing;
-    
-    CTParagraphStyleRef style = CTParagraphStyleCreate((const CTParagraphStyleSetting*) &paragraphStyle, 1);
-    [output addAttribute:(NSString*)kCTParagraphStyleAttributeName value:(__bridge_transfer id)style range:NSMakeRange(0, [output length])];
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.lineSpacing = 6;
+    paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+    [output addAttribute:(NSString*)NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [output length])];
     
     for(NSDictionary *dict in attributes) {
         [output addAttributes:dict range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];

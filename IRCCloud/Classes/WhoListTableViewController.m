@@ -16,15 +16,15 @@
 
 #import <MobileCoreServices/UTCoreTypes.h>
 #import "WhoListTableViewController.h"
-#import "TTTAttributedLabel.h"
+#import "LinkLabel.h"
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
 
 @interface WhoTableCell : UITableViewCell {
-    TTTAttributedLabel *_info;
+    LinkLabel *_info;
 }
-@property (readonly) UILabel *info;
+@property (readonly) LinkLabel *info;
 @end
 
 @implementation WhoTableCell
@@ -34,10 +34,13 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _info = [[TTTAttributedLabel alloc] init];
+        _info = [[LinkLabel alloc] init];
         _info.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _info.lineBreakMode = NSLineBreakByCharWrapping;
-        _info.numberOfLines = 0;
+        _info.editable = NO;
+        _info.scrollEnabled = NO;
+        _info.textContainerInset = UIEdgeInsetsZero;
+        _info.backgroundColor = [UIColor clearColor];
+        _info.textColor = [UIColor messageTextColor];
         [self.contentView addSubview:_info];
     }
     return self;
@@ -89,10 +92,7 @@
             name = [NSString stringWithFormat:@"%c%@", BOLD, [user objectForKey:@"nick"]];
         NSAttributedString *formatted = [ColorFormatter format:[NSString stringWithFormat:@"%@%c%@%cConnected via %@\n%@",name,CLEAR,[[user objectForKey:@"away"] intValue]?@" [away]\n":@"\n", ITALICS,[user objectForKey:@"ircserver"], [user objectForKey:@"usermask"]] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
         [u setObject:formatted forKey:@"formatted"];
-        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(formatted));
-        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.bounds.size.width - 6 - 12,CGFLOAT_MAX), NULL);
-        [u setObject:@(ceilf(suggestedSize.height) + 16) forKey:@"height"];
-        CFRelease(framesetter);
+        [u setObject:@([LinkLabel heightOfString:formatted constrainedToWidth:self.tableView.bounds.size.width - 6 - 12] + 16) forKey:@"height"];
         [data addObject:u];
     }
     

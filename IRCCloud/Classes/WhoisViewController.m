@@ -29,24 +29,13 @@
         
         _scrollView = [[UIScrollView alloc] init];
         _scrollView.backgroundColor = [UIColor contentBackgroundColor];
-        _label = [[TTTAttributedLabel alloc] init];
-        _label.delegate = self;
-        _label.numberOfLines = 0;
-        _label.lineBreakMode = NSLineBreakByWordWrapping;
-        CGFloat lineSpacing = 6;
-        CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
-        CTParagraphStyleSetting paragraphStyles[2] = {
-            {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
-            {.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
-        };
-        CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
-        
-        NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-        [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-        [mutableLinkAttributes setObject:(__bridge id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
-        _label.linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
-        
-        CFRelease(paragraphStyle);
+        _label = [[LinkLabel alloc] init];
+        _label.linkDelegate = self;
+        _label.editable = NO;
+        _label.scrollEnabled = NO;
+        _label.backgroundColor = [UIColor clearColor];
+        _label.textColor = [UIColor messageTextColor];
+        _label.textContainerInset = UIEdgeInsetsZero;
         
         Server *s = [[ServersDataSource sharedInstance] getServer:[[object objectForKey:@"cid"] intValue]];
 
@@ -165,6 +154,7 @@
         
 
         _label.attributedText = data;
+        _label.linkAttributes = [UIColor linkAttributes];
         for(NSTextCheckingResult *result in links)
             [_label addLinkWithTextCheckingResult:result];
         [_scrollView addSubview:_label];
@@ -239,12 +229,7 @@
 -(void)loadView {
     [super loadView];
     self.navigationController.navigationBar.clipsToBounds = YES;
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(_label.attributedText));
-    if(framesetter) {
-        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.view.bounds.size.width - 24,CGFLOAT_MAX), NULL);
-        _label.frame = CGRectMake(12,2,self.view.bounds.size.width-24, suggestedSize.height+12);
-        CFRelease(framesetter);
-    }
+    _label.frame = CGRectMake(12,2,self.view.bounds.size.width-24, [LinkLabel heightOfString:_label.attributedText constrainedToWidth:self.view.bounds.size.width-24]+12);
     _scrollView.frame = self.view.frame;
     _scrollView.contentSize = _label.frame.size;
     self.view = _scrollView;
@@ -254,9 +239,9 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {
-    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
-    if([url.scheme hasPrefix:@"irc"])
+- (void)LinkLabel:(LinkLabel *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:result.URL];
+    if([result.URL.scheme hasPrefix:@"irc"])
         [self dismissViewControllerAnimated:YES completion:nil];
 }
 

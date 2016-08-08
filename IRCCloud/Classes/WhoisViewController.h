@@ -16,12 +16,12 @@
 
 
 #import <UIKit/UIKit.h>
-#import "TTTAttributedLabel.h"
+#import "LinkLabel.h"
 #import "IRCCloudJSONObject.h"
 
-@interface WhoisViewController : UIViewController<TTTAttributedLabelDelegate> {
+@interface WhoisViewController : UIViewController<LinkLabelDelegate> {
     UIScrollView *_scrollView;
-    TTTAttributedLabel *_label;
+    LinkLabel *_label;
 }
 -(id)initWithJSONObject:(IRCCloudJSONObject*)object;
 @end

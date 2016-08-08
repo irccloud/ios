@@ -1048,5 +1048,21 @@ NSString *__current_theme;
 +(UIColor *)selectedArchivedBufferBackgroundColor {
     return __selectedArchivedBufferBackgroundColor;
 }
++(NSDictionary *)linkAttributes {
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.lineSpacing = 6;
+    paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+    
+    return @{NSForegroundColorAttributeName: [UIColor linkColor],
+             NSParagraphStyleAttributeName: paragraphStyle };
 
+}
++(NSDictionary *)lightLinkAttributes {
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.lineSpacing = 6;
+    paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+    
+    return @{NSForegroundColorAttributeName: [UIColor lightLinkColor],
+             NSParagraphStyleAttributeName: paragraphStyle };
+}
 @end

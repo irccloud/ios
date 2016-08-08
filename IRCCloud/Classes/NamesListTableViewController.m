@@ -14,17 +14,16 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
 #import "NamesListTableViewController.h"
-#import "TTTAttributedLabel.h"
+#import "LinkLabel.h"
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
 
 @interface NamesTableCell : UITableViewCell {
-    TTTAttributedLabel *_info;
+    LinkLabel *_info;
 }
-@property (readonly) UILabel *info;
+@property (readonly) LinkLabel *info;
 @end
 
 @implementation NamesTableCell
@@ -34,11 +33,14 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _info = [[TTTAttributedLabel alloc] init];
+        _info = [[LinkLabel alloc] init];
         _info.font = [UIFont systemFontOfSize:FONT_SIZE];
         _info.textColor = [UITableViewCell appearance].detailTextLabelColor;
-        _info.lineBreakMode = NSLineBreakByCharWrapping;
-        _info.numberOfLines = 0;
+        _info.editable = NO;
+        _info.scrollEnabled = NO;
+        _info.textContainerInset = UIEdgeInsetsZero;
+        _info.backgroundColor = [UIColor clearColor];
+        _info.textColor = [UIColor messageTextColor];
         [self.contentView addSubview:_info];
     }
     return self;
@@ -49,8 +51,9 @@
 	
 	CGRect frame = [self.contentView bounds];
     frame.origin.x = 6;
+    frame.origin.y = 6;
     frame.size.width -= 12;
-    
+    frame.size.height -= 12;
     _info.frame = frame;
 }
 
@@ -88,12 +91,12 @@
             name = [NSString stringWithFormat:@"%c%@%c (+%@)", BOLD, [user objectForKey:@"nick"], CLEAR, [user objectForKey:@"mode"]];
         else
             name = [NSString stringWithFormat:@"%c%@", BOLD, [user objectForKey:@"nick"]];
-        NSAttributedString *formatted = [ColorFormatter format:[NSString stringWithFormat:@"%@%c%@%c%@",name,CLEAR,[[user objectForKey:@"away"] intValue]?@" [away]\n":@"\n", ITALICS, [user objectForKey:@"usermask"]] defaultColor:[UITableViewCell appearance].textLabelColor mono:NO linkify:NO server:nil links:nil];
+        NSString *s = [NSString stringWithFormat:@"%@%c%@%c",name,CLEAR,[[user objectForKey:@"away"] intValue]?@" [away]":@"", ITALICS];
+        if([[user objectForKey:@"usermask"] length])
+            s = [s stringByAppendingFormat:@"\n%@", [user objectForKey:@"usermask"]];
+        NSAttributedString *formatted = [ColorFormatter format:s defaultColor:[UITableViewCell appearance].textLabelColor mono:NO linkify:NO server:nil links:nil];
         [u setObject:formatted forKey:@"formatted"];
-        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(formatted));
-        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.bounds.size.width - 6 - 12,CGFLOAT_MAX), NULL);
-        [u setObject:@(ceilf(suggestedSize.height) + 16) forKey:@"height"];
-        CFRelease(framesetter);
+        [u setObject:@([LinkLabel heightOfString:formatted constrainedToWidth:self.tableView.bounds.size.width - 6 - 12]) forKey:@"height"];
         [data addObject:u];
     }
     
@@ -113,7 +116,7 @@
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-    return [[row objectForKey:@"height"] floatValue];
+    return [[row objectForKey:@"height"] floatValue] + 12;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

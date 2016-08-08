@@ -14,7 +14,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
 #import "ChannelInfoViewController.h"
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
@@ -53,12 +52,16 @@
     }
     self.navigationItem.title = [NSString stringWithFormat:@"%@ Info", _channel.name];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-    _topicLabel = [[TTTAttributedLabel alloc] initWithFrame:CGRectZero];
-    _topicLabel.numberOfLines = 0;
-    _topicLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    _topicLabel.dataDetectorTypes = UIDataDetectorTypeLink;
-    _topicLabel.delegate = self;
+    _topicLabel = [[LinkLabel alloc] initWithFrame:CGRectZero];
+    _topicLabel.editable = NO;
+    _topicLabel.scrollEnabled = NO;
+    _topicLabel.textContainerInset = UIEdgeInsetsZero;
+    _topicLabel.dataDetectorTypes = UIDataDetectorTypeNone;
+    _topicLabel.linkDelegate = self;
     _topicLabel.backgroundColor = [UIColor clearColor];
+    _topicLabel.textColor = [UIColor messageTextColor];
+    _topicLabel.textContainer.lineFragmentPadding = 0;
+
     _topicEdit = [[UITextView alloc] initWithFrame:CGRectZero];
     _topicEdit.font = [UIFont systemFontOfSize:14];
     _topicEdit.returnKeyType = UIReturnKeyDone;
@@ -73,9 +76,9 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {
-    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
-    if([url.scheme hasPrefix:@"irc"])
+- (void)LinkLabel:(LinkLabel *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:result.URL];
+    if([result.URL.scheme hasPrefix:@"irc"])
         [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -125,19 +128,8 @@
     if([_channel.topic_text isKindOfClass:[NSString class]] && _channel.topic_text.length) {
         NSArray *links;
         _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor messageTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
-        _topicLabel.text = _topic;
-        CGFloat lineSpacing = 6;
-        CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
-        CTParagraphStyleSetting paragraphStyles[2] = {
-            {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
-            {.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
-        };
-        CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
-        
-        NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-        [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-        [mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
-        _topicLabel.linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+        _topicLabel.attributedText = _topic;
+        _topicLabel.linkAttributes = [UIColor linkAttributes];
         
         for(NSTextCheckingResult *result in links) {
             if(result.resultType == NSTextCheckingTypeLink) {
@@ -170,7 +162,7 @@
         }
     } else {
         _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
-        _topicLabel.text = _topic;
+        _topicLabel.attributedText = _topic;
         _topicEdit.text = @"";
         _topicSetBy = nil;
     }
@@ -258,17 +250,10 @@
     if(indexPath.section == 0) {
         if(tableView.isEditing)
             return 148;
-        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)_topic);
-        if(framesetter) {
-            CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX), NULL);
-            float height = ceilf(suggestedSize.height);
-            _topicLabel.frame = CGRectMake(8,8,suggestedSize.width,suggestedSize.height);
-            _topicEdit.frame = CGRectMake(4,4,self.tableView.bounds.size.width - offset,140);
-            CFRelease(framesetter);
-            return height + 20;
-        } else {
-            return 0;
-        }
+        CGFloat height = [LinkLabel heightOfString:_topic constrainedToWidth:self.tableView.bounds.size.width - offset];
+        _topicLabel.frame = CGRectMake(8,8,self.tableView.bounds.size.width - offset,height);
+        _topicEdit.frame = CGRectMake(4,4,self.tableView.bounds.size.width - offset,140);
+        return height + 20;
     } else {
         if(indexPath.row == 0 && _modeHints.count == 0) {
             return 48;

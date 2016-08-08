@@ -14,18 +14,17 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
 #import "ChannelListTableViewController.h"
 #import "NetworkConnection.h"
-#import "TTTAttributedLabel.h"
+#import "LinkLabel.h"
 #import "ColorFormatter.h"
 #import "UIColor+IRCCloud.h"
 
 @interface ChannelTableCell : UITableViewCell {
-    TTTAttributedLabel *_channel;
-    TTTAttributedLabel *_topic;
+    LinkLabel *_channel;
+    LinkLabel *_topic;
 }
-@property (readonly) UILabel *channel,*topic;
+@property (readonly) LinkLabel *channel,*topic;
 @end
 
 @implementation ChannelTableCell
@@ -35,16 +34,24 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _channel = [[TTTAttributedLabel alloc] init];
+        _channel = [[LinkLabel alloc] init];
         _channel.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
-        _channel.lineBreakMode = NSLineBreakByCharWrapping;
-        _channel.numberOfLines = 1;
+        _channel.editable = NO;
+        _channel.scrollEnabled = NO;
+        _channel.textContainerInset = UIEdgeInsetsZero;
+        _channel.textContainer.lineFragmentPadding = 0;
+        _channel.backgroundColor = [UIColor clearColor];
+        _channel.textColor = [UIColor messageTextColor];
         [self.contentView addSubview:_channel];
         
-        _topic = [[TTTAttributedLabel alloc] init];
+        _topic = [[LinkLabel alloc] init];
         _topic.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _topic.lineBreakMode = NSLineBreakByCharWrapping;
-        _topic.numberOfLines = 0;
+        _topic.editable = NO;
+        _topic.scrollEnabled = NO;
+        _topic.textContainerInset = UIEdgeInsetsZero;
+        _topic.textContainer.lineFragmentPadding = 0;
+        _topic.backgroundColor = [UIColor clearColor];
+        _topic.textColor = [UIColor messageTextColor];
         [self.contentView addSubview:_topic];
     }
     return self;
@@ -130,10 +137,7 @@
         NSMutableDictionary *c = [[NSMutableDictionary alloc] initWithDictionary:channel];
         NSAttributedString *topic = [ColorFormatter format:[c objectForKey:@"topic"] defaultColor:[UITableViewCell appearance].detailTextLabelColor mono:NO linkify:NO server:nil links:nil];
         [c setObject:topic forKey:@"formatted_topic"];
-        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(topic));
-        CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(self.tableView.bounds.size.width - 6 - 12,CGFLOAT_MAX), NULL);
-        [c setObject:@(ceilf(suggestedSize.height) + 16 + FONT_SIZE + 2) forKey:@"height"];
-        CFRelease(framesetter);
+        [c setObject:@([LinkLabel heightOfString:topic constrainedToWidth:self.tableView.bounds.size.width - 6 - 12] + 16 + FONT_SIZE + 2) forKey:@"height"];
         [data addObject:c];
     }
     

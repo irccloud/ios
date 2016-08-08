@@ -88,9 +88,9 @@ float __largeAvatarHeight = 32;
 @interface EventsTableCell : UITableViewCell {
     UIImageView *_avatar;
     UILabel *_timestamp;
-    TTTAttributedLabel *_message;
-    TTTAttributedLabel *_nickname;
-    TTTAttributedLabel *_realname;
+    LinkLabel *_message;
+    LinkLabel *_nickname;
+    LinkLabel *_realname;
     int _type;
     UIView *_socketClosedBar;
     UILabel *_accessory;
@@ -101,7 +101,7 @@ float __largeAvatarHeight = 32;
 @property int type;
 @property float timestampPosition;
 @property (readonly) UILabel *timestamp, *accessory;
-@property (readonly) TTTAttributedLabel *message, *nickname, *realname;
+@property (readonly) LinkLabel *message, *nickname, *realname;
 @property (readonly) UIImageView *avatar;
 @end
 
@@ -121,34 +121,38 @@ float __largeAvatarHeight = 32;
         _timestamp.textAlignment = NSTextAlignmentCenter;
         [self.contentView addSubview:_timestamp];
 
-        _nickname = [[TTTAttributedLabel alloc] init];
-        _nickname.verticalAlignment = TTTAttributedLabelVerticalAlignmentTop;
-        _nickname.numberOfLines = 1;
-        _nickname.lineBreakMode = NSLineBreakByTruncatingTail;
+        _nickname = [[LinkLabel alloc] init];
+        _nickname.editable = NO;
+        _nickname.textContainerInset = UIEdgeInsetsZero;
         _nickname.backgroundColor = [UIColor clearColor];
         _nickname.textColor = [UIColor messageTextColor];
-        _nickname.baselineAdjustment = UIBaselineAdjustmentNone;
         _nickname.dataDetectorTypes = UIDataDetectorTypeNone;
+        _nickname.scrollEnabled = NO;
+        _nickname.textContainer.lineFragmentPadding = 0;
+        _nickname.selectable = NO;
         [self.contentView addSubview:_nickname];
         
-        _realname = [[TTTAttributedLabel alloc] init];
-        _realname.verticalAlignment = TTTAttributedLabelVerticalAlignmentTop;
-        _realname.numberOfLines = 1;
-        _realname.lineBreakMode = NSLineBreakByTruncatingTail;
+        _realname = [[LinkLabel alloc] init];
+        _realname.editable = NO;
+        _realname.textContainerInset = UIEdgeInsetsZero;
         _realname.backgroundColor = [UIColor clearColor];
         _realname.textColor = [UIColor timestampColor];
         _realname.font = [ColorFormatter timestampFont];
-        _realname.baselineAdjustment = UIBaselineAdjustmentNone;
         _realname.dataDetectorTypes = UIDataDetectorTypeNone;
+        _realname.scrollEnabled = NO;
+        _realname.textContainer.lineFragmentPadding = 0;
+        _realname.selectable = NO;
         [self.contentView addSubview:_realname];
         
-        _message = [[TTTAttributedLabel alloc] init];
-        _message.verticalAlignment = TTTAttributedLabelVerticalAlignmentTop;
-        _message.numberOfLines = 0;
-        _message.lineBreakMode = NSLineBreakByWordWrapping;
+        _message = [[LinkLabel alloc] init];
+        _message.editable = NO;
+        _message.textContainerInset = UIEdgeInsetsZero;
         _message.backgroundColor = [UIColor clearColor];
         _message.textColor = [UIColor messageTextColor];
         _message.dataDetectorTypes = UIDataDetectorTypeNone;
+        _message.scrollEnabled = NO;
+        _message.textContainer.lineFragmentPadding = 0;
+        _message.selectable = NO;
         [self.contentView addSubview:_message];
         
         _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
@@ -1464,21 +1468,8 @@ float __largeAvatarHeight = 32;
         _headerView.backgroundColor = [UIColor contentBackgroundColor];
         _backlogFailedView.backgroundColor = [UIColor contentBackgroundColor];
         
-        CGFloat lineSpacing = 6;
-        CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
-        CTParagraphStyleSetting paragraphStyles[2] = {
-            {.spec = kCTParagraphStyleSpecifierLineSpacing, .valueSize = sizeof(CGFloat), .value = &lineSpacing},
-            {.spec = kCTParagraphStyleSpecifierLineBreakMode, .valueSize = sizeof(CTLineBreakMode), .value = (const void *)&lineBreakMode}
-        };
-        CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate(paragraphStyles, 2);
-        
-        NSMutableDictionary *mutableLinkAttributes = [NSMutableDictionary dictionary];
-        [mutableLinkAttributes setObject:(id)[[UIColor linkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-        [mutableLinkAttributes setObject:(__bridge_transfer id)paragraphStyle forKey:(NSString *)kCTParagraphStyleAttributeName];
-        _linkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
-        
-        [mutableLinkAttributes setObject:(id)[[UIColor lightLinkColor] CGColor] forKey:(NSString*)kCTForegroundColorAttributeName];
-        _lightLinkAttributes = [NSDictionary dictionaryWithDictionary:mutableLinkAttributes];
+        _linkAttributes = [UIColor linkAttributes];
+        _lightLinkAttributes = [UIColor lightLinkAttributes];
 
         [_lock lock];
         [_scrollTimer invalidate];
@@ -1804,29 +1795,12 @@ float __largeAvatarHeight = 32;
     float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+17);
     float estimatedWidth = _tableView.frame.size.width - 4 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0);
     estimatedWidth -= (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?12:22;
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formatted));
-    CGSize suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(estimatedWidth,CGFLOAT_MAX), NULL);
-    e.height = ceilf(suggestedSize.height) + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
     
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathAddRect(path, NULL, CGRectMake(0,0,suggestedSize.width,suggestedSize.height));
-    CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, 0), path, NULL);
-    
-    NSArray *lines = (__bridge NSArray *)CTFrameGetLines(frame);
-    CGPoint origins[[lines count]];
-    CTFrameGetLineOrigins(frame, CFRangeMake(0, 0), origins);
-    
-    e.timestampPosition = suggestedSize.height - origins[0].y;
-    
-    CFRelease(frame);
-    CFRelease(path);
-    CFRelease(framesetter);
+    e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+    e.timestampPosition = FONT_SIZE;
     
     if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
-        framesetter = CTFramesetterCreateWithAttributedString((__bridge CFAttributedStringRef)(e.formattedNick));
-        suggestedSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0,0), NULL, CGSizeMake(CGFLOAT_MAX,CGFLOAT_MAX), NULL);
-        e.height += ceilf(suggestedSize.height) + 8;
-        CFRelease(framesetter);
+        e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + 8;
         if(e.height < __largeAvatarHeight + 12)
             e.height = __largeAvatarHeight + 12;
     }
@@ -1882,8 +1856,8 @@ float __largeAvatarHeight = 32;
         cell.backgroundColor = nil;
         cell.contentView.backgroundColor = e.bgColor;
         if(e.isHeader) {
-            cell.realname.text = (([e.realname isKindOfClass:[NSString class]] && [e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) || __norealnamePref)?nil:e.formattedRealname;
-            cell.nickname.text = e.formattedNick;
+            cell.realname.attributedText = (([e.realname isKindOfClass:[NSString class]] && [e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) || __norealnamePref)?nil:e.formattedRealname;
+            cell.nickname.attributedText = e.formattedNick;
             cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
         } else {
             cell.realname.text = nil;
@@ -1901,7 +1875,7 @@ float __largeAvatarHeight = 32;
         cell.realname.textColor = [UIColor timestampColor];
         cell.timestamp.font = cell.realname.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
         cell.message.font = [ColorFormatter timestampFont];
-        cell.message.delegate = self;
+        cell.message.linkDelegate = self;
         if(!e.formatted && e.formattedMsg.length > 0) {
             [self _format:e];
             if(e.formatted) {
@@ -1919,8 +1893,8 @@ float __largeAvatarHeight = 32;
         cell.accessibilityHint = nil;
         cell.accessibilityElementsHidden = NO;
 
-        if(cell.message.text != e.formatted) {
-            cell.message.text = e.formatted;
+        if(cell.message.attributedText != e.formatted) {
+            cell.message.attributedText = e.formatted;
             
             if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
                 if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
@@ -1980,7 +1954,7 @@ float __largeAvatarHeight = 32;
             }
             if(e.realnameLinks.count) {
                 cell.realname.linkAttributes = _linkAttributes;
-                cell.realname.delegate = self;
+                cell.realname.linkDelegate = self;
                 @try {
                     for(NSTextCheckingResult *result in e.realnameLinks) {
                         if(result.resultType == NSTextCheckingTypeLink) {
@@ -2031,8 +2005,8 @@ float __largeAvatarHeight = 32;
     }
 }
 
-- (void)attributedLabel:(TTTAttributedLabel *)label didSelectLinkWithURL:(NSURL *)url {
-    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
+- (void)LinkLabel:(LinkLabel *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:result.URL];
 }
 
 /*

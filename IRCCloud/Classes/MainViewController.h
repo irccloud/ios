@@ -26,6 +26,7 @@
 #import "ImageUploader.h"
 #import "FileUploader.h"
 #import "FilesTableViewController.h"
+#import "LinkLabel.h"
 
 @interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate> {
     IBOutlet EventsTableView *_eventsView;
@@ -45,7 +46,7 @@
     IBOutlet UIView *_2swipeTip;
     IBOutlet UIView *_mentionTip;
     IBOutlet UIView *_globalMsgContainer;
-    IBOutlet TTTAttributedLabel *_globalMsg;
+    IBOutlet LinkLabel *_globalMsg;
     IBOutlet UILabel *_fetchingFailed;
     IBOutlet UIButton *_loadMoreBacklog;
     IBOutlet NSLayoutConstraint *_eventsViewWidthConstraint;
