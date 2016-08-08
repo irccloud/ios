@@ -142,6 +142,8 @@ float __largeAvatarHeight = 32;
         _realname.scrollEnabled = NO;
         _realname.textContainer.lineFragmentPadding = 0;
         _realname.selectable = NO;
+        _realname.textContainer.maximumNumberOfLines = 1;
+        _realname.textContainer.lineBreakMode = NSLineBreakByTruncatingTail;
         [self.contentView addSubview:_realname];
         
         _message = [[LinkLabel alloc] init];
@@ -1952,7 +1954,7 @@ float __largeAvatarHeight = 32;
                     NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
                 }
             }
-            if(e.realnameLinks.count) {
+            if(cell.realname.text.length && e.realnameLinks.count) {
                 cell.realname.linkAttributes = _linkAttributes;
                 cell.realname.linkDelegate = self;
                 @try {
