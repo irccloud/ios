@@ -30,6 +30,8 @@ NSLayoutManager *__LinkLabelLayoutManager;
     self = [super initWithFrame:frame];
     if(self) {
         _links = [[NSMutableArray alloc] init];
+        _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)];
+        [self addGestureRecognizer:_tapGesture];
     }
     return self;
 }
@@ -37,8 +39,26 @@ NSLayoutManager *__LinkLabelLayoutManager;
 - (void)viewTapped:(UITapGestureRecognizer *)sender {
     if(_linkDelegate && sender.state == UIGestureRecognizerStateEnded) {
         NSTextCheckingResult *r = [self linkAtPoint:[sender locationInView:self]];
-        if(r)
+        if(r) {
             [_linkDelegate LinkLabel:self didSelectLinkWithTextCheckingResult:r];
+        } else {
+            UIView *obj = self;
+            
+            do {
+                obj = obj.superview;
+            } while (obj && ![obj isKindOfClass:[UITableViewCell class]]);
+            if(obj) {
+                UITableViewCell *cell = (UITableViewCell*)obj;
+                
+                do {
+                    obj = obj.superview;
+                } while (![obj isKindOfClass:[UITableView class]]);
+                UITableView *tableView = (UITableView*)obj;
+                
+                NSIndexPath *indePath = [tableView indexPathForCell:cell];
+                [[tableView delegate] tableView:tableView didSelectRowAtIndexPath:indePath];
+            }
+        }
     }
 }
 
@@ -47,10 +67,6 @@ NSLayoutManager *__LinkLabelLayoutManager;
 }
 
 - (void)addLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
-    if(!_tapGesture) {
-        _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)];
-        [self addGestureRecognizer:_tapGesture];
-    }
     [_links addObject:result];
     [self.textStorage addAttributes:self.linkAttributes range:result.range];
 }

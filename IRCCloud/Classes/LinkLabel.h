@@ -18,7 +18,7 @@
 
 @protocol LinkLabelDelegate;
 
-@interface LinkLabel : UITextView<UIGestureRecognizerDelegate> {
+@interface LinkLabel : UITextView {
     UITapGestureRecognizer *_tapGesture;
     NSMutableArray *_links;
 }
