@@ -38,6 +38,7 @@
         _channel.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
         _channel.editable = NO;
         _channel.scrollEnabled = NO;
+        _channel.selectable = NO;
         _channel.textContainerInset = UIEdgeInsetsZero;
         _channel.textContainer.lineFragmentPadding = 0;
         _channel.backgroundColor = [UIColor clearColor];

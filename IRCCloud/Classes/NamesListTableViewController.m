@@ -35,9 +35,9 @@
         
         _info = [[LinkLabel alloc] init];
         _info.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _info.textColor = [UITableViewCell appearance].detailTextLabelColor;
         _info.editable = NO;
         _info.scrollEnabled = NO;
+        _info.selectable = NO;
         _info.textContainerInset = UIEdgeInsetsZero;
         _info.backgroundColor = [UIColor clearColor];
         _info.textColor = [UIColor messageTextColor];
@@ -53,7 +53,6 @@
     frame.origin.x = 6;
     frame.origin.y = 6;
     frame.size.width -= 12;
-    frame.size.height -= 12;
     _info.frame = frame;
 }
 
