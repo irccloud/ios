@@ -52,7 +52,7 @@
     }
     self.navigationItem.title = [NSString stringWithFormat:@"%@ Info", _channel.name];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-    _topicLabel = [[LinkLabel alloc] initWithFrame:CGRectZero];
+    _topicLabel = [[LinkTextView alloc] initWithFrame:CGRectZero];
     _topicLabel.editable = NO;
     _topicLabel.scrollEnabled = NO;
     _topicLabel.textContainerInset = UIEdgeInsetsZero;
@@ -76,7 +76,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)LinkLabel:(LinkLabel *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
+- (void)LinkTextView:(LinkTextView *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
     [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:result.URL];
     if([result.URL.scheme hasPrefix:@"irc"])
         [self dismissViewControllerAnimated:YES completion:nil];
@@ -250,7 +250,7 @@
     if(indexPath.section == 0) {
         if(tableView.isEditing)
             return 148;
-        CGFloat height = [LinkLabel heightOfString:_topic constrainedToWidth:self.tableView.bounds.size.width - offset];
+        CGFloat height = [LinkTextView heightOfString:_topic constrainedToWidth:self.tableView.bounds.size.width - offset];
         _topicLabel.frame = CGRectMake(8,8,self.tableView.bounds.size.width - offset,height);
         _topicEdit.frame = CGRectMake(4,4,self.tableView.bounds.size.width - offset,140);
         return height + 20;

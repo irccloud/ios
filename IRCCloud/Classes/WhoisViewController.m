@@ -29,7 +29,7 @@
         
         _scrollView = [[UIScrollView alloc] init];
         _scrollView.backgroundColor = [UIColor contentBackgroundColor];
-        _label = [[LinkLabel alloc] init];
+        _label = [[LinkTextView alloc] init];
         _label.linkDelegate = self;
         _label.editable = NO;
         _label.scrollEnabled = NO;
@@ -229,7 +229,7 @@
 -(void)loadView {
     [super loadView];
     self.navigationController.navigationBar.clipsToBounds = YES;
-    _label.frame = CGRectMake(12,2,self.view.bounds.size.width-24, [LinkLabel heightOfString:_label.attributedText constrainedToWidth:self.view.bounds.size.width-24]+12);
+    _label.frame = CGRectMake(12,2,self.view.bounds.size.width-24, [LinkTextView heightOfString:_label.attributedText constrainedToWidth:self.view.bounds.size.width-24]+12);
     _scrollView.frame = self.view.frame;
     _scrollView.contentSize = _label.frame.size;
     self.view = _scrollView;
@@ -239,7 +239,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)LinkLabel:(LinkLabel *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
+- (void)LinkTextView:(LinkTextView *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
     [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:result.URL];
     if([result.URL.scheme hasPrefix:@"irc"])
         [self dismissViewControllerAnimated:YES completion:nil];

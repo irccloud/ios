@@ -16,15 +16,15 @@
 
 #import <MobileCoreServices/UTCoreTypes.h>
 #import "WhoListTableViewController.h"
-#import "LinkLabel.h"
+#import "LinkTextView.h"
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
 
 @interface WhoTableCell : UITableViewCell {
-    LinkLabel *_info;
+    LinkTextView *_info;
 }
-@property (readonly) LinkLabel *info;
+@property (readonly) LinkTextView *info;
 @end
 
 @implementation WhoTableCell
@@ -34,7 +34,7 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _info = [[LinkLabel alloc] init];
+        _info = [[LinkTextView alloc] init];
         _info.font = [UIFont systemFontOfSize:FONT_SIZE];
         _info.editable = NO;
         _info.scrollEnabled = NO;
@@ -92,7 +92,7 @@
             name = [NSString stringWithFormat:@"%c%@", BOLD, [user objectForKey:@"nick"]];
         NSAttributedString *formatted = [ColorFormatter format:[NSString stringWithFormat:@"%@%c%@%cConnected via %@\n%@",name,CLEAR,[[user objectForKey:@"away"] intValue]?@" [away]\n":@"\n", ITALICS,[user objectForKey:@"ircserver"], [user objectForKey:@"usermask"]] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
         [u setObject:formatted forKey:@"formatted"];
-        [u setObject:@([LinkLabel heightOfString:formatted constrainedToWidth:self.tableView.bounds.size.width - 6 - 12] + 16) forKey:@"height"];
+        [u setObject:@([LinkTextView heightOfString:formatted constrainedToWidth:self.tableView.bounds.size.width - 6 - 12] + 16) forKey:@"height"];
         [data addObject:u];
     }
     

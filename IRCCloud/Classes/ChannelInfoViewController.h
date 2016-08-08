@@ -17,13 +17,13 @@
 
 #import <UIKit/UIKit.h>
 #import "ChannelsDataSource.h"
-#import "LinkLabel.h"
+#import "LinkTextView.h"
 
-@interface ChannelInfoViewController : UITableViewController<UITextViewDelegate,LinkLabelDelegate> {
+@interface ChannelInfoViewController : UITableViewController<UITextViewDelegate,LinkTextViewDelegate> {
     Channel *_channel;
     UITextView *_topicEdit;
     NSAttributedString *_topic;
-    LinkLabel *_topicLabel;
+    LinkTextView *_topicLabel;
     NSMutableArray *_modeHints;
     NSString *_topicSetBy;
     BOOL _topicChanged;

@@ -122,39 +122,25 @@ float __largeAvatarHeight = 32;
         [self.contentView addSubview:_timestamp];
 
         _nickname = [[LinkLabel alloc] init];
-        _nickname.editable = NO;
-        _nickname.textContainerInset = UIEdgeInsetsZero;
         _nickname.backgroundColor = [UIColor clearColor];
         _nickname.textColor = [UIColor messageTextColor];
-        _nickname.dataDetectorTypes = UIDataDetectorTypeNone;
-        _nickname.scrollEnabled = NO;
-        _nickname.textContainer.lineFragmentPadding = 0;
-        _nickname.selectable = NO;
         [self.contentView addSubview:_nickname];
         
         _realname = [[LinkLabel alloc] init];
-        _realname.editable = NO;
-        _realname.textContainerInset = UIEdgeInsetsZero;
         _realname.backgroundColor = [UIColor clearColor];
         _realname.textColor = [UIColor timestampColor];
         _realname.font = [ColorFormatter timestampFont];
-        _realname.dataDetectorTypes = UIDataDetectorTypeNone;
-        _realname.scrollEnabled = NO;
-        _realname.textContainer.lineFragmentPadding = 0;
-        _realname.selectable = NO;
-        _realname.textContainer.maximumNumberOfLines = 1;
-        _realname.textContainer.lineBreakMode = NSLineBreakByTruncatingTail;
+        _realname.numberOfLines = 1;
+        _realname.lineBreakMode = NSLineBreakByTruncatingTail;
+        _realname.userInteractionEnabled = YES;
         [self.contentView addSubview:_realname];
         
         _message = [[LinkLabel alloc] init];
-        _message.editable = NO;
-        _message.textContainerInset = UIEdgeInsetsZero;
         _message.backgroundColor = [UIColor clearColor];
         _message.textColor = [UIColor messageTextColor];
-        _message.dataDetectorTypes = UIDataDetectorTypeNone;
-        _message.scrollEnabled = NO;
-        _message.textContainer.lineFragmentPadding = 0;
-        _message.selectable = NO;
+        _message.numberOfLines = 0;
+        _message.lineBreakMode = NSLineBreakByWordWrapping;
+        _message.userInteractionEnabled = YES;
         [self.contentView addSubview:_message];
         
         _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
@@ -1656,7 +1642,7 @@ float __largeAvatarHeight = 32;
                 [self updateTopUnread:firstRow];
             } else if(lastRow < _lastSeenEidPos) {
                 for(Event *e in _data) {
-                    if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && e.eid > _buffer.scrolledUpFrom && !e.isSelf && e.rowType != ROW_LASTSEENEID && [e isImportant:_buffer.type]) {
+                    if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && !e.isSelf && e.rowType != ROW_LASTSEENEID && [e isImportant:_buffer.type]) {
                         _newMsgs++;
                         if(e.isHighlight)
                             _newHighlights++;

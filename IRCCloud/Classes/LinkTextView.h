@@ -1,5 +1,5 @@
 //
-//  LinkLabel.h
+//  LinkTextView.h
 //
 //  Copyright (C) 2016 IRCCloud, Ltd.
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,13 +16,13 @@
 
 #import <UIKit/UIKit.h>
 
-@protocol LinkLabelDelegate;
+@protocol LinkTextViewDelegate;
 
-@interface LinkLabel : UILabel {
+@interface LinkTextView : UITextView {
     UITapGestureRecognizer *_tapGesture;
     NSMutableArray *_links;
 }
-@property (nonatomic, unsafe_unretained) id <LinkLabelDelegate> linkDelegate;
+@property (nonatomic, unsafe_unretained) id <LinkTextViewDelegate> linkDelegate;
 @property (nonatomic, strong) NSDictionary *linkAttributes;
 @property (nonatomic, strong) NSDictionary *activeLinkAttributes;
 
@@ -33,6 +33,6 @@
 +(CGFloat)heightOfString:(NSAttributedString *)text constrainedToWidth:(CGFloat)width;
 @end
 
-@protocol LinkLabelDelegate
-- (void)LinkLabel:(LinkLabel *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result;
+@protocol LinkTextViewDelegate
+- (void)LinkTextView:(LinkTextView *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result;
 @end

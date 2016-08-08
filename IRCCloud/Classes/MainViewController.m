@@ -2265,7 +2265,6 @@ extern NSDictionary *emojiMap;
     if([NetworkConnection sharedInstance].globalMsg.length) {
         _globalMsgContainer.hidden = NO;
         _globalMsg.userInteractionEnabled = NO;
-        _globalMsg.selectable = NO;
         NSString *msg = [NetworkConnection sharedInstance].globalMsg;
         msg = [msg stringByReplacingOccurrencesOfString:@"<b>" withString:[NSString stringWithFormat:@"%c", BOLD]];
         msg = [msg stringByReplacingOccurrencesOfString:@"</b>" withString:[NSString stringWithFormat:@"%c", BOLD]];

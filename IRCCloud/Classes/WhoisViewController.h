@@ -16,12 +16,12 @@
 
 
 #import <UIKit/UIKit.h>
-#import "LinkLabel.h"
+#import "LinkTextView.h"
 #import "IRCCloudJSONObject.h"
 
-@interface WhoisViewController : UIViewController<LinkLabelDelegate> {
+@interface WhoisViewController : UIViewController<LinkTextViewDelegate> {
     UIScrollView *_scrollView;
-    LinkLabel *_label;
+    LinkTextView *_label;
 }
 -(id)initWithJSONObject:(IRCCloudJSONObject*)object;
 @end

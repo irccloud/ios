@@ -15,15 +15,15 @@
 //  limitations under the License.
 
 #import "NamesListTableViewController.h"
-#import "LinkLabel.h"
+#import "LinkTextView.h"
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
 
 @interface NamesTableCell : UITableViewCell {
-    LinkLabel *_info;
+    LinkTextView *_info;
 }
-@property (readonly) LinkLabel *info;
+@property (readonly) LinkTextView *info;
 @end
 
 @implementation NamesTableCell
@@ -33,7 +33,7 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _info = [[LinkLabel alloc] init];
+        _info = [[LinkTextView alloc] init];
         _info.font = [UIFont systemFontOfSize:FONT_SIZE];
         _info.editable = NO;
         _info.scrollEnabled = NO;
@@ -95,7 +95,7 @@
             s = [s stringByAppendingFormat:@"\n%@", [user objectForKey:@"usermask"]];
         NSAttributedString *formatted = [ColorFormatter format:s defaultColor:[UITableViewCell appearance].textLabelColor mono:NO linkify:NO server:nil links:nil];
         [u setObject:formatted forKey:@"formatted"];
-        [u setObject:@([LinkLabel heightOfString:formatted constrainedToWidth:self.tableView.bounds.size.width - 6 - 12]) forKey:@"height"];
+        [u setObject:@([LinkTextView heightOfString:formatted constrainedToWidth:self.tableView.bounds.size.width - 6 - 12]) forKey:@"height"];
         [data addObject:u];
     }
     

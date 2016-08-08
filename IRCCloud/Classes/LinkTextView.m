@@ -1,5 +1,5 @@
 //
-//  LinkLabel.m
+//  LinkTextView.m
 //
 //  Copyright (C) 2016 IRCCloud, Ltd.
 //  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +14,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import "LinkLabel.h"
+#import "LinkTextView.h"
 
-NSTextStorage *__LinkLabelTextStorage;
-NSTextContainer *__LinkLabelTextContainer;
-NSLayoutManager *__LinkLabelLayoutManager;
+NSTextStorage *__LinkTextViewTextStorage;
+NSTextContainer *__LinkTextViewTextContainer;
+NSLayoutManager *__LinkTextViewLayoutManager;
 
-@implementation LinkLabel
+@implementation LinkTextView
 
 - (id)init {
     return [self initWithFrame:CGRectZero];
@@ -40,7 +40,7 @@ NSLayoutManager *__LinkLabelLayoutManager;
     if(_linkDelegate && sender.state == UIGestureRecognizerStateEnded) {
         NSTextCheckingResult *r = [self linkAtPoint:[sender locationInView:self]];
         if(r) {
-            [_linkDelegate LinkLabel:self didSelectLinkWithTextCheckingResult:r];
+            [_linkDelegate LinkTextView:self didSelectLinkWithTextCheckingResult:r];
         } else {
             UIView *obj = self;
             
@@ -68,24 +68,13 @@ NSLayoutManager *__LinkLabelLayoutManager;
 
 - (void)addLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
     [_links addObject:result];
-    NSMutableAttributedString *s = self.attributedText.mutableCopy;
-    [s addAttributes:self.linkAttributes range:result.range];
-    self.attributedText = s;
+    [self.textStorage addAttributes:self.linkAttributes range:result.range];
 }
 
 - (NSTextCheckingResult *)linkAtPoint:(CGPoint)p {
-    NSTextStorage *textStorage = [[NSTextStorage alloc] initWithAttributedString:self.attributedText];
-    NSLayoutManager *layoutManager = [[NSLayoutManager alloc] init];
-    [textStorage addLayoutManager:layoutManager];
+    UITextRange *textRange = [self characterRangeAtPoint:p];
+    int start = [self offsetFromPosition:self.beginningOfDocument toPosition:textRange.start];
     
-    NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:CGSizeMake(self.frame.size.width, self.frame.size.height)];
-    textContainer.lineFragmentPadding  = 0;
-    textContainer.maximumNumberOfLines = self.numberOfLines;
-    textContainer.lineBreakMode        = self.lineBreakMode;
-    
-    [layoutManager addTextContainer:textContainer];
-    
-    NSUInteger start = [layoutManager characterIndexForPoint:p inTextContainer:textContainer fractionOfDistanceBetweenInsertionPoints:NULL];
     for(NSTextCheckingResult *r in _links) {
         if(start >= r.range.location && start < r.range.location + r.range.length)
             return r;
@@ -94,20 +83,20 @@ NSLayoutManager *__LinkLabelLayoutManager;
 }
 
 +(CGFloat)heightOfString:(NSAttributedString *)text constrainedToWidth:(CGFloat)width {
-    if(!__LinkLabelTextStorage) {
-        __LinkLabelTextStorage = [[NSTextStorage alloc] init];
-        __LinkLabelLayoutManager = [[NSLayoutManager alloc] init];
-        [__LinkLabelTextStorage addLayoutManager:__LinkLabelLayoutManager];
-        __LinkLabelTextContainer = [[NSTextContainer alloc] initWithSize:CGSizeZero];
-        __LinkLabelTextContainer.lineFragmentPadding = 0;
-        __LinkLabelTextContainer.lineBreakMode = NSLineBreakByWordWrapping;
-        [__LinkLabelLayoutManager addTextContainer:__LinkLabelTextContainer];
+    if(!__LinkTextViewTextStorage) {
+        __LinkTextViewTextStorage = [[NSTextStorage alloc] init];
+        __LinkTextViewLayoutManager = [[NSLayoutManager alloc] init];
+        [__LinkTextViewTextStorage addLayoutManager:__LinkTextViewLayoutManager];
+        __LinkTextViewTextContainer = [[NSTextContainer alloc] initWithSize:CGSizeZero];
+        __LinkTextViewTextContainer.lineFragmentPadding = 0;
+        __LinkTextViewTextContainer.lineBreakMode = NSLineBreakByWordWrapping;
+        [__LinkTextViewLayoutManager addTextContainer:__LinkTextViewTextContainer];
     }
-    @synchronized (__LinkLabelTextStorage) {
-        __LinkLabelTextContainer.size = CGSizeMake(width, CGFLOAT_MAX);
-        [__LinkLabelTextStorage setAttributedString:text];
-        (void) [__LinkLabelLayoutManager glyphRangeForTextContainer:__LinkLabelTextContainer];
-        return [__LinkLabelLayoutManager usedRectForTextContainer:__LinkLabelTextContainer].size.height;
+    @synchronized (__LinkTextViewTextStorage) {
+        __LinkTextViewTextContainer.size = CGSizeMake(width, CGFLOAT_MAX);
+        [__LinkTextViewTextStorage setAttributedString:text];
+        (void) [__LinkTextViewLayoutManager glyphRangeForTextContainer:__LinkTextViewTextContainer];
+        return [__LinkTextViewLayoutManager usedRectForTextContainer:__LinkTextViewTextContainer].size.height;
     }
 }
 

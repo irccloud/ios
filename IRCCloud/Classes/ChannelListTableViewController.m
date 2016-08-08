@@ -16,15 +16,15 @@
 
 #import "ChannelListTableViewController.h"
 #import "NetworkConnection.h"
-#import "LinkLabel.h"
+#import "LinkTextView.h"
 #import "ColorFormatter.h"
 #import "UIColor+IRCCloud.h"
 
 @interface ChannelTableCell : UITableViewCell {
-    LinkLabel *_channel;
-    LinkLabel *_topic;
+    LinkTextView *_channel;
+    LinkTextView *_topic;
 }
-@property (readonly) LinkLabel *channel,*topic;
+@property (readonly) LinkTextView *channel,*topic;
 @end
 
 @implementation ChannelTableCell
@@ -34,7 +34,7 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _channel = [[LinkLabel alloc] init];
+        _channel = [[LinkTextView alloc] init];
         _channel.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
         _channel.editable = NO;
         _channel.scrollEnabled = NO;
@@ -45,7 +45,7 @@
         _channel.textColor = [UIColor messageTextColor];
         [self.contentView addSubview:_channel];
         
-        _topic = [[LinkLabel alloc] init];
+        _topic = [[LinkTextView alloc] init];
         _topic.font = [UIFont systemFontOfSize:FONT_SIZE];
         _topic.editable = NO;
         _topic.scrollEnabled = NO;
@@ -138,7 +138,7 @@
         NSMutableDictionary *c = [[NSMutableDictionary alloc] initWithDictionary:channel];
         NSAttributedString *topic = [ColorFormatter format:[c objectForKey:@"topic"] defaultColor:[UITableViewCell appearance].detailTextLabelColor mono:NO linkify:NO server:nil links:nil];
         [c setObject:topic forKey:@"formatted_topic"];
-        [c setObject:@([LinkLabel heightOfString:topic constrainedToWidth:self.tableView.bounds.size.width - 6 - 12] + 16 + FONT_SIZE + 2) forKey:@"height"];
+        [c setObject:@([LinkTextView heightOfString:topic constrainedToWidth:self.tableView.bounds.size.width - 6 - 12] + 16 + FONT_SIZE + 2) forKey:@"height"];
         [data addObject:c];
     }
     

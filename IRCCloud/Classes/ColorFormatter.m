@@ -16,7 +16,7 @@
 
 
 #import "ColorFormatter.h"
-#import "LinkLabel.h"
+#import "LinkTextView.h"
 #import "UIColor+IRCCloud.h"
 #import "NSURL+IDN.h"
 #import "NetworkConnection.h"
