@@ -90,7 +90,6 @@ float __largeAvatarHeight = 32;
     UILabel *_timestamp;
     LinkLabel *_message;
     LinkLabel *_nickname;
-    LinkLabel *_realname;
     int _type;
     UIView *_socketClosedBar;
     UILabel *_accessory;
@@ -101,7 +100,7 @@ float __largeAvatarHeight = 32;
 @property int type;
 @property float timestampPosition;
 @property (readonly) UILabel *timestamp, *accessory;
-@property (readonly) LinkLabel *message, *nickname, *realname;
+@property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
 @end
 
@@ -123,17 +122,12 @@ float __largeAvatarHeight = 32;
 
         _nickname = [[LinkLabel alloc] init];
         _nickname.backgroundColor = [UIColor clearColor];
-        _nickname.textColor = [UIColor messageTextColor];
+        _nickname.textColor = [UIColor timestampColor];
+        _nickname.font = [ColorFormatter timestampFont];
+        _nickname.numberOfLines = 1;
+        _nickname.lineBreakMode = NSLineBreakByTruncatingTail;
+        _nickname.userInteractionEnabled = YES;
         [self.contentView addSubview:_nickname];
-        
-        _realname = [[LinkLabel alloc] init];
-        _realname.backgroundColor = [UIColor clearColor];
-        _realname.textColor = [UIColor timestampColor];
-        _realname.font = [ColorFormatter timestampFont];
-        _realname.numberOfLines = 1;
-        _realname.lineBreakMode = NSLineBreakByTruncatingTail;
-        _realname.userInteractionEnabled = YES;
-        [self.contentView addSubview:_realname];
         
         _message = [[LinkLabel alloc] init];
         _message.backgroundColor = [UIColor clearColor];
@@ -199,13 +193,11 @@ float __largeAvatarHeight = 32;
             frame.size.height -= 4;
             [_nickname sizeToFit];
             _nickname.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth+4):0), frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
-            [_realname sizeToFit];
-            _realname.frame = CGRectMake(_nickname.frame.origin.x + _nickname.frame.size.width + 6, frame.origin.y + _nickname.frame.size.height - _realname.frame.size.height, frame.size.width - (_nickname.frame.size.width + 6) - __timestampWidth, _realname.frame.size.height);
             frame.origin.y += _nickname.frame.size.height + 4;
             frame.size.height -= _nickname.frame.size.height + 4;
-            _nickname.hidden = _realname.hidden = NO;
+            _nickname.hidden = NO;
         } else {
-            _nickname.hidden = _realname.hidden = YES;
+            _nickname.hidden = YES;
         }
         if(_type == ROW_SOCKETCLOSED) {
             frame.size.height -= 26;
@@ -1844,11 +1836,14 @@ float __largeAvatarHeight = 32;
         cell.backgroundColor = nil;
         cell.contentView.backgroundColor = e.bgColor;
         if(e.isHeader) {
-            cell.realname.attributedText = (([e.realname isKindOfClass:[NSString class]] && [e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) || __norealnamePref)?nil:e.formattedRealname;
-            cell.nickname.attributedText = e.formattedNick;
+            NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithAttributedString:e.formattedNick];
+            if(([e.realname isKindOfClass:[NSString class]] && ![e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) && !__norealnamePref) {
+                [s appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
+                [s appendAttributedString:e.formattedRealname];
+            }
+            cell.nickname.attributedText = s;
             cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
         } else {
-            cell.realname.text = nil;
             cell.nickname.text = nil;
             cell.avatar.hidden = !((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && e.groupEid < 1);
         }
@@ -1860,8 +1855,7 @@ float __largeAvatarHeight = 32;
         } else {
             cell.avatar.image = nil;
         }
-        cell.realname.textColor = [UIColor timestampColor];
-        cell.timestamp.font = cell.realname.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
+        cell.timestamp.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
         cell.message.font = [ColorFormatter timestampFont];
         cell.message.linkDelegate = self;
         if(!e.formatted && e.formattedMsg.length > 0) {
@@ -1940,14 +1934,14 @@ float __largeAvatarHeight = 32;
                     NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
                 }
             }
-            if(cell.realname.text.length && e.realnameLinks.count) {
-                cell.realname.linkAttributes = _lightLinkAttributes;
-                cell.realname.linkDelegate = self;
+            if(cell.nickname.text.length && e.realnameLinks.count) {
+                cell.nickname.linkAttributes = _lightLinkAttributes;
+                cell.nickname.linkDelegate = self;
                 @try {
                     for(NSTextCheckingResult *result in e.realnameLinks) {
                         if(result.resultType == NSTextCheckingTypeLink) {
                             if(result.URL)
-                                [cell.realname addLinkWithTextCheckingResult:result];
+                                [cell.nickname addLinkToURL:result.URL withRange:NSMakeRange(result.range.location + e.formattedNick.length + 1, result.range.length)];
                         } else {
                             NSString *url = [[e.formattedRealname attributedSubstringFromRange:result.range] string];
                             if(![url hasPrefix:@"irc"]) {
@@ -1959,7 +1953,7 @@ float __largeAvatarHeight = 32;
                             }
                             NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
                             if(u)
-                                [cell.realname addLinkToURL:u withRange:result.range];
+                                [cell.nickname addLinkToURL:u withRange:NSMakeRange(result.range.location + e.formattedNick.length + 1, result.range.length)];
                         }
                     }
                 }
