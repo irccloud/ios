@@ -92,9 +92,25 @@ platform :ios do
 
   desc "Upload metadata"
   lane :metadata do |options|
+    app_review_information = {
+      'first_name' => "first_name",
+      'last_name' => "last_name",
+      'phone_number' => "phone_number",
+      'email_address' => "email_address",
+      'demo_user' => "demo_user",
+      'demo_password' => "demo_password",
+      'notes' => <<-REVIEW_NOTES
+notes
+REVIEW_NOTES
+    }
+
     if options[:enterprise]
         metadata_path = "./fastlane/metadata-enterprise"
         app_identifier = "com.irccloud.enterprise"
+        app_review_information['notes'] = <<-REVIEW_NOTES
+For Host, please use www.irccloud.com
+#{app_review_information['notes']}
+REVIEW_NOTES
     else
         metadata_path = "./fastlane/metadata"
         app_identifier = "com.irccloud.IRCCloud"
