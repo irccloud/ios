@@ -16,10 +16,6 @@ fastlane_version "1.97.2"
 default_platform :ios
 
 platform :ios do
-  before_all do
-    # ENV["SLACK_URL"] = "https://hooks.slack.com/services/..."   
-  end
-  
   desc "Check all certs and provisioning profiles from github"
   lane :certs do
     app_root = "com.irccloud."
@@ -113,14 +109,10 @@ platform :ios do
         skip_binary_upload: true,
         skip_screenshots: skip_screenshots,
         metadata_path: metadata_path,
+        app_review_information: app_review_information,
         automatic_release: true
     )
   end
-
-  #desc "Runs all the tests"
-  #lane :test do
-  #  scan
-  #end
 
   desc "Make sure all devices are added to the ad-hoc profile"
   lane :updateadhoc do
@@ -149,31 +141,6 @@ platform :ios do
     crashlytics(api_token: CRASHLYTICS_TOKEN, build_secret: CRASHLYTICS_SECRET, groups: ["irccloud","ios-enterprise"], notes: notes)
   end
 
-  #desc "Deploy a new version to the App Store"
-  #lane :appstore do
-    # match(type: "appstore")
-    # snapshot
-    ## gym(scheme: "IRCCloud") # Build your app - more options available
-    ## deliver(force: true)
-    # frameit
-  #end
-
-  # You can define as many lanes as you want
-
-  after_all do |lane|
-    # This block is called, only if the executed lane was successful
-
-    # slack(
-    #   message: "Successfully deployed new App Update."
-    # )
-  end
-
-  error do |lane, exception|
-    # slack(
-    #   message: exception.message,
-    #   success: false
-    # )
-  end
 end
 
 
