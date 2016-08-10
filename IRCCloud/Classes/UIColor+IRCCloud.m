@@ -16,6 +16,7 @@
 
 
 #import "UIColor+IRCCloud.h"
+#import "ColorFormatter.h"
 
 UIImage *__timestampBackgroundImage;
 UIImage *__newMsgsBackgroundImage;
@@ -1050,7 +1051,7 @@ NSString *__current_theme;
 }
 +(NSDictionary *)linkAttributes {
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineSpacing = 6;
+    paragraphStyle.lineSpacing = MESSAGE_LINE_SPACING;
     paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
     
     return @{NSForegroundColorAttributeName: [UIColor linkColor],
@@ -1059,7 +1060,7 @@ NSString *__current_theme;
 }
 +(NSDictionary *)lightLinkAttributes {
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineSpacing = 6;
+    paragraphStyle.lineSpacing = MESSAGE_LINE_SPACING;
     paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
     
     return @{NSForegroundColorAttributeName: [UIColor lightLinkColor],

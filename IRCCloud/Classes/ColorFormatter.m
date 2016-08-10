@@ -1435,7 +1435,7 @@ float ColorFormatterCachedFontSize = 0.0f;
     }
     
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineSpacing = 6;
+    paragraphStyle.lineSpacing = MESSAGE_LINE_SPACING;
     paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
     [output addAttribute:(NSString*)NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [output length])];
     

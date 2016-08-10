@@ -25,6 +25,7 @@
 #define UNDERLINE 31
 
 #define FONT_SIZE [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"]
+#define MESSAGE_LINE_SPACING 2
 
 @interface ColorFormatter : NSObject
 +(NSRegularExpression*)ircChannelRegexForServer:(Server *)s;

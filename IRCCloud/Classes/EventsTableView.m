@@ -127,6 +127,7 @@ float __largeAvatarHeight = 32;
         _nickname.numberOfLines = 1;
         _nickname.lineBreakMode = NSLineBreakByTruncatingTail;
         _nickname.userInteractionEnabled = YES;
+        _nickname.baselineAdjustment = UIBaselineAdjustmentNone;
         [self.contentView addSubview:_nickname];
         
         _message = [[LinkLabel alloc] init];
@@ -135,6 +136,7 @@ float __largeAvatarHeight = 32;
         _message.numberOfLines = 0;
         _message.lineBreakMode = NSLineBreakByWordWrapping;
         _message.userInteractionEnabled = YES;
+        _message.baselineAdjustment = UIBaselineAdjustmentNone;
         [self.contentView addSubview:_message];
         
         _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
@@ -144,6 +146,7 @@ float __largeAvatarHeight = 32;
         _accessory = [[UILabel alloc] initWithFrame:CGRectZero];
         _accessory.hidden = YES;
         _accessory.textAlignment = NSTextAlignmentCenter;
+        _accessory.baselineAdjustment = UIBaselineAdjustmentNone;
         _accessory.textColor = [UIColor expandCollapseIndicatorColor];
         [self.contentView addSubview:_accessory];
 
@@ -180,8 +183,8 @@ float __largeAvatarHeight = 32;
     
     if(_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED) {
         frame.origin.x = (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?6:16;
-        frame.origin.y = 4;
-        frame.size.height -= 6;
+        frame.origin.y = 2;
+        frame.size.height -= 4;
         frame.size.width -= frame.origin.x + 6;
         if(!__chatOneLinePref && !__avatarsOffPref) {
             _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + ((_nickname.attributedText.length)?4:0),__largeAvatarHeight,__largeAvatarHeight);
@@ -189,34 +192,35 @@ float __largeAvatarHeight = 32;
             frame.size.width -= _avatar.frame.size.width + 17;
         }
         if((_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE) && !__chatOneLinePref && _nickname.attributedText.length) {
-            frame.origin.y += 4;
-            frame.size.height -= 4;
+            frame.origin.y += 2;
+            frame.size.height -= 2;
             [_nickname sizeToFit];
             _nickname.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth+4):0), frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
-            frame.origin.y += _nickname.frame.size.height + 4;
-            frame.size.height -= _nickname.frame.size.height + 4;
+            frame.origin.y += _nickname.frame.size.height + 2;
+            frame.size.height -= _nickname.frame.size.height + 2;
             _nickname.hidden = NO;
         } else {
             _nickname.hidden = YES;
         }
+        [_accessory sizeToFit];
         if(_type == ROW_SOCKETCLOSED) {
             frame.size.height -= 26;
             _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, self.contentView.bounds.size.width, 26);
             _socketClosedBar.hidden = NO;
             _socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
-            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
+            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 4, _accessory.frame.size.width, _accessory.frame.size.height);
         } else if(_type == ROW_FAILED) {
             frame.size.width -= 20;
-            _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
+            _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _accessory.frame.size.width, _accessory.frame.size.height);
         } else {
             _socketClosedBar.hidden = YES;
-            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 1, _timestamp.font.pointSize, _timestamp.font.pointSize);
+            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 4, _accessory.frame.size.width, _accessory.frame.size.height);
         }
         [_timestamp sizeToFit];
         _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition - _timestamp.frame.size.height + 4, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && frame.size.height < 0);
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
-        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, frame.size.height);
+        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, [_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y,__smallAvatarHeight,__smallAvatarHeight);
         }
@@ -1776,13 +1780,14 @@ float __largeAvatarHeight = 32;
     float estimatedWidth = _tableView.frame.size.width - 4 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0);
     estimatedWidth -= (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?12:22;
     
-    e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + 8 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+    
+    e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + 4 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
     e.timestampPosition = FONT_SIZE;
     
     if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
-        e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + 8;
-        if(e.height < __largeAvatarHeight + 12)
-            e.height = __largeAvatarHeight + 12;
+        e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + 4;
+        if(e.height < __largeAvatarHeight + 4)
+            e.height = __largeAvatarHeight + 4;
     }
 }
 
