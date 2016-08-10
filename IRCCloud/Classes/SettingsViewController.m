@@ -772,7 +772,6 @@
     _fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
     
     NSArray *account;
-    NSLog(@"%@", [NetworkConnection sharedInstance].config);
     if([[[NetworkConnection sharedInstance].config objectForKey:@"auth_mechanism"] isEqualToString:@"internal"]) {
         account = @[
                     @{@"title":@"Email Address", @"accessory":_email},
