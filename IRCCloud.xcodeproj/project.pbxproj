@@ -278,6 +278,7 @@
 		228E2BA218CF770D0011DEAB /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
 		228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
 		228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */; };
+		2292AD591D5B55CC00BEE269 /* LinkLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE91781D59160B0014B25C /* LinkLabel.m */; };
 		2293907B19D754D600A73946 /* ServerMapTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293907A19D754D600A73946 /* ServerMapTableViewController.m */; };
 		2293907C19D754D600A73946 /* ServerMapTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293907A19D754D600A73946 /* ServerMapTableViewController.m */; };
 		2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
@@ -1818,6 +1819,7 @@
 				225D975218AA995900065087 /* ServersDataSource.m in Sources */,
 				225D975318AA995900065087 /* NickCompletionView.m in Sources */,
 				22CE91761D58C81C0014B25C /* LinkTextView.m in Sources */,
+				2292AD591D5B55CC00BEE269 /* LinkLabel.m in Sources */,
 				22DB8D711C441C3000302271 /* YouTubeViewController.m in Sources */,
 				225D975418AA995900065087 /* NSURL+IDN.m in Sources */,
 				225D975518AA995900065087 /* BuffersDataSource.m in Sources */,

@@ -73,7 +73,7 @@ NSLayoutManager *__LinkTextViewLayoutManager;
 
 - (NSTextCheckingResult *)linkAtPoint:(CGPoint)p {
     UITextRange *textRange = [self characterRangeAtPoint:p];
-    int start = [self offsetFromPosition:self.beginningOfDocument toPosition:textRange.start];
+    NSUInteger start = [self offsetFromPosition:self.beginningOfDocument toPosition:textRange.start];
     
     for(NSTextCheckingResult *r in _links) {
         if(start >= r.range.location && start < r.range.location + r.range.length)
