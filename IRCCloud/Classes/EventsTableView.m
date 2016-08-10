@@ -191,7 +191,7 @@ float __largeAvatarHeight = 32;
             frame.origin.x += _avatar.frame.size.width + 13;
             frame.size.width -= _avatar.frame.size.width + 17;
         }
-        if((_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE) && !__chatOneLinePref && _nickname.attributedText.length) {
+        if(_type == ROW_MESSAGE && !__chatOneLinePref && _nickname.attributedText.length) {
             frame.origin.y += 2;
             frame.size.height -= 2;
             [_nickname sizeToFit];
