@@ -771,6 +771,22 @@
     _tabletMode.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"];
     _fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
     
+    NSArray *account;
+    NSLog(@"%@", [NetworkConnection sharedInstance].config);
+    if([[[NetworkConnection sharedInstance].config objectForKey:@"auth_mechanism"] isEqualToString:@"internal"]) {
+        account = @[
+                    @{@"title":@"Email Address", @"accessory":_email},
+                    @{@"title":@"Full Name", @"accessory":_name},
+                    @{@"title":@"Auto Away", @"accessory":_autoaway},
+                    ];
+        
+    } else {
+        account = @[
+                    @{@"title":@"Full Name", @"accessory":_name},
+                    @{@"title":@"Auto Away", @"accessory":_autoaway},
+                    ];
+    }
+    
     NSString *imageSize;
     switch([[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue]) {
         case 512:
@@ -817,11 +833,7 @@
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
     
     _data = @[
-              @{@"title":@"Account", @"items":@[
-                        @{@"title":@"Email Address", @"accessory":_email},
-                        @{@"title":@"Full Name", @"accessory":_name},
-                        @{@"title":@"Auto Away", @"accessory":_autoaway},
-                        ]},
+              @{@"title":@"Account", @"items":account},
               @{@"title":@"Highlight Words", @"items":@[
                         @{@"configure":^(UITableViewCell *cell) {
                             cell.textLabel.text = nil;
