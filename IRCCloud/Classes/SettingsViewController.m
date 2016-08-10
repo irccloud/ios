@@ -772,19 +772,23 @@
     _fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
     
     NSArray *account;
+#ifdef ENTERPRISE
     if([[[NetworkConnection sharedInstance].config objectForKey:@"auth_mechanism"] isEqualToString:@"internal"]) {
+#endif
         account = @[
                     @{@"title":@"Email Address", @"accessory":_email},
                     @{@"title":@"Full Name", @"accessory":_name},
                     @{@"title":@"Auto Away", @"accessory":_autoaway},
                     ];
         
+#ifdef ENTERPRISE
     } else {
         account = @[
                     @{@"title":@"Full Name", @"accessory":_name},
                     @{@"title":@"Auto Away", @"accessory":_autoaway},
                     ];
     }
+#endif
     
     NSString *imageSize;
     switch([[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] intValue]) {

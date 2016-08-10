@@ -78,7 +78,7 @@ NSLayoutManager *__LinkLabelLayoutManager;
     NSLayoutManager *layoutManager = [[NSLayoutManager alloc] init];
     [textStorage addLayoutManager:layoutManager];
     
-    NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:CGSizeMake(self.frame.size.width, self.frame.size.height)];
+    NSTextContainer *textContainer = [[NSTextContainer alloc] initWithSize:CGSizeMake(self.frame.size.width, CGFLOAT_MAX)];
     textContainer.lineFragmentPadding  = 0;
     textContainer.maximumNumberOfLines = self.numberOfLines;
     textContainer.lineBreakMode        = self.lineBreakMode;
