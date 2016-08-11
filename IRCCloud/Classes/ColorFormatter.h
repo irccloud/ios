@@ -36,6 +36,7 @@
 +(UIFont *)timestampFont;
 +(UIFont *)monoTimestampFont;
 +(UIFont *)awesomeFont;
++(UIFont *)messageFont:(BOOL)mono;
 @end
 
 @interface NSString (ColorFormatter)

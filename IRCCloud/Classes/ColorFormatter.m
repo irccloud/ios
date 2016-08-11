@@ -62,6 +62,10 @@ float ColorFormatterCachedFontSize = 0.0f;
     return awesomeFont;
 }
 
++(UIFont *)messageFont:(BOOL)mono {
+    return mono?Courier:Helvetica;
+}
+
 +(NSRegularExpression *)emoji {
     if(!emojiMap)
         emojiMap = @{

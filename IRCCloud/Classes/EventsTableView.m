@@ -217,7 +217,7 @@ float __largeAvatarHeight = 32;
             _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 4, _accessory.frame.size.width, _accessory.frame.size.height);
         }
         [_timestamp sizeToFit];
-        _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition - _timestamp.frame.size.height + 4, __timestampWidth, _timestamp.frame.size.height);
+        _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && frame.size.height < 0);
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
         _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, [_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height);
@@ -1782,7 +1782,7 @@ float __largeAvatarHeight = 32;
     
     
     e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + 4 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
-    e.timestampPosition = FONT_SIZE;
+    e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
     
     if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
         e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + 4;
