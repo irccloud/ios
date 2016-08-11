@@ -195,9 +195,13 @@ float __largeAvatarHeight = 32;
             frame.origin.y += 2;
             frame.size.height -= 2;
             [_nickname sizeToFit];
-            _nickname.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth+4):0), frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
+            _nickname.frame = CGRectMake(frame.origin.x + (__timeLeftPref?__timestampWidth:0), frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
             frame.origin.y += _nickname.frame.size.height + 2;
             frame.size.height -= _nickname.frame.size.height + 2;
+            if(__timeLeftPref) {
+                frame.origin.x += 4;
+                frame.size.width -= 4;
+            }
             _nickname.hidden = NO;
         } else {
             _nickname.hidden = YES;
@@ -1779,7 +1783,8 @@ float __largeAvatarHeight = 32;
     float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+17);
     float estimatedWidth = _tableView.frame.size.width - 4 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0);
     estimatedWidth -= (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?12:22;
-    
+    if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
+        estimatedWidth -= 4;
     
     e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + 4 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
     e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
