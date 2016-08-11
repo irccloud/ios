@@ -82,6 +82,16 @@ NSLayoutManager *__LinkTextViewLayoutManager;
     return nil;
 }
 
+-(void)setText:(NSString *)text {
+    [_links removeAllObjects];
+    [super setText:text];
+}
+
+-(void)setAttributedText:(NSAttributedString *)attributedText {
+    [_links removeAllObjects];
+    [super setAttributedText:attributedText];
+}
+
 +(CGFloat)heightOfString:(NSAttributedString *)text constrainedToWidth:(CGFloat)width {
     if(!__LinkTextViewTextStorage) {
         __LinkTextViewTextStorage = [[NSTextStorage alloc] init];

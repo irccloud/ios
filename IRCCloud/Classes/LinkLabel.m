@@ -73,6 +73,16 @@ NSLayoutManager *__LinkLabelLayoutManager;
     self.attributedText = s;
 }
 
+-(void)setText:(NSString *)text {
+    [_links removeAllObjects];
+    [super setText:text];
+}
+
+-(void)setAttributedText:(NSAttributedString *)attributedText {
+    [_links removeAllObjects];
+    [super setAttributedText:attributedText];
+}
+
 - (NSTextCheckingResult *)linkAtPoint:(CGPoint)p {
     NSTextStorage *textStorage = [[NSTextStorage alloc] initWithAttributedString:self.attributedText];
     NSLayoutManager *layoutManager = [[NSLayoutManager alloc] init];
