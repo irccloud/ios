@@ -86,8 +86,16 @@ NSLayoutManager *__LinkLabelLayoutManager;
     [layoutManager addTextContainer:textContainer];
     
     NSUInteger start = [layoutManager characterIndexForPoint:p inTextContainer:textContainer fractionOfDistanceBetweenInsertionPoints:NULL];
+    if(start == self.attributedText.length - 1) {
+        NSRange glyphRange;
+        [layoutManager characterRangeForGlyphRange:NSMakeRange(start, 1) actualGlyphRange:&glyphRange];
+        CGRect rect = [layoutManager boundingRectForGlyphRange:glyphRange inTextContainer:textContainer];
+        if(!CGRectContainsPoint(rect, p))
+            return nil;
+    }
+    
     for(NSTextCheckingResult *r in _links) {
-        if(start >= r.range.location && start < r.range.location + r.range.length)
+        if(NSLocationInRange(start, r.range))
             return r;
     }
     return nil;
