@@ -1885,7 +1885,7 @@ float __largeAvatarHeight = 32;
         cell.accessibilityHint = nil;
         cell.accessibilityElementsHidden = NO;
 
-        if(cell.message.attributedText != e.formatted) {
+        if(![cell.message.attributedText.string isEqualToString:e.formatted.string]) {
             cell.message.attributedText = e.formatted;
             
             if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {

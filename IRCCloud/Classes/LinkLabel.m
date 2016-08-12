@@ -67,10 +67,10 @@ NSLayoutManager *__LinkLabelLayoutManager;
 }
 
 - (void)addLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
-    [_links addObject:result];
     NSMutableAttributedString *s = self.attributedText.mutableCopy;
     [s addAttributes:self.linkAttributes range:result.range];
-    self.attributedText = s;
+    [super setAttributedText:s];
+    [_links addObject:result];
 }
 
 -(void)setText:(NSString *)text {
