@@ -1056,7 +1056,7 @@ float __largeAvatarHeight = 32;
         }
         
         [self _addItem:event eid:eid];
-        if(!event.formatted && event.formattedMsg.length > 0) {
+        if(!backlog && !event.formatted && event.formattedMsg.length > 0) {
             [self _format:event];
         }
         
