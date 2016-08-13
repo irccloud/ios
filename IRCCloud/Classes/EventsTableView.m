@@ -1866,7 +1866,6 @@ float __largeAvatarHeight = 32;
             cell.avatar.image = nil;
         }
         cell.timestamp.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
-        cell.message.font = [ColorFormatter timestampFont];
         cell.message.linkDelegate = self;
         if(!e.formatted && e.formattedMsg.length > 0) {
             [self _format:e];
