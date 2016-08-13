@@ -1976,6 +1976,7 @@ float __largeAvatarHeight = 32;
         else
             cell.timestamp.text = e.timestamp;
         if(e.rowType == ROW_TIMESTAMP) {
+            cell.timestamp.font = [ColorFormatter messageFont:__monospacePref];
             cell.timestamp.textColor = [UIColor messageTextColor];
         } else if(e.isHighlight && !e.isSelf) {
             cell.timestamp.textColor = [UIColor highlightTimestampColor];

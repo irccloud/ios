@@ -43,14 +43,14 @@ float ColorFormatterCachedFontSize = 0.0f;
 
 +(UIFont *)timestampFont {
     if(!timestampFont) {
-        timestampFont = [UIFont systemFontOfSize:FONT_SIZE];
+        timestampFont = [UIFont systemFontOfSize:FONT_SIZE - 2];
     }
     return timestampFont;
 }
 
 +(UIFont *)monoTimestampFont {
     if(!monoTimestampFont) {
-        monoTimestampFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        monoTimestampFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE - 2];
     }
     return monoTimestampFont;
 }
@@ -1186,8 +1186,8 @@ float ColorFormatterCachedFontSize = 0.0f;
 }
 
 +(void)loadFonts {
-    monoTimestampFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-    timestampFont = [UIFont systemFontOfSize:FONT_SIZE];
+    monoTimestampFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE - 2];
+    timestampFont = [UIFont systemFontOfSize:FONT_SIZE - 2];
     awesomeFont = [UIFont fontWithName:@"FontAwesome" size:FONT_SIZE];
     arrowFont = [UIFont fontWithName:@"HiraMinProN-W3" size:FONT_SIZE];
     Courier = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
