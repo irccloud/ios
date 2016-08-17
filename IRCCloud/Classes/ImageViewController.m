@@ -190,11 +190,13 @@
 -(void)_hideToolbar {
     [_hideTimer invalidate];
     _hideTimer = nil;
-    [UIView animateWithDuration:0.5 animations:^{
-        _toolbar.alpha = 0;
-    } completion:^(BOOL finished){
-        _toolbar.hidden = YES;
-    }];
+    if(_imageView.image != nil || _movieController != nil) {
+        [UIView animateWithDuration:0.5 animations:^{
+            _toolbar.alpha = 0;
+        } completion:^(BOOL finished){
+            _toolbar.hidden = YES;
+        }];
+    }
 }
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
@@ -206,13 +208,27 @@
     _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
 }
 
--(void)fail {
+-(void)fail:(NSString *)error {
     [_progressView removeFromSuperview];
 
     if(_previewing || self.view.window.rootViewController != self) {
         NSLog(@"Not launching fallback URL as we're not the root view controller");
         return;
     }
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Unable To Load Image" message:error preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Open in Browser" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        [self _openInBrowser];
+    }]];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {
+        [self doneButtonPressed:alert];
+    }]];
+    [self presentViewController:alert animated:YES completion:nil];
+    [self _showToolbar];
+}
+
+-(void)_openInBrowser {
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
         if([[OpenInChromeController sharedInstance] openInChrome:_url withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
@@ -253,7 +269,7 @@
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
             NSLog(@"Error fetching oembed. Error %li : %@", (long)error.code, error.userInfo);
-            [self fail];
+            [self fail:error.localizedDescription];
         } else {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
             NSDictionary *dict = [parser objectWithData:data];
@@ -273,7 +289,7 @@
                 }
             } else {
                 NSLog(@"Invalid type from oembed");
-                [self fail];
+                [self fail:@"This URL type is not supported"];
             }
         }
     }];
@@ -294,6 +310,7 @@
     if([UIApplication sharedApplication].delegate.window.rootViewController == self)
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
+    [self scrollViewDidZoom:_scrollView];
 }
 
 -(void)loadGfycat:(NSString *)gyfID {
@@ -303,7 +320,7 @@
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
             NSLog(@"Error fetching gfycat. Error %li : %@", (long)error.code, error.userInfo);
-            [self fail];
+            [self fail:error.localizedDescription];
         } else {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
             NSDictionary *dict = [parser objectWithData:data];
@@ -318,12 +335,12 @@
                     
                     [_connection start];
                 } else {
-                    NSLog(@"Invalid type from gfycat");
-                    [self fail];
+                    CLS_LOG(@"Invalid type from gfycat: %@", dict);
+                    [self fail:@"This image type is not supported"];
                 }
             } else {
-                NSLog(@"Gfycat failure");
-                [self fail];
+                CLS_LOG(@"Gfycat failure: %@", dict);
+                [self fail:@"Unexpected response from server"];
             }
         }
     }];
@@ -336,7 +353,7 @@
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
             NSLog(@"Error fetching giphy. Error %li : %@", (long)error.code, error.userInfo);
-            [self fail];
+            [self fail:error.localizedDescription];
         } else {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
             NSDictionary *dict = [parser objectWithData:data];
@@ -351,12 +368,12 @@
                     
                     [_connection start];
                 } else {
-                    NSLog(@"Invalid type from giphy");
-                    [self fail];
+                    CLS_LOG(@"Invalid type from giphy: %@", dict);
+                    [self fail:@"This image type is not supported"];
                 }
             } else {
-                NSLog(@"giphy failure");
-                [self fail];
+                CLS_LOG(@"giphy failure: %@", dict);
+                [self fail:@"Unexpected response from server"];
             }
         }
     }];
@@ -377,7 +394,7 @@
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
             CLS_LOG(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
-            [self fail];
+            [self fail:error.localizedDescription];
         } else {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
             NSDictionary *dict = [parser objectWithData:data];
@@ -394,11 +411,11 @@
                         _movieController.repeatMode = MPMovieRepeatModeOne;
                 } else {
                     CLS_LOG(@"Invalid type from imgur: %@", dict);
-                    [self fail];
+                    [self fail:@"This image type is not supported"];
                 }
             } else {
                 CLS_LOG(@"Imgur failure: %@", dict);
-                [self fail];
+                [self fail:@"Unexpected response from server"];
             }
         }
     }];
@@ -419,7 +436,7 @@
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
             CLS_LOG(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
-            [self fail];
+            [self fail:error.localizedDescription];
         } else {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
             NSDictionary *dict = [parser objectWithData:data];
@@ -438,15 +455,15 @@
                             _movieController.repeatMode = MPMovieRepeatModeOne;
                     } else {
                         CLS_LOG(@"Invalid type from imgur: %@", dict);
-                        [self fail];
+                        [self fail:@"This image type is not supported"];
                     }
                 } else {
                     CLS_LOG(@"Too many images from imgur: %@", dict);
-                    [self fail];
+                    [self fail:@"Albums with images are not supported"];
                 }
             } else {
                 CLS_LOG(@"Imgur failure: %@", dict);
-                [self fail];
+                [self fail:@"Unexpected response from server"];
             }
         }
     }];
@@ -474,7 +491,7 @@
         } else if([imageID hasPrefix:@"a/"]) {
             [self loadImgur:[imageID substringFromIndex:2] type:@"album"];
         } else {
-            [self fail];
+            [self fail:@"Invalid URL"];
         }
         return;
     } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"]) {
@@ -502,7 +519,7 @@
         [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
             if (error) {
                 NSLog(@"Error fetching cl.ly metadata. Error %li : %@", (long)error.code, error.userInfo);
-                [self fail];
+                [self fail:error.localizedDescription];
             } else {
                 SBJsonParser *parser = [[SBJsonParser alloc] init];
                 NSDictionary *dict = [parser objectWithData:data];
@@ -513,7 +530,7 @@
                     [_connection start];
                 } else {
                     NSLog(@"Invalid type from cl.ly");
-                    [self fail];
+                    [self fail:@"This image type is not supported"];
                 }
             }
         }];
@@ -527,7 +544,7 @@
         [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
             if (error) {
                 NSLog(@"Error fetching MediaWiki metadata. Error %li : %@", (long)error.code, error.userInfo);
-                [self fail];
+                [self fail:error.localizedDescription];
             } else {
                 SBJsonParser *parser = [[SBJsonParser alloc] init];
                 NSDictionary *dict = [parser objectWithData:data];
@@ -539,7 +556,7 @@
                     [_connection start];
                 } else {
                     NSLog(@"Invalid data from MediaWiki");
-                    [self fail];
+                    [self fail:@"This image type is not supported"];
                 }
             }
         }];
@@ -568,12 +585,16 @@
     return nil;
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
     _bytesExpected = [response expectedContentLength];
     _imageData = [[NSMutableData alloc] initWithCapacity:_bytesExpected + 32]; // Just in case? Unsure if the extra 32 bytes are necessary
+    if(response.statusCode != 200) {
+        [self fail:[NSString stringWithFormat:@"HTTP error %i: %@", response.statusCode, [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]]];
+        return;
+    }
     if(response.MIMEType.length && ![response.MIMEType.lowercaseString hasPrefix:@"image/"] && ![response.MIMEType.lowercaseString isEqualToString:@"binary/octet-stream"]) {
         [connection cancel];
-        [self fail];
+        [self fail:[NSString stringWithFormat:@"Invalid MIME type: %@", response.MIMEType]];
     }
 }
 
@@ -601,7 +622,7 @@
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     if(connection == _connection) {
         NSLog(@"Couldn't download image. Error code %li: %@", (long)error.code, error.localizedDescription);
-        [self fail];
+        [self fail:error.localizedDescription];
         _connection = nil;
     }
 }
@@ -611,7 +632,7 @@
         if(_imageData) {
             [self performSelectorInBackground:@selector(_parseImageData:) withObject:_imageData];
         } else {
-            [self fail];
+            [self fail:@"No image data recieved"];
         }
         _connection = nil;
     }
@@ -629,7 +650,7 @@
         _progressView.progress = 1.f;
         [self performSelectorOnMainThread:@selector(_setImage:) withObject:img waitUntilDone:NO];
     } else {
-        [self fail];
+        [self fail:@"Unable to display image"];
     }
 }
 
