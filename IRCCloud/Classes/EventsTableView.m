@@ -1867,6 +1867,7 @@ float __largeAvatarHeight = 32;
         }
         cell.timestamp.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
         cell.message.linkDelegate = self;
+        cell.nickname.linkDelegate = self;
         if(!e.formatted && e.formattedMsg.length > 0) {
             [self _format:e];
             if(e.formatted) {
@@ -1945,7 +1946,6 @@ float __largeAvatarHeight = 32;
             }
             if(cell.nickname.text.length && e.realnameLinks.count) {
                 cell.nickname.linkAttributes = _lightLinkAttributes;
-                cell.nickname.linkDelegate = self;
                 @try {
                     for(NSTextCheckingResult *result in e.realnameLinks) {
                         if(result.resultType == NSTextCheckingTypeLink) {

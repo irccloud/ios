@@ -2941,9 +2941,9 @@ extern NSDictionary *emojiMap;
         [sheet addButtonWithTitle:@"Copy Message"];
     if(_selectedUser) {
         [sheet addButtonWithTitle:@"Whois"];
-        [sheet addButtonWithTitle:@"Send a message"];
+        [sheet addButtonWithTitle:@"Send a Message"];
         [sheet addButtonWithTitle:@"Mention"];
-        [sheet addButtonWithTitle:@"Invite to channel"];
+        [sheet addButtonWithTitle:@"Invite to Channel"];
         [sheet addButtonWithTitle:@"Ignore"];
         if([_buffer.type isEqualToString:@"channel"]) {
             Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
@@ -3088,7 +3088,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)_inviteToChannel {
-    Server *s = [[ServersDataSource sharedInstance] getServer:_selectedUser?_selectedBuffer.cid:_buffer.cid];
+    Server *s = [[ServersDataSource sharedInstance] getServer:_selectedUser?_buffer.cid:_selectedBuffer.cid];
     _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
     _alertView.tag = TAG_INVITE;
     _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
@@ -4007,7 +4007,7 @@ Device type: %@\n",
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
             NSString *plaintext = [NSString stringWithFormat:@"%@!%@", _selectedUser.nick, _selectedUser.hostmask];
             [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-        } else if([action isEqualToString:@"Send a message"]) {
+        } else if([action isEqualToString:@"Send a Message"]) {
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];
             if(b) {
                 [self bufferSelected:b.bid];
