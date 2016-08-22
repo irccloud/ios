@@ -28,10 +28,19 @@
             if(output.attachments.count) {
                 NSItemProvider *i = nil;
                 for(NSItemProvider *p in output.attachments) {
-                    if(([p hasItemConformingToTypeIdentifier:@"public.file-url"] && ![p hasItemConformingToTypeIdentifier:@"public.image"]) || [p hasItemConformingToTypeIdentifier:@"public.movie"]) {
-                        NSLog(@"Attachment is file URL");
+                    if([p hasItemConformingToTypeIdentifier:@"public.url"] && ![p hasItemConformingToTypeIdentifier:@"public.file-url"]) {
+                        NSLog(@"Attachment has a public URL");
                         i = p;
                         break;
+                    }
+                }
+                if(!i) {
+                    for(NSItemProvider *p in output.attachments) {
+                        if(([p hasItemConformingToTypeIdentifier:@"public.file-url"] && ![p hasItemConformingToTypeIdentifier:@"public.image"]) || [p hasItemConformingToTypeIdentifier:@"public.movie"]) {
+                            NSLog(@"Attachment is file URL");
+                            i = p;
+                            break;
+                        }
                     }
                 }
                 if(!i) {
@@ -82,6 +91,10 @@
                 
                 if([i hasItemConformingToTypeIdentifier:@"public.file-url"]) {
                     [i loadItemForTypeIdentifier:@"public.file-url" options:nil completionHandler:urlHandler];
+                } else if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
+                    _fileUploader = nil;
+                    [self reloadConfigurationItems];
+                    [self validateContent];
                 } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
                     [i loadItemForTypeIdentifier:@"public.movie" options:nil completionHandler:urlHandler];
                 } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
@@ -134,7 +147,6 @@
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.title = @"IRCCloud";
     _sound = 1001;
-    //AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &_sound);
 }
 
 - (void)backlogComplete:(NSNotification *)n {
@@ -172,7 +184,7 @@
         } else {
             NSItemProvider *i = nil;
             for(NSItemProvider *p in output.attachments) {
-                if([p hasItemConformingToTypeIdentifier:@"public.url"] && ![p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                if([p hasItemConformingToTypeIdentifier:@"public.url"] && ![p hasItemConformingToTypeIdentifier:@"public.file-url"]) {
                     i = p;
                     break;
                 }
@@ -262,7 +274,7 @@
 #else
         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-        if([d boolForKey:@"uploadsAvailable"]) {
+        if(_fileUploader && [d boolForKey:@"uploadsAvailable"]) {
             NSExtensionItem *input = self.extensionContext.inputItems.firstObject;
             NSExtensionItem *output = [input copy];
             output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
