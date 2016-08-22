@@ -589,7 +589,7 @@
     _bytesExpected = [response expectedContentLength];
     _imageData = [[NSMutableData alloc] initWithCapacity:_bytesExpected + 32]; // Just in case? Unsure if the extra 32 bytes are necessary
     if(response.statusCode != 200) {
-        [self fail:[NSString stringWithFormat:@"HTTP error %i: %@", response.statusCode, [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]]];
+        [self fail:[NSString stringWithFormat:@"HTTP error %ld: %@", (long)response.statusCode, [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]]];
         return;
     }
     if(response.MIMEType.length && ![response.MIMEType.lowercaseString hasPrefix:@"image/"] && ![response.MIMEType.lowercaseString isEqualToString:@"binary/octet-stream"]) {
