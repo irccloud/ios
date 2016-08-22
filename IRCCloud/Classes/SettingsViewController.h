@@ -43,6 +43,7 @@
     UISwitch *_noRealName;
     UISwitch *_timeLeft;
     UISwitch *_avatarsOff;
+    UISwitch *_browserWarning;
     NSString *_version;
     UISlider *_fontSize;
     int _userinforeqid;

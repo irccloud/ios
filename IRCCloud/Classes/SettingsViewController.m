@@ -517,6 +517,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:!_noRealName.isOn forKey:@"chat-norealname"];
         [[NSUserDefaults standardUserDefaults] setBool:!_timeLeft.isOn forKey:@"time-left"];
         [[NSUserDefaults standardUserDefaults] setBool:!_avatarsOff.isOn forKey:@"avatars-off"];
+        [[NSUserDefaults standardUserDefaults] setBool:!_browserWarning.isOn forKey:@"warnBeforeLaunchingBrowser"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -751,6 +752,12 @@
         _avatarsOff.on = YES;
     }
     
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"warnBeforeLaunchingBrowser"]) {
+        _browserWarning.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"warnBeforeLaunchingBrowser"];
+    } else {
+        _browserWarning.on = YES;
+    }
+    
     if(_oneLine.on) {
         _noRealName.enabled = YES;
         if(_avatarsOff.on) {
@@ -816,6 +823,7 @@
         [device addObject:@{@"title":@"Show Sidebars In Landscape", @"accessory":_tabletMode}];
     }
     [device addObject:@{@"title":@"Ask to Pastebin", @"accessory":_pastebin}];
+    [device addObject:@{@"title":@"Retry Failed Images in Browser", @"accessory":_browserWarning}];
     
     NSMutableArray *photos = [[NSMutableArray alloc] init];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
@@ -940,6 +948,7 @@
     _timeLeft = [[UISwitch alloc] init];
     _avatarsOff = [[UISwitch alloc] init];
     [_avatarsOff addTarget:self action:@selector(oneLineToggled:) forControlEvents:UIControlEventValueChanged];
+    _browserWarning = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";

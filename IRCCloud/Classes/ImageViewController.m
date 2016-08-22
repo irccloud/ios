@@ -216,16 +216,20 @@
         return;
     }
     
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Unable To Load Image" message:error preferredStyle:UIAlertControllerStyleAlert];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Open in Browser" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"warnBeforeLaunchingBrowser"]) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Unable To Load Image" message:error preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Open in Browser" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _openInBrowser];
+        }]];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {
+            [self doneButtonPressed:alert];
+        }]];
+        [self presentViewController:alert animated:YES completion:nil];
+        [self _showToolbar];
+    } else {
         [self _openInBrowser];
-    }]];
-    
-    [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {
-        [self doneButtonPressed:alert];
-    }]];
-    [self presentViewController:alert animated:YES completion:nil];
-    [self _showToolbar];
+    }
 }
 
 -(void)_openInBrowser {
