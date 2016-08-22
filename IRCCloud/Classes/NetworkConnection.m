@@ -1183,14 +1183,17 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid {
-    return [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":to, @"cid":[@(cid) stringValue]}];
+    if(to)
+        return [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":to, @"cid":[@(cid) stringValue]}];
+    else
+        return [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":@"*", @"cid":[@(cid) stringValue]}];
 }
 
 -(int)say:(NSString *)message to:(NSString *)to cid:(int)cid {
     if(to)
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":to}];
     else
-        return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message}];
+        return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":@"*"}];
 }
 
 -(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids {
