@@ -322,7 +322,8 @@ volatile BOOL __socketPaused = NO;
                     
                     if(show && ![_notifications getNotification:event.eid bid:event.bid]) {
                         [_notifications notify:nil cid:event.cid bid:event.bid eid:event.eid];
-                        [_notifications updateBadgeCount];
+                        if(!backlog)
+                            [_notifications updateBadgeCount];
                     }
                 }
                 if((!backlog && !_resuming) || event.reqId > 0) {
@@ -1881,6 +1882,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }
     [self performSelectorInBackground:@selector(serialize) withObject:nil];
+    [_notifications performSelectorOnMainThread:@selector(updateBadgeCount) withObject:nil waitUntilDone:YES];
 }
 
 -(void)serialize {
