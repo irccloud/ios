@@ -47,16 +47,19 @@ NSLayoutManager *__LinkTextViewLayoutManager;
             do {
                 obj = obj.superview;
             } while (obj && ![obj isKindOfClass:[UITableViewCell class]]);
-            if(obj) {
+            if([obj isKindOfClass:[UITableViewCell class]]) {
                 UITableViewCell *cell = (UITableViewCell*)obj;
                 
                 do {
                     obj = obj.superview;
                 } while (![obj isKindOfClass:[UITableView class]]);
-                UITableView *tableView = (UITableView*)obj;
-                
-                NSIndexPath *indePath = [tableView indexPathForCell:cell];
-                [[tableView delegate] tableView:tableView didSelectRowAtIndexPath:indePath];
+                if([obj isKindOfClass:[UITableView class]]) {
+                    UITableView *tableView = (UITableView*)obj;
+                    if([tableView.delegate respondsToSelector:@selector(tableView:didSelectRowAtIndexPath:)]) {
+                        NSIndexPath *indePath = [tableView indexPathForCell:cell];
+                        [[tableView delegate] tableView:tableView didSelectRowAtIndexPath:indePath];
+                    }
+                }
             }
         }
     }
