@@ -614,10 +614,12 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     CGRect frame = self.underLeftView.frame;
     if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         frame.origin.y = sbheight;
-        frame.size.height = self.view.bounds.size.height - sbheight;
+        frame.size.height = self.view.bounds.size.height;
+        if([UIApplication sharedApplication].statusBarFrame.size.height <= 20)
+            frame.size.height -= sbheight;
     } else {
         frame.origin.y = sbwidth;
-        frame.size.height = self.view.bounds.size.height - sbwidth;
+        frame.size.height = self.view.bounds.size.height;
     }
     self.underLeftView.frame = frame;
 }
@@ -666,7 +668,9 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     CGRect frame = self.underRightView.frame;
     if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 8) {
         frame.origin.y = sbheight;
-        frame.size.height = self.view.bounds.size.height - sbheight;
+        frame.size.height = self.view.bounds.size.height;
+        if([UIApplication sharedApplication].statusBarFrame.size.height <= 20)
+            frame.size.height -= sbheight;
     } else {
         frame.origin.y = sbwidth;
         frame.size.height = self.view.bounds.size.height - sbwidth;

@@ -2462,7 +2462,7 @@ extern NSDictionary *emojiMap;
 
 -(void)updateLayout:(float)sbHeight {
     CGRect frame = self.slidingViewController.view.frame;
-    if(sbHeight > 20)
+    if(sbHeight >= 20)
         frame.origin.y = (sbHeight - 20);
     frame.size = self.slidingViewController.view.window.bounds.size;
     if(frame.size.width > 0 && frame.size.height > 0) {
@@ -2470,6 +2470,8 @@ extern NSDictionary *emojiMap;
             frame.size.height -= sbHeight;
         
         self.slidingViewController.view.frame = frame;
+        [self.slidingViewController updateUnderLeftLayout];
+        [self.slidingViewController updateUnderRightLayout];
         [self transitionToSize:frame.size];
     }
 }
