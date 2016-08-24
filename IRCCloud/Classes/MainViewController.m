@@ -3940,6 +3940,8 @@ Device type: %@\n",
                 folders = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[[folders[0] URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:@"active"] includingPropertiesForKeys:nil options:0 error:nil];
                 
                 if(folders.count) {
+                    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+                    formatter.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS ";
                     NSMutableArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:folders[0] includingPropertiesForKeys:nil options:0 error:nil].mutableCopy;
                     if(files.count) {
                         [files sortUsingComparator:^ (NSURL *a, NSURL *b) {
@@ -3957,11 +3959,8 @@ Device type: %@\n",
                                         NSDictionary *dict = [parser objectWithString:line];
                                         NSString *msg = [[dict objectForKey:@"log"] objectForKey:@"msg"];
                                         if(msg.length) {
-                                            NSInteger ti = [[[dict objectForKey:@"log"] objectForKey:@"time"] intValue] / 1000;
-                                            NSInteger seconds = ti % 60;
-                                            NSInteger minutes = (ti / 60) % 60;
-                                            NSInteger hours = (ti / 3600);
-                                            [report appendFormat:@"%02ld:%02ld:%02ld ", (long)hours, (long)minutes, (long)seconds];
+                                            NSDate *date = [NSDate dateWithTimeIntervalSince1970:[[[dict objectForKey:@"log"] objectForKey:@"time"] doubleValue] / 1000.0f];
+                                            [report appendString:[formatter stringFromDate:date]];
                                             
                                             for (NSInteger i = 0; i < msg.length; i += 2) {
                                                 NSString *hex = [msg substringWithRange:NSMakeRange(i, 2)];

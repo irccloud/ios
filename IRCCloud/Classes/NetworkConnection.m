@@ -75,7 +75,7 @@ volatile BOOL __socketPaused = NO;
         _parser.delegate = _adapter;
         _cancelled = NO;
         _running = NO;
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:8];
         [request setHTTPShouldHandleCookies:NO];
         [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
         [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
