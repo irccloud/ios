@@ -1878,11 +1878,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
     CLS_LOG(@"I downloaded %i events", _totalCount);
     [_oobQueue removeObject:fetcher];
+    [_notifications updateBadgeCount];
     if([_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }
     [self performSelectorInBackground:@selector(serialize) withObject:nil];
-    [_notifications performSelectorOnMainThread:@selector(updateBadgeCount) withObject:nil waitUntilDone:YES];
 }
 
 -(void)serialize {
