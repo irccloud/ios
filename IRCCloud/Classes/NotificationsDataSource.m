@@ -105,7 +105,6 @@
         }
         if(!found) {
             [[_notifications objectForKey:@(bid)] addObject:n];
-            CLS_LOG(@"Got notification for bid%i eid%.0f", bid, eid);
             //[[UIApplication sharedApplication] presentLocalNotificationNow:n];
         }
     }
