@@ -24,6 +24,8 @@
 #import "OpenInFirefoxControllerObjC.h"
 #import "config.h"
 
+#define HIDE_DURATION 2
+
 @implementation ImageViewController
 {
     NSMutableData *_imageData;
@@ -172,7 +174,7 @@
     if(_toolbar.hidden && !_previewing)
         [self _showToolbar];
     [_hideTimer invalidate];
-    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
     
     pScrollView.alwaysBounceHorizontal = (pScrollView.zoomScale > pScrollView.minimumZoomScale);
     pScrollView.alwaysBounceVertical = (pScrollView.zoomScale > pScrollView.minimumZoomScale);
@@ -205,7 +207,7 @@
 }
 
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
 }
 
 -(void)fail:(NSString *)error {
@@ -731,7 +733,7 @@
                     self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
                 }];
                 [self _showToolbar];
-                _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+                _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
                 break;
             }
             case UIGestureRecognizerStateChanged:
@@ -758,7 +760,7 @@
                 } else {
                     frame.origin.y = 0;
                     [self _showToolbar];
-                    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+                    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
                     [UIView animateWithDuration:0.25 animations:^{
                         _scrollView.frame = frame;
                         _progressView.center = _scrollView.center;
@@ -776,7 +778,7 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self transitionToSize:self.view.bounds.size];
-    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
     NSUserActivity *activity = [self userActivity];
     [activity invalidate];
     activity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
@@ -795,14 +797,13 @@
 -(IBAction)viewTapped:(id)sender {
     if(_toolbar.hidden && !_previewing) {
         [self _showToolbar];
-        _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
     } else {
         [self _hideToolbar];
     }
 }
 
 -(void)popoverPresentationControllerDidDismissPopover:(UIPopoverPresentationController *)popoverPresentationController {
-    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
 }
 
 -(IBAction)shareButtonPressed:(id)sender {
