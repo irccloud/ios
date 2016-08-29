@@ -24,7 +24,7 @@
 #import "OpenInFirefoxControllerObjC.h"
 #import "config.h"
 
-#define HIDE_DURATION 2
+#define HIDE_DURATION 3
 
 @implementation ImageViewController
 {
@@ -211,6 +211,9 @@
 }
 
 -(void)fail:(NSString *)error {
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
     [_progressView removeFromSuperview];
 
     if(_previewing || self.view.window.rootViewController != self) {
@@ -317,6 +320,9 @@
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
     [self scrollViewDidZoom:_scrollView];
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
 }
 
 -(void)loadGfycat:(NSString *)gyfID {
@@ -479,6 +485,9 @@
 #ifdef DEBUG
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
 #endif
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
     
     NSURL *url = _url;
     if([[url.host lowercaseString] isEqualToString:@"www.dropbox.com"]) {
@@ -634,6 +643,9 @@
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
     if(connection == _connection) {
         if(_imageData) {
             [self performSelectorInBackground:@selector(_parseImageData:) withObject:_imageData];
@@ -824,6 +836,9 @@
     [_connection cancel];
     _connection = nil;
     [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
 }
 
 - (void)didReceiveMemoryWarning {

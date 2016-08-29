@@ -97,6 +97,9 @@ volatile BOOL __socketPaused = NO;
         _running = YES;
         [_connection start];
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
+#ifndef EXTENSION
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
     } else {
         CLS_LOG(@"Failed to create NSURLConnection");
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
@@ -114,6 +117,9 @@ volatile BOOL __socketPaused = NO;
     }];
     _running = NO;
     _cancelled = YES;
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if(_cancelled)
@@ -123,6 +129,9 @@ volatile BOOL __socketPaused = NO;
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
     }];
     _running = NO;
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
     if(_cancelled)
@@ -1479,6 +1488,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 url = [url stringByAppendingFormat:@"&limit=%i", limit];
         }
         
+#ifndef EXTENSION
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
         CLS_LOG(@"Connecting: %@", url);
         _notifier = notifier;
         _state = kIRCCloudStateConnecting;
@@ -1566,6 +1578,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocketDidOpen:(WebSocket *)socket {
     if(socket == _socket) {
+#ifndef EXTENSION
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
         CLS_LOG(@"Socket connected");
         _idleInterval = 20;
         _reconnectTimestamp = -1;
@@ -1592,6 +1607,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocket:(WebSocket *)socket didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError {
     if(socket == _socket) {
+#ifndef EXTENSION
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
         CLS_LOG(@"Status Code: %lu", (unsigned long)aStatusCode);
         CLS_LOG(@"Close Message: %@", aMessage);
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
@@ -1612,6 +1630,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocket:(WebSocket *)socket didReceiveError: (NSError*) aError {
     if(socket == _socket) {
+#ifndef EXTENSION
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
         __socketPaused = NO;
