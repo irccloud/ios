@@ -1694,6 +1694,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(!_prefs && _userInfo && [[_userInfo objectForKey:@"prefs"] isKindOfClass:[NSString class]] && [[_userInfo objectForKey:@"prefs"] length]) {
         SBJsonParser *parser = [[SBJsonParser alloc] init];
         _prefs = [parser objectWithString:[_userInfo objectForKey:@"prefs"]];
+    } else {
+        _prefs = nil;
     }
     return _prefs;
 }
