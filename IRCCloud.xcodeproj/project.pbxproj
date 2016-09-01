@@ -1552,6 +1552,7 @@
 					};
 					22CE2ADB1D2AA659001397C0 = {
 						CreatedOnToolsVersion = 7.3.1;
+						LastSwiftMigration = 0800;
 						TestTargetID = 228A056B16D3DABA0029769C;
 					};
 					22DB24FA1982DF2B0008728E = {
@@ -2448,6 +2449,7 @@
 				PROVISIONING_PROFILE = "$(sigh_com.irccloud.UITests_development)";
 				SWIFT_OBJC_BRIDGING_HEADER = "UITests/UITests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = IRCCloud;
 			};
 			name = Debug;
@@ -2479,6 +2481,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "$(sigh_com.irccloud.UITests_adhoc)";
 				SWIFT_OBJC_BRIDGING_HEADER = "UITests/UITests-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = IRCCloud;
 			};
 			name = Release;
@@ -2510,6 +2513,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "$(sigh_com.irccloud.UITests_appstore)";
 				SWIFT_OBJC_BRIDGING_HEADER = "UITests/UITests-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 				TEST_TARGET_NAME = IRCCloud;
 			};
 			name = AppStore;

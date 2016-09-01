@@ -15,10 +15,10 @@ class UITests: XCTestCase {
 
 override func setUp() {
     super.setUp()
-    XCUIDevice().orientation = UIDeviceOrientation.Portrait
+    XCUIDevice().orientation = UIDeviceOrientation.portrait
 }
 
-  func takeScreenshotTheme(theme: String, mono: Bool = false, memberlist: Bool = false) {
+  func takeScreenshotTheme(_ theme: String, mono: Bool = false, memberlist: Bool = false) {
     let app = XCUIApplication()
     app.launchArguments = ["-theme", theme]
     if (mono) {
@@ -30,8 +30,8 @@ override func setUp() {
     setupSnapshot(app)
     app.launch()
     
-    let isPhone = UIDevice().userInterfaceIdiom == .Phone
-    let isPad = UIDevice().userInterfaceIdiom == .Pad
+    let isPhone = UIDevice().userInterfaceIdiom == .phone
+    let isPad = UIDevice().userInterfaceIdiom == .pad
     let args = app.launchArguments
     var isBigPhone = false
     if (
@@ -51,7 +51,7 @@ override func setUp() {
             snapshot("\(theme)-Portrait", waitForLoadingIndicator: false)
         }
         if (isPad || (isDawn && isBigPhone)) {
-            XCUIDevice().orientation = UIDeviceOrientation.LandscapeLeft;
+            XCUIDevice().orientation = UIDeviceOrientation.landscapeLeft;
             sleep(SCREENSHOT_DELAY)
             snapshot("\(theme)-Landscape", waitForLoadingIndicator: false)
         }
@@ -67,7 +67,7 @@ func testDawnScreenshots () {
 }
     
 func testDawnMembersScreenshots () {
-    if (UIDevice().userInterfaceIdiom == .Phone) {
+    if (UIDevice().userInterfaceIdiom == .phone) {
         takeScreenshotTheme("dawn", memberlist: true)
     }
 }
