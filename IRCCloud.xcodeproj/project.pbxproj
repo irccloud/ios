@@ -240,6 +240,10 @@
 		2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
 		2284EF721B4AD47F0058D483 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2284EF711B4AD47F0058D483 /* MediaPlayer.framework */; };
 		2284EF731B4AD48E0058D483 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2284EF711B4AD47F0058D483 /* MediaPlayer.framework */; };
+		2289EF631D7866BD00DB285E /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2289EF621D7866BD00DB285E /* UserNotifications.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		2289EF641D7866D200DB285E /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2289EF621D7866BD00DB285E /* UserNotifications.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		2289EF781D787CC500DB285E /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2289EF771D787CC500DB285E /* Intents.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		2289EF791D787CD100DB285E /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2289EF771D787CC500DB285E /* Intents.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
@@ -640,6 +644,8 @@
 		227FF8221772063F00394114 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		2283322F17944E2B00ED22EA /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		2284EF711B4AD47F0058D483 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		2289EF621D7866BD00DB285E /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		2289EF771D787CC500DB285E /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = System/Library/Frameworks/Intents.framework; sourceTree = SDKROOT; };
 		228A056C16D3DABA0029769C /* IRCCloud.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCCloud.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		228A056F16D3DABA0029769C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -841,6 +847,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2289EF791D787CD100DB285E /* Intents.framework in Frameworks */,
+				2289EF641D7866D200DB285E /* UserNotifications.framework in Frameworks */,
 				227C63BA1C7B8C4800B674D6 /* SafariServices.framework in Frameworks */,
 				2265DC8A1C722E7A00382C7C /* MessageUI.framework in Frameworks */,
 				2245E3781B542D0E00B763D7 /* AVKit.framework in Frameworks */,
@@ -875,6 +883,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2289EF781D787CC500DB285E /* Intents.framework in Frameworks */,
+				2289EF631D7866BD00DB285E /* UserNotifications.framework in Frameworks */,
 				2265DC891C722E6B00382C7C /* MessageUI.framework in Frameworks */,
 				22A1F1151C232B3A00AEC09A /* SafariServices.framework in Frameworks */,
 				2245E3771B542D0200B763D7 /* AVKit.framework in Frameworks */,
@@ -1015,6 +1025,8 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2289EF771D787CC500DB285E /* Intents.framework */,
+				2289EF621D7866BD00DB285E /* UserNotifications.framework */,
 				227DA89D1CF381B60041B1BF /* CoreTelephony.framework */,
 				2265DC881C722E6B00382C7C /* MessageUI.framework */,
 				22A1F1141C232B3A00AEC09A /* SafariServices.framework */,

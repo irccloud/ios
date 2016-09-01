@@ -17,6 +17,8 @@
 
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <MobileCoreServices/UTCoreTypes.h>
+#import <UserNotifications/UserNotifications.h>
+#import <Intents/Intents.h>
 #import "MainViewController.h"
 #import "NetworkConnection.h"
 #import "ColorFormatter.h"
@@ -1391,8 +1393,17 @@ extern NSDictionary *emojiMap;
     [self.slidingViewController resetTopView];
     
     NSString *session = [NetworkConnection sharedInstance].session;
-#if !TARGET_IPHONE_SIMULATOR
     if(session.length) {
+#ifdef __IPHONE_10_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+            UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+            
+            [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                if(!granted)
+                    CLS_LOG(@"Notification permission denied: %@", error);
+            }];
+        } else
+#endif
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
             UIMutableUserNotificationAction *replyAction = [[UIMutableUserNotificationAction alloc] init];
             replyAction.identifier = @"reply";
@@ -1455,7 +1466,6 @@ extern NSDictionary *emojiMap;
         [[UIApplication sharedApplication] registerForRemoteNotifications];
 #endif
     }
-#endif
     if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
         [[NetworkConnection sharedInstance] connect:NO];
     }

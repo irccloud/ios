@@ -330,7 +330,7 @@ volatile BOOL __socketPaused = NO;
                     }
                     
                     if(show && ![_notifications getNotification:event.eid bid:event.bid]) {
-                        [_notifications notify:nil cid:event.cid bid:event.bid eid:event.eid];
+                        [_notifications notify:[NSString stringWithFormat:@"<%@> %@",event.from,event.msg] category:event.type cid:event.cid bid:event.bid eid:event.eid];
                         if(!backlog)
                             [_notifications updateBadgeCount];
                     }

@@ -18,6 +18,7 @@
 #import <Fabric/Fabric.h>
 #import <Crashlytics/Crashlytics.h>
 #import <AdSupport/AdSupport.h>
+#import <Intents/Intents.h>
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
 #import "EditConnectionViewController.h"
@@ -82,6 +83,25 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 #ifdef CRASHLYTICS_TOKEN
     [Fabric with:@[CrashlyticsKit]];
+#endif
+#ifdef __IPHONE_10_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+        UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+        center.delegate = self;
+        UNTextInputNotificationAction *replyAction = [UNTextInputNotificationAction actionWithIdentifier:@"reply" title:@"Reply" options:UNNotificationActionOptionAuthenticationRequired textInputButtonTitle:@"Send" textInputPlaceholder:@""];
+        
+        UNNotificationAction *joinAction = [UNNotificationAction actionWithIdentifier:@"join" title:@"Join" options:UNNotificationActionOptionForeground];
+        UNNotificationAction *acceptAction = [UNNotificationAction actionWithIdentifier:@"accept" title:@"Accept" options:UNNotificationActionOptionNone];
+        UNNotificationAction *retryAction = [UNNotificationAction actionWithIdentifier:@"retry" title:@"Retry" options:UNNotificationActionOptionNone];
+        
+        [center setNotificationCategories:[NSSet setWithObjects:
+                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_msg" actions:@[replyAction] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
+                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_me_msg" actions:@[replyAction] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
+                                           [UNNotificationCategory categoryWithIdentifier:@"channel_invite" actions:@[joinAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
+                                           [UNNotificationCategory categoryWithIdentifier:@"callerid" actions:@[acceptAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
+                                           [UNNotificationCategory categoryWithIdentifier:@"retry" actions:@[retryAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
+                                           nil]];
+    }
 #endif
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
@@ -508,7 +528,7 @@
         NSTimeInterval eid = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
         
         if(application.applicationState == UIApplicationStateBackground && (!_conn || (_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
-            [[NotificationsDataSource sharedInstance] notify:nil cid:cid bid:bid eid:eid];
+            [[NotificationsDataSource sharedInstance] notify:nil category:nil cid:cid bid:bid eid:eid];
         }
         
         if(_movedToBackground && application.applicationState == UIApplicationStateInactive) {
@@ -589,15 +609,26 @@
     }
 }
 
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
+    if([response isKindOfClass:[UNTextInputNotificationResponse class]])
+        [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:((UNTextInputNotificationResponse *)response).userText completionHandler:completionHandler];
+    else
+        [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:nil completionHandler:completionHandler];
+}
+
 -(void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
-    [self application:application handleActionWithIdentifier:[notification.userInfo objectForKey:@"identifier"] forRemoteNotification:[notification.userInfo objectForKey:@"userInfo"] withResponseInfo:[notification.userInfo objectForKey:@"responseInfo"] completionHandler:completionHandler];
+    [self handleAction:[notification.userInfo objectForKey:@"identifier"] userInfo:[notification.userInfo objectForKey:@"userInfo"] response:[[notification.userInfo objectForKey:@"responseInfo"] objectForKey:UIUserNotificationActionResponseTypedTextKey] completionHandler:completionHandler];
 }
 
 - (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forRemoteNotification:(NSDictionary *)userInfo withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
+    [self handleAction:identifier userInfo:userInfo response:[responseInfo objectForKey:UIUserNotificationActionResponseTypedTextKey] completionHandler:completionHandler];
+}
+
+-(void)handleAction:(NSString *)identifier userInfo:(NSDictionary *)userInfo response:(NSString *)response completionHandler:(void (^)())completionHandler {
     NSDictionary *result;
     
     if([identifier isEqualToString:@"reply"]) {
-        result = [[NetworkConnection sharedInstance] POSTsay:[responseInfo objectForKey:UIUserNotificationActionResponseTypedTextKey]
+        result = [[NetworkConnection sharedInstance] POSTsay:response
                                                           to:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-key"] hasSuffix:@"CH"]?2:0]
                                                  cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
     } else if([identifier isEqualToString:@"join"]) {
@@ -629,7 +660,7 @@
         if([identifier isEqualToString:@"reply"]) {
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0] server:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
             if(b)
-                b.draft = [responseInfo objectForKey:UIUserNotificationActionResponseTypedTextKey];
+                b.draft = response;
             alert.alertBody = [NSString stringWithFormat:@"Failed to send message to %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
         } else if([identifier isEqualToString:@"join"]) {
             alert.alertBody = [NSString stringWithFormat:@"Failed to join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]];
@@ -638,8 +669,8 @@
         }
         alert.soundName = @"a.caf";
         alert.category = @"retry";
-        if(responseInfo)
-            alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"responseInfo":responseInfo, @"d":[userInfo objectForKey:@"d"]};
+        if(response)
+            alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"responseInfo":@{UIUserNotificationActionResponseTypedTextKey:response}, @"d":[userInfo objectForKey:@"d"]};
         else
             alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"d":[userInfo objectForKey:@"d"]};
         [[UIApplication sharedApplication] scheduleLocalNotification:alert];

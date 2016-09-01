@@ -15,6 +15,7 @@
 //  limitations under the License.
 
 #import <UIKit/UIKit.h>
+#import <UserNotifications/UserNotifications.h>
 #import "LoginSplashViewController.h"
 #import "MainViewController.h"
 #import "ECSlidingViewController.h"
@@ -24,7 +25,7 @@
 
 @class ViewController;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate, NSURLSessionDataDelegate> {
+@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate, NSURLSessionDataDelegate, UNUserNotificationCenterDelegate> {
     NetworkConnection *_conn;
     URLHandler *_urlHandler;
     id _backlogCompletedObserver;
