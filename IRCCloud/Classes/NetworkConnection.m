@@ -1691,13 +1691,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)prefs {
-    if(!_prefs && _userInfo && [[_userInfo objectForKey:@"prefs"] isKindOfClass:[NSString class]] && [[_userInfo objectForKey:@"prefs"] length]) {
-        SBJsonParser *parser = [[SBJsonParser alloc] init];
-        _prefs = [parser objectWithString:[_userInfo objectForKey:@"prefs"]];
-    } else {
-        _prefs = nil;
+    @synchronized(self) {
+        if(!_prefs && _userInfo && [[_userInfo objectForKey:@"prefs"] isKindOfClass:[NSString class]] && [[_userInfo objectForKey:@"prefs"] length]) {
+            SBJsonParser *parser = [[SBJsonParser alloc] init];
+            _prefs = [parser objectWithString:[_userInfo objectForKey:@"prefs"]];
+        }
+        return _prefs;
     }
-    return _prefs;
 }
 
 -(void)parse:(NSDictionary *)dict backlog:(BOOL)backlog {
