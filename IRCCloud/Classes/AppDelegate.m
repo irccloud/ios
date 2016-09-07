@@ -904,6 +904,10 @@
             _background_task = UIBackgroundTaskInvalid;
         }
     }
+    
+#ifdef __IPHONE_10_0
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10)
+#endif
     [[NotificationsDataSource sharedInstance] clear];
     [[NotificationsDataSource sharedInstance] updateBadgeCount];
 }

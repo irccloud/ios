@@ -90,6 +90,11 @@
         [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
         [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
         [[UIApplication sharedApplication] cancelAllLocalNotifications];
+#ifdef __IPHONE_10_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+            [[UNUserNotificationCenter currentNotificationCenter] removeAllDeliveredNotifications];
+        }
+#endif
 #endif
     }
 }
@@ -150,6 +155,33 @@
 #ifndef EXTENSION
     @synchronized(_notifications) {
         NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
+#ifdef __IPHONE_10_0
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+            for(UNNotification *n in ns) {
+                NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+                if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] < eid) {
+                    [[_notifications objectForKey:@(bid)] removeObject:n];
+                }
+            }
+            
+            [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
+                @synchronized(_notifications) {
+                    NSMutableArray *identifiers = [[NSMutableArray alloc] init];
+                    
+                    for(UNNotification *n in notifications) {
+                        NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+                        if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] < eid) {
+                            NSLog(@"Remove notification: %@", n.request.identifier);
+                            [identifiers addObject:n.request.identifier];
+                        }
+                    }
+                    
+                    [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:identifiers];
+                }
+                [self updateBadgeCount];
+            }];
+        } else
+#endif
         for(UILocalNotification *n in ns) {
             NSArray *d = [n.userInfo objectForKey:@"d"];
             if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] < eid) {
@@ -214,8 +246,8 @@
 
 -(void)refresh {
     [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
-        for(UNNotification *n in notifications) {
-            @synchronized(_notifications) {
+        @synchronized(_notifications) {
+            for(UNNotification *n in notifications) {
                 int bid = [[[n.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
                 NSTimeInterval eid = [[[n.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
                 
