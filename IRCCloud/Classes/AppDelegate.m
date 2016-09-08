@@ -618,10 +618,18 @@
 }
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
-    if([response isKindOfClass:[UNTextInputNotificationResponse class]])
+    if([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:((UNTextInputNotificationResponse *)response).userText completionHandler:completionHandler];
-    else
+    } else if([response.actionIdentifier isEqualToString:UNNotificationDefaultActionIdentifier]) {
+        if([response.notification.request.content.userInfo objectForKey:@"d"]) {
+            self.mainViewController.bidToOpen = [[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
+            self.mainViewController.eidToOpen = [[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
+            CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
+            [self.mainViewController bufferSelected:[[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
+        }
+    } else {
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:nil completionHandler:completionHandler];
+    }
 }
 
 -(void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
