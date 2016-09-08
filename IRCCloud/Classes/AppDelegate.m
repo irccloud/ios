@@ -627,6 +627,7 @@
             CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
             [self.mainViewController bufferSelected:[[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
         }
+        completionHandler();
     } else {
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:nil completionHandler:completionHandler];
     }
