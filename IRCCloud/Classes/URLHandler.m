@@ -131,7 +131,7 @@
 - (void)launchURL:(NSURL *)url
 {
     if([[UIApplication sharedApplication] respondsToSelector:NSSelectorFromString(@"_deactivateReachability")])
-        objc_msgSend([UIApplication sharedApplication], NSSelectorFromString(@"_deactivateReachability"));
+        ((id (*)(id, SEL))objc_msgSend)([UIApplication sharedApplication], NSSelectorFromString(@"_deactivateReachability"));
     NSLog(@"Launch: %@", url);
     UIApplication *app = [UIApplication sharedApplication];
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;

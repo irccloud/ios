@@ -602,7 +602,7 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
     _bytesExpected = [response expectedContentLength];
-    _imageData = [[NSMutableData alloc] initWithCapacity:_bytesExpected + 32]; // Just in case? Unsure if the extra 32 bytes are necessary
+    _imageData = [[NSMutableData alloc] initWithCapacity:(NSUInteger)(_bytesExpected + 32)]; // Just in case? Unsure if the extra 32 bytes are necessary
     if(response.statusCode != 200) {
         [self fail:[NSString stringWithFormat:@"HTTP error %ld: %@", (long)response.statusCode, [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]]];
         return;

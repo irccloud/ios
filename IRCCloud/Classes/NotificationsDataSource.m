@@ -30,12 +30,9 @@
         if(!_notifications)
             _notifications = [[NSMutableDictionary alloc] init];
         
-#ifdef __IPHONE_10_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
             [self refresh];
-        } else
-#endif
-        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
+        } else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"notifications"];
             
             @try {
@@ -57,11 +54,9 @@
 }
 
 -(void)serialize {
-#ifdef __IPHONE_10_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
         return;
     }
-#endif
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"notifications"];
     
     NSMutableArray *n;
@@ -90,18 +85,15 @@
         [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
         [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
         [[UIApplication sharedApplication] cancelAllLocalNotifications];
-#ifdef __IPHONE_10_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
             [[UNUserNotificationCenter currentNotificationCenter] removeAllDeliveredNotifications];
         }
-#endif
 #endif
     }
 }
 
 -(void)notify:(NSString *)alert category:(NSString *)category cid:(int)cid bid:(int)bid eid:(NSTimeInterval)eid {
 #ifndef EXTENSION
-#ifdef __IPHONE_10_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
 #if TARGET_IPHONE_SIMULATOR
         UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
@@ -120,34 +112,31 @@
         [self refresh];
 #endif
     } else {
-#endif
-    UILocalNotification *n = [[UILocalNotification alloc] init];
-    if([n respondsToSelector:@selector(setAlertTitle:)])
-        n.alertTitle = @"IRCCloud";
-    n.alertBody = alert;
-    n.alertAction = @"Reply";
-    n.userInfo = @{@"d": @[@(cid), @(bid), @(eid)]};
-    @synchronized(_notifications) {
-        if(![_notifications objectForKey:@(bid)])
-            [_notifications setObject:[[NSMutableArray alloc] init] forKey:@(bid)];
-        
-        NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
-        BOOL found = NO;
-        for(UILocalNotification *n in ns) {
-            NSArray *d = [n.userInfo objectForKey:@"d"];
-            if([[d objectAtIndex:2] doubleValue] == eid) {
-                found = YES;
-                break;
+        UILocalNotification *n = [[UILocalNotification alloc] init];
+        if([n respondsToSelector:@selector(setAlertTitle:)])
+            n.alertTitle = @"IRCCloud";
+        n.alertBody = alert;
+        n.alertAction = @"Reply";
+        n.userInfo = @{@"d": @[@(cid), @(bid), @(eid)]};
+        @synchronized(_notifications) {
+            if(![_notifications objectForKey:@(bid)])
+                [_notifications setObject:[[NSMutableArray alloc] init] forKey:@(bid)];
+            
+            NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
+            BOOL found = NO;
+            for(UILocalNotification *n in ns) {
+                NSArray *d = [n.userInfo objectForKey:@"d"];
+                if([[d objectAtIndex:2] doubleValue] == eid) {
+                    found = YES;
+                    break;
+                }
+            }
+            if(!found) {
+                [[_notifications objectForKey:@(bid)] addObject:n];
+                //[[UIApplication sharedApplication] presentLocalNotificationNow:n];
             }
         }
-        if(!found) {
-            [[_notifications objectForKey:@(bid)] addObject:n];
-            //[[UIApplication sharedApplication] presentLocalNotificationNow:n];
-        }
     }
-#ifdef __IPHONE_10_0
-    }
-#endif
 #endif
 }
 
@@ -155,7 +144,6 @@
 #ifndef EXTENSION
     @synchronized(_notifications) {
         NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
-#ifdef __IPHONE_10_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
             for(UNNotification *n in ns) {
                 NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
@@ -180,13 +168,13 @@
                 }
                 [self updateBadgeCount];
             }];
-        } else
-#endif
-        for(UILocalNotification *n in ns) {
-            NSArray *d = [n.userInfo objectForKey:@"d"];
-            if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] < eid) {
-                //[[UIApplication sharedApplication] cancelLocalNotification:n];
-                [[_notifications objectForKey:@(bid)] removeObject:n];
+        } else {
+            for(UILocalNotification *n in ns) {
+                NSArray *d = [n.userInfo objectForKey:@"d"];
+                if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] < eid) {
+                    //[[UIApplication sharedApplication] cancelLocalNotification:n];
+                    [[_notifications objectForKey:@(bid)] removeObject:n];
+                }
             }
         }
         if(![[_notifications objectForKey:@(bid)] count])
@@ -199,7 +187,6 @@
 #ifndef EXTENSION
     @synchronized(_notifications) {
         NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
-#ifdef __IPHONE_10_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
             for(UNNotification *n in ns) {
                 NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
@@ -207,12 +194,12 @@
                     return n;
                 }
             }
-        } else
-#endif
-        for(UILocalNotification *n in ns) {
-            NSArray *d = [n.userInfo objectForKey:@"d"];
-            if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] == eid) {
-                return n;
+        } else {
+            for(UILocalNotification *n in ns) {
+                NSArray *d = [n.userInfo objectForKey:@"d"];
+                if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:1] doubleValue] == eid) {
+                    return n;
+                }
             }
         }
     }
@@ -222,21 +209,31 @@
 
 -(void)updateBadgeCount {
 #ifndef EXTENSION
-    int count = 0;
-    for(NSArray *a in _notifications.allValues) {
-        count += a.count;
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+        [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                if([UIApplication sharedApplication].applicationIconBadgeNumber != notifications.count)
+                    CLS_LOG(@"Setting iOS icon badge to %lu", (unsigned long)notifications.count);
+                [UIApplication sharedApplication].applicationIconBadgeNumber = notifications.count;
+            }];
+        }];
+    } else {
+        int count = 0;
+        for(NSArray *a in _notifications.allValues) {
+            count += a.count;
+        }
+        /*NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
+        for(Buffer *b in buffers) {
+            count += [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+        }*/
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if([UIApplication sharedApplication].applicationIconBadgeNumber != count)
+                CLS_LOG(@"Setting iOS icon badge to %i", count);
+            [UIApplication sharedApplication].applicationIconBadgeNumber = count;
+            if(!count)
+                [[UIApplication sharedApplication] cancelAllLocalNotifications];
+        }];
     }
-    /*NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
-    for(Buffer *b in buffers) {
-        count += [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
-    }*/
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if([UIApplication sharedApplication].applicationIconBadgeNumber != count)
-            CLS_LOG(@"Setting iOS icon badge to %i", count);
-        [UIApplication sharedApplication].applicationIconBadgeNumber = count;
-        if(!count)
-            [[UIApplication sharedApplication] cancelAllLocalNotifications];
-    }];
 #endif
 }
 

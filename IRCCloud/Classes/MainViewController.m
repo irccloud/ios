@@ -1042,7 +1042,7 @@ extern NSDictionary *emojiMap;
                     if(e.ignoreMask && [ignore match:e.ignoreMask])
                         break;
                     if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
-                        if([[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
+                        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10 && [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
                             _lastNotificationTime = [NSDate date].timeIntervalSince1970;
                             AudioServicesPlaySystemSound(alertSound);
                             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
@@ -1394,7 +1394,6 @@ extern NSDictionary *emojiMap;
     
     NSString *session = [NetworkConnection sharedInstance].session;
     if(session.length) {
-#ifdef __IPHONE_10_0
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
             
@@ -1402,9 +1401,7 @@ extern NSDictionary *emojiMap;
                 if(!granted)
                     CLS_LOG(@"Notification permission denied: %@", error);
             }];
-        } else
-#endif
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
+        } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
             UIMutableUserNotificationAction *replyAction = [[UIMutableUserNotificationAction alloc] init];
             replyAction.identifier = @"reply";
             replyAction.title = @"Reply";
@@ -1562,9 +1559,9 @@ extern NSDictionary *emojiMap;
 
 -(void)sendButtonPressed:(id)sender {
     if(_message.text && _message.text.length) {
-        id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+        id k = ((id (*)(id, SEL))objc_msgSend)(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
         if([k respondsToSelector:NSSelectorFromString(@"acceptAutocorrection")]) {
-            objc_msgSend(k, NSSelectorFromString(@"acceptAutocorrection"));
+            ((id (*)(id, SEL))objc_msgSend)(k, NSSelectorFromString(@"acceptAutocorrection"));
         }
 
         if(_message.text.length > 1 && [_message.text hasSuffix:@" "])
@@ -1843,9 +1840,9 @@ extern NSDictionary *emojiMap;
             if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
                 [_message.internalTextView reloadInputViews];
-                id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+                id k = ((id (*)(id, SEL))objc_msgSend)(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
                 if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
-                    objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), YES);
+                    ((id (*)(id, SEL, BOOL))objc_msgSend)(k, NSSelectorFromString(@"_setAutocorrects:"), YES);
                 }
             }
             _sortedChannels = nil;
@@ -1862,10 +1859,10 @@ extern NSDictionary *emojiMap;
             if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
                 [_message.internalTextView reloadInputViews];
-                id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+                id k = ((id (*)(id, SEL))objc_msgSend)(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
                 if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
-                    objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
-                    objc_msgSend(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
+                    ((id (*)(id, SEL, BOOL))objc_msgSend)(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
+                    ((id (*)(id, SEL))objc_msgSend)(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
                 }
             }
             _message.delegate = self;
@@ -3478,12 +3475,12 @@ extern NSDictionary *emojiMap;
                         [fvc viewWillAppear:NO];
                     } else if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
                         CLS_LOG(@"Uploading file data");
-                        NSMutableData *data = [[NSMutableData alloc] initWithCapacity:imageRep.size];
+                        NSMutableData *data = [[NSMutableData alloc] initWithCapacity:(NSUInteger)imageRep.size];
                         uint8_t buffer[4096];
                         long long len = 0;
                         while(len < imageRep.size) {
                             long long i = [imageRep getBytes:buffer fromOffset:len length:4096 error:nil];
-                            [data appendBytes:buffer length:i];
+                            [data appendBytes:buffer length:(NSUInteger)i];
                             len += i;
                         }
                         [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];

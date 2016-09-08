@@ -102,6 +102,7 @@
 @property (nonatomic) NSString *incomingDraft;
 @property (nonatomic) NSString *bufferToOpen;
 @property (readonly) EventsTableView *eventsView;
+@property (readonly) Buffer *buffer;
 @property BOOL isShowingPreview;
 -(void)bufferSelected:(int)bid;
 -(void)sendButtonPressed:(id)sender;

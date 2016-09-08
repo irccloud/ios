@@ -84,7 +84,6 @@
 #ifdef CRASHLYTICS_TOKEN
     [Fabric with:@[CrashlyticsKit]];
 #endif
-#ifdef __IPHONE_10_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
         center.delegate = self;
@@ -102,7 +101,6 @@
                                            [UNNotificationCategory categoryWithIdentifier:@"retry" actions:@[retryAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
                                            nil]];
     }
-#endif
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
     [[NSFileManager defaultManager] removeItemAtURL:caches error:nil];
@@ -609,6 +607,16 @@
     }
 }
 
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    if([notification.request.content.userInfo objectForKey:@"d"]) {
+        if(_mainViewController.buffer.bid != [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue]) {
+            completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
+            return;
+        }
+    }
+    completionHandler(UNNotificationPresentationOptionNone);
+}
+
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
     if([response isKindOfClass:[UNTextInputNotificationResponse class]])
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:((UNTextInputNotificationResponse *)response).userText completionHandler:completionHandler];
@@ -905,10 +913,8 @@
         }
     }
     
-#ifdef __IPHONE_10_0
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10)
-#endif
-    [[NotificationsDataSource sharedInstance] clear];
+        [[NotificationsDataSource sharedInstance] clear];
     [[NotificationsDataSource sharedInstance] updateBadgeCount];
 }
 
