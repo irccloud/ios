@@ -1559,10 +1559,10 @@ extern NSDictionary *emojiMap;
 
 -(void)sendButtonPressed:(id)sender {
     if(_message.text && _message.text.length) {
-        id k = ((id (*)(id, SEL))objc_msgSend)(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+        /*id k = ((id (*)(id, SEL))objc_msgSend)(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
         if([k respondsToSelector:NSSelectorFromString(@"acceptAutocorrection")]) {
             ((id (*)(id, SEL))objc_msgSend)(k, NSSelectorFromString(@"acceptAutocorrection"));
-        }
+        }*/
 
         if(_message.text.length > 1 && [_message.text hasSuffix:@" "])
             _message.text = [_message.text substringToIndex:_message.text.length - 1];

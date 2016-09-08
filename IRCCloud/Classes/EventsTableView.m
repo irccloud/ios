@@ -1065,7 +1065,8 @@ float __largeAvatarHeight = 32;
             if(!_buffer.scrolledUp) {
                 [self scrollToBottom];
                 [self _scrollToBottom];
-                [self sendHeartbeat];
+                if(_topUnreadView.alpha == 0)
+                    [self sendHeartbeat];
             } else if(!event.isSelf && [event isImportant:_buffer.type]) {
                 _newMsgs++;
                 if(event.isHighlight)
