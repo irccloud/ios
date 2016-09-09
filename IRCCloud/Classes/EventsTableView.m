@@ -1811,15 +1811,15 @@ float __largeAvatarHeight = 32;
     @synchronized (e) {
         if(e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
             if(e.formatted != nil && e.height > 0) {
-                NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
+                //NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
                 return e.height;
             } else if(!e.formatted && e.formattedMsg.length > 0) {
                 [self _format:e];
-                NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
+                //NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
                 return e.height;
             } else if(e.height == 0 && e.formatted) {
                 [self _calculateHeight:e];
-                NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
+                //NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
                 return e.height;
             }
         }

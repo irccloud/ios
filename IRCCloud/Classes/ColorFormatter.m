@@ -1186,14 +1186,14 @@ float ColorFormatterCachedFontSize = 0.0f;
 }
 
 +(void)loadFonts {
-    monoTimestampFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE - 2];
+    monoTimestampFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
     timestampFont = [UIFont systemFontOfSize:FONT_SIZE - 2];
     awesomeFont = [UIFont fontWithName:@"FontAwesome" size:FONT_SIZE];
     arrowFont = [UIFont fontWithName:@"HiraMinProN-W3" size:FONT_SIZE];
-    Courier = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-    CourierBold = [UIFont fontWithName:@"Courier-Bold" size:FONT_SIZE];
-    CourierOblique = [UIFont fontWithName:@"Courier-Oblique" size:FONT_SIZE];
-    CourierBoldOblique = [UIFont fontWithName:@"Courier-BoldOblique" size:FONT_SIZE];
+    Courier = [UIFont fontWithName:@"Courier" size:FONT_SIZE+2];
+    CourierBold = [UIFont fontWithName:@"Courier-Bold" size:FONT_SIZE+2];
+    CourierOblique = [UIFont fontWithName:@"Courier-Oblique" size:FONT_SIZE+2];
+    CourierBoldOblique = [UIFont fontWithName:@"Courier-BoldOblique" size:FONT_SIZE+2];
     chalkboardFont = [UIFont fontWithName:@"ChalkboardSE-Light" size:FONT_SIZE];
     markerFont = [UIFont fontWithName:@"MarkerFelt-Thin" size:FONT_SIZE];
     UIFontDescriptor *bodyFontDescriptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
