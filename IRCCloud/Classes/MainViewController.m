@@ -51,6 +51,7 @@
 #import "ServerReorderViewController.h"
 #import "FontAwesome.h"
 #import "YouTubeViewController.h"
+#import "AvatarsDataSource.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -1588,6 +1589,36 @@ extern NSDictionary *emojiMap;
             } else if([_message.text isEqualToString:@"/crash"]) {
                 CLS_LOG(@"/crash requested");
                 [[Crashlytics sharedInstance] crash];
+            } else if([_message.text isEqualToString:@"/mono 1"]) {
+                CLS_LOG(@"Set monospace");
+                NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
+                [p setObject:@"mono" forKey:@"font"];
+                SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+                NSString *json = [writer stringWithObject:p];
+                [[NetworkConnection sharedInstance] setPrefs:json];
+                _message.text = @"";
+                return;
+            } else if([_message.text isEqualToString:@"/mono 0"]) {
+                NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
+                [p setObject:@"sans" forKey:@"font"];
+                SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+                NSString *json = [writer stringWithObject:p];
+                [[NetworkConnection sharedInstance] setPrefs:json];
+                _message.text = @"";
+                return;
+            } else if([_message.text hasPrefix:@"/fontsize "]) {
+                [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:[[_message.text substringFromIndex:10] intValue]] forKey:@"fontSize"];
+                if([ColorFormatter shouldClearFontCache]) {
+                    [ColorFormatter clearFontCache];
+                    [ColorFormatter loadFonts];
+                }
+                [[EventsDataSource sharedInstance] clearFormattingCache];
+                [[AvatarsDataSource sharedInstance] clear];
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:nil userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventUserInfo]}];
+                }];
+                _message.text = @"";
+                return;
 #endif
             } else if(_message.text.length > 1080 || [_message.text isEqualToString:@"/paste"] || [_message.text hasPrefix:@"/paste "] || [_message.text rangeOfString:@"\n"].location < _message.text.length - 1) {
                 BOOL prompt = YES;
