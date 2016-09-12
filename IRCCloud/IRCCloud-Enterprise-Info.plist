@@ -93,12 +93,6 @@
 	<array>
 		<string>com.irccloud.enterprise.buffer</string>
 	</array>
-	<key>UIAppFonts</key>
-	<array>
-		<string>SourceSansPro-LightIt.otf</string>
-		<string>SourceSansPro-Regular.otf</string>
-		<string>FontAwesome.otf</string>
-	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
@@ -136,5 +130,15 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Hack-BoldItalic.otf</string>
+		<string>Hack-Italic.otf</string>
+		<string>Hack-Bold.otf</string>
+		<string>Hack-Regular.otf</string>
+		<string>SourceSansPro-LightIt.otf</string>
+		<string>SourceSansPro-Regular.otf</string>
+		<string>FontAwesome.otf</string>
+	</array>
 </dict>
 </plist>
