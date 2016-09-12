@@ -140,5 +140,9 @@
 		<string>SourceSansPro-Regular.otf</string>
 		<string>FontAwesome.otf</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>${PRODUCT_NAME} requires access to your photo library to share photos and videos on IRC</string>
+	<key>NSCameraUsageDescription</key>
+	<string>${PRODUCT_NAME} requires access to your camera to share photos and videos on IRC</string>
 </dict>
 </plist>

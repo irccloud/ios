@@ -113,6 +113,10 @@
 	<string>Launch</string>
 	<key>UIMainStoryboardFile</key>
 	<string>MainStoryboard</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>${PRODUCT_NAME} requires access to your photo library to share photos and videos on IRC</string>
+	<key>NSCameraUsageDescription</key>
+	<string>${PRODUCT_NAME} requires access to your camera to share photos and videos on IRC</string>
 	<key>UIPrerenderedIcon</key>
 	<true/>
 	<key>UIRequiredDeviceCapabilities</key>
