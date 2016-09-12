@@ -75,7 +75,7 @@ volatile BOOL __socketPaused = NO;
         _parser.delegate = _adapter;
         _cancelled = NO;
         _running = NO;
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:8];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:15];
         [request setHTTPShouldHandleCookies:NO];
         [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
         [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
@@ -1593,6 +1593,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)fail {
+    [self clearOOB];
     _failCount++;
     if(_failCount < 4)
         _idleInterval = _failCount;
