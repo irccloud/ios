@@ -1563,11 +1563,14 @@ extern NSDictionary *emojiMap;
 
 -(void)sendButtonPressed:(id)sender {
     if(_message.text && _message.text.length) {
-        /*id k = ((id (*)(id, SEL))objc_msgSend)(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
-        if([k respondsToSelector:NSSelectorFromString(@"acceptAutocorrection")]) {
-            ((id (*)(id, SEL))objc_msgSend)(k, NSSelectorFromString(@"acceptAutocorrection"));
-        }*/
-
+        //Create an invisible, temporary text field and give it focus to accept the autocorrect suggestion without causing the keyboard to hide
+        UITextField *temp = [[UITextField alloc] initWithFrame:CGRectZero];
+        temp.hidden = YES;
+        [self.view addSubview:temp];
+        [temp becomeFirstResponder];
+        [self becomeFirstResponder];
+        [temp removeFromSuperview];
+        
         if(_message.text.length > 1 && [_message.text hasSuffix:@" "])
             _message.text = [_message.text substringToIndex:_message.text.length - 1];
         
