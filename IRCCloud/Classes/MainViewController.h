@@ -114,4 +114,5 @@
 -(void)launchURL:(NSURL *)url;
 -(void)refresh;
 -(void)_setSelectedBuffer:(Buffer *)b;
+-(void)applyTheme;
 @end

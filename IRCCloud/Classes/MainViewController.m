@@ -110,59 +110,67 @@ extern NSDictionary *emojiMap;
     if(![__currentTheme isEqualToString:[UIColor currentTheme]]) {
         __currentTheme = [UIColor currentTheme];
         UIView *v = self.navigationController.view.superview;
-        [self.navigationController.view removeFromSuperview];
-        [v addSubview: self.navigationController.view];
+        if(v) {
+            [self.navigationController.view removeFromSuperview];
+            [v addSubview: self.navigationController.view];
+        }
 
-        self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
-        self.view.backgroundColor = [UIColor contentBackgroundColor];
-        self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor navBarColor];
-        _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
-        [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-        [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
-        UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
-        [_sendBtn setTitleColor:c forState:UIControlStateNormal];
-        [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
-        [_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
-        [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
-        [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
-        _message.textColor = [UIColor textareaTextColor];
-        _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
-
-        UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
-        [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-        [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-        users.frame = CGRectMake(0,0,24,22);
-        [users setTintColor:[UIColor navBarSubheadingColor]];
-        users.accessibilityLabel = @"Channel members list";
-        _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
-
-        _menuBtn.tintColor = [UIColor navBarSubheadingColor];
-        
-        _eventsView.topUnreadView.backgroundColor = [UIColor chatterBarColor];
-        _eventsView.bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
-        _eventsView.topUnreadLabel.textColor = [UIColor chatterBarTextColor];
-        _eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
-        _eventsView.topUnreadArrow.textColor = _eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
-        
-        _borders.backgroundColor = [UIColor iPadBordersColor];
-        [[_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
-        
-        _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
-        
-        _fetchingFailed.textColor = [UIColor timestampColor];
-        [_loadMoreBacklog setTitleColor:[UIColor isDarkTheme]?[UIColor navBarSubheadingColor]:[UIColor unreadBlueColor] forState:UIControlStateNormal];
-        [_loadMoreBacklog setTitleShadowColor:[UIColor contentBackgroundColor] forState:UIControlStateNormal];
-        
-        [_eventsView refresh];
-        [_buffersView performSelectorInBackground:@selector(refresh) withObject:nil];
-        [_usersView performSelectorInBackground:@selector(refresh) withObject:nil];
-        
-        [self _resetStatusBar];
+        [self applyTheme];
     }
+}
+
+- (void)applyTheme {
+    self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
+    self.view.backgroundColor = [UIColor contentBackgroundColor];
+    self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor navBarColor];
+    _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
+    [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+    [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
+    UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
+    [_sendBtn setTitleColor:c forState:UIControlStateNormal];
+    [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
+    [_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
+    [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
+    [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
+    _message.textColor = [UIColor textareaTextColor];
+    _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    
+    UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
+    [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [users addTarget:self action:@selector(usersButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    users.frame = CGRectMake(0,0,24,22);
+    [users setTintColor:[UIColor navBarSubheadingColor]];
+    users.accessibilityLabel = @"Channel members list";
+    _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+    
+    _menuBtn.tintColor = [UIColor navBarSubheadingColor];
+    
+    _eventsView.topUnreadView.backgroundColor = [UIColor chatterBarColor];
+    _eventsView.bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
+    _eventsView.topUnreadLabel.textColor = [UIColor chatterBarTextColor];
+    _eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
+    _eventsView.topUnreadArrow.textColor = _eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
+    
+    _borders.backgroundColor = [UIColor iPadBordersColor];
+    [[_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
+    
+    _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
+    
+    _fetchingFailed.textColor = [UIColor timestampColor];
+    [_loadMoreBacklog setTitleColor:[UIColor isDarkTheme]?[UIColor navBarSubheadingColor]:[UIColor unreadBlueColor] forState:UIControlStateNormal];
+    [_loadMoreBacklog setTitleShadowColor:[UIColor contentBackgroundColor] forState:UIControlStateNormal];
+    
+    [_eventsView refresh];
+    [_buffersView performSelectorInBackground:@selector(refresh) withObject:nil];
+    [_usersView performSelectorInBackground:@selector(refresh) withObject:nil];
+    
+    [self _resetStatusBar];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.slidingViewController.view.frame = [UIScreen mainScreen].applicationFrame;
+
     [_eventsView viewDidLoad];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -275,7 +283,6 @@ extern NSDictionary *emojiMap;
     _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 24,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
     [_bottomBar addSubview:_settingsBtn];
     
-    self.slidingViewController.view.frame = [UIScreen mainScreen].applicationFrame;
     self.slidingViewController.shouldAllowPanningPastAnchor = NO;
     if(self.slidingViewController.underLeftViewController == nil)
         self.slidingViewController.underLeftViewController = _buffersView;
@@ -307,24 +314,20 @@ extern NSDictionary *emojiMap;
     [_message addConstraints:@[_messageWidthConstraint, _messageHeightConstraint]];
 
     [_bottomBar addSubview:_message];
-    if(_bottomBar != nil) {
-        [_bottomBar addConstraints:@[
-                                 [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:50.0f],
-                                 [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-2.0f]
-                                 ]];
-    }
+    [_bottomBar addConstraints:@[
+                             [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:50.0f],
+                             [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-2.0f]
+                             ]];
     _nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectZero];
     _nickCompletionView.translatesAutoresizingMaskIntoConstraints = NO;
     _nickCompletionView.completionDelegate = self;
     _nickCompletionView.alpha = 0;
     [self.view addSubview:_nickCompletionView];
-    if(self.view != nil) {
-        [self.view addConstraints:@[
-                                    [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:_eventsView.tableView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f],
-                                    [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:_eventsView.tableView attribute:NSLayoutAttributeWidth multiplier:1.0f constant:-20.0f],
-                                     [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_eventsView.bottomUnreadView attribute:NSLayoutAttributeTop multiplier:1.0f constant:-6.0f]
-                                     ]];
-    }
+    [self.view addConstraints:@[
+                                [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:_eventsView.tableView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f],
+                                [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:_eventsView.tableView attribute:NSLayoutAttributeWidth multiplier:1.0f constant:-20.0f],
+                                 [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_eventsView.bottomUnreadView attribute:NSLayoutAttributeTop multiplier:1.0f constant:-6.0f]
+                                 ]];
 
     _connectingProgress = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
     [_connectingProgress sizeToFit];
@@ -1355,7 +1358,7 @@ extern NSDictionary *emojiMap;
     _isShowingPreview = NO;
     [super viewWillAppear:animated];
     [_eventsView viewWillAppear:animated];
-    [self _resetStatusBar];
+    [self applyTheme];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     for(Event *e in [_pendingEvents copy]) {

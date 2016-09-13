@@ -294,6 +294,7 @@
     
     [ColorFormatter loadFonts];
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [self.mainViewController applyTheme];
     [[EventsDataSource sharedInstance] reformat];
     
     if(IRCCLOUD_HOST.length < 1)
@@ -336,7 +337,6 @@
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
 
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [self.mainViewController viewDidLoad];
         NSString *session = [NetworkConnection sharedInstance].session;
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
             //Store the session in the keychain again to update the access policy
@@ -514,6 +514,8 @@
             self.mainViewController.bidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
             self.mainViewController.eidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
             CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
+            [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+            [self.mainViewController applyTheme];
             [self.mainViewController bufferSelected:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
         }
     }
@@ -533,6 +535,8 @@
             self.mainViewController.bidToOpen = bid;
             self.mainViewController.eidToOpen = eid;
             CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
+            [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+            [self.mainViewController applyTheme];
             [self.mainViewController bufferSelected:bid];
         } else if(application.applicationState == UIApplicationStateBackground && (!_conn || (_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
             if(_backlogCompletedObserver) {
@@ -618,6 +622,8 @@
 }
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [self.mainViewController applyTheme];
     if([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:((UNTextInputNotificationResponse *)response).userText completionHandler:completionHandler];
     } else if([response.actionIdentifier isEqualToString:UNNotificationDefaultActionIdentifier]) {
@@ -791,6 +797,8 @@
 }
 
 -(void)showMainView:(BOOL)animated {
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [self.mainViewController applyTheme];
     if(animated) {
         if([NetworkConnection sharedInstance].session.length && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected)
             [[NetworkConnection sharedInstance] connect:NO];
