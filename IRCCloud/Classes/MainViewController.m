@@ -1563,13 +1563,11 @@ extern NSDictionary *emojiMap;
 
 -(void)sendButtonPressed:(id)sender {
     if(_message.text && _message.text.length) {
-        //Create an invisible, temporary text field and give it focus to accept the autocorrect suggestion without causing the keyboard to hide
-        UITextField *temp = [[UITextField alloc] initWithFrame:CGRectZero];
-        temp.hidden = YES;
-        [self.view addSubview:temp];
-        [temp becomeFirstResponder];
-        [self becomeFirstResponder];
-        [temp removeFromSuperview];
+        id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+        SEL sel = NSSelectorFromString(@"acceptAutocorrection");
+        if([k respondsToSelector:sel]) {
+            objc_msgSend(k, sel);
+        }
         
         if(_message.text.length > 1 && [_message.text hasSuffix:@" "])
             _message.text = [_message.text substringToIndex:_message.text.length - 1];
@@ -1877,9 +1875,9 @@ extern NSDictionary *emojiMap;
             if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
                 [_message.internalTextView reloadInputViews];
-                id k = ((id (*)(id, SEL))objc_msgSend)(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+                id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
                 if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
-                    ((id (*)(id, SEL, BOOL))objc_msgSend)(k, NSSelectorFromString(@"_setAutocorrects:"), YES);
+                    objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), YES);
                 }
             }
             _sortedChannels = nil;
@@ -1896,10 +1894,10 @@ extern NSDictionary *emojiMap;
             if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
                 [_message.internalTextView reloadInputViews];
-                id k = ((id (*)(id, SEL))objc_msgSend)(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+                id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
                 if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
-                    ((id (*)(id, SEL, BOOL))objc_msgSend)(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
-                    ((id (*)(id, SEL))objc_msgSend)(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
+                    objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
+                    objc_msgSend(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
                 }
             }
             _message.delegate = self;
