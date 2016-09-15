@@ -107,8 +107,8 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)_themeChanged {
-    if(![__currentTheme isEqualToString:[UIColor currentTheme]]) {
-        __currentTheme = [UIColor currentTheme];
+    if(![_currentTheme isEqualToString:[UIColor currentTheme]]) {
+        _currentTheme = [UIColor currentTheme];
         UIView *v = self.navigationController.view.superview;
         if(v) {
             [self.navigationController.view removeFromSuperview];
@@ -1502,6 +1502,7 @@ extern NSDictionary *emojiMap;
     [_doubleTapTimer invalidate];
     _doubleTapTimer = nil;
     _eidToOpen = -1;
+    _currentTheme = nil;
     
     self.slidingViewController.view.autoresizesSubviews = YES;
     [self.slidingViewController resetTopView];

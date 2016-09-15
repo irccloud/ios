@@ -90,7 +90,7 @@
     UIPopoverController *_popover;
     NSTimeInterval _lastNotificationTime;
     BOOL _isShowingPreview;
-    NSString *__currentTheme;
+    NSString *_currentTheme;
     BOOL _atMention;
     NSString *_bugReport;
     

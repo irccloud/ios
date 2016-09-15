@@ -797,6 +797,7 @@
 }
 
 -(void)showMainView:(BOOL)animated {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [self.mainViewController applyTheme];
     if(animated) {
@@ -830,6 +831,7 @@
             self.window.backgroundColor = [UIColor textareaBackgroundColor];
         }];
     }
+    }];
 }
 
 -(void)showConnectionView {
