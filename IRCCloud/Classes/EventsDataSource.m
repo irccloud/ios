@@ -65,7 +65,7 @@
             ||[_type isEqualToString:@"wallops"]);
 }
 -(NSString *)description {
-    return [NSString stringWithFormat:@"{cid: %i, bid: %i, eid: %f, group: %f, type: %@, from: %@, msg: %@, self: %i, header: %i}", _cid, _bid, _eid, _groupEid, _type, _from, _msg, _isSelf, _isHeader];
+    return [NSString stringWithFormat:@"{cid: %i, bid: %i, eid: %f, group: %f, type: %@, from: %@, msg: %@, self: %i, header: %i, reqid: %i, pending: %i, formatted: %@}", _cid, _bid, _eid, _groupEid, _type, _from, _msg, _isSelf, _isHeader, _reqid, _pending, _formatted];
 }
 -(NSString *)ignoreMask {
     if(!_ignoreMask) {
@@ -936,6 +936,8 @@
     event.rowType = 0;
     event.formatted = nil;
     event.formattedMsg = nil;
+    event.formattedNick = nil;
+    event.formattedRealname = nil;
     event.groupMsg = nil;
     event.linkify = YES;
     event.targetMode = nil;

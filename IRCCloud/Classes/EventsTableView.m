@@ -96,12 +96,14 @@ float __largeAvatarHeight = 32;
     UIView *_topBorder;
     UIView *_bottomBorder;
     float _timestampPosition;
+    UIColor *_messageTextColor;
 }
 @property int type;
 @property float timestampPosition;
 @property (readonly) UILabel *timestamp, *accessory;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
+@property UIColor *messageTextColor;
 @end
 
 @implementation EventsTableCell
@@ -1893,7 +1895,8 @@ float __largeAvatarHeight = 32;
         cell.accessibilityHint = nil;
         cell.accessibilityElementsHidden = NO;
 
-        if(![cell.message.attributedText.string isEqualToString:e.formatted.string]) {
+        if(cell.messageTextColor != e.color || ![cell.message.attributedText.string isEqualToString:e.formatted.string]) {
+            cell.messageTextColor = e.color;
             cell.message.attributedText = e.formatted;
             
             if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {

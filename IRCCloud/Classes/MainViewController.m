@@ -120,6 +120,7 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)applyTheme {
+    _currentTheme = [UIColor currentTheme];
     self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
     self.view.backgroundColor = [UIColor contentBackgroundColor];
     self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor navBarColor];
@@ -1725,10 +1726,7 @@ extern NSDictionary *emojiMap;
                     e.type = @"buffer_msg";
                 }
                 e.color = [UIColor timestampColor];
-                if([_buffer.name isEqualToString:s.nick])
-                    e.bgColor = [UIColor whiteColor];
-                else
-                    e.bgColor = [UIColor selfBackgroundColor];
+                e.bgColor = [UIColor selfBackgroundColor];
                 e.rowType = 0;
                 e.formatted = nil;
                 e.formattedMsg = nil;
@@ -1771,6 +1769,7 @@ extern NSDictionary *emojiMap;
         e.rowType = ROW_FAILED;
         e.color = [UIColor networkErrorColor];
         e.bgColor = [UIColor errorBackgroundColor];
+        e.formatted = nil;
         [_eventsView.tableView reloadData];
     }
 }
