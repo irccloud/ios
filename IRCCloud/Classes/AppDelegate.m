@@ -823,13 +823,11 @@
             }
         }];
     } else if(self.window.rootViewController != self.slideViewController) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
-            self.slideViewController.view.alpha = 1;
-            [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-            self.window.rootViewController = self.slideViewController;
-            self.window.backgroundColor = [UIColor textareaBackgroundColor];
-        }];
+        [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
+        self.slideViewController.view.alpha = 1;
+        [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+        self.window.rootViewController = self.slideViewController;
+        self.window.backgroundColor = [UIColor textareaBackgroundColor];
     }
     }];
 }

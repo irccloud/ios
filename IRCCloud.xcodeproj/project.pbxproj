@@ -143,8 +143,6 @@
 		2250176D1783434900066E71 /* TUSafariActivity.m in Sources */ = {isa = PBXBuildFile; fileRef = 225017601783434900066E71 /* TUSafariActivity.m */; };
 		2251693317B5A8040093ADC5 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
 		2253BA251770CD7200CCA77F /* ChannelListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */; };
-		2257336D19BFCB3000948690 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
-		2257336E19BFCB3400948690 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
 		225D973818AA995900065087 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A057B16D3DABA0029769C /* main.m */; };
 		225D973918AA995900065087 /* ServerReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22462B5118906B03009EF986 /* ServerReorderViewController.m */; };
 		225D973A18AA995900065087 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05AF16D3DB7B0029769C /* AppDelegate.m */; };
@@ -1633,7 +1631,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2257336D19BFCB3000948690 /* a.caf in Resources */,
 				22103529197EFCF100AB414F /* Icons.xcassets in Resources */,
 				22103527197EFCEB00AB414F /* Logo.xcassets in Resources */,
 				2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */,
@@ -1727,7 +1724,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2257336E19BFCB3400948690 /* a.caf in Resources */,
 				22DB25301982DF2B0008728E /* Icons.xcassets in Resources */,
 				22DB25401982E3130008728E /* EnterpriseImages.xcassets in Resources */,
 				2236BD661BAA5E0900015753 /* FontAwesome.otf in Resources */,
@@ -2329,7 +2325,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE_SPECIFIER = "match AdHoc com.irccloud.enterprise";
+				PROVISIONING_PROFILE_SPECIFIER = "Crashlytics-Enterprise";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -2644,6 +2640,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
+				PROVISIONING_PROFILE_SPECIFIER = "Crashlytics ShareExtension-Enterprise";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;

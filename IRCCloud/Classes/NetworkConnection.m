@@ -1894,6 +1894,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 if(!b.scrolledUp && [_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
                         [_events pruneEventsForBuffer:b.bid maxSize:101];
                 }
+                [_notifications removeNotificationsForBID:b.bid olderThan:b.last_seen_eid];
             }
         });
         _numBuffers = 0;
