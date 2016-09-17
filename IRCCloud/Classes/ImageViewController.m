@@ -454,8 +454,9 @@
             NSDictionary *dict = [parser objectWithData:data];
             if([[dict objectForKey:@"success"] intValue]) {
                 dict = [dict objectForKey:@"data"];
-                if([[dict objectForKey:@"images_count"] intValue] == 1) {
-                    dict = [[dict objectForKey:@"images"] objectAtIndex:0];
+                if([[dict objectForKey:@"images_count"] intValue] == 1 || [[dict objectForKey:@"is_album"] intValue] == 0) {
+                    if([[dict objectForKey:@"is_album"] intValue] == 1)
+                        dict = [[dict objectForKey:@"images"] objectAtIndex:0];
                     if([[dict objectForKey:@"type"] hasPrefix:@"image/"] && [[dict objectForKey:@"animated"] intValue] == 0) {
                         NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"link"]]];
                         _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
