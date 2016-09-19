@@ -89,14 +89,6 @@
 
 @end
 
-@interface FontSizeCell : UITableViewCell {
-    UILabel *_small;
-    UILabel *_large;
-    UISlider *_fontSize;
-}
--(void)setFontSize:(UISlider *)fontSize;
-@end
-
 @implementation FontSizeCell
 
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -114,13 +106,18 @@
         [self.contentView addSubview:_small];
         
         _large = [[UILabel alloc] init];
-        _large.font = [UIFont systemFontOfSize:18];
+        _large.font = [UIFont systemFontOfSize:24];
         _large.lineBreakMode = NSLineBreakByCharWrapping;
         _large.textAlignment = NSTextAlignmentCenter;
         _large.numberOfLines = 0;
         _large.text = @"Aa";
         _large.textColor = [[UITableViewCell appearance] textLabelColor];
         [self.contentView addSubview:_large];
+        
+        _fontSample = [[UILabel alloc] initWithFrame:CGRectZero];
+        _fontSample.textAlignment = NSTextAlignmentCenter;
+        _fontSample.text = @"Example";
+        [self.contentView addSubview:_fontSample];
     }
     return self;
 }
@@ -128,6 +125,7 @@
 -(void)setFontSize:(UISlider *)fontSize {
     [_fontSize removeFromSuperview];
     _fontSize = fontSize;
+    
     [self.contentView addSubview:_fontSize];
 }
 
@@ -136,13 +134,14 @@
     
     CGRect frame = CGRectInset([self.contentView bounds], 6, 6);
     
-    _small.frame = CGRectMake(frame.origin.x, frame.origin.y, 32, frame.size.height);
-    _large.frame = CGRectMake(frame.origin.x + frame.size.width - 32, frame.origin.y, 32, frame.size.height);
+    _small.frame = CGRectMake(frame.origin.x, frame.origin.y, 32, frame.size.height/2);
+    _large.frame = CGRectMake(frame.origin.x + frame.size.width - 32, frame.origin.y, 32, frame.size.height/2);
     [_fontSize sizeToFit];
-    _fontSize.frame = CGRectMake(frame.origin.x + 32, 0, frame.size.width - 64 - frame.origin.x, _fontSize.frame.size.height);
+    _fontSize.frame = CGRectMake(frame.origin.x + 32, 0, frame.size.width - 64 - frame.origin.x, _fontSize.frame.size.height/2);
     CGPoint p = _fontSize.center;
-    p.y = self.contentView.center.y;
+    p.y = self.contentView.center.y/2;
     _fontSize.center = p;
+    _fontSample.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height / 2, frame.size.width, frame.size.height / 2);
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -875,11 +874,9 @@
                         ]},
               @{@"title":@"Font Size", @"items":@[
                         @{@"special":^UITableViewCell *(UITableViewCell *cell, NSString *identifier) {
-                            if(!cell) {
-                                cell = [[FontSizeCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:identifier];
-                                ((FontSizeCell *)cell).fontSize = _fontSize;
-                            }
-                            return cell;
+                            _fontSizeCell.fontSample.textColor = [UIColor messageTextColor];
+                            [self monoToggled:nil];
+                            return _fontSizeCell;
                         }}
                         ]},
               @{@"title":@"Photo Sharing", @"items":photos},
@@ -937,6 +934,7 @@
     _tabletMode = [[UISwitch alloc] init];
     _pastebin = [[UISwitch alloc] init];
     _mono = [[UISwitch alloc] init];
+    [_mono addTarget:self action:@selector(monoToggled:) forControlEvents:UIControlEventValueChanged];
     _hideJoinPart = [[UISwitch alloc] init];
     _expandJoinPart = [[UISwitch alloc] init];
     _notifyAll = [[UISwitch alloc] init];
@@ -969,10 +967,12 @@
     
     _fontSize = [[UISlider alloc] init];
     _fontSize.minimumValue = 10;
-    _fontSize.maximumValue = 18;
+    _fontSize.maximumValue = 24;
     _fontSize.continuous = YES;
     [_fontSize addTarget:self action:@selector(sliderChanged:) forControlEvents:UIControlEventValueChanged];
-
+    
+    _fontSizeCell = [[FontSizeCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+    _fontSizeCell.fontSize = _fontSize;
     [self refresh];
 }
 
@@ -991,8 +991,16 @@
     }
 }
 
+-(void)monoToggled:(id)sender {
+    if(_mono.on)
+        _fontSizeCell.fontSample.font = [UIFont fontWithName:@"Hack" size:_fontSize.value - 1];
+    else
+        _fontSizeCell.fontSample.font = [UIFont fontWithDescriptor:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] size:_fontSize.value];
+}
+
 -(void)sliderChanged:(UISlider *)slider {
     [slider setValue:(int)slider.value animated:NO];
+    [self monoToggled:nil];
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
@@ -1024,7 +1032,7 @@
 #pragma mark - Table view data source
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.section == 1)
+    if(indexPath.section == 1 || [[[_data objectAtIndex:indexPath.section] objectForKey:@"title"] isEqualToString:@"Font Size"])
         return 80;
     else
         return 48;

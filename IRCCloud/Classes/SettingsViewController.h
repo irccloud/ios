@@ -17,6 +17,16 @@
 
 #import <UIKit/UIKit.h>
 
+@interface FontSizeCell : UITableViewCell {
+    UILabel *_small;
+    UILabel *_large;
+    UILabel *_fontSample;
+    UISlider *_fontSize;
+}
+@property (readonly) UILabel *fontSample;
+-(void)setFontSize:(UISlider *)fontSize;
+@end
+
 @interface SettingsViewController : UITableViewController<UITextFieldDelegate,UITextViewDelegate> {
     UITextField *_email;
     UITextField *_name;
@@ -54,5 +64,6 @@
     NSString *_oldTheme;
     UIAlertView *_alertView;
     NSArray *_data;
+    FontSizeCell *_fontSizeCell;
 }
 @end
