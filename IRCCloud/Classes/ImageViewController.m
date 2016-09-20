@@ -798,11 +798,13 @@
     activity.webpageURL = [NSURL URLWithString:[_url.absoluteString stringByReplacingCharactersInRange:NSMakeRange(0, _url.scheme.length) withString:_url.scheme.lowercaseString]];
     [self setUserActivity:activity];
     [activity becomeCurrent];
+    if(_movieController)
+        [_movieController play];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     if(_movieController)
-        [_movieController stop];
+        [_movieController pause];
     [_hideTimer invalidate];
     _hideTimer = nil;
 }

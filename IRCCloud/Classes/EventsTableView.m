@@ -345,7 +345,7 @@ float __largeAvatarHeight = 32;
 #if TARGET_IPHONE_SIMULATOR
     UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
     t.delegate = self;
-    [self.view addGestureRecognizer:t];
+    [_tableView addGestureRecognizer:t];
 #endif
 }
 
