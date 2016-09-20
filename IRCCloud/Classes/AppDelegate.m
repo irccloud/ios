@@ -613,7 +613,10 @@
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
     if([notification.request.content.userInfo objectForKey:@"d"]) {
-        if(_mainViewController.buffer.bid != [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue]) {
+        int bid = [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
+        NSTimeInterval eid = [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
+        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
+        if(_mainViewController.buffer.bid != bid && eid > b.last_seen_eid) {
             completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
             return;
         }

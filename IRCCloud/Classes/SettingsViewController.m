@@ -28,6 +28,9 @@
 #import "OpenInFirefoxControllerObjC.h"
 #import "AvatarsDataSource.h"
 
+#define FONT_MIN 10
+#define FONT_MAX 24
+
 @interface BrowserViewController : UITableViewController {
     NSMutableArray *_browsers;
 }
@@ -97,7 +100,7 @@
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
         _small = [[UILabel alloc] init];
-        _small.font = [UIFont boldSystemFontOfSize:10];
+        _small.font = [UIFont boldSystemFontOfSize:FONT_MIN];
         _small.lineBreakMode = NSLineBreakByCharWrapping;
         _small.textAlignment = NSTextAlignmentCenter;
         _small.numberOfLines = 0;
@@ -106,7 +109,7 @@
         [self.contentView addSubview:_small];
         
         _large = [[UILabel alloc] init];
-        _large.font = [UIFont systemFontOfSize:24];
+        _large.font = [UIFont systemFontOfSize:FONT_MAX];
         _large.lineBreakMode = NSLineBreakByCharWrapping;
         _large.textAlignment = NSTextAlignmentCenter;
         _large.numberOfLines = 0;
@@ -966,8 +969,8 @@
 #endif
     
     _fontSize = [[UISlider alloc] init];
-    _fontSize.minimumValue = 10;
-    _fontSize.maximumValue = 24;
+    _fontSize.minimumValue = FONT_MAX;
+    _fontSize.maximumValue = FONT_MIN;
     _fontSize.continuous = YES;
     [_fontSize addTarget:self action:@selector(sliderChanged:) forControlEvents:UIControlEventValueChanged];
     
