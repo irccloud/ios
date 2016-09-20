@@ -969,8 +969,8 @@
 #endif
     
     _fontSize = [[UISlider alloc] init];
-    _fontSize.minimumValue = FONT_MAX;
-    _fontSize.maximumValue = FONT_MIN;
+    _fontSize.minimumValue = FONT_MIN;
+    _fontSize.maximumValue = FONT_MAX;
     _fontSize.continuous = YES;
     [_fontSize addTarget:self action:@selector(sliderChanged:) forControlEvents:UIControlEventValueChanged];
     
