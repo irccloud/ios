@@ -24,7 +24,6 @@ platform :ios do
       match(type: type, app_identifier: "#{app_root}IRCCloud.ShareExtension")
       match(type: type, app_identifier: "#{app_root}enterprise")
       match(type: type, app_identifier: "#{app_root}enterprise.ShareExtension")
-      match(type: type, app_identifier: "#{app_root}UITests")
     end
   end
 
