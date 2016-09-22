@@ -1,6 +1,10 @@
-• Support for SAML single sign on
-• Imgur improvements: m.imgur.com and single image album links now open inline, and gifs are loaded as mp4 for faster, smaller downloads
-• twimg.com URLs open inline
-• More reliable file uploads, no more "(null)" messages
-• Fixed: Double tapping a user to mention them now closes the member list correctly
+• iOS 10: Highlights in other channels will now show a notification banner while using the app
+• New monospace font
+• Turning off the "Unread message indicator" setting globally no longer disables private message indicators. You can still turn them off individually
+• Improved sharing links from the App Store and other apps that include an image along with a URL
+• Improved support for imgur gallery URLs
+• Text in channel topic and whois responses can now be selected
+• Fixed a crash when browsing the photo library on iOS 10
+• Fixed the 'Invite to Channel' dialog
+• Fixed issues with channels being marked as read (or not in certain cases)
 • Stability improvements, and minor fixes
