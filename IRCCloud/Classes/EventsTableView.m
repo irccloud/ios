@@ -1851,13 +1851,22 @@ float __largeAvatarHeight = 32;
         }
         Event *e = [_data objectAtIndex:indexPath.row];
         [_lock unlock];
+        if(!e.formatted && e.formattedMsg.length > 0) {
+            [self _format:e];
+            if(e.formatted) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [_tableView reloadData];
+                }];
+                CLS_LOG(@"Event was formatted during cellForRowAtIndexPath, reloading table heights");
+            }
+        }
         cell.type = e.rowType;
         cell.backgroundView = nil;
         cell.backgroundColor = nil;
         cell.contentView.backgroundColor = e.bgColor;
         if(e.isHeader) {
             NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithAttributedString:e.formattedNick];
-            if(([e.realname isKindOfClass:[NSString class]] && ![e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) && !__norealnamePref) {
+            if(e.formattedRealname && ([e.realname isKindOfClass:[NSString class]] && ![e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) && !__norealnamePref) {
                 [s appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
                 [s appendAttributedString:e.formattedRealname];
             }
@@ -1878,15 +1887,6 @@ float __largeAvatarHeight = 32;
         cell.timestamp.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
         cell.message.linkDelegate = self;
         cell.nickname.linkDelegate = self;
-        if(!e.formatted && e.formattedMsg.length > 0) {
-            [self _format:e];
-            if(e.formatted) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [_tableView reloadData];
-                }];
-                CLS_LOG(@"Event was formatted during cellForRowAtIndexPath, reloading table heights");
-            }
-        }
         cell.timestampPosition = e.timestampPosition;
         cell.accessory.font = [ColorFormatter awesomeFont];
         cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
