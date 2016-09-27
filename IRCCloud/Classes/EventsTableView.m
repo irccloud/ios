@@ -198,8 +198,8 @@ float __largeAvatarHeight = 32;
             frame.size.height -= 2;
             [_nickname sizeToFit];
             _nickname.frame = CGRectMake(frame.origin.x + (__timeLeftPref?__timestampWidth:0), frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
-            frame.origin.y += _nickname.frame.size.height + 2;
-            frame.size.height -= _nickname.frame.size.height + 2;
+            frame.origin.y += _nickname.frame.size.height;
+            frame.size.height -= _nickname.frame.size.height;
             if(__timeLeftPref) {
                 frame.origin.x += 4;
                 frame.size.width -= 4;
@@ -1793,7 +1793,7 @@ float __largeAvatarHeight = 32;
     if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
         estimatedWidth -= 4;
     
-    e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + 4 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+    e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + 5 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
     e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
     
     if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
