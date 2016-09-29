@@ -214,7 +214,11 @@
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 if([UIApplication sharedApplication].applicationIconBadgeNumber != notifications.count)
                     CLS_LOG(@"Setting iOS icon badge to %lu", (unsigned long)notifications.count);
-                [UIApplication sharedApplication].applicationIconBadgeNumber = notifications.count;
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    CLS_LOG(@"Setting iOS icon badge to %lu", (unsigned long)notifications.count);
+                    [UIApplication sharedApplication].applicationIconBadgeNumber = notifications.count + 1;
+                    [UIApplication sharedApplication].applicationIconBadgeNumber = notifications.count;
+                }];
             }];
         }];
     } else {
