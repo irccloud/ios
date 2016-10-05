@@ -605,6 +605,7 @@
         NSDictionary *result = [[NetworkConnection sharedInstance] requestConfiguration];
         if(result) {
             IRCCLOUD_HOST = [result objectForKey:@"api_host"];
+            [self _stripIRCCloudHost];
             if([[result objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     enterpriseHint.text = [[result objectForKey:@"enterprise"] objectForKey:@"fullname"];
