@@ -472,7 +472,7 @@
                     }
                 } else {
                     CLS_LOG(@"Too many images from imgur: %@", dict);
-                    [self fail:@"Albums with images are not supported"];
+                    [self fail:@"Albums with multiple images are not supported"];
                 }
             } else {
                 CLS_LOG(@"Imgur failure: %@", dict);
