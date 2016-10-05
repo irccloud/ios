@@ -181,6 +181,7 @@
     password.alpha = 0;
     name.alpha = 0;
     enterpriseHint.alpha = 1;
+    enterpriseHint.text = @"Enterprise Edition";
     loginHint.alpha = 0;
     signupHint.alpha = 0;
     login.alpha = 0;
@@ -603,13 +604,14 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] requestConfiguration];
         if(result) {
+            IRCCLOUD_HOST = [result objectForKey:@"api_host"];
             if([[result objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     enterpriseHint.text = [[result objectForKey:@"enterprise"] objectForKey:@"fullname"];
                 });
             }
             if(![[result objectForKey:@"auth_mechanism"] isEqualToString:@"internal"])
-                signupHint.enabled = NO;
+                signupHint.enabled = YES;
             
             if([[result objectForKey:@"auth_mechanism"] isEqualToString:@"saml"]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
