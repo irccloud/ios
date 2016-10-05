@@ -118,6 +118,8 @@ BOOL __color_theme_is_dark;
 
 NSString *__current_theme;
 
+BOOL __compact = NO;
+
 @implementation UITextField (IRCCloudAppearanceHax)
 -(void)setPlaceholder:(NSString *)placeholder {
     [self setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:placeholder?placeholder:@"" attributes:@{NSForegroundColorAttributeName:__placeholderColor}]];
@@ -1051,7 +1053,10 @@ NSString *__current_theme;
 }
 +(NSDictionary *)linkAttributes {
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineSpacing = MESSAGE_LINE_SPACING;
+    if(__compact)
+        paragraphStyle.lineSpacing = 0;
+    else
+        paragraphStyle.lineSpacing = MESSAGE_LINE_SPACING;
     paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
     
     return @{NSForegroundColorAttributeName: [UIColor linkColor],
@@ -1060,7 +1065,10 @@ NSString *__current_theme;
 }
 +(NSDictionary *)lightLinkAttributes {
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineSpacing = MESSAGE_LINE_SPACING;
+    if(__compact)
+        paragraphStyle.lineSpacing = 0;
+    else
+        paragraphStyle.lineSpacing = MESSAGE_LINE_SPACING;
     paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
     
     return @{NSForegroundColorAttributeName: [UIColor lightLinkColor],

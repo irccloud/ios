@@ -500,6 +500,7 @@
         [prefs setObject:[NSNumber numberWithBool:_notifyAll.isOn] forKey:@"notifications-all"];
         [prefs setObject:[NSNumber numberWithBool:!_showUnread.isOn] forKey:@"disableTrackUnread"];
         [prefs setObject:[NSNumber numberWithBool:_markAsRead.isOn] forKey:@"enableReadOnSelect"];
+        [prefs setObject:[NSNumber numberWithBool:_compact.isOn] forKey:@"ascii-compact"];
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -773,6 +774,12 @@
         _timeLeft.enabled = YES;
     }
 
+    if([[prefs objectForKey:@"ascii-compact"] isKindOfClass:[NSNumber class]]) {
+        _compact.on = [[prefs objectForKey:@"ascii-compact"] boolValue];
+    } else {
+        _compact.on = NO;
+    }
+    
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
@@ -860,6 +867,7 @@
                          @{@"title":@"Show Real Names", @"accessory":_noRealName},
                          @{@"title":@"Right Hand Side Timestamps", @"accessory":_timeLeft},
                          @{@"title":@"User Icons", @"accessory":_avatarsOff},
+                         @{@"title":@"Compact Spacing", @"accessory":_compact},
                          @{@"title":@"24-Hour Clock", @"accessory":_24hour},
                          @{@"title":@"Show Seconds", @"accessory":_seconds},
                          @{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."},
@@ -950,6 +958,7 @@
     _avatarsOff = [[UISwitch alloc] init];
     [_avatarsOff addTarget:self action:@selector(oneLineToggled:) forControlEvents:UIControlEventValueChanged];
     _browserWarning = [[UISwitch alloc] init];
+    _compact = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";

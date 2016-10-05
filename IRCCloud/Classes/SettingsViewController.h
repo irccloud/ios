@@ -54,6 +54,7 @@
     UISwitch *_timeLeft;
     UISwitch *_avatarsOff;
     UISwitch *_browserWarning;
+    UISwitch *_compact;
     NSString *_version;
     UISlider *_fontSize;
     int _userinforeqid;

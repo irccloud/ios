@@ -85,6 +85,8 @@ BOOL __monospacePref = NO;
 float __smallAvatarHeight;
 float __largeAvatarHeight = 32;
 
+extern BOOL __compact;
+
 @interface EventsTableCell : UITableViewCell {
     UIImageView *_avatar;
     UILabel *_timestamp;
@@ -189,7 +191,7 @@ float __largeAvatarHeight = 32;
         frame.size.height -= 4;
         frame.size.width -= frame.origin.x + 6;
         if(!__chatOneLinePref && !__avatarsOffPref) {
-            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + ((_nickname.attributedText.length)?4:0),__largeAvatarHeight,__largeAvatarHeight);
+            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y,__largeAvatarHeight,__largeAvatarHeight);
             frame.origin.x += _avatar.frame.size.width + 13;
             frame.size.width -= _avatar.frame.size.width + 17;
         }
@@ -1417,6 +1419,7 @@ float __largeAvatarHeight = 32;
         __chatOneLinePref = NO;
         __norealnamePref = NO;
         __monospacePref = NO;
+        __compact = NO;
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         if(prefs) {
             __monospacePref = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
@@ -1429,6 +1432,7 @@ float __largeAvatarHeight = 32;
             if(!__chatOneLinePref && !__avatarsOffPref)
                 __timeLeftPref = NO;
             __norealnamePref = [[NSUserDefaults standardUserDefaults] boolForKey:@"chat-norealname"];
+            __compact = [[prefs objectForKey:@"ascii-compact"] boolValue];
 
             NSDictionary *hiddenMap;
             
@@ -1487,7 +1491,7 @@ float __largeAvatarHeight = 32;
         [_unseenHighlightPositions removeAllObjects];
         _hiddenAvatarRow = -1;
         _stickyAvatar.hidden = YES;
-        __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + 3;
+        __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + (__compact?0:MESSAGE_LINE_SPACING);
         
         if(!_buffer) {
             [_lock unlock];
@@ -1793,13 +1797,15 @@ float __largeAvatarHeight = 32;
     if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
         estimatedWidth -= 4;
     
-    e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + 5 + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+    e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+    if(!__compact)
+        e.height += MESSAGE_LINE_SPACING;
     e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
     
     if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
-        e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + 4;
-        if(e.height < __largeAvatarHeight + 4)
-            e.height = __largeAvatarHeight + 4;
+        e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + MESSAGE_LINE_SPACING;
+        if(e.height < __largeAvatarHeight + (__compact?0:MESSAGE_LINE_SPACING))
+            e.height = __largeAvatarHeight + (__compact?0:MESSAGE_LINE_SPACING);
     }
 }
 
@@ -2220,9 +2226,9 @@ float __largeAvatarHeight = 32;
                 }
             }
             if(e.from.length && !(((Event *)[_data objectAtIndex:firstRow]).rowType == ROW_LASTSEENEID && groupHeight == 26) && (!e.isHeader || groupHeight > __largeAvatarHeight + 14)) {
-                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + 4);
-                if(_stickyAvatarYOffsetConstraint.constant > offset + 8)
-                    _stickyAvatarYOffsetConstraint.constant = offset + 8;
+                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + MESSAGE_LINE_SPACING);
+                if(_stickyAvatarYOffsetConstraint.constant >= offset + MESSAGE_LINE_SPACING)
+                    _stickyAvatarYOffsetConstraint.constant = offset + MESSAGE_LINE_SPACING;
                 if(_hiddenAvatarRow != topIndexPath.row) {
                     _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                     _stickyAvatar.hidden = NO;

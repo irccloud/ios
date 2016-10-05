@@ -29,6 +29,8 @@ NSDictionary *emojiMap;
 NSDictionary *quotes;
 float ColorFormatterCachedFontSize = 0.0f;
 
+extern BOOL __compact;
+
 @implementation ColorFormatter
 
 +(BOOL)shouldClearFontCache {
@@ -1439,7 +1441,10 @@ float ColorFormatterCachedFontSize = 0.0f;
     }
     
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.lineSpacing = MESSAGE_LINE_SPACING;
+    if(__compact)
+        paragraphStyle.lineSpacing = 0;
+    else
+        paragraphStyle.lineSpacing = MESSAGE_LINE_SPACING;
     paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
     [output addAttribute:(NSString*)NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [output length])];
     
