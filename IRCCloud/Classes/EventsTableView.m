@@ -230,7 +230,7 @@ extern BOOL __compact;
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
         _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, [_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
-            _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y,__smallAvatarHeight,__smallAvatarHeight);
+            _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y + 2,__smallAvatarHeight,__smallAvatarHeight);
         }
     } else {
         if(_type == ROW_BACKLOG) {
