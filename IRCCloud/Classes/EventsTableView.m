@@ -187,11 +187,11 @@ extern BOOL __compact;
     
     if(_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED) {
         frame.origin.x = (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?6:16;
-        frame.origin.y = 2;
+        frame.origin.y = 0;
         frame.size.height -= 4;
         frame.size.width -= frame.origin.x + 6;
         if(!__chatOneLinePref && !__avatarsOffPref) {
-            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y,__largeAvatarHeight,__largeAvatarHeight);
+            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + 2,__largeAvatarHeight,__largeAvatarHeight);
             frame.origin.x += _avatar.frame.size.width + 13;
             frame.size.width -= _avatar.frame.size.width + 17;
         }
