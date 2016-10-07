@@ -1643,7 +1643,7 @@ extern BOOL __compact;
             NSInteger firstRow = [[rows objectAtIndex:0] row];
             NSInteger lastRow = [[rows lastObject] row];
             Event *e = ((_lastSeenEidPos+1) < _data.count)?[_data objectAtIndex:_lastSeenEidPos+1]:nil;
-            if(e && _lastSeenEidPos >= 0 && firstRow > _lastSeenEidPos && e.eid > _buffer.last_seen_eid) {
+            if(e && _lastSeenEidPos >= 0 && firstRow > _lastSeenEidPos && e.eid >= _buffer.last_seen_eid) {
                 if(_topUnreadView.alpha == 0) {
                     [UIView beginAnimations:nil context:nil];
                     [UIView setAnimationDuration:0.1];
