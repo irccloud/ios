@@ -503,35 +503,35 @@
                     break;
                 case kCollapsedEventJoin:
                     if(_showChan)
-                        output = [NSString stringWithFormat:@"→ %@%@ joined %@ (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.chan, e.hostname];
+                        output = [NSString stringWithFormat:@"→\U0000FE0E %@%@ joined %@ (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.chan, e.hostname];
                     else
-                        output = [NSString stringWithFormat:@"→ %@%@ joined (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.hostname];
+                        output = [NSString stringWithFormat:@"→\U0000FE0E %@%@ joined (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.hostname];
                     break;
                 case kCollapsedEventPart:
                     if(_showChan)
-                        output = [NSString stringWithFormat:@"← %@%@ left %@ (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.chan, e.hostname];
+                        output = [NSString stringWithFormat:@"←\U0000FE0E %@%@ left %@ (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.chan, e.hostname];
                     else
-                        output = [NSString stringWithFormat:@"← %@%@ left (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.hostname];
+                        output = [NSString stringWithFormat:@"←\U0000FE0E %@%@ left (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.hostname];
                     if(e.msg.length > 0)
                         output = [output stringByAppendingFormat:@": %@", e.msg];
                     break;
                 case kCollapsedEventQuit:
-                    output = [NSString stringWithFormat:@"⇐ %@%@ quit", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
+                    output = [NSString stringWithFormat:@"⇐\U0000FE0E %@%@ quit", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
                     if(e.hostname.length > 0)
                         output = [output stringByAppendingFormat:@" (%@)", e.hostname];
                     if(e.msg.length > 0)
                         output = [output stringByAppendingFormat:@": %@", e.msg];
                     break;
                 case kCollapsedEventNickChange:
-                    output = [NSString stringWithFormat:@"%@ → %@", e.oldNick, [self formatNick:e.nick mode:e.fromMode colorize:NO]];
+                    output = [NSString stringWithFormat:@"%@ →\U0000FE0E %@", e.oldNick, [self formatNick:e.nick mode:e.fromMode colorize:NO]];
                     break;
                 case kCollapsedEventPopIn:
-                    output = [NSString stringWithFormat:@"↔ %@%@ popped in", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
+                    output = [NSString stringWithFormat:@"↔\U0000FE0E %@%@ popped in", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
                     if(_showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
                 case kCollapsedEventPopOut:
-                    output = [NSString stringWithFormat:@"↔ %@%@ nipped out", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
+                    output = [NSString stringWithFormat:@"↔\U0000FE0E %@%@ nipped out", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
                     if(_showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
@@ -577,13 +577,13 @@
                             [message appendString:@"mode: "];
                             break;
                         case kCollapsedEventJoin:
-                            [message appendString:@"→ "];
+                            [message appendString:@"→\U0000FE0E "];
                             break;
                         case kCollapsedEventPart:
-                            [message appendString:@"← "];
+                            [message appendString:@"←\U0000FE0E "];
                             break;
                         case kCollapsedEventQuit:
-                            [message appendString:@"⇐ "];
+                            [message appendString:@"⇐\U0000FE0E "];
                             break;
                         case kCollapsedEventNickChange:
                             if(message.length)
@@ -591,7 +591,7 @@
                             break;
                         case kCollapsedEventPopIn:
                         case kCollapsedEventPopOut:
-                            [message appendString:@"↔ "];
+                            [message appendString:@"↔\U0000FE0E "];
                             break;
                         case kCollapsedEventConnectionStatus:
                             break;
@@ -599,13 +599,13 @@
                 }
                 
                 if(e.type == kCollapsedEventNickChange) {
-                    [message appendFormat:@"%@ → %@", e.oldNick, [self formatNick:e.nick mode:e.fromMode colorize:NO]];
+                    [message appendFormat:@"%@ →\U0000FE0E %@", e.oldNick, [self formatNick:e.nick mode:e.fromMode colorize:NO]];
                     NSString *oldNick = e.oldNick;
                     e.oldNick = nil;
                     [message appendString:[self was:e]];
                     e.oldNick = oldNick;
                 } else if(e.type == kCollapsedEventNetSplit) {
-                    [message appendString:[e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "]];
+                    [message appendString:[e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮\U0000FE0E "]];
                 } else if(e.type == kCollapsedEventConnectionStatus) {
                     if(e.msg) {
                         [message appendString:e.msg];

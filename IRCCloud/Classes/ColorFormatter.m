@@ -23,7 +23,7 @@
 
 id Courier = NULL, CourierBold, CourierOblique,CourierBoldOblique;
 id Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
-id arrowFont, chalkboardFont, markerFont, awesomeFont;
+id chalkboardFont, markerFont, awesomeFont;
 UIFont *timestampFont, *monoTimestampFont;
 NSDictionary *emojiMap;
 NSDictionary *quotes;
@@ -39,7 +39,7 @@ extern BOOL __compact;
 
 +(void)clearFontCache {
     CLS_LOG(@"Clearing font cache");
-    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = arrowFont = chalkboardFont = markerFont = NULL;
+    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = chalkboardFont = markerFont = NULL;
     timestampFont = monoTimestampFont = awesomeFont = NULL;
 }
 
@@ -1191,7 +1191,6 @@ extern BOOL __compact;
     monoTimestampFont = [UIFont fontWithName:@"Hack" size:FONT_SIZE - 3];
     timestampFont = [UIFont systemFontOfSize:FONT_SIZE - 2];
     awesomeFont = [UIFont fontWithName:@"FontAwesome" size:FONT_SIZE];
-    arrowFont = [UIFont fontWithName:@"HiraMinProN-W3" size:FONT_SIZE - 3];
     Courier = [UIFont fontWithName:@"Hack" size:FONT_SIZE - 1];
     CourierBold = [UIFont fontWithName:@"Hack-Bold" size:FONT_SIZE - 1];
     CourierOblique = [UIFont fontWithName:@"Hack-Italic" size:FONT_SIZE - 1];
@@ -1436,10 +1435,6 @@ extern BOOL __compact;
     [output addAttributes:@{NSFontAttributeName:font} range:NSMakeRange(0, text.length)];
     [output addAttributes:@{(NSString *)NSForegroundColorAttributeName:color} range:NSMakeRange(0, text.length)];
 
-    for(NSNumber *i in arrowIndex) {
-        [output addAttributes:@{NSFontAttributeName:arrowFont} range:NSMakeRange([i intValue], 1)];
-    }
-    
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
     if(__compact)
         paragraphStyle.lineSpacing = 0;
