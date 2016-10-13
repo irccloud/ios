@@ -37,9 +37,9 @@ NSLayoutManager *__LinkTextViewLayoutManager;
 }
 
 - (void)viewTapped:(UITapGestureRecognizer *)sender {
-    if(_linkDelegate && sender.state == UIGestureRecognizerStateEnded) {
+    if(sender.state == UIGestureRecognizerStateEnded) {
         NSTextCheckingResult *r = [self linkAtPoint:[sender locationInView:self]];
-        if(r) {
+        if(r && _linkDelegate) {
             [_linkDelegate LinkTextView:self didSelectLinkWithTextCheckingResult:r];
         } else {
             UIView *obj = self;
