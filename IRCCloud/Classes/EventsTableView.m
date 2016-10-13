@@ -1684,7 +1684,9 @@ extern BOOL __compact;
             [[NetworkConnection sharedInstance] scheduleIdleTimer];
         }
         
-        [_tableView flashScrollIndicators];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [_tableView flashScrollIndicators];
+        }];
     }
 }
 
