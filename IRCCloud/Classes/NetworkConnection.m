@@ -281,6 +281,7 @@ volatile BOOL __socketPaused = NO;
     };
     
     void (^makeserver)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
+        NSLog(@"%@", object);
         Server *server = [_servers getServer:object.cid];
         if(!server) {
             server = [[Server alloc] init];
@@ -308,6 +309,10 @@ volatile BOOL __socketPaused = NO;
             server.order = [[object objectForKey:@"order"] intValue];
         else
             server.order = 0;
+        if([[object objectForKey:@"deferred_archives"] isKindOfClass:[NSNumber class]])
+            server.deferred_archives = [[object objectForKey:@"deferred_archives"] intValue];
+        else
+            server.deferred_archives = 0;
         if(!backlog && !_resuming)
             [self postObject:server forEvent:kIRCEventMakeServer];
     };
@@ -535,6 +540,11 @@ volatile BOOL __socketPaused = NO;
                        buffer.valid = YES;
                        if(buffer.timeout)
                            [[EventsDataSource sharedInstance] removeEventsForBuffer:buffer.bid];
+                       if(backlog && buffer.archived) {
+                           Server *server = [[ServersDataSource sharedInstance] getServer:buffer.cid];
+                           if(server.deferred_archives)
+                               server.deferred_archives--;
+                       }
                        [_notifications removeNotificationsForBID:buffer.bid olderThan:buffer.last_seen_eid];
                        if(!backlog && !_resuming)
                            [self postObject:buffer forEvent:kIRCEventMakeBuffer];
@@ -1471,6 +1481,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             else
                 url = [url stringByAppendingFormat:@"&notifier=1"];
         }
+        if([url rangeOfString:@"?"].location == NSNotFound)
+            url = [url stringByAppendingFormat:@"?exclude_archives=1"];
+        else
+            url = [url stringByAppendingFormat:@"&exclude_archives=1"];
 
         SCNetworkReachabilityFlags flags;
         BOOL success = SCNetworkReachabilityGetFlags(_reachability, &flags);
@@ -1814,6 +1828,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     fetcher.bid = bid;
 }
 
+-(void)requestArchives:(int)cid {
+  OOBFetcher *fetcher = [self fetchOOB:[NSString stringWithFormat:@"https://%@/chat/archives?cid=%i", IRCCLOUD_HOST, cid]];
+  fetcher.bid = -1;
+}
 
 -(OOBFetcher *)fetchOOB:(NSString *)url {
     @synchronized(_oobQueue) {

@@ -231,4 +231,5 @@ typedef enum {
 -(int)deletePaste:(NSString *)pasteID;
 -(int)editPaste:(NSString *)pasteID name:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension;
 -(NSDictionary *)getPastebins:(int)page;
+-(void)requestArchives:(int)cid;
 @end

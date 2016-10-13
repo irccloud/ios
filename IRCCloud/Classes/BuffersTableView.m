@@ -220,7 +220,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         
         for(Server *server in [_servers getServers]) {
-            archiveCount = 0;
+            archiveCount = server.deferred_archives;
             NSArray *buffers = [_buffers getBuffersForServer:server.cid];
             for(Buffer *buffer in buffers) {
                 if([buffer.type isEqualToString:@"console"]) {
@@ -1015,6 +1015,14 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                     cell.label.textColor = [UIColor blackColor];
                     cell.bgColor = [UIColor timestampColor];
                     cell.accessibilityHint = @"Hides archive list";
+                    if([[ServersDataSource sharedInstance] getServer:[[row objectForKey:@"cid"] intValue]].deferred_archives) {
+                        [cell.activity startAnimating];
+                        cell.activity.hidden = NO;
+                        cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
+                    } else {
+                        [cell.activity stopAnimating];
+                        cell.activity.hidden = YES;
+                    }
                 } else {
                     cell.label.textColor = [UIColor archivesHeadingTextColor];
                     cell.bgColor = [UIColor bufferBackgroundColor];
@@ -1085,11 +1093,15 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
             return;
         
         if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER) {
-            if([_expandedArchives objectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]])
-                [_expandedArchives removeObjectForKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
+            int cid = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
+            if([_expandedArchives objectForKey:@(cid)])
+                [_expandedArchives removeObjectForKey:@(cid)];
             else
-                [_expandedArchives setObject:@YES forKey:[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"]];
+                [_expandedArchives setObject:@YES forKey:@(cid)];
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
+            if([[ServersDataSource sharedInstance] getServer:cid].deferred_archives) {
+                [[NetworkConnection sharedInstance] requestArchives:cid];
+            }
     #ifndef EXTENSION
         } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
             [_delegate dismissKeyboard];

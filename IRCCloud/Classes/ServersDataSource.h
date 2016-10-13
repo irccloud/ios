@@ -40,8 +40,9 @@
     NSDictionary *_PREFIX;
     int _order;
     NSString *_MODE_OPER, *_MODE_OWNER, *_MODE_ADMIN, *_MODE_OP, *_MODE_HALFOP, *_MODE_VOICED;
+    int _deferred_archives;
 }
-@property (nonatomic, assign) int cid, port, ssl, order;
+@property (nonatomic, assign) int cid, port, ssl, order, deferred_archives;
 @property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname;
 @property (nonatomic, copy) NSDictionary *fail_info, *PREFIX;
 @property (nonatomic, copy) NSMutableDictionary *isupport;
