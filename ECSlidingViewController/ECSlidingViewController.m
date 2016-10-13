@@ -429,6 +429,10 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
           complete();
         }
       }];
+    } else {
+        if (complete) {
+            complete();
+        }
     }
 }
 
