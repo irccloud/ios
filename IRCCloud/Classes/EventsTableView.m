@@ -118,6 +118,10 @@ extern BOOL __compact;
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         self.backgroundColor = [UIColor contentBackgroundColor];
         
+        _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
+        _socketClosedBar.hidden = YES;
+        [self.contentView addSubview:_socketClosedBar];
+        
         _timestamp = [[UILabel alloc] init];
         _timestamp.backgroundColor = [UIColor clearColor];
         _timestamp.textColor = [UIColor timestampColor];
@@ -142,10 +146,6 @@ extern BOOL __compact;
         _message.userInteractionEnabled = YES;
         _message.baselineAdjustment = UIBaselineAdjustmentNone;
         [self.contentView addSubview:_message];
-        
-        _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
-        _socketClosedBar.hidden = YES;
-        [self.contentView addSubview:_socketClosedBar];
         
         _accessory = [[UILabel alloc] initWithFrame:CGRectZero];
         _accessory.hidden = YES;
