@@ -1235,7 +1235,6 @@ extern BOOL __compact;
         boldItalicFont = HelveticaBoldOblique;
     }
     NSMutableArray *attributes = [[NSMutableArray alloc] init];
-    NSMutableArray *arrowIndex = [[NSMutableArray alloc] init];
     
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", input, CLEAR];
     BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
@@ -1258,12 +1257,6 @@ extern BOOL __compact;
     
     for(int i = 0; i < text.length; i++) {
         switch([text characterAtIndex:i]) {
-            case 0x2190:
-            case 0x2192:
-            case 0x2194:
-            case 0x21D0:
-                [arrowIndex addObject:@(i)];
-                break;
             case BOLD:
                 if(bold == -1) {
                     bold = i;

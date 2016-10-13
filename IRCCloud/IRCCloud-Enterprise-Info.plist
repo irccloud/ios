@@ -144,5 +144,7 @@
 	<string>${PRODUCT_NAME} requires access to your photo library to share photos and videos on IRC</string>
 	<key>NSCameraUsageDescription</key>
 	<string>${PRODUCT_NAME} requires access to your camera to share photos and videos on IRC</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>${PRODUCT_NAME} requires access to your microphone to record a video</string>
 </dict>
 </plist>
