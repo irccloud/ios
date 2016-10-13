@@ -3469,7 +3469,6 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    CLS_LOG(@"Image file chosen: %@", info);
     FileMetadataViewController *fvc = nil;
     NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
     NSURL *mediaURL = [info valueForKey:UIImagePickerControllerMediaURL];
@@ -3477,6 +3476,7 @@ extern NSDictionary *emojiMap;
     if(!img)
         img = [info objectForKey:UIImagePickerControllerOriginalImage];
     
+    CLS_LOG(@"Image file chosen: %@ %@", refURL, mediaURL);
     if(img || refURL || mediaURL) {
         if(picker.sourceType == UIImagePickerControllerSourceTypeCamera && [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"]) {
             if(img)
