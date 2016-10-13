@@ -3493,7 +3493,7 @@ extern NSDictionary *emojiMap;
             u.delegate = self;
             u.bid = _buffer.bid;
             fvc = [[FileMetadataViewController alloc] initWithUploader:u];
-            if(picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
+            if(picker == nil || picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
                 [fvc showCancelButton];
             }
 
@@ -3549,6 +3549,12 @@ extern NSDictionary *emojiMap;
                     }
                     [fvc viewWillAppear:NO];
                 }];
+            } else if([info objectForKey:@"gifData"]) {
+                CLS_LOG(@"Uploading GIF from Pasteboard");
+                [u uploadFile:[NSString stringWithFormat:@"%li.GIF", time(NULL)] UTI:@"image/gif" data:[info objectForKey:@"gifData"]];
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [fvc setImage:img];
+                }];
             } else {
                 CLS_LOG(@"no asset library URL, uploading image data instead");
                 if(img) {
@@ -3586,12 +3592,14 @@ extern NSDictionary *emojiMap;
         [_popover dismissPopoverAnimated:YES];
         if(nc)
             [self presentViewController:nc animated:YES completion:nil];
-    } else {
+    } else if(self.presentedViewController) {
         [self dismissViewControllerAnimated:YES completion:^{
             [self _resetStatusBar];
             if(nc)
                 [self presentViewController:nc animated:YES completion:nil];
         }];
+    } else if(nc) {
+        [self presentViewController:nc animated:YES completion:nil];
     }
     
     if(!nc)
@@ -4111,6 +4119,28 @@ Device type: %@\n",
 
 -(BOOL)canBecomeFirstResponder {
     return YES;
+}
+
+-(BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+    
+    if (action == @selector(paste:)) {
+        return [UIPasteboard generalPasteboard].image != nil;
+    }
+    
+    return [super canPerformAction:action withSender:sender];
+    
+}
+
+-(void)paste:(id)sender {
+    if([UIPasteboard generalPasteboard].image) {
+        for(NSString *type in [UIPasteboard generalPasteboard].pasteboardTypes) {
+            if([type isEqualToString:(__bridge NSString *)kUTTypeGIF]) {
+                [self imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image, @"gifData":[[UIPasteboard generalPasteboard] dataForPasteboardType:(__bridge NSString *)kUTTypeGIF]}];
+                return;
+            }
+        }
+        [self imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image}];
+    }
 }
 
 -(NSArray<UIKeyCommand *> *)keyCommands {
