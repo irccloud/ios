@@ -31,7 +31,7 @@
     _lastAccessTime = [[NSDate date] timeIntervalSince1970];
     NSMutableDictionary *images = isSelf?_selfImages:_images;
     if(![images objectForKey:@(size)]) {
-        UIFont *font = [UIFont fontWithName:@"SourceSansPro-Regular" size:size * 0.6];
+        UIFont *font = [UIFont fontWithName:@"SourceSansPro-Regular" size:(size * 0.6 > 8)?(size * 0.6):8];
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0);
         CGContextRef ctx = UIGraphicsGetCurrentContext();
         UIColor *color = isSelf?[UIColor messageTextColor]:[UIColor colorFromHexString:[UIColor colorForNick:_nick]];
