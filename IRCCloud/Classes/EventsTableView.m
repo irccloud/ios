@@ -98,10 +98,11 @@ extern BOOL __compact;
     UIView *_topBorder;
     UIView *_bottomBorder;
     float _timestampPosition;
+    float _accessoryOffset;
     UIColor *_messageTextColor;
 }
 @property int type;
-@property float timestampPosition;
+@property float timestampPosition, accessoryOffset;
 @property (readonly) UILabel *timestamp, *accessory;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
@@ -216,13 +217,13 @@ extern BOOL __compact;
             _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, self.contentView.bounds.size.width, 26);
             _socketClosedBar.hidden = NO;
             _socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
-            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0) + 2, frame.origin.y + 2, _accessory.frame.size.width, _accessory.frame.size.height);
+            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0) + 2, frame.origin.y + 2 + _accessoryOffset, _accessory.frame.size.width, _accessory.frame.size.height);
         } else if(_type == ROW_FAILED) {
             frame.size.width -= 20;
             _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _accessory.frame.size.width, _accessory.frame.size.height);
         } else {
             _socketClosedBar.hidden = YES;
-            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0) + 2, frame.origin.y + 2, _accessory.frame.size.width, _accessory.frame.size.height);
+            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0) + 2, frame.origin.y + 2 + _accessoryOffset, _accessory.frame.size.width, _accessory.frame.size.height);
         }
         [_timestamp sizeToFit];
         _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition, __timestampWidth, _timestamp.frame.size.height);
@@ -1898,6 +1899,7 @@ extern BOOL __compact;
         cell.timestampPosition = e.timestampPosition;
         cell.accessory.font = [ColorFormatter awesomeFont];
         cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
+        cell.accessoryOffset = 0;
         cell.accessibilityLabel = e.accessibilityLabel;
         cell.accessibilityValue = e.accessibilityValue;
         cell.accessibilityHint = nil;
@@ -1919,6 +1921,7 @@ extern BOOL __compact;
                         cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
                         cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status message. at %@", e.timestamp];
                         cell.accessibilityHint = @"Collapses this group";
+                        cell.accessoryOffset = -1;
                     }
                 } else {
                     cell.accessory.text = FA_PLUS_SQUARE_O;
