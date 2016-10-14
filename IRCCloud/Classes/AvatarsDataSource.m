@@ -31,21 +31,21 @@
     _lastAccessTime = [[NSDate date] timeIntervalSince1970];
     NSMutableDictionary *images = isSelf?_selfImages:_images;
     if(![images objectForKey:@(size)]) {
-        UIFont *font = [UIFont fontWithName:@"SourceSansPro-Semibold" size:(size * 0.7 > 9)?(size * 0.7):9];
+        UIFont *font = [UIFont fontWithName:@"SourceSansPro-Semibold" size:(size * 0.65)];
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0);
         CGContextRef ctx = UIGraphicsGetCurrentContext();
         UIColor *color = isSelf?[UIColor selfNickColor]:[UIColor colorFromHexString:[UIColor colorForNick:_nick]];
         if([UIColor isDarkTheme]) {
             CGContextSetFillColorWithColor(ctx, color.CGColor);
-            CGContextFillEllipseInRect(ctx,CGRectMake(0,0,size,size));
+            CGContextFillEllipseInRect(ctx,CGRectMake(1,1,size-2,size-2));
         } else {
             CGFloat h, s, b, a;
             [color getHue:&h saturation:&s brightness:&b alpha:&a];
             
             CGContextSetFillColorWithColor(ctx, [UIColor colorWithHue:h saturation:s brightness:b * 0.8 alpha:a].CGColor);
-            CGContextFillEllipseInRect(ctx,CGRectMake(0,0,size,size));
+            CGContextFillEllipseInRect(ctx,CGRectMake(1,1,size-2,size-2));
             CGContextSetFillColorWithColor(ctx, color.CGColor);
-            CGContextFillEllipseInRect(ctx,CGRectMake(0,0,size-0.5,size-0.5));
+            CGContextFillEllipseInRect(ctx,CGRectMake(1,1,size-2,size-3));
         }
         
         NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[_\\W]+" options:NSRegularExpressionCaseInsensitive error:nil];
@@ -54,7 +54,7 @@
             text = [_nick uppercaseString];
         text = [text substringToIndex:1];
         CGSize textSize = [text sizeWithAttributes:@{NSFontAttributeName:font, NSForegroundColorAttributeName:[UIColor contentBackgroundColor]}];
-        CGPoint p = CGPointMake((size / 2) - (textSize.width / 2),(size / 2) - (textSize.height / 2) - ([UIColor isDarkTheme]?0.5:1.0));
+        CGPoint p = CGPointMake((size / 2) - (textSize.width / 2),(size / 2) - (textSize.height / 2) - 0.5);
         [text drawAtPoint:p withAttributes:@{NSFontAttributeName:font, NSForegroundColorAttributeName:[UIColor contentBackgroundColor]}];
         
         [images setObject:UIGraphicsGetImageFromCurrentImageContext() forKey:@(size)];
