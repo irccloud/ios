@@ -1717,7 +1717,7 @@ extern BOOL __compact;
         NSArray *links;
         [_lock lock];
         if(e.from.length)
-            e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf)] defaultColor:e.color mono:__monospacePref linkify:NO server:nil links:nil];
+            e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf) defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43"] defaultColor:e.color mono:__monospacePref linkify:NO server:nil links:nil];
         if([e.realname isKindOfClass:[NSString class]] && e.realname.length) {
             e.formattedRealname = [ColorFormatter format:e.realname defaultColor:[UIColor timestampColor] mono:__monospacePref linkify:YES server:_server links:&links];
             e.realnameLinks = links;
