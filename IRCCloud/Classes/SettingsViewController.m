@@ -540,6 +540,8 @@
         }
         [[EventsDataSource sharedInstance] clearFormattingCache];
         [[AvatarsDataSource sharedInstance] clear];
+        
+        [((AppDelegate *)[UIApplication sharedApplication].delegate).mainViewController viewWillAppear:YES];
     }
 }
 
