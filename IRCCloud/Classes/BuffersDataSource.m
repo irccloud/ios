@@ -250,8 +250,14 @@
 
 -(void)updateArchived:(int)archived buffer:(int)bid {
     Buffer *buffer = [self getBuffer:bid];
-    if(buffer)
+    if(buffer) {
         buffer.archived = archived;
+        if(!archived) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:buffer.cid];
+            if(s.deferred_archives)
+                s.deferred_archives--;
+        }
+    }
 }
 
 -(void)updateTimeout:(int)timeout buffer:(int)bid {

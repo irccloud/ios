@@ -216,13 +216,13 @@ extern BOOL __compact;
             _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, self.contentView.bounds.size.width, 26);
             _socketClosedBar.hidden = NO;
             _socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
-            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 4, _accessory.frame.size.width, _accessory.frame.size.height);
+            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0) + 2, frame.origin.y + 2, _accessory.frame.size.width, _accessory.frame.size.height);
         } else if(_type == ROW_FAILED) {
             frame.size.width -= 20;
             _accessory.frame = CGRectMake(frame.origin.x + frame.size.width + 6, frame.origin.y + 1, _accessory.frame.size.width, _accessory.frame.size.height);
         } else {
             _socketClosedBar.hidden = YES;
-            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 4, _accessory.frame.size.width, _accessory.frame.size.height);
+            _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0) + 2, frame.origin.y + 2, _accessory.frame.size.width, _accessory.frame.size.height);
         }
         [_timestamp sizeToFit];
         _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition, __timestampWidth, _timestamp.frame.size.height);
@@ -230,7 +230,7 @@ extern BOOL __compact;
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
         _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, [_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
-            _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y + 2,__smallAvatarHeight,__smallAvatarHeight);
+            _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y + 1,__smallAvatarHeight,__smallAvatarHeight);
         }
     } else {
         if(_type == ROW_BACKLOG) {
@@ -1491,7 +1491,7 @@ extern BOOL __compact;
         [_unseenHighlightPositions removeAllObjects];
         _hiddenAvatarRow = -1;
         _stickyAvatar.hidden = YES;
-        __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + (__compact?0:MESSAGE_LINE_SPACING);
+        __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + (__compact?0:MESSAGE_LINE_SPACING) + 2;
         
         if(!_buffer) {
             [_lock unlock];
@@ -1723,7 +1723,7 @@ extern BOOL __compact;
             links = nil;
         }
         if(e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE))
-            e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"      %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
+            e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
         else
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
         if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {

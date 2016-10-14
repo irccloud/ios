@@ -31,7 +31,7 @@
     _lastAccessTime = [[NSDate date] timeIntervalSince1970];
     NSMutableDictionary *images = isSelf?_selfImages:_images;
     if(![images objectForKey:@(size)]) {
-        UIFont *font = [UIFont fontWithName:@"SourceSansPro-Regular" size:(size * 0.6 > 8)?(size * 0.6):8];
+        UIFont *font = [UIFont fontWithName:@"SourceSansPro-Regular" size:(size * 0.7 > 9)?(size * 0.7):9];
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0);
         CGContextRef ctx = UIGraphicsGetCurrentContext();
         UIColor *color = isSelf?[UIColor messageTextColor]:[UIColor colorFromHexString:[UIColor colorForNick:_nick]];
@@ -43,9 +43,9 @@
             [color getHue:&h saturation:&s brightness:&b alpha:&a];
             
             CGContextSetFillColorWithColor(ctx, [UIColor colorWithHue:h saturation:s brightness:b * 0.8 alpha:a].CGColor);
-            CGContextFillEllipseInRect(ctx,CGRectMake(0.5,2,size-1,size-2));
-            CGContextSetFillColorWithColor(ctx, color.CGColor);
             CGContextFillEllipseInRect(ctx,CGRectMake(0.5,1,size-1,size-2));
+            CGContextSetFillColorWithColor(ctx, color.CGColor);
+            CGContextFillEllipseInRect(ctx,CGRectMake(0.5,0,size-1,size-2));
         }
         
         NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[_\\W]+" options:NSRegularExpressionCaseInsensitive error:nil];
@@ -54,7 +54,7 @@
             text = [_nick uppercaseString];
         text = [text substringToIndex:1];
         CGSize textSize = [text sizeWithAttributes:@{NSFontAttributeName:font, NSForegroundColorAttributeName:[UIColor contentBackgroundColor]}];
-        CGPoint p = CGPointMake((size / 2) - (textSize.width / 2),(size / 2) - (textSize.height / 2));
+        CGPoint p = CGPointMake((size / 2) - (textSize.width / 2),(size / 2) - (textSize.height / 2) - ([UIColor isDarkTheme]?0.5:1.0));
         [text drawAtPoint:p withAttributes:@{NSFontAttributeName:font, NSForegroundColorAttributeName:[UIColor contentBackgroundColor]}];
         
         [images setObject:UIGraphicsGetImageFromCurrentImageContext() forKey:@(size)];
