@@ -88,5 +88,6 @@ typedef enum {
 -(NSString *)collapse;
 -(NSUInteger)count;
 -(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize;
+-(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize defaultColor:(NSString *)color;
 -(void)setServer:(Server *)server;
 @end

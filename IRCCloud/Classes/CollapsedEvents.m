@@ -687,6 +687,9 @@
 }
 
 -(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize {
+    return [self formatNick:nick mode:mode colorize:colorize defaultColor:nil];
+}
+-(NSString *)formatNick:(NSString *)nick mode:(NSString *)mode colorize:(BOOL)colorize defaultColor:(NSString *)color {
     NSDictionary *PREFIX = nil;
     if(_server)
         PREFIX = _server.PREFIX;
@@ -709,14 +712,11 @@
         _server?_server.MODE_VOICED.lowercaseString:@"v":@"25B100"
     };
     
-    NSString *color = nil;
     NSMutableString *output = [[NSMutableString alloc] initWithFormat:@"%c", BOLD];
     BOOL showSymbol = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue];
     
     if(colorize) {
         color = [UIColor colorForNick:nick];
-    } else {
-        color = [UIColor isDarkTheme]?@"ffffff":@"142b43";
     }
     
     if(mode.length) {

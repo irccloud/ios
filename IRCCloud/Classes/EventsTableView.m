@@ -983,7 +983,7 @@ extern BOOL __compact;
 
             if(!event.formatted.length || !event.formattedMsg.length) {
                 if((__chatOneLinePref || ![event isMessage]) && [event.from length]) {
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.msg];
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43"], event.msg];
                 } else {
                     event.formattedMsg = event.msg;
                 }
