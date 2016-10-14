@@ -34,7 +34,7 @@
         UIFont *font = [UIFont fontWithName:@"SourceSansPro-Semibold" size:(size * 0.7 > 9)?(size * 0.7):9];
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0);
         CGContextRef ctx = UIGraphicsGetCurrentContext();
-        UIColor *color = isSelf?[UIColor messageTextColor]:[UIColor colorFromHexString:[UIColor colorForNick:_nick]];
+        UIColor *color = isSelf?[UIColor selfNickColor]:[UIColor colorFromHexString:[UIColor colorForNick:_nick]];
         if([UIColor isDarkTheme]) {
             CGContextSetFillColorWithColor(ctx, color.CGColor);
             CGContextFillEllipseInRect(ctx,CGRectMake(0,0,size,size));

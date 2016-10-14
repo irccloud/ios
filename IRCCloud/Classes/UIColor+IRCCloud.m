@@ -113,6 +113,7 @@ UIColor *__selectedBufferHighlightColor;
 UIColor *__archivedBufferHighlightColor;
 UIColor *__selectedArchivedBufferHighlightColor;
 UIColor *__selectedArchivedBufferBackgroundColor;
+UIColor *__selfNickColor;
 
 BOOL __color_theme_is_dark;
 
@@ -323,6 +324,8 @@ BOOL __compact = NO;
         __halfopsHeadingColor = [UIColor colorWithRed:0.71 green:0.349 blue:0 alpha:1];
         __voicedHeadingColor = [UIColor colorWithRed:0.145 green:0.694 blue:0 alpha:1];
         __membersHeadingColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+        
+        __selfNickColor = [UIColor colorWithRed:0.08 green:0.17 blue:0.26 alpha:1.0];
 
         [[UITableView appearance] setBackgroundColor:[UIColor colorWithRed:0.937 green:0.937 blue:0.957 alpha:1]];
         [[UITableView appearance] setSeparatorColor:nil];
@@ -535,6 +538,8 @@ BOOL __compact = NO;
         __halfopsHeadingColor = [UIColor colorWithRed:1 green:0.749 blue:0.51 alpha:1];
         __voicedHeadingColor = [UIColor colorWithRed:0.6 green:1 blue:0.494 alpha:1];
         __membersHeadingColor = [UIColor colorWithRed:0.533 green:0.698 blue:0.867 alpha:1];
+        
+        __selfNickColor = [UIColor whiteColor];
         
         [[UITableView appearance] setBackgroundColor:color_background7];
         [[UITableView appearance] setSeparatorColor:color_border11];
@@ -1073,5 +1078,8 @@ BOOL __compact = NO;
     
     return @{NSForegroundColorAttributeName: [UIColor lightLinkColor],
              NSParagraphStyleAttributeName: paragraphStyle };
+}
++(UIColor *)selfNickColor {
+    return __selfNickColor;
 }
 @end

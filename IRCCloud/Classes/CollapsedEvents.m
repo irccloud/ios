@@ -715,6 +715,8 @@
     
     if(colorize) {
         color = [UIColor colorForNick:nick];
+    } else {
+        color = [UIColor isDarkTheme]?@"ffffff":@"142b43";
     }
     
     if(mode.length) {

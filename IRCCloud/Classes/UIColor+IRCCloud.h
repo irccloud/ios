@@ -121,4 +121,5 @@
 +(NSString *)colorForNick:(NSString *)nick;
 +(NSDictionary *)linkAttributes;
 +(NSDictionary *)lightLinkAttributes;
++(UIColor *)selfNickColor;
 @end
