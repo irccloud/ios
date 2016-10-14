@@ -230,7 +230,7 @@ extern BOOL __compact;
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
         _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, [_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
-            _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y + 1,__smallAvatarHeight,__smallAvatarHeight);
+            _avatar.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0),frame.origin.y + (__compact?0:1.5),__smallAvatarHeight,__smallAvatarHeight);
         }
     } else {
         if(_type == ROW_BACKLOG) {
@@ -1491,7 +1491,7 @@ extern BOOL __compact;
         [_unseenHighlightPositions removeAllObjects];
         _hiddenAvatarRow = -1;
         _stickyAvatar.hidden = YES;
-        __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + (__compact?0:MESSAGE_LINE_SPACING) + 2;
+        __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + 2;
         
         if(!_buffer) {
             [_lock unlock];

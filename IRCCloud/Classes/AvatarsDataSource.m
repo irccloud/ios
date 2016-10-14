@@ -31,7 +31,7 @@
     _lastAccessTime = [[NSDate date] timeIntervalSince1970];
     NSMutableDictionary *images = isSelf?_selfImages:_images;
     if(![images objectForKey:@(size)]) {
-        UIFont *font = [UIFont fontWithName:@"SourceSansPro-Regular" size:(size * 0.7 > 9)?(size * 0.7):9];
+        UIFont *font = [UIFont fontWithName:@"SourceSansPro-Semibold" size:(size * 0.7 > 9)?(size * 0.7):9];
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0);
         CGContextRef ctx = UIGraphicsGetCurrentContext();
         UIColor *color = isSelf?[UIColor messageTextColor]:[UIColor colorFromHexString:[UIColor colorForNick:_nick]];
@@ -43,9 +43,9 @@
             [color getHue:&h saturation:&s brightness:&b alpha:&a];
             
             CGContextSetFillColorWithColor(ctx, [UIColor colorWithHue:h saturation:s brightness:b * 0.8 alpha:a].CGColor);
-            CGContextFillEllipseInRect(ctx,CGRectMake(0.5,1,size-1,size-2));
+            CGContextFillEllipseInRect(ctx,CGRectMake(0,0,size,size));
             CGContextSetFillColorWithColor(ctx, color.CGColor);
-            CGContextFillEllipseInRect(ctx,CGRectMake(0.5,0,size-1,size-2));
+            CGContextFillEllipseInRect(ctx,CGRectMake(0,0,size-0.5,size-0.5));
         }
         
         NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[_\\W]+" options:NSRegularExpressionCaseInsensitive error:nil];
