@@ -393,7 +393,7 @@ BOOL __compact = NO;
         CGFloat saturation = 0.55f;
         CGFloat selectedSaturation = 1.0f;
         
-        if([theme isEqualToString:@"ash"]) {
+        if([theme isEqualToString:@"ash"] || [theme isEqualToString:@"midnight"]) {
             hue = 210.0f/360.0f;
             saturation = 0.0f;
             selectedSaturation = 0.0f;
@@ -541,11 +541,27 @@ BOOL __compact = NO;
         
         __selfNickColor = [UIColor whiteColor];
         
-        [[UITableView appearance] setBackgroundColor:color_background7];
-        [[UITableView appearance] setSeparatorColor:color_border11];
-        [[UITableViewCell appearance] setBackgroundColor:color_background6];
+        if([theme isEqualToString:@"midnight"]) {
+            __contentBackgroundColor = [UIColor blackColor];
+            __buffersDrawerBackgroundColor = [UIColor blackColor];
+            __navBarColor = __textareaBackgroundColor = color_border9;
+            __navBarBorderColor = color_border10;
+            __bufferBorderColor = __bufferBackgroundColor = [UIColor blackColor];
+            __serverBorderColor = color_border10;
+            __serverBackgroundColor = color_border9;
+            __iPadBordersColor = color_border10;
+            
+            __highlightBackgroundColor = color_border10;
+            __selfBackgroundColor = color_border11;
+            __statusBackgroundColor = color_border10;
+            __noticeBackgroundColor = color_border11;
+        }
+        
+        [[UITableView appearance] setBackgroundColor:__contentBackgroundColor];
+        [[UITableView appearance] setSeparatorColor:__navBarBorderColor];
+        [[UITableViewCell appearance] setBackgroundColor:__serverBackgroundColor];
         UIView *v = [[UIView alloc]initWithFrame:CGRectZero];
-        v.backgroundColor = color_background7;
+        v.backgroundColor = __contentBackgroundColor;
         [[UITableViewCell appearance] setSelectedBackgroundView:v];
         [[UITableViewCell appearance] setTextLabelColor:color_text4];
         [[UITableViewCell appearance] setDetailTextLabelColor:color_text7];
