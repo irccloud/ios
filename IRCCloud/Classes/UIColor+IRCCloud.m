@@ -115,6 +115,8 @@ UIColor *__selectedArchivedBufferHighlightColor;
 UIColor *__selectedArchivedBufferBackgroundColor;
 UIColor *__selfNickColor;
 
+UIColor *__mIRCBlackColor;
+
 BOOL __color_theme_is_dark;
 
 NSString *__current_theme;
@@ -596,6 +598,8 @@ BOOL __compact = NO;
     __unreadBlueColor = [UIColor colorWithRed:0.118 green:0.447 blue:1 alpha:1];
     
     __current_theme = theme?theme:@"dawn";
+    
+    __mIRCBlackColor = [__current_theme isEqualToString:@"midnight"]?[UIColor colorFromHexString:@"222222"]:[UIColor blackColor];
 }
 
 +(NSString *)currentTheme {
@@ -735,7 +739,7 @@ BOOL __compact = NO;
         case 0:
             return [UIColor colorFromHexString:@"FFFFFF"]; //white
         case 1:
-            return [UIColor colorFromHexString:@"000000"]; //black
+            return __mIRCBlackColor; //black
         case 2:
             return __color_theme_is_dark?[UIColor colorFromHexString:@"4682B4"]:[UIColor colorFromHexString:@"000080"]; //steelblue or navy
         case 3:
