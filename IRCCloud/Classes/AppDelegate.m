@@ -906,7 +906,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     if(_conn.reconnectTimestamp == 0)
         _conn.reconnectTimestamp = -1;
-    
+    _conn.failCount = 0;
     if(_conn.session.length && _conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting)
         [_conn connect:NO];
     else if(_conn.notifier)
