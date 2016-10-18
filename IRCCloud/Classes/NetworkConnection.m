@@ -261,10 +261,6 @@ volatile BOOL __socketPaused = NO;
     }
     if(_userInfo) {
         _config = [_userInfo objectForKey:@"config"];
-#ifdef EXTENSION
-        _streamId = [_userInfo objectForKey:@"streamId"];
-        _highestEID = [[_userInfo objectForKey:@"highestEID"] doubleValue];
-#endif
     }
     
     CLS_LOG(@"%@", _userAgent);
