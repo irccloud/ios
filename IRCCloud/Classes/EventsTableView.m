@@ -854,7 +854,7 @@ extern BOOL __compact;
 
         if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"] || [type isEqualToString:@"connecting_cancelled"]) {
             _collapsedEvents.showChan = ![_buffer.type isEqualToString:@"channel"];
-            if(__hideJoinPartPref) {
+            if(__hideJoinPartPref && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"] && ![type isEqualToString:@"connecting_cancelled"]) {
                 [_lock lock];
                 for(Event *e in _data) {
                     if(e.eid == event.eid) {
@@ -2145,7 +2145,7 @@ extern BOOL __compact;
         }
     }
     
-    if(tableView.tableHeaderView == _headerView && _minEid > 0 && _buffer && _buffer.bid != -1 && (_buffer.scrolledUp || (_data.count && firstRow == 0 && lastRow == _data.count - 1))) {
+    if(tableView.tableHeaderView == _headerView && _minEid > 0 && _buffer && _buffer.bid != -1 && (_buffer.scrolledUp || !_data.count || (_data.count && firstRow == 0 && lastRow == _data.count - 1))) {
         if(_conn.state == kIRCCloudStateConnected && scrollView.contentOffset.y < _headerView.frame.size.height && _conn.ready) {
             CLS_LOG(@"The table scrolled and the loading header became visible, requesting more backlog");
             _requestingBacklog = YES;
