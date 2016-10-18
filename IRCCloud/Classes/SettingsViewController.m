@@ -319,7 +319,7 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         self.navigationItem.title = @"Theme";
-        _themes = @[@"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash"];
+        _themes = @[@"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash", @"Midnight"];
         
         NSMutableArray *previews = [[NSMutableArray alloc] init];
         
@@ -367,6 +367,12 @@
         
         v = [[UIView alloc] initWithFrame:CGRectZero];
         v.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
+        v.layer.borderColor = [UIColor blackColor].CGColor;
+        v.layer.borderWidth = 1.0f;
+        [previews addObject:v];
+        
+        v = [[UIView alloc] initWithFrame:CGRectZero];
+        v.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1];
         v.layer.borderColor = [UIColor blackColor].CGColor;
         v.layer.borderWidth = 1.0f;
         [previews addObject:v];
