@@ -715,6 +715,8 @@
         _expandJoinPart.on = YES;
     }
     
+    _expandJoinPart.enabled = _hideJoinPart.on;
+    
     if([[prefs objectForKey:@"font"] isKindOfClass:[NSString class]]) {
         _mono.on = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
     } else {
@@ -955,6 +957,7 @@
     _mono = [[UISwitch alloc] init];
     [_mono addTarget:self action:@selector(monoToggled:) forControlEvents:UIControlEventValueChanged];
     _hideJoinPart = [[UISwitch alloc] init];
+    [_hideJoinPart addTarget:self action:@selector(hideJoinPartToggled:) forControlEvents:UIControlEventValueChanged];
     _expandJoinPart = [[UISwitch alloc] init];
     _notifyAll = [[UISwitch alloc] init];
     _showUnread = [[UISwitch alloc] init];
@@ -994,6 +997,10 @@
     _fontSizeCell = [[FontSizeCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
     _fontSizeCell.fontSize = _fontSize;
     [self refresh];
+}
+
+-(void)hideJoinPartToggled:(id)sender {
+    _expandJoinPart.enabled = _hideJoinPart.on;
 }
 
 -(void)oneLineToggled:(id)sender {

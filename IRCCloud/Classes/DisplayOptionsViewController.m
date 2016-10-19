@@ -388,6 +388,7 @@
         else
             _expandDisco.on = YES;
     }
+    _collapseJoinPart.enabled = !_showJoinPart.on;
 }
 
 - (void)viewDidLoad {
@@ -398,11 +399,16 @@
     _notifyAll = [[UISwitch alloc] init];
     _trackUnread = [[UISwitch alloc] init];
     _showJoinPart = [[UISwitch alloc] init];
+    [_showJoinPart addTarget:self action:@selector(showJoinPartToggled:) forControlEvents:UIControlEventValueChanged];
     _collapseJoinPart = [[UISwitch alloc] init];
     _expandDisco = [[UISwitch alloc] init];
     _readOnSelect = [[UISwitch alloc] init];
 
     [self refresh];
+}
+
+-(void)showJoinPartToggled:(id)sender {
+    _collapseJoinPart.enabled = !_showJoinPart.on;
 }
 
 - (void)didReceiveMemoryWarning {
