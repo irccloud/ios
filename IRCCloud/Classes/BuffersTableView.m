@@ -359,7 +359,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                     }
                 }
             }
-            if(buffers.count == 1 && [server.status isEqualToString:@"connected_ready"]) {
+            if(buffers.count == 1 && [server.status isEqualToString:@"connected_ready"] && archiveCount == 0) {
                 [data addObject:@{
                  @"type":@TYPE_JOIN_CHANNEL,
                  @"cid":@(server.cid),
