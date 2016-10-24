@@ -277,7 +277,6 @@ volatile BOOL __socketPaused = NO;
     };
     
     void (^makeserver)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
-        NSLog(@"%@", object);
         Server *server = [_servers getServer:object.cid];
         if(!server) {
             server = [[Server alloc] init];
