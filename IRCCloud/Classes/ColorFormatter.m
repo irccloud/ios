@@ -23,7 +23,7 @@
 
 id Courier = NULL, CourierBold, CourierOblique,CourierBoldOblique;
 id Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
-id chalkboardFont, markerFont, awesomeFont;
+id arrowFont, chalkboardFont, markerFont, awesomeFont;
 UIFont *timestampFont, *monoTimestampFont;
 NSDictionary *emojiMap;
 NSDictionary *quotes;
@@ -39,7 +39,7 @@ extern BOOL __compact;
 
 +(void)clearFontCache {
     CLS_LOG(@"Clearing font cache");
-    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = chalkboardFont = markerFont = NULL;
+    Courier = CourierBold = CourierBoldOblique = CourierOblique = Helvetica = HelveticaBold = HelveticaBoldOblique = HelveticaOblique = chalkboardFont = markerFont = arrowFont = NULL;
     timestampFont = monoTimestampFont = awesomeFont = NULL;
 }
 
@@ -1191,6 +1191,7 @@ extern BOOL __compact;
     monoTimestampFont = [UIFont fontWithName:@"Hack" size:FONT_SIZE - 3];
     timestampFont = [UIFont systemFontOfSize:FONT_SIZE - 2];
     awesomeFont = [UIFont fontWithName:@"FontAwesome" size:FONT_SIZE];
+    arrowFont = [UIFont fontWithName:@"SourceSansPro-Regular" size:FONT_SIZE];
     Courier = [UIFont fontWithName:@"Hack" size:FONT_SIZE - 1];
     CourierBold = [UIFont fontWithName:@"Hack-Bold" size:FONT_SIZE - 1];
     CourierOblique = [UIFont fontWithName:@"Hack-Italic" size:FONT_SIZE - 1];
@@ -1235,6 +1236,7 @@ extern BOOL __compact;
         boldItalicFont = HelveticaBoldOblique;
     }
     NSMutableArray *attributes = [[NSMutableArray alloc] init];
+    NSMutableArray *arrowIndex = [[NSMutableArray alloc] init];
     
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", [input stringByReplacingOccurrencesOfString:@"  " withString:@"\u00A0 "], CLEAR];
     BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
@@ -1257,6 +1259,14 @@ extern BOOL __compact;
     
     for(int i = 0; i < text.length; i++) {
         switch([text characterAtIndex:i]) {
+            case 0x2190:
+            case 0x2192:
+            case 0x2194:
+            case 0x21D0:
+                if(i < text.length - 1 && [text characterAtIndex:i+1] == 0xFE0E) {
+                    [arrowIndex addObject:@(i)];
+                }
+                break;
             case BOLD:
                 if(bold == -1) {
                     bold = i;
@@ -1431,6 +1441,10 @@ extern BOOL __compact;
     [output addAttributes:@{NSFontAttributeName:font} range:NSMakeRange(0, text.length)];
     [output addAttributes:@{(NSString *)NSForegroundColorAttributeName:color} range:NSMakeRange(0, text.length)];
 
+    for(NSNumber *i in arrowIndex) {
+        [output addAttributes:@{NSFontAttributeName:arrowFont} range:NSMakeRange([i intValue], 2)];
+    }
+    
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
     if(__compact)
         paragraphStyle.lineSpacing = 0;
