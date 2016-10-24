@@ -1416,7 +1416,7 @@ extern BOOL __compact;
 
 - (void)refresh {
     @synchronized(self) {
-        __largeAvatarHeight = (FONT_SIZE * 2) + 6;
+        __largeAvatarHeight = (FONT_SIZE * 2) + (__compact?2:6);
         if(__largeAvatarHeight > 32)
             __largeAvatarHeight = 32;
         __24hrPref = NO;
