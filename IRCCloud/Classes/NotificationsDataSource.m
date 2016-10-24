@@ -99,7 +99,6 @@
         UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
         content.title = @"IRCCloud";
         content.body = alert;
-        content.sound = [UNNotificationSound soundNamed:@"a.caf"];
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
         content.userInfo = @{@"d": @[@(cid), @(bid), @(eid)], @"aps":@{@"alert":@{@"loc-args":@[b.name, b.name, b.name, b.name]}}};
         content.categoryIdentifier = category;
