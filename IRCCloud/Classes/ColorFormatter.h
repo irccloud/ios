@@ -25,7 +25,7 @@
 #define UNDERLINE 31
 
 #define FONT_SIZE [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"]
-#define MESSAGE_LINE_SPACING 0
+#define MESSAGE_LINE_SPACING 3
 #define MESSAGE_LINE_PADDING 4
 
 @interface ColorFormatter : NSObject
