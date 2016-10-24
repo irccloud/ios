@@ -192,13 +192,13 @@ extern BOOL __compact;
         frame.size.height -= __compact ? 4 : 0;
         frame.size.width -= frame.origin.x + 6;
         if(!__chatOneLinePref && !__avatarsOffPref) {
-            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y,__largeAvatarHeight,__largeAvatarHeight);
+            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + __compact?0:2,__largeAvatarHeight,__largeAvatarHeight);
             frame.origin.x += _avatar.frame.size.width + 13;
             frame.size.width -= _avatar.frame.size.width + 17;
         }
         if(_type == ROW_MESSAGE && !__chatOneLinePref && _nickname.attributedText.length) {
-            frame.origin.y += 2;
-            frame.size.height -= __compact ? 2 : 0;
+            frame.origin.y += __compact ? 1 : 2;
+            frame.size.height -= __compact ? 1 : 2;
             [_nickname sizeToFit];
             _nickname.frame = CGRectMake(frame.origin.x + (__timeLeftPref?__timestampWidth:0), frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
             frame.origin.y += _nickname.frame.size.height;
@@ -2240,9 +2240,9 @@ extern BOOL __compact;
                 }
             }
             if(e.from.length && !(((Event *)[_data objectAtIndex:firstRow]).rowType == ROW_LASTSEENEID && groupHeight == 26) && (!e.isHeader || groupHeight > __largeAvatarHeight + 14)) {
-                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight);
-                if(_stickyAvatarYOffsetConstraint.constant >= offset)
-                    _stickyAvatarYOffsetConstraint.constant = offset;
+                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + (__compact?0:2));
+                if(_stickyAvatarYOffsetConstraint.constant >= offset + (__compact?0:2))
+                    _stickyAvatarYOffsetConstraint.constant = offset + (__compact?0:2);
                 if(_hiddenAvatarRow != topIndexPath.row) {
                     _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                     _stickyAvatar.hidden = NO;
