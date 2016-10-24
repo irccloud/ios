@@ -86,6 +86,8 @@ float __smallAvatarHeight;
 float __largeAvatarHeight = 32;
 
 extern BOOL __compact;
+extern UIImage *__socketClosedBackgroundImage;
+extern UIImage *__newMsgsBackgroundImage;
 
 @interface EventsTableCell : UITableViewCell {
     UIImageView *_avatar;
@@ -213,8 +215,8 @@ extern BOOL __compact;
         }
         [_accessory sizeToFit];
         if(_type == ROW_SOCKETCLOSED) {
-            frame.size.height -= 26;
-            _socketClosedBar.frame = CGRectMake(0, frame.origin.y + frame.size.height, self.contentView.bounds.size.width, 26);
+            frame.size.height -= __socketClosedBackgroundImage.size.height;
+            _socketClosedBar.frame = CGRectMake(0,self.contentView.bounds.size.height - __socketClosedBackgroundImage.size.height, self.contentView.bounds.size.width, __socketClosedBackgroundImage.size.height);
             _socketClosedBar.hidden = NO;
             _socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
             _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 2 + _accessoryOffset, _accessory.frame.size.width, _accessory.frame.size.height);
@@ -1482,6 +1484,11 @@ extern BOOL __compact;
         _linkAttributes = [UIColor linkAttributes];
         _lightLinkAttributes = [UIColor lightLinkAttributes];
 
+        __socketClosedBackgroundImage = nil;
+        [UIColor socketClosedBackgroundColor];
+        __newMsgsBackgroundImage = nil;
+        [UIColor newMsgsBackgroundColor];
+
         [_lock lock];
         [_scrollTimer invalidate];
         _ready = NO;
@@ -1811,7 +1818,7 @@ extern BOOL __compact;
     if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
         estimatedWidth -= 4;
     
-    e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + ((e.rowType == ROW_SOCKETCLOSED)?26:0);
+    e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + ((e.rowType == ROW_SOCKETCLOSED)?__socketClosedBackgroundImage.size.height:0);
     if(!__compact)
         e.height += MESSAGE_LINE_PADDING;
     e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
@@ -1847,6 +1854,10 @@ extern BOOL __compact;
                 //NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
                 return e.height;
             }
+        } else if(e.rowType == ROW_LASTSEENEID) {
+            return __newMsgsBackgroundImage.size.height;
+        } else if(e.rowType == ROW_BACKLOG) {
+            return __compact?4:26;
         }
     }
     return 26;
