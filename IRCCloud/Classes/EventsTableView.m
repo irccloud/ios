@@ -188,11 +188,11 @@ extern BOOL __compact;
     
     if(_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED) {
         frame.origin.x = (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?6:16;
-        frame.origin.y = __compact ? 0 : 0.5;
+        frame.origin.y = 0;
         frame.size.height -= __compact ? 4 : 0;
         frame.size.width -= frame.origin.x + 6;
         if(!__chatOneLinePref && !__avatarsOffPref) {
-            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + 2,__largeAvatarHeight,__largeAvatarHeight);
+            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y,__largeAvatarHeight,__largeAvatarHeight);
             frame.origin.x += _avatar.frame.size.width + 13;
             frame.size.width -= _avatar.frame.size.width + 17;
         }
@@ -2240,9 +2240,9 @@ extern BOOL __compact;
                 }
             }
             if(e.from.length && !(((Event *)[_data objectAtIndex:firstRow]).rowType == ROW_LASTSEENEID && groupHeight == 26) && (!e.isHeader || groupHeight > __largeAvatarHeight + 14)) {
-                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + MESSAGE_LINE_PADDING - 1);
-                if(_stickyAvatarYOffsetConstraint.constant >= offset + MESSAGE_LINE_PADDING - 1)
-                    _stickyAvatarYOffsetConstraint.constant = offset + MESSAGE_LINE_PADDING - 1;
+                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight);
+                if(_stickyAvatarYOffsetConstraint.constant >= offset)
+                    _stickyAvatarYOffsetConstraint.constant = offset;
                 if(_hiddenAvatarRow != topIndexPath.row) {
                     _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                     _stickyAvatar.hidden = NO;
