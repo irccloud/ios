@@ -554,7 +554,6 @@ BOOL __compact = NO;
             __iPadBordersColor = color_border10;
             
             __highlightBackgroundColor = color_border10;
-            __selfBackgroundColor = color_border11;
             __statusBackgroundColor = color_border10;
             __noticeBackgroundColor = color_border11;
         }
