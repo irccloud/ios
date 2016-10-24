@@ -192,13 +192,13 @@ extern BOOL __compact;
         frame.size.height -= __compact ? 4 : 0;
         frame.size.width -= frame.origin.x + 6;
         if(!__chatOneLinePref && !__avatarsOffPref) {
-            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + __compact?0:2,__largeAvatarHeight,__largeAvatarHeight);
+            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + __compact?1:2,__largeAvatarHeight,__largeAvatarHeight);
             frame.origin.x += _avatar.frame.size.width + 13;
             frame.size.width -= _avatar.frame.size.width + 17;
         }
         if(_type == ROW_MESSAGE && !__chatOneLinePref && _nickname.attributedText.length) {
-            frame.origin.y += __compact ? 1 : 2;
-            frame.size.height -= __compact ? 1 : 2;
+            frame.origin.y += 2;
+            frame.size.height -= 2;
             [_nickname sizeToFit];
             _nickname.frame = CGRectMake(frame.origin.x + (__timeLeftPref?__timestampWidth:0), frame.origin.y, _nickname.frame.size.width, _nickname.frame.size.height);
             frame.origin.y += _nickname.frame.size.height;
@@ -832,6 +832,8 @@ extern BOOL __compact;
             for(Event *e in _data) {
                 e.formatted = nil;
                 e.timestamp = nil;
+                e.formattedNick = nil;
+                e.formattedRealname = nil;
                 e.height = 0;
             }
             [self refresh];
@@ -1416,9 +1418,6 @@ extern BOOL __compact;
 
 - (void)refresh {
     @synchronized(self) {
-        __largeAvatarHeight = (FONT_SIZE * 2) + (__compact?2:6);
-        if(__largeAvatarHeight > 32)
-            __largeAvatarHeight = 32;
         __24hrPref = NO;
         __secondsPref = NO;
         __timeLeftPref = NO;
@@ -1469,6 +1468,9 @@ extern BOOL __compact;
             if([[prefs objectForKey:@"expandJoinPart"] boolValue] || (expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
                 __expandJoinPartPref = YES;
         }
+        __largeAvatarHeight = (FONT_SIZE * 2) + (__compact?2:6);
+        if(__largeAvatarHeight > 32)
+            __largeAvatarHeight = 32;
         if(__monospacePref)
             _groupIndent = @"  ";
         else
@@ -1815,9 +1817,9 @@ extern BOOL __compact;
     e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
     
     if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
-        e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + (__compact?0:MESSAGE_LINE_PADDING);
-        if(e.height < __largeAvatarHeight + (__compact?0:MESSAGE_LINE_PADDING))
-            e.height = __largeAvatarHeight + (__compact?0:MESSAGE_LINE_PADDING);
+        e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + (__compact?1:MESSAGE_LINE_PADDING);
+        if(e.height < __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING))
+            e.height = __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING);
     }
 }
 
@@ -2240,9 +2242,9 @@ extern BOOL __compact;
                 }
             }
             if(e.from.length && !(((Event *)[_data objectAtIndex:firstRow]).rowType == ROW_LASTSEENEID && groupHeight == 26) && (!e.isHeader || groupHeight > __largeAvatarHeight + 14)) {
-                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + (__compact?0:2));
-                if(_stickyAvatarYOffsetConstraint.constant >= offset + (__compact?0:2))
-                    _stickyAvatarYOffsetConstraint.constant = offset + (__compact?0:2);
+                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + (__compact?1:2));
+                if(_stickyAvatarYOffsetConstraint.constant >= offset + (__compact?1:2))
+                    _stickyAvatarYOffsetConstraint.constant = offset + (__compact?1:2);
                 if(_hiddenAvatarRow != topIndexPath.row) {
                     _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                     _stickyAvatar.hidden = NO;
