@@ -2240,9 +2240,9 @@ extern BOOL __compact;
                 }
             }
             if(e.from.length && !(((Event *)[_data objectAtIndex:firstRow]).rowType == ROW_LASTSEENEID && groupHeight == 26) && (!e.isHeader || groupHeight > __largeAvatarHeight + 14)) {
-                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + MESSAGE_LINE_PADDING);
-                if(_stickyAvatarYOffsetConstraint.constant >= offset + MESSAGE_LINE_PADDING)
-                    _stickyAvatarYOffsetConstraint.constant = offset + MESSAGE_LINE_PADDING;
+                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + MESSAGE_LINE_PADDING - 1);
+                if(_stickyAvatarYOffsetConstraint.constant >= offset + MESSAGE_LINE_PADDING - 1)
+                    _stickyAvatarYOffsetConstraint.constant = offset + MESSAGE_LINE_PADDING - 1;
                 if(_hiddenAvatarRow != topIndexPath.row) {
                     _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                     _stickyAvatar.hidden = NO;
