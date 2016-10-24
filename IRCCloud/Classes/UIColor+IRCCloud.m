@@ -841,7 +841,7 @@ BOOL __compact = NO;
     if(!__socketClosedBackgroundImage) {
         float scaleFactor = [[UIScreen mainScreen] scale];
         int width = [[UIScreen mainScreen] bounds].size.width;
-        int height = __compact?FONT_SIZE-2:26;
+        int height = FONT_SIZE-2;
         CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
         CGContextRef context = CGBitmapContextCreate(NULL, width * scaleFactor, height * scaleFactor, 8, 4 * width * scaleFactor, colorSpace, (CGBitmapInfo)kCGImageAlphaNoneSkipFirst);
         CGContextScaleCTM(context, scaleFactor, scaleFactor);
