@@ -1330,6 +1330,7 @@ extern BOOL __compact;
                 }
                 BOOL rgb = [text characterAtIndex:i] == COLOR_RGB;
                 int count = 0;
+                int fg_color = -1;
                 [text deleteCharactersInRange:NSMakeRange(i,1)];
                 if(i < text.length) {
                     while(i+count < text.length && (([text characterAtIndex:i+count] >= '0' && [text characterAtIndex:i+count] <= '9') ||
@@ -1340,14 +1341,14 @@ extern BOOL __compact;
                     }
                     if(count > 0) {
                         if(count < 3 && !rgb) {
-                            int color = [[text substringWithRange:NSMakeRange(i, count)] intValue];
-                            if(color > 15) {
+                            fg_color = [[text substringWithRange:NSMakeRange(i, count)] intValue];
+                            if(fg_color > 15) {
                                 count--;
-                                color /= 10;
+                                fg_color /= 10;
                             }
-                            fgColor = [UIColor mIRCColor:color];
                         } else {
                             fgColor = [UIColor colorFromHexString:[text substringWithRange:NSMakeRange(i, count)]];
+                            fg_color = -1;
                         }
                         [text deleteCharactersInRange:NSMakeRange(i,count)];
                         fg = i;
@@ -1369,7 +1370,7 @@ extern BOOL __compact;
                                 count--;
                                 color /= 10;
                             }
-                            bgColor = [UIColor mIRCColor:color];
+                            bgColor = [UIColor mIRCColor:color background:YES];
                         } else {
                             bgColor = [UIColor colorFromHexString:[text substringWithRange:NSMakeRange(i, count)]];
                         }
@@ -1377,6 +1378,8 @@ extern BOOL __compact;
                         bg = i;
                     }
                 }
+                if(fg_color != -1)
+                    fgColor = [UIColor mIRCColor:fg_color background:bgColor != nil];
                 i--;
                 continue;
             case CLEAR:

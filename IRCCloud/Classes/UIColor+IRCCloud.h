@@ -56,7 +56,7 @@
 +(UIColor *)networkErrorBackgroundColor;
 +(UIColor *)networkErrorColor;
 +(UIColor *)colorFromHexString:(NSString *)hexString;
-+(UIColor *)mIRCColor:(int)color;
++(UIColor *)mIRCColor:(int)color background:(BOOL)isBackground;
 +(UIColor *)errorBackgroundColor;
 +(UIColor *)statusBackgroundColor;
 +(UIColor *)selfBackgroundColor;

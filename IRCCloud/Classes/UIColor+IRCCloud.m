@@ -115,7 +115,8 @@ UIColor *__selectedArchivedBufferHighlightColor;
 UIColor *__selectedArchivedBufferBackgroundColor;
 UIColor *__selfNickColor;
 
-UIColor *__mIRCBlackColor;
+UIColor *__mIRCColors_BG[16];
+UIColor *__mIRCColors_FG[16];
 
 BOOL __color_theme_is_dark;
 
@@ -242,6 +243,23 @@ BOOL __compact = NO;
 +(void)setTheme:(NSString *)theme {
     NSLog(@"Setting theme: %@", theme);
     
+    __mIRCColors_BG[0] = [UIColor colorFromHexString:@"FFFFFF"]; //white
+    __mIRCColors_BG[1] = [UIColor blackColor];
+    __mIRCColors_BG[2] = [UIColor colorFromHexString:@"000080"]; //navy
+    __mIRCColors_BG[3] = [UIColor colorFromHexString:@"008000"]; //green
+    __mIRCColors_BG[4] = [UIColor colorFromHexString:@"FF0000"]; //red
+    __mIRCColors_BG[5] = [UIColor colorFromHexString:@"800000"]; //maroon
+    __mIRCColors_BG[6] = [UIColor colorFromHexString:@"800080"]; //purple
+    __mIRCColors_BG[7] = [UIColor colorFromHexString:@"FFA500"]; //orange
+    __mIRCColors_BG[8] = [UIColor colorFromHexString:@"FFFF00"]; //yellow
+    __mIRCColors_BG[9] = [UIColor colorFromHexString:@"00FF00"]; //lime
+    __mIRCColors_BG[10] = [UIColor colorFromHexString:@"008080"]; //teal
+    __mIRCColors_BG[11] = [UIColor colorFromHexString:@"00FFFF"]; //cyan
+    __mIRCColors_BG[12] = [UIColor colorFromHexString:@"0000FF"]; //blue
+    __mIRCColors_BG[13] = [UIColor colorFromHexString:@"FF00FF"]; //magenta
+    __mIRCColors_BG[14] = [UIColor colorFromHexString:@"808080"]; //grey
+    __mIRCColors_BG[15] = [UIColor colorFromHexString:@"C0C0C0"]; //silver
+
     if([theme isEqualToString:@"dawn"] || theme == nil) {
         __color_theme_is_dark = NO;
         
@@ -354,6 +372,23 @@ BOOL __compact = NO;
         [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
         [[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:0 green:0.478 blue:1 alpha:1]];
+        
+        __mIRCColors_FG[0] = [UIColor colorFromHexString:@"FFFFFF"]; //white
+        __mIRCColors_FG[1] = [UIColor blackColor]; //black
+        __mIRCColors_FG[2] = __color_theme_is_dark?[UIColor colorFromHexString:@"4682B4"]:[UIColor colorFromHexString:@"000080"]; //steelblue or navy
+        __mIRCColors_FG[3] = __color_theme_is_dark?[UIColor colorFromHexString:@"32CD32"]:[UIColor colorFromHexString:@"008000"]; //limegreen or green
+        __mIRCColors_FG[4] = [UIColor colorFromHexString:@"FF0000"]; //red
+        __mIRCColors_FG[5] = __color_theme_is_dark?[UIColor colorFromHexString:@"FA8072"]:[UIColor colorFromHexString:@"800000"]; //salmon or maroon
+        __mIRCColors_FG[6] = __color_theme_is_dark?[UIColor colorFromHexString:@"DA70D6"]:[UIColor colorFromHexString:@"800080"]; //orchird or purple
+        __mIRCColors_FG[7] = [UIColor colorFromHexString:@"FFA500"]; //orange
+        __mIRCColors_FG[8] = [UIColor colorFromHexString:@"FFFF00"]; //yellow
+        __mIRCColors_FG[9] = [UIColor colorFromHexString:@"00FF00"]; //lime
+        __mIRCColors_FG[10] = __color_theme_is_dark?[UIColor colorFromHexString:@"20B2AA"]:[UIColor colorFromHexString:@"008080"]; //lightseagreen or teal
+        __mIRCColors_FG[11] = [UIColor colorFromHexString:@"00FFFF"]; //cyan
+        __mIRCColors_FG[12] = __color_theme_is_dark?[UIColor colorFromHexString:@"00BFFF"]:[UIColor colorFromHexString:@"0000FF"]; //deepskyblue or blue
+        __mIRCColors_FG[13] = [UIColor colorFromHexString:@"FF00FF"]; //magenta
+        __mIRCColors_FG[14] = [UIColor colorFromHexString:@"808080"]; //grey
+        __mIRCColors_FG[15] = [UIColor colorFromHexString:@"C0C0C0"]; //silver
     } else {
         UIColor *color_border1;
         UIColor *color_border2;
@@ -543,6 +578,23 @@ BOOL __compact = NO;
         
         __selfNickColor = [UIColor whiteColor];
         
+        __mIRCColors_FG[0] = [UIColor colorFromHexString:@"FFFFFF"]; //white
+        __mIRCColors_FG[1] = [UIColor blackColor]; //black
+        __mIRCColors_FG[2] = [UIColor colorFromHexString:@"4682B4"]; //steelblue
+        __mIRCColors_FG[3] = [UIColor colorFromHexString:@"32CD32"]; //limegreen
+        __mIRCColors_FG[4] = [UIColor colorFromHexString:@"FF0000"]; //red
+        __mIRCColors_FG[5] = [UIColor colorFromHexString:@"FA8072"]; //salmon
+        __mIRCColors_FG[6] = [UIColor colorFromHexString:@"DA70D6"]; //orchird
+        __mIRCColors_FG[7] = [UIColor colorFromHexString:@"FFA500"]; //orange
+        __mIRCColors_FG[8] = [UIColor colorFromHexString:@"FFFF00"]; //yellow
+        __mIRCColors_FG[9] = [UIColor colorFromHexString:@"00FF00"]; //lime
+        __mIRCColors_FG[10] = [UIColor colorFromHexString:@"20B2AA"]; //lightseagreen
+        __mIRCColors_FG[11] = [UIColor colorFromHexString:@"00FFFF"]; //cyan
+        __mIRCColors_FG[12] = [UIColor colorFromHexString:@"00BFFF"]; //deepskyblue
+        __mIRCColors_FG[13] = [UIColor colorFromHexString:@"FF00FF"]; //magenta
+        __mIRCColors_FG[14] = [UIColor colorFromHexString:@"808080"]; //grey
+        __mIRCColors_FG[15] = [UIColor colorFromHexString:@"C0C0C0"]; //silver
+        
         if([theme isEqualToString:@"midnight"]) {
             __contentBackgroundColor = [UIColor blackColor];
             __buffersDrawerBackgroundColor = [UIColor blackColor];
@@ -556,6 +608,8 @@ BOOL __compact = NO;
             __highlightBackgroundColor = color_border10;
             __statusBackgroundColor = color_border10;
             __noticeBackgroundColor = color_border11;
+            
+            __mIRCColors_FG[1] = [UIColor colorFromHexString:@"222222"];
         }
         
         [[UITableView appearance] setBackgroundColor:__contentBackgroundColor];
@@ -597,8 +651,6 @@ BOOL __compact = NO;
     __unreadBlueColor = [UIColor colorWithRed:0.118 green:0.447 blue:1 alpha:1];
     
     __current_theme = theme?theme:@"dawn";
-    
-    __mIRCBlackColor = [__current_theme isEqualToString:@"midnight"]?[UIColor colorFromHexString:@"222222"]:[UIColor blackColor];
 }
 
 +(NSString *)currentTheme {
@@ -733,43 +785,13 @@ BOOL __compact = NO;
     
     return [UIColor colorWithRed:red green:green blue:blue alpha:alpha];
 }
-+(UIColor *)mIRCColor:(int)color {
-    switch(color) {
-        case 0:
-            return [UIColor colorFromHexString:@"FFFFFF"]; //white
-        case 1:
-            return __mIRCBlackColor; //black
-        case 2:
-            return __color_theme_is_dark?[UIColor colorFromHexString:@"4682B4"]:[UIColor colorFromHexString:@"000080"]; //steelblue or navy
-        case 3:
-            return __color_theme_is_dark?[UIColor colorFromHexString:@"32CD32"]:[UIColor colorFromHexString:@"008000"]; //limegreen or green
-        case 4:
-            return [UIColor colorFromHexString:@"FF0000"]; //red
-        case 5:
-            return __color_theme_is_dark?[UIColor colorFromHexString:@"FA8072"]:[UIColor colorFromHexString:@"800000"]; //salmon or maroon
-        case 6:
-            return __color_theme_is_dark?[UIColor colorFromHexString:@"DA70D6"]:[UIColor colorFromHexString:@"800080"]; //orchird or purple
-        case 7:
-            return [UIColor colorFromHexString:@"FFA500"]; //orange
-        case 8:
-            return [UIColor colorFromHexString:@"FFFF00"]; //yellow
-        case 9:
-            return [UIColor colorFromHexString:@"00FF00"]; //lime
-        case 10:
-            return __color_theme_is_dark?[UIColor colorFromHexString:@"20B2AA"]:[UIColor colorFromHexString:@"008080"]; //lightseagreen or teal
-        case 11:
-            return [UIColor colorFromHexString:@"00FFFF"]; //cyan
-        case 12:
-            return __color_theme_is_dark?[UIColor colorFromHexString:@"00BFFF"]:[UIColor colorFromHexString:@"0000FF"]; //deepskyblue or blue
-        case 13:
-            return [UIColor colorFromHexString:@"FF00FF"]; //magenta
-        case 14:
-            return [UIColor colorFromHexString:@"808080"]; //grey
-        case 15:
-            return [UIColor colorFromHexString:@"C0C0C0"]; //silver
-    }
+
++(UIColor *)mIRCColor:(int)color background:(BOOL)isBackground {
+    if(color < 16)
+        return isBackground?__mIRCColors_BG[color]:__mIRCColors_FG[color];
     return nil;
 }
+
 +(UIColor *)errorBackgroundColor {
     return __errorBackgroundColor;
 }
