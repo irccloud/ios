@@ -235,7 +235,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && frame.size.height < 0);
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
-        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, floorf([_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height));
+        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, frame.size.width - 4 - __timestampWidth, floorf([_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height) + 1);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(
                                        frame.origin.x + (__timeLeftPref ? (__timestampWidth + 4) : 0),
