@@ -1613,7 +1613,10 @@ extern NSDictionary *emojiMap;
                 _message.text = @"";
                 return;
             } else if([_message.text hasPrefix:@"/fontsize "]) {
-                [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:[[_message.text substringFromIndex:10] intValue]] forKey:@"fontSize"];
+                [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:
+                                                                  MIN(FONT_MAX, MAX(FONT_MIN, [[_message.text substringFromIndex:10] intValue]))
+                                                                  ]
+                                                          forKey:@"fontSize"];
                 if([ColorFormatter shouldClearFontCache]) {
                     [ColorFormatter clearFontCache];
                     [ColorFormatter loadFonts];

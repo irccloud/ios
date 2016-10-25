@@ -28,9 +28,6 @@
 #import "OpenInFirefoxControllerObjC.h"
 #import "AvatarsDataSource.h"
 
-#define FONT_MIN 10
-#define FONT_MAX 24
-
 @interface BrowserViewController : UITableViewController {
     NSMutableArray *_browsers;
 }
