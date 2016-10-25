@@ -82,8 +82,8 @@ BOOL __avatarsOffPref = NO;
 BOOL __chatOneLinePref = NO;
 BOOL __norealnamePref = NO;
 BOOL __monospacePref = NO;
-float __smallAvatarHeight;
-float __largeAvatarHeight = 32;
+int __smallAvatarHeight;
+int __largeAvatarHeight = 32;
 
 extern BOOL __compact;
 extern UIImage *__socketClosedBackgroundImage;
@@ -194,7 +194,12 @@ extern UIImage *__newMsgsBackgroundImage;
         frame.size.height -= __compact ? 4 : 0;
         frame.size.width -= frame.origin.x + 6;
         if(!__chatOneLinePref && !__avatarsOffPref) {
-            _avatar.frame = CGRectMake(frame.origin.x + 4,frame.origin.y + __compact?1:2,__largeAvatarHeight,__largeAvatarHeight);
+            _avatar.frame = CGRectMake(
+                                       frame.origin.x + 4,
+                                       frame.origin.y + (__compact ? 1 : 2),
+                                       __largeAvatarHeight,
+                                       __largeAvatarHeight
+                                       );
             frame.origin.x += _avatar.frame.size.width + 13;
             frame.size.width -= _avatar.frame.size.width + 17;
         }
@@ -235,12 +240,8 @@ extern UIImage *__newMsgsBackgroundImage;
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(
                                        frame.origin.x + (__timeLeftPref ? (__timestampWidth + 4) : 0),
-                                       frame.origin.y + (
-                                                         __compact ?
-                                                            (__monospacePref ? 0   : 0.5) :
-                                                            (__monospacePref ? 0.5 : 1.5)
-                                                         )
-                                       ,__smallAvatarHeight,
+                                       frame.origin.y + ( __monospacePref ? (__compact ? 0 : 0.5) : roundf((__smallAvatarHeight+3)/10) ),
+                                       __smallAvatarHeight,
                                        __smallAvatarHeight
                                        );
         }
@@ -1470,9 +1471,7 @@ extern UIImage *__newMsgsBackgroundImage;
             if([[prefs objectForKey:@"expandJoinPart"] boolValue] || (expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
                 __expandJoinPartPref = YES;
         }
-        __largeAvatarHeight = (FONT_SIZE * 2) + (__compact?2:6);
-        if(__largeAvatarHeight > 32)
-            __largeAvatarHeight = 32;
+        __largeAvatarHeight = MIN(32, roundf(FONT_SIZE * 2) + (__compact ? 3 : 6));
         if(__monospacePref)
             _groupIndent = @"  ";
         else
@@ -1510,7 +1509,10 @@ extern UIImage *__newMsgsBackgroundImage;
         [_unseenHighlightPositions removeAllObjects];
         _hiddenAvatarRow = -1;
         _stickyAvatar.hidden = YES;
-        __smallAvatarHeight = [[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] floatValue] + 2;
+        __smallAvatarHeight = roundf(FONT_SIZE) + 1;
+        if (__smallAvatarHeight % 2) {
+            __smallAvatarHeight += 1;
+        }
         
         if(!_buffer) {
             [_lock unlock];
