@@ -19,7 +19,6 @@
 #import "ColorFormatter.h"
 
 UIImage *__timestampBackgroundImage;
-UIImage *__newMsgsBackgroundImage;
 UIImage *__navbarBackgroundImage;
 UIImage *__textareaBackgroundImage;
 UIImage *__buffersDrawerBackgroundImage;
@@ -642,7 +641,6 @@ BOOL __compact = NO;
     }
     
     __timestampBackgroundImage = nil;
-    __newMsgsBackgroundImage = nil;
     __navbarBackgroundImage = nil;
     __textareaBackgroundImage = nil;
     __buffersDrawerBackgroundImage = nil;
@@ -812,30 +810,6 @@ BOOL __compact = NO;
 }
 +(UIColor *)timestampBackgroundColor {
     return __timestampBackgroundColor;
-}
-+(UIColor *)newMsgsBackgroundColor {
-    if(!__newMsgsBackgroundImage) {
-        float scaleFactor = [[UIScreen mainScreen] scale];
-        int width = [[UIScreen mainScreen] bounds].size.width;
-        int height = __compact?FONT_SIZE-2:26;
-        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-        CGContextRef context = CGBitmapContextCreate(NULL, width * scaleFactor, height * scaleFactor, 8, 4 * width * scaleFactor, colorSpace, (CGBitmapInfo)kCGImageAlphaNoneSkipFirst);
-        CGContextScaleCTM(context, scaleFactor, scaleFactor);
-        CGContextSetFillColorWithColor(context, [self contentBackgroundColor].CGColor);
-        CGContextFillRect(context, CGRectMake(0,0,width,height));
-        CGContextSetLineCap(context, kCGLineCapSquare);
-        CGContextSetStrokeColorWithColor(context, [UIColor timestampColor].CGColor);
-        CGContextSetLineWidth(context, 1.0);
-        CGContextMoveToPoint(context, 0.0, height / 2.0);
-        CGContextAddLineToPoint(context, width, height / 2.0);
-        CGContextStrokePath(context);
-        CGImageRef cgImage = CGBitmapContextCreateImage(context);
-        __newMsgsBackgroundImage = [UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp];
-        CFRelease(cgImage);
-        CGContextRelease(context);
-        CGColorSpaceRelease(colorSpace);
-    }
-    return [UIColor colorWithPatternImage:__newMsgsBackgroundImage];
 }
 +(UIColor *)socketClosedBackgroundColor {
     if(!__socketClosedBackgroundImage) {

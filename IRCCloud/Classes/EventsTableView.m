@@ -87,7 +87,6 @@ int __largeAvatarHeight = 32;
 
 extern BOOL __compact;
 extern UIImage *__socketClosedBackgroundImage;
-extern UIImage *__newMsgsBackgroundImage;
 
 @interface EventsTableCell : UITableViewCell {
     UIImageView *_avatar;
@@ -250,6 +249,8 @@ extern UIImage *__newMsgsBackgroundImage;
             frame.origin.y = frame.size.height / 2;
             frame.size.height = 1;
         } else if(_type == ROW_LASTSEENEID) {
+            _socketClosedBar.backgroundColor = [UIColor timestampColor];
+            _socketClosedBar.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height / 2, frame.size.width, 1);
             if(!__avatarsOffPref && !__chatOneLinePref) {
                 frame.origin.x += __largeAvatarHeight + 16;
                 frame.size.width -= __largeAvatarHeight + 16;
@@ -263,7 +264,7 @@ extern UIImage *__newMsgsBackgroundImage;
         _timestamp.frame = frame;
         _timestamp.hidden = NO;
         _message.hidden = YES;
-        _socketClosedBar.hidden = YES;
+        _socketClosedBar.hidden = (_type != ROW_LASTSEENEID);
     }
 }
 
@@ -1485,8 +1486,6 @@ extern UIImage *__newMsgsBackgroundImage;
 
         __socketClosedBackgroundImage = nil;
         [UIColor socketClosedBackgroundColor];
-        __newMsgsBackgroundImage = nil;
-        [UIColor newMsgsBackgroundColor];
 
         [_lock lock];
         [_scrollTimer invalidate];
@@ -1583,7 +1582,7 @@ extern UIImage *__newMsgsBackgroundImage;
             e.type = TYPE_LASTSEENEID;
             e.rowType = ROW_LASTSEENEID;
             e.formattedMsg = nil;
-            e.bgColor = [UIColor newMsgsBackgroundColor];
+            e.bgColor = [UIColor contentBackgroundColor];
             e.timestamp = @"New Messages";
             _lastSeenEidPos = _data.count - 1;
             NSEnumerator *i = [_data reverseObjectEnumerator];
@@ -1857,7 +1856,7 @@ extern UIImage *__newMsgsBackgroundImage;
                 return e.height;
             }
         } else if(e.rowType == ROW_LASTSEENEID) {
-            return __newMsgsBackgroundImage.size.height;
+            return __compact?FONT_SIZE:26;
         } else if(e.rowType == ROW_BACKLOG) {
             return __compact?4:26;
         }

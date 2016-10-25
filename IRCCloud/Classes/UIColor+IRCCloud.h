@@ -64,7 +64,6 @@
 +(UIColor *)highlightTimestampColor;
 +(UIColor *)noticeBackgroundColor;
 +(UIColor *)timestampBackgroundColor;
-+(UIColor *)newMsgsBackgroundColor;
 +(UIColor *)collapsedRowTextColor;
 +(UIColor *)collapsedHeadingBackgroundColor;
 +(UIColor *)navBarColor;

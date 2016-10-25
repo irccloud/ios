@@ -118,7 +118,7 @@
         if(_rowType == ROW_TIMESTAMP)
             _bgColor = [UIColor timestampBackgroundColor];
         else if(_rowType == ROW_LASTSEENEID)
-            _bgColor = [UIColor newMsgsBackgroundColor];
+            _bgColor = [UIColor contentBackgroundColor];
         else
             decodeObject(_bgColor);
         
@@ -1132,7 +1132,7 @@
             for(Event *e in events) {
                 e.color = [UIColor messageTextColor];
                 if(e.rowType == ROW_LASTSEENEID)
-                    e.bgColor = [UIColor newMsgsBackgroundColor];
+                    e.bgColor = [UIColor contentBackgroundColor];
                 else if(e.rowType == ROW_TIMESTAMP)
                     e.bgColor = [UIColor timestampBackgroundColor];
                 else
