@@ -44,6 +44,7 @@ NSString *IRCCLOUD_PATH = @"/";
 #define TYPE_WWAN 2
 
 NSLock *__serializeLock = nil;
+NSLock *__userInfoLock = nil;
 volatile BOOL __socketPaused = NO;
 
 @interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
@@ -214,6 +215,7 @@ volatile BOOL __socketPaused = NO;
 #endif
     if(self) {
     __serializeLock = [[NSLock alloc] init];
+    __userInfoLock = [[NSLock alloc] init];
     _queue = [[NSOperationQueue alloc] init];
     _servers = [ServersDataSource sharedInstance];
     _buffers = [BuffersDataSource sharedInstance];
@@ -255,12 +257,14 @@ volatile BOOL __socketPaused = NO;
     
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
         NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
+        [__userInfoLock lock];
         _userInfo = [NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile];
+        [__userInfoLock unlock];
     } else {
         CLS_LOG(@"Version changed, not loading caches");
     }
-    if(_userInfo) {
-        _config = [_userInfo objectForKey:@"config"];
+    if(self.userInfo) {
+        _config = [self.userInfo objectForKey:@"config"];
     }
     
     CLS_LOG(@"%@", _userAgent);
@@ -297,7 +301,7 @@ volatile BOOL __socketPaused = NO;
         server.join_commands = [object objectForKey:@"join_commands"];
         server.fail_info = [object objectForKey:@"fail_info"];
         server.away = (backlog && [_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
-        if([[_userInfo objectForKey:@"autoaway"] intValue] && [server.away isEqualToString:@"Auto-away"])
+        if([[self.userInfo objectForKey:@"autoaway"] intValue] && [server.away isEqualToString:@"Auto-away"])
             server.away = @"";
         server.ignores = [object objectForKey:@"ignores"];
         if([[object objectForKey:@"order"] isKindOfClass:[NSNumber class]])
@@ -453,8 +457,10 @@ volatile BOOL __socketPaused = NO;
                        [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       _userInfo = [object.dictionary copy];
-                       if([[_userInfo objectForKey:@"uploads_disabled"] intValue] == 1 && [[_userInfo objectForKey:@"id"] intValue] != 11694)
+                       [__userInfoLock lock];
+                       _userInfo = object.dictionary;
+                       [__userInfoLock unlock];
+                       if([[self.userInfo objectForKey:@"uploads_disabled"] intValue] == 1 && [[self.userInfo objectForKey:@"id"] intValue] != 11694)
                            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"uploadsAvailable"];
                        else
                            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"uploadsAvailable"];
@@ -500,7 +506,7 @@ volatile BOOL __socketPaused = NO;
                        [_events reformat];
                        [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
 #endif
-                       [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[_userInfo objectForKey:@"id"]]];
+                       [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
                        CLS_LOG(@"Prefs: %@", [self prefs]);
                        [self postObject:object forEvent:kIRCEventUserInfo];
                    },
@@ -1223,9 +1229,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [d setObject:[lastSeenEids objectAtIndex:i] forKey:[NSString stringWithFormat:@"%@",[bids objectAtIndex:i]]];
         }
         NSString *seenEids = [_writer stringWithObject:heartbeat];
+        [__userInfoLock lock];
         NSMutableDictionary *d = _userInfo.mutableCopy;
         [d setObject:@(selectedBuffer) forKey:@"last_selected_bid"];
         _userInfo = d;
+        [__userInfoLock unlock];
         return [self _sendRequest:@"heartbeat" args:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids}];
     }
 }
@@ -1570,7 +1578,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)clearPrefs {
     _prefs = nil;
+    [__userInfoLock lock];
     _userInfo = nil;
+    [__userInfoLock unlock];
 }
 
 -(void)parser:(SBJsonStreamParser *)parser foundArray:(NSArray *)array {
@@ -1702,9 +1712,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(NSDictionary *)prefs {
     @synchronized(self) {
-        if(!_prefs && _userInfo && [[_userInfo objectForKey:@"prefs"] isKindOfClass:[NSString class]] && [[_userInfo objectForKey:@"prefs"] length]) {
+        if(!_prefs && self.userInfo && [[self.userInfo objectForKey:@"prefs"] isKindOfClass:[NSString class]] && [[self.userInfo objectForKey:@"prefs"] length]) {
             SBJsonParser *parser = [[SBJsonParser alloc] init];
-            _prefs = [parser objectWithString:[_userInfo objectForKey:@"prefs"]];
+            _prefs = [parser objectWithString:[self.userInfo objectForKey:@"prefs"]];
         }
         return _prefs;
     }
@@ -1935,6 +1945,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [_notifications serialize];
 #ifndef EXTENSION
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
+    [__userInfoLock lock];
     NSMutableDictionary *stream = [_userInfo mutableCopy];
     if(_streamId)
         [stream setObject:_streamId forKey:@"streamId"];
@@ -1946,6 +1957,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [stream removeObjectForKey:@"config"];
     [stream setObject:@(_highestEID) forKey:@"highestEID"];
     [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
+    [__userInfoLock unlock];
     [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
 #endif
     [[NSUserDefaults standardUserDefaults] setObject:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"cacheVersion"];
@@ -2012,7 +2024,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     CLS_LOG(@"Logging out");
     _reconnectTimestamp = 0;
     _streamId = nil;
+    [__userInfoLock lock];
     _userInfo = @{};
+    [__userInfoLock unlock];
     _highestEID = 0;
     NSString *s = self.session;
     SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, nil]);
@@ -2125,4 +2139,27 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [self _sendRequest:@"upgrade_notifier" args:nil];
     }
 }
+
+-(NSDictionary *)userInfo {
+    [__userInfoLock lock];
+    NSDictionary *d = _userInfo;
+    [__userInfoLock unlock];
+    return d;
+}
+
+-(void)setUserInfo:(NSDictionary *)userInfo {
+  [__userInfoLock lock];
+  _userInfo = userInfo;
+  [__userInfoLock unlock];
+}
+
+-(void)setLastSelectedBID:(int)bid {
+  [__userInfoLock lock];
+  NSMutableDictionary *d = _userInfo.mutableCopy;
+  [d setObject:@(bid) forKey:@"last_selected_bid"];
+  _userInfo = d;
+  [__userInfoLock unlock];
+  
+}
+
 @end

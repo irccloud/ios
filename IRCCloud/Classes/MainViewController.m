@@ -2214,11 +2214,7 @@ extern NSDictionary *emojiMap;
                 }
             }
         }
-        NSMutableDictionary *u = [NetworkConnection sharedInstance].userInfo.mutableCopy;
-        if(u) {
-            [u setObject:@(bid) forKey:@"last_selected_bid"];
-            [NetworkConnection sharedInstance].userInfo = [NSDictionary dictionaryWithDictionary:u];
-        }
+        [[NetworkConnection sharedInstance] setLastSelectedBID:bid];
         NSUserActivity *activity = [self userActivity];
         if(![activity.activityType hasSuffix:@".buffer"]) {
             [activity invalidate];
