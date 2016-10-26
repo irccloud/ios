@@ -424,6 +424,8 @@ BOOL __compact = NO;
         UIColor *color_background6;
         UIColor *color_background6a;
         UIColor *color_background7;
+        UIColor *color_background7a;
+        UIColor *color_background8;
         
         CGFloat hue = 210.0f/360.0f;
         CGFloat saturation = 0.55f;
@@ -494,6 +496,8 @@ BOOL __compact = NO;
         color_background6 = [UIColor colorWithHue:hue saturation:saturation lightness:0.20f alpha:1.0f];
         color_background6a = [UIColor colorWithHue:hue saturation:saturation lightness:0.17f alpha:1.0f];
         color_background7 = [UIColor colorWithHue:hue saturation:saturation lightness:0.15f alpha:1.0f];
+        color_background7a = [UIColor colorWithHue:hue saturation:saturation lightness:0.12f alpha:1.0f];
+        color_background8 = [UIColor colorWithHue:hue saturation:saturation lightness:0.10f alpha:1.0f];
         
         __color_theme_is_dark = YES;
 
@@ -604,9 +608,10 @@ BOOL __compact = NO;
             __serverBackgroundColor = color_border9;
             __iPadBordersColor = color_border10;
             
-            __highlightBackgroundColor = color_border10;
-            __statusBackgroundColor = color_border10;
-            __noticeBackgroundColor = color_border11;
+            __highlightBackgroundColor = color_background6a;
+            __noticeBackgroundColor = color_background7;
+            __selfBackgroundColor = color_background7a;
+            __statusBackgroundColor = color_background8;
             
             __mIRCColors_FG[1] = [UIColor colorFromHexString:@"222222"];
         }
