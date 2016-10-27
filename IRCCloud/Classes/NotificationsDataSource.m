@@ -211,10 +211,18 @@
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
         [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                if([UIApplication sharedApplication].applicationIconBadgeNumber != notifications.count)
-                    CLS_LOG(@"Setting iOS icon badge to %lu", (unsigned long)notifications.count);
+                int count = 0;
+                NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
+                for(Buffer *b in buffers) {
+                    count += [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                }
+                if(notifications.count > count)
+                    count = notifications.count;
+
+                if([UIApplication sharedApplication].applicationIconBadgeNumber != count)
+                    CLS_LOG(@"Setting iOS icon badge to %i", count);
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [UIApplication sharedApplication].applicationIconBadgeNumber = notifications.count;
+                    [UIApplication sharedApplication].applicationIconBadgeNumber = count;
                 }];
             }];
         }];
