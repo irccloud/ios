@@ -716,7 +716,7 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)_sendHeartbeat {
-    if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0 && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus] && !_requestingBacklog && _conn.state == kIRCCloudStateConnected && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type]) {
+    if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0 && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus] && !_requestingBacklog && _conn.state == kIRCCloudStateConnected) {
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         NSTimeInterval eid = _buffer.scrolledUpFrom;
         if(eid <= 0) {
@@ -2088,7 +2088,7 @@ extern UIImage *__socketClosedBackgroundImage;
         [UIView setAnimationDuration:0.1];
         _topUnreadView.alpha = 0;
         [UIView commitAnimations];
-        [self _sendHeartbeat];
+        [self sendHeartbeat];
     }
 }
 
@@ -2105,7 +2105,7 @@ extern UIImage *__socketClosedBackgroundImage;
             [UIView commitAnimations];
             [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_lastSeenEidPos+1 inSection:0] atScrollPosition: UITableViewScrollPositionTop animated: YES];
             [self scrollViewDidScroll:_tableView];
-            [self _sendHeartbeat];
+            [self sendHeartbeat];
         } else {
             if(_tableView.tableHeaderView == _backlogFailedView)
                 [self loadMoreBacklogButtonPressed:nil];
@@ -2197,7 +2197,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
                 _buffer.savedScrollOffset = -1;
-                [self _sendHeartbeat];
+                [self sendHeartbeat];
             } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
                 _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
                 _buffer.scrolledUp = YES;
@@ -2209,7 +2209,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     [UIView setAnimationDuration:0.1];
                     _topUnreadView.alpha = 0;
                     [UIView commitAnimations];
-                    [self _sendHeartbeat];
+                    [self sendHeartbeat];
                 } else {
                     [self updateTopUnread:firstRow];
                 }
