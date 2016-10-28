@@ -54,10 +54,12 @@
         CLS_LOG(@"Finalize success: %@", result);
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:_bid];
         if(b) {
-            if(_msg.length)
-                _msg = [_msg stringByAppendingString:@" "];
-            else
+            if(_msg.length) {
+                if(![_msg hasSuffix:@" "])
+                    _msg = [_msg stringByAppendingString:@" "];
+            } else {
                 _msg = @"";
+            }
             _msg = [_msg stringByAppendingFormat:@"%@", [[result objectForKey:@"file"] objectForKey:@"url"]];
             [[NetworkConnection sharedInstance] POSTsay:_msg to:b.name cid:b.cid];
             [_delegate fileUploadDidFinish];
