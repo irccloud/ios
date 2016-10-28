@@ -2120,8 +2120,12 @@ extern UIImage *__socketClosedBackgroundImage;
         [UIView setAnimationDuration:0.1];
         _bottomUnreadView.alpha = 0;
         [UIView commitAnimations];
-        if(_data.count)
-            [_tableView setContentOffset:CGPointMake(0, _tableView.contentSize.height - _tableView.frame.size.height) animated:YES];
+        if(_data.count) {
+            if(_tableView.contentSize.height > (_tableView.frame.size.height - _tableView.contentInset.top - _tableView.contentInset.bottom))
+                [_tableView setContentOffset:CGPointMake(0, (_tableView.contentSize.height - _tableView.frame.size.height) + _tableView.contentInset.bottom) animated:YES];
+            else
+                [_tableView setContentOffset:CGPointMake(0, -_tableView.contentInset.top) animated:YES];
+        }
         _buffer.scrolledUp = NO;
         _buffer.scrolledUpFrom = -1;
     }

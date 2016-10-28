@@ -2632,7 +2632,7 @@ extern NSDictionary *emojiMap;
         _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
     }];
 
-    if(!_isShowingPreview) {
+    if(!_isShowingPreview && (_eventsView.tableView.contentInset.top != top || _eventsView.tableView.contentInset.bottom != height)) {
         [_eventsView.tableView setContentInset:UIEdgeInsetsMake(top, 0, height, 0)];
         [_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(top, 0, height, 0)];
 
