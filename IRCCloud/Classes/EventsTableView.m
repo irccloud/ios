@@ -716,7 +716,7 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)_sendHeartbeat {
-    if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus] && !_requestingBacklog && _conn.state == kIRCCloudStateConnected) {
+    if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0 && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus] && !_requestingBacklog && _conn.state == kIRCCloudStateConnected && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type]) {
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         NSTimeInterval eid = _buffer.scrolledUpFrom;
         if(eid <= 0) {
@@ -739,7 +739,7 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)sendHeartbeat {
-    if(!_heartbeatTimer && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _conn.state == kIRCCloudStateConnected)
+    if(!_heartbeatTimer)
         _heartbeatTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(_sendHeartbeat) userInfo:nil repeats:NO];
 }
 
@@ -1658,42 +1658,6 @@ extern UIImage *__socketClosedBackgroundImage;
             [self scrollToBottom];
         }
         
-        NSArray *rows = [_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)];
-        if(_data.count && rows.count) {
-            NSInteger firstRow = [[rows objectAtIndex:0] row];
-            NSInteger lastRow = [[rows lastObject] row];
-            Event *e = ((_lastSeenEidPos+1) < _data.count)?[_data objectAtIndex:_lastSeenEidPos+1]:nil;
-            if(e && _lastSeenEidPos >= 0 && firstRow > _lastSeenEidPos && e.eid >= _buffer.last_seen_eid) {
-                if(_topUnreadView.alpha == 0) {
-                    [UIView beginAnimations:nil context:nil];
-                    [UIView setAnimationDuration:0.1];
-                    _topUnreadView.alpha = 1;
-                    [UIView commitAnimations];
-                }
-                [self updateTopUnread:firstRow];
-            } else if(lastRow < _lastSeenEidPos) {
-                for(Event *e in _data) {
-                    if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && !e.isSelf && e.rowType != ROW_LASTSEENEID && [e isImportant:_buffer.type]) {
-                        _newMsgs++;
-                        if(e.isHighlight)
-                            _newHighlights++;
-                    }
-                }
-            } else {
-                [UIView beginAnimations:nil context:nil];
-                [UIView setAnimationDuration:0.1];
-                _topUnreadView.alpha = 0;
-                [UIView commitAnimations];
-            }
-            _requestingBacklog = NO;
-        }
-        
-        [self updateUnread];
-        
-        _ready = YES;
-        [self scrollViewDidScroll:_tableView];
-        [_lock unlock];
-        
         if(_conn.state == kIRCCloudStateConnected) {
             if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _conn.ready && !_requestingBacklog) {
                 CLS_LOG(@"Empty table after refresh, requesting more backlog");
@@ -1705,6 +1669,39 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            NSArray *rows = [_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)];
+            if(_data.count && rows.count) {
+                NSInteger firstRow = [[rows objectAtIndex:0] row];
+                NSInteger lastRow = [[rows lastObject] row];
+                Event *e = ((_lastSeenEidPos+1) < _data.count)?[_data objectAtIndex:_lastSeenEidPos+1]:nil;
+                if(e && _lastSeenEidPos >= 0 && firstRow > _lastSeenEidPos && e.eid >= _buffer.last_seen_eid) {
+                    if(_topUnreadView.alpha == 0) {
+                        [UIView beginAnimations:nil context:nil];
+                        [UIView setAnimationDuration:0.1];
+                        _topUnreadView.alpha = 1;
+                        [UIView commitAnimations];
+                    }
+                    [self updateTopUnread:firstRow];
+                } else if(lastRow < _lastSeenEidPos) {
+                    for(Event *e in _data) {
+                        if(_buffer.last_seen_eid > 0 && e.eid > _buffer.last_seen_eid && !e.isSelf && e.rowType != ROW_LASTSEENEID && [e isImportant:_buffer.type]) {
+                            _newMsgs++;
+                            if(e.isHighlight)
+                                _newHighlights++;
+                        }
+                    }
+                } else {
+                    [UIView beginAnimations:nil context:nil];
+                    [UIView setAnimationDuration:0.1];
+                    _topUnreadView.alpha = 0;
+                    [UIView commitAnimations];
+                }
+                _requestingBacklog = NO;
+            }
+            
+            [self updateUnread];
+            _ready = YES;
+            [self scrollViewDidScroll:_tableView];
             [_tableView flashScrollIndicators];
         }];
     }
@@ -2200,8 +2197,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
                 _buffer.savedScrollOffset = -1;
-                if(_topUnreadView.alpha == 0 && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type])
-                    [self _sendHeartbeat];
+                [self _sendHeartbeat];
             } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
                 _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
                 _buffer.scrolledUp = YES;
