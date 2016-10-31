@@ -2498,6 +2498,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)updateLayout {
+    [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
     [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
 }
 
@@ -2599,6 +2600,7 @@ extern NSDictionary *emojiMap;
     [_eventActivity startAnimating];
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
         [self transitionToSize:size];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         _eventActivity.alpha = 0;
