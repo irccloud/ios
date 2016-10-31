@@ -524,6 +524,8 @@
         [[NSUserDefaults standardUserDefaults] setBool:!_timeLeft.isOn forKey:@"time-left"];
         [[NSUserDefaults standardUserDefaults] setBool:!_avatarsOff.isOn forKey:@"avatars-off"];
         [[NSUserDefaults standardUserDefaults] setBool:!_browserWarning.isOn forKey:@"warnBeforeLaunchingBrowser"];
+        [[NSUserDefaults standardUserDefaults] setBool:!_imageViewer.isOn forKey:@"imageViewer"];
+        [[NSUserDefaults standardUserDefaults] setBool:!_videoViewer.isOn forKey:@"videoViewer"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -793,6 +795,8 @@
     _notificationSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"];
     _tabletMode.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"];
     _fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
+    _imageViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"imageViewer"];
+    _videoViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"];
     
     NSArray *account;
 #ifdef ENTERPRISE
@@ -839,6 +843,8 @@
         [device addObject:@{@"title":@"Show Sidebars In Landscape", @"accessory":_tabletMode}];
     }
     [device addObject:@{@"title":@"Ask to Pastebin", @"accessory":_pastebin}];
+    [device addObject:@{@"title":@"Open Images in Browser", @"accessory":_imageViewer}];
+    [device addObject:@{@"title":@"Open Videos in Browser", @"accessory":_videoViewer}];
     [device addObject:@{@"title":@"Retry Failed Images in Browser", @"accessory":_browserWarning}];
     
     NSMutableArray *photos = [[NSMutableArray alloc] init];
@@ -967,6 +973,8 @@
     [_avatarsOff addTarget:self action:@selector(oneLineToggled:) forControlEvents:UIControlEventValueChanged];
     _browserWarning = [[UISwitch alloc] init];
     _compact = [[UISwitch alloc] init];
+    _imageViewer = [[UISwitch alloc] init];
+    _videoViewer = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";

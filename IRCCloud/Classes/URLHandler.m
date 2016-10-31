@@ -193,9 +193,9 @@
         [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"facetime-prompt%@",[url.absoluteString substringFromIndex:8]]]];
     } else if([url.scheme isEqualToString:@"tel"]) {
         [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"telprompt%@",[url.absoluteString substringFromIndex:3]]]];
-    } else if([[self class] isImageURL:url]) {
+    } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"imageViewer"] && [[self class] isImageURL:url]) {
         [self showImage:url];
-    } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"]) {
+    } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && ([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"])) {
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         if(NSClassFromString(@"AVPlayerViewController")) {
             AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
@@ -206,10 +206,10 @@
             [mainViewController presentMoviePlayerViewControllerAnimated:player];
         }
         [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
-    } else if(IS_YOUTUBE(url)) {
+    } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
 #ifdef FB_ACCESS_TOKEN
-    } else if([url.host.lowercaseString hasSuffix:@"facebook.com"] && ([url.path.lowercaseString isEqualToString:@"/video.php"] || (url.pathComponents.count > 3 && [url.pathComponents[2] isEqualToString:@"videos"]))) {
+    } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && [url.host.lowercaseString hasSuffix:@"facebook.com"] && ([url.path.lowercaseString isEqualToString:@"/video.php"] || (url.pathComponents.count > 3 && [url.pathComponents[2] isEqualToString:@"videos"]))) {
         NSString *videoID = nil;
         
         if([url.path.lowercaseString isEqualToString:@"/video.php"]) {
