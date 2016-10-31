@@ -466,7 +466,7 @@
     NSString *output = @"";
     NSString *modes = [e modes:NO mode_modes:_mode_modes];
     
-    if(e.oldNick && e.type != kCollapsedEventMode)
+    if(e.oldNick && e.type != kCollapsedEventMode && e.type != kCollapsedEventNickChange)
         output = [NSString stringWithFormat:@"was %@", e.oldNick];
     if(modes.length) {
         if(output.length > 0)
@@ -600,10 +600,7 @@
                 
                 if(e.type == kCollapsedEventNickChange) {
                     [message appendFormat:@"%@ →\U0000FE0E %@", e.oldNick, [self formatNick:e.nick mode:e.fromMode colorize:NO]];
-                    NSString *oldNick = e.oldNick;
-                    e.oldNick = nil;
                     [message appendString:[self was:e]];
-                    e.oldNick = oldNick;
                 } else if(e.type == kCollapsedEventNetSplit) {
                     [message appendString:[e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮\U0000FE0E "]];
                 } else if(e.type == kCollapsedEventConnectionStatus) {
@@ -637,7 +634,7 @@
                         default:
                             break;
                     }
-                } else if(_showChan && e.type != kCollapsedEventNetSplit && e.type != kCollapsedEventConnectionStatus) {
+                } else if(_showChan && e.type != kCollapsedEventNetSplit && e.type != kCollapsedEventConnectionStatus && e.type != kCollapsedEventNickChange) {
                     if(groupcount == 0) {
                         [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO]];
                         [message appendString:[self was:e]];
