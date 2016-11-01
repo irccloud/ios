@@ -662,7 +662,7 @@
                         [message appendString:e.chan];
                 }
                 
-                if(next != nil && next.type == e.type) {
+                if(next != nil && next.type == e.type && message.length > 0) {
                     [message appendString:@", "];
                     groupcount++;
                 } else if(next != nil) {

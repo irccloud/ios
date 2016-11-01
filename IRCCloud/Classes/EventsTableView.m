@@ -233,7 +233,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         [_timestamp sizeToFit];
         _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition, __timestampWidth, _timestamp.frame.size.height);
-        _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && frame.size.height < 0);
+        _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && _message.text.length == 0);
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
         _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, frame.size.width - 4 - __timestampWidth, floorf([_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height) + 1);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
@@ -955,7 +955,10 @@ extern UIImage *__socketClosedBackgroundImage;
                     if([event.type isEqualToString:@"socket_closed"] || [event.type isEqualToString:@"connecting_failed"] || [event.type isEqualToString:@"connecting_cancelled"]) {
                         Event *last = [[EventsDataSource sharedInstance] event:_lastCollapsedEid buffer:_buffer.bid];
                         if(last) {
-                            last.rowType = ROW_MESSAGE;
+                            if(last.msg.length == 0)
+                                [_data removeObject:last];
+                            else
+                                last.rowType = ROW_MESSAGE;
                         }
                         event.rowType = ROW_SOCKETCLOSED;
                     }
@@ -1840,7 +1843,9 @@ extern UIImage *__socketClosedBackgroundImage;
     [_lock unlock];
     @synchronized (e) {
         if(e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
-            if(e.formatted != nil && e.height > 0) {
+            if(e.rowType == ROW_SOCKETCLOSED && e.msg.length == 0) {
+                return __socketClosedBackgroundImage.size.height;
+            } else if(e.formatted != nil && e.height > 0) {
                 //NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
                 return e.height;
             } else if(!e.formatted && e.formattedMsg.length > 0) {
