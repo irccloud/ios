@@ -1628,6 +1628,11 @@ extern NSDictionary *emojiMap;
                 }];
                 _message.text = @"";
                 return;
+            } else if([_message.text isEqualToString:@"/read"]) {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:_eventsView.YUNoHeartbeat delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                [alert show];
+                _message.text = @"";
+                return;
 #endif
             } else if(_message.text.length > 1080 || [_message.text isEqualToString:@"/paste"] || [_message.text hasPrefix:@"/paste "] || [_message.text rangeOfString:@"\n"].location < _message.text.length - 1) {
                 BOOL prompt = YES;
@@ -2639,7 +2644,7 @@ extern NSDictionary *emojiMap;
         [_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(top, 0, height, 0)];
 
         if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) {
-            if(_eventsView.tableView.contentOffset.y + diff + (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom) > _eventsView.tableView.contentSize.height)
+            if(floorf(_eventsView.tableView.contentOffset.y + diff + (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) > floorf(_eventsView.tableView.contentSize.height))
                 [_eventsView _scrollToBottom];
             else if(diff > 0 || _buffer.scrolledUp)
                 _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);

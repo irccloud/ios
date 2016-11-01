@@ -2189,9 +2189,9 @@ extern UIImage *__socketClosedBackgroundImage;
     if(rows.count && _topUnreadView) {
         if(_data.count) {
             if(lastRow < _data.count)
-                _buffer.savedScrollOffset = tableView.contentOffset.y - tableView.tableHeaderView.bounds.size.height;
+                _buffer.savedScrollOffset = floorf(tableView.contentOffset.y - tableView.tableHeaderView.bounds.size.height);
             
-            if(tableView.contentOffset.y >= (tableView.contentSize.height - (tableView.bounds.size.height - tableView.contentInset.top - tableView.contentInset.bottom))) {
+            if(floorf(tableView.contentOffset.y) >= floorf(tableView.contentSize.height - (tableView.bounds.size.height - tableView.contentInset.top - tableView.contentInset.bottom))) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
                 _bottomUnreadView.alpha = 0;
@@ -2318,7 +2318,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     _buffer.scrolledUpFrom = [[_data lastObject] eid];
                     _buffer.scrolledUp = YES;
                 }
-                _buffer.savedScrollOffset = _tableView.contentOffset.y - _tableView.tableHeaderView.bounds.size.height;
+                _buffer.savedScrollOffset = floorf(_tableView.contentOffset.y - _tableView.tableHeaderView.bounds.size.height);
                 [self refresh];
             }
         } else if(indexPath.row < _data.count) {
@@ -2375,5 +2375,61 @@ extern UIImage *__socketClosedBackgroundImage;
             }
         }
     }
+}
+
+-(NSString *)YUNoHeartbeat {
+    if(!_ready)
+        return @"Events table view not ready";
+    if(!_buffer)
+        return @"No buffer";
+    if(_requestingBacklog)
+        return @"Currently requesting backlog";
+    if([UIApplication sharedApplication].applicationState != UIApplicationStateActive)
+        return @"Application state not active";
+    if(!_topUnreadView)
+        return @"Can't find top chatter bar";
+    if(_topUnreadView.alpha != 0)
+        return @"Top chatter bar is visible";
+    if(_bottomUnreadView.alpha != 0)
+        return @"Bottom chatter bar is visible";
+    if([NetworkConnection sharedInstance].notifier)
+        return @"Connected as a notifier socket";
+    if(![self.slidingViewController topViewHasFocus])
+        return @"A drawer is open";
+    if(_conn.state != kIRCCloudStateConnected)
+        return @"Websocket not in Connected state";
+    if(_lastSeenEidPos == 0)
+        return @"New Messages marker is above the loaded backlog";
+    UITableView *tableView = _tableView;
+    NSInteger firstRow = -1;
+    NSInteger lastRow = -1;
+    NSArray *rows = [tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(tableView.bounds, tableView.contentInset)];
+    if(rows.count) {
+        firstRow = [[rows objectAtIndex:0] row];
+        lastRow = [[rows lastObject] row];
+    } else {
+        return @"Empty table view";
+    }
+    if(_lastSeenEidPos > 0 && firstRow >= _lastSeenEidPos)
+        return @"New Messages marker is above the current visible range";
+    NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
+    NSTimeInterval eid = _buffer.scrolledUpFrom;
+    if(eid <= 0) {
+        Event *last;
+        for(NSInteger i = events.count - 1; i >= 0; i--) {
+            last = [events objectAtIndex:i];
+            if(!last.pending && last.rowType != ROW_LASTSEENEID)
+                break;
+        }
+        if(!last.pending) {
+            eid = last.eid;
+        }
+    }
+    if(eid < 0 || eid < _buffer.last_seen_eid)
+        return @"eid <= last_seen_eid";
+    if(floorf(tableView.contentOffset.y) >= floorf(tableView.contentSize.height - (tableView.bounds.size.height - tableView.contentInset.top - tableView.contentInset.bottom)))
+        return @"This channel should be marked as read";
+    else
+        return @"Table view is not scrolled to the bottom";
 }
 @end

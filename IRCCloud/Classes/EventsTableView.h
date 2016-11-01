@@ -102,4 +102,5 @@
 -(void)clearLastSeenMarker;
 -(void)refresh;
 -(void)clearCachedHeights;
+-(NSString *)YUNoHeartbeat;
 @end
