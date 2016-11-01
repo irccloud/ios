@@ -40,6 +40,7 @@
 +(UIFont *)monoTimestampFont;
 +(UIFont *)awesomeFont;
 +(UIFont *)messageFont:(BOOL)mono;
++(void)emojify:(NSMutableString *)text;
 @end
 
 @interface NSString (ColorFormatter)

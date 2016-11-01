@@ -1209,6 +1209,23 @@ extern BOOL __compact;
     ColorFormatterCachedFontSize = FONT_SIZE;
 }
 
++(void)emojify:(NSMutableString *)text {
+    NSInteger offset = 0;
+    NSArray *results = [[self emoji] matchesInString:[text lowercaseString] options:0 range:NSMakeRange(0, text.length)];
+    for(NSTextCheckingResult *result in results) {
+        for(int i = 1; i < result.numberOfRanges; i++) {
+            NSRange range = [result rangeAtIndex:i];
+            range.location -= offset;
+            NSString *token = [text substringWithRange:range];
+            if([emojiMap objectForKey:token.lowercaseString]) {
+                NSString *emoji = [emojiMap objectForKey:token.lowercaseString];
+                [text replaceCharactersInRange:NSMakeRange(range.location - 1, range.length + 2) withString:emoji];
+                offset += range.length - emoji.length + 2;
+            }
+        }
+    }
+}
+
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
     if(!color)
         color = [UIColor messageTextColor];
@@ -1241,20 +1258,7 @@ extern BOOL __compact;
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", [input stringByReplacingOccurrencesOfString:@"  " withString:@"\u00A0 "], CLEAR];
     BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
     if(!disableConvert) {
-        NSInteger offset = 0;
-        NSArray *results = [[self emoji] matchesInString:[text lowercaseString] options:0 range:NSMakeRange(0, text.length)];
-        for(NSTextCheckingResult *result in results) {
-            for(int i = 1; i < result.numberOfRanges; i++) {
-                NSRange range = [result rangeAtIndex:i];
-                range.location -= offset;
-                NSString *token = [text substringWithRange:range];
-                if([emojiMap objectForKey:token.lowercaseString]) {
-                    NSString *emoji = [emojiMap objectForKey:token.lowercaseString];
-                    [text replaceCharactersInRange:NSMakeRange(range.location - 1, range.length + 2) withString:emoji];
-                    offset += range.length - emoji.length + 2;
-                }
-            }
-        }
+        [self emojify:text];
     }
     
     for(int i = 0; i < text.length; i++) {

@@ -1709,10 +1709,13 @@ extern NSDictionary *emojiMap;
             
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
             Event *e = [[Event alloc] init];
-            NSString *msg = _message.text;
+            NSMutableString *msg = _message.text.mutableCopy;
+            BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
+            if(!disableConvert)
+                [ColorFormatter emojify:msg];
             
             if([msg hasPrefix:@"//"])
-                msg = [msg substringFromIndex:1];
+                [msg deleteCharactersInRange:NSMakeRange(0, 1)];
             else if([msg hasPrefix:@"/"] && ![[msg lowercaseString] hasPrefix:@"/me "])
                 msg = nil;
             if(msg) {
@@ -1759,7 +1762,10 @@ extern NSDictionary *emojiMap;
                 [_pendingEvents addObject:e];
             [_message clearText];
             _buffer.draft = nil;
-            e.reqId = [[NetworkConnection sharedInstance] say:e.command to:_buffer.name cid:_buffer.cid];
+            msg = e.command.mutableCopy;
+            if(!disableConvert)
+                [ColorFormatter emojify:msg];
+            e.reqId = [[NetworkConnection sharedInstance] say:msg to:_buffer.name cid:_buffer.cid];
             if(e.reqId < 0)
                 e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
             CLS_LOG(@"Sending message with reqid %i", e.reqId);

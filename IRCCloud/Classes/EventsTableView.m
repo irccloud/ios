@@ -128,6 +128,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _timestamp.backgroundColor = [UIColor clearColor];
         _timestamp.textColor = [UIColor timestampColor];
         _timestamp.textAlignment = NSTextAlignmentCenter;
+        _timestamp.adjustsFontSizeToFitWidth = YES;
         [self.contentView addSubview:_timestamp];
 
         _nickname = [[LinkLabel alloc] init];
