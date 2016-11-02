@@ -111,7 +111,7 @@ open class Snapshot: NSObject {
 
     class func pathPrefix() -> NSString? {
         if let path = ProcessInfo().environment["SIMULATOR_HOST_HOME"] as NSString? {
-            return path.appendingPathComponent("Library/Caches/tools.fastlane")
+            return path.appendingPathComponent("Library/Caches/tools.fastlane") as NSString?
         }
         print("Couldn't find Snapshot configuration files at ~/Library/Caches/tools.fastlane")
         return nil

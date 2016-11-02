@@ -122,6 +122,7 @@
 		223C407C1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */; };
 		223C407D1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */; };
 		223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
+		224589C71DCA19BB00D3110A /* CollapsedEventsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 224589C61DCA19BB00D3110A /* CollapsedEventsTests.m */; };
 		2245E3771B542D0200B763D7 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2245E3761B542D0200B763D7 /* AVKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		2245E3781B542D0E00B763D7 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2245E3761B542D0200B763D7 /* AVKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22462B5218906B03009EF986 /* ServerReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22462B5118906B03009EF986 /* ServerReorderViewController.m */; };
@@ -482,6 +483,13 @@
 			remoteGlobalIDString = 221034E6197EFBAF00AB414F;
 			remoteInfo = ShareExtension;
 		};
+		224589C91DCA19BB00D3110A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 228A056B16D3DABA0029769C;
+			remoteInfo = IRCCloud;
+		};
 		22CE2AE11D2AA662001397C0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 228A056416D3DABA0029769C /* Project object */;
@@ -611,6 +619,9 @@
 		223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudSafariViewController.m; sourceTree = "<group>"; };
 		223DA90A16DFC626006FF808 /* EventsTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsTableView.h; sourceTree = "<group>"; };
 		223DA90B16DFC626006FF808 /* EventsTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsTableView.m; sourceTree = "<group>"; };
+		224589C41DCA19BB00D3110A /* IRCCloudUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IRCCloudUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		224589C61DCA19BB00D3110A /* CollapsedEventsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollapsedEventsTests.m; sourceTree = "<group>"; };
+		224589C81DCA19BB00D3110A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2245E3761B542D0200B763D7 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		22462B5018906B03009EF986 /* ServerReorderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerReorderViewController.h; sourceTree = "<group>"; };
 		22462B5118906B03009EF986 /* ServerReorderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerReorderViewController.m; sourceTree = "<group>"; };
@@ -856,6 +867,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		224589C11DCA19BB00D3110A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		225D977818AA995900065087 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -985,6 +1003,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		224589C51DCA19BB00D3110A /* IRCCloudUnitTests */ = {
+			isa = PBXGroup;
+			children = (
+				224589C61DCA19BB00D3110A /* CollapsedEventsTests.m */,
+				224589C81DCA19BB00D3110A /* Info.plist */,
+			);
+			path = IRCCloudUnitTests;
+			sourceTree = "<group>";
+		};
 		225017411783434800066E71 /* ARChromeActivity */ = {
 			isa = PBXGroup;
 			children = (
@@ -1018,6 +1045,7 @@
 				228A057516D3DABA0029769C /* IRCCloud */,
 				221034E8197EFBAF00AB414F /* ShareExtension */,
 				22CE2ADD1D2AA660001397C0 /* UITests */,
+				224589C51DCA19BB00D3110A /* IRCCloudUnitTests */,
 				228A056E16D3DABA0029769C /* Frameworks */,
 				228A056D16D3DABA0029769C /* Products */,
 			);
@@ -1031,6 +1059,7 @@
 				221034E7197EFBAF00AB414F /* ShareExtension.appex */,
 				22DB25371982DF2B0008728E /* ShareExtension Enterprise.appex */,
 				22CE2ADC1D2AA65A001397C0 /* UITests.xctest */,
+				224589C41DCA19BB00D3110A /* IRCCloudUnitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1417,6 +1446,24 @@
 			productReference = 221034E7197EFBAF00AB414F /* ShareExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		224589C31DCA19BB00D3110A /* IRCCloudUnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 224589CE1DCA19BB00D3110A /* Build configuration list for PBXNativeTarget "IRCCloudUnitTests" */;
+			buildPhases = (
+				224589C01DCA19BB00D3110A /* Sources */,
+				224589C11DCA19BB00D3110A /* Frameworks */,
+				224589C21DCA19BB00D3110A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				224589CA1DCA19BB00D3110A /* PBXTargetDependency */,
+			);
+			name = IRCCloudUnitTests;
+			productName = IRCCloudUnitTests;
+			productReference = 224589C41DCA19BB00D3110A /* IRCCloudUnitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		225D973618AA995900065087 /* IRCCloud Enterprise */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 225D979C18AA995900065087 /* Build configuration list for PBXNativeTarget "IRCCloud Enterprise" */;
@@ -1522,6 +1569,12 @@
 							};
 						};
 					};
+					224589C31DCA19BB00D3110A = {
+						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = GED45EQAGA;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 228A056B16D3DABA0029769C;
+					};
 					225D973618AA995900065087 = {
 						DevelopmentTeam = GED45EQAGA;
 						SystemCapabilities = {
@@ -1626,6 +1679,7 @@
 				221034E6197EFBAF00AB414F /* ShareExtension */,
 				22DB24FA1982DF2B0008728E /* ShareExtension Enterprise */,
 				22CE2ADB1D2AA659001397C0 /* UITests */,
+				224589C31DCA19BB00D3110A /* IRCCloudUnitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -1639,6 +1693,13 @@
 				22103527197EFCEB00AB414F /* Logo.xcassets in Resources */,
 				2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				22103528197EFCEE00AB414F /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		224589C21DCA19BB00D3110A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1828,6 +1889,14 @@
 				22C8CE041B01372100F637D2 /* zip.c in Sources */,
 				22103525197EFC6200AB414F /* WebSocketMessage.m in Sources */,
 				221034ED197EFBAF00AB414F /* ShareViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		224589C01DCA19BB00D3110A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				224589C71DCA19BB00D3110A /* CollapsedEventsTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2102,6 +2171,11 @@
 			target = 221034E6197EFBAF00AB414F /* ShareExtension */;
 			targetProxy = 221034F3197EFBAF00AB414F /* PBXContainerItemProxy */;
 		};
+		224589CA1DCA19BB00D3110A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 228A056B16D3DABA0029769C /* IRCCloud */;
+			targetProxy = 224589C91DCA19BB00D3110A /* PBXContainerItemProxy */;
+		};
 		22CE2AE21D2AA662001397C0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 228A056B16D3DABA0029769C /* IRCCloud */;
@@ -2277,6 +2351,89 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "match AppStore com.irccloud.IRCCloud.ShareExtension";
 				SKIP_INSTALL = YES;
+			};
+			name = AppStore;
+		};
+		224589CB1DCA19BB00D3110A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = GED45EQAGA;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = IRCCloudUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloudUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IRCCloud.app/IRCCloud";
+			};
+			name = Debug;
+		};
+		224589CC1DCA19BB00D3110A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = GED45EQAGA;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = IRCCloudUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloudUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IRCCloud.app/IRCCloud";
+			};
+			name = Release;
+		};
+		224589CD1DCA19BB00D3110A /* AppStore */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = GED45EQAGA;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = IRCCloudUnitTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloudUnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IRCCloud.app/IRCCloud";
 			};
 			name = AppStore;
 		};
@@ -2827,6 +2984,15 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		224589CE1DCA19BB00D3110A /* Build configuration list for PBXNativeTarget "IRCCloudUnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				224589CB1DCA19BB00D3110A /* Debug */,
+				224589CC1DCA19BB00D3110A /* Release */,
+				224589CD1DCA19BB00D3110A /* AppStore */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		225D979C18AA995900065087 /* Build configuration list for PBXNativeTarget "IRCCloud Enterprise" */ = {
 			isa = XCConfigurationList;

@@ -29,12 +29,22 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
-            skipped = "NO">
+            skipped = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "22CE2ADB1D2AA659001397C0"
                BuildableName = "UITests.xctest"
                BlueprintName = "UITests"
+               ReferencedContainer = "container:IRCCloud.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "224589C31DCA19BB00D3110A"
+               BuildableName = "IRCCloudUnitTests.xctest"
+               BlueprintName = "IRCCloudUnitTests"
                ReferencedContainer = "container:IRCCloud.xcodeproj">
             </BuildableReference>
          </TestableReference>

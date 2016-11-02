@@ -233,7 +233,7 @@
 -(CollapsedEvent *)findEvent:(NSString *)nick chan:(NSString *)chan {
     @synchronized(_data) {
         for(CollapsedEvent *event in _data) {
-            if([[event.nick lowercaseString] isEqualToString:[nick lowercaseString]] && [[event.chan lowercaseString] isEqualToString:[chan lowercaseString]])
+            if([[event.nick lowercaseString] isEqualToString:[nick lowercaseString]] && (chan == nil || event.chan == nil || [[event.chan lowercaseString] isEqualToString:[chan lowercaseString]]))
                 return event;
         }
         return nil;
