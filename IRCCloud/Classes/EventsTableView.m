@@ -741,7 +741,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)sendHeartbeat {
     if(!_heartbeatTimer)
-        _heartbeatTimer = [NSTimer scheduledTimerWithTimeInterval:1 target:self selector:@selector(_sendHeartbeat) userInfo:nil repeats:NO];
+        _heartbeatTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(_sendHeartbeat) userInfo:nil repeats:NO];
 }
 
 - (void)handleEvent:(NSNotification *)notification {
