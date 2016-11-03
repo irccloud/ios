@@ -755,7 +755,7 @@ extern NSDictionary *emojiMap;
             break;
         case kIRCEventBanList:
             o = notification.object;
-            if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name] && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
+            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
                 cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"b" param:@"bans" placeholder:@"No bans in effect.\n\nYou can ban someone by tapping their nickname in the user list, long-pressing a message, or by using /ban." bid:_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"bans"];
@@ -773,7 +773,7 @@ extern NSDictionary *emojiMap;
             break;
         case kIRCEventQuietList:
             o = notification.object;
-            if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name] && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
+            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
                 cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"q" param:@"list" placeholder:@"Empty quiet list." bid:_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"list"];
@@ -792,7 +792,7 @@ extern NSDictionary *emojiMap;
             break;
         case kIRCEventInviteList:
             o = notification.object;
-            if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name] && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
+            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
                 cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"I" param:@"list" placeholder:@"Empty invite list." bid:_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"list"];
@@ -810,7 +810,7 @@ extern NSDictionary *emojiMap;
             break;
         case kIRCEventBanExceptionList:
             o = notification.object;
-            if(o.cid == _buffer.cid && [[o objectForKey:@"channel"] isEqualToString:_buffer.name] && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
+            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
                 cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"e" param:@"exceptions" placeholder:@"Empty exception list." bid:_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"exceptions"];
