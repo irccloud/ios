@@ -684,13 +684,14 @@
                               event.monospace = YES;
                           },
                           @"callerid":^(Event *event, IRCCloudJSONObject *object) {
-                              event.msg = [event.msg stringByAppendingFormat:@" Tap to add %c%@%c to the whitelist.", BOLD, event.nick, CLEAR];
                               event.from = event.nick;
                               event.isHighlight = YES;
                               event.linkify = NO;
                               event.monospace = YES;
-                              if(object)
+                              if(object) {
                                   event.hostmask = [object objectForKey:@"usermask"];
+                                  event.msg = [event.msg stringByAppendingFormat:@" Tap to add %c%@%c to the whitelist.", BOLD, event.nick, CLEAR];
+                              }
                           },
                           @"target_callerid":^(Event *event, IRCCloudJSONObject *object) {
                               if(object)
