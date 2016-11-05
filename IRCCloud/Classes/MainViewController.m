@@ -40,7 +40,6 @@
 #import <objc/message.h>
 #import "config.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
-#import "ServerMapTableViewController.h"
 #import "FileMetadataViewController.h"
 #import "FilesTableViewController.h"
 #import "PastebinEditorViewController.h"
@@ -52,6 +51,7 @@
 #import "FontAwesome.h"
 #import "YouTubeViewController.h"
 #import "AvatarsDataSource.h"
+#import "TextTableViewController.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -529,7 +529,6 @@ extern NSDictionary *emojiMap;
     CallerIDTableViewController *citv = nil;
     WhoListTableViewController *wtv = nil;
     NamesListTableViewController *ntv = nil;
-    ServerMapTableViewController *smtv = nil;
     Event *e = nil;
     Server *s = nil;
     NSString *msg = nil;
@@ -878,6 +877,40 @@ extern NSDictionary *emojiMap;
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
+        case kIRCEventWhoSpecialResponse:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                TextTableViewController *tv = [[TextTableViewController alloc] initWithData:[o objectForKey:@"users"]];
+                tv.navigationItem.title = [NSString stringWithFormat:@"WHO For %@", [o objectForKey:@"subject"]];
+                tv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                if(self.presentedViewController)
+                    [self dismissViewControllerAnimated:NO completion:nil];
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventModulesList:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                TextTableViewController *tv = [[TextTableViewController alloc] initWithData:[o objectForKey:@"modules"]];
+                tv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                tv.navigationItem.title = [NSString stringWithFormat:@"Modules list for %@", tv.server.hostname];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                if(self.presentedViewController)
+                    [self dismissViewControllerAnimated:NO completion:nil];
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
         case kIRCEventNamesList:
             o = notification.object;
             if(o.cid == _buffer.cid) {
@@ -898,8 +931,8 @@ extern NSDictionary *emojiMap;
         case kIRCEventServerMap:
             o = notification.object;
             if(o.cid == _buffer.cid) {
-                smtv = [[ServerMapTableViewController alloc] initWithStyle:UITableViewStylePlain];
-                smtv.event = o;
+                TextTableViewController *smtv = [[TextTableViewController alloc] initWithData:[o objectForKey:@"servers"]];
+                smtv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
                 smtv.navigationItem.title = @"Server Map";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:smtv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];

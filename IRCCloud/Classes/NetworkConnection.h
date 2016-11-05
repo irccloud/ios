@@ -88,6 +88,8 @@ typedef enum {
     kIRCEventQuietList,
     kIRCEventBanExceptionList,
     kIRCEventInviteList,
+    kIRCEventWhoSpecialResponse,
+    kIRCEventModulesList,
     kIRCEventFailureMsg,
     kIRCEventSuccess,
     kIRCEventAlert

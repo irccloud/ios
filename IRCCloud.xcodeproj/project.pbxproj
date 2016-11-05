@@ -230,6 +230,8 @@
 		22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		226EB6011B4C2E8600C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
 		226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
+		2271FDA11DCDF45C00A39F84 /* TextTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */; };
+		2271FDA21DCDF45C00A39F84 /* TextTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
 		227C63BA1C7B8C4800B674D6 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A1F1141C232B3A00AEC09A /* SafariServices.framework */; };
 		227DA89E1CF381B60041B1BF /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 227DA89D1CF381B60041B1BF /* CoreTelephony.framework */; };
@@ -284,8 +286,6 @@
 		228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
 		228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */; };
 		2292AD591D5B55CC00BEE269 /* LinkLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE91781D59160B0014B25C /* LinkLabel.m */; };
-		2293907B19D754D600A73946 /* ServerMapTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293907A19D754D600A73946 /* ServerMapTableViewController.m */; };
-		2293907C19D754D600A73946 /* ServerMapTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293907A19D754D600A73946 /* ServerMapTableViewController.m */; };
 		2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
 		229C85411B502920004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
 		229C85421B50292D004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
@@ -655,6 +655,8 @@
 		22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollapsedEvents.h; sourceTree = "<group>"; };
 		22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollapsedEvents.m; sourceTree = "<group>"; };
 		226EB6001B4C2E8600C432C7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		2271FD9F1DCDF45C00A39F84 /* TextTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextTableViewController.h; sourceTree = "<group>"; };
+		2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextTableViewController.m; sourceTree = "<group>"; };
 		2274F49D1756723F0039B4CB /* OpenInChromeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInChromeController.h; path = OpenInChrome/OpenInChromeController.h; sourceTree = SOURCE_ROOT; };
 		2274F49E1756723F0039B4CB /* OpenInChromeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OpenInChromeController.m; path = OpenInChrome/OpenInChromeController.m; sourceTree = SOURCE_ROOT; };
 		227DA89D1CF381B60041B1BF /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
@@ -711,8 +713,6 @@
 		228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonWriter.m; sourceTree = "<group>"; };
 		228EFBC6177B4F6000B83A4C /* DisplayOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayOptionsViewController.h; sourceTree = "<group>"; };
 		228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayOptionsViewController.m; sourceTree = "<group>"; };
-		2293907919D754D600A73946 /* ServerMapTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServerMapTableViewController.h; sourceTree = "<group>"; };
-		2293907A19D754D600A73946 /* ServerMapTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerMapTableViewController.m; sourceTree = "<group>"; };
 		2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURL+IDN.m"; path = "NSURL+IDN/NSURL+IDN.m"; sourceTree = SOURCE_ROOT; };
 		2293AF0017F9CCD10022BD06 /* NSURL+IDN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+IDN.h"; path = "NSURL+IDN/NSURL+IDN.h"; sourceTree = SOURCE_ROOT; };
 		2296E0B619805751002D59E3 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareExtension.entitlements; sourceTree = "<group>"; };
@@ -1233,8 +1233,6 @@
 				22C2E0561B0E2E4800387B4B /* PastebinViewController.m */,
 				22BB94A91D425A4E00BFB6F0 /* SamlLoginViewController.h */,
 				22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */,
-				2293907919D754D600A73946 /* ServerMapTableViewController.h */,
-				2293907A19D754D600A73946 /* ServerMapTableViewController.m */,
 				22462B5018906B03009EF986 /* ServerReorderViewController.h */,
 				22462B5118906B03009EF986 /* ServerReorderViewController.m */,
 				2236F5F816DA765C007BE535 /* ServersDataSource.h */,
@@ -1243,6 +1241,8 @@
 				227FF8221772063F00394114 /* SettingsViewController.m */,
 				22D268C41BF4F95200B682AE /* SplashViewController.h */,
 				22D268C51BF4F95200B682AE /* SplashViewController.m */,
+				2271FD9F1DCDF45C00A39F84 /* TextTableViewController.h */,
+				2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */,
 				2236F63A16DBF3CA007BE535 /* UIColor+IRCCloud.h */,
 				2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */,
 				22A19C5E178FCCAB00772C60 /* UINavigationController+iPadSux.h */,
@@ -1978,7 +1978,6 @@
 				225D976918AA995900065087 /* OpenInChromeController.m in Sources */,
 				225D976A18AA995900065087 /* ChannelInfoViewController.m in Sources */,
 				22C8CDF71B01372100F637D2 /* ioapi.c in Sources */,
-				2293907C19D754D600A73946 /* ServerMapTableViewController.m in Sources */,
 				22C8CDFB1B01372100F637D2 /* mztools.c in Sources */,
 				225D976B18AA995900065087 /* ImageViewController.m in Sources */,
 				225D976C18AA995900065087 /* UIImage+animatedGIF.m in Sources */,
@@ -1996,6 +1995,7 @@
 				225D977518AA995900065087 /* WhoListTableViewController.m in Sources */,
 				225D977618AA995900065087 /* NamesListTableViewController.m in Sources */,
 				228E2B8C18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */,
+				2271FDA21DCDF45C00A39F84 /* TextTableViewController.m in Sources */,
 				225D977718AA995900065087 /* UINavigationController+iPadSux.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2078,7 +2078,6 @@
 				2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */,
 				2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
 				22C8CDF61B01372100F637D2 /* ioapi.c in Sources */,
-				2293907B19D754D600A73946 /* ServerMapTableViewController.m in Sources */,
 				22C8CDFA1B01372100F637D2 /* mztools.c in Sources */,
 				2223C6AA1768D7150032544B /* ImageViewController.m in Sources */,
 				2223C6B01768F36F0032544B /* UIImage+animatedGIF.m in Sources */,
@@ -2096,6 +2095,7 @@
 				22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */,
 				22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */,
 				228E2B8A18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */,
+				2271FDA11DCDF45C00A39F84 /* TextTableViewController.m in Sources */,
 				22A19C60178FCCAC00772C60 /* UINavigationController+iPadSux.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2993,6 +2993,7 @@
 				224589CD1DCA19BB00D3110A /* AppStore */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		225D979C18AA995900065087 /* Build configuration list for PBXNativeTarget "IRCCloud Enterprise" */ = {
 			isa = XCConfigurationList;

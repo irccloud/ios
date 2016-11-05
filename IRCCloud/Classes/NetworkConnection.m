@@ -641,6 +641,14 @@ volatile BOOL __socketPaused = NO;
                        if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventServerMap];
                    },
+                   @"who_special_response": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       if(!backlog && !_resuming)
+                           [self postObject:object forEvent:kIRCEventWhoSpecialResponse];
+                   },
+                   @"modules_list": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       if(!backlog && !_resuming)
+                           [self postObject:object forEvent:kIRCEventModulesList];
+                   },
                    @"connection_deleted": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        [_servers removeAllDataForServer:object.cid];
                        if(!backlog && !_resuming)
