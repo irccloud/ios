@@ -113,6 +113,7 @@ UIColor *__archivedBufferHighlightColor;
 UIColor *__selectedArchivedBufferHighlightColor;
 UIColor *__selectedArchivedBufferBackgroundColor;
 UIColor *__selfNickColor;
+UIColor *__socketClosedBarColor;
 
 UIColor *__mIRCColors_BG[16];
 UIColor *__mIRCColors_FG[16];
@@ -345,6 +346,7 @@ BOOL __compact = NO;
         __membersHeadingColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
         
         __selfNickColor = [UIColor colorWithRed:0.08 green:0.17 blue:0.26 alpha:1.0];
+        __socketClosedBarColor = __timestampColor;
 
         [[UITableView appearance] setBackgroundColor:[UIColor colorWithRed:0.937 green:0.937 blue:0.957 alpha:1]];
         [[UITableView appearance] setSeparatorColor:nil];
@@ -554,6 +556,7 @@ BOOL __compact = NO;
         __archivedBufferHighlightColor = color_background5;
         __selectedArchivedBufferHighlightColor = color_text6;
         __selectedArchivedBufferBackgroundColor = color_text6;
+        __socketClosedBarColor = color_border5;
 
         __opersBorderColor = [UIColor colorWithHue:30.0/360.0 saturation:0.85 lightness:0.25 alpha:1.0];
         __ownersBorderColor = [UIColor colorWithHue:47.0/360.0 saturation:0.68 lightness:0.25 alpha:1.0];
@@ -827,7 +830,7 @@ BOOL __compact = NO;
         CGContextSetFillColorWithColor(context, [self contentBackgroundColor].CGColor);
         CGContextFillRect(context, CGRectMake(0,0,width,height));
         CGContextSetLineCap(context, kCGLineCapSquare);
-        CGContextSetStrokeColorWithColor(context, [UIColor timestampColor].CGColor);
+        CGContextSetStrokeColorWithColor(context, __socketClosedBarColor.CGColor);
         CGContextSetLineWidth(context, 1.0);
         CGContextMoveToPoint(context, 0.0, height / 2 - 1);
         CGContextAddLineToPoint(context, width, height / 2 - 1);
