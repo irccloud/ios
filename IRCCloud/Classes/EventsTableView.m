@@ -190,13 +190,13 @@ extern UIImage *__socketClosedBackgroundImage;
     
     if(_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED) {
         frame.origin.x = (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?6:16;
-        frame.origin.y = 0;
+        frame.origin.y = __compact ? 0 : (FONT_SIZE > 13 ? 2 : 1);
         frame.size.height -= __compact ? 4 : 0;
         frame.size.width -= frame.origin.x + 6;
         if(!__chatOneLinePref && !__avatarsOffPref) {
             _avatar.frame = CGRectMake(
                                        frame.origin.x + 4,
-                                       frame.origin.y + (__compact ? 1 : 2),
+                                       frame.origin.y + (FONT_SIZE > 13 ? (__compact ? 3 : 2) : (__compact ? 2 : 1)),
                                        __largeAvatarHeight,
                                        __largeAvatarHeight
                                        );
@@ -1476,7 +1476,7 @@ extern UIImage *__socketClosedBackgroundImage;
             if([[prefs objectForKey:@"expandJoinPart"] boolValue] || (expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
                 __expandJoinPartPref = YES;
         }
-        __largeAvatarHeight = MIN(32, roundf(FONT_SIZE * 2) + (__compact ? 3 : 6));
+        __largeAvatarHeight = MIN(32, roundf(FONT_SIZE * 2) + (__compact ? 1 : 6));
         if(__monospacePref)
             _groupIndent = @"  ";
         else
