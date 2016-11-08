@@ -63,6 +63,7 @@ UIColor *__noticeBackgroundColor;
 UIColor *__timestampBackgroundColor;
 UIColor *__newMsgsBackgroundColor;
 UIColor *__collapsedRowTextColor;
+UIColor *__collapsedRowNickColor;
 UIColor *__collapsedHeadingBackgroundColor;
 UIColor *__navBarColor;
 UIColor *__navBarHeadingColor;
@@ -284,6 +285,7 @@ BOOL __compact = NO;
         __statusBackgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
         __noticeBackgroundColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
         __collapsedRowTextColor = [UIColor colorWithWhite:0.686 alpha:1.0];
+        __collapsedRowNickColor = [UIColor colorWithWhite:0.33 alpha:1.0];
         __collapsedHeadingBackgroundColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
         __navBarColor = [UIColor colorWithRed:0.949 green:0.969 blue:0.988 alpha:1];
         __navBarBorderColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
@@ -522,7 +524,8 @@ BOOL __compact = NO;
         __timestampBackgroundColor = color_background6;
         __statusBackgroundColor = color_background6a;
         __noticeBackgroundColor = color_background5a;
-        __collapsedRowTextColor = color_text7;
+        __collapsedRowTextColor = color_text12;
+        __collapsedRowNickColor = color_text7;
         __collapsedHeadingBackgroundColor = color_background6;
         __navBarColor = color_background5;
         __navBarBorderColor = color_border10;
@@ -848,6 +851,9 @@ BOOL __compact = NO;
 +(UIColor *)collapsedRowTextColor {
     return __collapsedRowTextColor;
 }
++(UIColor *)collapsedRowNickColor {
+    return __collapsedRowNickColor;
+}
 +(UIColor *)collapsedHeadingBackgroundColor {
     return __collapsedHeadingBackgroundColor;
 }
@@ -1106,5 +1112,13 @@ BOOL __compact = NO;
 }
 +(UIColor *)selfNickColor {
     return __selfNickColor;
+}
+-(NSString *)toHexString {
+    CGFloat r,g,b;
+    
+    [self getRed:&r green:&g blue:&b alpha:nil];
+    
+    
+    return [NSString stringWithFormat:@"%02x%02x%02x", (int)(255.0 * r), (int)(255.0 * g), (int)(255.0 * b)];
 }
 @end

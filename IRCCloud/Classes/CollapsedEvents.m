@@ -475,7 +475,7 @@
     }
     
     if(output.length)
-        output = [NSString stringWithFormat:@" (%@)", output];
+        output = [NSString stringWithFormat:@" (%c%@%@%c)", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, output, CLEAR];
     
     return output;
 }
@@ -493,7 +493,7 @@
                     output = [e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "];
                     break;
                 case kCollapsedEventMode:
-                    output = [NSString stringWithFormat:@"%@ was %@", [self formatNick:e.nick mode:e.targetMode colorize:NO], [e modes:YES mode_modes:_mode_modes]];
+                    output = [NSString stringWithFormat:@"%c%@%@%c was %@", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.targetMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR, [e modes:YES mode_modes:_mode_modes]];
                     if(e.fromNick) {
                         if([e.fromMode isEqualToString:@"__the_server__"])
                             output = [output stringByAppendingFormat:@" by the server %c%@%c", BOLD, e.fromNick, CLEAR];
@@ -503,35 +503,35 @@
                     break;
                 case kCollapsedEventJoin:
                     if(_showChan)
-                        output = [NSString stringWithFormat:@"→\U0000FE0E %@%@ joined %@ (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.chan, e.hostname];
+                        output = [NSString stringWithFormat:@"%c%@→\U0000FE0E %@%c%@ joined %@ (%@)", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR, [self was:e], e.chan, e.hostname];
                     else
-                        output = [NSString stringWithFormat:@"→\U0000FE0E %@%@ joined (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.hostname];
+                        output = [NSString stringWithFormat:@"%c%@→\U0000FE0E %@%c%@ joined (%@)", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR, [self was:e], e.hostname];
                     break;
                 case kCollapsedEventPart:
                     if(_showChan)
-                        output = [NSString stringWithFormat:@"←\U0000FE0E %@%@ left %@ (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.chan, e.hostname];
+                        output = [NSString stringWithFormat:@"%c%@←\U0000FE0E %@%c%@ left %@ (%@)", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR, [self was:e], e.chan, e.hostname];
                     else
-                        output = [NSString stringWithFormat:@"←\U0000FE0E %@%@ left (%@)", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e], e.hostname];
+                        output = [NSString stringWithFormat:@"%c%@←\U0000FE0E %@%c%@ left (%@)", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR, [self was:e], e.hostname];
                     if(e.msg.length > 0)
                         output = [output stringByAppendingFormat:@": %@", e.msg];
                     break;
                 case kCollapsedEventQuit:
-                    output = [NSString stringWithFormat:@"⇐\U0000FE0E %@%@ quit", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
+                    output = [NSString stringWithFormat:@"%c%@⇐\U0000FE0E %@%c%@ qt", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR, [self was:e]];
                     if(e.hostname.length > 0)
                         output = [output stringByAppendingFormat:@" (%@)", e.hostname];
                     if(e.msg.length > 0)
                         output = [output stringByAppendingFormat:@": %@", e.msg];
                     break;
                 case kCollapsedEventNickChange:
-                    output = [NSString stringWithFormat:@"%@ →\U0000FE0E %@", e.oldNick, [self formatNick:e.nick mode:e.fromMode colorize:NO]];
+                    output = [NSString stringWithFormat:@"%@ %c%@→\U0000FE0E %@%c", e.oldNick, COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR];
                     break;
                 case kCollapsedEventPopIn:
-                    output = [NSString stringWithFormat:@"↔\U0000FE0E %@%@ popped in", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
+                    output = [NSString stringWithFormat:@"%c%@↔\U0000FE0E %@%c%@ popped in", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR, [self was:e]];
                     if(_showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
                 case kCollapsedEventPopOut:
-                    output = [NSString stringWithFormat:@"↔\U0000FE0E %@%@ nipped out", [self formatNick:e.nick mode:e.fromMode colorize:NO], [self was:e]];
+                    output = [NSString stringWithFormat:@"%c%@↔\U0000FE0E %@%c%@ nipped out", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR, [self was:e]];
                     if(_showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
@@ -574,16 +574,16 @@
                         case kCollapsedEventMode:
                             if(message.length)
                                 [message appendString:@"• "];
-                            [message appendString:@"mode: "];
+                            [message appendFormat:@"%c%@mode: %c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, CLEAR];
                             break;
                         case kCollapsedEventJoin:
-                            [message appendString:@"→\U0000FE0E "];
+                            [message appendFormat:@"%c%@→\U0000FE0E %c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, CLEAR];
                             break;
                         case kCollapsedEventPart:
-                            [message appendString:@"←\U0000FE0E "];
+                            [message appendFormat:@"%c%@←\U0000FE0E %c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, CLEAR];
                             break;
                         case kCollapsedEventQuit:
-                            [message appendString:@"⇐\U0000FE0E "];
+                            [message appendFormat:@"%c%@⇐\U0000FE0E %c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, CLEAR];
                             break;
                         case kCollapsedEventNickChange:
                             if(message.length)
@@ -591,7 +591,7 @@
                             break;
                         case kCollapsedEventPopIn:
                         case kCollapsedEventPopOut:
-                            [message appendString:@"↔\U0000FE0E "];
+                            [message appendFormat:@"%c%@↔\U0000FE0E %c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, CLEAR];
                             break;
                         case kCollapsedEventConnectionStatus:
                             break;
@@ -599,7 +599,7 @@
                 }
                 
                 if(e.type == kCollapsedEventNickChange) {
-                    [message appendFormat:@"%@ →\U0000FE0E %@", e.oldNick, [self formatNick:e.nick mode:e.fromMode colorize:NO]];
+                    [message appendFormat:@"%@ %c%@→\U0000FE0E %@%c", e.oldNick, COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR];
                     [message appendString:[self was:e]];
                 } else if(e.type == kCollapsedEventNetSplit) {
                     [message appendString:[e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮\U0000FE0E "]];
@@ -610,7 +610,7 @@
                             [message appendFormat:@" (x%i)", e.count];
                     }
                 } else if(!_showChan) {
-                    [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO]];
+                    [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString]];
                     [message appendString:[self was:e]];
                 }
                 

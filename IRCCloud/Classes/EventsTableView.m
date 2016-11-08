@@ -917,13 +917,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 [_collapsedEvents clear];
             }
 
-            if((_currentCollapsedEid == event.eid || [_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) && [event.type isEqualToString:@"user_channel_mode"]) {
-                event.color = [UIColor messageTextColor];
-                event.bgColor = [UIColor contentBackgroundColor];
-            } else {
-                event.color = [UIColor collapsedRowTextColor];
-                event.bgColor = [UIColor contentBackgroundColor];
-            }
+            event.color = [UIColor collapsedRowTextColor];
+            event.bgColor = [UIColor contentBackgroundColor];
             
             NSString *msg;
             if([_expandedSectionEids objectForKey:@(_currentCollapsedEid)]) {
@@ -1739,7 +1734,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if(e.from.length)
             e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf) defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43"] defaultColor:e.color mono:__monospacePref linkify:NO server:nil links:nil];
         if([e.realname isKindOfClass:[NSString class]] && e.realname.length) {
-            e.formattedRealname = [ColorFormatter format:e.realname defaultColor:[UIColor timestampColor] mono:__monospacePref linkify:YES server:_server links:&links];
+            e.formattedRealname = [ColorFormatter format:e.realname defaultColor:[UIColor collapsedRowTextColor] mono:__monospacePref linkify:YES server:_server links:&links];
             e.realnameLinks = links;
             links = nil;
         }

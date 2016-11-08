@@ -65,6 +65,7 @@
 +(UIColor *)noticeBackgroundColor;
 +(UIColor *)timestampBackgroundColor;
 +(UIColor *)collapsedRowTextColor;
++(UIColor *)collapsedRowNickColor;
 +(UIColor *)collapsedHeadingBackgroundColor;
 +(UIColor *)navBarColor;
 +(UIColor *)navBarHeadingColor;
@@ -121,4 +122,5 @@
 +(NSDictionary *)linkAttributes;
 +(NSDictionary *)lightLinkAttributes;
 +(UIColor *)selfNickColor;
+-(NSString *)toHexString;
 @end
