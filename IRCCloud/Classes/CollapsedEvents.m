@@ -516,7 +516,7 @@
                         output = [output stringByAppendingFormat:@": %@", e.msg];
                     break;
                 case kCollapsedEventQuit:
-                    output = [NSString stringWithFormat:@"%c%@⇐\U0000FE0E %@%c%@ qt", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR, [self was:e]];
+                    output = [NSString stringWithFormat:@"%c%@⇐\U0000FE0E %@%c%@ quit", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], CLEAR, [self was:e]];
                     if(e.hostname.length > 0)
                         output = [output stringByAppendingFormat:@" (%@)", e.hostname];
                     if(e.msg.length > 0)
