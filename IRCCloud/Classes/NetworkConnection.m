@@ -379,12 +379,22 @@ volatile BOOL __socketPaused = NO;
         [_events addJSONObject:object];
         if(!backlog) {
             [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+            if(!_resuming)
+                [self postObject:object forEvent:kIRCEventPart];
             if([object.type isEqualToString:@"you_parted_channel"]) {
                 [_channels removeChannelForBuffer:object.bid];
                 [_users removeUsersForBuffer:object.bid];
+                Event *e = [[Event alloc] init];
+                e.cid = object.cid;
+                e.bid = object.bid;
+                e.eid = object.eid + 1;
+                e.type = @"__you_parted_marker__";
+                e.rowType = ROW_SOCKETCLOSED;
+                
+                [_events addEvent:e];
+                if(!_resuming)
+                    [self postObject:e forEvent:kIRCEventBufferMsg];
             }
-            if(!_resuming)
-                [self postObject:object forEvent:kIRCEventPart];
         }
     };
     
