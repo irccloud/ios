@@ -1047,11 +1047,11 @@ extern UIImage *__socketClosedBackgroundImage;
                 if(event.from.length && __chatOneLinePref)
                     event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.formattedMsg];
             } else if([type isEqualToString:@"kicked_channel"]) {
-                event.formattedMsg = @"← ";
+                event.formattedMsg = [NSString stringWithFormat:@"%c%@← ", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString];
                 if([event.type hasPrefix:@"you_"])
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@"You"];
                 else
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c", BOLD, event.oldNick, CLEAR];
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%@%c", event.oldNick, CLEAR];
                 if(event.hostmask && event.hostmask.length)
                     event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" (%@)", event.hostmask];
                 if([event.type hasPrefix:@"you_"])
@@ -1059,9 +1059,9 @@ extern UIImage *__socketClosedBackgroundImage;
                 else
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
                 if(event.hostmask && event.hostmask.length)
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO]];
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO]];
                 else
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by the server %c%@%c", BOLD, event.nick, CLEAR];
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by the server %c%@%@%c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, event.nick, CLEAR];
                 if(event.msg.length > 0 && ![event.msg isEqualToString:event.nick])
                     event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", event.msg];
             } else if([type isEqualToString:@"channel_mode_list_change"]) {
