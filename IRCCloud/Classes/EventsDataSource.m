@@ -815,6 +815,18 @@
                                   event.from = [object objectForKey:@"charset"];
                               event.monospace = YES;
                           },
+                          @"you_parted_channel":^(Event *event, IRCCloudJSONObject *object) {
+                              if(object) {
+                                  Event *e = [[Event alloc] init];
+                                  e.cid = object.cid;
+                                  e.bid = object.bid;
+                                  e.eid = object.eid + 1;
+                                  e.type = @"__you_parted_marker__";
+                                  e.rowType = ROW_SOCKETCLOSED;
+                                  
+                                  [self addEvent:e];
+                              }
+                          },
       };
     }
     return self;
