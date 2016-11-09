@@ -322,8 +322,8 @@
 
 - (void)testModeMode2 {
     [self addMode:@"o" nick:@"sam" from:@"ChanServ" channel:@"#test"];
-    [self addMode:@"o" nick:@"sam" from:@"ChanServ" channel:@"#test"];
-    AssertEvents(@"mode: • sam (opped; voiced)");
+    [self addMode:@"v" nick:@"sam" from:@"ChanServ" channel:@"#test"];
+    AssertEvents(@"mode: • sam (opped, voiced)");
 }
 
 - (void)testModeNickchange {
