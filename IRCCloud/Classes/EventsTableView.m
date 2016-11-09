@@ -904,7 +904,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
             }
             
-            if(_currentCollapsedEid == -1 || ![[_formatter stringFromDate:date] isEqualToString:_lastCollpasedDay] || __expandJoinPartPref) {
+            if(_currentCollapsedEid == -1 || ![[_formatter stringFromDate:date] isEqualToString:_lastCollpasedDay] || __expandJoinPartPref || [event.type isEqualToString:@"you_parted_channel"]) {
                 [_collapsedEvents clear];
                 _currentCollapsedEid = eid;
                 _lastCollpasedDay = [_formatter stringFromDate:date];
@@ -984,7 +984,7 @@ extern UIImage *__socketClosedBackgroundImage;
             event.formatted = nil;
             event.linkify = NO;
             _lastCollapsedEid = event.eid;
-            if([_buffer.type isEqualToString:@"console"] && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"] && ![type isEqualToString:@"connecting_cancelled"]) {
+            if(([_buffer.type isEqualToString:@"console"] && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"] && ![type isEqualToString:@"connecting_cancelled"]) || [event.type isEqualToString:@"you_parted_channel"]) {
                 _currentCollapsedEid = -1;
                 _lastCollapsedEid = -1;
                 [_collapsedEvents clear];

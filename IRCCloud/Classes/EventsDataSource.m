@@ -815,6 +815,9 @@
                                   event.from = [object objectForKey:@"charset"];
                               event.monospace = YES;
                           },
+                          @"you_parted_channel":^(Event *event, IRCCloudJSONObject *object) {
+                              event.rowType = ROW_SOCKETCLOSED;
+                          },
       };
     }
     return self;
