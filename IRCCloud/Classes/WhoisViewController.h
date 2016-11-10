@@ -23,5 +23,5 @@
     UIScrollView *_scrollView;
     LinkTextView *_label;
 }
--(id)initWithJSONObject:(IRCCloudJSONObject*)object;
+-(void)setData:(IRCCloudJSONObject*)object;
 @end

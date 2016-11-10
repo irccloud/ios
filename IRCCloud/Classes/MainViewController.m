@@ -543,15 +543,23 @@ extern NSDictionary *emojiMap;
             break;
         case kIRCEventWhois:
         {
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:[[WhoisViewController alloc] initWithJSONObject:notification.object]];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            if(self.presentedViewController)
-                [self dismissViewControllerAnimated:NO completion:nil];
-            [self presentViewController:nc animated:YES completion:nil];
+            if([self.presentedViewController isKindOfClass:UINavigationController.class] && [((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:WhoisViewController.class]) {
+                WhoisViewController *wvc = (WhoisViewController *)(((UINavigationController *)self.presentedViewController).topViewController);
+                [wvc setData:notification.object];
+            } else {
+                WhoisViewController *wvc = [[WhoisViewController alloc] init];
+                [wvc setData:notification.object];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:wvc];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                
+                if(self.presentedViewController)
+                    [self dismissViewControllerAnimated:NO completion:nil];
+                [self presentViewController:nc animated:YES completion:nil];
+            }
         }
             break;
         case kIRCEventChannelTopicIs:
