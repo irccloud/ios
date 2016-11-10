@@ -220,8 +220,8 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         [_accessory sizeToFit];
         if(_type == ROW_SOCKETCLOSED) {
-            frame.size.height -= __socketClosedBackgroundImage.size.height;
-            _socketClosedBar.frame = CGRectMake(0,self.contentView.bounds.size.height - __socketClosedBackgroundImage.size.height, self.contentView.bounds.size.width, __socketClosedBackgroundImage.size.height);
+            frame.size.height -= (FONT_SIZE-2);
+            _socketClosedBar.frame = CGRectMake(0,self.contentView.bounds.size.height - (FONT_SIZE-2), self.contentView.bounds.size.width, (FONT_SIZE-2));
             _socketClosedBar.hidden = NO;
             _socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
             _accessory.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 2 + _accessoryOffset, _accessory.frame.size.width, _accessory.frame.size.height);
@@ -1815,7 +1815,7 @@ extern UIImage *__socketClosedBackgroundImage;
     if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
         estimatedWidth -= 4;
     
-    e.height = floorf([LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + ((e.rowType == ROW_SOCKETCLOSED)?__socketClosedBackgroundImage.size.height:0));
+    e.height = floorf([LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0));
     if(!__compact)
         e.height += MESSAGE_LINE_PADDING;
     e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
@@ -1840,7 +1840,7 @@ extern UIImage *__socketClosedBackgroundImage;
     @synchronized (e) {
         if(e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
             if(e.rowType == ROW_SOCKETCLOSED && e.msg.length == 0) {
-                return __socketClosedBackgroundImage.size.height;
+                return (FONT_SIZE-2);
             } else if(e.formatted != nil && e.height > 0) {
                 //NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
                 return e.height;
