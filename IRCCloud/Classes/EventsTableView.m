@@ -1839,7 +1839,7 @@ extern UIImage *__socketClosedBackgroundImage;
     [_lock unlock];
     @synchronized (e) {
         if(e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
-            if(e.rowType == ROW_SOCKETCLOSED && e.msg.length == 0) {
+            if(e.rowType == ROW_SOCKETCLOSED && e.formattedMsg.length == 0) {
                 return (FONT_SIZE-2);
             } else if(e.formatted != nil && e.height > 0) {
                 //NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
