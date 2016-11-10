@@ -18,6 +18,7 @@
 #import "NotificationsDataSource.h"
 #import "BuffersDataSource.h"
 #import "EventsDataSource.h"
+#import "NetworkConnection.h"
 
 @implementation NotificationsDataSource
 +(NotificationsDataSource *)sharedInstance {
@@ -221,8 +222,12 @@
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 NSUInteger count = 0;
                 NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
+                NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
                 for(Buffer *b in buffers) {
-                    count += [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                    int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+                    if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                        highlights = 0;
+                    count += highlights;
                 }
                 if(notifications.count > count)
                     count = notifications.count;
