@@ -489,6 +489,11 @@
     [self connection:_connection didSendBodyData:(NSInteger)bytesSent totalBytesWritten:(NSInteger)totalBytesSent totalBytesExpectedToWrite:(NSInteger)_body.length];
 }
 
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
+    CLS_LOG(@"Got HTTP redirect to: %@ %@", request.URL, response);
+    completionHandler(request);
+}
+
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
     _response = [NSData dataWithContentsOfURL:location].mutableCopy;
     CLS_LOG(@"Did finish downloading to URL: %@", location);
