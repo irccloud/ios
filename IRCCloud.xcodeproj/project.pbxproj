@@ -1812,7 +1812,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "CRASHLYTICS_TOKEN=`grep CRASHLYTICS_TOKEN $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nCRASHLYTICS_SECRET=`grep CRASHLYTICS_SECRET $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nif [ -n \"$CRASHLYTICS_TOKEN\" ] && [[ $SDK_NAME != iphonesimulator* ]]; then ./Fabric.framework/run $CRASHLYTICS_TOKEN $CRASHLYTICS_SECRET; fi";
+			shellScript = "$SRCROOT/build-scripts/crashlytics.sh";
 		};
 		2200DB4E18BCF97B00343583 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1838,7 +1838,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [ $CONFIGURATION == \"AppStore\" ]; then\n    bN=$(/usr/libexec/PlistBuddy -c \"Print CFBundleShortVersionString\" $PROJECT_DIR/IRCCloud/IRCCloud-Info.plist)\nelse\n    bN=$(/usr/bin/git rev-parse --short HEAD)\nfi\necho -n \"#define GIT_VERSION \" > $PROJECT_DIR/IRCCloud/InfoPlist.h\necho $bN >> $PROJECT_DIR/IRCCloud/InfoPlist.h\n\nCRASHLYTICS_TOKEN=`grep CRASHLYTICS_TOKEN $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nif [ -n \"$CRASHLYTICS_TOKEN\" ]; then\n    echo -n \"#define FABRIC_API_KEY \" >> $PROJECT_DIR/IRCCloud/InfoPlist.h\n    echo $CRASHLYTICS_TOKEN >> $PROJECT_DIR/IRCCloud/InfoPlist.h\nfi\n\ntouch $PROJECT_DIR/IRCCloud/IRCCloud-Info.plist\ntouch $PROJECT_DIR/IRCCloud/IRCCloud-Enterprise-Info.plist\ntouch $PROJECT_DIR/ShareExtension/Info.plist\ntouch $PROJECT_DIR/ShareExtension/Info-Enterprise.plist";
+			shellScript = "$SRCROOT/build-scripts/git-revision.sh";
 		};
 /* End PBXShellScriptBuildPhase section */
 
