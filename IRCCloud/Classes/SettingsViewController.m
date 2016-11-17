@@ -369,7 +369,7 @@
         [previews addObject:v];
         
         v = [[UIView alloc] initWithFrame:CGRectZero];
-        v.backgroundColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:1];
+        v.backgroundColor = [UIColor blackColor];
         v.layer.borderColor = [UIColor blackColor].CGColor;
         v.layer.borderWidth = 1.0f;
         [previews addObject:v];
