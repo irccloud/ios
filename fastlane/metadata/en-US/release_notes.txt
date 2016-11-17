@@ -1,10 +1,19 @@
-• iOS 10: Highlights in other channels will now show a notification banner while using the app
-• New monospace font
-• Turning off the "Unread message indicator" setting globally no longer disables private message indicators. You can still turn them off individually
-• Improved sharing links from the App Store and other apps that include an image along with a URL
-• Improved support for imgur gallery URLs
-• Text in channel topic and whois responses can now be selected
-• Fixed a crash when browsing the photo library on iOS 10
-• Fixed the 'Invite to Channel' dialog
-• Fixed issues with channels being marked as read (or not in certain cases)
+New theme: Midnight. This is a variant of the ash theme that uses a pure black background and is being made available on all platforms at the same time.
+
+---
+
+The compact spacing setting from the web app is now available on iOS. With this change we've also adjusted the default spacing to more closely match the web app. It's wider than in 3.3, not as wide as it was in 3.2, but hopefully more consistent and readable overall.
+
+---
+
+More changes:
+• Added support for pasting images from the clipboard, useful for custom image keyboards
+• Added settings to disable the built-in image viewer and video player
+• Fixed some issues with innacurate unread markers and notifiation badges
+• Fixed a crash when recording video on iOS 10
+• Improved imgur support
+• Fixed tapping channels in the /list dialog
+• Fixed pastebin/file uploads to respect the auto-capitalization setting.
+• Improved coloured message formatting on dark themes
+• Improved the appearance of collapsed joins/parts/quits/mode changes
 • Stability improvements, and minor fixes

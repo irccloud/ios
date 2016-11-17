@@ -7,7 +7,7 @@ Chat on IRC from anywhere, and never miss a message.
 • Get push notifications for mentions and private messages.
 • Upload and share photos, videos and files straight from your device.
 • Full support for iPhone and iPad.
-• Choose from 8 colourful themes.
+• Choose from 9 colourful themes.
 • Monospace font option.
 
 Join our #feedback channel on irc.irccloud.com for feedback and suggestions to help us improve this app. You can also email us at enterprise@irccloud.com or find us on Twitter: @irccloud
