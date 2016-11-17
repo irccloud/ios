@@ -227,6 +227,11 @@
     _message.font = _filename.font;
     _message.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
+        _message.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+    } else {
+        _message.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    }
 
     _messageFooter = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, 32)];
     _messageFooter.backgroundColor = [UIColor clearColor];
@@ -243,6 +248,11 @@
     _text.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _text.text = _buffer.draft;
     _text.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
+        _text.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+    } else {
+        _text.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    }
     [self textViewDidChange:_text];
     
     if(_pasteID)

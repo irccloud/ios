@@ -132,6 +132,11 @@
     _msg.font = _filename.font;
     _msg.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _msg.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
+        _msg.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+    } else {
+        _msg.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    }
     
     _imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
