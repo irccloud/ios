@@ -12,6 +12,7 @@ More changes:
 • Fixed some issues with innacurate unread markers and notifiation badges
 • Fixed a crash when recording video on iOS 10
 • Improved imgur support
+• Fixed connection issues on some mobile networks
 • Fixed tapping channels in the /list dialog
 • Fixed pastebin/file uploads to respect the auto-capitalization setting.
 • Improved coloured message formatting on dark themes
