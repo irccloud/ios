@@ -1287,6 +1287,7 @@ WebSocketWaitingState waitingState;
         self.config = aConfig;
         delegateQueue = aDispatchQueue;
         socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:delegateQueue];
+        socket.IPv4PreferredOverIPv6 = NO;
         pendingFragments = [[MutableQueue alloc] init];
         isClosing = NO;
         isInContinuation = NO;
