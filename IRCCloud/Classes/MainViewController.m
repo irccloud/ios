@@ -3066,6 +3066,7 @@ extern NSDictionary *emojiMap;
         }
         [sheet addButtonWithTitle:@"Copy Hostmask"];
     }
+    [sheet addButtonWithTitle:@"Clear Backlog"];
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
         [sheet showInView:self.view];
@@ -3893,6 +3894,10 @@ extern NSDictionary *emojiMap;
             } else {
                 [pb setValue:[NSString stringWithFormat:@"%@ %@", _selectedEvent.timestamp, [[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
             }
+        } else if([action isEqualToString:@"Clear Backlog"]) {
+            [[EventsDataSource sharedInstance] removeEventsForBuffer:_selectedBuffer.bid];
+            if(_buffer.bid == _selectedBuffer.bid)
+                [_eventsView refresh];
         } else if([action isEqualToString:@"Copy URL"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
             [pb setValue:_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
