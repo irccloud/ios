@@ -225,7 +225,7 @@
                 NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
                 NSMutableArray *identifiers = [[NSMutableArray alloc] init];
                 
-                CLS_LOG(@"Notification Center currently has %i notifications", (unsigned long)notifications.count);
+                CLS_LOG(@"Notification Center currently has %lu notifications", (unsigned long)notifications.count);
                 for(UNNotification *n in notifications) {
                     NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
                     CLS_LOG(@"ID: %@ BID: %i EID: %f", n.request.identifier, [[d objectAtIndex:1] intValue], [[d objectAtIndex:2] doubleValue]);
