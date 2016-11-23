@@ -865,6 +865,14 @@
     [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":_saveToCameraRoll}];
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
     
+    NSMutableArray *notifications = [[NSMutableArray alloc] init];
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10) {
+        [notifications addObject:@{@"title":@"Background Alert Sounds", @"accessory":_notificationSound}];
+    }
+    [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":_notifyAll}];
+    [notifications addObject:@{@"title":@"Show Unread Indicators", @"accessory":_showUnread}];
+    [notifications addObject:@{@"title":@"Mark As Read Automatically", @"accessory":_markAsRead}];
+    
     _data = @[
               @{@"title":@"Account", @"items":account},
               @{@"title":@"Highlight Words", @"items":@[
@@ -890,12 +898,7 @@
                          @{@"title":@"Collapse joins, parts, quits", @"accessory":_expandJoinPart},
                          ]},
               @{@"title":@"Device", @"items":device},
-              @{@"title":@"Notifications", @"items":@[
-                        @{@"title":@"Background Alert Sounds", @"accessory":_notificationSound},
-                        @{@"title":@"Notify On All Messages", @"accessory":_notifyAll},
-                        @{@"title":@"Show Unread Indicators", @"accessory":_showUnread},
-                        @{@"title":@"Mark As Read Automatically", @"accessory":_markAsRead}
-                        ]},
+              @{@"title":@"Notifications", @"items":notifications},
               @{@"title":@"Font Size", @"items":@[
                         @{@"special":^UITableViewCell *(UITableViewCell *cell, NSString *identifier) {
                             _fontSizeCell.fontSample.textColor = [UIColor messageTextColor];
