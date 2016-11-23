@@ -223,14 +223,34 @@
                 NSUInteger count = 0;
                 NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
                 NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+                NSMutableArray *identifiers = [[NSMutableArray alloc] init];
+                
+                CLS_LOG(@"Notification Center currently has %i notifications", (unsigned long)notifications.count);
+                for(UNNotification *n in notifications) {
+                    NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+                    CLS_LOG(@"ID: %@ BID: %i EID: %f", n.request.identifier, [[d objectAtIndex:1] intValue], [[d objectAtIndex:2] doubleValue]);
+                }
+                
+                for(UNNotification *n in notifications) {
+                    NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+                    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
+                    CLS_LOG(@"BID %i last_seen_eid: %f", b.bid, b.last_seen_eid);
+                    if(b && [[d objectAtIndex:2] doubleValue] < b.last_seen_eid) {
+                        CLS_LOG(@"Removing stale notification: %@", n.request.identifier);
+                        [identifiers addObject:n.request.identifier];
+                    }
+                }
+                
+                [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:identifiers];
+                
                 for(Buffer *b in buffers) {
                     int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
                     if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
                         highlights = 0;
                     count += highlights;
                 }
-                if(notifications.count > count)
-                    count = notifications.count;
+                if((notifications.count - identifiers.count) > count)
+                    count = notifications.count - identifiers.count;
 
                 if([UIApplication sharedApplication].applicationIconBadgeNumber != count)
                     CLS_LOG(@"Setting iOS icon badge to %lu", (unsigned long)count);
