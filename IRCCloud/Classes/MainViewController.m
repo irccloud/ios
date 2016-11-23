@@ -157,9 +157,9 @@ extern NSDictionary *emojiMap;
     
     _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
     
-    _fetchingFailed.textColor = [UIColor timestampColor];
     [_loadMoreBacklog setTitleColor:[UIColor isDarkTheme]?[UIColor navBarSubheadingColor]:[UIColor unreadBlueColor] forState:UIControlStateNormal];
     [_loadMoreBacklog setTitleShadowColor:[UIColor contentBackgroundColor] forState:UIControlStateNormal];
+    _loadMoreBacklog.backgroundColor = [UIColor timestampBackgroundColor];
     
     [_eventsView refresh];
     [_buffersView performSelectorInBackground:@selector(refresh) withObject:nil];
@@ -1631,6 +1631,10 @@ extern NSDictionary *emojiMap;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 [self presentViewController:nc animated:YES completion:nil];
+                return;
+            } else if([_message.text isEqualToString:@"/clear"]) {
+                [[EventsDataSource sharedInstance] removeEventsForBuffer:_buffer.bid];
+                [_eventsView refresh];
                 return;
 #ifndef APPSTORE
             } else if([_message.text isEqualToString:@"/crash"]) {

@@ -47,7 +47,6 @@
     IBOutlet UIView *_mentionTip;
     IBOutlet UIView *_globalMsgContainer;
     IBOutlet LinkLabel *_globalMsg;
-    IBOutlet UILabel *_fetchingFailed;
     IBOutlet UIButton *_loadMoreBacklog;
     IBOutlet NSLayoutConstraint *_eventsViewWidthConstraint;
     IBOutlet NSLayoutConstraint *_eventsViewOffsetXConstraint;

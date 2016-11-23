@@ -1533,28 +1533,11 @@ extern UIImage *__socketClosedBackgroundImage;
         _paste_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
 
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
-        if(!events || (events.count == 0 && _buffer.min_eid > 0)) {
-            if(_buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _conn.ready) {
-                CLS_LOG(@"No data after refresh, requesting more backlog");
-                _tableView.tableHeaderView = _headerView;
-                _requestingBacklog = YES;
-                [_conn cancelPendingBacklogRequests];
-                [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid];
-            } else {
-                _tableView.tableHeaderView = nil;
-            }
-        } else if(events.count) {
+        if(events.count) {
             [_ignore setIgnores:_server.ignores];
-            _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
-            if(_earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected) {
-                _tableView.tableHeaderView = _headerView;
-            } else {
-                _tableView.tableHeaderView = nil;
-            }
             for(Event *e in events) {
                 [self insertEvent:e backlog:true nextIsGrouped:false];
             }
-        } else {
             _tableView.tableHeaderView = nil;
         }
         
@@ -1617,9 +1600,19 @@ extern UIImage *__socketClosedBackgroundImage;
         } else {
             _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
         }
-        _tableView.tableHeaderView = _tableView.tableHeaderView;
         
         [_tableView reloadData];
+
+        if(events.count)
+            _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
+        if(events.count && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && _conn.ready && _tableView.contentSize.height > _tableView.bounds.size.height) {
+            _tableView.tableHeaderView = _headerView;
+        } else if(_buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && _conn.ready) {
+            _tableView.tableHeaderView = _backlogFailedView;
+        } else {
+            _tableView.tableHeaderView = nil;
+        }
+
         if(_requestingBacklog && backlogEid > 0 && _buffer.scrolledUp) {
             int markerPos = -1;
             for(Event *e in _data) {
@@ -1657,14 +1650,8 @@ extern UIImage *__socketClosedBackgroundImage;
             [self scrollToBottom];
         }
         
-        if(_conn.state == kIRCCloudStateConnected) {
-            if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _conn.ready && !_requestingBacklog) {
-                CLS_LOG(@"Empty table after refresh, requesting more backlog");
-                _requestingBacklog = YES;
-                [_conn cancelPendingBacklogRequests];
-                [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
-            }
-            [[NetworkConnection sharedInstance] scheduleIdleTimer];
+        if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _conn.ready && !_requestingBacklog) {
+            _tableView.tableHeaderView = _backlogFailedView;
         }
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{

@@ -91,12 +91,12 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-theme ash"
+            argument = "-theme midnight"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-mono"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <EnvironmentVariables>
