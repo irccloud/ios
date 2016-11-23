@@ -593,10 +593,12 @@
             handler(UIBackgroundFetchResultNoData);
         }
     } else if ([userInfo objectForKey:@"hb"] && application.applicationState == UIApplicationStateBackground) {
+        CLS_LOG(@"APNS Heartbeat: %@", userInfo);
         for(NSString *key in [userInfo objectForKey:@"hb"]) {
             NSDictionary *bids = [[userInfo objectForKey:@"hb"] objectForKey:key];
             for(NSString *bid in bids.allKeys) {
                 NSTimeInterval eid = [[bids objectForKey:bid] doubleValue];
+                CLS_LOG(@"Setting bid %i last_seen_eid to %f", bid.intValue, eid);
                 [[BuffersDataSource sharedInstance] updateLastSeenEID:eid buffer:bid.intValue];
                 [[NotificationsDataSource sharedInstance] removeNotificationsForBID:bid.intValue olderThan:eid];
             }
