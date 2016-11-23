@@ -155,7 +155,7 @@
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
             for(UNNotification *n in ns) {
                 NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
-                if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] < eid) {
+                if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] <= eid) {
                     [[_notifications objectForKey:@(bid)] removeObject:n];
                 }
             }
@@ -166,7 +166,7 @@
                     
                     for(UNNotification *n in notifications) {
                         NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
-                        if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] < eid) {
+                        if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] <= eid) {
                             NSLog(@"Remove notification: %@", n.request.identifier);
                             [identifiers addObject:n.request.identifier];
                         }
@@ -179,7 +179,7 @@
         } else {
             for(UILocalNotification *n in ns) {
                 NSArray *d = [n.userInfo objectForKey:@"d"];
-                if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] < eid) {
+                if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] <= eid) {
                     //[[UIApplication sharedApplication] cancelLocalNotification:n];
                     [[_notifications objectForKey:@(bid)] removeObject:n];
                 }
@@ -235,7 +235,7 @@
                     NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
                     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
                     CLS_LOG(@"BID %i last_seen_eid: %f", b.bid, b.last_seen_eid);
-                    if(b && [[d objectAtIndex:2] doubleValue] < b.last_seen_eid) {
+                    if(b && [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
                         CLS_LOG(@"Removing stale notification: %@", n.request.identifier);
                         [identifiers addObject:n.request.identifier];
                     }
