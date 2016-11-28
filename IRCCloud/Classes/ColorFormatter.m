@@ -1390,6 +1390,8 @@ extern BOOL __compact;
                         }
                         [text deleteCharactersInRange:NSMakeRange(i,count)];
                         bg = i;
+                    } else {
+                        [text insertString:@"," atIndex:i];
                     }
                 }
                 if(fg_color != -1)
