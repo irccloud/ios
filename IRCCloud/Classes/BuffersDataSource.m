@@ -23,46 +23,48 @@
 
 @implementation Buffer
 -(NSComparisonResult)compare:(Buffer *)aBuffer {
-    int joinedLeft = 1, joinedRight = 1;
-    if(_cid < aBuffer.cid)
-        return NSOrderedAscending;
-    if(_cid > aBuffer.cid)
-        return NSOrderedDescending;
-    if([_type isEqualToString:@"console"])
-        return NSOrderedAscending;
-    if([aBuffer.type isEqualToString:@"console"])
-        return NSOrderedDescending;
-    if(_bid == aBuffer.bid)
-        return NSOrderedSame;
-    if([_type isEqualToString:@"channel"])
-        joinedLeft = [[ChannelsDataSource sharedInstance] channelForBuffer:_bid] != nil;
-    if([[aBuffer type] isEqualToString:@"channel"])
-        joinedRight = [[ChannelsDataSource sharedInstance] channelForBuffer:aBuffer.bid] != nil;
-    if([_type isEqualToString:@"conversation"] && [[aBuffer type] isEqualToString:@"channel"])
-        return NSOrderedDescending;
-    else if([_type isEqualToString:@"channel"] && [[aBuffer type] isEqualToString:@"conversation"])
-        return NSOrderedAscending;
-    else if(joinedLeft > joinedRight)
-        return NSOrderedAscending;
-    else if(joinedLeft < joinedRight)
-        return NSOrderedDescending;
-    else {
-        if(_chantypes == nil) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
-            if(s) {
-                _chantypes = s.CHANTYPES;
-                if(_chantypes == nil || _chantypes.length == 0)
-                    _chantypes = @"#";
+    @synchronized (self) {
+        int joinedLeft = 1, joinedRight = 1;
+        if(_cid < aBuffer.cid)
+            return NSOrderedAscending;
+        if(_cid > aBuffer.cid)
+            return NSOrderedDescending;
+        if([_type isEqualToString:@"console"])
+            return NSOrderedAscending;
+        if([aBuffer.type isEqualToString:@"console"])
+            return NSOrderedDescending;
+        if(_bid == aBuffer.bid)
+            return NSOrderedSame;
+        if([_type isEqualToString:@"channel"])
+            joinedLeft = [[ChannelsDataSource sharedInstance] channelForBuffer:_bid] != nil;
+        if([[aBuffer type] isEqualToString:@"channel"])
+            joinedRight = [[ChannelsDataSource sharedInstance] channelForBuffer:aBuffer.bid] != nil;
+        if([_type isEqualToString:@"conversation"] && [[aBuffer type] isEqualToString:@"channel"])
+            return NSOrderedDescending;
+        else if([_type isEqualToString:@"channel"] && [[aBuffer type] isEqualToString:@"conversation"])
+            return NSOrderedAscending;
+        else if(joinedLeft > joinedRight)
+            return NSOrderedAscending;
+        else if(joinedLeft < joinedRight)
+            return NSOrderedDescending;
+        else {
+            if(_chantypes == nil) {
+                Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
+                if(s) {
+                    _chantypes = s.CHANTYPES;
+                    if(_chantypes == nil || _chantypes.length == 0)
+                        _chantypes = @"#";
+                }
             }
+            NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
+            NSString *nameLeft = _name?[r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""]:@"";
+            NSString *nameRight = aBuffer.name?[r stringByReplacingMatchesInString:[aBuffer.name lowercaseString] options:0 range:NSMakeRange(0, aBuffer.name.length) withTemplate:@""]:@"";
+            
+            if([nameLeft compare:nameRight] == NSOrderedSame)
+                return (_bid < aBuffer.bid)?NSOrderedAscending:NSOrderedDescending;
+            else
+                return [nameLeft localizedStandardCompare:nameRight];
         }
-        NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
-        NSString *nameLeft = _name?[r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""]:@"";
-        NSString *nameRight = aBuffer.name?[r stringByReplacingMatchesInString:[aBuffer.name lowercaseString] options:0 range:NSMakeRange(0, aBuffer.name.length) withTemplate:@""]:@"";
-        
-        if([nameLeft compare:nameRight] == NSOrderedSame)
-            return (_bid < aBuffer.bid)?NSOrderedAscending:NSOrderedDescending;
-        else
-            return [nameLeft localizedStandardCompare:nameRight];
     }
 }
 -(NSString *)description {
@@ -224,16 +226,18 @@
 }
 
 -(NSArray *)getBuffersForServer:(int)cid {
-    NSMutableArray *buffers = [[NSMutableArray alloc] init];
-    NSArray *copy;
-    @synchronized(_buffers) {
-        copy = _buffers.allValues;
+    @synchronized (self) {
+        NSMutableArray *buffers = [[NSMutableArray alloc] init];
+        NSArray *copy;
+        @synchronized(_buffers) {
+            copy = _buffers.allValues;
+        }
+        for(Buffer *buffer in copy) {
+            if(buffer.cid == cid)
+                [buffers addObject:buffer];
+        }
+        return [buffers sortedArrayUsingSelector:@selector(compare:)];
     }
-    for(Buffer *buffer in copy) {
-        if(buffer.cid == cid)
-            [buffers addObject:buffer];
-    }
-    return [buffers sortedArrayUsingSelector:@selector(compare:)];
 }
 
 -(NSArray *)getBuffers {
