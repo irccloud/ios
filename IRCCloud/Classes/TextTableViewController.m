@@ -31,16 +31,16 @@
     return self;
 }
 
+- (void)appendData:(NSArray *)data {
+    _data = [_data arrayByAddingObjectsFromArray:data];
+    [self refresh];
+}
+
 - (void)doneButtonPressed:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    LinkLabel *tv = [[LinkLabel alloc] initWithFrame:CGRectZero];
-    tv.backgroundColor = [UIColor contentBackgroundColor];
-    tv.textColor = [UIColor messageTextColor];
-    tv.numberOfLines = 0;
+- (void)refresh {
     NSMutableString *text = [[NSMutableString alloc] init];
     for(id item in _data) {
         NSString *s;
@@ -73,16 +73,27 @@
             [tv addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
         }
     }
-
+    
     CGSize size = [tv.attributedText boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin context:nil].size;
     tv.frame = CGRectMake(0,0,size.width,size.height);
+    sv.contentSize = tv.bounds.size;
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    tv = [[LinkLabel alloc] initWithFrame:CGRectZero];
+    tv.backgroundColor = [UIColor contentBackgroundColor];
+    tv.textColor = [UIColor messageTextColor];
+    tv.numberOfLines = 0;
     
-    UIScrollView *sv = [[UIScrollView alloc] initWithFrame:self.view.bounds];
+    sv = [[UIScrollView alloc] initWithFrame:self.view.bounds];
     sv.backgroundColor = [UIColor contentBackgroundColor];
     sv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     [sv addSubview:tv];
-    sv.contentSize = tv.bounds.size;
+    
     [self.view addSubview:sv];
+    
+    [self refresh];
 }
 
 - (void)didReceiveMemoryWarning {

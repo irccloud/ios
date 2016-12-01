@@ -563,6 +563,10 @@ volatile BOOL __socketPaused = NO;
                        if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventBadChannelKey];
                    },
+                   @"channel_query": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       if(!backlog && !_resuming)
+                           [self postObject:object forEvent:kIRCEventChannelQuery];
+                   },
                    @"too_many_channels": alert, @"no_such_channel": alert, @"bad_channel_name": alert,
                    @"no_such_nick": alert, @"invalid_nick_change": alert, @"chan_privs_needed": alert,
                    @"accept_exists": alert, @"banned_from_channel": alert, @"oper_only": alert,

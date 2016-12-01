@@ -16,11 +16,17 @@
 
 #import <UIKit/UIKit.h>
 #import "ServersDataSource.h"
+#import "LinkLabel.h"
 
 @interface TextTableViewController : UIViewController {
     NSArray *_data;
     Server *_server;
+    LinkLabel *tv;
+    UIScrollView *sv;
+    NSString *_type;
 }
 @property Server *server;
+@property NSString *type;
 -(id)initWithData:(NSArray *)data;
+-(void)appendData:(NSArray *)data;
 @end

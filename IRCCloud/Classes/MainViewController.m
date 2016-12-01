@@ -915,6 +915,45 @@ extern NSDictionary *emojiMap;
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
+        case kIRCEventChannelQuery:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                NSString *type = [o objectForKey:@"query_type"];
+                NSString *msg = nil;
+                
+                if([type isEqualToString:@"mode"]) {
+                    msg = [NSString stringWithFormat:@"%@ mode is %c%@%c", [o objectForKey:@"channel"], BOLD, [o objectForKey:@"diff"], CLEAR];
+                } else if([type isEqualToString:@"timestamp"]) {
+                    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+                    [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
+                    [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
+                    msg = [NSString stringWithFormat:@"%@ created on %c%@%c", [o objectForKey:@"channel"], BOLD, [dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:[[o objectForKey:@"timestamp"] intValue]]], CLEAR];
+                } else {
+                    CLS_LOG(@"Unhandled channel_query type: %@", type);
+                }
+                
+                if(msg) {
+                    if([self.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[TextTableViewController class]] && [((TextTableViewController *)(((UINavigationController *)self.presentedViewController).topViewController)).type isEqualToString:@"channel_query"]) {
+                        TextTableViewController *tv = ((TextTableViewController *)(((UINavigationController *)self.presentedViewController).topViewController));
+                        [tv appendData:@[msg]];
+                    } else {
+                        TextTableViewController *tv = [[TextTableViewController alloc] initWithData:@[msg]];
+                        tv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                        tv.type = @"channel_query";
+                        tv.navigationItem.title = tv.server.hostname;
+                        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
+                        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                        else
+                            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                        if(self.presentedViewController)
+                            [self dismissViewControllerAnimated:NO completion:nil];
+                        [self presentViewController:nc animated:YES completion:nil];
+                    }
+                }
+            }
+            break;
         case kIRCEventNamesList:
             o = notification.object;
             if(o.cid == _buffer.cid) {
