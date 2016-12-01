@@ -75,6 +75,8 @@
     }
     
     CGSize size = [tv.attributedText boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin context:nil].size;
+    if(size.width < self.view.bounds.size.width)
+        size.width = self.view.bounds.size.width;
     tv.frame = CGRectMake(0,0,size.width,size.height);
     sv.contentSize = tv.bounds.size;
 }
