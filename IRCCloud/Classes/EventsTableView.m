@@ -713,7 +713,7 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)_sendHeartbeat {
-    if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0 && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus] && !_requestingBacklog && _conn.state == kIRCCloudStateConnected) {
+    if(_data.count && _earliestEid < _buffer.last_seen_eid && _topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0 && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && ![NetworkConnection sharedInstance].notifier && [self.slidingViewController topViewHasFocus] && !_requestingBacklog && _conn.state == kIRCCloudStateConnected) {
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         NSTimeInterval eid = _buffer.scrolledUpFrom;
         if(eid <= 0) {
@@ -1116,7 +1116,11 @@ extern UIImage *__socketClosedBackgroundImage;
         _topUnreadLabelXOffsetConstraint.constant = 0;
     }
     if(_lastSeenEidPos == 0 && firstRow < _data.count) {
-        int seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
+        int seconds;
+        if(firstRow < 0)
+            seconds = (_earliestEid - _buffer.last_seen_eid) / 1000000;
+        else
+            seconds = ([[_data objectAtIndex:firstRow] eid] - _buffer.last_seen_eid) / 1000000;
         if(seconds < 0) {
             _topUnreadView.alpha = 0;
         } else {
@@ -1475,6 +1479,9 @@ extern UIImage *__socketClosedBackgroundImage;
         _tableView.backgroundColor = [UIColor contentBackgroundColor];
         _headerView.backgroundColor = [UIColor contentBackgroundColor];
         _backlogFailedView.backgroundColor = [UIColor contentBackgroundColor];
+        [_loadMoreBacklog setTitleColor:[UIColor isDarkTheme]?[UIColor navBarSubheadingColor]:[UIColor unreadBlueColor] forState:UIControlStateNormal];
+        [_loadMoreBacklog setTitleShadowColor:[UIColor contentBackgroundColor] forState:UIControlStateNormal];
+        _loadMoreBacklog.backgroundColor = [UIColor timestampBackgroundColor];
         
         _linkAttributes = [UIColor linkAttributes];
         _lightLinkAttributes = [UIColor lightLinkAttributes];
@@ -1550,7 +1557,7 @@ extern UIImage *__socketClosedBackgroundImage;
         
         if(_buffer.last_seen_eid == 0 && _data.count > 1) {
             _lastSeenEidPos = 1;
-        } else if(_minEid > 0 && _minEid >= _buffer.last_seen_eid) {
+        } else if((_minEid > 0 && _minEid >= _buffer.last_seen_eid) || (_data.count == 0 && _buffer.last_seen_eid > 0)) {
             _lastSeenEidPos = 0;
         } else {
             Event *e = [[Event alloc] init];
@@ -1591,11 +1598,7 @@ extern UIImage *__socketClosedBackgroundImage;
             }
         }
 
-        if(_lastSeenEidPos == 0) {
-            _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 92);
-        } else {
-            _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
-        }
+        _backlogFailedView.frame = _headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
         
         [_tableView reloadData];
 
@@ -1656,7 +1659,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 NSInteger firstRow = [[rows objectAtIndex:0] row];
                 NSInteger lastRow = [[rows lastObject] row];
                 Event *e = ((_lastSeenEidPos+1) < _data.count)?[_data objectAtIndex:_lastSeenEidPos+1]:nil;
-                if(e && _lastSeenEidPos >= 0 && firstRow > _lastSeenEidPos && e.eid >= _buffer.last_seen_eid) {
+                if(e && ((_lastSeenEidPos > 0 && firstRow > _lastSeenEidPos) || _lastSeenEidPos == 0) && e.eid >= _buffer.last_seen_eid) {
                     if(_topUnreadView.alpha == 0) {
                         [UIView beginAnimations:nil context:nil];
                         [UIView setAnimationDuration:0.1];
@@ -1679,6 +1682,14 @@ extern UIImage *__socketClosedBackgroundImage;
                     [UIView commitAnimations];
                 }
                 _requestingBacklog = NO;
+            } else if(_earliestEid > _buffer.last_seen_eid) {
+                if(_topUnreadView.alpha == 0) {
+                    [UIView beginAnimations:nil context:nil];
+                    [UIView setAnimationDuration:0.1];
+                    _topUnreadView.alpha = 1;
+                    [UIView commitAnimations];
+                }
+                [self updateTopUnread:-1];
             }
             
             [self updateUnread];

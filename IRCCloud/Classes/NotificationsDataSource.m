@@ -225,18 +225,10 @@
                 NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
                 NSMutableArray *identifiers = [[NSMutableArray alloc] init];
                 
-                CLS_LOG(@"Notification Center currently has %lu notifications", (unsigned long)notifications.count);
-                for(UNNotification *n in notifications) {
-                    NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
-                    CLS_LOG(@"ID: %@ BID: %i EID: %f", n.request.identifier, [[d objectAtIndex:1] intValue], [[d objectAtIndex:2] doubleValue]);
-                }
-                
                 for(UNNotification *n in notifications) {
                     NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
                     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
-                    CLS_LOG(@"BID %i last_seen_eid: %f", b.bid, b.last_seen_eid);
                     if(b && [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
-                        CLS_LOG(@"Removing stale notification: %@", n.request.identifier);
                         [identifiers addObject:n.request.identifier];
                     }
                 }

@@ -724,17 +724,17 @@
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="32"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="↑" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="14" translatesAutoresizingMaskIntoConstraints="NO" id="nV2-yC-Cav">
-                                        <rect key="frame" x="6" y="7" width="12.5" height="17"/>
+                                        <rect key="frame" x="6" y="7" width="13" height="17"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="24" placeholderIntrinsicHeight="24" translatesAutoresizingMaskIntoConstraints="NO" id="NXY-Lp-a7w" customClass="HighlightsCountView">
-                                        <rect key="frame" x="18.5" y="4" width="24" height="24"/>
+                                        <rect key="frame" x="19" y="4" width="24" height="24"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </view>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="722" translatesAutoresizingMaskIntoConstraints="NO" id="2eF-8l-jgk">
-                                        <rect key="frame" x="18.5" y="6" width="717.5" height="20"/>
+                                        <rect key="frame" x="19" y="6" width="717" height="20"/>
                                         <accessibility key="accessibilityConfiguration" hint="Scrolls to first unread message">
                                             <accessibilityTraits key="traits" button="YES"/>
                                         </accessibility>
@@ -786,17 +786,17 @@
                                 <rect key="frame" x="0.0" y="884" width="768" height="32"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="↓" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="14" translatesAutoresizingMaskIntoConstraints="NO" id="MQi-6s-Aew">
-                                        <rect key="frame" x="6" y="7" width="12.5" height="17"/>
+                                        <rect key="frame" x="6" y="7" width="13" height="17"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view opaque="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="24" placeholderIntrinsicHeight="24" translatesAutoresizingMaskIntoConstraints="NO" id="2A3-WY-mos" customClass="HighlightsCountView">
-                                        <rect key="frame" x="18.5" y="4" width="24" height="24"/>
+                                        <rect key="frame" x="19" y="4" width="24" height="24"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </view>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="742" translatesAutoresizingMaskIntoConstraints="NO" id="jfo-ng-UHu">
-                                        <rect key="frame" x="18.5" y="6" width="743.5" height="20"/>
+                                        <rect key="frame" x="19" y="6" width="743" height="20"/>
                                         <accessibility key="accessibilityConfiguration" hint="Scrolls to bottom"/>
                                         <constraints>
                                             <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="20" id="pEJ-oh-CxO"/>
@@ -998,7 +998,7 @@
                                 <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </state>
                             <connections>
-                                <action selector="loadMoreBacklogButtonPressed:" destination="pci-6M-5ag" eventType="touchUpInside" id="JaV-Yc-Rwn"/>
+                                <action selector="loadMoreBacklogButtonPressed:" destination="pci-6M-5ag" eventType="touchUpInside" id="iIn-3V-7bC"/>
                             </connections>
                         </button>
                     </subviews>
@@ -1023,6 +1023,7 @@
                         <outlet property="_bottomUnreadView" destination="scS-39-nDE" id="Ytz-Ch-daX"/>
                         <outlet property="_delegate" destination="eA9-ra-BSf" id="uGg-vX-v2h"/>
                         <outlet property="_headerView" destination="tmc-fI-0Xs" id="BFZ-vI-cNO"/>
+                        <outlet property="_loadMoreBacklog" destination="Sya-Jj-2rP" id="YVU-7f-mst"/>
                         <outlet property="_stickyAvatar" destination="WXm-cx-Mj2" id="RZb-zC-iTA"/>
                         <outlet property="_stickyAvatarYOffsetConstraint" destination="Uac-VW-eBx" id="MSL-Dc-ffe"/>
                         <outlet property="_tableView" destination="t8Z-Pu-wcU" id="eMn-Er-9RS"/>

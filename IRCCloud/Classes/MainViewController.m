@@ -157,10 +157,6 @@ extern NSDictionary *emojiMap;
     
     _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
     
-    [_loadMoreBacklog setTitleColor:[UIColor isDarkTheme]?[UIColor navBarSubheadingColor]:[UIColor unreadBlueColor] forState:UIControlStateNormal];
-    [_loadMoreBacklog setTitleShadowColor:[UIColor contentBackgroundColor] forState:UIControlStateNormal];
-    _loadMoreBacklog.backgroundColor = [UIColor timestampBackgroundColor];
-    
     [_eventsView refresh];
     [_buffersView performSelectorInBackground:@selector(refresh) withObject:nil];
     [_usersView performSelectorInBackground:@selector(refresh) withObject:nil];
@@ -1626,6 +1622,8 @@ extern NSDictionary *emojiMap;
                 [self presentViewController:nc animated:YES completion:nil];
                 return;
             } else if([_message.text isEqualToString:@"/clear"]) {
+                [_message clearText];
+                _buffer.draft = nil;
                 [[EventsDataSource sharedInstance] removeEventsForBuffer:_buffer.bid];
                 [_eventsView refresh];
                 return;
@@ -1640,7 +1638,8 @@ extern NSDictionary *emojiMap;
                 SBJsonWriter *writer = [[SBJsonWriter alloc] init];
                 NSString *json = [writer stringWithObject:p];
                 [[NetworkConnection sharedInstance] setPrefs:json];
-                _message.text = @"";
+                [_message clearText];
+                _buffer.draft = nil;
                 return;
             } else if([_message.text isEqualToString:@"/mono 0"]) {
                 NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
@@ -1648,7 +1647,8 @@ extern NSDictionary *emojiMap;
                 SBJsonWriter *writer = [[SBJsonWriter alloc] init];
                 NSString *json = [writer stringWithObject:p];
                 [[NetworkConnection sharedInstance] setPrefs:json];
-                _message.text = @"";
+                [_message clearText];
+                _buffer.draft = nil;
                 return;
             } else if([_message.text hasPrefix:@"/fontsize "]) {
                 [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:
@@ -1664,12 +1664,14 @@ extern NSDictionary *emojiMap;
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:nil userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventUserInfo]}];
                 }];
-                _message.text = @"";
+                [_message clearText];
+                _buffer.draft = nil;
                 return;
             } else if([_message.text isEqualToString:@"/read"]) {
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:_eventsView.YUNoHeartbeat delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
                 [alert show];
-                _message.text = @"";
+                [_message clearText];
+                _buffer.draft = nil;
                 return;
 #endif
             } else if(_message.text.length > 1080 || [_message.text isEqualToString:@"/paste"] || [_message.text hasPrefix:@"/paste "] || [_message.text rangeOfString:@"\n"].location < _message.text.length - 1) {
@@ -1700,6 +1702,8 @@ extern NSDictionary *emojiMap;
                 }
 #ifndef APPSTORE
             } else if([_message.text isEqualToString:@"/buffers"]) {
+                [_message clearText];
+                _buffer.draft = nil;
                 NSMutableString *msg = [[NSMutableString alloc] init];
                 [msg appendString:@"=== Buffers ===\n"];
                 NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:_buffer.cid];
@@ -1742,6 +1746,61 @@ extern NSDictionary *emojiMap;
                 [[EventsDataSource sharedInstance] addEvent:e];
                 [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
                 return;
+            } else if([_message.text isEqualToString:@"/badge"]) {
+                [_message clearText];
+                _buffer.draft = nil;
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+                    [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            NSMutableString *msg = [[NSMutableString alloc] init];
+                            [msg appendFormat:@"Notification Center currently has %lu notifications\n", (unsigned long)notifications.count];
+                            for(UNNotification *n in notifications) {
+                                NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+                                [msg appendFormat:@"ID: %@ BID: %i EID: %f\n", n.request.identifier, [[d objectAtIndex:1] intValue], [[d objectAtIndex:2] doubleValue]];
+                            }
+                            
+                            for(UNNotification *n in notifications) {
+                                NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+                                Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
+                                [msg appendFormat:@"BID %i last_seen_eid: %f\n", b.bid, b.last_seen_eid];
+                                if(b && [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
+                                    [msg appendFormat:@"Stale notification: %@\n", n.request.identifier];
+                                }
+                            }
+                            
+                            CLS_LOG(@"%@", msg);
+                            
+                            Event *e = [[Event alloc] init];
+                            e.cid = s.cid;
+                            e.bid = _buffer.bid;
+                            e.eid = [[NSDate date] timeIntervalSince1970] * 1000000;
+                            if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
+                                e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
+                            e.isSelf = YES;
+                            e.from = nil;
+                            e.nick = nil;
+                            e.msg = msg;
+                            e.type = @"buffer_msg";
+                            e.color = [UIColor timestampColor];
+                            if([_buffer.name isEqualToString:s.nick])
+                                e.bgColor = [UIColor whiteColor];
+                            else
+                                e.bgColor = [UIColor selfBackgroundColor];
+                            e.rowType = 0;
+                            e.formatted = nil;
+                            e.formattedMsg = nil;
+                            e.groupMsg = nil;
+                            e.linkify = YES;
+                            e.targetMode = nil;
+                            e.isHighlight = NO;
+                            e.reqId = -1;
+                            e.pending = YES;
+                            [_eventsView scrollToBottom];
+                            [[EventsDataSource sharedInstance] addEvent:e];
+                            [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
+                        }];
+                    }];
+                }
 #endif
             }
             

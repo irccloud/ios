@@ -47,6 +47,7 @@
     IBOutlet NSLayoutConstraint *_bottomUnreadLabelXOffsetConstraint;
     IBOutlet NSLayoutConstraint *_stickyAvatarYOffsetConstraint;
     IBOutlet UIImageView *_stickyAvatar;
+    IBOutlet UIButton *_loadMoreBacklog;
     
     NSDateFormatter *_formatter;
     NSMutableArray *_data;
