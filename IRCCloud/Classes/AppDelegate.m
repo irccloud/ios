@@ -539,55 +539,24 @@
             [self.mainViewController applyTheme];
             [self.mainViewController bufferSelected:bid];
         } else if(application.applicationState == UIApplicationStateBackground && (!_conn || (_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
-            if(_backlogCompletedObserver) {
-                [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
-                _backlogCompletedObserver = nil;
-            }
-            if(_backlogFailedObserver) {
-                [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-                _backlogFailedObserver = nil;
-            }
             [[NSNotificationCenter defaultCenter] removeObserver:self];
             
-            _backlogCompletedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogCompletedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-                if([n.object bid] == bid) {
-                    if(_backlogCompletedObserver) {
-                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
-                        _backlogCompletedObserver = nil;
-                    }
-                    if(_backlogFailedObserver) {
-                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-                        _backlogFailedObserver = nil;
-                    }
-                    [self.mainViewController refresh];
-                    NSLog(@"Backlog download completed for bid%i", bid);
-                    [[NotificationsDataSource sharedInstance] updateBadgeCount];
-                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                        [[NetworkConnection sharedInstance] serialize];
-                        handler(UIBackgroundFetchResultNewData);
-                    });
-                }
-            }];
-            _backlogFailedObserver = [[NSNotificationCenter defaultCenter] addObserverForName:kIRCCloudBacklogFailedNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *n) {
-                if([n.object bid] == bid) {
-                    if(_backlogCompletedObserver) {
-                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
-                        _backlogCompletedObserver = nil;
-                    }
-                    if(_backlogFailedObserver) {
-                        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-                        _backlogFailedObserver = nil;
-                    }
-                    [self.mainViewController refresh];
-                    NSLog(@"Backlog download failed for bid%i", bid);
-                    [[NotificationsDataSource sharedInstance] updateBadgeCount];
-                    handler(UIBackgroundFetchResultFailed);
-                }
-            }];
-
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                NSLog(@"Preloading backlog for bid%i from notification", bid);
-                [[NetworkConnection sharedInstance] requestBacklogForBuffer:bid server:cid];
+                CLS_LOG(@"Preloading backlog for bid%i from notification", bid);
+                [[NetworkConnection sharedInstance] requestBacklogForBuffer:bid server:cid completion:^(BOOL success) {
+                    [self.mainViewController refresh];
+                    [[NotificationsDataSource sharedInstance] updateBadgeCount];
+                    if(success) {
+                        CLS_LOG(@"Backlog download completed for bid%i", bid);
+                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                            [[NetworkConnection sharedInstance] serialize];
+                            handler(UIBackgroundFetchResultNewData);
+                        });
+                    } else {
+                        CLS_LOG(@"Backlog download failed for bid%i", bid);
+                        handler(UIBackgroundFetchResultFailed);
+                    }
+                }];
             });
         } else {
             handler(UIBackgroundFetchResultNoData);

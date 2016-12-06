@@ -39,9 +39,7 @@
         if(!_notifications)
             _notifications = [[NSMutableDictionary alloc] init];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
-            [self refresh];
-        } else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10 && [[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"notifications"];
             
             @try {
@@ -116,8 +114,6 @@
         [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError *error) {
             [self refresh];
         }];
-#else
-        [self refresh];
 #endif
     } else {
         UILocalNotification *n = [[UILocalNotification alloc] init];
@@ -152,31 +148,7 @@
 #ifndef EXTENSION
     @synchronized(_notifications) {
         NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
-            for(UNNotification *n in ns) {
-                NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
-                if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] <= eid) {
-                    [[_notifications objectForKey:@(bid)] removeObject:n];
-                }
-            }
-            
-            [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
-                @synchronized(_notifications) {
-                    NSMutableArray *identifiers = [[NSMutableArray alloc] init];
-                    
-                    for(UNNotification *n in notifications) {
-                        NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
-                        if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] <= eid) {
-                            NSLog(@"Remove notification: %@", n.request.identifier);
-                            [identifiers addObject:n.request.identifier];
-                        }
-                    }
-                    
-                    [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:identifiers];
-                }
-                [self updateBadgeCount];
-            }];
-        } else {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10) {
             for(UILocalNotification *n in ns) {
                 NSArray *d = [n.userInfo objectForKey:@"d"];
                 if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] <= eid) {
@@ -269,37 +241,5 @@
         }];
     }
 #endif
-}
-
--(NSUInteger)count {
-    return _notifications.count;
-}
-
--(void)refresh {
-    [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
-        @synchronized(_notifications) {
-            for(UNNotification *n in notifications) {
-                int bid = [[[n.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
-                NSTimeInterval eid = [[[n.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
-                
-                if(![_notifications objectForKey:@(bid)])
-                    [_notifications setObject:[[NSMutableArray alloc] init] forKey:@(bid)];
-                
-                NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
-                BOOL found = NO;
-                for(UNNotification *un in ns) {
-                    NSArray *d = [un.request.content.userInfo objectForKey:@"d"];
-                    if([[d objectAtIndex:2] doubleValue] == eid) {
-                        found = YES;
-                        break;
-                    }
-                }
-                if(!found) {
-                    [[_notifications objectForKey:@(bid)] addObject:n];
-                }
-            }
-        }
-        [self updateBadgeCount];
-    }];
 }
 @end

@@ -654,7 +654,7 @@ extern UIImage *__socketClosedBackgroundImage;
     if(_conn.ready) {
         _requestingBacklog = YES;
         [_conn cancelPendingBacklogRequests];
-        [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
+        [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid completion:nil];
         _tableView.tableHeaderView = _headerView;
     }
 }
@@ -2169,7 +2169,7 @@ extern UIImage *__socketClosedBackgroundImage;
             CLS_LOG(@"The table scrolled and the loading header became visible, requesting more backlog");
             _requestingBacklog = YES;
             [_conn cancelPendingBacklogRequests];
-            [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid];
+            [_conn requestBacklogForBuffer:_buffer.bid server:_buffer.cid beforeId:_earliestEid completion:nil];
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Downloading more chat history");
             _stickyAvatar.hidden = YES;
             if(_hiddenAvatarRow != -1) {

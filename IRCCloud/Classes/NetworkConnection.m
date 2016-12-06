@@ -55,9 +55,11 @@ volatile BOOL __socketPaused = NO;
     BOOL _running;
     NSURLConnection *_connection;
     int _bid;
+    void (^_completionHandler)(BOOL);
 }
 @property (readonly) NSString *url;
 @property int bid;
+@property (nonatomic, copy) void (^completionHandler)(BOOL);
 -(id)initWithURL:(NSString *)URL;
 -(void)cancel;
 -(void)start;
@@ -104,6 +106,8 @@ volatile BOOL __socketPaused = NO;
     } else {
         CLS_LOG(@"Failed to create NSURLConnection");
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
+        if(_completionHandler)
+            _completionHandler(NO);
     }
 }
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
@@ -115,6 +119,8 @@ volatile BOOL __socketPaused = NO;
 	CLS_LOG(@"Request failed: %@", error);
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
+        if(_completionHandler)
+            _completionHandler(NO);
     }];
     _running = NO;
     _cancelled = YES;
@@ -128,6 +134,8 @@ volatile BOOL __socketPaused = NO;
 	CLS_LOG(@"Backlog download completed");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
+        if(_completionHandler)
+            _completionHandler(YES);
     }];
     _running = NO;
 #ifndef EXTENSION
@@ -146,6 +154,8 @@ volatile BOOL __socketPaused = NO;
 		CLS_LOG(@"HTTP headers: %@", [response allHeaderFields]);
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
+            if(_completionHandler)
+                _completionHandler(NO);
         }];
         _cancelled = YES;
 	}
@@ -1838,11 +1848,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self connect:_notifier];
 }
 
--(void)requestBacklogForBuffer:(int)bid server:(int)cid {
-    [self requestBacklogForBuffer:bid server:cid beforeId:-1];
+-(void)requestBacklogForBuffer:(int)bid server:(int)cid completion:(void (^)(BOOL))completionHandler {
+    [self requestBacklogForBuffer:bid server:cid beforeId:-1 completion:completionHandler];
 }
 
--(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid {
+-(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid completion:(void (^)(BOOL))completionHandler {
     NSString *URL = nil;
     if(eid > 0)
         URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i&beforeid=%.0lf", IRCCLOUD_HOST, cid, bid, eid];
@@ -1850,6 +1860,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         URL = [NSString stringWithFormat:@"https://%@/chat/backlog?cid=%i&bid=%i", IRCCLOUD_HOST, cid, bid];
     OOBFetcher *fetcher = [self fetchOOB:URL];
     fetcher.bid = bid;
+    fetcher.completionHandler = completionHandler;
 }
 
 -(void)requestArchives:(int)cid {
@@ -1940,7 +1951,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             }
         });
         _numBuffers = 0;
-        [_notifications updateBadgeCount];
         __socketPaused = NO;
     }
     CLS_LOG(@"I downloaded %i events", _totalCount);
@@ -2020,7 +2030,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                     continue;
             }
             CLS_LOG(@"Requesting backlog for buffer: %@", buffer.name);
-            [self requestBacklogForBuffer:buffer.bid server:buffer.cid];
+            [self requestBacklogForBuffer:buffer.bid server:buffer.cid completion:nil];
         }
     }
     if(_oobQueue.count > 0) {
