@@ -539,8 +539,6 @@
             [self.mainViewController applyTheme];
             [self.mainViewController bufferSelected:bid];
         } else if(application.applicationState == UIApplicationStateBackground && (!_conn || (_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
-            [[NSNotificationCenter defaultCenter] removeObserver:self];
-            
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 CLS_LOG(@"Preloading backlog for bid%i from notification", bid);
                 [[NetworkConnection sharedInstance] requestBacklogForBuffer:bid server:cid completion:^(BOOL success) {
@@ -572,7 +570,6 @@
                 [[NotificationsDataSource sharedInstance] removeNotificationsForBID:bid.intValue olderThan:eid];
             }
         }
-        [[NotificationsDataSource sharedInstance] updateBadgeCount];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [[NetworkConnection sharedInstance] serialize];
             handler(UIBackgroundFetchResultNoData);
@@ -580,6 +577,7 @@
     } else {
         handler(UIBackgroundFetchResultNoData);
     }
+    [[NotificationsDataSource sharedInstance] updateBadgeCount];
 }
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
