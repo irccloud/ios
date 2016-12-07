@@ -3373,11 +3373,13 @@ extern NSDictionary *emojiMap;
         [self _joinAChannel];
     }]];
     
-    int activeCount = 0;
+    BOOL activeCount = NO;
     NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:_selectedBuffer.cid];
     for(Buffer *b in buffers) {
-        if([b.type isEqualToString:@"conversation"] && !b.archived)
-            activeCount++;
+        if([b.type isEqualToString:@"conversation"] && !b.archived) {
+            activeCount = YES;
+            break;
+        }
     }
     
     if(activeCount) {
