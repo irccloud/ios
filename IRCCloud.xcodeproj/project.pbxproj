@@ -285,6 +285,8 @@
 		228E2BA218CF770D0011DEAB /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
 		228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
 		228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */; };
+		228F69731DF8A3F30079E276 /* SpamViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228F69721DF8A3F30079E276 /* SpamViewController.m */; };
+		228F69741DF8A3F30079E276 /* SpamViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228F69721DF8A3F30079E276 /* SpamViewController.m */; };
 		2292AD591D5B55CC00BEE269 /* LinkLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE91781D59160B0014B25C /* LinkLabel.m */; };
 		2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
 		229C85411B502920004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
@@ -713,6 +715,8 @@
 		228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonWriter.m; sourceTree = "<group>"; };
 		228EFBC6177B4F6000B83A4C /* DisplayOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayOptionsViewController.h; sourceTree = "<group>"; };
 		228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayOptionsViewController.m; sourceTree = "<group>"; };
+		228F69711DF8A3F30079E276 /* SpamViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpamViewController.h; sourceTree = "<group>"; };
+		228F69721DF8A3F30079E276 /* SpamViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpamViewController.m; sourceTree = "<group>"; };
 		2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURL+IDN.m"; path = "NSURL+IDN/NSURL+IDN.m"; sourceTree = SOURCE_ROOT; };
 		2293AF0017F9CCD10022BD06 /* NSURL+IDN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+IDN.h"; path = "NSURL+IDN/NSURL+IDN.h"; sourceTree = SOURCE_ROOT; };
 		2296E0B619805751002D59E3 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareExtension.entitlements; sourceTree = "<group>"; };
@@ -1239,6 +1243,8 @@
 				2236F5F916DA765C007BE535 /* ServersDataSource.m */,
 				227FF8211772062E00394114 /* SettingsViewController.h */,
 				227FF8221772063F00394114 /* SettingsViewController.m */,
+				228F69711DF8A3F30079E276 /* SpamViewController.h */,
+				228F69721DF8A3F30079E276 /* SpamViewController.m */,
 				22D268C41BF4F95200B682AE /* SplashViewController.h */,
 				22D268C51BF4F95200B682AE /* SplashViewController.m */,
 				2271FD9F1DCDF45C00A39F84 /* TextTableViewController.h */,
@@ -1961,6 +1967,7 @@
 				22D268C71BF4F95200B682AE /* SplashViewController.m in Sources */,
 				228E2B9E18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */,
 				225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */,
+				228F69741DF8A3F30079E276 /* SpamViewController.m in Sources */,
 				228E2BA418CF770D0011DEAB /* SBJsonWriter.m in Sources */,
 				225D976418AA995900065087 /* UIExpandingTextView.m in Sources */,
 				22E54AE11D10593B00891FE4 /* AvatarsDataSource.m in Sources */,
@@ -2061,6 +2068,7 @@
 				22D268C61BF4F95200B682AE /* SplashViewController.m in Sources */,
 				228E2B9C18CF770D0011DEAB /* SBJsonTokeniser.m in Sources */,
 				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
+				228F69731DF8A3F30079E276 /* SpamViewController.m in Sources */,
 				228E2BA218CF770D0011DEAB /* SBJsonWriter.m in Sources */,
 				22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
 				22E54AE01D10593B00891FE4 /* AvatarsDataSource.m in Sources */,

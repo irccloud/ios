@@ -52,6 +52,7 @@
 #import "YouTubeViewController.h"
 #import "AvatarsDataSource.h"
 #import "TextTableViewController.h"
+#import "SpamViewController.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -3373,6 +3374,19 @@ extern NSDictionary *emojiMap;
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Reorder" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         [self _reorder];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Delete Active Conversations" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
+        SpamViewController *svc = [[SpamViewController alloc] initWithCid:_selectedBuffer.cid];
+        svc.navigationItem.title = s.hostname;
+        [self.slidingViewController resetTopView];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:nc animated:YES completion:nil];
     }]];
 
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
