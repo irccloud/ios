@@ -334,14 +334,20 @@
         void (^cap)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
             event.bgColor = [UIColor statusBackgroundColor];
             event.linkify = NO;
-            event.from = @"CAP";
+            event.from = nil;
             if(object) {
                 if([event.type isEqualToString:@"cap_ls"])
-                    event.msg = @"Server supports: ";
+                    event.msg = [NSString stringWithFormat:@"%cCAP%c Server supports: ", BOLD, BOLD];
                 else if([event.type isEqualToString:@"cap_req"])
-                    event.msg = @"Requesting: ";
+                    event.msg = [NSString stringWithFormat:@"%cCAP%c Requesting: ", BOLD, BOLD];
                 else if([event.type isEqualToString:@"cap_ack"])
-                    event.msg = @"Acknowledged: ";
+                    event.msg = [NSString stringWithFormat:@"%cCAP%c Acknowledged: ", BOLD, BOLD];
+                else if([event.type isEqualToString:@"cap_nak"])
+                    event.msg = [NSString stringWithFormat:@"%cCAP%c Rejected: ", BOLD, BOLD];
+                else if([event.type isEqualToString:@"cap_new"])
+                    event.msg = [NSString stringWithFormat:@"%cCAP%c Server added: ", BOLD, BOLD];
+                else if([event.type isEqualToString:@"cap_del"])
+                    event.msg = [NSString stringWithFormat:@"%cCAP%c Server removed: ", BOLD, BOLD];
                 else if([event.type isEqualToString:@"cap_raw"])
                     event.msg = [object objectForKey:@"line"];
                 if([object objectForKey:@"caps"])
@@ -363,7 +369,7 @@
                           @"btn_metadata_set": status, @"logged_in_as": status, @"sasl_success": status, @"you_are_operator": status,
                           @"server_snomask": status, @"starircd_welcome": status, @"zurna_motd": status, @"codepage": status, @"logged_out": status,
                           @"nick_locked": status, @"text": status, @"admin_info": status,
-                          @"cap_ls": cap, @"cap_req": cap, @"cap_ack": cap, @"cap_raw": cap,
+                          @"cap_ls": cap, @"cap_req": cap, @"cap_ack": cap, @"cap_raw": cap, @"cap_nak": cap, @"cap_new": cap, @"cap_del": cap,
                           @"unhandled_line":unhandled_line, @"unparsed_line":unhandled_line,
                           @"kicked_channel":kicked_channel, @"you_kicked_channel":kicked_channel,
                           @"motd_response":motd, @"server_motd":motd, @"info_response":motd,

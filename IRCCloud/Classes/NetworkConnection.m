@@ -718,8 +718,7 @@ volatile BOOL __socketPaused = NO;
                    @"inviting_to_channel": msg, @"error": msg, @"too_fast": msg, @"no_bots": msg,
                    @"wallops": msg, @"logged_in_as": msg, @"sasl_fail": msg, @"sasl_too_long": msg,
                    @"sasl_aborted": msg, @"sasl_already": msg, @"you_are_operator": msg,
-                   @"btn_metadata_set": msg, @"sasl_success": msg, @"cap_ls": msg,
-                   @"cap_req": msg, @"cap_ack": msg,
+                   @"btn_metadata_set": msg, @"sasl_success": msg, @"cap_ls": msg, @"cap_req": msg, @"cap_ack": msg, @"cap_nak": msg, @"cap_new": msg,@"cap_del": msg,
                    @"help_topics_start": msg, @"help_topics": msg, @"help_topics_end": msg, @"helphdr": msg, @"helpop": msg, @"helptlr": msg, @"helphlp": msg, @"helpfwd": msg, @"helpign": msg, @"version": msg,
                    @"newsflash": msg, @"invited": msg, @"server_snomask": msg, @"codepage": msg, @"logged_out": msg, @"nick_locked": msg, @"info_response": msg, @"generic_server_info": msg, @"unknown_umode": msg, @"bad_ping": msg, @"cap_raw": msg, @"rehashed_config": msg, @"knock": msg, @"bad_channel_mask": msg, @"kill_deny": msg, @"chan_own_priv_needed": msg, @"not_for_halfops": msg, @"chan_forbidden": msg, @"starircd_welcome": msg, @"zurna_motd": msg, @"ambiguous_error_message": msg, @"list_usage": msg, @"list_syntax": msg, @"who_syntax": msg, @"text": msg, @"admin_info": msg, @"watch_status": msg, @"sqline_nick": msg,
                    @"time": ^(IRCCloudJSONObject *object, BOOL backlog) {
