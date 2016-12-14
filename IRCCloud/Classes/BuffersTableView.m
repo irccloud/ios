@@ -122,7 +122,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         [self.contentView addSubview:_activity];
         
         _spamHint = [[UILabel alloc] init];
-        _spamHint.text = @"Tap to choose conversations to delete";
+        _spamHint.text = @"Tap here to choose conversations to delete";
         _spamHint.numberOfLines = 0;
         [self.contentView addSubview:_spamHint];
     }
