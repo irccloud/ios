@@ -1075,6 +1075,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                 cell.bgColor = cell.highlightColor = [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
                 cell.icon.text = FA_EXCLAMATION_TRIANGLE;
                 cell.icon.hidden = NO;
+                cell.accessibilityLabel = @"Spam detected. Double tap to choose conversations to delete";
                 break;
         }
         return cell;
