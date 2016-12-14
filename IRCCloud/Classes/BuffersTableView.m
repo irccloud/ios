@@ -236,7 +236,9 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         
         for(Server *server in [_servers getServers]) {
+#ifndef EXTENSION
             int spamCount = 0;
+#endif
             archiveCount = server.deferred_archives;
             NSArray *buffers = [_buffers getBuffersForServer:server.cid];
             for(Buffer *buffer in buffers) {

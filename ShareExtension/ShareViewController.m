@@ -439,4 +439,7 @@
     AudioServicesPlaySystemSound(_sound);
 }
 
+-(void)spamSelected:(int)cid {
+    
+}
 @end
