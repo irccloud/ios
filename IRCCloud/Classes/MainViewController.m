@@ -3384,17 +3384,7 @@ extern NSDictionary *emojiMap;
     
     if(activeCount) {
         [alert addAction:[UIAlertAction actionWithTitle:@"Delete Active Conversations" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
-            SpamViewController *svc = [[SpamViewController alloc] initWithCid:_selectedBuffer.cid];
-            svc.navigationItem.title = s.hostname;
-            [self.slidingViewController resetTopView];
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            [self presentViewController:nc animated:YES completion:nil];
+            [self spamSelected:_selectedBuffer.cid];
         }]];
     }
     [alert addAction:[UIAlertAction actionWithTitle:@"Reorder" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
@@ -3405,6 +3395,20 @@ extern NSDictionary *emojiMap;
     alert.popoverPresentationController.sourceRect = rect;
     alert.popoverPresentationController.sourceView = _buffersView.tableView;
     [self presentViewController:alert animated:YES completion:nil];
+}
+
+-(void)spamSelected:(int)cid {
+    Server *s = [[ServersDataSource sharedInstance] getServer:cid];
+    SpamViewController *svc = [[SpamViewController alloc] initWithCid:cid];
+    svc.navigationItem.title = s.hostname;
+    [self.slidingViewController resetTopView];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self presentViewController:nc animated:YES completion:nil];
 }
 
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect link:(NSString *)url {

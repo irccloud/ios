@@ -20,6 +20,7 @@
 #import "BuffersDataSource.h"
 
 @protocol BuffersTableViewDelegate<NSObject>
+-(void)spamSelected:(int)cid;
 -(void)bufferSelected:(int)bid;
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect;
 -(void)dismissKeyboard;

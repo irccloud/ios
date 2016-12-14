@@ -61,10 +61,12 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 #define TYPE_CONVERSATION 2
 #define TYPE_ARCHIVES_HEADER 3
 #define TYPE_JOIN_CHANNEL 4
+#define TYPE_SPAM 5
 
 @interface BuffersTableCell : UITableViewCell {
     UILabel *_label;
     UILabel *_icon;
+    UILabel *_spamHint;
     int _type;
     UIView *_unreadIndicator;
     UIView *_bg;
@@ -118,6 +120,11 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
         _activity.hidden = YES;
         [self.contentView addSubview:_activity];
+        
+        _spamHint = [[UILabel alloc] init];
+        _spamHint.text = @"Tap to choose conversations to delete";
+        _spamHint.numberOfLines = 0;
+        [self.contentView addSubview:_spamHint];
     }
     return self;
 }
@@ -151,7 +158,16 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         frame.size.width -= size.width + 12;
         _highlights.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 6, size.width, size.height);
     }
-    _label.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.height + 6, frame.origin.y, frame.size.width - 6 - _icon.frame.size.height - 16, frame.size.height);
+    _label.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.height + 6, (_type == TYPE_SPAM)?_icon.frame.origin.y-1:frame.origin.y, frame.size.width - 6 - _icon.frame.size.height - 16, (_type == TYPE_SPAM)?_icon.frame.size.height:frame.size.height);
+    
+    if(_type == TYPE_SPAM) {
+        _spamHint.textColor = _label.textColor;
+        _spamHint.font = [_label.font fontWithSize:_label.font.pointSize - 2];
+        _spamHint.frame = CGRectMake(_label.frame.origin.x, _label.frame.origin.y + _label.frame.size.height, _label.frame.size.width, frame.size.height - _label.frame.size.height - _label.frame.origin.y);
+        _spamHint.hidden = NO;
+    } else {
+        _spamHint.hidden = YES;
+    }
 }
 
 -(void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
@@ -220,6 +236,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         
         for(Server *server in [_servers getServers]) {
+            int spamCount = 0;
             archiveCount = server.deferred_archives;
             NSArray *buffers = [_buffers getBuffersForServer:server.cid];
             for(Buffer *buffer in buffers) {
@@ -324,13 +341,27 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                         firstHighlightPosition = data.count - 1;
                     if(highlights > 0 && (lastHighlightPosition == -1 || lastHighlightPosition < data.count - 1))
                         lastHighlightPosition = data.count - 1;
-
+#ifndef EXTENSION
+                    if(type == TYPE_CONVERSATION && unread == 1 && [[EventsDataSource sharedInstance] sizeOfBuffer:buffer.bid] == 1)
+                        spamCount++;
+#endif
                     if(buffer.bid == _selectedBuffer.bid)
                         selectedRow = data.count - 1;
                 }
                 if(type > 0 && buffer.archived > 0)
                     archiveCount++;
             }
+#ifndef EXTENSION
+            if(spamCount > 3) {
+                for(int i = 0; i < data.count; i++) {
+                    NSDictionary *d = [data objectAtIndex:i];
+                    if([[d objectForKey:@"cid"] intValue] == server.cid && [[d objectForKey:@"type"] intValue] == TYPE_CONVERSATION) {
+                        [data insertObject:@{@"type":@(TYPE_SPAM), @"name":@"Spam Detected", @"cid":@(server.cid)} atIndex:i];
+                        break;
+                    }
+                }
+            }
+#endif
             if(archiveCount > 0) {
                 [data addObject:@{@"type":@(TYPE_ARCHIVES_HEADER), @"name":@"Archives", @"cid":@(server.cid)}];
                 if([_expandedArchives objectForKey:@(server.cid)]) {
@@ -866,10 +897,12 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized(_data) {
        if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER) {
-            return 46;
-        } else {
-            return 40;
-        }
+           return 46;
+       } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SPAM) {
+           return 64;
+       } else {
+           return 40;
+       }
     }
 }
 
@@ -1035,6 +1068,12 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                 cell.icon.text = nil;
                 cell.icon.hidden = YES;
                 break;
+            case TYPE_SPAM:
+                cell.icon.textColor = cell.label.textColor = [UIColor ownersBorderColor];
+                cell.bgColor = cell.highlightColor = [UIColor colorWithRed:1 green:0.933 blue:0.592 alpha:1];
+                cell.icon.text = FA_EXCLAMATION_TRIANGLE;
+                cell.icon.hidden = NO;
+                break;
         }
         return cell;
     }
@@ -1103,6 +1142,9 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                 [[NetworkConnection sharedInstance] requestArchives:cid];
             }
     #ifndef EXTENSION
+        } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SPAM) {
+            if(_delegate)
+                [_delegate spamSelected:[[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
         } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
             [_delegate dismissKeyboard];
             Server *s = [_servers getServer:[[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
