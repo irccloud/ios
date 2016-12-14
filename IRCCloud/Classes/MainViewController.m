@@ -1803,7 +1803,7 @@ extern NSDictionary *emojiMap;
                                 NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
                                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
                                 [msg appendFormat:@"BID %i last_seen_eid: %f\n", b.bid, b.last_seen_eid];
-                                if(b && [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
+                                if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
                                     [msg appendFormat:@"Stale notification: %@\n", n.request.identifier];
                                 }
                             }

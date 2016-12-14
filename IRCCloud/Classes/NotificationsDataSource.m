@@ -200,7 +200,7 @@
                 for(UNNotification *n in notifications) {
                     NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
                     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
-                    if(b && [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
+                    if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
                         [identifiers addObject:n.request.identifier];
                     }
                 }
