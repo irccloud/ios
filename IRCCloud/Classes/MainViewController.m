@@ -1786,6 +1786,7 @@ extern NSDictionary *emojiMap;
                 [[EventsDataSource sharedInstance] addEvent:e];
                 [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
                 return;
+#endif
             } else if([_message.text isEqualToString:@"/badge"]) {
                 [_message clearText];
                 _buffer.draft = nil;
@@ -1841,7 +1842,6 @@ extern NSDictionary *emojiMap;
                         }];
                     }];
                 }
-#endif
             }
             
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
