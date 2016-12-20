@@ -1481,7 +1481,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _backlogFailedView.backgroundColor = [UIColor contentBackgroundColor];
         [_loadMoreBacklog setTitleColor:[UIColor isDarkTheme]?[UIColor navBarSubheadingColor]:[UIColor unreadBlueColor] forState:UIControlStateNormal];
         [_loadMoreBacklog setTitleShadowColor:[UIColor contentBackgroundColor] forState:UIControlStateNormal];
-        _loadMoreBacklog.backgroundColor = [UIColor timestampBackgroundColor];
+        _loadMoreBacklog.backgroundColor = [UIColor contentBackgroundColor];
         
         _linkAttributes = [UIColor linkAttributes];
         _lightLinkAttributes = [UIColor lightLinkAttributes];
