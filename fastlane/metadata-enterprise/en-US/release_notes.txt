@@ -1,20 +1,7 @@
-New theme: Midnight. This is a variant of the ash theme that uses a pure black background and is being made available on all platforms at the same time.
-
----
-
-The compact spacing setting from the web app is now available on iOS. With this change we've also adjusted the default spacing to more closely match the web app. It's wider than in 3.3, not as wide as it was in 3.2, but hopefully more consistent and readable overall.
-
----
-
-More changes:
-• Added support for pasting images from the clipboard, useful for custom image keyboards
-• Added settings to disable the built-in image viewer and video player
-• Fixed some issues with innacurate unread markers and notifiation badges
-• Fixed a crash when recording video on iOS 10
-• Improved imgur support
-• Fixed connection issues on some mobile networks
-• Fixed tapping channels in the /list dialog
-• Fixed pastebin/file uploads to respect the auto-capitalization setting.
-• Improved coloured message formatting on dark themes
-• Improved the appearance of collapsed joins/parts/quits/mode changes
+• Added /clear command and "Clear Backlog" menu option to temporarily clear the visible backlog
+• Added a spam detection warning and a dialog for bulk removing private messages
+• Added support for a few additional minor IRC message types
+• Improved color formatting
+• Fixed a crash when 3D Touch previewing a Pastebin URL
+• Fixed a few issues with updating the icon badge count
 • Stability improvements, and minor fixes
