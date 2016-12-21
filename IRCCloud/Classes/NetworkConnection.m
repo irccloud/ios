@@ -590,7 +590,7 @@ volatile BOOL __socketPaused = NO;
                    @"operator_fail": alert, @"not_on_channel": alert, @"ban_on_chan": alert,
                    @"cannot_send_to_chan": alert, @"user_on_channel": alert, @"no_nick_given": alert,
                    @"no_text_to_send": alert, @"no_origin": alert, @"only_servers_can_change_mode": alert,
-                   @"silence": alert, @"no_channel_topic": alert, @"invite_only_chan": alert, @"channel_full": alert,
+                   @"silence": alert, @"no_channel_topic": alert, @"invite_only_chan": alert, @"channel_full": alert, @"channel_key_set": alert,
                    @"open_buffer": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventOpenBuffer];
