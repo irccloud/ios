@@ -177,7 +177,7 @@
 -(void)addChannels:(NSArray *)channels forGroup:(NSString *)group attributedString:(NSMutableAttributedString *)data links:(NSMutableArray *)links server:(Server *)s {
     NSArray *matches;
     if(channels.count) {
-        [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ of:\n", group] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil]];
+        [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:[group isEqualToString:@"Member"]?@"%@ of:\n":@"%@ in:\n", group] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil]];
         for(NSString *channel in channels) {
             NSUInteger offset = data.length;
             [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@" • %@\n", channel] defaultColor:[UIColor messageTextColor] mono:NO linkify:YES server:s links:&matches]];
