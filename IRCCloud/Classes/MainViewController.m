@@ -53,6 +53,7 @@
 #import "AvatarsDataSource.h"
 #import "TextTableViewController.h"
 #import "SpamViewController.h"
+#import "LinksListTableViewController.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -906,6 +907,23 @@ extern NSDictionary *emojiMap;
                 tv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
                 tv.navigationItem.title = [NSString stringWithFormat:@"Modules list for %@", tv.server.hostname];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                if(self.presentedViewController)
+                    [self dismissViewControllerAnimated:NO completion:nil];
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventLinksResponse:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                LinksListTableViewController *lv = [[LinksListTableViewController alloc] init];
+                lv.event = o;
+                lv.navigationItem.title = [o objectForKey:@"server"];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                     nc.modalPresentationStyle = UIModalPresentationFormSheet;
