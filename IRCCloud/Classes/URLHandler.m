@@ -23,14 +23,17 @@
 #import "AppDelegate.h"
 #import "MainViewController.h"
 #import "ImageViewController.h"
+#ifndef EXTENSION
 #import "OpenInChromeController.h"
 #import "OpenInFirefoxControllerObjC.h"
+#endif
 #import "PastebinViewController.h"
 #import "UIColor+IRCCloud.h"
 #import "config.h"
 #import "ARChromeActivity.h"
 #import "TUSafariActivity.h"
 
+#ifndef EXTENSION
 @interface OpenInFirefoxActivity : UIActivity
 
 @end
@@ -59,7 +62,6 @@
             }
         }
     }
-    
     return NO;
 }
 
@@ -78,7 +80,7 @@
 }
 
 @end
-
+#endif
 
 @implementation URLHandler
 
@@ -130,6 +132,7 @@
 
 - (void)launchURL:(NSURL *)url
 {
+#ifndef EXTENSION
     if([[UIApplication sharedApplication] respondsToSelector:NSSelectorFromString(@"_deactivateReachability")])
         objc_msgSend([UIApplication sharedApplication], NSSelectorFromString(@"_deactivateReachability"));
     NSLog(@"Launch: %@", url);
@@ -260,10 +263,12 @@
     } else {
         [self openWebpage:url];
     }
+#endif
 }
 
 - (void)showImage:(NSURL *)url
 {
+#ifndef EXTENSION
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     ImageViewController *ivc = [[ImageViewController alloc] initWithURL:url];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -276,10 +281,12 @@
             appDelegate.window.rootViewController.view.alpha = 1;
         } completion:nil];
     }];
+#endif
 }
 
 - (void)openWebpage:(NSURL *)url
 {
+#ifndef EXTENSION
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
         if([[OpenInChromeController sharedInstance] openInChrome:url withCallbackURL:self.appCallbackURL createNewTab:NO])
             return;
@@ -301,9 +308,11 @@
     } else {
         [[UIApplication sharedApplication] openURL:url];
     }
+#endif
 }
 
 + (UIActivityViewController *)activityControllerForItems:(NSArray *)items type:(NSString *)type {
+#ifndef EXTENSION
     NSArray *activities;
     
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
@@ -331,6 +340,9 @@
         }
     };
     return activityController;
+#else
+    return nil;
+#endif
 }
 
 @end

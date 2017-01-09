@@ -215,6 +215,7 @@ volatile BOOL __socketPaused = NO;
         [NetworkConnection sync:[caches URLByAppendingPathComponent:@"servers"] with:[sharedcontainer URLByAppendingPathComponent:@"servers"]];
         [NetworkConnection sync:[caches URLByAppendingPathComponent:@"buffers"] with:[sharedcontainer URLByAppendingPathComponent:@"buffers"]];
         [NetworkConnection sync:[caches URLByAppendingPathComponent:@"channels"] with:[sharedcontainer URLByAppendingPathComponent:@"channels"]];
+        [NetworkConnection sync:[caches URLByAppendingPathComponent:@"stream"] with:[sharedcontainer URLByAppendingPathComponent:@"stream"]];
     }
 }
 
@@ -265,14 +266,10 @@ volatile BOOL __socketPaused = NO;
 #endif
     _userAgent = [NSString stringWithFormat:@"%@/%@ (%@; %@; %@ %@)", app, version, [UIDevice currentDevice].model, [[[NSUserDefaults standardUserDefaults] objectForKey: @"AppleLanguages"] objectAtIndex:0], [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
     
-    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
-        NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
-        [__userInfoLock lock];
-        _userInfo = [NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile];
-        [__userInfoLock unlock];
-    } else {
-        CLS_LOG(@"Version changed, not loading caches");
-    }
+    NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
+    [__userInfoLock lock];
+    _userInfo = [NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile];
+    [__userInfoLock unlock];
     if(self.userInfo) {
         _config = [self.userInfo objectForKey:@"config"];
     }
@@ -1956,6 +1953,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 }
                 [_notifications removeNotificationsForBID:b.bid olderThan:b.last_seen_eid];
             }
+            [NetworkConnection sync];
         });
         _numBuffers = 0;
         __socketPaused = NO;
