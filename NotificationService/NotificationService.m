@@ -1,15 +1,23 @@
 //
-//  NotificationService.m
-//  NotificationService
+//  NotificationService.h
 //
-//  Created by Sam Steele on 1/9/17.
-//  Copyright © 2017 IRCCloud, Ltd. All rights reserved.
+//  Copyright (C) 2017 IRCCloud, Ltd.
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
+//  http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 
 #import "NetworkConnection.h"
 #import "NotificationService.h"
 #import "ColorFormatter.h"
-#import "URLHandler.h"
+#import "CSURITemplate.h"
 
 @interface NotificationService () {
     NSURL *_attachment;
@@ -37,17 +45,33 @@
     IRCCLOUD_PATH = [d objectForKey:@"path"];
 
     [NetworkConnection sync];
-    NSLog(@"Config: %@", [NetworkConnection sharedInstance].config);
-    
-    NSArray *links;
-    [ColorFormatter format:request.content.body defaultColor:[UIColor blackColor] mono:NO linkify:YES server:nil links:&links];
-    NSLog(@"Links: %@", links);
-    
     NSURL *attachment = nil;
-    for(NSTextCheckingResult *r in links) {
-        if(r.resultType == NSTextCheckingTypeLink && [URLHandler isImageURL:r.URL]) {
-            attachment = r.URL;
-            break;
+    
+    if([request.content.userInfo objectForKey:@"f"]) {
+        NSString *fileID = [[request.content.userInfo objectForKey:@"f"] objectAtIndex:0];
+        NSString *type = [[request.content.userInfo objectForKey:@"f"] objectAtIndex:1];
+        
+        if(![NetworkConnection sharedInstance].config)
+            [NetworkConnection sharedInstance].config = [[NetworkConnection sharedInstance] requestConfiguration];
+        
+        CSURITemplate *template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
+
+        if([type hasPrefix:@"image/"])
+            attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"name":[NSString stringWithFormat:@"%@.%@", fileID, [type substringFromIndex:[type rangeOfString:@"/"].location + 1]], @"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", [UIScreen mainScreen].bounds.size.width]} error:nil]];
+        else
+            attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"name":[NSString stringWithFormat:@"%@.%@", fileID, [type substringFromIndex:[type rangeOfString:@"/"].location + 1]], @"id":fileID} error:nil]];
+    } else {
+        NSArray *links;
+        [ColorFormatter format:request.content.body defaultColor:[UIColor blackColor] mono:NO linkify:YES server:nil links:&links];
+
+        for(NSTextCheckingResult *r in links) {
+            if(r.resultType == NSTextCheckingTypeLink) {
+                NSString *type = [r.URL.pathExtension lowercaseString];
+                if([type isEqualToString:@"png"] || [type isEqualToString:@"jpg"] || [type isEqualToString:@"jpeg"] || [type isEqualToString:@"gif"] || [type isEqualToString:@"m4v"] || [type isEqualToString:@"mp4"] || [type isEqualToString:@"mov"] || [type isEqualToString:@"m4a"] || [type isEqualToString:@"mp3"]) {
+                    attachment = r.URL;
+                    break;
+                }
+            }
         }
     }
     

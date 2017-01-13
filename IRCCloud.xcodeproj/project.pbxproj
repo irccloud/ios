@@ -117,8 +117,6 @@
 		221D4BBF1E23F4D800D403E6 /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		221D4BC01E23F4DF00D403E6 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		221D4BC11E23F4DF00D403E6 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
-		221D4BC21E23F4F800D403E6 /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
-		221D4BC31E23F4F900D403E6 /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
 		221D4BC41E23F4FD00D403E6 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		221D4BC51E23F4FE00D403E6 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		221D4BC61E23F5EC00D403E6 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; };
@@ -177,6 +175,8 @@
 		221D4BFB1E23F76A00D403E6 /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 228E2B7D18CF770D0011DEAB /* SBJsonWriter.m */; };
 		221D4BFC1E23FD3B00D403E6 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
 		221D4BFD1E23FD3B00D403E6 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
+		221D4BFE1E291C5300D403E6 /* CSURITemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649231B1E0719003BFD86 /* CSURITemplate.m */; };
+		221D4BFF1E291C5400D403E6 /* CSURITemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649231B1E0719003BFD86 /* CSURITemplate.m */; };
 		221E3F4C1AD2DEE00090934B /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */; };
 		221E3F4D1AD2DEE00090934B /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */; };
 		221F0BC5177368B40008EE04 /* CallerIDTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */; };
@@ -2142,6 +2142,7 @@
 				221D4BD51E23F75300D403E6 /* NSData+Base64.m in Sources */,
 				221D4BC01E23F4DF00D403E6 /* UIColor+IRCCloud.m in Sources */,
 				221D4BB21E23F48A00D403E6 /* BuffersDataSource.m in Sources */,
+				221D4BFE1E291C5300D403E6 /* CSURITemplate.m in Sources */,
 				221D4BB61E23F49800D403E6 /* EventsDataSource.m in Sources */,
 				221D4BB81E23F4AF00D403E6 /* ColorFormatter.m in Sources */,
 				221D4BE61E23F76900D403E6 /* SBJsonStreamParserAdapter.m in Sources */,
@@ -2152,7 +2153,6 @@
 				221D4BE81E23F76900D403E6 /* SBJsonStreamTokeniser.m in Sources */,
 				221D4BEC1E23F76900D403E6 /* SBJsonTokeniser.m in Sources */,
 				221D4BE21E23F76900D403E6 /* NSObject+SBJson.m in Sources */,
-				221D4BC21E23F4F800D403E6 /* URLHandler.m in Sources */,
 				221D4BE71E23F76900D403E6 /* SBJsonStreamParserState.m in Sources */,
 				221D4BE31E23F76900D403E6 /* SBJsonParser.m in Sources */,
 				221D4BE51E23F76900D403E6 /* SBJsonStreamParserAccumulator.m in Sources */,
@@ -2184,6 +2184,7 @@
 				221D4BDD1E23F75400D403E6 /* NSData+Base64.m in Sources */,
 				221D4BC11E23F4DF00D403E6 /* UIColor+IRCCloud.m in Sources */,
 				221D4BB31E23F48B00D403E6 /* BuffersDataSource.m in Sources */,
+				221D4BFF1E291C5400D403E6 /* CSURITemplate.m in Sources */,
 				221D4BB71E23F49800D403E6 /* EventsDataSource.m in Sources */,
 				221D4BB91E23F4B000D403E6 /* ColorFormatter.m in Sources */,
 				221D4BF31E23F76A00D403E6 /* SBJsonStreamParserAdapter.m in Sources */,
@@ -2194,7 +2195,6 @@
 				221D4BF51E23F76A00D403E6 /* SBJsonStreamTokeniser.m in Sources */,
 				221D4BF91E23F76A00D403E6 /* SBJsonTokeniser.m in Sources */,
 				221D4BEF1E23F76A00D403E6 /* NSObject+SBJson.m in Sources */,
-				221D4BC31E23F4F900D403E6 /* URLHandler.m in Sources */,
 				221D4BF41E23F76A00D403E6 /* SBJsonStreamParserState.m in Sources */,
 				221D4BF01E23F76A00D403E6 /* SBJsonParser.m in Sources */,
 				221D4BF21E23F76A00D403E6 /* SBJsonStreamParserAccumulator.m in Sources */,
