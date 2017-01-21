@@ -496,7 +496,7 @@
                     output = [NSString stringWithFormat:@"%c%@%@%c %c%@was %@", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.targetMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO], CLEAR, COLOR_RGB, [UIColor messageTextColor].toHexString, [e modes:YES mode_modes:_mode_modes]];
                     if(e.fromNick) {
                         if([e.fromMode isEqualToString:@"__the_server__"])
-                            output = [output stringByAppendingFormat:@" by%c the server %c%@%@%c", CLEAR, BOLD, e.fromNick, [UIColor collapsedRowNickColor].toHexString, CLEAR];
+                            output = [output stringByAppendingFormat:@" by the server %c%@%@%c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, e.fromNick, CLEAR];
                         else
                             output = [output stringByAppendingFormat:@" by%c %@", CLEAR, [self formatNick:e.fromNick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO]];
                     }

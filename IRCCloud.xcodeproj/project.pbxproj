@@ -1770,7 +1770,7 @@
 					221D4B8C1E23EAD600D403E6 = {
 						CreatedOnToolsVersion = 8.2.1;
 						DevelopmentTeam = GED45EQAGA;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -2701,6 +2701,7 @@
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = GED45EQAGA;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2719,6 +2720,8 @@
 				OTHER_CFLAGS = "-DEXTENSION";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "59ca9d36-ce52-4d83-9338-34b8dc372c9b";
+				PROVISIONING_PROFILE_SPECIFIER = "NotificationService development";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -2732,9 +2735,10 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = GED45EQAGA;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -2756,6 +2760,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "70d3285d-18b4-499d-a528-a6f80e139ccc";
+				PROVISIONING_PROFILE_SPECIFIER = "Crashlytics NotificationService";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -2772,7 +2778,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = GED45EQAGA;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
