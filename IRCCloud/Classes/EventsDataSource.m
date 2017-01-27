@@ -254,8 +254,8 @@
         
         void (^error)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
             event.from = @"";
-            event.color = [UIColor networkErrorColor];
-            event.bgColor = [UIColor errorBackgroundColor];
+            event.bgColor = [UIColor statusBackgroundColor];
+            event.monospace = YES;
         };
         
         void (^notice)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
