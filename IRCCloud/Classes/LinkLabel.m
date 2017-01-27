@@ -22,20 +22,6 @@ NSLayoutManager *__LinkLabelLayoutManager;
 
 @implementation LinkLabel
 
-- (id)init {
-    return [self initWithFrame:CGRectZero];
-}
-
-- (id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    if(self) {
-        _links = [[NSMutableArray alloc] init];
-        _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)];
-        [self addGestureRecognizer:_tapGesture];
-    }
-    return self;
-}
-
 - (void)viewTapped:(UITapGestureRecognizer *)sender {
     if(sender.state == UIGestureRecognizerStateEnded) {
         NSTextCheckingResult *r = [self linkAtPoint:[sender locationInView:self]];
@@ -62,11 +48,24 @@ NSLayoutManager *__LinkLabelLayoutManager;
     }
 }
 
+-(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    NSTextCheckingResult *r = [self linkAtPoint:[touch locationInView:self]];
+    return (r && _linkDelegate);
+}
+
 - (void)addLinkToURL:(NSURL *)url withRange:(NSRange)range {
     [self addLinkWithTextCheckingResult:[NSTextCheckingResult linkCheckingResultWithRange:range URL:url]];
 }
 
 - (void)addLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
+    if(!_links) {
+        _links = [[NSMutableArray alloc] init];
+    }
+    if(!_tapGesture) {
+        _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)];
+        _tapGesture.delegate = self;
+        [self addGestureRecognizer:_tapGesture];
+    }
     NSMutableAttributedString *s = self.attributedText.mutableCopy;
     [s addAttributes:self.linkAttributes range:result.range];
     [super setAttributedText:s];

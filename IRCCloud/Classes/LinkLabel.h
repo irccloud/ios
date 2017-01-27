@@ -18,7 +18,7 @@
 
 @protocol LinkLabelDelegate;
 
-@interface LinkLabel : UILabel {
+@interface LinkLabel : UILabel<UIGestureRecognizerDelegate> {
     UITapGestureRecognizer *_tapGesture;
     NSMutableArray *_links;
 }

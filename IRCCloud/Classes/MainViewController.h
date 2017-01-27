@@ -28,7 +28,7 @@
 #import "FilesTableViewController.h"
 #import "LinkLabel.h"
 
-@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate> {
+@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate,LinkLabelDelegate> {
     IBOutlet EventsTableView *_eventsView;
     IBOutlet UIView *_connectingView;
     IBOutlet UILabel *_connectingStatus;
@@ -46,7 +46,7 @@
     IBOutlet UIView *_2swipeTip;
     IBOutlet UIView *_mentionTip;
     IBOutlet UIView *_globalMsgContainer;
-    IBOutlet UILabel *_globalMsg;
+    IBOutlet LinkLabel *_globalMsg;
     IBOutlet UIButton *_loadMoreBacklog;
     IBOutlet NSLayoutConstraint *_eventsViewWidthConstraint;
     IBOutlet NSLayoutConstraint *_eventsViewOffsetXConstraint;

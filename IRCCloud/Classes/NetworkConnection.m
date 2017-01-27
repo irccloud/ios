@@ -1642,7 +1642,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _config = [self requestConfiguration];
 #ifdef ENTERPRISE
         if(![[_config objectForKey:@"enterprise"] intValue])
-            _globalMsg = @"This server is not an Enterprise instance. Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store.";
+            _globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [_config objectForKey:@"ios_app"]];
 #endif
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");

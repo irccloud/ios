@@ -164,6 +164,8 @@ extern NSDictionary *emojiMap;
     [_usersView performSelectorInBackground:@selector(refresh) withObject:nil];
     
     [self _resetStatusBar];
+    
+    _globalMsg.linkAttributes = [UIColor lightLinkAttributes];
 }
 
 - (void)viewDidLoad {
@@ -223,6 +225,9 @@ extern NSDictionary *emojiMap;
     [self addChildViewController:_eventsView];
     
     AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &alertSound);
+    
+    _globalMsg.linkDelegate = self;
+    [_globalMsg addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(globalMsgPressed:)]];
     
     if(!_buffersView) {
         _buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
@@ -2471,7 +2476,7 @@ extern NSDictionary *emojiMap;
 -(void)_updateGlobalMsg {
     if([NetworkConnection sharedInstance].globalMsg.length) {
         _globalMsgContainer.hidden = NO;
-        _globalMsg.userInteractionEnabled = NO;
+        _globalMsg.userInteractionEnabled = YES;
         NSString *msg = [NetworkConnection sharedInstance].globalMsg;
         msg = [msg stringByReplacingOccurrencesOfString:@"<b>" withString:[NSString stringWithFormat:@"%c", BOLD]];
         msg = [msg stringByReplacingOccurrencesOfString:@"</b>" withString:[NSString stringWithFormat:@"%c", BOLD]];
@@ -2484,7 +2489,8 @@ extern NSDictionary *emojiMap;
         msg = [msg stringByReplacingOccurrencesOfString:@"<br>" withString:@"\n"];
         msg = [msg stringByReplacingOccurrencesOfString:@"<br/>" withString:@"\n"];
         
-        NSMutableAttributedString *s = (NSMutableAttributedString *)[ColorFormatter format:msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil];
+        NSArray *links;
+        NSMutableAttributedString *s = (NSMutableAttributedString *)[ColorFormatter format:msg defaultColor:[UIColor blackColor] mono:NO linkify:YES server:nil links:&links];
         
         NSMutableParagraphStyle *p = [[NSMutableParagraphStyle alloc] init];
         p.alignment = NSTextAlignmentCenter;
@@ -2492,6 +2498,11 @@ extern NSDictionary *emojiMap;
 
         _globalMsg.textColor = [UIColor messageTextColor];
         _globalMsg.attributedText = s;
+        for(NSTextCheckingResult *result in links) {
+            if(result.resultType == NSTextCheckingTypeLink) {
+                [_globalMsg addLinkWithTextCheckingResult:result];
+            }
+        }
         _topUnreadBarYOffsetConstraint.constant = _globalMsg.intrinsicContentSize.height + 12;
         [self.view layoutIfNeeded];
     } else {
@@ -4343,6 +4354,10 @@ Device type: %@\n",
         }
         [self imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image}];
     }
+}
+
+- (void)LinkLabel:(LinkLabel *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:result.URL];
 }
 
 -(NSArray<UIKeyCommand *> *)keyCommands {
