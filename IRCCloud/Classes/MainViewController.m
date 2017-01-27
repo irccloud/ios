@@ -2493,6 +2493,7 @@ extern NSDictionary *emojiMap;
         _globalMsg.textColor = [UIColor messageTextColor];
         _globalMsg.attributedText = s;
         _topUnreadBarYOffsetConstraint.constant = _globalMsg.intrinsicContentSize.height + 12;
+        [self.view layoutIfNeeded];
     } else {
         _globalMsgContainer.hidden = YES;
         _topUnreadBarYOffsetConstraint.constant = 0;

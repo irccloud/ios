@@ -111,9 +111,7 @@
         content.categoryIdentifier = category;
         
         UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:[@(eid) stringValue] content:content trigger:nil];
-        [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:^(NSError *error) {
-            [self refresh];
-        }];
+        [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
 #endif
     } else {
         UILocalNotification *n = [[UILocalNotification alloc] init];

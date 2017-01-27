@@ -1556,11 +1556,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
+                                                                         tlsSettings:[@{
 #ifdef DEBUG
-                                                                         tlsSettings:[@{(NSString *)GCDAsyncSocketManuallyEvaluateTrust:@(YES)
+                                                                         (NSString *)GCDAsyncSocketManuallyEvaluateTrust:@(YES)
 #else
-                                                                         tlsSettings:[@{(NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
-                                                                                        (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kTLSProtocol1),
+                                                                         (NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
+                                                                         (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kTLSProtocol1),
 #ifndef ENTERPRISE
                                                                                         @"fingerprints":@[@"E6B8B984CA03D68389A227021B11C496770DE26A", @"8D3BE1983F75F4A4546F42F5EC189BC65A9D3A42"]
 #endif
@@ -1639,6 +1640,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _state = kIRCCloudStateConnected;
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         _config = [self requestConfiguration];
+#ifdef ENTERPRISE
+        if(![[_config objectForKey:@"enterprise"] intValue])
+            _globalMsg = @"This server is not an Enterprise instance. Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store.";
+#endif
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");
     }

@@ -373,6 +373,8 @@
 		228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */; };
 		228F69731DF8A3F30079E276 /* SpamViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228F69721DF8A3F30079E276 /* SpamViewController.m */; };
 		228F69741DF8A3F30079E276 /* SpamViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228F69721DF8A3F30079E276 /* SpamViewController.m */; };
+		2291EEDC1E3B755500FBC003 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
+		2291EEDD1E3B756A00FBC003 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
 		2292AD591D5B55CC00BEE269 /* LinkLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE91781D59160B0014B25C /* LinkLabel.m */; };
 		2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
 		229C85411B502920004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
@@ -1006,6 +1008,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2291EEDC1E3B755500FBC003 /* Crashlytics.framework in Frameworks */,
+				2291EEDD1E3B756A00FBC003 /* Fabric.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2817,6 +2821,10 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
@@ -2847,6 +2855,10 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -2880,6 +2892,10 @@
 				DEVELOPMENT_TEAM = GED45EQAGA;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -3544,6 +3560,7 @@
 				221D4B991E23EAD700D403E6 /* AppStore */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		221D4B9F1E23EB4900D403E6 /* Build configuration list for PBXNativeTarget "NotificationService Enterprise" */ = {
 			isa = XCConfigurationList;
