@@ -262,7 +262,11 @@ volatile BOOL __socketPaused = NO;
 #ifdef EXTENSION
     NSString *app = @"ShareExtension";
 #else
+#ifdef ENTERPRISE
+    NSString *app = @"IRCEnterprise";
+#else
     NSString *app = @"IRCCloud";
+#endif
 #endif
     _userAgent = [NSString stringWithFormat:@"%@/%@ (%@; %@; %@ %@)", app, version, [UIDevice currentDevice].model, [[[NSUserDefaults standardUserDefaults] objectForKey: @"AppleLanguages"] objectAtIndex:0], [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
     
