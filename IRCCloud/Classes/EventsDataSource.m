@@ -254,8 +254,8 @@
         
         void (^error)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
             event.from = @"";
-            event.bgColor = [UIColor statusBackgroundColor];
-            event.monospace = YES;
+            event.color = [UIColor networkErrorColor];
+            event.bgColor = [UIColor errorBackgroundColor];
         };
         
         void (^notice)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
@@ -357,7 +357,7 @@
         };
         
         _formatterMap = @{@"too_fast":error, @"sasl_fail":error, @"sasl_too_long":error, @"sasl_aborted":error,
-                          @"sasl_already":error, @"no_bots":error, @"msg_services":error, @"bad_ping":error, @"error":error,
+                          @"sasl_already":error, @"no_bots":error, @"msg_services":error, @"bad_ping":error, @"error":status,
                           @"not_for_halfops":error, @"ambiguous_error_message":error, @"list_syntax":error, @"who_syntax":error,
                           @"wait":status, @"stats": status, @"statslinkinfo": status, @"statscommands": status, @"statscline": status, @"statsnline": status, @"statsiline": status, @"statskline": status, @"statsqline": status, @"statsyline": status, @"statsbline": status, @"statsgline": status, @"statstline": status, @"statseline": status, @"statsvline": status, @"statslline": status, @"statsuptime": status, @"statsoline": status, @"statshline": status, @"statssline": status, @"statsuline": status, @"statsdebug": status, @"endofstats": status, @"spamfilter": status,
                           @"server_motdstart": status, @"server_welcome": status, @"server_endofmotd": status,
@@ -823,6 +823,12 @@
                           },
                           @"you_parted_channel":^(Event *event, IRCCloudJSONObject *object) {
                               event.rowType = ROW_SOCKETCLOSED;
+                          },
+                          @"user_chghost":^(Event *event, IRCCloudJSONObject *object) {
+                              if(object) {
+                                  event.from = event.nick;
+                                  event.msg = [NSString stringWithFormat:@"changed host: %@@@%@ → %@@@%@", [object objectForKey:@"user"], [object objectForKey:@"userhost"], [object objectForKey:@"from_name"], [object objectForKey:@"from_host"]];
+                              }
                           },
       };
     }
