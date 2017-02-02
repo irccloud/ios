@@ -3158,8 +3158,10 @@ extern NSDictionary *emojiMap;
             title = _selectedUser.nick;
     }
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:title delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
-    if(_selectedURL)
+    if(_selectedURL) {
         [sheet addButtonWithTitle:@"Copy URL"];
+        [sheet addButtonWithTitle:@"Share URL"];
+    }
     if(_selectedEvent)
         [sheet addButtonWithTitle:@"Copy Message"];
     if(_selectedUser) {
@@ -4052,6 +4054,9 @@ extern NSDictionary *emojiMap;
         } else if([action isEqualToString:@"Copy URL"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
             [pb setValue:_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+        } else if([action isEqualToString:@"Share URL"]) {
+            UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:_selectedURL]] type:@"URL"];
+            [self.slidingViewController presentViewController:activityController animated:YES completion:nil];
         } else if([action isEqualToString:@"Archive"]) {
             [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Unarchive"]) {
