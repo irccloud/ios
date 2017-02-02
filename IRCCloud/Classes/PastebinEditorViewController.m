@@ -90,6 +90,10 @@
 
 -(void)sendButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
+    UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+    [spinny startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+
     if(_type.selectedSegmentIndex == 1) {
         if(_message.text.length) {
             _buffer.draft = [NSString stringWithFormat:@"%@ %@", _message.text, _text.text];
@@ -98,10 +102,6 @@
         }
         _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid];
     } else {
-        UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-        [spinny startAnimating];
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
-        
         if([_filename.text rangeOfString:@"."].location != NSNotFound) {
             NSString *extension = [_filename.text substringFromIndex:[_filename.text rangeOfString:@"." options:NSBackwardsSearch].location + 1];
             if(extension.length)
