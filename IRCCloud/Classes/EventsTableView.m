@@ -1017,7 +1017,7 @@ extern UIImage *__socketClosedBackgroundImage;
             } else if([type isEqualToString:@"buffer_me_msg"]) {
                 event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], event.msg];
                 event.rowType = ROW_ME_MESSAGE;
-            } else if([type isEqualToString:@"notice"]) {
+            } else if([type isEqualToString:@"notice"] || [type isEqualToString:@"buffer_msg"]) {
                 Server *s = [[ServersDataSource sharedInstance] getServer:event.cid];
                 if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OPER]])
                     event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO],BOLD];
@@ -1033,10 +1033,15 @@ extern UIImage *__socketClosedBackgroundImage;
                     event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Voiced" mode:s.MODE_VOICED colorize:NO],BOLD];
                 else
                     event.formattedMsg = @"";
-                if([_buffer.type isEqualToString:@"console"] && event.toChan && event.chan.length) {
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c: %@", BOLD, event.chan, BOLD, event.msg];
-                } else if([_buffer.type isEqualToString:@"console"] && event.isSelf && event.nick.length) {
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c: %@", BOLD, event.nick, BOLD, event.msg];
+                
+                if([type isEqualToString:@"notice"]) {
+                    if([_buffer.type isEqualToString:@"console"] && event.toChan && event.chan.length) {
+                        event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c: %@", BOLD, event.chan, BOLD, event.msg];
+                    } else if([_buffer.type isEqualToString:@"console"] && event.isSelf && event.nick.length) {
+                        event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c: %@", BOLD, event.nick, BOLD, event.msg];
+                    } else {
+                        event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
+                    }
                 } else {
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
                 }

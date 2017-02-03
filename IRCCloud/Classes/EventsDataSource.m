@@ -374,6 +374,14 @@
                           @"kicked_channel":kicked_channel, @"you_kicked_channel":kicked_channel,
                           @"motd_response":motd, @"server_motd":motd, @"info_response":motd,
                           @"notice":notice, @"newsflash":notice, @"generic_server_info":notice, @"list_usage":notice,
+                          @"buffer_msg": ^(Event *event, IRCCloudJSONObject *object) {
+                              if(object) {
+                                  if([[object objectForKey:@"statusmsg"] isKindOfClass:[NSString class]])
+                                      event.targetMode = [object objectForKey:@"statusmsg"];
+                                  else
+                                      event.targetMode = nil;
+                              }
+                          },
                           @"socket_closed":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
                               event.rowType = ROW_SOCKETCLOSED;
