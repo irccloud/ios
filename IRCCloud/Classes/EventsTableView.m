@@ -260,10 +260,10 @@ extern UIImage *__socketClosedBackgroundImage;
         if(_type == ROW_THUMBNAIL) {
             _thumbbackground.backgroundColor = [UIColor bufferBackgroundColor];
             if(__timeLeftPref) {
-                _thumbbackground.frame = CGRectMake(frame.origin.x + __timestampWidth + 8, frame.origin.y + 2, frame.size.width - 16 - __timestampWidth, frame.size.height - 2);
-                _thumbnail.frame = CGRectMake(frame.origin.x + 16 + __timestampWidth, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
+                _thumbbackground.frame = CGRectMake(frame.origin.x + __timestampWidth + 6, frame.origin.y + 2, frame.size.width - 16 - __timestampWidth, frame.size.height - 8);
+                _thumbnail.frame = CGRectMake(frame.origin.x + 14 + __timestampWidth, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
             } else {
-                _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y + 1, _timestamp.frame.origin.x - frame.origin.x - 8, frame.size.height - 2);
+                _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y + 1, _timestamp.frame.origin.x - frame.origin.x - 8, frame.size.height - 8);
                 _thumbnail.frame = CGRectMake(frame.origin.x + 8, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
             }
             _thumbbackground.hidden = NO;
@@ -1933,7 +1933,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
             width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
         float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-        e.height += ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + 16;
+        e.height += ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + 24;
     }
 }
 
