@@ -429,8 +429,18 @@ extern UIImage *__socketClosedBackgroundImage;
     MainViewController *mainViewController = [(AppDelegate *)([UIApplication sharedApplication].delegate) mainViewController];
     EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[_tableView indexPathForRowAtPoint:location]];
     _previewingRow = [_tableView indexPathForRowAtPoint:location].row;
-    NSTextCheckingResult *r = [cell.message linkAtPoint:[_tableView convertPoint:location toView:cell.message]];
-    NSURL *url = r.URL;
+    Event *e = [_data objectAtIndex:_previewingRow];
+
+    NSURL *url;
+    if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE) {
+        NSString *extension = [e.entities objectForKey:@"extension"];
+        if(!extension.length)
+            extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [_file_url_template relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]];
+    } else {
+        NSTextCheckingResult *r = [cell.message linkAtPoint:[_tableView convertPoint:location toView:cell.message]];
+        url = r.URL;
+    }
     mainViewController.isShowingPreview = YES;
     
     if([URLHandler isImageURL:url]) {
@@ -2436,7 +2446,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 [_conn join:e.oldNick key:nil cid:e.cid];
             else if([e.type isEqualToString:@"callerid"])
                 [_conn say:[NSString stringWithFormat:@"/accept %@", e.nick] to:nil cid:e.cid];
-            else if(e.rowType == ROW_THUMBNAIL) {
+            else if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE) {
                 NSString *extension = [e.entities objectForKey:@"extension"];
                 if(!extension.length)
                     extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
@@ -2470,8 +2480,13 @@ extern UIImage *__socketClosedBackgroundImage;
         NSIndexPath *indexPath = [_tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:_tableView]];
         if(indexPath) {
             if(indexPath.row < _data.count) {
+                Event *e = [_data objectAtIndex:indexPath.row];
                 EventsTableCell *c = (EventsTableCell *)[_tableView cellForRowAtIndexPath:indexPath];
-                NSURL *url = [c.message linkAtPoint:[gestureRecognizer locationInView:c.message]].URL;
+                NSURL *url;
+                if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE)
+                    url = [NSURL URLWithString:[e.entities objectForKey:@"url"]];
+                else
+                    url = [c.message linkAtPoint:[gestureRecognizer locationInView:c.message]].URL;
                 if(url) {
                     if([url.scheme hasPrefix:@"irc"] && [url.host intValue] > 0 && url.path && url.path.length > 1) {
                         Server *s = [[ServersDataSource sharedInstance] getServer:[url.host intValue]];
