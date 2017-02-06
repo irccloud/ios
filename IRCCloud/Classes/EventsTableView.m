@@ -260,10 +260,16 @@ extern UIImage *__socketClosedBackgroundImage;
         if(_type == ROW_THUMBNAIL) {
             _thumbbackground.backgroundColor = [UIColor bufferBackgroundColor];
             if(__timeLeftPref) {
-                _thumbbackground.frame = CGRectMake(frame.origin.x + __timestampWidth + 6, frame.origin.y + 2, frame.size.width - 16 - __timestampWidth, frame.size.height - 8);
+                float width = frame.size.width - 16 - __timestampWidth;
+                if(width < _thumbnailWidth + 16)
+                    width = _thumbnailWidth + 16;
+                _thumbbackground.frame = CGRectMake(frame.origin.x + __timestampWidth + 6, frame.origin.y + 2, width, frame.size.height - 8);
                 _thumbnail.frame = CGRectMake(frame.origin.x + 14 + __timestampWidth, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
             } else {
-                _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y + 1, _timestamp.frame.origin.x - frame.origin.x - 8, frame.size.height - 8);
+                float width = frame.size.width - 16 - __timestampWidth;
+                if(width < _thumbnailWidth + 16)
+                    width = _thumbnailWidth + 16;
+                _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y + 1, width, frame.size.height - 8);
                 _thumbnail.frame = CGRectMake(frame.origin.x + 8, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
             }
             _thumbbackground.hidden = NO;
@@ -1929,7 +1935,7 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     
     if(e.rowType == ROW_THUMBNAIL) {
-        float width = (self.tableView.bounds.size.width/3) * 2;
+        float width = self.tableView.bounds.size.width/2;
         if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
             width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
         float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
@@ -2151,7 +2157,7 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.timestamp.backgroundColor = [UIColor clearColor];
         }
         if(e.rowType == ROW_THUMBNAIL) {
-            float width = (self.tableView.bounds.size.width/3) * 2;
+            float width = self.tableView.bounds.size.width/2;
             if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
                 width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
             float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
