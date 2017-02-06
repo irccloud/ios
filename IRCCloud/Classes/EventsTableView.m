@@ -1133,6 +1133,36 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self scrollViewDidScroll:_tableView];
             }
         }
+        
+        NSTimeInterval entity_eid = event.eid;
+        for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
+            entity_eid += 1;
+            if([[entity objectForKey:@"mime_type"] hasPrefix:@"image/"]) {
+                Event *e1 = [[Event alloc] init];
+                e1.cid = event.cid;
+                e1.bid = event.bid;
+                e1.eid = entity_eid;
+                e1.from = event.from;
+                e1.isSelf = event.isSelf;
+                e1.fromMode = event.fromMode;
+                e1.realname = event.realname;
+                e1.hostmask = event.hostmask;
+                
+                int bytes = [[entity objectForKey:@"size"] intValue];
+                if(bytes < 1024) {
+                    e1.msg = [NSString stringWithFormat:@"%lu B • %@", (unsigned long)bytes, [entity objectForKey:@"mime_type"]];
+                } else {
+                    int exp = (int)(log(bytes) / log(1024));
+                    e1.msg = [NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [entity objectForKey:@"mime_type"]];
+                }
+                e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:event.bgColor;
+                e1.type = event.type;
+                e1.rowType = ROW_THUMBNAIL;
+                e1.entities = entity;
+                
+                [self insertEvent:e1 backlog:backlog nextIsGrouped:NO];
+            }
+        }
     }
 }
 
