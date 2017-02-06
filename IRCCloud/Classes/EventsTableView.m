@@ -1936,10 +1936,22 @@ extern UIImage *__socketClosedBackgroundImage;
     
     if(e.rowType == ROW_THUMBNAIL) {
         float width = self.tableView.bounds.size.width/2;
-        if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
-            width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-        float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-        e.height += ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + 24;
+        if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
+            UIImage *img = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)width];
+            if(img) {
+                NSMutableDictionary *entities = [e.entities mutableCopy];
+                [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
+                e.entities = entities;
+                e.height += ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue]) + 24;
+            } else {
+                e.height += 64;
+            }
+        } else {
+            if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
+                width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+            float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+            e.height += ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + 24;
+        }
     }
 }
 
@@ -2158,20 +2170,41 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         if(e.rowType == ROW_THUMBNAIL) {
             float width = self.tableView.bounds.size.width/2;
-            if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
-                width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-            float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-            cell.thumbnailWidth = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
-            cell.thumbnailHeight = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
+            if([[e.entities objectForKey:@"properties"] objectForKey:@"width"] && [[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
+                if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
+                    width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+                float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+                cell.thumbnailWidth = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
+                cell.thumbnailHeight = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
+            } else {
+                cell.thumbnailWidth = width;
+                cell.thumbnailHeight = 48;
+            }
             cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)width];
             if(!cell.thumbnail.image) {
                 [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)width completionHandler:^(UIImage *img) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        cell.thumbnail.image = img;
-                        cell.thumbnail.hidden = NO;
-                        cell.spinner.hidden = YES;
-                        [cell.spinner stopAnimating];
+                        if([[e.entities objectForKey:@"properties"] objectForKey:@"width"] && [[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
+                            cell.thumbnail.image = img;
+                            cell.thumbnail.hidden = NO;
+                            cell.spinner.hidden = YES;
+                            [cell.spinner stopAnimating];
+                        } else {
+                            NSMutableDictionary *entities = [e.entities mutableCopy];
+                            [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
+                            e.entities = entities;
+                            [self.tableView reloadData];
+                        }
                     }];
+                }];
+            } else if(![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
+                NSMutableDictionary *entities = [e.entities mutableCopy];
+                [entities setObject:@{@"width":@(cell.thumbnail.image.size.width), @"height":@(cell.thumbnail.image.size.height)} forKey:@"properties"];
+                e.entities = entities;
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    NSLog(@"Image dimensions were missing, reloading table");
+                    [self _calculateHeight:e];
+                    [self.tableView reloadData];
                 }];
             }
         }
