@@ -49,6 +49,12 @@
     _template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
 }
 
+-(void)purge {
+    NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"imagecache"];
+    [[NSFileManager defaultManager] removeItemAtURL:caches error:nil];
+    [self clear];
+}
+
 - (NSString *)md5:(NSString *)string {
     const char *cstr = [string UTF8String];
     unsigned char result[16];

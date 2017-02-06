@@ -20,6 +20,7 @@
 #import "HandshakeHeader.h"
 #import "IRCCloudJSONObject.h"
 #import "UIColor+IRCCloud.h"
+#import "ImageCache.h"
 
 NSString *_userAgent = nil;
 NSString *kIRCCloudConnectivityNotification = @"com.irccloud.notification.connectivity";
@@ -2121,6 +2122,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         }
     }
 #endif
+    [[ImageCache sharedInstance] purge];
     [self cancelIdleTimer];
 }
 

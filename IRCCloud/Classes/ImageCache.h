@@ -28,6 +28,7 @@ typedef void (^imageCompletionHandler)(UIImage *);
 
 +(ImageCache *)sharedInstance;
 -(void)clear;
+-(void)purge;
 -(UIImage *)imageForURL:(NSURL *)url;
 -(UIImage *)imageForFileID:(NSString *)fileID;
 -(UIImage *)thumbnailForFileID:(NSString *)fileID;
