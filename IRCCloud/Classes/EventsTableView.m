@@ -259,10 +259,15 @@ extern UIImage *__socketClosedBackgroundImage;
 
         if(_type == ROW_THUMBNAIL) {
             _thumbbackground.backgroundColor = [UIColor bufferBackgroundColor];
-            _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y, _timestamp.frame.origin.x - frame.origin.x, frame.size.height);
+            if(__timeLeftPref) {
+                _thumbbackground.frame = CGRectMake(frame.origin.x + __timestampWidth + 8, frame.origin.y + 2, frame.size.width - 16 - __timestampWidth, frame.size.height - 2);
+                _thumbnail.frame = CGRectMake(frame.origin.x + 16 + __timestampWidth, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
+            } else {
+                _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y + 1, _timestamp.frame.origin.x - frame.origin.x - 8, frame.size.height - 2);
+                _thumbnail.frame = CGRectMake(frame.origin.x + 8, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
+            }
             _thumbbackground.hidden = NO;
             _timestamp.hidden = YES;
-            _thumbnail.frame = CGRectMake(frame.origin.x + 8, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
             frame.origin.x += 8;
             frame.origin.y += _thumbnailHeight + 10;
             frame.size.height -= _thumbnailHeight - 8;
@@ -1041,7 +1046,7 @@ extern UIImage *__socketClosedBackgroundImage;
             [_collapsedEvents clear];
 
             if(!event.formatted.length || !event.formattedMsg.length) {
-                if((__chatOneLinePref || ![event isMessage]) && [event.from length]) {
+                if((__chatOneLinePref || ![event isMessage]) && [event.from length] && event.rowType != ROW_THUMBNAIL && event.rowType != ROW_FILE) {
                     event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43"], event.msg];
                 } else {
                     event.formattedMsg = event.msg;
@@ -1094,7 +1099,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 } else {
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
                 }
-                if(event.from.length && __chatOneLinePref)
+                if(event.from.length && __chatOneLinePref && event.rowType != ROW_THUMBNAIL && event.rowType != ROW_FILE)
                     event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.formattedMsg];
             } else if([type isEqualToString:@"kicked_channel"]) {
                 event.formattedMsg = [NSString stringWithFormat:@"%c%@← ", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString];
@@ -1835,7 +1840,7 @@ extern UIImage *__socketClosedBackgroundImage;
             e.realnameLinks = links;
             links = nil;
         }
-        if(e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE))
+        if(e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE)
             e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
         else
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links];
@@ -1924,7 +1929,7 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     
     if(e.rowType == ROW_THUMBNAIL) {
-        float width = [UIScreen mainScreen].bounds.size.width/2;
+        float width = (self.tableView.bounds.size.width/3) * 2;
         if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
             width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
         float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
@@ -2011,13 +2016,17 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.nickname.text = nil;
             cell.avatar.hidden = !((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && e.groupEid < 1);
         }
-        float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
-        if(e.from.length && !__avatarsOffPref) {
-            cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
-        } else if(e.rowType == ROW_ME_MESSAGE && !__avatarsOffPref && e.nick.length) {
-            cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.nick bid:e.bid] getImage:__smallAvatarHeight isSelf:e.isSelf];
-        } else {
+        if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE) {
             cell.avatar.image = nil;
+        } else {
+            float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
+            if(e.from.length && !__avatarsOffPref) {
+                cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
+            } else if(e.rowType == ROW_ME_MESSAGE && !__avatarsOffPref && e.nick.length) {
+                cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.nick bid:e.bid] getImage:__smallAvatarHeight isSelf:e.isSelf];
+            } else {
+                cell.avatar.image = nil;
+            }
         }
         cell.timestamp.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
         cell.message.linkDelegate = self;
@@ -2142,7 +2151,7 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.timestamp.backgroundColor = [UIColor clearColor];
         }
         if(e.rowType == ROW_THUMBNAIL) {
-            float width = [UIScreen mainScreen].bounds.size.width/2;
+            float width = (self.tableView.bounds.size.width/3) * 2;
             if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
                 width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
             float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
