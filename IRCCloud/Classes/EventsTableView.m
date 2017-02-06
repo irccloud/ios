@@ -1924,7 +1924,10 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     
     if(e.rowType == ROW_THUMBNAIL) {
-        float ratio = ([UIScreen mainScreen].bounds.size.width/2) / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+        float width = [UIScreen mainScreen].bounds.size.width/2;
+        if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
+            width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+        float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
         e.height += ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + 16;
     }
 }
@@ -2139,12 +2142,15 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.timestamp.backgroundColor = [UIColor clearColor];
         }
         if(e.rowType == ROW_THUMBNAIL) {
-            float ratio = ([UIScreen mainScreen].bounds.size.width/2) / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+            float width = [UIScreen mainScreen].bounds.size.width/2;
+            if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
+                width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+            float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
             cell.thumbnailWidth = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
             cell.thumbnailHeight = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
-            cell.thumbnail.image = [[ImageCache sharedInstance] thumbnailForFileID:[e.entities objectForKey:@"id"]];
+            cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)width];
             if(!cell.thumbnail.image) {
-                [[ImageCache sharedInstance] fetchThumbnailForFileID:[e.entities objectForKey:@"id"] completionHandler:^(UIImage *img) {
+                [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)width completionHandler:^(UIImage *img) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         cell.thumbnail.image = img;
                         cell.thumbnail.hidden = NO;

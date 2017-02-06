@@ -84,8 +84,8 @@
     return [self imageForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID} error:nil]]];
 }
 
--(UIImage *)thumbnailForFileID:(NSString *)fileID {
-    return [self imageForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", [UIScreen mainScreen].bounds.size.width/2]} error:nil]]];
+-(UIImage *)imageForFileID:(NSString *)fileID width:(int)width {
+    return [self imageForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
 }
 
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler {
@@ -120,8 +120,8 @@
     return [self fetchURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID} error:nil]] completionHandler:handler];
 }
 
--(void)fetchThumbnailForFileID:(NSString *)fileID completionHandler:(imageCompletionHandler)handler {
-    return [self fetchURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", [UIScreen mainScreen].bounds.size.width/2]} error:nil]] completionHandler:handler];
+-(void)fetchFileID:(NSString *)fileID width:(int)width completionHandler:(imageCompletionHandler)handler {
+    return [self fetchURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]] completionHandler:handler];
 }
 
 @end

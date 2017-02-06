@@ -2122,7 +2122,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         }
     }
 #endif
+#ifndef EXTENSION
     [[ImageCache sharedInstance] purge];
+#endif
     [self cancelIdleTimer];
 }
 

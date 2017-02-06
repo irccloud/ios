@@ -31,8 +31,8 @@ typedef void (^imageCompletionHandler)(UIImage *);
 -(void)purge;
 -(UIImage *)imageForURL:(NSURL *)url;
 -(UIImage *)imageForFileID:(NSString *)fileID;
--(UIImage *)thumbnailForFileID:(NSString *)fileID;
+-(UIImage *)imageForFileID:(NSString *)fileID width:(int)width;
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler;
 -(void)fetchFileID:(NSString *)fileID completionHandler:(imageCompletionHandler)handler;
--(void)fetchThumbnailForFileID:(NSString *)fileID completionHandler:(imageCompletionHandler)handler;
+-(void)fetchFileID:(NSString *)fileID width:(int)width completionHandler:(imageCompletionHandler)handler;
 @end
