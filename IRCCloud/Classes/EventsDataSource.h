@@ -25,9 +25,13 @@
 #define ROW_SOCKETCLOSED 4
 #define ROW_FAILED 5
 #define ROW_ME_MESSAGE 6
+#define ROW_THUMBNAIL 7
+#define ROW_FILE 8
 #define TYPE_TIMESTMP @"__timestamp__"
 #define TYPE_BACKLOG @"__backlog__"
 #define TYPE_LASTSEENEID @"__lastseeneid"
+#define TYPE_THUMBNAIL @"__thumbnail__"
+#define TYPE_FILE @"__file__"
 
 @interface Event : NSObject<NSCoding> {
     int _cid;

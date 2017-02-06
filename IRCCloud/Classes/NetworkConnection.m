@@ -352,6 +352,13 @@ volatile BOOL __socketPaused = NO;
                 }
                 if((!backlog && !_resuming) || event.reqId > 0) {
                     [self postObject:event forEvent:kIRCEventBufferMsg];
+                    event.entities = [object objectForKey:@"entities"];
+                    
+                    NSTimeInterval entity_eid = event.eid;
+                    for(int i = 0; i < [[event.entities objectForKey:@"files"] count]; i++) {
+                        entity_eid += 1;
+                        [self postObject:[_events event:entity_eid buffer:event.bid] forEvent:kIRCEventBufferMsg];
+                    }
                 }
             }
         } else {

@@ -183,6 +183,8 @@
 		2223C6AA1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
 		2223C6B01768F36F0032544B /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */; };
 		2223C6B61768F4500032544B /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
+		222C80B61E48ABB200A243E7 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
+		222C80B71E48ABB200A243E7 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
 		2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		2230F8E817162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
 		22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
@@ -703,6 +705,8 @@
 		2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+animatedGIF.m"; sourceTree = "<group>"; };
 		2223C6AF1768F36F0032544B /* UIImage+animatedGIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+animatedGIF.h"; sourceTree = "<group>"; };
 		2223C6B51768F4500032544B /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		222C80B41E48ABB200A243E7 /* ImageCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageCache.h; sourceTree = "<group>"; };
+		222C80B51E48ABB200A243E7 /* ImageCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageCache.m; sourceTree = "<group>"; };
 		2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		2230F8E617162ACC007F7C98 /* Ignore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ignore.h; sourceTree = "<group>"; };
 		2230F8E717162ACC007F7C98 /* Ignore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ignore.m; sourceTree = "<group>"; };
@@ -1359,6 +1363,8 @@
 				2230F8E717162ACC007F7C98 /* Ignore.m */,
 				22D4309E171C663A003C0684 /* IgnoresTableViewController.h */,
 				22D4309F171C663A003C0684 /* IgnoresTableViewController.m */,
+				222C80B41E48ABB200A243E7 /* ImageCache.h */,
+				222C80B51E48ABB200A243E7 /* ImageCache.m */,
 				2223C6A71768D7150032544B /* ImageViewController.h */,
 				2223C6A81768D7150032544B /* ImageViewController.m */,
 				223581C1191AD79B00A4B124 /* ImageUploader.h */,
@@ -2324,6 +2330,7 @@
 				225D977618AA995900065087 /* NamesListTableViewController.m in Sources */,
 				228E2B8C18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */,
 				2271FDA21DCDF45C00A39F84 /* TextTableViewController.m in Sources */,
+				222C80B71E48ABB200A243E7 /* ImageCache.m in Sources */,
 				225D977718AA995900065087 /* UINavigationController+iPadSux.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2426,6 +2433,7 @@
 				22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */,
 				228E2B8A18CF770D0011DEAB /* SBJsonStreamParserAdapter.m in Sources */,
 				2271FDA11DCDF45C00A39F84 /* TextTableViewController.m in Sources */,
+				222C80B61E48ABB200A243E7 /* ImageCache.m in Sources */,
 				22A19C60178FCCAC00772C60 /* UINavigationController+iPadSux.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

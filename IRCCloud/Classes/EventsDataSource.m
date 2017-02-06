@@ -968,6 +968,37 @@
     event.pending = NO;
     event.monospace = NO;
     event.entities = [object objectForKey:@"entities"];
+    
+    NSTimeInterval entity_eid = event.eid;
+    for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
+        entity_eid += 1;
+        if([[entity objectForKey:@"mime_type"] hasPrefix:@"image/"]) {
+            Event *e1 = [self event:entity_eid buffer:event.bid];
+            if(!e1) {
+                e1 = [[Event alloc] init];
+                e1.bid = event.bid;
+                e1.eid = entity_eid;
+                [self addEvent: e1];
+            }
+            
+            e1.from = event.from;
+            e1.fromMode = event.fromMode;
+            e1.realname = event.realname;
+            e1.hostmask = event.hostmask;
+            
+            int bytes = [[entity objectForKey:@"size"] intValue];
+            if(bytes < 1024) {
+                e1.msg = [NSString stringWithFormat:@"%lu B • %@", (unsigned long)bytes, [entity objectForKey:@"mime_type"]];
+            } else {
+                int exp = (int)(log(bytes) / log(1024));
+                e1.msg = [NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [entity objectForKey:@"mime_type"]];
+            }
+            e1.bgColor = event.bgColor;
+            e1.type = event.type;
+            e1.rowType = ROW_THUMBNAIL;
+            e1.entities = entity;
+        }
+    }
     event.serverTime = [[object objectForKey:@"server_time"] doubleValue];
     
     void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:object.type];

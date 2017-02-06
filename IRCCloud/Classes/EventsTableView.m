@@ -31,6 +31,7 @@
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "IRCCloudSafariViewController.h"
 #import "AvatarsDataSource.h"
+#import "ImageCache.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -101,12 +102,17 @@ extern UIImage *__socketClosedBackgroundImage;
     float _timestampPosition;
     float _accessoryOffset;
     UIColor *_messageTextColor;
+    UIActivityIndicatorView *_spinner;
+    UIView *_thumbbackground;
+    UIImageView *_thumbnail;
+    float _thumbnailHeight;
 }
 @property int type;
-@property float timestampPosition, accessoryOffset;
+@property float timestampPosition, accessoryOffset, thumbnailHeight;
 @property (readonly) UILabel *timestamp, *accessory;
 @property (readonly) LinkLabel *message, *nickname;
-@property (readonly) UIImageView *avatar;
+@property (readonly) UIImageView *avatar, *thumbnail;
+@property (readonly) UIActivityIndicatorView *spinner;
 @property UIColor *messageTextColor;
 @end
 
@@ -123,6 +129,10 @@ extern UIImage *__socketClosedBackgroundImage;
         _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
         _socketClosedBar.hidden = YES;
         [self.contentView addSubview:_socketClosedBar];
+        
+        _thumbbackground = [[UIView alloc] initWithFrame:CGRectZero];
+        _thumbbackground.hidden = YES;
+        [self.contentView addSubview:_thumbbackground];
         
         _timestamp = [[UILabel alloc] init];
         _timestamp.backgroundColor = [UIColor clearColor];
@@ -160,6 +170,13 @@ extern UIImage *__socketClosedBackgroundImage;
         _avatar = [[UIImageView alloc] init];
         [self.contentView addSubview:_avatar];
 
+        _thumbnail = [[UIImageView alloc] init];
+        [self.contentView addSubview:_thumbnail];
+        
+        _spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+        [_spinner sizeToFit];
+        [self.contentView addSubview:_spinner];
+        
         _topBorder = [[UIView alloc] initWithFrame:CGRectZero];
         _topBorder.hidden = YES;
         [self.contentView addSubview:_topBorder];
@@ -178,6 +195,8 @@ extern UIImage *__socketClosedBackgroundImage;
 	CGRect frame = self.contentView.bounds;
     _topBorder.frame = CGRectMake(0,0,frame.size.width, 1);
     _bottomBorder.frame = CGRectMake(0,frame.size.height - 3,frame.size.width, 3);
+    _thumbbackground.hidden = YES;
+
     if(_type == ROW_TIMESTAMP) {
         _topBorder.backgroundColor = [UIColor timestampTopBorderColor];
         _topBorder.hidden = NO;
@@ -188,7 +207,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _topBorder.hidden = _bottomBorder.hidden = YES;
     }
     
-    if(_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED) {
+    if(_type == ROW_MESSAGE || _type == ROW_ME_MESSAGE || _type == ROW_SOCKETCLOSED || _type == ROW_FAILED || _type == ROW_THUMBNAIL) {
         frame.origin.x = (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?6:16;
         frame.origin.y = __compact ? 0 : (FONT_SIZE > 13 ? 2 : 1);
         frame.size.height -= __compact ? 4 : 0;
@@ -236,6 +255,22 @@ extern UIImage *__socketClosedBackgroundImage;
         _timestamp.frame = CGRectMake(frame.origin.x + (__timeLeftPref?0:(frame.size.width - __timestampWidth)), frame.origin.y + _timestampPosition, __timestampWidth, _timestamp.frame.size.height);
         _timestamp.hidden = _message.hidden = (_type == ROW_SOCKETCLOSED && _message.text.length == 0);
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
+
+        if(_type == ROW_THUMBNAIL) {
+            _thumbbackground.backgroundColor = [UIColor bufferBackgroundColor];
+            _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y, _timestamp.frame.origin.x - frame.origin.x, frame.size.height);
+            _thumbbackground.hidden = NO;
+            _timestamp.hidden = YES;
+            _thumbnail.frame = CGRectMake(frame.origin.x + 8, frame.origin.y + 8, _thumbnail.image.size.width, _thumbnail.image.size.height);
+            frame.origin.x += 8;
+            frame.origin.y += _thumbnailHeight + 10;
+            frame.size.height -= _thumbnailHeight - 8;
+            _spinner.center = self.contentView.center;
+            _spinner.hidden = (_thumbnail.image != nil);
+            if(!_spinner.hidden && !_spinner.isAnimating)
+                [_spinner startAnimating];
+        }
+
         _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, frame.size.width - 4 - __timestampWidth, floorf([_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height) + 1);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(
@@ -264,8 +299,11 @@ extern UIImage *__socketClosedBackgroundImage;
         _timestamp.textAlignment = NSTextAlignmentCenter;
         _timestamp.frame = frame;
         _timestamp.hidden = NO;
-        _message.hidden = YES;
+        if(_type != ROW_THUMBNAIL)
+            _message.hidden = YES;
         _socketClosedBar.hidden = (_type != ROW_LASTSEENEID);
+        _spinner.hidden = _thumbnail.hidden = YES;
+        [_spinner stopAnimating];
     }
 }
 
@@ -1359,8 +1397,10 @@ extern UIImage *__socketClosedBackgroundImage;
     [_scrollTimer invalidate];
     _scrollTimer = nil;
     _requestingBacklog = NO;
-    if(buffer != _buffer)
+    if(buffer != _buffer) {
         _bottomRow = -1;
+        [[ImageCache sharedInstance] clear];
+    }
     if(_buffer && _buffer.scrolledUp) {
         NSLog(@"Table was scrolled up, adjusting scroll offset");
         [_lock lock];
@@ -1568,7 +1608,10 @@ extern UIImage *__socketClosedBackgroundImage;
             Event *e = [[Event alloc] init];
             e.cid = _buffer.cid;
             e.bid = _buffer.bid;
-            e.eid = _buffer.last_seen_eid + 1;
+            NSTimeInterval eid = _buffer.last_seen_eid + 1;
+            while([[EventsDataSource sharedInstance] event:eid buffer:_buffer.bid])
+                eid++;
+            e.eid = eid;
             e.type = TYPE_LASTSEENEID;
             e.rowType = ROW_LASTSEENEID;
             e.formattedMsg = nil;
@@ -1824,6 +1867,11 @@ extern UIImage *__socketClosedBackgroundImage;
         if(e.height < __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING))
             e.height = __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING);
     }
+    
+    if(e.rowType == ROW_THUMBNAIL) {
+        float ratio = ([UIScreen mainScreen].bounds.size.width/2) / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+        e.height += ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + 16;
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -1837,7 +1885,7 @@ extern UIImage *__socketClosedBackgroundImage;
     Event *e = [_data objectAtIndex:indexPath.row];
     [_lock unlock];
     @synchronized (e) {
-        if(e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED) {
+        if(e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_SOCKETCLOSED || e.rowType == ROW_FAILED || e.rowType == ROW_THUMBNAIL) {
             if(e.rowType == ROW_SOCKETCLOSED && e.formattedMsg.length == 0) {
                 return (FONT_SIZE-2);
             } else if(e.formatted != nil && e.height > 0) {
@@ -2034,6 +2082,24 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.timestamp.backgroundColor = [UIColor contentBackgroundColor];
         } else {
             cell.timestamp.backgroundColor = [UIColor clearColor];
+        }
+        if(e.rowType == ROW_THUMBNAIL) {
+            float ratio = ([UIScreen mainScreen].bounds.size.width/2) / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+            cell.thumbnailHeight = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
+            cell.thumbnail.image = [[ImageCache sharedInstance] thumbnailForFileID:[e.entities objectForKey:@"id"]];
+            if(!cell.thumbnail.image) {
+                [[ImageCache sharedInstance] fetchThumbnailForFileID:[e.entities objectForKey:@"id"] completionHandler:^(UIImage *img) {
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        CGRect frame = cell.thumbnail.frame;
+                        frame.size = img.size;
+                        cell.thumbnail.frame = frame;
+                        cell.thumbnail.image = img;
+                        cell.thumbnail.hidden = NO;
+                        cell.spinner.hidden = YES;
+                        [cell.spinner stopAnimating];
+                    }];
+                }];
+            }
         }
         return cell;
     }
@@ -2327,7 +2393,12 @@ extern UIImage *__socketClosedBackgroundImage;
                 [_conn join:e.oldNick key:nil cid:e.cid];
             else if([e.type isEqualToString:@"callerid"])
                 [_conn say:[NSString stringWithFormat:@"/accept %@", e.nick] to:nil cid:e.cid];
-            else
+            else if(e.rowType == ROW_THUMBNAIL) {
+                NSString *extension = [e.entities objectForKey:@"extension"];
+                if(!extension.length)
+                    extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
+                [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [_file_url_template relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]]];
+            } else
                 [_delegate rowSelected:e];
         }
     }
