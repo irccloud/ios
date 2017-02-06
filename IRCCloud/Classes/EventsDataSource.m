@@ -43,6 +43,8 @@
         return NO;
     if(!_type)
         return NO;
+    if(_rowType == ROW_THUMBNAIL || _rowType == ROW_FILE)
+        return NO;
     if([_type isEqualToString:@"notice"] || [_type isEqualToString:@"channel_invite"]) {
         // Notices sent from the server (with no nick sender) aren't important
         // e.g. *** Looking up your hostname...
