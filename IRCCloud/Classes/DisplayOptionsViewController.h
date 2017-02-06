@@ -27,6 +27,7 @@
     UISwitch *_collapseJoinPart;
     UISwitch *_expandDisco;
     UISwitch *_readOnSelect;
+    UISwitch *_disableInlineFiles;
     int _reqid;
 }
 @property (strong, nonatomic) Buffer *buffer;

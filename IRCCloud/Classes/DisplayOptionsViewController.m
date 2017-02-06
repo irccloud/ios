@@ -52,6 +52,7 @@
     NSMutableDictionary *expandDisco = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *enableReadOnSelect = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *disableReadOnSelect = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *disableInlineFiles = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
     
     if([_buffer.type isEqualToString:@"channel"]) {
@@ -159,6 +160,17 @@
             [prefs setObject:hiddenMembers forKey:@"channel-hiddenMembers"];
         else
             [prefs removeObjectForKey:@"channel-hiddenMembers"];
+        
+        if([[prefs objectForKey:@"channel-files-disableinline"] isKindOfClass:[NSDictionary class]])
+            [disableInlineFiles addEntriesFromDictionary:[prefs objectForKey:@"channel-files-disableinline"]];
+        if(_disableInlineFiles.on)
+            [disableInlineFiles removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [disableInlineFiles setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(disableInlineFiles.count)
+            [prefs setObject:disableInlineFiles forKey:@"channel-files-disableinline"];
+        else
+            [prefs removeObjectForKey:@"channel-files-disableinline"];
     } else {
         if([[prefs objectForKey:@"buffer-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
             [disableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableReadOnSelect"]];
@@ -228,6 +240,17 @@
                 [prefs setObject:expandJoinPart forKey:@"buffer-expandJoinPart"];
             else
                 [prefs removeObjectForKey:@"buffer-expandJoinPart"];
+            
+            if([[prefs objectForKey:@"buffer-files-disableinline"] isKindOfClass:[NSDictionary class]])
+                [disableInlineFiles addEntriesFromDictionary:[prefs objectForKey:@"buffer-files-disableinline"]];
+            if(_disableInlineFiles.on)
+                [disableInlineFiles removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [disableInlineFiles setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(disableInlineFiles.count)
+                [prefs setObject:disableInlineFiles forKey:@"buffer-files-disableinline"];
+            else
+                [prefs removeObjectForKey:@"buffer-files-disableinline"];
         }
         
         if([_buffer.type isEqualToString:@"console"]) {
@@ -348,6 +371,11 @@
             _showMembers.on = NO;
         else
             _showMembers.on = YES;
+        
+        if([[[prefs objectForKey:@"channel-files-disableinline"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+            _disableInlineFiles.on = NO;
+        else
+            _disableInlineFiles.on = YES;
     } else {
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
             if([[[prefs objectForKey:@"buffer-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
@@ -387,6 +415,11 @@
             _expandDisco.on = NO;
         else
             _expandDisco.on = YES;
+        
+        if([[[prefs objectForKey:@"buffer-files-disableinline"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+            _disableInlineFiles.on = NO;
+        else
+            _disableInlineFiles.on = YES;
     }
     _collapseJoinPart.enabled = !_showJoinPart.on;
 }
@@ -403,6 +436,7 @@
     _collapseJoinPart = [[UISwitch alloc] init];
     _expandDisco = [[UISwitch alloc] init];
     _readOnSelect = [[UISwitch alloc] init];
+    _disableInlineFiles = [[UISwitch alloc] init];
 
     [self refresh];
 }
@@ -431,11 +465,11 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if([_buffer.type isEqualToString:@"channel"])
-        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?5:6;
+        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?6:7;
     else if([_buffer.type isEqualToString:@"console"])
         return 3;
     else
-        return 4;
+        return 5;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -481,6 +515,10 @@
         case 5:
             cell.textLabel.text = @"Collapse joins/parts";
             cell.accessoryView = _collapseJoinPart;
+            break;
+        case 6:
+            cell.textLabel.text = @"Embed uploaded files";
+            cell.accessoryView = _disableInlineFiles;
             break;
     }
     return cell;

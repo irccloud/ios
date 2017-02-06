@@ -504,6 +504,7 @@
         [prefs setObject:[NSNumber numberWithBool:!_showUnread.isOn] forKey:@"disableTrackUnread"];
         [prefs setObject:[NSNumber numberWithBool:_markAsRead.isOn] forKey:@"enableReadOnSelect"];
         [prefs setObject:[NSNumber numberWithBool:_compact.isOn] forKey:@"ascii-compact"];
+        [prefs setObject:[NSNumber numberWithBool:!_disableInlineFiles.isOn] forKey:@"files-disableinline"];
         
         SBJsonWriter *writer = [[SBJsonWriter alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -789,6 +790,12 @@
         _compact.on = NO;
     }
     
+    if([[prefs objectForKey:@"files-disableinline"] isKindOfClass:[NSNumber class]]) {
+        _disableInlineFiles.on = ![[prefs objectForKey:@"files-disableinline"] boolValue];
+    } else {
+        _disableInlineFiles.on = YES;
+    }
+    
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
@@ -896,6 +903,7 @@
                          @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
                          @{@"title":@"Show joins, parts, quits", @"accessory":_hideJoinPart},
                          @{@"title":@"Collapse joins, parts, quits", @"accessory":_expandJoinPart},
+                         @{@"title":@"Embed uploaded files", @"accessory":_disableInlineFiles},
                          ]},
               @{@"title":@"Device", @"items":device},
               @{@"title":@"Notifications", @"items":notifications},
@@ -978,6 +986,7 @@
     _compact = [[UISwitch alloc] init];
     _imageViewer = [[UISwitch alloc] init];
     _videoViewer = [[UISwitch alloc] init];
+    _disableInlineFiles = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";

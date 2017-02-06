@@ -57,6 +57,7 @@
     UISwitch *_compact;
     UISwitch *_imageViewer;
     UISwitch *_videoViewer;
+    UISwitch *_disableInlineFiles;
     NSString *_version;
     UISlider *_fontSize;
     int _userinforeqid;

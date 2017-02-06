@@ -83,6 +83,7 @@ BOOL __avatarsOffPref = NO;
 BOOL __chatOneLinePref = NO;
 BOOL __norealnamePref = NO;
 BOOL __monospacePref = NO;
+BOOL __disableInlineFilesPref = NO;
 int __smallAvatarHeight;
 int __largeAvatarHeight = 32;
 
@@ -1134,34 +1135,38 @@ extern UIImage *__socketClosedBackgroundImage;
             }
         }
         
-        NSTimeInterval entity_eid = event.eid;
-        for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
-            entity_eid += 1;
-            if([[entity objectForKey:@"mime_type"] hasPrefix:@"image/"]) {
-                Event *e1 = [[Event alloc] init];
-                e1.cid = event.cid;
-                e1.bid = event.bid;
-                e1.eid = entity_eid;
-                e1.from = event.from;
-                e1.isSelf = event.isSelf;
-                e1.fromMode = event.fromMode;
-                e1.realname = event.realname;
-                e1.hostmask = event.hostmask;
-                
-                int bytes = [[entity objectForKey:@"size"] intValue];
-                if(bytes < 1024) {
-                    e1.msg = [NSString stringWithFormat:@"%lu B • %@", (unsigned long)bytes, [entity objectForKey:@"mime_type"]];
-                } else {
-                    int exp = (int)(log(bytes) / log(1024));
-                    e1.msg = [NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [entity objectForKey:@"mime_type"]];
+        if(!__disableInlineFilesPref) {
+            NSTimeInterval entity_eid = event.eid;
+            for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
+                if([[entity objectForKey:@"mime_type"] hasPrefix:@"image/"]) {
+                    entity_eid += 1;
+                    Event *e1 = [[Event alloc] init];
+                    e1.cid = event.cid;
+                    e1.bid = event.bid;
+                    e1.eid = entity_eid;
+                    e1.from = event.from;
+                    e1.isSelf = event.isSelf;
+                    e1.fromMode = event.fromMode;
+                    e1.realname = event.realname;
+                    e1.hostmask = event.hostmask;
+                    
+                    int bytes = [[entity objectForKey:@"size"] intValue];
+                    if(bytes < 1024) {
+                        e1.msg = [NSString stringWithFormat:@"%lu B • %@", (unsigned long)bytes, [entity objectForKey:@"mime_type"]];
+                    } else {
+                        int exp = (int)(log(bytes) / log(1024));
+                        e1.msg = [NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [entity objectForKey:@"mime_type"]];
+                    }
+                    e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:event.bgColor;
+                    e1.type = event.type;
+                    e1.rowType = ROW_THUMBNAIL;
+                    e1.entities = entity;
+                    
+                    [self insertEvent:e1 backlog:backlog nextIsGrouped:NO];
                 }
-                e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:event.bgColor;
-                e1.type = event.type;
-                e1.rowType = ROW_THUMBNAIL;
-                e1.entities = entity;
-                
-                [self insertEvent:e1 backlog:backlog nextIsGrouped:NO];
             }
+            if(_buffer.last_seen_eid == event.eid)
+                _buffer.last_seen_eid = entity_eid;
         }
     }
 }
@@ -1506,6 +1511,7 @@ extern UIImage *__socketClosedBackgroundImage;
         __chatOneLinePref = NO;
         __norealnamePref = NO;
         __monospacePref = NO;
+        __disableInlineFilesPref = NO;
         __compact = NO;
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         if(prefs) {
@@ -1545,6 +1551,18 @@ extern UIImage *__socketClosedBackgroundImage;
             
             if([[prefs objectForKey:@"expandJoinPart"] boolValue] || (expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
                 __expandJoinPartPref = YES;
+            
+            NSDictionary *disableFilesMap;
+            
+            if([_buffer.type isEqualToString:@"channel"]) {
+                disableFilesMap = [prefs objectForKey:@"channel-files-disableinline"];
+            } else {
+                disableFilesMap = [prefs objectForKey:@"buffer-files-disableinline"];
+            }
+            
+            if([[prefs objectForKey:@"files-disableinline"] boolValue] || (disableFilesMap && [[disableFilesMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
+                __disableInlineFilesPref = YES;
+
         }
         __largeAvatarHeight = MIN(32, roundf(FONT_SIZE * 2) + (__compact ? 1 : 6));
         if(__monospacePref)
@@ -1638,10 +1656,6 @@ extern UIImage *__socketClosedBackgroundImage;
             Event *e = [[Event alloc] init];
             e.cid = _buffer.cid;
             e.bid = _buffer.bid;
-            NSTimeInterval eid = _buffer.last_seen_eid + 1;
-            while([[EventsDataSource sharedInstance] event:eid buffer:_buffer.bid])
-                eid++;
-            e.eid = eid;
             e.type = TYPE_LASTSEENEID;
             e.rowType = ROW_LASTSEENEID;
             e.formattedMsg = nil;
@@ -1653,6 +1667,7 @@ extern UIImage *__socketClosedBackgroundImage;
             while(event) {
                 if(event.eid <= _buffer.last_seen_eid && event.rowType != ROW_LASTSEENEID)
                     break;
+                e.eid = event.eid - 1;
                 event = [i nextObject];
                 _lastSeenEidPos--;
             }
