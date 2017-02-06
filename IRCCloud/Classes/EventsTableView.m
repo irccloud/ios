@@ -2193,6 +2193,7 @@ extern UIImage *__socketClosedBackgroundImage;
                             NSMutableDictionary *entities = [e.entities mutableCopy];
                             [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
                             e.entities = entities;
+                            [self _calculateHeight:e];
                             [self.tableView reloadData];
                         }
                     }];
