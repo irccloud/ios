@@ -105,10 +105,10 @@ extern UIImage *__socketClosedBackgroundImage;
     UIActivityIndicatorView *_spinner;
     UIView *_thumbbackground;
     UIImageView *_thumbnail;
-    float _thumbnailHeight;
+    float _thumbnailWidth, _thumbnailHeight;
 }
 @property int type;
-@property float timestampPosition, accessoryOffset, thumbnailHeight;
+@property float timestampPosition, accessoryOffset, thumbnailWidth, thumbnailHeight;
 @property (readonly) UILabel *timestamp, *accessory;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar, *thumbnail;
@@ -261,7 +261,7 @@ extern UIImage *__socketClosedBackgroundImage;
             _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y, _timestamp.frame.origin.x - frame.origin.x, frame.size.height);
             _thumbbackground.hidden = NO;
             _timestamp.hidden = YES;
-            _thumbnail.frame = CGRectMake(frame.origin.x + 8, frame.origin.y + 8, _thumbnail.image.size.width, _thumbnail.image.size.height);
+            _thumbnail.frame = CGRectMake(frame.origin.x + 8, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
             frame.origin.x += 8;
             frame.origin.y += _thumbnailHeight + 10;
             frame.size.height -= _thumbnailHeight - 8;
@@ -2085,14 +2085,12 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         if(e.rowType == ROW_THUMBNAIL) {
             float ratio = ([UIScreen mainScreen].bounds.size.width/2) / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+            cell.thumbnailWidth = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
             cell.thumbnailHeight = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
             cell.thumbnail.image = [[ImageCache sharedInstance] thumbnailForFileID:[e.entities objectForKey:@"id"]];
             if(!cell.thumbnail.image) {
                 [[ImageCache sharedInstance] fetchThumbnailForFileID:[e.entities objectForKey:@"id"] completionHandler:^(UIImage *img) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        CGRect frame = cell.thumbnail.frame;
-                        frame.size = img.size;
-                        cell.thumbnail.frame = frame;
                         cell.thumbnail.image = img;
                         cell.thumbnail.hidden = NO;
                         cell.spinner.hidden = YES;
