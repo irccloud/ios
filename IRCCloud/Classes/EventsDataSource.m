@@ -982,6 +982,7 @@
             }
             
             e1.from = event.from;
+            e1.isSelf = event.isSelf;
             e1.fromMode = event.fromMode;
             e1.realname = event.realname;
             e1.hostmask = event.hostmask;
@@ -993,7 +994,7 @@
                 int exp = (int)(log(bytes) / log(1024));
                 e1.msg = [NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [entity objectForKey:@"mime_type"]];
             }
-            e1.bgColor = event.bgColor;
+            e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:event.bgColor;
             e1.type = event.type;
             e1.rowType = ROW_THUMBNAIL;
             e1.entities = entity;
