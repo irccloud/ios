@@ -28,6 +28,7 @@
 #import "URLHandler.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "AvatarsDataSource.h"
+#import "imageCache.h"
 
 #ifdef DEBUG
 @implementation NSURLRequest(CertificateHack)
@@ -381,6 +382,8 @@
         }
 #endif
     }];
+    
+    [[ImageCache sharedInstance] performSelectorInBackground:@selector(prune) withObject:nil];
     
     return YES;
 }
@@ -869,6 +872,7 @@
         self.window.backgroundColor = [UIColor blackColor];
     }
     [[NotificationsDataSource sharedInstance] updateBadgeCount];
+    [[ImageCache sharedInstance] performSelectorInBackground:@selector(prune) withObject:nil];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {

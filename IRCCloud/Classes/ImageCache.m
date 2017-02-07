@@ -34,12 +34,33 @@
 -(id)init {
     self = [super init];
     if(self) {
+        _cachePath = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"imagecache"];
         _session = [NSURLSession sharedSession];
         _tasks = [[NSMutableDictionary alloc] init];
         _images = [[NSMutableDictionary alloc] init];
         [self clear];
     }
     return self;
+}
+
+-(void)prune {
+    @synchronized (self) {
+        CLS_LOG(@"Pruning image cache directory: %@", _cachePath.path);
+        
+        NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtURL:_cachePath includingPropertiesForKeys:@[NSURLContentModificationDateKey] options:0 errorHandler:nil];
+        
+        NSDate *lastWeek = [NSDate dateWithTimeIntervalSinceNow:(-60*60*24*7)];
+        
+        for (NSURL *fileURL in directoryEnumerator) {
+            NSDate *modificationDate = nil;
+            [fileURL getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
+            
+            if([lastWeek compare:modificationDate] == NSOrderedDescending) {
+                CLS_LOG(@"Removing stale image cache file: %@", fileURL.path);
+                [[NSFileManager defaultManager] removeItemAtURL:fileURL error:nil];
+            }
+        }
+    }
 }
 
 -(void)clear {
@@ -50,8 +71,7 @@
 }
 
 -(void)purge {
-    NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"imagecache"];
-    [[NSFileManager defaultManager] removeItemAtURL:caches error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:_cachePath error:nil];
     [self clear];
 }
 
@@ -71,9 +91,8 @@
 
 -(UIImage *)imageForURL:(NSURL *)url {
     if(![_images objectForKey:url]) {
-        NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"imagecache"];
-        caches = [caches URLByAppendingPathComponent:[self md5:url.absoluteString]];
-        UIImage *img = [UIImage imageWithContentsOfFile:caches.path];
+        NSURL *cache = [_cachePath URLByAppendingPathComponent:[self md5:url.absoluteString]];
+        UIImage *img = [UIImage imageWithContentsOfFile:cache.path];
         if(img)
             [_images setObject:img forKey:url.absoluteString];
     }
@@ -91,21 +110,17 @@
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler {
     @synchronized (_tasks) {
         if([_tasks objectForKey:url]) {
-            NSLog(@"Duplicate task for URL: %@", url);
             return;
         }
         NSURLSessionDownloadTask *task = [[NSURLSession sharedSession] downloadTaskWithURL:url completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
             [_tasks removeObjectForKey:url];
             if(error) {
-                NSLog(@"Download failed: %@", error);
+                CLS_LOG(@"Download failed: %@", error);
             } else if(location) {
-                NSLog(@"Downloaded to: %@", location);
-                NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"imagecache"];
-                [[NSFileManager defaultManager] createDirectoryAtURL:caches withIntermediateDirectories:YES attributes:nil error:nil];
-                caches = [caches URLByAppendingPathComponent:[self md5:url.absoluteString]];
-                [[NSFileManager defaultManager] copyItemAtURL:location toURL:caches error:nil];
-                NSLog(@"Copied to: %@", caches);
-                UIImage *img = [UIImage imageWithContentsOfFile:caches.path];
+                [[NSFileManager defaultManager] createDirectoryAtURL:_cachePath withIntermediateDirectories:YES attributes:nil error:nil];
+                NSURL *cache = [_cachePath URLByAppendingPathComponent:[self md5:url.absoluteString]];
+                [[NSFileManager defaultManager] copyItemAtURL:location toURL:cache error:nil];
+                UIImage *img = [UIImage imageWithContentsOfFile:cache.path];
                 if(img)
                     [_images setObject:img forKey:url.absoluteString];
             }

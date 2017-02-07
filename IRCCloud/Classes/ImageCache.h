@@ -20,6 +20,7 @@
 typedef void (^imageCompletionHandler)(UIImage *);
 
 @interface ImageCache : NSObject {
+    NSURL *_cachePath;
     NSURLSession *_session;
     CSURITemplate *_template;
     NSMutableDictionary *_tasks;
@@ -27,6 +28,7 @@ typedef void (^imageCompletionHandler)(UIImage *);
 }
 
 +(ImageCache *)sharedInstance;
+-(void)prune;
 -(void)clear;
 -(void)purge;
 -(UIImage *)imageForURL:(NSURL *)url;
