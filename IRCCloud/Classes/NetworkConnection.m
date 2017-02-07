@@ -16,7 +16,6 @@
 
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import "NetworkConnection.h"
-#import "SBJson.h"
 #import "HandshakeHeader.h"
 #import "IRCCloudJSONObject.h"
 #import "UIColor+IRCCloud.h"
@@ -49,8 +48,7 @@ NSLock *__userInfoLock = nil;
 volatile BOOL __socketPaused = NO;
 
 @interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
-    SBJsonStreamParser *_parser;
-    SBJsonStreamParserAdapter *_adapter;
+    SBJson5Parser *_parser;
     NSString *_url;
     BOOL _cancelled;
     BOOL _running;
@@ -71,12 +69,14 @@ volatile BOOL __socketPaused = NO;
 -(id)initWithURL:(NSString *)URL {
     self = [super init];
     if(self) {
+        NetworkConnection *conn = [NetworkConnection sharedInstance];
         _url = URL;
         _bid = -1;
-        _adapter = [[SBJsonStreamParserAdapter alloc] init];
-        _adapter.delegate = [NetworkConnection sharedInstance];
-        _parser = [[SBJsonStreamParser alloc] init];
-        _parser.delegate = _adapter;
+        _parser = [SBJson5Parser unwrapRootArrayParserWithBlock:^(id item, BOOL *stop) {
+            [conn parse:item backlog:YES];
+        } errorHandler:^(NSError *error) {
+            CLS_LOG(@"OOB JSON ERROR: %@", error);
+        }];
         _cancelled = NO;
         _running = NO;
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:15];
@@ -238,17 +238,17 @@ volatile BOOL __socketPaused = NO;
     _state = kIRCCloudStateDisconnected;
     _oobQueue = [[NSMutableArray alloc] init];
     _awayOverride = nil;
-    _adapter = [[SBJsonStreamParserAdapter alloc] init];
-    _adapter.delegate = self;
-    _parser = [[SBJsonStreamParser alloc] init];
-    _parser.supportMultipleDocuments = YES;
-    _parser.delegate = _adapter;
+    _parser = [SBJson5Parser multiRootParserWithBlock:^(id item, BOOL *stop) {
+        [self parse:item backlog:NO];
+    } errorHandler:^(NSError *error) {
+        CLS_LOG(@"JSON ERROR: %@", error);
+    }];
     _lastReqId = 1;
     _idleInterval = 20;
     _reconnectTimestamp = -1;
     _failCount = 0;
     _notifier = NO;
-    _writer = [[SBJsonWriter alloc] init];
+    _writer = [[SBJson5Writer alloc] init];
     _reachabilityValid = NO;
     _reachability = nil;
     _ignore = [[Ignore alloc] init];
@@ -1065,7 +1065,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
 }
 
 -(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token impression:(NSString *)impression {
@@ -1138,7 +1138,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
 }
 
 -(NSDictionary *)getFiles:(int)page {
@@ -1159,7 +1159,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
 }
 
 -(NSDictionary *)getPastebins:(int)page {
@@ -1180,7 +1180,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    return [[[SBJsonParser alloc] init] objectWithData:data];
+    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
 }
 
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args {
@@ -1240,8 +1240,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         CLS_LOG(@"HTTP request failed: %@ %@", error.localizedDescription, error.localizedFailureReason);
     }
     
-    return [[[SBJsonParser alloc] init] objectWithData:data];
-
+    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
 }
 
 -(NSDictionary *)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid {
@@ -1625,18 +1624,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [__userInfoLock unlock];
 }
 
--(void)parser:(SBJsonStreamParser *)parser foundArray:(NSArray *)array {
-    //This is wasteful, we don't use it
-}
-
--(void)parser:(SBJsonStreamParser *)parser foundObject:(NSDictionary *)dict {
-    [self parse:dict backlog:NO];
-}
-
--(void)parser:(SBJsonStreamParser *)parser foundObjectInArray:(NSDictionary *)dict {
-    [self parse:dict backlog:YES];
-}
-
 -(void)webSocketDidOpen:(WebSocket *)socket {
     if(socket == _socket) {
 #ifndef EXTENSION
@@ -1759,8 +1746,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(NSDictionary *)prefs {
     @synchronized(self) {
         if(!_prefs && self.userInfo && [[self.userInfo objectForKey:@"prefs"] isKindOfClass:[NSString class]] && [[self.userInfo objectForKey:@"prefs"] length]) {
-            SBJsonParser *parser = [[SBJsonParser alloc] init];
-            _prefs = [parser objectWithString:[self.userInfo objectForKey:@"prefs"]];
+            _prefs = [NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:[[self.userInfo objectForKey:@"prefs"] UTF8String] length:[[self.userInfo objectForKey:@"prefs"] length]] options:kNilOptions error:nil];
         }
         return _prefs;
     }

@@ -15,7 +15,6 @@
 //  limitations under the License.
 
 #import "ImageUploader.h"
-#import "SBJson.h"
 #import "NSData+Base64.h"
 #import "config.h"
 
@@ -59,8 +58,7 @@
                 [_delegate imageUploadDidFail];
             }];
         } else {
-            SBJsonParser *parser = [[SBJsonParser alloc] init];
-            NSDictionary *dict = [parser objectWithData:data];
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
             if([dict objectForKey:@"access_token"]) {
                 for(NSString *key in dict.allKeys) {
                     if([[dict objectForKey:key] isKindOfClass:[NSString class]]) {
@@ -286,7 +284,7 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
     
-    NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:_response];
+    NSDictionary *d = [NSJSONSerialization JSONObjectWithData:_response options:kNilOptions error:nil];
     if(!d) {
         CLS_LOG(@"IMGUR: Invalid JSON response: %@", [[NSString alloc] initWithData:_response encoding:NSUTF8StringEncoding]);
     }

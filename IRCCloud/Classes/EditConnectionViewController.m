@@ -19,7 +19,6 @@
 #import "NetworkConnection.h"
 #import "AppDelegate.h"
 #import "UIColor+IRCCloud.h"
-#import "SBJson.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "FontAwesome.h"
 
@@ -101,8 +100,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
                           ];
         }
         else {
-            SBJsonParser *parser = [[SBJsonParser alloc] init];
-            NSDictionary *dict = [parser objectWithData:data];
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
             NSMutableArray *networks = [[NSMutableArray alloc] initWithCapacity:[(NSArray *)dict[FetchedDataNetworksKey] count]];
             for (NSDictionary *network in dict[FetchedDataNetworksKey]) {
                 NSDictionary *server = [(NSArray *)network[NetworkServersKey] objectAtIndex:0];

@@ -280,8 +280,7 @@
             NSLog(@"Error fetching oembed. Error %li : %@", (long)error.code, error.userInfo);
             [self fail:error.localizedDescription];
         } else {
-            SBJsonParser *parser = [[SBJsonParser alloc] init];
-            NSDictionary *dict = [parser objectWithData:data];
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             if([[dict objectForKey:@"type"] isEqualToString:@"photo"]) {
                 NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"url"]]];
                 _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
@@ -334,8 +333,7 @@
             NSLog(@"Error fetching gfycat. Error %li : %@", (long)error.code, error.userInfo);
             [self fail:error.localizedDescription];
         } else {
-            SBJsonParser *parser = [[SBJsonParser alloc] init];
-            NSDictionary *dict = [parser objectWithData:data];
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             if([dict objectForKey:@"gfyItem"]) {
                 dict = [dict objectForKey:@"gfyItem"];
                 if([[dict objectForKey:@"mp4Url"] length]) {
@@ -367,8 +365,7 @@
             NSLog(@"Error fetching giphy. Error %li : %@", (long)error.code, error.userInfo);
             [self fail:error.localizedDescription];
         } else {
-            SBJsonParser *parser = [[SBJsonParser alloc] init];
-            NSDictionary *dict = [parser objectWithData:data];
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             if([[[dict objectForKey:@"meta"] objectForKey:@"status"] intValue] == 200 && [[dict objectForKey:@"data"] objectForKey:@"images"]) {
                 dict = [[[dict objectForKey:@"data"] objectForKey:@"images"] objectForKey:@"original"];
                 if([[dict objectForKey:@"mp4"] length]) {
@@ -408,8 +405,7 @@
             CLS_LOG(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
             [self fail:error.localizedDescription];
         } else {
-            SBJsonParser *parser = [[SBJsonParser alloc] init];
-            NSDictionary *dict = [parser objectWithData:data];
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             if([[dict objectForKey:@"success"] intValue]) {
                 dict = [dict objectForKey:@"data"];
                 if([[dict objectForKey:@"type"] hasPrefix:@"image/"] && [[dict objectForKey:@"animated"] intValue] == 0) {
@@ -450,8 +446,7 @@
             CLS_LOG(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
             [self fail:error.localizedDescription];
         } else {
-            SBJsonParser *parser = [[SBJsonParser alloc] init];
-            NSDictionary *dict = [parser objectWithData:data];
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             if([[dict objectForKey:@"success"] intValue]) {
                 dict = [dict objectForKey:@"data"];
                 if([[dict objectForKey:@"images_count"] intValue] == 1 || [[dict objectForKey:@"is_album"] intValue] == 0) {
@@ -537,8 +532,7 @@
                 NSLog(@"Error fetching cl.ly metadata. Error %li : %@", (long)error.code, error.userInfo);
                 [self fail:error.localizedDescription];
             } else {
-                SBJsonParser *parser = [[SBJsonParser alloc] init];
-                NSDictionary *dict = [parser objectWithData:data];
+                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
                 if([[dict objectForKey:@"item_type"] isEqualToString:@"image"]) {
                     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"content_url"]]];
                     _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
@@ -562,8 +556,7 @@
                 NSLog(@"Error fetching MediaWiki metadata. Error %li : %@", (long)error.code, error.userInfo);
                 [self fail:error.localizedDescription];
             } else {
-                SBJsonParser *parser = [[SBJsonParser alloc] init];
-                NSDictionary *dict = [parser objectWithData:data];
+                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
                 NSDictionary *page = [[[[dict objectForKey:@"query"] objectForKey:@"pages"] allValues] objectAtIndex:0];
                 if(page && [page objectForKey:@"imageinfo"]) {
                     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]]];

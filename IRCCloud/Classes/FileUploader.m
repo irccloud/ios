@@ -17,7 +17,6 @@
 #import <AVFoundation/AVFoundation.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "FileUploader.h"
-#import "SBJson.h"
 #import "NSData+Base64.h"
 #import "config.h"
 #import "NetworkConnection.h"
@@ -466,7 +465,7 @@
 #endif
     if(_cancelled)
         return;
-    NSDictionary *d = [[[SBJsonParser alloc] init] objectWithData:_response];
+    NSDictionary *d = [NSJSONSerialization JSONObjectWithData:_response options:kNilOptions error:nil];
     if(d) {
         CLS_LOG(@"Upload finished: %@", d);
         if([[d objectForKey:@"success"] intValue] == 1) {

@@ -267,7 +267,7 @@
         }
     }
     
-    SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+    SBJson5Writer *writer = [[SBJson5Writer alloc] init];
     NSString *json = [writer stringWithObject:prefs];
     
     _reqid = [[NetworkConnection sharedInstance] setPrefs:json];

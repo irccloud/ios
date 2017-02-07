@@ -1698,7 +1698,7 @@ extern NSDictionary *emojiMap;
                 CLS_LOG(@"Set monospace");
                 NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
                 [p setObject:@"mono" forKey:@"font"];
-                SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+                SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                 NSString *json = [writer stringWithObject:p];
                 [[NetworkConnection sharedInstance] setPrefs:json];
                 [_message clearText];
@@ -1707,7 +1707,7 @@ extern NSDictionary *emojiMap;
             } else if([_message.text isEqualToString:@"/mono 0"]) {
                 NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
                 [p setObject:@"sans" forKey:@"font"];
-                SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+                SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                 NSString *json = [writer stringWithObject:p];
                 [[NetworkConnection sharedInstance] setPrefs:json];
                 [_message clearText];
@@ -4218,13 +4218,12 @@ Device type: %@\n",
                             return [da compare:db];
                         }];
                         [report appendString:@"==========\nConsole log:\n"];
-                        SBJsonParser *parser = [[SBJsonParser alloc] init];
                         for(NSURL *file in files.reverseObjectEnumerator) {
                             if([file.lastPathComponent hasPrefix:@"log_"] && [file.lastPathComponent hasSuffix:@".clsrecord"]) {
                                 NSArray *lines = [[NSString stringWithContentsOfURL:file encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
                                 if(lines.count) {
                                     for(NSString *line in lines) {
-                                        NSDictionary *dict = [parser objectWithString:line];
+                                        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:[line UTF8String] length:[line length]] options:kNilOptions error:nil];
                                         NSString *msg = [[dict objectForKey:@"log"] objectForKey:@"msg"];
                                         if(msg.length) {
                                             NSDate *date = [NSDate dateWithTimeIntervalSince1970:[[[dict objectForKey:@"log"] objectForKey:@"time"] doubleValue] / 1000.0f];

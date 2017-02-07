@@ -238,8 +238,7 @@
                     NSLog(@"Error fetching Facebook. Error %li : %@", (long)error.code, error.userInfo);
                     [self openWebpage:url];
                 } else {
-                    SBJsonParser *parser = [[SBJsonParser alloc] init];
-                    NSDictionary *dict = [parser objectWithData:data];
+                    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
                     
                     if([[dict objectForKey:@"source"] length]) {
                         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];

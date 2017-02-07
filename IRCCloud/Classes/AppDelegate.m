@@ -956,7 +956,7 @@
         [d setObject:uploadtasks forKey:@"uploadtasks"];
         [d synchronize];
         
-        NSDictionary *r = [[[SBJsonParser alloc] init] objectWithData:response];
+        NSDictionary *r = [NSJSONSerialization JSONObjectWithData:response options:kNilOptions error:nil];
         if(!r) {
             CLS_LOG(@"Invalid JSON response: %@", [[NSString alloc] initWithData:response encoding:NSUTF8StringEncoding]);
         } else if([[r objectForKey:@"success"] intValue] == 1) {

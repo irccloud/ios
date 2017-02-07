@@ -32,15 +32,15 @@
 
 #import <Foundation/Foundation.h>
 
-#import "SBJsonTokeniser.h"
-#import "SBJsonStreamParser.h"
+#import "SBJson5StreamTokeniser.h"
+#import "SBJson5StreamParser.h"
 
-@interface SBJsonStreamParserState : NSObject
+@interface SBJson5StreamParserState : NSObject
 + (id)sharedInstance;
 
-- (BOOL)parser:(SBJsonStreamParser*)parser shouldAcceptToken:(sbjson_token_t)token;
-- (SBJsonStreamParserStatus)parserShouldReturn:(SBJsonStreamParser*)parser;
-- (void)parser:(SBJsonStreamParser*)parser shouldTransitionTo:(sbjson_token_t)tok;
+- (BOOL)parser:(SBJson5StreamParser *)parser shouldAcceptToken:(sbjson5_token_t)token;
+- (SBJson5ParserStatus)parserShouldReturn:(SBJson5StreamParser *)parser;
+- (void)parser:(SBJson5StreamParser *)parser shouldTransitionTo:(sbjson5_token_t)tok;
 - (BOOL)needKey;
 - (BOOL)isError;
 
@@ -48,36 +48,35 @@
 
 @end
 
-@interface SBJsonStreamParserStateStart : SBJsonStreamParserState
+@interface SBJson5StreamParserStateStart : SBJson5StreamParserState
 @end
 
-@interface SBJsonStreamParserStateComplete : SBJsonStreamParserState
+@interface SBJson5StreamParserStateComplete : SBJson5StreamParserState
 @end
 
-@interface SBJsonStreamParserStateError : SBJsonStreamParserState
+@interface SBJson5StreamParserStateError : SBJson5StreamParserState
 @end
 
-
-@interface SBJsonStreamParserStateObjectStart : SBJsonStreamParserState
+@interface SBJson5StreamParserStateObjectStart : SBJson5StreamParserState
 @end
 
-@interface SBJsonStreamParserStateObjectGotKey : SBJsonStreamParserState
+@interface SBJson5StreamParserStateObjectGotKey : SBJson5StreamParserState
 @end
 
-@interface SBJsonStreamParserStateObjectSeparator : SBJsonStreamParserState
+@interface SBJson5StreamParserStateObjectSeparator : SBJson5StreamParserState
 @end
 
-@interface SBJsonStreamParserStateObjectGotValue : SBJsonStreamParserState
+@interface SBJson5StreamParserStateObjectGotValue : SBJson5StreamParserState
 @end
 
-@interface SBJsonStreamParserStateObjectNeedKey : SBJsonStreamParserState
+@interface SBJson5StreamParserStateObjectNeedKey : SBJson5StreamParserState
 @end
 
-@interface SBJsonStreamParserStateArrayStart : SBJsonStreamParserState
+@interface SBJson5StreamParserStateArrayStart : SBJson5StreamParserState
 @end
 
-@interface SBJsonStreamParserStateArrayGotValue : SBJsonStreamParserState
+@interface SBJson5StreamParserStateArrayGotValue : SBJson5StreamParserState
 @end
 
-@interface SBJsonStreamParserStateArrayNeedValue : SBJsonStreamParserState
+@interface SBJson5StreamParserStateArrayNeedValue : SBJson5StreamParserState
 @end

@@ -506,7 +506,7 @@
         [prefs setObject:[NSNumber numberWithBool:_compact.isOn] forKey:@"ascii-compact"];
         [prefs setObject:[NSNumber numberWithBool:!_disableInlineFiles.isOn] forKey:@"files-disableinline"];
         
-        SBJsonWriter *writer = [[SBJsonWriter alloc] init];
+        SBJson5Writer *writer = [[SBJson5Writer alloc] init];
         NSString *json = [writer stringWithObject:prefs];
         
         _userinfosaved = NO;

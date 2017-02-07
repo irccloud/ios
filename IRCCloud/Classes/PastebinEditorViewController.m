@@ -76,8 +76,7 @@
         if (error) {
             NSLog(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
         } else {
-            SBJsonParser *parser = [[SBJsonParser alloc] init];
-            NSDictionary *dict = [parser objectWithData:data];
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             _text.text = [dict objectForKey:@"body"];
             _filename.text = [dict objectForKey:@"name"];
             _text.editable = _filename.enabled = YES;

@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 #import "WebSocket.h"
-#import "SBJson.h"
+#import "SBJson5.h"
 #import "ServersDataSource.h"
 #import "BuffersDataSource.h"
 #import "ChannelsDataSource.h"
@@ -109,11 +109,10 @@ typedef enum {
     kIRCCloudUnknown
 } kIRCCloudReachability;
 
-@interface NetworkConnection : NSObject<WebSocketDelegate, SBJsonStreamParserAdapterDelegate> {
+@interface NetworkConnection : NSObject<WebSocketDelegate> {
     WebSocket *_socket;
-    SBJsonStreamParserAdapter *_adapter;
-    SBJsonStreamParser *_parser;
-    SBJsonWriter *_writer;
+    SBJson5Parser *_parser;
+    SBJson5Writer *_writer;
     ServersDataSource *_servers;
     BuffersDataSource *_buffers;
     ChannelsDataSource *_channels;
@@ -237,4 +236,5 @@ typedef enum {
 -(NSDictionary *)getPastebins:(int)page;
 -(void)requestArchives:(int)cid;
 -(void)setLastSelectedBID:(int)bid;
+-(void)parse:(NSDictionary *)object backlog:(BOOL)backlog;
 @end
