@@ -463,6 +463,8 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
+    if(!_data.count)
+        return nil;
     MainViewController *mainViewController = [(AppDelegate *)([UIApplication sharedApplication].delegate) mainViewController];
     EventsTableCell *cell = [_tableView cellForRowAtIndexPath:[_tableView indexPathForRowAtPoint:location]];
     _previewingRow = [_tableView indexPathForRowAtPoint:location].row;
@@ -1967,7 +1969,7 @@ extern UIImage *__socketClosedBackgroundImage;
     if(e.rowType == ROW_THUMBNAIL) {
         float width = self.tableView.bounds.size.width/2;
         if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
-            UIImage *img = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)width];
+            UIImage *img = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
             if(img) {
                 NSMutableDictionary *entities = [e.entities mutableCopy];
                 [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
@@ -2213,9 +2215,9 @@ extern UIImage *__socketClosedBackgroundImage;
                 cell.thumbnailWidth = width;
                 cell.thumbnailHeight = 48;
             }
-            cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)width];
+            cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
             if(!cell.thumbnail.image) {
-                [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)width completionHandler:^(UIImage *img) {
+                [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(UIImage *img) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         if([[e.entities objectForKey:@"properties"] objectForKey:@"width"] && [[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
                             cell.thumbnail.image = img;

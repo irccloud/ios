@@ -93,8 +93,10 @@
     if(![_images objectForKey:url]) {
         NSURL *cache = [_cachePath URLByAppendingPathComponent:[self md5:url.absoluteString]];
         UIImage *img = [UIImage imageWithContentsOfFile:cache.path];
-        if(img)
+        if(img) {
+            img = [UIImage imageWithCGImage:img.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
             [_images setObject:img forKey:url.absoluteString];
+        }
     }
     return [_images objectForKey:url.absoluteString];
 }
@@ -121,8 +123,10 @@
                 NSURL *cache = [_cachePath URLByAppendingPathComponent:[self md5:url.absoluteString]];
                 [[NSFileManager defaultManager] copyItemAtURL:location toURL:cache error:nil];
                 UIImage *img = [UIImage imageWithContentsOfFile:cache.path];
-                if(img)
+                if(img) {
+                    img = [UIImage imageWithCGImage:img.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
                     [_images setObject:img forKey:url.absoluteString];
+                }
             }
             handler([self imageForURL:url]);
         }];
