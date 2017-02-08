@@ -1989,9 +1989,15 @@ extern BOOL __compact;
     if(links)
         *links = [NSArray arrayWithArray:matches];
     
-    if(largeEmoji && [self emojiOnly:text]) {
-        NSUInteger start;
-        for(start = 0; start < text.length; start++)
+    if(largeEmoji) {
+        NSUInteger start = 0;
+        if(![self emojiOnly:text]) {
+            for(; start < text.length; start++)
+                if([self emojiOnly:[text substringFromIndex:start]])
+                    break;
+        }
+        
+        for(; start < text.length; start++)
             if([text characterAtIndex:start] != ' ' && [text characterAtIndex:start] != 0x00A0)
                 break;
         [output addAttributes:@{NSFontAttributeName:largeEmojiFont} range:NSMakeRange(start, text.length - start)];

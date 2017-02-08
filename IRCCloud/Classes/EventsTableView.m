@@ -108,6 +108,7 @@ extern UIImage *__socketClosedBackgroundImage;
     UIImageView *_thumbnail;
     UILabel *_filename, *_extension;
     float _thumbnailWidth, _thumbnailHeight;
+    BOOL _emojiOnly;
 }
 @property int type;
 @property float timestampPosition, accessoryOffset, thumbnailWidth, thumbnailHeight;
@@ -116,6 +117,7 @@ extern UIImage *__socketClosedBackgroundImage;
 @property (readonly) UIImageView *avatar, *thumbnail;
 @property (readonly) UIActivityIndicatorView *spinner;
 @property UIColor *messageTextColor;
+@property BOOL emojiOnly;
 @end
 
 @implementation EventsTableCell
@@ -325,7 +327,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(
                                        frame.origin.x + (__timeLeftPref ? (__timestampWidth + 4) : 0),
-                                       frame.origin.y + ( __monospacePref ? (__compact ? 0 : 0.5) : roundf((__smallAvatarHeight+3)/10) ),
+                                       frame.origin.y + (_emojiOnly ? __smallAvatarHeight : 0) + ( __monospacePref ? (__compact ? 0 : 0.5) : roundf((__smallAvatarHeight+3)/10) ),
                                        __smallAvatarHeight,
                                        __smallAvatarHeight
                                        );
@@ -1902,6 +1904,11 @@ extern UIImage *__socketClosedBackgroundImage;
     @synchronized (e) {
         NSArray *links;
         [_lock lock];
+        NSMutableString *msg = [e.msg mutableCopy];
+        if(msg) {
+            [ColorFormatter emojify:msg];
+            e.isEmojiOnly = [ColorFormatter emojiOnly:msg];
+        }
         if(e.from.length)
             e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf) defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43"] defaultColor:e.color mono:__monospacePref linkify:NO server:nil links:nil];
         if([e.realname isKindOfClass:[NSString class]] && e.realname.length) {
@@ -1910,9 +1917,9 @@ extern UIImage *__socketClosedBackgroundImage;
             links = nil;
         }
         if(e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE)
-            e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:YES];
+            e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
         else
-            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:YES];
+            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
         if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
             NSMutableArray *mutableLinks = links.mutableCopy;
             for(int i = 0; i < mutableLinks.count; i++) {
@@ -2293,6 +2300,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         
         cell.filename.text = [e.entities objectForKey:@"name"];
+        cell.emojiOnly = e.isEmojiOnly;
         return cell;
     }
 }
