@@ -1447,7 +1447,23 @@ extern BOOL __compact;
     
     static NSPredicate *_pattern;
     if(!_pattern) {
-        _pattern = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", [NSString stringWithFormat:@"[%@]+", [emojiMap.allValues componentsJoinedByString:@""]]];
+        NSString *pattern = [[NSString stringWithFormat:@"(?:%@)+", [emojiMap.allValues componentsJoinedByString:@"|"]] stringByReplacingOccurrencesOfString:@"|:)" withString:@""];
+        NSMutableString *pattern_escaped = [@"" mutableCopy];
+        
+        NSScanner *scanner = [NSScanner scannerWithString:pattern];
+        while (![scanner isAtEnd]) {
+            NSString *tempString;
+            [scanner scanUpToCharactersFromSet:[NSCharacterSet characterSetWithCharactersInString:@"*"] intoString:&tempString];
+            if([scanner isAtEnd]){
+                [pattern_escaped appendString:tempString];
+            }
+            else {
+                [pattern_escaped appendFormat:@"%@\\%@", tempString, [pattern substringWithRange:NSMakeRange([scanner scanLocation], 1)]];
+                [scanner setScanLocation:[scanner scanLocation]+1];
+            }
+        }
+        
+        _pattern = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", pattern_escaped];
     }
     return _pattern;
 }
