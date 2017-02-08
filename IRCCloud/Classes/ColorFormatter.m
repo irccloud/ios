@@ -23,7 +23,7 @@
 
 id Courier = NULL, CourierBold, CourierOblique,CourierBoldOblique;
 id Helvetica, HelveticaBold, HelveticaOblique,HelveticaBoldOblique;
-id arrowFont, chalkboardFont, markerFont, awesomeFont;
+id arrowFont, chalkboardFont, markerFont, awesomeFont, largeEmojiFont;
 UIFont *timestampFont, *monoTimestampFont;
 NSDictionary *emojiMap;
 NSDictionary *quotes;
@@ -1441,6 +1441,21 @@ extern BOOL __compact;
     return _pattern;
 }
 
++(NSPredicate *)emojiOnlyPattern {
+    if(!emojiMap)
+        [self emoji];
+    
+    static NSPredicate *_pattern;
+    if(!_pattern) {
+        _pattern = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", [NSString stringWithFormat:@"[%@]+", [emojiMap.allValues componentsJoinedByString:@""]]];
+    }
+    return _pattern;
+}
+
++(BOOL)emojiOnly:(NSString *)text {
+    return [[self emojiOnlyPattern] evaluateWithObject:text];
+}
+
 +(NSRegularExpression *)spotify {
     static NSRegularExpression *_pattern = nil;
     if(!_pattern) {
@@ -1560,6 +1575,7 @@ extern BOOL __compact;
     CourierBoldOblique = [UIFont fontWithName:@"Hack-BoldItalic" size:FONT_SIZE - 1];
     chalkboardFont = [UIFont fontWithName:@"ChalkboardSE-Light" size:FONT_SIZE];
     markerFont = [UIFont fontWithName:@"MarkerFelt-Thin" size:FONT_SIZE];
+    largeEmojiFont = [UIFont fontWithName:@"AppleColorEmoji" size:FONT_SIZE * 2];
     UIFontDescriptor *bodyFontDescriptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
     UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     UIFontDescriptor *italicBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
@@ -1589,6 +1605,9 @@ extern BOOL __compact;
 }
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
+    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO];
+}
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji {
     if(!color)
         color = [UIColor messageTextColor];
     
@@ -1969,6 +1988,14 @@ extern BOOL __compact;
     }
     if(links)
         *links = [NSArray arrayWithArray:matches];
+    
+    if(largeEmoji && [self emojiOnly:text]) {
+        NSUInteger start;
+        for(start = 0; start < text.length; start++)
+            if([text characterAtIndex:start] != ' ' && [text characterAtIndex:start] != 0x00A0)
+                break;
+        [output addAttributes:@{NSFontAttributeName:largeEmojiFont} range:NSMakeRange(start, text.length - start)];
+    }
     return output;
 }
 @end
