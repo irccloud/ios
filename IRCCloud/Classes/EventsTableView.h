@@ -82,6 +82,7 @@
     NSUInteger _previewingRow;
     NSUInteger _hiddenAvatarRow;
     NSMutableDictionary *_rowCache;
+    NSMutableDictionary *_filePropsCache;
 }
 @property (readonly) UITableView *tableView;
 @property (readonly) UIView *topUnreadView;

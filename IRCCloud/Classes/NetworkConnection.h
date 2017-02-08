@@ -237,4 +237,5 @@ typedef enum {
 -(void)requestArchives:(int)cid;
 -(void)setLastSelectedBID:(int)bid;
 -(void)parse:(NSDictionary *)object backlog:(BOOL)backlog;
+-(NSDictionary *)propertiesForFile:(NSString *)fileID;
 @end

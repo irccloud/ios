@@ -1141,6 +1141,25 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
 }
 
+-(NSDictionary *)propertiesForFile:(NSString *)fileID {
+    NSData *data;
+    NSURLResponse *response = nil;
+    NSError *error = nil;
+    
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+#endif
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, fileID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    
+    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+#ifndef EXTENSION
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+#endif
+    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+}
+
 -(NSDictionary *)getFiles:(int)page {
     NSData *data;
     NSURLResponse *response = nil;

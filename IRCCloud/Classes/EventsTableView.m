@@ -106,12 +106,12 @@ extern UIImage *__socketClosedBackgroundImage;
     UIActivityIndicatorView *_spinner;
     UIView *_thumbbackground;
     UIImageView *_thumbnail;
-    UILabel *_extension;
+    UILabel *_filename, *_extension;
     float _thumbnailWidth, _thumbnailHeight;
 }
 @property int type;
 @property float timestampPosition, accessoryOffset, thumbnailWidth, thumbnailHeight;
-@property (readonly) UILabel *timestamp, *accessory, *extension;
+@property (readonly) UILabel *timestamp, *accessory, *filename, *extension;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar, *thumbnail;
 @property (readonly) UIActivityIndicatorView *spinner;
@@ -135,6 +135,12 @@ extern UIImage *__socketClosedBackgroundImage;
         _thumbbackground = [[UIView alloc] initWithFrame:CGRectZero];
         _thumbbackground.hidden = YES;
         [self.contentView addSubview:_thumbbackground];
+        
+        _filename = [[UILabel alloc] init];
+        _filename.textColor = [UIColor linkColor];
+        _filename.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+        _filename.lineBreakMode = NSLineBreakByTruncatingTail;
+        [self.contentView addSubview:_filename];
         
         _extension = [[UILabel alloc] init];
         _extension.textColor = [UIColor whiteColor];
@@ -207,6 +213,7 @@ extern UIImage *__socketClosedBackgroundImage;
     _bottomBorder.frame = CGRectMake(0,frame.size.height - 3,frame.size.width, 3);
     _thumbbackground.hidden = YES;
     _extension.hidden = YES;
+    _filename.hidden = YES;
 
     if(_type == ROW_TIMESTAMP) {
         _topBorder.backgroundColor = [UIColor timestampTopBorderColor];
@@ -291,6 +298,8 @@ extern UIImage *__socketClosedBackgroundImage;
             _spinner.hidden = (_thumbnail.image != nil);
             if(!_spinner.hidden && !_spinner.isAnimating)
                 [_spinner startAnimating];
+            _filename.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 14 - __timestampWidth, FONT_SIZE + 2);
+            _filename.hidden = NO;
         } else if(_type == ROW_FILE) {
             _thumbbackground.backgroundColor = [UIColor bufferBackgroundColor];
             if(__timeLeftPref) {
@@ -307,6 +316,9 @@ extern UIImage *__socketClosedBackgroundImage;
             frame.size.width -= _extension.frame.size.width + 16;
 
             _timestamp.hidden = YES;
+            
+            _filename.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 8, frame.size.width - 14 - __timestampWidth, FONT_SIZE + 2);
+            _filename.hidden = NO;
         }
 
         _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, frame.size.width - 4 - __timestampWidth, _type == ROW_FILE ? _thumbbackground.frame.size.height : floorf([_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height) + 1);
@@ -365,6 +377,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _expandedSectionEids = [[NSMutableDictionary alloc] init];
         _collapsedEvents = [[CollapsedEvents alloc] init];
         _unseenHighlightPositions = [[NSMutableArray alloc] init];
+        _filePropsCache = [[NSMutableDictionary alloc] init];
         _buffer = nil;
         _ignore = [[Ignore alloc] init];
         _eidToOpen = -1;
@@ -384,6 +397,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _expandedSectionEids = [[NSMutableDictionary alloc] init];
         _collapsedEvents = [[CollapsedEvents alloc] init];
         _unseenHighlightPositions = [[NSMutableArray alloc] init];
+        _filePropsCache = [[NSMutableDictionary alloc] init];
         _buffer = nil;
         _ignore = [[Ignore alloc] init];
         _eidToOpen = -1;
@@ -1188,38 +1202,57 @@ extern UIImage *__socketClosedBackgroundImage;
             NSTimeInterval entity_eid = event.eid;
             for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
                 entity_eid += 1;
-                Event *e1 = [[Event alloc] init];
-                e1.cid = event.cid;
-                e1.bid = event.bid;
-                e1.eid = entity_eid;
-                e1.from = event.from;
-                e1.isSelf = event.isSelf;
-                e1.fromMode = event.fromMode;
-                e1.realname = event.realname;
-                e1.hostmask = event.hostmask;
-                if([[entity objectForKey:@"mime_type"] hasPrefix:@"image/"])
-                    e1.rowType = ROW_THUMBNAIL;
-                else
-                    e1.rowType = ROW_FILE;
-                
-                int bytes = [[entity objectForKey:@"size"] intValue];
-                NSString *separator = (e1.rowType == ROW_THUMBNAIL) ? @" • " : @"\n";
-                if(bytes < 1024) {
-                    e1.msg = [NSString stringWithFormat:@"%lu B%@%@", (unsigned long)bytes, separator, [entity objectForKey:@"mime_type"]];
+                NSDictionary *properties = [_filePropsCache objectForKey:[entity objectForKey:@"id"]];
+                if(properties) {
+                    [self insertEvent:[self entity:event eid:entity_eid properties:properties] backlog:backlog nextIsGrouped:NO];
                 } else {
-                    int exp = (int)(log(bytes) / log(1024));
-                    e1.msg = [NSString stringWithFormat:@"%.1f %cB%@%@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], separator, [entity objectForKey:@"mime_type"]];
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                        NSDictionary *properties = [_conn propertiesForFile:[entity objectForKey:@"id"]];
+                        if(properties) {
+                            [_filePropsCache setObject:properties forKey:[entity objectForKey:@"id"]];
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                [self insertEvent:[self entity:event eid:entity_eid properties:properties] backlog:NO nextIsGrouped:NO];
+                            }];
+                        }
+                    });
                 }
-                e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:event.bgColor;
-                e1.type = event.type;
-                e1.entities = entity;
-                
-                [self insertEvent:e1 backlog:backlog nextIsGrouped:NO];
             }
             if(_buffer.last_seen_eid == event.eid)
                 _buffer.last_seen_eid = entity_eid;
         }
     }
+}
+
+-(Event *)entity:(Event *)parent eid:(NSTimeInterval)eid properties:(NSDictionary *)properties {
+    Event *e1 = [[Event alloc] init];
+    e1.cid = parent.cid;
+    e1.bid = parent.bid;
+    e1.eid = eid;
+    e1.from = parent.from;
+    e1.isSelf = parent.isSelf;
+    e1.fromMode = parent.fromMode;
+    e1.realname = parent.realname;
+    e1.hostmask = parent.hostmask;
+    if([[properties objectForKey:@"mime_type"] hasPrefix:@"image/"])
+        e1.rowType = ROW_THUMBNAIL;
+    else
+        e1.rowType = ROW_FILE;
+    
+    int bytes = [[properties objectForKey:@"size"] intValue];
+    NSString *separator = (e1.rowType == ROW_THUMBNAIL) ? @" • " : @"\n";
+    if(bytes < 1024) {
+        e1.msg = [NSString stringWithFormat:@"%lu B%@%@", (unsigned long)bytes, separator, [properties objectForKey:@"mime_type"]];
+    } else {
+        int exp = (int)(log(bytes) / log(1024));
+        e1.msg = [NSString stringWithFormat:@"%.1f %cB%@%@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], separator, [properties objectForKey:@"mime_type"]];
+    }
+    if([[properties objectForKey:@"name"] length])
+        e1.msg = [NSString stringWithFormat:@"\n%@", e1.msg];
+    e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:parent.bgColor;
+    e1.type = parent.type;
+    e1.entities = properties;
+
+    return e1;
 }
 
 -(void)updateTopUnread:(NSInteger)firstRow {
@@ -1986,8 +2019,8 @@ extern UIImage *__socketClosedBackgroundImage;
         }
     }
     
-    if(e.rowType == ROW_FILE && e.height < 64)
-        e.height = 64;
+    if(e.rowType == ROW_FILE && e.height < 72)
+        e.height = 80;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -2258,6 +2291,8 @@ extern UIImage *__socketClosedBackgroundImage;
 
             cell.extension.text = extension.uppercaseString;
         }
+        
+        cell.filename.text = [e.entities objectForKey:@"name"];
         return cell;
     }
 }
