@@ -505,6 +505,7 @@
         [prefs setObject:[NSNumber numberWithBool:_markAsRead.isOn] forKey:@"enableReadOnSelect"];
         [prefs setObject:[NSNumber numberWithBool:_compact.isOn] forKey:@"ascii-compact"];
         [prefs setObject:[NSNumber numberWithBool:!_disableInlineFiles.isOn] forKey:@"files-disableinline"];
+        [prefs setObject:[NSNumber numberWithBool:!_disableBigEmoji.isOn] forKey:@"emoji-nobig"];
         
         SBJson5Writer *writer = [[SBJson5Writer alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -796,6 +797,12 @@
         _disableInlineFiles.on = YES;
     }
     
+    if([[prefs objectForKey:@"emoji-nobig"] isKindOfClass:[NSNumber class]]) {
+        _disableBigEmoji.on = ![[prefs objectForKey:@"emoji-nobig"] boolValue];
+    } else {
+        _disableBigEmoji.on = YES;
+    }
+    
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
     _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
     _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
@@ -900,10 +907,11 @@
                          @{@"title":@"Show Seconds", @"accessory":_seconds},
                          @{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."},
                          @{@"title":@"Colourise Nicknames", @"accessory":_colors},
+                         @{@"title":@"Enlarge Emoji Messages", @"accessory":_disableBigEmoji},
                          @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
-                         @{@"title":@"Show joins, parts, quits", @"accessory":_hideJoinPart},
-                         @{@"title":@"Collapse joins, parts, quits", @"accessory":_expandJoinPart},
-                         @{@"title":@"Embed uploaded files", @"accessory":_disableInlineFiles},
+                         @{@"title":@"Show Joins, Parts, Quits", @"accessory":_hideJoinPart},
+                         @{@"title":@"Collapse Joins, Parts, Quits", @"accessory":_expandJoinPart},
+                         @{@"title":@"Embed Uploaded Files", @"accessory":_disableInlineFiles},
                          ]},
               @{@"title":@"Device", @"items":device},
               @{@"title":@"Notifications", @"items":notifications},
@@ -987,6 +995,7 @@
     _imageViewer = [[UISwitch alloc] init];
     _videoViewer = [[UISwitch alloc] init];
     _disableInlineFiles = [[UISwitch alloc] init];
+    _disableBigEmoji = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";

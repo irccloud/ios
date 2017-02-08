@@ -84,6 +84,7 @@ BOOL __chatOneLinePref = NO;
 BOOL __norealnamePref = NO;
 BOOL __monospacePref = NO;
 BOOL __disableInlineFilesPref = NO;
+BOOL __disableBigEmojiPref = NO;
 int __smallAvatarHeight;
 int __largeAvatarHeight = 32;
 
@@ -1599,6 +1600,7 @@ extern UIImage *__socketClosedBackgroundImage;
         __monospacePref = NO;
         __disableInlineFilesPref = NO;
         __compact = NO;
+        __disableBigEmojiPref = NO;
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         if(prefs) {
             __monospacePref = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
@@ -1612,6 +1614,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 __timeLeftPref = NO;
             __norealnamePref = [[NSUserDefaults standardUserDefaults] boolForKey:@"chat-norealname"];
             __compact = [[prefs objectForKey:@"ascii-compact"] boolValue];
+            __disableBigEmojiPref = [[prefs objectForKey:@"emoji-nobig"] boolValue];
 
             NSDictionary *hiddenMap;
             
@@ -1904,10 +1907,14 @@ extern UIImage *__socketClosedBackgroundImage;
     @synchronized (e) {
         NSArray *links;
         [_lock lock];
-        NSMutableString *msg = [e.msg mutableCopy];
-        if(msg) {
-            [ColorFormatter emojify:msg];
-            e.isEmojiOnly = [ColorFormatter emojiOnly:msg];
+        if(!__disableBigEmojiPref) {
+            NSMutableString *msg = [e.msg mutableCopy];
+            if(msg) {
+                [ColorFormatter emojify:msg];
+                e.isEmojiOnly = [ColorFormatter emojiOnly:msg];
+            }
+        } else {
+            e.isEmojiOnly = NO;
         }
         if(e.from.length)
             e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf) defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43"] defaultColor:e.color mono:__monospacePref linkify:NO server:nil links:nil];

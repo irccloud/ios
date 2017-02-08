@@ -58,6 +58,7 @@
     UISwitch *_imageViewer;
     UISwitch *_videoViewer;
     UISwitch *_disableInlineFiles;
+    UISwitch *_disableBigEmoji;
     NSString *_version;
     UISlider *_fontSize;
     int _userinforeqid;

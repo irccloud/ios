@@ -1997,9 +1997,6 @@ extern BOOL __compact;
                     break;
         }
         
-        for(; start < text.length; start++)
-            if([text characterAtIndex:start] != ' ' && [text characterAtIndex:start] != 0x00A0)
-                break;
         [output addAttributes:@{NSFontAttributeName:largeEmojiFont} range:NSMakeRange(start, text.length - start)];
     }
     return output;

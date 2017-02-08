@@ -1157,7 +1157,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    if(data)
+        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    else
+        return nil;
 }
 
 -(NSDictionary *)getFiles:(int)page {
