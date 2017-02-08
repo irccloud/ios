@@ -1720,7 +1720,7 @@ extern UIImage *__socketClosedBackgroundImage;
             _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
         if(events.count && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && _conn.ready && _tableView.contentSize.height > _tableView.bounds.size.height) {
             _tableView.tableHeaderView = _headerView;
-        } else if(!_data.count && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && _conn.ready) {
+        } else if((!_data.count || _earliestEid > _buffer.min_eid) && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && _conn.ready) {
             _tableView.tableHeaderView = _backlogFailedView;
         } else {
             _tableView.tableHeaderView = nil;
