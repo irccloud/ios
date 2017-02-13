@@ -2265,20 +2265,13 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
             if(!cell.thumbnail.image) {
                 [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(UIImage *img) {
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        if([[e.entities objectForKey:@"properties"] objectForKey:@"width"] && [[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
-                            cell.thumbnail.image = img;
-                            cell.thumbnail.hidden = NO;
-                            cell.spinner.hidden = YES;
-                            [cell.spinner stopAnimating];
-                        } else {
-                            NSMutableDictionary *entities = [e.entities mutableCopy];
-                            [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
-                            e.entities = entities;
-                            [self _calculateHeight:e];
-                            [self.tableView reloadData];
-                        }
-                    }];
+                    if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
+                        NSMutableDictionary *entities = [e.entities mutableCopy];
+                        [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
+                        e.entities = entities;
+                    }
+                    [self _calculateHeight:e];
+                    [self.tableView reloadData];
                 }];
             } else if(![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
                 NSMutableDictionary *entities = [e.entities mutableCopy];

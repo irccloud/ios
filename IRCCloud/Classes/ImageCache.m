@@ -128,7 +128,9 @@
                     [_images setObject:img forKey:url.absoluteString];
                 }
             }
-            handler([self imageForURL:url]);
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                handler([self imageForURL:url]);
+            }];
         }];
         [_tasks setObject:task forKey:url];
         [task resume];

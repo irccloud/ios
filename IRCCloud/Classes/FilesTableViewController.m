@@ -19,73 +19,7 @@
 #import "ColorFormatter.h"
 #import "UIColor+IRCCloud.h"
 #import "FileMetadataViewController.h"
-
-@implementation ImageFetcher
-
--(id)initWithURL:(NSString *)URL fileID:(NSString *)fileID {
-    self = [super init];
-    if(self) {
-        _url = URL;
-        _fileID = fileID;
-        _cancelled = NO;
-        _running = NO;
-    }
-    return self;
-}
--(void)cancel {
-    _cancelled = YES;
-    [_connection cancel];
-}
--(void)start {
-    if(_cancelled || _running)
-        return;
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:60];
-    [request setHTTPShouldHandleCookies:NO];
-    
-    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    if(_connection) {
-        _data = [[NSMutableData alloc] init];
-        _running = YES;
-    } else {
-        CLS_LOG(@"ImageFetcher failed to create NSURLConnection");
-    }
-}
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
-    return nil;
-}
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    if(_cancelled)
-        return;
-    CLS_LOG(@"ImageFetcher request failed: %@", error);
-    _running = NO;
-    _cancelled = YES;
-    [_delegate imageFetcherDidFail:self];
-}
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    if(_cancelled)
-        return;
-    _running = NO;
-    [_delegate imageFetcher:self downloadedImage:_data];
-}
-- (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
-    if(_cancelled)
-        return nil;
-    return request;
-}
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
-    if([response statusCode] != 200) {
-        CLS_LOG(@"ImageFetcher HTTP status code: %li", (long)[response statusCode]);
-        CLS_LOG(@"ImageFetcher HTTP headers: %@", [response allHeaderFields]);
-        _cancelled = YES;
-        [_delegate imageFetcherDidFail:self];
-    }
-}
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [_data appendData:data];
-}
-
-@end
+#import "ImageCache.h"
 
 @interface FilesTableCell : UITableViewCell {
     UILabel *_date;
@@ -172,11 +106,9 @@
     _formatter = [[NSDateFormatter alloc] init];
     _formatter.dateStyle = NSDateFormatterLongStyle;
     _formatter.timeStyle = NSDateFormatterMediumStyle;
-    _thumbnails = [[NSMutableDictionary alloc] init];
     _imageViews = [[NSMutableDictionary alloc] init];
     _spinners = [[NSMutableDictionary alloc] init];
     _extensions = [[NSMutableDictionary alloc] init];
-    _imageFetchers = [[NSMutableDictionary alloc] init];
     
     _footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
     _footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -203,8 +135,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
     _files = nil;
     _canLoadMore = NO;
-    [_imageFetchers.allValues makeObjectsPerformSelector:@selector(cancel)];
-    [_imageFetchers removeAllObjects];
+    [[ImageCache sharedInstance] clear];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -285,41 +216,15 @@
             return;
         }
     }
-    for(NSDictionary *d in _files) {
-        NSString *fileID = [d objectForKey:@"id"];
-        if(![_thumbnails objectForKey:fileID]) {
-            NSString *url = [_url_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", self.view.frame.size.width]} error:nil];
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                ImageFetcher *i = [[ImageFetcher alloc] initWithURL:url fileID:fileID];
-                i.delegate = self;
-                [_imageFetchers setObject:i forKey:fileID];
-                [i start];
-            }];
-        }
-    }
-    
     [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
-}
-
--(void)imageFetcher:(ImageFetcher *)imageFetcher downloadedImage:(NSData *)data {
-    UIImage *img = [UIImage imageWithData:data];
-    if(img)
-        [_thumbnails setObject:img forKey:imageFetcher.fileID];
-
-    [self _refreshFileID:imageFetcher.fileID];
-    [_imageFetchers removeObjectForKey:imageFetcher.fileID];
-}
-
--(void)imageFetcherDidFail:(ImageFetcher *)imageFetcher {
-    [self _refreshFileID:imageFetcher.fileID];
-    [_imageFetchers removeObjectForKey:imageFetcher.fileID];
 }
 
 -(void)_refreshFileID:(NSString *)fileID {
     [[_spinners objectForKey:fileID] stopAnimating];
     [[_spinners objectForKey:fileID] setHidden:YES];
-    if([_thumbnails objectForKey:fileID]) {
-        [[_imageViews objectForKey:fileID] setImage:[_thumbnails objectForKey:fileID]];
+    UIImage *image = [[ImageCache sharedInstance] imageForFileID:fileID width:self.view.frame.size.width];
+    if(image) {
+        [[_imageViews objectForKey:fileID] setImage:image];
         [[_imageViews objectForKey:fileID] setHidden:NO];
         [[_extensions objectForKey:fileID] setHidden:YES];
     } else {
@@ -385,8 +290,9 @@
         [_spinners setObject:cell.spinner forKey:[file objectForKey:@"id"]];
         [_imageViews setObject:cell.thumbnail forKey:[file objectForKey:@"id"]];
         [_extensions setObject:cell.extension forKey:[file objectForKey:@"id"]];
-        if([_thumbnails objectForKey:[file objectForKey:@"id"]]) {
-            [cell.thumbnail setImage:[_thumbnails objectForKey:[file objectForKey:@"id"]]];
+        UIImage *image = [[ImageCache sharedInstance] imageForFileID:[file objectForKey:@"id"] width:self.view.frame.size.width];
+        if(image) {
+            [cell.thumbnail setImage:image];
             cell.thumbnail.hidden = NO;
             cell.extension.hidden = YES;
             cell.spinner.hidden = YES;
@@ -396,6 +302,9 @@
             cell.spinner.hidden = NO;
             if(![cell.spinner isAnimating])
                 [cell.spinner startAnimating];
+            [[ImageCache sharedInstance] fetchFileID:[file objectForKey:@"id"] width:self.view.frame.size.width completionHandler:^(UIImage *image) {
+                [self _refreshFileID:[file objectForKey:@"id"]];
+            }];
         }
     } else {
         cell.extension.hidden = NO;
@@ -414,7 +323,6 @@
     @synchronized (_files) {
         if (editingStyle == UITableViewCellEditingStyleDelete) {
             _reqid = [[NetworkConnection sharedInstance] deleteFile:[[_files objectAtIndex:indexPath.row] objectForKey:@"id"]];
-            [_thumbnails removeObjectForKey:[[_files objectAtIndex:indexPath.row] objectForKey:@"id"]];
             NSMutableArray *a = _files.mutableCopy;
             [a removeObjectAtIndex:indexPath.row];
             _files = [NSArray arrayWithArray:a];
@@ -450,7 +358,7 @@
         int bytes = [[_selectedFile objectForKey:@"size"] intValue];
         int exp = (int)(log(bytes) / log(1024));
         [c setFilename:[_selectedFile objectForKey:@"name"] metadata:[NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [_selectedFile objectForKey:@"mime_type"]]];
-        [c setImage:[_thumbnails objectForKey:[_selectedFile objectForKey:@"id"]]];
+        [c setImage:[[ImageCache sharedInstance] imageForFileID:[_selectedFile objectForKey:@"id"] width:self.view.frame.size.width]];
         [c setURL:[_url_template relativeStringWithVariables:_selectedFile error:nil]];
         [self.navigationController pushViewController:c animated:YES];
     }
