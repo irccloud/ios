@@ -1591,7 +1591,6 @@ extern BOOL __compact;
     CourierBoldOblique = [UIFont fontWithName:@"Hack-BoldItalic" size:FONT_SIZE - 1];
     chalkboardFont = [UIFont fontWithName:@"ChalkboardSE-Light" size:FONT_SIZE];
     markerFont = [UIFont fontWithName:@"MarkerFelt-Thin" size:FONT_SIZE];
-    largeEmojiFont = [UIFont fontWithName:@"AppleColorEmoji" size:FONT_SIZE * 2];
     UIFontDescriptor *bodyFontDescriptor = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
     UIFontDescriptor *boldBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     UIFontDescriptor *italicBodyFontDescriptor = [bodyFontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
@@ -1600,6 +1599,7 @@ extern BOOL __compact;
     HelveticaBold = [UIFont fontWithDescriptor:boldBodyFontDescriptor size:FONT_SIZE];
     HelveticaOblique = [UIFont fontWithDescriptor:italicBodyFontDescriptor size:FONT_SIZE];
     HelveticaBoldOblique = [UIFont fontWithDescriptor:boldItalicBodyFontDescriptor size:FONT_SIZE];
+    largeEmojiFont = [UIFont fontWithDescriptor:bodyFontDescriptor size:FONT_SIZE * 2];
     ColorFormatterCachedFontSize = FONT_SIZE;
 }
 
