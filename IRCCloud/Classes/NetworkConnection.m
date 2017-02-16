@@ -999,6 +999,14 @@ volatile BOOL __socketPaused = NO;
     return kIRCCloudUnknown;
 }
 
+-(BOOL)isWifi {
+    SCNetworkReachabilityFlags flags;
+    if(_reachabilityValid && SCNetworkReachabilityGetFlags(_reachability, &flags)) {
+        return (flags & kSCNetworkReachabilityFlagsIsWWAN) != kSCNetworkReachabilityFlagsIsWWAN;
+    }
+    return NO;
+}
+
 static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) {
     static BOOL firstTime = YES;
     static int lastType = TYPE_UNKNOWN;

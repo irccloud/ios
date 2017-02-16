@@ -4195,8 +4195,9 @@ extern NSDictionary *emojiMap;
 UID: %@\n\
 App Version: %@\n\
 OS Version: %@\n\
-Device type: %@\n",
-                                       [[NetworkConnection sharedInstance].userInfo objectForKey:@"id"],version,[UIDevice currentDevice].systemVersion,[UIDevice currentDevice].model];
+Device type: %@\n\
+Network type: %@\n",
+                                       [[NetworkConnection sharedInstance].userInfo objectForKey:@"id"],version,[UIDevice currentDevice].systemVersion,[UIDevice currentDevice].model,[NetworkConnection sharedInstance].isWifi ? @"Wi-Fi" : @"Mobile"];
             [report appendString:@"==========\nPrefs:\n"];
             [report appendFormat:@"%@\n", [[NetworkConnection sharedInstance] prefs]];
             [report appendString:@"==========\nNSUserDefaults:\n"];

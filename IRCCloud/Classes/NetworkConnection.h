@@ -177,6 +177,7 @@ typedef enum {
 +(NetworkConnection*)sharedInstance;
 +(void)sync;
 +(void)sync:(NSURL *)file1 with:(NSURL *)file2;
+-(BOOL)isWifi;
 -(void)serialize;
 -(NSDictionary *)requestAuthToken;
 -(NSDictionary *)requestConfiguration;

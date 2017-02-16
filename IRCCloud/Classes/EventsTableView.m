@@ -1652,6 +1652,8 @@ extern UIImage *__socketClosedBackgroundImage;
             if([[prefs objectForKey:@"files-disableinline"] boolValue] || (disableFilesMap && [[disableFilesMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
                 __disableInlineFilesPref = YES;
 
+            if([[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"] && ![NetworkConnection sharedInstance].isWifi)
+                __disableInlineFilesPref = YES;
         }
         __largeAvatarHeight = MIN(32, roundf(FONT_SIZE * 2) + (__compact ? 1 : 6));
         if(__monospacePref)

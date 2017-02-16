@@ -528,6 +528,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:!_browserWarning.isOn forKey:@"warnBeforeLaunchingBrowser"];
         [[NSUserDefaults standardUserDefaults] setBool:!_imageViewer.isOn forKey:@"imageViewer"];
         [[NSUserDefaults standardUserDefaults] setBool:!_videoViewer.isOn forKey:@"videoViewer"];
+        [[NSUserDefaults standardUserDefaults] setBool:_inlineWifiOnly.isOn forKey:@"inlineWifiOnly"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -772,6 +773,12 @@
         _browserWarning.on = YES;
     }
     
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"inlineWifiOnly"]) {
+        _inlineWifiOnly.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"];
+    } else {
+        _inlineWifiOnly.on = NO;
+    }
+    
     if(_oneLine.on) {
         _noRealName.enabled = YES;
         if(_avatarsOff.on) {
@@ -912,6 +919,7 @@
                          @{@"title":@"Show Joins, Parts, Quits", @"accessory":_hideJoinPart},
                          @{@"title":@"Collapse Joins, Parts, Quits", @"accessory":_expandJoinPart},
                          @{@"title":@"Embed Uploaded Files", @"accessory":_disableInlineFiles},
+                         @{@"title":@"Embed Files Only Over Wi-Fi", @"accessory":_inlineWifiOnly},
                          ]},
               @{@"title":@"Device", @"items":device},
               @{@"title":@"Notifications", @"items":notifications},
@@ -996,6 +1004,7 @@
     _videoViewer = [[UISwitch alloc] init];
     _disableInlineFiles = [[UISwitch alloc] init];
     _disableBigEmoji = [[UISwitch alloc] init];
+    _inlineWifiOnly = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
