@@ -34,7 +34,7 @@
     }
 }
 -(NSString *)description {
-    return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, modes: %@, msg: %@, netsplit: %i}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, [self modes:YES mode_modes:nil], _msg, _netsplit];
+    return [NSString stringWithFormat:@"{type: %i, chan: %@, nick: %@, oldNick: %@, hostmask: %@, fromMode: %@, targetMode: %@, modes: %@, msg: %@}", _type, _chan, _nick, _oldNick, _hostname, _fromMode, _targetMode, [self modes:YES mode_modes:nil], _msg];
 }
 -(BOOL)addMode:(NSString *)mode server:(Server *)server {
     if([mode rangeOfString:server?server.MODE_OPER.lowercaseString:@"y"].location != NSNotFound)
@@ -304,7 +304,6 @@
                     e.type = kCollapsedEventPopIn;
                 }
                 e.eid = event.eid;
-                e.netsplit = event.netsplit;
                 if(event.type == kCollapsedEventPart || event.type == kCollapsedEventQuit)
                     e.msg = event.msg;
                 [e copyModes:event];
@@ -434,10 +433,9 @@
                 if([[NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^(?:[^\\s:\\/.]+\\.)+[a-z]{2,} (?:[^\\s:\\/.]+\\.)+[a-z]{2,}$"] evaluateWithObject:event.msg]) {
                     NSArray *parts = [event.msg componentsSeparatedByString:@" "];
                     if(parts.count > 1 && ![[parts objectAtIndex:0] isEqualToString:[parts objectAtIndex:1]]) {
-                        c.netsplit = YES;
                         BOOL match = NO;
-                        for(CollapsedEvent *event in _data) {
-                            if(event.type == kCollapsedEventNetSplit && [event.msg isEqualToString:event.msg])
+                        for(CollapsedEvent *ce in _data) {
+                            if(ce.type == kCollapsedEventNetSplit && [ce.msg isEqualToString:event.msg])
                                 match = YES;
                         }
                         if(!match && _data.count > 0) {
@@ -542,7 +540,6 @@
                     break;
             }
         } else {
-            BOOL isNetsplit = NO;
             [_data sortUsingSelector:@selector(compare:)];
             NSEnumerator *i = [_data objectEnumerator];
             CollapsedEvent *last = nil;
@@ -553,10 +550,7 @@
             
             while(next) {
                 e = next;
-                
-                do {
-                    next = [i nextObject];
-                } while(isNetsplit && next.netsplit);
+                next = [i nextObject];
                 
                 if(message.length > 0 && e.type < kCollapsedEventNickChange && ((next == nil || next.type != e.type) && last != nil && last.type == e.type)) {
 					if(groupcount == 1) {
@@ -568,9 +562,6 @@
                 
                 if(last == nil || last.type != e.type) {
                     switch(e.type) {
-                        case kCollapsedEventNetSplit:
-                            isNetsplit = YES;
-                            break;
                         case kCollapsedEventMode:
                             if(message.length)
                                 [message appendString:@"• "];
@@ -593,7 +584,7 @@
                         case kCollapsedEventPopOut:
                             [message appendFormat:@"%c%@↔\U0000FE0E %c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, CLEAR];
                             break;
-                        case kCollapsedEventConnectionStatus:
+                        default:
                             break;
                     }
                 }
