@@ -3174,9 +3174,9 @@ extern NSDictionary *emojiMap;
         [sheet addButtonWithTitle:@"Share URL"];
     }
     if(_selectedEvent) {
-        //if([[_selectedEvent.entities objectForKey:@"own_file"] intValue]) {
+        if([[_selectedEvent.entities objectForKey:@"own_file"] intValue]) {
             [sheet addButtonWithTitle:@"Delete File"];
-        //}
+        }
         [sheet addButtonWithTitle:@"Copy Message"];
     }
     if(_selectedUser) {
