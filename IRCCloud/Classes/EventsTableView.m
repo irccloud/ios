@@ -734,6 +734,12 @@ extern UIImage *__socketClosedBackgroundImage;
     }];
 }
 
+-(void)uncacheFile:(NSString *)fileID {
+    @synchronized (_filePropsCache) {
+        [_filePropsCache removeObjectForKey:fileID];
+    }
+}
+
 -(void)clearCachedHeights {
     if(_ready) {
         if([_data count]) {
@@ -1205,19 +1211,23 @@ extern UIImage *__socketClosedBackgroundImage;
             NSTimeInterval entity_eid = event.eid;
             for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
                 entity_eid += 1;
-                NSDictionary *properties = [_filePropsCache objectForKey:[entity objectForKey:@"id"]];
-                if(properties) {
-                    [self insertEvent:[self entity:event eid:entity_eid properties:properties] backlog:backlog nextIsGrouped:NO];
-                } else {
-                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                        NSDictionary *properties = [_conn propertiesForFile:[entity objectForKey:@"id"]];
-                        if(properties) {
-                            [_filePropsCache setObject:properties forKey:[entity objectForKey:@"id"]];
-                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                [self insertEvent:[self entity:event eid:entity_eid properties:properties] backlog:NO nextIsGrouped:NO];
-                            }];
-                        }
-                    });
+                @synchronized (_filePropsCache) {
+                    NSDictionary *properties = [_filePropsCache objectForKey:[entity objectForKey:@"id"]];
+                    if(properties) {
+                        [self insertEvent:[self entity:event eid:entity_eid properties:properties] backlog:backlog nextIsGrouped:NO];
+                    } else {
+                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                            NSDictionary *properties = [_conn propertiesForFile:[entity objectForKey:@"id"]];
+                            if(properties) {
+                                @synchronized (_filePropsCache) {
+                                    [_filePropsCache setObject:properties forKey:[entity objectForKey:@"id"]];
+                                }
+                                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                    [self insertEvent:[self entity:event eid:entity_eid properties:properties] backlog:NO nextIsGrouped:NO];
+                                }];
+                            }
+                        });
+                    }
                 }
             }
             if(_buffer.last_seen_eid == event.eid)

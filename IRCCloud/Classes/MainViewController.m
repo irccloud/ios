@@ -537,6 +537,13 @@ extern NSDictionary *emojiMap;
     NSString *msg = nil;
     NSString *type = nil;
     switch(event) {
+        case kIRCEventSuccess:
+            o = notification.object;
+            if([[o objectForKey:@"_reqid"] intValue] == _deleteFileReqId) {
+                [_eventsView uncacheFile:[_selectedEvent.entities objectForKey:@"id"]];
+                [_eventsView refresh];
+            }
+            break;
         case kIRCEventSessionDeleted:
             [self bufferSelected:-1];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
@@ -1064,7 +1071,11 @@ extern NSDictionary *emojiMap;
             break;
         case kIRCEventFailureMsg:
             o = notification.object;
-            if([o objectForKey:@"_reqid"] && [[o objectForKey:@"_reqid"] intValue] > 0) {
+            if([[o objectForKey:@"_reqid"] intValue] == _deleteFileReqId) {
+                CLS_LOG(@"Error deleting file: %@", o);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+            } else if([o objectForKey:@"_reqid"] && [[o objectForKey:@"_reqid"] intValue] > 0) {
                 int reqid = [[o objectForKey:@"_reqid"] intValue];
                 for(Event *e in _pendingEvents) {
                     if(e.reqId == reqid) {
@@ -3162,8 +3173,12 @@ extern NSDictionary *emojiMap;
         [sheet addButtonWithTitle:@"Copy URL"];
         [sheet addButtonWithTitle:@"Share URL"];
     }
-    if(_selectedEvent)
+    if(_selectedEvent) {
+        //if([[_selectedEvent.entities objectForKey:@"own_file"] intValue]) {
+            [sheet addButtonWithTitle:@"Delete File"];
+        //}
         [sheet addButtonWithTitle:@"Copy Message"];
+    }
     if(_selectedUser) {
         [sheet addButtonWithTitle:@"Whois"];
         [sheet addButtonWithTitle:@"Send a Message"];
@@ -4057,6 +4072,8 @@ extern NSDictionary *emojiMap;
         } else if([action isEqualToString:@"Share URL"]) {
             UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:_selectedURL]] type:@"URL"];
             [self.slidingViewController presentViewController:activityController animated:YES completion:nil];
+        } else if([action isEqualToString:@"Delete File"]) {
+            _deleteFileReqId = [[NetworkConnection sharedInstance] deleteFile:[_selectedEvent.entities objectForKey:@"id"]];
         } else if([action isEqualToString:@"Archive"]) {
             [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Unarchive"]) {

@@ -92,6 +92,7 @@
     NSString *_currentTheme;
     BOOL _atMention;
     NSString *_bugReport;
+    int _deleteFileReqId;
     
     id<UIViewControllerPreviewing> __previewer;
 }

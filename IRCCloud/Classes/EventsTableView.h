@@ -104,5 +104,6 @@
 -(void)clearLastSeenMarker;
 -(void)refresh;
 -(void)clearCachedHeights;
+-(void)uncacheFile:(NSString *)fileID;
 -(NSString *)YUNoHeartbeat;
 @end
