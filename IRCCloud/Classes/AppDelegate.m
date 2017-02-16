@@ -447,6 +447,8 @@
                 [self.mainViewController launchURL:[NSURL URLWithString:url]];
             } else if([userActivity.webpageURL.path isEqualToString:@"/invite"]) {
                 [self launchURL:[NSURL URLWithString:[userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
+            } else if([userActivity.webpageURL.path hasPrefix:@"/pastebin/"]) {
+                [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-https://%@%@",userActivity.webpageURL.host,userActivity.webpageURL.path]]];
             } else {
                 [[UIApplication sharedApplication] openURL:userActivity.webpageURL];
                 return NO;
