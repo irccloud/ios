@@ -127,4 +127,6 @@
 -(NSTimeInterval)lastEidForBuffer:(int)bid;
 -(void)clearPendingAndFailed;
 -(void)reformat;
++(NSString *)reason:(NSString *)reason;
++(NSString *)SSLreason:(NSDictionary *)info;
 @end

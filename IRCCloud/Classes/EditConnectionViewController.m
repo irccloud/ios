@@ -69,35 +69,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:NetworksListLink]];
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         if (error) {
-            NSLog(@"Error fetching remote networks list, falling back to default. Error %li : %@", (long)error.code, error.userInfo);
+            NSLog(@"Error fetching remote networks list. Error %li : %@", (long)error.code, error.userInfo);
             
-            _networks = @[
-                          @{@"network":@"IRCCloud", @"host":@"irc.irccloud.com", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"Freenode", @"host":@"irc.freenode.net", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"QuakeNet", @"host":@"blacklotus.ca.us.quakenet.org", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"IRCNet", @"host":@"ircnet.blacklotus.net", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"Undernet", @"host":@"losangeles.ca.us.undernet.org", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"DALNet", @"host":@"irc.dal.net", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"OFTC", @"host":@"irc.oftc.net", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"GameSurge", @"host":@"irc.gamesurge.net", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"Efnet", @"host":@"efnet.port80.se", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"Mozilla", @"host":@"irc.mozilla.org", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"Rizon", @"host":@"irc6.rizon.net", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"Espernet", @"host":@"irc.esper.net", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"ReplayIRC", @"host":@"irc.replayirc.com", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"synIRC", @"host":@"naamia.fl.eu.synirc.net", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"fossnet", @"host":@"irc.fossnet.info", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"P2P-NET", @"host":@"irc.p2p-network.net", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"euIRCnet", @"host":@"irc.euirc.net", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"SlashNET", @"host":@"irc.slashnet.org", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"Atrum", @"host":@"irc.atrum.org", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"Indymedia", @"host":@"irc.indymedia.org", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"TWiT", @"host":@"irc.twit.tv", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"Snoonet", @"host":@"irc.snoonet.org", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"BrasIRC", @"host":@"irc.brasirc.org", @"port":@(6667), @"SSL":@(NO)},
-                          @{@"network":@"darkscience", @"host":@"irc.darkscience.net", @"port":@(6697), @"SSL":@(YES)},
-                          @{@"network":@"Techman's World", @"host":@"irc.techmansworld.com", @"port":@(6697), @"SSL":@(YES)}
-                          ];
+            _networks = @[];
         }
         else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
@@ -700,6 +674,8 @@ static NSString * const ServerHasSSLKey = @"ssl";
                     msg = @"You can’t connect to passworded servers with free accounts";
                 } else if([msg isEqualToString:@"networks"]) {
                     msg = @"You’ve exceeded the connection limit for free accounts";
+                } else if([msg isEqualToString:@"sts_policy"]) {
+                    msg = @"You can’t disable secure connections to this network because it’s using a strict transport security policy";
                 } else if([msg isEqualToString:@"unverified"]) {
                     msg = @"You can’t connect to external servers until you confirm your email address";
                 }

@@ -394,32 +394,7 @@
                                   else if([object objectForKey:@"server_ping_timeout"])
                                       event.msg = @"Server PING timed out";
                                   else if([object objectForKey:@"reason"] && [[object objectForKey:@"reason"] length] > 0) {
-                                      NSString *reason = [object objectForKey:@"reason"];
-                                      if([reason isKindOfClass:[NSString class]] && [reason length]) {
-                                          if([reason isEqualToString:@"pool_lost"])
-                                              reason = @"Connection pool failed";
-                                          else if([reason isEqualToString:@"no_pool"])
-                                              reason = @"No available connection pools";
-                                          else if([reason isEqualToString:@"enetdown"])
-                                              reason = @"Network down";
-                                          else if([reason isEqualToString:@"etimedout"] || [reason isEqualToString:@"timeout"])
-                                              reason = @"Timed out";
-                                          else if([reason isEqualToString:@"ehostunreach"])
-                                              reason = @"Host unreachable";
-                                          else if([reason isEqualToString:@"econnrefused"])
-                                              reason = @"Connection refused";
-                                          else if([reason isEqualToString:@"nxdomain"])
-                                              reason = @"Invalid hostname";
-                                          else if([reason isEqualToString:@"server_ping_timeout"])
-                                              reason = @"PING timeout";
-                                          else if([reason isEqualToString:@"ssl_certificate_error"])
-                                              reason = @"SSL certificate error";
-                                          else if([reason isEqualToString:@"ssl_error"])
-                                              reason = @"SSL error";
-                                          else if([reason isEqualToString:@"crash"])
-                                              reason = @"Connection crashed";
-                                      }
-                                      event.msg = [@"Connection lost: " stringByAppendingString:reason];
+                                      event.msg = [@"Connection lost: " stringByAppendingString:[EventsDataSource reason:[object objectForKey:@"reason"]]];
                                   } else if([object objectForKey:@"abnormal"])
                                       event.msg = @"Connection closed unexpectedly";
                                   else
@@ -449,7 +424,12 @@
                           },
                           @"connecting_cancelled":^(Event *event, IRCCloudJSONObject *object) {
                               event.from = @"";
-                              event.msg = @"Cancelled";
+                              if(object) {
+                                  if([object objectForKey:@"sts"])
+                                      event.msg = @"Upgrading connection security";
+                                  else
+                                      event.msg = @"Cancelled";
+                              }
                               event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
                           },
@@ -460,29 +440,16 @@
                               if(object) {
                                   NSString *reason = [object objectForKey:@"reason"];
                                   if([reason isKindOfClass:[NSString class]] && [reason length]) {
-                                      if([reason isEqualToString:@"pool_lost"])
-                                          reason = @"Connection pool failed";
-                                      else if([reason isEqualToString:@"no_pool"])
-                                          reason = @"No available connection pools";
-                                      else if([reason isEqualToString:@"enetdown"])
-                                          reason = @"Network down";
-                                      else if([reason isEqualToString:@"etimedout"] || [reason isEqualToString:@"timeout"])
-                                          reason = @"Timed out";
-                                      else if([reason isEqualToString:@"ehostunreach"])
-                                          reason = @"Host unreachable";
-                                      else if([reason isEqualToString:@"econnrefused"])
-                                          reason = @"Connection refused";
-                                      else if([reason isEqualToString:@"nxdomain"])
-                                          reason = @"Invalid hostname";
-                                      else if([reason isEqualToString:@"server_ping_timeout"])
-                                          reason = @"PING timeout";
-                                      else if([reason isEqualToString:@"ssl_certificate_error"])
-                                          reason = @"SSL certificate error";
-                                      else if([reason isEqualToString:@"ssl_error"])
-                                          reason = @"SSL error";
-                                      else if([reason isEqualToString:@"crash"])
-                                          reason = @"Connection crashed";
-                                      event.msg = [@"Failed to connect: " stringByAppendingString:reason];
+                                      if([reason isEqualToString:@"ssl_verify_error"]) {
+                                          NSString *error = [object objectForKey:@"ssl_verify_error"];
+                                          if([error isKindOfClass:[NSString class]] && [error length]) {
+                                              event.msg = [@"Strict transport security error: " stringByAppendingString:[EventsDataSource SSLreason:reason]];
+                                          } else {
+                                              event.msg = @"Strict transport security error";
+                                          }
+                                      } else {
+                                          event.msg = [@"Failed to connect: " stringByAppendingString:[EventsDataSource reason:reason]];
+                                      }
                                   } else {
                                       event.msg = @"Failed to connect.";
                                   }
@@ -1204,4 +1171,52 @@
     }
 }
 
++(NSString *)reason:(NSString *)reason {
+    static NSDictionary *r;
+    if(!r)
+        r = @{@"pool_lost":@"Connection pool failed",
+              @"no_pool":@"No available connection pools",
+              @"enetdown":@"Network down",
+              @"etimedout":@"Timed out",
+              @"timeout":@"Timed out",
+              @"ehostunreach":@"Host unreachable",
+              @"econnrefused":@"Connection refused",
+              @"nxdomain":@"Invalid hostname",
+              @"server_ping_timeout":@"PING timeout",
+              @"ssl_certificate_error":@"SSL certificate error",
+              @"ssl_error":@"SSL error",
+              @"crash":@"Connection crashed",
+              @"networks":@"You've exceeded the connection limit for free accounts.",
+              @"passworded_servers":@"You can't connect to passworded servers with free accounts.",
+              @"unverified":@"You can’t connect to external servers until you confirm your email address.",
+              };
+    if([reason isKindOfClass:[NSString class]] && [reason length]) {
+        if([r objectForKey:reason])
+            return [r objectForKey:reason];
+    }
+    return reason;
+}
+
++(NSString *)SSLreason:(NSDictionary *)info {
+    static NSDictionary *r;
+    if(!r)
+        r = @{@"bad_cert":@{@"unknown_ca": @"Unknown certificate authority",
+                            @"selfsigned_peer": @"Self signed certificate",
+                            @"cert_expired": @"Certificate expired",
+                            @"invalid_issuer": @"Invalid certificate issuer",
+                            @"invalid_signature": @"Invalid certificate signature",
+                            @"name_not_permitted": @"Invalid certificate alternative hostname",
+                            @"missing_basic_constraint": @"Missing certificate basic contraints",
+                            @"invalid_key_usage": @"Invalid certificate key usage"},
+              @"ssl_verify_hostname":@{@"unable_to_match_altnames": @"Certificate hostname mismatch",
+                                       @"unable_to_match_common_name": @"Certificate hostname mismatch",
+                                       @"unable_to_decode_common_name": @"Invalid certificate hostname"}
+              };
+
+    if([[r objectForKey:[info objectForKey:@"type"]] objectForKey:@"error"]) {
+        return [[r objectForKey:[info objectForKey:@"type"]] objectForKey:@"error"];
+    }
+    
+    return [NSString stringWithFormat:@"%@: %@", [info objectForKey:@"type"], [info objectForKey:@"error"]];
+}
 @end
