@@ -1736,6 +1736,10 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self insertEvent:e backlog:true nextIsGrouped:false];
             }
             _tableView.tableHeaderView = nil;
+        } else if(_buffer.deferred && _conn.state == kIRCCloudStateConnected && _conn.ready) {
+            [self loadMoreBacklogButtonPressed:nil];
+            [_tableView reloadData];
+            return;
         }
         
         if(backlogEid > 0) {
