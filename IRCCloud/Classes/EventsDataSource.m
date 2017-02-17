@@ -441,9 +441,9 @@
                                   NSString *reason = [object objectForKey:@"reason"];
                                   if([reason isKindOfClass:[NSString class]] && [reason length]) {
                                       if([reason isEqualToString:@"ssl_verify_error"]) {
-                                          NSString *error = [object objectForKey:@"ssl_verify_error"];
-                                          if([error isKindOfClass:[NSString class]] && [error length]) {
-                                              event.msg = [@"Strict transport security error: " stringByAppendingString:[EventsDataSource SSLreason:reason]];
+                                          NSDictionary *error = [object objectForKey:@"ssl_verify_error"];
+                                          if([error objectForKey:@"type"]) {
+                                              event.msg = [@"Strict transport security error: " stringByAppendingString:[EventsDataSource SSLreason:error]];
                                           } else {
                                               event.msg = @"Strict transport security error";
                                           }
