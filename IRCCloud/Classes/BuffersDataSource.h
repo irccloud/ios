@@ -22,6 +22,7 @@
     int _cid;
     NSTimeInterval _min_eid;
     NSTimeInterval _last_seen_eid;
+    NSTimeInterval _created;
     NSString *_name;
     NSString *_type;
     int _archived;
@@ -38,7 +39,7 @@
     Buffer *_nextBuffer;
 }
 @property (nonatomic, assign) int bid, cid, archived, deferred, timeout;
-@property (nonatomic, assign) NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom;
+@property (nonatomic, assign) NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom, created;
 @property (nonatomic, assign) CGFloat savedScrollOffset;
 @property (nonatomic, copy) NSString *name, *type, *away_msg, *chantypes;
 @property (nonatomic, assign) BOOL valid, scrolledUp;
