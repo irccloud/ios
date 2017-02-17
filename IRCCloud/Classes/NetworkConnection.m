@@ -1979,6 +1979,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     OOBFetcher *fetcher = notification.object;
     CLS_LOG(@"Backlog finished for bid: %i", fetcher.bid);
     if(fetcher.bid > 0) {
+        [_buffers getBuffer:fetcher.bid].deferred = 0;
         [_buffers updateTimeout:0 buffer:fetcher.bid];
     } else {
         _ready = YES;
