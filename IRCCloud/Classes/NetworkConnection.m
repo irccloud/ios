@@ -1150,7 +1150,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    _config = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+#ifdef ENTERPRISE
+    if(![[_config objectForKey:@"enterprise"] intValue])
+        _globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [_config objectForKey:@"ios_app"]];
+#endif
+    return _config;
 }
 
 -(NSDictionary *)propertiesForFile:(NSString *)fileID {
@@ -1668,11 +1673,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _reconnectTimestamp = -1;
         _state = kIRCCloudStateConnected;
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-        _config = [self requestConfiguration];
-#ifdef ENTERPRISE
-        if(![[_config objectForKey:@"enterprise"] intValue])
-            _globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [_config objectForKey:@"ios_app"]];
-#endif
+        [self performSelectorInBackground:@selector(requestConfiguration) withObject:nil];
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");
     }
