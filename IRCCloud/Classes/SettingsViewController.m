@@ -606,8 +606,10 @@
     
     switch(event) {
         case kIRCEventUserInfo:
-            if(_userinforeqid == 0 && _prefsreqid == 0 && _emailreqid == 0)
+            if(_userinforeqid == 0 && _prefsreqid == 0 && _emailreqid == 0) {
+                [self setFromPrefs];
                 [self refresh];
+            }
             break;
         case kIRCEventFailureMsg:
             o = notification.object;
@@ -645,180 +647,6 @@
 }
 
 -(void)refresh {
-    NSDictionary *userInfo = [NetworkConnection sharedInstance].userInfo;
-    NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
-    
-    if([[userInfo objectForKey:@"name"] isKindOfClass:[NSString class]] && [[userInfo objectForKey:@"name"] length])
-        _name.text = [userInfo objectForKey:@"name"];
-    else
-        _name.text = @"";
-    
-    if([[userInfo objectForKey:@"email"] isKindOfClass:[NSString class]] && [[userInfo objectForKey:@"email"] length])
-        _email.text = [userInfo objectForKey:@"email"];
-    else
-        _email.text = @"";
-    
-    if([[userInfo objectForKey:@"autoaway"] isKindOfClass:[NSNumber class]]) {
-        _autoaway.on = [[userInfo objectForKey:@"autoaway"] boolValue];
-    }
-    
-    if([[userInfo objectForKey:@"highlights"] isKindOfClass:[NSArray class]] && [(NSArray *)[userInfo objectForKey:@"highlights"] count])
-        _highlights.text = [[userInfo objectForKey:@"highlights"] componentsJoinedByString:@", "];
-    else if([[userInfo objectForKey:@"highlights"] isKindOfClass:[NSString class]] && [[userInfo objectForKey:@"highlights"] length])
-        _highlights.text = [userInfo objectForKey:@"highlights"];
-    else
-        _highlights.text = @"";
-    
-    if([[prefs objectForKey:@"time-24hr"] isKindOfClass:[NSNumber class]]) {
-        _24hour.on = [[prefs objectForKey:@"time-24hr"] boolValue];
-    } else {
-        _24hour.on = NO;
-    }
-    
-    if([[prefs objectForKey:@"time-seconds"] isKindOfClass:[NSNumber class]]) {
-        _seconds.on = [[prefs objectForKey:@"time-seconds"] boolValue];
-    } else {
-        _seconds.on = NO;
-    }
-    
-    if([[prefs objectForKey:@"mode-showsymbol"] isKindOfClass:[NSNumber class]]) {
-        _symbols.on = [[prefs objectForKey:@"mode-showsymbol"] boolValue];
-    } else {
-        _symbols.on = NO;
-    }
-    
-    if([[prefs objectForKey:@"nick-colors"] isKindOfClass:[NSNumber class]]) {
-        _colors.on = [[prefs objectForKey:@"nick-colors"] boolValue];
-    } else {
-        _colors.on = NO;
-    }
-    
-    if([[prefs objectForKey:@"emoji-disableconvert"] isKindOfClass:[NSNumber class]]) {
-        _emocodes.on = ![[prefs objectForKey:@"emoji-disableconvert"] boolValue];
-    } else {
-        _emocodes.on = YES;
-    }
-    
-    if([[prefs objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
-        _pastebin.on = ![[prefs objectForKey:@"pastebin-disableprompt"] boolValue];
-    } else {
-        _pastebin.on = YES;
-    }
-
-    if([[prefs objectForKey:@"hideJoinPart"] isKindOfClass:[NSNumber class]]) {
-        _hideJoinPart.on = ![[prefs objectForKey:@"hideJoinPart"] boolValue];
-    } else {
-        _hideJoinPart.on = YES;
-    }
-    
-    if([[prefs objectForKey:@"expandJoinPart"] isKindOfClass:[NSNumber class]]) {
-        _expandJoinPart.on = ![[prefs objectForKey:@"expandJoinPart"] boolValue];
-    } else {
-        _expandJoinPart.on = YES;
-    }
-    
-    _expandJoinPart.enabled = _hideJoinPart.on;
-    
-    if([[prefs objectForKey:@"font"] isKindOfClass:[NSString class]]) {
-        _mono.on = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
-    } else {
-        _mono.on = NO;
-    }
-
-    if([[prefs objectForKey:@"notifications-all"] isKindOfClass:[NSNumber class]]) {
-        _notifyAll.on = [[prefs objectForKey:@"notifications-all"] boolValue];
-    } else {
-        _notifyAll.on = NO;
-    }
-    
-    if([[prefs objectForKey:@"disableTrackUnread"] isKindOfClass:[NSNumber class]]) {
-        _showUnread.on = ![[prefs objectForKey:@"disableTrackUnread"] boolValue];
-    } else {
-        _showUnread.on = YES;
-    }
-    
-    if([[prefs objectForKey:@"enableReadOnSelect"] isKindOfClass:[NSNumber class]]) {
-        _markAsRead.on = [[prefs objectForKey:@"enableReadOnSelect"] boolValue];
-    } else {
-        _markAsRead.on = NO;
-    }
-    
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"chat-oneline"]) {
-        _oneLine.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"chat-oneline"];
-    } else {
-        _oneLine.on = YES;
-    }
-    
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"chat-norealname"]) {
-        _noRealName.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"chat-norealname"];
-    } else {
-        _noRealName.on = YES;
-    }
-    
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"time-left"]) {
-        _timeLeft.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"time-left"];
-    } else {
-        _timeLeft.on = YES;
-    }
-    
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"avatars-off"]) {
-        _avatarsOff.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"avatars-off"];
-    } else {
-        _avatarsOff.on = YES;
-    }
-    
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"warnBeforeLaunchingBrowser"]) {
-        _browserWarning.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"warnBeforeLaunchingBrowser"];
-    } else {
-        _browserWarning.on = YES;
-    }
-    
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"inlineWifiOnly"]) {
-        _inlineWifiOnly.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"];
-    } else {
-        _inlineWifiOnly.on = NO;
-    }
-    
-    if(_oneLine.on) {
-        _noRealName.enabled = YES;
-        if(_avatarsOff.on) {
-            _timeLeft.enabled = NO;
-            _timeLeft.on = YES;
-        } else {
-            _timeLeft.enabled = YES;
-        }
-    } else {
-        _noRealName.enabled = NO;
-        _timeLeft.enabled = YES;
-    }
-
-    if([[prefs objectForKey:@"ascii-compact"] isKindOfClass:[NSNumber class]]) {
-        _compact.on = [[prefs objectForKey:@"ascii-compact"] boolValue];
-    } else {
-        _compact.on = NO;
-    }
-    
-    if([[prefs objectForKey:@"files-disableinline"] isKindOfClass:[NSNumber class]]) {
-        _disableInlineFiles.on = ![[prefs objectForKey:@"files-disableinline"] boolValue];
-    } else {
-        _disableInlineFiles.on = YES;
-    }
-    
-    if([[prefs objectForKey:@"emoji-nobig"] isKindOfClass:[NSNumber class]]) {
-        _disableBigEmoji.on = ![[prefs objectForKey:@"emoji-nobig"] boolValue];
-    } else {
-        _disableBigEmoji.on = YES;
-    }
-    
-    _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
-    _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
-    _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
-    _notificationSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"];
-    _tabletMode.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"];
-    _fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
-    _imageViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"imageViewer"];
-    _videoViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"];
-    
     NSArray *account;
 #ifdef ENTERPRISE
     if([[[NetworkConnection sharedInstance].config objectForKey:@"auth_mechanism"] isEqualToString:@"internal"]) {
@@ -1031,7 +859,185 @@
     
     _fontSizeCell = [[FontSizeCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
     _fontSizeCell.fontSize = _fontSize;
+    
+    [self setFromPrefs];
     [self refresh];
+}
+
+-(void)setFromPrefs {
+    NSDictionary *userInfo = [NetworkConnection sharedInstance].userInfo;
+    NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+    
+    if([[userInfo objectForKey:@"name"] isKindOfClass:[NSString class]] && [[userInfo objectForKey:@"name"] length])
+        _name.text = [userInfo objectForKey:@"name"];
+    else
+        _name.text = @"";
+    
+    if([[userInfo objectForKey:@"email"] isKindOfClass:[NSString class]] && [[userInfo objectForKey:@"email"] length])
+        _email.text = [userInfo objectForKey:@"email"];
+    else
+        _email.text = @"";
+    
+    if([[userInfo objectForKey:@"autoaway"] isKindOfClass:[NSNumber class]]) {
+        _autoaway.on = [[userInfo objectForKey:@"autoaway"] boolValue];
+    }
+    
+    if([[userInfo objectForKey:@"highlights"] isKindOfClass:[NSArray class]] && [(NSArray *)[userInfo objectForKey:@"highlights"] count])
+        _highlights.text = [[userInfo objectForKey:@"highlights"] componentsJoinedByString:@", "];
+    else if([[userInfo objectForKey:@"highlights"] isKindOfClass:[NSString class]] && [[userInfo objectForKey:@"highlights"] length])
+        _highlights.text = [userInfo objectForKey:@"highlights"];
+    else
+        _highlights.text = @"";
+    
+    if([[prefs objectForKey:@"time-24hr"] isKindOfClass:[NSNumber class]]) {
+        _24hour.on = [[prefs objectForKey:@"time-24hr"] boolValue];
+    } else {
+        _24hour.on = NO;
+    }
+    
+    if([[prefs objectForKey:@"time-seconds"] isKindOfClass:[NSNumber class]]) {
+        _seconds.on = [[prefs objectForKey:@"time-seconds"] boolValue];
+    } else {
+        _seconds.on = NO;
+    }
+    
+    if([[prefs objectForKey:@"mode-showsymbol"] isKindOfClass:[NSNumber class]]) {
+        _symbols.on = [[prefs objectForKey:@"mode-showsymbol"] boolValue];
+    } else {
+        _symbols.on = NO;
+    }
+    
+    if([[prefs objectForKey:@"nick-colors"] isKindOfClass:[NSNumber class]]) {
+        _colors.on = [[prefs objectForKey:@"nick-colors"] boolValue];
+    } else {
+        _colors.on = NO;
+    }
+    
+    if([[prefs objectForKey:@"emoji-disableconvert"] isKindOfClass:[NSNumber class]]) {
+        _emocodes.on = ![[prefs objectForKey:@"emoji-disableconvert"] boolValue];
+    } else {
+        _emocodes.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
+        _pastebin.on = ![[prefs objectForKey:@"pastebin-disableprompt"] boolValue];
+    } else {
+        _pastebin.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"hideJoinPart"] isKindOfClass:[NSNumber class]]) {
+        _hideJoinPart.on = ![[prefs objectForKey:@"hideJoinPart"] boolValue];
+    } else {
+        _hideJoinPart.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"expandJoinPart"] isKindOfClass:[NSNumber class]]) {
+        _expandJoinPart.on = ![[prefs objectForKey:@"expandJoinPart"] boolValue];
+    } else {
+        _expandJoinPart.on = YES;
+    }
+    
+    _expandJoinPart.enabled = _hideJoinPart.on;
+    
+    if([[prefs objectForKey:@"font"] isKindOfClass:[NSString class]]) {
+        _mono.on = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
+    } else {
+        _mono.on = NO;
+    }
+    
+    if([[prefs objectForKey:@"notifications-all"] isKindOfClass:[NSNumber class]]) {
+        _notifyAll.on = [[prefs objectForKey:@"notifications-all"] boolValue];
+    } else {
+        _notifyAll.on = NO;
+    }
+    
+    if([[prefs objectForKey:@"disableTrackUnread"] isKindOfClass:[NSNumber class]]) {
+        _showUnread.on = ![[prefs objectForKey:@"disableTrackUnread"] boolValue];
+    } else {
+        _showUnread.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"enableReadOnSelect"] isKindOfClass:[NSNumber class]]) {
+        _markAsRead.on = [[prefs objectForKey:@"enableReadOnSelect"] boolValue];
+    } else {
+        _markAsRead.on = NO;
+    }
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"chat-oneline"]) {
+        _oneLine.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"chat-oneline"];
+    } else {
+        _oneLine.on = YES;
+    }
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"chat-norealname"]) {
+        _noRealName.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"chat-norealname"];
+    } else {
+        _noRealName.on = YES;
+    }
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"time-left"]) {
+        _timeLeft.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"time-left"];
+    } else {
+        _timeLeft.on = YES;
+    }
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"avatars-off"]) {
+        _avatarsOff.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"avatars-off"];
+    } else {
+        _avatarsOff.on = YES;
+    }
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"warnBeforeLaunchingBrowser"]) {
+        _browserWarning.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"warnBeforeLaunchingBrowser"];
+    } else {
+        _browserWarning.on = YES;
+    }
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"inlineWifiOnly"]) {
+        _inlineWifiOnly.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"];
+    } else {
+        _inlineWifiOnly.on = NO;
+    }
+    
+    if(_oneLine.on) {
+        _noRealName.enabled = YES;
+        if(_avatarsOff.on) {
+            _timeLeft.enabled = NO;
+            _timeLeft.on = YES;
+        } else {
+            _timeLeft.enabled = YES;
+        }
+    } else {
+        _noRealName.enabled = NO;
+        _timeLeft.enabled = YES;
+    }
+    
+    if([[prefs objectForKey:@"ascii-compact"] isKindOfClass:[NSNumber class]]) {
+        _compact.on = [[prefs objectForKey:@"ascii-compact"] boolValue];
+    } else {
+        _compact.on = NO;
+    }
+    
+    if([[prefs objectForKey:@"files-disableinline"] isKindOfClass:[NSNumber class]]) {
+        _disableInlineFiles.on = ![[prefs objectForKey:@"files-disableinline"] boolValue];
+    } else {
+        _disableInlineFiles.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"emoji-nobig"] isKindOfClass:[NSNumber class]]) {
+        _disableBigEmoji.on = ![[prefs objectForKey:@"emoji-nobig"] boolValue];
+    } else {
+        _disableBigEmoji.on = YES;
+    }
+    
+    _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
+    _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
+    _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
+    _notificationSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"];
+    _tabletMode.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"];
+    _fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
+    _imageViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"imageViewer"];
+    _videoViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"];
 }
 
 -(void)hideJoinPartToggled:(id)sender {
