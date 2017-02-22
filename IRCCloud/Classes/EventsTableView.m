@@ -107,13 +107,13 @@ extern UIImage *__socketClosedBackgroundImage;
     UIActivityIndicatorView *_spinner;
     UIView *_thumbbackground;
     UIImageView *_thumbnail;
-    UILabel *_filename, *_extension;
+    UILabel *_filename, *_mimeTypr, *_extension;
     float _thumbnailWidth, _thumbnailHeight;
     BOOL _emojiOnly;
 }
 @property int type;
 @property float timestampPosition, accessoryOffset, thumbnailWidth, thumbnailHeight;
-@property (readonly) UILabel *timestamp, *accessory, *filename, *extension;
+@property (readonly) UILabel *timestamp, *accessory, *filename, *mimeType, *extension;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar, *thumbnail;
 @property (readonly) UIActivityIndicatorView *spinner;
@@ -145,10 +145,16 @@ extern UIImage *__socketClosedBackgroundImage;
         _filename.lineBreakMode = NSLineBreakByTruncatingTail;
         [self.contentView addSubview:_filename];
         
+        _mimeType = [[UILabel alloc] init];
+        _mimeType.textColor = [UIColor messageTextColor];
+        _mimeType.font = [UIFont systemFontOfSize:FONT_SIZE];
+        _mimeType.lineBreakMode = NSLineBreakByTruncatingTail;
+        [self.contentView addSubview:_mimeType];
+        
         _extension = [[UILabel alloc] init];
         _extension.textColor = [UIColor whiteColor];
         _extension.backgroundColor = [UIColor blueColor];
-        _extension.font = [UIFont boldSystemFontOfSize:20];
+        _extension.font = [UIFont boldSystemFontOfSize:FONT_SIZE * 1.5];
         _extension.textAlignment = NSTextAlignmentCenter;
         _extension.adjustsFontSizeToFitWidth = YES;
         [self.contentView addSubview:_extension];
@@ -217,6 +223,7 @@ extern UIImage *__socketClosedBackgroundImage;
     _thumbbackground.hidden = YES;
     _extension.hidden = YES;
     _filename.hidden = YES;
+    _mimeType.hidden = YES;
 
     if(_type == ROW_TIMESTAMP) {
         _topBorder.backgroundColor = [UIColor timestampTopBorderColor];
@@ -301,14 +308,21 @@ extern UIImage *__socketClosedBackgroundImage;
             _spinner.hidden = (_thumbnail.image != nil);
             if(!_spinner.hidden && !_spinner.isAnimating)
                 [_spinner startAnimating];
-            _filename.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 14 - __timestampWidth, FONT_SIZE + 2);
-            _filename.hidden = NO;
+            if(_filename.text.length) {
+                _filename.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 30 - __timestampWidth, FONT_SIZE + 2);
+                _filename.hidden = NO;
+                frame.origin.y += FONT_SIZE + 2;
+                frame.size.height -= FONT_SIZE + 2;
+            }
+            _mimeType.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 30 - __timestampWidth, FONT_SIZE + 2);
+            _mimeType.hidden = NO;
+            _message.hidden = YES;
         } else if(_type == ROW_FILE) {
             _thumbbackground.backgroundColor = [UIColor bufferBackgroundColor];
             if(__timeLeftPref) {
-                _thumbbackground.frame = CGRectMake(frame.origin.x + __timestampWidth + 6, frame.origin.y + 2, frame.size.width - 16 - __timestampWidth, frame.size.height - 8);
+                _thumbbackground.frame = CGRectMake(frame.origin.x + __timestampWidth + 6, frame.origin.y + 2, frame.size.width - 10 - __timestampWidth, frame.size.height - 8);
             } else {
-                _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y + 1, frame.size.width - 16 - __timestampWidth, frame.size.height - 8);
+                _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y + 1, frame.size.width - 10 - __timestampWidth, frame.size.height - 8);
             }
             _thumbbackground.hidden = NO;
             
@@ -316,15 +330,24 @@ extern UIImage *__socketClosedBackgroundImage;
             _extension.hidden = NO;
             
             frame.origin.x += _extension.frame.size.width + 16;
-            frame.size.width -= _extension.frame.size.width + 16;
+            frame.size.width -= _extension.frame.size.width + 32;
 
             _timestamp.hidden = YES;
             
-            _filename.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 8, frame.size.width - 14 - __timestampWidth, FONT_SIZE + 2);
+            _filename.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 6, frame.size.width - 4 - __timestampWidth, FONT_SIZE + 2);
             _filename.hidden = NO;
+            frame.origin.y += FONT_SIZE + 8;
+            frame.size.height -= FONT_SIZE + 8;
+            _mimeType.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 4 - __timestampWidth, FONT_SIZE + 2);
+            _mimeType.hidden = NO;
+            frame.origin.y += FONT_SIZE + 2;
+            frame.size.height -= FONT_SIZE + 2;
+            
+            _message.font = _mimeType.font = [UIFont systemFontOfSize:FONT_SIZE - 2];
+            _message.numberOfLines = 1;
         }
 
-        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, frame.size.width - 4 - __timestampWidth, _type == ROW_FILE ? _thumbbackground.frame.size.height : floorf([_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height) + 1);
+        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, frame.size.width - 4 - __timestampWidth, floorf([_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height) + 1);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(
                                        frame.origin.x + (__timeLeftPref ? (__timestampWidth + 4) : 0),
@@ -1252,15 +1275,12 @@ extern UIImage *__socketClosedBackgroundImage;
         e1.rowType = ROW_FILE;
     
     int bytes = [[properties objectForKey:@"size"] intValue];
-    NSString *separator = (e1.rowType == ROW_THUMBNAIL) ? @" • " : @"\n";
     if(bytes < 1024) {
-        e1.msg = [NSString stringWithFormat:@"%lu B%@%@", (unsigned long)bytes, separator, [properties objectForKey:@"mime_type"]];
+        e1.msg = [NSString stringWithFormat:@"%lu B", (unsigned long)bytes];
     } else {
         int exp = (int)(log(bytes) / log(1024));
-        e1.msg = [NSString stringWithFormat:@"%.1f %cB%@%@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], separator, [properties objectForKey:@"mime_type"]];
+        e1.msg = [NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1]];
     }
-    if([[properties objectForKey:@"name"] length])
-        e1.msg = [NSString stringWithFormat:@"\n%@", e1.msg];
     e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:parent.bgColor;
     e1.type = parent.type;
     e1.entities = properties;
@@ -2010,25 +2030,6 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)_calculateHeight:(Event *)e {
-    float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+17);
-    float estimatedWidth = _tableView.frame.size.width - 4 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0);
-    estimatedWidth -= (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?12:22;
-    if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
-        estimatedWidth -= 4;
-    if(e.rowType == ROW_FILE)
-        estimatedWidth -= 64;
-    
-    e.height = floorf([LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0));
-    if(!__compact)
-        e.height += MESSAGE_LINE_PADDING;
-    e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
-    
-    if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
-        e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + (__compact?1:MESSAGE_LINE_PADDING);
-        if(e.height < __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING))
-            e.height = __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING);
-    }
-    
     if(e.rowType == ROW_THUMBNAIL) {
         float width = self.tableView.bounds.size.width/2;
         if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
@@ -2037,20 +2038,39 @@ extern UIImage *__socketClosedBackgroundImage;
                 NSMutableDictionary *entities = [e.entities mutableCopy];
                 [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
                 e.entities = entities;
-                e.height += ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue]) + 24;
+                e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue]) + 24;
             } else {
-                e.height += 64;
+                e.height = 64;
             }
         } else {
             if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
                 width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
             float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-            e.height += ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + 24;
+            e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + 24;
+        }
+        e.height += FONT_SIZE + 2;
+        if([[e.entities objectForKey:@"name"] length])
+            e.height += FONT_SIZE + 2;
+    } else if(e.rowType == ROW_FILE) {
+        e.height = FONT_SIZE * 3 + 30;
+    } else {
+        float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+17);
+        float estimatedWidth = _tableView.frame.size.width - 4 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0);
+        estimatedWidth -= (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?12:22;
+        if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
+            estimatedWidth -= 4;
+        
+        e.height = floorf([LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0));
+        if(!__compact)
+            e.height += MESSAGE_LINE_PADDING;
+        e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
+        
+        if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
+            e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + (__compact?1:MESSAGE_LINE_PADDING);
+            if(e.height < __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING))
+                e.height = __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING);
         }
     }
-    
-    if(e.rowType == ROW_FILE && e.height < 72)
-        e.height = 80;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -2278,6 +2298,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 cell.thumbnailWidth = width;
                 cell.thumbnailHeight = 48;
             }
+            cell.mimeType.text = [NSString stringWithFormat:@"%@ • %@", [e.entities objectForKey:@"mime_type"], e.msg];
             cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
             if(!cell.thumbnail.image) {
                 [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(UIImage *img) {
@@ -2313,6 +2334,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 extension = [[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location];
 
             cell.extension.text = extension.uppercaseString;
+            cell.mimeType.text = [e.entities objectForKey:@"mime_type"];
         }
         
         cell.filename.text = [e.entities objectForKey:@"name"];
