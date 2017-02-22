@@ -321,6 +321,8 @@
 		22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
 		226EB6011B4C2E8600C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
 		226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
+		226F080A1E5DFEC1003EED23 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
+		226F080B1E5DFEC2003EED23 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
 		2271FDA11DCDF45C00A39F84 /* TextTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */; };
 		2271FDA21DCDF45C00A39F84 /* TextTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
@@ -2100,6 +2102,7 @@
 				221D4BBC1E23F4CD00D403E6 /* NotificationsDataSource.m in Sources */,
 				221D4BD81E23F75300D403E6 /* WebSocketFragment.m in Sources */,
 				221D4BB41E23F48E00D403E6 /* ChannelsDataSource.m in Sources */,
+				226F080A1E5DFEC1003EED23 /* ImageCache.m in Sources */,
 				221D4BD71E23F75300D403E6 /* WebSocketConnectConfig.m in Sources */,
 				221D4BC41E23F4FD00D403E6 /* UsersDataSource.m in Sources */,
 				221D4BD21E23F75300D403E6 /* GCDAsyncSocket.m in Sources */,
@@ -2136,6 +2139,7 @@
 				221D4BBD1E23F4CE00D403E6 /* NotificationsDataSource.m in Sources */,
 				221D4BE01E23F75400D403E6 /* WebSocketFragment.m in Sources */,
 				221D4BB51E23F48F00D403E6 /* ChannelsDataSource.m in Sources */,
+				226F080B1E5DFEC2003EED23 /* ImageCache.m in Sources */,
 				221D4BDF1E23F75400D403E6 /* WebSocketConnectConfig.m in Sources */,
 				221D4BC51E23F4FE00D403E6 /* UsersDataSource.m in Sources */,
 				221D4BDA1E23F75400D403E6 /* GCDAsyncSocket.m in Sources */,

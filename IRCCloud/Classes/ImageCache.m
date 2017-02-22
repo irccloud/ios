@@ -34,7 +34,12 @@
 -(id)init {
     self = [super init];
     if(self) {
-        _cachePath = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"imagecache"];
+#ifdef ENTERPRISE
+        NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
+#else
+        NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
+#endif
+        _cachePath = [sharedcontainer URLByAppendingPathComponent:@"imagecache"];
         _session = [NSURLSession sharedSession];
         _tasks = [[NSMutableDictionary alloc] init];
         _images = [[NSMutableDictionary alloc] init];
@@ -91,7 +96,7 @@
 
 -(UIImage *)imageForURL:(NSURL *)url {
     if(![_images objectForKey:url]) {
-        NSURL *cache = [_cachePath URLByAppendingPathComponent:[self md5:url.absoluteString]];
+        NSURL *cache = [self pathForURL:url];
         UIImage *img = [UIImage imageWithContentsOfFile:cache.path];
         if(img) {
             img = [UIImage imageWithCGImage:img.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
@@ -119,9 +124,10 @@
             if(error) {
                 CLS_LOG(@"Download failed: %@", error);
             } else if(location) {
+                NSURL *cache = [self pathForURL:url];
                 [[NSFileManager defaultManager] createDirectoryAtURL:_cachePath withIntermediateDirectories:YES attributes:nil error:nil];
-                NSURL *cache = [_cachePath URLByAppendingPathComponent:[self md5:url.absoluteString]];
                 [[NSFileManager defaultManager] copyItemAtURL:location toURL:cache error:nil];
+                NSLog(@"Downloaded %@ to %@", url, cache);
                 UIImage *img = [UIImage imageWithContentsOfFile:cache.path];
                 if(img) {
                     img = [UIImage imageWithCGImage:img.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
@@ -144,5 +150,18 @@
 -(void)fetchFileID:(NSString *)fileID width:(int)width completionHandler:(imageCompletionHandler)handler {
     return [self fetchURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]] completionHandler:handler];
 }
+
+-(NSURL *)pathForURL:(NSURL *)url {
+    return [_cachePath URLByAppendingPathComponent:[self md5:url.absoluteString]];
+}
+
+-(NSURL *)pathForFileID:(NSString *)fileID {
+    return [self pathForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID} error:nil]]];
+}
+
+-(NSURL *)pathForFileID:(NSString *)fileID width:(int)width {
+    return [self pathForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
+}
+
 
 @end

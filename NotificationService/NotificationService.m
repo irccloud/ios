@@ -14,15 +14,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <MobileCoreServices/MobileCoreServices.h>
 #import "NetworkConnection.h"
 #import "NotificationService.h"
 #import "ColorFormatter.h"
-#import "CSURITemplate.h"
+#import "ImageCache.h"
 
-@interface NotificationService () {
-    NSURL *_attachment;
-}
-
+@interface NotificationService ()
 @property (nonatomic, strong) void (^contentHandler)(UNNotificationContent *contentToDeliver);
 @property (nonatomic, strong) UNMutableNotificationContent *bestAttemptContent;
 
@@ -36,20 +34,21 @@
 
 #ifdef ENTERPRISE
     NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
-    NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
 #else
     NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
-    NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
 #endif
     IRCCLOUD_HOST = [d objectForKey:@"host"];
     IRCCLOUD_PATH = [d objectForKey:@"path"];
 
     [NetworkConnection sync];
     NSURL *attachment = nil;
+    NSString *typeHint = (NSString *)kUTTypeJPEG;
     
     if([request.content.userInfo objectForKey:@"f"]) {
         NSString *fileID = [[request.content.userInfo objectForKey:@"f"] objectAtIndex:0];
         NSString *type = [[request.content.userInfo objectForKey:@"f"] objectAtIndex:1];
+        
+        typeHint = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (__bridge CFStringRef _Nonnull)(type), NULL);
         
         if(![NetworkConnection sharedInstance].config)
             [NetworkConnection sharedInstance].config = [[NetworkConnection sharedInstance] requestConfiguration];
@@ -57,18 +56,33 @@
         CSURITemplate *template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
 
         if([type hasPrefix:@"image/"])
-            attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"name":[NSString stringWithFormat:@"%@.%@", fileID, [type substringFromIndex:[type rangeOfString:@"/"].location + 1]], @"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", [UIScreen mainScreen].bounds.size.width]} error:nil]];
+            attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", ([UIScreen mainScreen].bounds.size.width/2) * [UIScreen mainScreen].scale]} error:nil]];
         else
-            attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"name":[NSString stringWithFormat:@"%@.%@", fileID, [type substringFromIndex:[type rangeOfString:@"/"].location + 1]], @"id":fileID} error:nil]];
+            attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"id":fileID} error:nil]];
     } else {
+        NSDictionary *extensions = @{@"png":(NSString *)kUTTypePNG,
+                                     @"jpg":(NSString *)kUTTypeJPEG,
+                                     @"jpeg":(NSString *)kUTTypeJPEG,
+                                     @"gif":(NSString *)kUTTypeGIF,
+                                     @"m4v":(NSString *)kUTTypeMPEG4,
+                                     @"mp4":(NSString *)kUTTypeMPEG4,
+                                     @"mov":(NSString *)kUTTypeMPEG4,
+                                     @"m4a":(NSString *)kUTTypeMPEG4Audio,
+                                     @"mp3":(NSString *)kUTTypeMP3,
+                                     @"wav":(NSString *)kUTTypeWaveformAudio,
+                                     @"avi":(NSString *)kUTTypeAVIMovie,
+                                     @"aif":(NSString *)kUTTypeAudioInterchangeFileFormat,
+                                     @"aiff":(NSString *)kUTTypeAudioInterchangeFileFormat
+                                     };
         NSArray *links;
         [ColorFormatter format:request.content.body defaultColor:[UIColor blackColor] mono:NO linkify:YES server:nil links:&links];
 
         for(NSTextCheckingResult *r in links) {
             if(r.resultType == NSTextCheckingTypeLink) {
                 NSString *type = [r.URL.pathExtension lowercaseString];
-                if([type isEqualToString:@"png"] || [type isEqualToString:@"jpg"] || [type isEqualToString:@"jpeg"] || [type isEqualToString:@"gif"] || [type isEqualToString:@"m4v"] || [type isEqualToString:@"mp4"] || [type isEqualToString:@"mov"] || [type isEqualToString:@"m4a"] || [type isEqualToString:@"mp3"]) {
+                if([extensions objectForKey:type]) {
                     attachment = r.URL;
+                    typeHint = [extensions objectForKey:type];
                     break;
                 }
             }
@@ -76,29 +90,27 @@
     }
     
     if(attachment) {
-        sharedcontainer = [sharedcontainer URLByAppendingPathComponent:@"attachments/"];
-        [[NSFileManager defaultManager] createDirectoryAtURL:sharedcontainer withIntermediateDirectories:YES attributes:nil error:nil];
-        _attachment = [sharedcontainer URLByAppendingPathComponent:[NSString stringWithFormat:@"%@-%@.%@",[[request.content.userInfo objectForKey:@"d"] objectAtIndex:1], [[request.content.userInfo objectForKey:@"d"] objectAtIndex:1], attachment.pathExtension]];
-        NSLog(@"Downloading %@ to %@", attachment.absoluteString, _attachment.absoluteString);
-        
-        NSURLSessionDownloadTask *task = [[NSURLSession sharedSession] downloadTaskWithURL:attachment completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
-            if(error) {
-                NSLog(@"Download failed: %@", error);
-            } else if(location) {
-                NSLog(@"Downloaded to: %@", location);
-                [[NSFileManager defaultManager] moveItemAtURL:location toURL:_attachment error:nil];
-                UNNotificationAttachment *a = [UNNotificationAttachment attachmentWithIdentifier:_attachment.lastPathComponent URL:_attachment options:nil error:&error];
-                if(error)
-                    NSLog(@"Attachment error: %@", error);
-                else
-                    self.bestAttemptContent.attachments = @[a];
-            }
-            self.contentHandler(self.bestAttemptContent);
-        }];
-        [task resume];
+        if([[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:attachment].path]) {
+            [self downloadComplete:attachment typeHint:typeHint];
+        } else {
+            [[ImageCache sharedInstance] fetchURL:attachment completionHandler:^(UIImage *image) {
+                [self downloadComplete:attachment typeHint:typeHint];
+            }];
+        }
     } else {
         self.contentHandler(self.bestAttemptContent);
     }
+}
+
+- (void)downloadComplete:(NSURL *)url typeHint:(NSString *)typeHint {
+    NSError *error;
+    UNNotificationAttachment *a = [UNNotificationAttachment attachmentWithIdentifier:url.lastPathComponent URL:[[ImageCache sharedInstance] pathForURL:url] options:@{UNNotificationAttachmentOptionsTypeHintKey:typeHint} error:&error];
+    if(error) {
+        NSLog(@"Attachment error: %@", error);
+    } else {
+        self.bestAttemptContent.attachments = @[a];
+    }
+    self.contentHandler(self.bestAttemptContent);
 }
 
 - (void)serviceExtensionTimeWillExpire {

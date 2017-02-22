@@ -222,7 +222,7 @@
 -(void)_refreshFileID:(NSString *)fileID {
     [[_spinners objectForKey:fileID] stopAnimating];
     [[_spinners objectForKey:fileID] setHidden:YES];
-    UIImage *image = [[ImageCache sharedInstance] imageForFileID:fileID width:self.view.frame.size.width];
+    UIImage *image = [[ImageCache sharedInstance] imageForFileID:fileID width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale];
     if(image) {
         [[_imageViews objectForKey:fileID] setImage:image];
         [[_imageViews objectForKey:fileID] setHidden:NO];
@@ -290,7 +290,7 @@
         [_spinners setObject:cell.spinner forKey:[file objectForKey:@"id"]];
         [_imageViews setObject:cell.thumbnail forKey:[file objectForKey:@"id"]];
         [_extensions setObject:cell.extension forKey:[file objectForKey:@"id"]];
-        UIImage *image = [[ImageCache sharedInstance] imageForFileID:[file objectForKey:@"id"] width:self.view.frame.size.width];
+        UIImage *image = [[ImageCache sharedInstance] imageForFileID:[file objectForKey:@"id"] width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale];
         if(image) {
             [cell.thumbnail setImage:image];
             cell.thumbnail.hidden = NO;
@@ -302,7 +302,7 @@
             cell.spinner.hidden = NO;
             if(![cell.spinner isAnimating])
                 [cell.spinner startAnimating];
-            [[ImageCache sharedInstance] fetchFileID:[file objectForKey:@"id"] width:self.view.frame.size.width completionHandler:^(UIImage *image) {
+            [[ImageCache sharedInstance] fetchFileID:[file objectForKey:@"id"] width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale completionHandler:^(UIImage *image) {
                 [self _refreshFileID:[file objectForKey:@"id"]];
             }];
         }
@@ -358,7 +358,7 @@
         int bytes = [[_selectedFile objectForKey:@"size"] intValue];
         int exp = (int)(log(bytes) / log(1024));
         [c setFilename:[_selectedFile objectForKey:@"name"] metadata:[NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [_selectedFile objectForKey:@"mime_type"]]];
-        [c setImage:[[ImageCache sharedInstance] imageForFileID:[_selectedFile objectForKey:@"id"] width:self.view.frame.size.width]];
+        [c setImage:[[ImageCache sharedInstance] imageForFileID:[_selectedFile objectForKey:@"id"] width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale]];
         [c setURL:[_url_template relativeStringWithVariables:_selectedFile error:nil]];
         [self.navigationController pushViewController:c animated:YES];
     }
