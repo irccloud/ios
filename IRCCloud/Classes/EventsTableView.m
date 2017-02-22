@@ -224,6 +224,7 @@ extern UIImage *__socketClosedBackgroundImage;
     _extension.hidden = YES;
     _filename.hidden = YES;
     _mimeType.hidden = YES;
+    _message.numberOfLines = 0;
 
     if(_type == ROW_TIMESTAMP) {
         _topBorder.backgroundColor = [UIColor timestampTopBorderColor];
