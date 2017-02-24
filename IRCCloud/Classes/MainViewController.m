@@ -1071,7 +1071,7 @@ extern NSDictionary *emojiMap;
             break;
         case kIRCEventFailureMsg:
             o = notification.object;
-            if([[o objectForKey:@"_reqid"] intValue] == _deleteFileReqId) {
+            if(_deleteFileReqId > 0 && [[o objectForKey:@"_reqid"] intValue] == _deleteFileReqId) {
                 CLS_LOG(@"Error deleting file: %@", o);
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
