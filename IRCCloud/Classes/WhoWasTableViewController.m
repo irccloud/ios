@@ -81,7 +81,7 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
 
     _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
-    _placeholder.backgroundColor = [UIColor contentBackgroundColor];
+    _placeholder.backgroundColor = [UIColor clearColor];
     _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
     _placeholder.numberOfLines = 0;
     _placeholder.textAlignment = NSTextAlignmentCenter;
@@ -114,16 +114,16 @@
         for(NSDictionary *line in [_event objectForKey:@"lines"]) {
             NSMutableDictionary *c = [[NSMutableDictionary alloc] init];
             NSMutableString *text = [[NSMutableString alloc] init];
-            [text appendFormat:@"%c%c%@Nick%c\n%@\n", BOLD, COLOR_RGB, [[UIColor linkColor] toHexString], CLEAR, [line objectForKey:@"nick"]];
+            [text appendFormat:@"%c%c%@Nick%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"nick"]];
             if([line objectForKey:@"user"] && [line objectForKey:@"host"])
-                [text appendFormat:@"%c%c%@Usermask%c\n%@\n", BOLD, COLOR_RGB, [[UIColor linkColor] toHexString], CLEAR, [line objectForKey:@"nick"]];
-            [text appendFormat:@"%c%c%@Real Name%c\n%@\n", BOLD, COLOR_RGB, [[UIColor linkColor] toHexString], CLEAR, [line objectForKey:@"realname"]];
-            [text appendFormat:@"%c%c%@Last Seen%c\n%@\n", BOLD, COLOR_RGB, [[UIColor linkColor] toHexString], CLEAR, [line objectForKey:@"last_seen"]];
-            [text appendFormat:@"%c%c%@Connecting Via%c\n%@\n", BOLD, COLOR_RGB, [[UIColor linkColor] toHexString], CLEAR, [line objectForKey:@"ircserver"]];
+                [text appendFormat:@"%c%c%@Usermask%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"nick"]];
+            [text appendFormat:@"%c%c%@Real Name%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"realname"]];
+            [text appendFormat:@"%c%c%@Last Seen%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"last_seen"]];
+            [text appendFormat:@"%c%c%@Connecting Via%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"ircserver"]];
             if([line objectForKey:@"connecting_from"])
-                [text appendFormat:@"%c%c%@Info%c\n%@\n", BOLD, COLOR_RGB, [[UIColor linkColor] toHexString], CLEAR, [line objectForKey:@"connecting_from"]];
+                [text appendFormat:@"%c%c%@Info%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"connecting_from"]];
             if([line objectForKey:@"actual_host"])
-                [text appendFormat:@"%c%c%@Actual Host%c\n%@\n", BOLD, COLOR_RGB, [[UIColor linkColor] toHexString], CLEAR, [line objectForKey:@"actual_host"]];
+                [text appendFormat:@"%c%c%@Actual Host%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"actual_host"]];
             [c setObject:[ColorFormatter format:text defaultColor:[UITableViewCell appearance].detailTextLabelColor mono:NO linkify:NO server:nil links:nil] forKey:@"text"];
             [c setObject:@([LinkTextView heightOfString:[c objectForKey:@"text"] constrainedToWidth:self.tableView.bounds.size.width - 6 - 12]) forKey:@"height"];
             [data addObject:c];
