@@ -54,6 +54,7 @@
 #import "TextTableViewController.h"
 #import "SpamViewController.h"
 #import "LinksListTableViewController.h"
+#import "WhoWasTableViewController.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -1017,6 +1018,28 @@ extern NSDictionary *emojiMap;
                 if(self.presentedViewController)
                     [self dismissViewControllerAnimated:NO completion:nil];
                 [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
+        case kIRCEventWhoWas:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                if([self.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[WhoWasTableViewController class]]) {
+                    WhoWasTableViewController *tv = ((WhoWasTableViewController *)(((UINavigationController *)self.presentedViewController).topViewController));
+                    tv.event = o;
+                    [tv refresh];
+                } else {
+                    WhoWasTableViewController *tv = [[WhoWasTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+                    tv.event = o;
+                    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
+                    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    else
+                        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                    if(self.presentedViewController)
+                        [self dismissViewControllerAnimated:NO completion:nil];
+                    [self presentViewController:nc animated:YES completion:nil];
+                }
             }
             break;
         case kIRCEventLinkChannel:

@@ -92,6 +92,7 @@ typedef enum {
     kIRCEventModulesList,
     kIRCEventChannelQuery,
     kIRCEventLinksResponse,
+    kIRCEventWhoWas,
     kIRCEventFailureMsg,
     kIRCEventSuccess,
     kIRCEventAlert

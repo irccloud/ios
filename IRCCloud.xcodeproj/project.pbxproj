@@ -323,6 +323,8 @@
 		226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
 		226F080A1E5DFEC1003EED23 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
 		226F080B1E5DFEC2003EED23 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
+		226F080E1E6495C8003EED23 /* WhoWasTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 226F080D1E6495C8003EED23 /* WhoWasTableViewController.m */; };
+		226F080F1E6495C8003EED23 /* WhoWasTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 226F080D1E6495C8003EED23 /* WhoWasTableViewController.m */; };
 		2271FDA11DCDF45C00A39F84 /* TextTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */; };
 		2271FDA21DCDF45C00A39F84 /* TextTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
@@ -756,6 +758,8 @@
 		22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollapsedEvents.h; sourceTree = "<group>"; };
 		22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollapsedEvents.m; sourceTree = "<group>"; };
 		226EB6001B4C2E8600C432C7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		226F080C1E6495C8003EED23 /* WhoWasTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhoWasTableViewController.h; sourceTree = "<group>"; };
+		226F080D1E6495C8003EED23 /* WhoWasTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoWasTableViewController.m; sourceTree = "<group>"; };
 		2271FD9F1DCDF45C00A39F84 /* TextTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextTableViewController.h; sourceTree = "<group>"; };
 		2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextTableViewController.m; sourceTree = "<group>"; };
 		2274F49D1756723F0039B4CB /* OpenInChromeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInChromeController.h; path = OpenInChrome/OpenInChromeController.h; sourceTree = SOURCE_ROOT; };
@@ -1385,6 +1389,8 @@
 				22A1D0261778A86900F8A89C /* WhoisViewController.m */,
 				22A35F24178A316300529CDA /* WhoListTableViewController.h */,
 				22A35F25178A317100529CDA /* WhoListTableViewController.m */,
+				226F080C1E6495C8003EED23 /* WhoWasTableViewController.h */,
+				226F080D1E6495C8003EED23 /* WhoWasTableViewController.m */,
 				22DB8D6E1C441C3000302271 /* YouTubeViewController.h */,
 				22DB8D6F1C441C3000302271 /* YouTubeViewController.m */,
 			);
@@ -2243,6 +2249,7 @@
 				225D977218AA995900065087 /* ARChromeActivity.m in Sources */,
 				22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				225D977318AA995900065087 /* TUSafariActivity.m in Sources */,
+				226F080F1E6495C8003EED23 /* WhoWasTableViewController.m in Sources */,
 				225D977418AA995900065087 /* LicenseViewController.m in Sources */,
 				223C407D1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */,
 				225D977518AA995900065087 /* WhoListTableViewController.m in Sources */,
@@ -2340,6 +2347,7 @@
 				225017631783434900066E71 /* ARChromeActivity.m in Sources */,
 				22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				2250176D1783434900066E71 /* TUSafariActivity.m in Sources */,
+				226F080E1E6495C8003EED23 /* WhoWasTableViewController.m in Sources */,
 				224FCF361787288400FC3879 /* LicenseViewController.m in Sources */,
 				223C407C1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */,
 				22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */,
