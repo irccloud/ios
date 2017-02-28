@@ -345,7 +345,6 @@
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
-		228A057A16D3DABA0029769C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 228A057816D3DABA0029769C /* InfoPlist.strings */; };
 		228A057C16D3DABA0029769C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A057B16D3DABA0029769C /* main.m */; };
 		228A05B216D3DB7B0029769C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05AF16D3DB7B0029769C /* AppDelegate.m */; };
 		228A05CA16D3DCB60029769C /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
@@ -778,7 +777,6 @@
 		228A057116D3DABA0029769C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		228A057316D3DABA0029769C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		228A057716D3DABA0029769C /* IRCCloud-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "IRCCloud-Info.plist"; sourceTree = "<group>"; };
-		228A057916D3DABA0029769C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		228A057B16D3DABA0029769C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		228A057D16D3DABA0029769C /* IRCCloud-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "IRCCloud-Prefix.pch"; sourceTree = "<group>"; };
 		228A05AE16D3DB7B0029769C /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -1254,7 +1252,6 @@
 				2200DB4D18B81BEB00343583 /* config.h */,
 				225017411783434800066E71 /* ARChromeActivity */,
 				22B15CF617301BAE0075EBA7 /* ECSlidingViewController */,
-				228A057816D3DABA0029769C /* InfoPlist.strings */,
 				228A057716D3DABA0029769C /* IRCCloud-Info.plist */,
 				225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */,
 				228A057D16D3DABA0029769C /* IRCCloud-Prefix.pch */,
@@ -1941,7 +1938,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				228A057A16D3DABA0029769C /* InfoPlist.strings in Resources */,
 				22C0F1541B8F6829001D109D /* Assets in Resources */,
 				22D4C9861D871745007C00B0 /* Hack-BoldItalic.otf in Resources */,
 				22EE12841C9B20DF00E7AE8D /* Firefox.png in Resources */,
@@ -2479,14 +2475,6 @@
 				2251693217B5A8040093ADC5 /* en */,
 			);
 			name = TUSafariActivity.strings;
-			sourceTree = "<group>";
-		};
-		228A057816D3DABA0029769C /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				228A057916D3DABA0029769C /* en */,
-			);
-			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 		22D4F9101743F3790095EE8F /* Localizable.strings */ = {
