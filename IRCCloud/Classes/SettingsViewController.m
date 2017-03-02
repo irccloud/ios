@@ -623,6 +623,29 @@
                     [alert show];
                 }
                 self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
+            } else if(reqid == _changepasswordreqid || reqid == _deleteaccountreqid) {
+                NSString *msg = [o objectForKey:@"message"];
+                if([msg isEqualToString:@"oldpassword"]) {
+                    msg = @"Current password incorrect";
+                } else if([msg isEqualToString:@"bad_pass"]) {
+                    msg = @"Incorrect password, please try again";
+                } else if([msg isEqualToString:@"rate_limited"]) {
+                    msg = @"Rate limited, try again in a few minutes";
+                } else if([msg isEqualToString:@"newpassword"] || [msg isEqualToString:@"password_error"]) {
+                    msg = @"Invalid password, please try again";
+                } else if([msg isEqualToString:@"last_admin_cant_leave"]) {
+                    msg = @"You can’t delete your account as the last admin of a team.  Please transfer ownership before continuing.";
+                }
+                if(reqid == _changepasswordreqid) {
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error Changing Password" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                    CLS_LOG(@"Password not changed: %@", [o objectForKey:@"message"]);
+                } else {
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error Deleting Account" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                    CLS_LOG(@"Account not deleted: %@", [o objectForKey:@"message"]);
+                }
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
             }
             break;
         case kIRCEventSuccess:
@@ -631,6 +654,15 @@
             if(reqid == _emailreqid) {
                 _emailreqid = 0;
                 [self saveButtonPressed:nil];
+            } else if(reqid == _changepasswordreqid) {
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Password Changed" message:@"Your password has been successfully updated and all your other sessions have been logged out" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+                return;
+            } else if(reqid == _deleteaccountreqid) {
+                [self.tableView endEditing:YES];
+                [self dismissViewControllerAnimated:YES completion:nil];
+                return;
             }
             if(reqid == _userinforeqid)
                 _userinfosaved = YES;
@@ -655,6 +687,51 @@
                     @{@"title":@"Email Address", @"accessory":_email},
                     @{@"title":@"Full Name", @"accessory":_name},
                     @{@"title":@"Auto Away", @"accessory":_autoaway},
+                    @{@"title":@"Change Password", @"selected":^{
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Change Password" message:nil preferredStyle:UIAlertControllerStyleAlert];
+                        
+                        [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                            textField.placeholder = @"Current Password";
+                            textField.secureTextEntry = YES;
+                        }];
+                        
+                        [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                            textField.placeholder = @"New Password";
+                            textField.secureTextEntry = YES;
+                        }];
+                        
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Change Password" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                            UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+                            [spinny startAnimating];
+                            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+
+                            _changepasswordreqid = [[NetworkConnection sharedInstance] changePassword:[alert.textFields objectAtIndex:0].text newPassword:[alert.textFields objectAtIndex:0].text];
+                        }]];
+                        
+                        [self presentViewController:alert animated:YES completion:nil];
+                        
+                    }},
+                    @{@"title":@"Delete Account", @"selected":^{
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Account" message:@"Re-enter your password to confirm" preferredStyle:UIAlertControllerStyleAlert];
+                        
+                        [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                            textField.placeholder = @"Password";
+                            textField.secureTextEntry = YES;
+                        }];
+
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+                            UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+                            [spinny startAnimating];
+                            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+                            
+                            _deleteaccountreqid = [[NetworkConnection sharedInstance] deleteAccount:[alert.textFields objectAtIndex:0].text];
+                        }]];
+                        
+                        [self presentViewController:alert animated:YES completion:nil];
+                        
+                    }}
                     ];
         
 #ifdef ENTERPRISE

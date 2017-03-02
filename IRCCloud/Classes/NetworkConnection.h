@@ -240,4 +240,6 @@ typedef enum {
 -(void)setLastSelectedBID:(int)bid;
 -(void)parse:(NSDictionary *)object backlog:(BOOL)backlog;
 -(NSDictionary *)propertiesForFile:(NSString *)fileID;
+-(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword;
+-(int)deleteAccount:(NSString *)password;
 @end

@@ -65,6 +65,8 @@
     int _userinforeqid;
     int _prefsreqid;
     int _emailreqid;
+    int _changepasswordreqid;
+    int _deleteaccountreqid;
     BOOL _userinfosaved;
     BOOL _prefssaved;
     NSString *_oldTheme;

@@ -1368,6 +1368,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"delete-connection" args:@{@"cid":@(cid)}];
 }
 
+-(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword {
+    return [self _sendRequest:@"change-password" args:@{@"password":password,@"newPassword":newPassword}];
+}
+
+-(int)deleteAccount:(NSString *)password {
+    return [self _sendRequest:@"delete-account" args:@{@"password":password}];
+}
+
+
 -(int)addServer:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands channels:(NSString *)channels {
     return [self _sendRequest:@"add-server" args:@{
                                                    @"hostname":hostname?hostname:@"",
