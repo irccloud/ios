@@ -23,6 +23,7 @@
 #import "UIImage+animatedGIF.h"
 #import "OpenInFirefoxControllerObjC.h"
 #import "config.h"
+#import "ImageCache.h"
 
 #define HIDE_DURATION 3
 
@@ -282,16 +283,10 @@
         } else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             if([[dict objectForKey:@"type"] isEqualToString:@"photo"]) {
-                NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"url"]]];
-                _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-                
-                [_connection start];
+                [self _fetchImage:[NSURL URLWithString:[dict objectForKey:@"url"]]];
             } else if([[dict objectForKey:@"provider_name"] isEqualToString:@"Giphy"] && [[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location != NSNotFound) {
                 if([dict objectForKey:@"image"] && [[dict objectForKey:@"image"] hasSuffix:@".gif"]) {
-                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"image"]]];
-                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-                    
-                    [_connection start];
+                    [self _fetchImage:[NSURL URLWithString:[dict objectForKey:@"image"]]];
                 } else {
                     [self loadGiphy:[[dict objectForKey:@"url"] substringFromIndex:[[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location + 6]];
                 }
@@ -340,10 +335,7 @@
                     [self loadVideo:[dict objectForKey:@"mp4Url"]];
                     _movieController.repeatMode = MPMovieRepeatModeOne;
                 } else if([[dict objectForKey:@"gifUrl"] length]) {
-                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"gifUrl"]]];
-                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-                    
-                    [_connection start];
+                    [self _fetchImage:[NSURL URLWithString:[dict objectForKey:@"gifUrl"]]];
                 } else {
                     CLS_LOG(@"Invalid type from gfycat: %@", dict);
                     [self fail:@"This image type is not supported"];
@@ -372,10 +364,7 @@
                     [self loadVideo:[dict objectForKey:@"mp4"]];
                     _movieController.repeatMode = MPMovieRepeatModeOne;
                 } else if([[dict objectForKey:@"url"] hasSuffix:@".gif"]) {
-                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"url"]]];
-                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-                    
-                    [_connection start];
+                    [self _fetchImage:[NSURL URLWithString:[dict objectForKey:@"url"]]];
                 } else {
                     CLS_LOG(@"Invalid type from giphy: %@", dict);
                     [self fail:@"This image type is not supported"];
@@ -409,10 +398,7 @@
             if([[dict objectForKey:@"success"] intValue]) {
                 dict = [dict objectForKey:@"data"];
                 if([[dict objectForKey:@"type"] hasPrefix:@"image/"] && [[dict objectForKey:@"animated"] intValue] == 0) {
-                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"link"]]];
-                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-                    
-                    [_connection start];
+                    [self _fetchImage:[NSURL URLWithString:[dict objectForKey:@"link"]]];
                 } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
                     [self loadVideo:[dict objectForKey:@"mp4"]];
                     if([[dict objectForKey:@"looping"] intValue] == 1)
@@ -453,10 +439,7 @@
                     if([dict objectForKey:@"images"] && [(NSDictionary *)[dict objectForKey:@"images"] count] == 1)
                         dict = [[dict objectForKey:@"images"] objectAtIndex:0];
                     if([[dict objectForKey:@"type"] hasPrefix:@"image/"] && [[dict objectForKey:@"animated"] intValue] == 0) {
-                        NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"link"]]];
-                        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-                        
-                        [_connection start];
+                        [self _fetchImage:[NSURL URLWithString:[dict objectForKey:@"link"]]];
                     } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
                         [self loadVideo:[dict objectForKey:@"mp4"]];
                         if([[dict objectForKey:@"looping"] intValue] == 1)
@@ -534,10 +517,7 @@
             } else {
                 NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
                 if([[dict objectForKey:@"item_type"] isEqualToString:@"image"]) {
-                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[dict objectForKey:@"content_url"]]];
-                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-                    
-                    [_connection start];
+                    [self _fetchImage:[NSURL URLWithString:[dict objectForKey:@"content_url"]]];
                 } else {
                     NSLog(@"Invalid type from cl.ly");
                     [self fail:@"This image type is not supported"];
@@ -559,10 +539,7 @@
                 NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
                 NSDictionary *page = [[[[dict objectForKey:@"query"] objectForKey:@"pages"] allValues] objectAtIndex:0];
                 if(page && [page objectForKey:@"imageinfo"]) {
-                    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]]];
-                    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-                    
-                    [_connection start];
+                    [self _fetchImage:[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]]];
                 } else {
                     NSLog(@"Invalid data from MediaWiki");
                     [self fail:@"This image type is not supported"];
@@ -584,10 +561,20 @@
         url = [NSURL URLWithString:u];
     }
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-    
-    [_connection start];
+    [self _fetchImage:url];
+}
+
+- (void)_fetchImage:(NSURL *)url {
+    NSString *cacheFile = [[ImageCache sharedInstance] pathForURL:url].path;
+    if([[NSFileManager defaultManager] fileExistsAtPath:cacheFile]) {
+        _imageData = [[NSData alloc] initWithContentsOfFile:cacheFile].mutableCopy;
+        [self _parseImageData:_imageData];
+    } else {
+        NSURLRequest *request = [NSURLRequest requestWithURL:url];
+        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+        
+        [_connection start];
+    }
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
@@ -642,6 +629,8 @@
 #endif
     if(connection == _connection) {
         if(_imageData) {
+            NSString *cacheFile = [[ImageCache sharedInstance] pathForURL:connection.originalRequest.URL].path;
+            [_imageData writeToFile:cacheFile atomically:YES];
             [self performSelectorInBackground:@selector(_parseImageData:) withObject:_imageData];
         } else {
             [self fail:@"No image data recieved"];
