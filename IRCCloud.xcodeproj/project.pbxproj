@@ -27,6 +27,16 @@
 		1A5703461A73FC7600D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
 		1A5703481A74145400D58225 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		1A5703491A74145B00D58225 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; };
+		1A6141471E6EDF30004B6025 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A61413D1E6EDF30004B6025 /* AdSupport.framework */; };
+		1A6141481E6EDF30004B6025 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A61413E1E6EDF30004B6025 /* AVFoundation.framework */; };
+		1A6141491E6EDF30004B6025 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A61413F1E6EDF30004B6025 /* CFNetwork.framework */; };
+		1A61414A1E6EDF30004B6025 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141401E6EDF30004B6025 /* CoreGraphics.framework */; };
+		1A61414B1E6EDF30004B6025 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141411E6EDF30004B6025 /* CoreText.framework */; };
+		1A61414C1E6EDF30004B6025 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141421E6EDF30004B6025 /* Foundation.framework */; };
+		1A61414D1E6EDF30004B6025 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141431E6EDF30004B6025 /* MobileCoreServices.framework */; };
+		1A61414E1E6EDF30004B6025 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141441E6EDF30004B6025 /* Security.framework */; };
+		1A61414F1E6EDF30004B6025 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141451E6EDF30004B6025 /* SystemConfiguration.framework */; };
+		1A6141501E6EDF30004B6025 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141461E6EDF30004B6025 /* UIKit.framework */; };
 		1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */; };
 		1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */; };
 		1ADCE22E1D2FCD78000B379F /* UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADCE22D1D2FCD78000B379F /* UITests.swift */; };
@@ -637,6 +647,16 @@
 /* Begin PBXFileReference section */
 		1A5703421A73FB1200D58225 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		1A5703471A74145400D58225 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
+		1A61413D1E6EDF30004B6025 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/AdSupport.framework; sourceTree = DEVELOPER_DIR; };
+		1A61413E1E6EDF30004B6025 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		1A61413F1E6EDF30004B6025 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/CFNetwork.framework; sourceTree = DEVELOPER_DIR; };
+		1A6141401E6EDF30004B6025 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/CoreGraphics.framework; sourceTree = DEVELOPER_DIR; };
+		1A6141411E6EDF30004B6025 /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/CoreText.framework; sourceTree = DEVELOPER_DIR; };
+		1A6141421E6EDF30004B6025 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		1A6141431E6EDF30004B6025 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/MobileCoreServices.framework; sourceTree = DEVELOPER_DIR; };
+		1A6141441E6EDF30004B6025 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/Security.framework; sourceTree = DEVELOPER_DIR; };
+		1A6141451E6EDF30004B6025 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
+		1A6141461E6EDF30004B6025 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
 		1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = EnterpriseLogo.xcassets; sourceTree = "<group>"; };
 		1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Logo.xcassets; sourceTree = "<group>"; };
 		1ADCE22D1D2FCD78000B379F /* UITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITests.swift; sourceTree = "<group>"; };
@@ -968,8 +988,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2291EEDC1E3B755500FBC003 /* Crashlytics.framework in Frameworks */,
+				1A6141501E6EDF30004B6025 /* UIKit.framework in Frameworks */,
+				1A6141471E6EDF30004B6025 /* AdSupport.framework in Frameworks */,
+				1A6141481E6EDF30004B6025 /* AVFoundation.framework in Frameworks */,
+				1A6141491E6EDF30004B6025 /* CFNetwork.framework in Frameworks */,
+				1A61414A1E6EDF30004B6025 /* CoreGraphics.framework in Frameworks */,
+				1A61414B1E6EDF30004B6025 /* CoreText.framework in Frameworks */,
+				1A61414C1E6EDF30004B6025 /* Foundation.framework in Frameworks */,
+				1A61414D1E6EDF30004B6025 /* MobileCoreServices.framework in Frameworks */,
 				2291EEDD1E3B756A00FBC003 /* Fabric.framework in Frameworks */,
+				2291EEDC1E3B755500FBC003 /* Crashlytics.framework in Frameworks */,
+				1A61414E1E6EDF30004B6025 /* Security.framework in Frameworks */,
+				1A61414F1E6EDF30004B6025 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1190,6 +1220,16 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1A61413D1E6EDF30004B6025 /* AdSupport.framework */,
+				1A61413E1E6EDF30004B6025 /* AVFoundation.framework */,
+				1A61413F1E6EDF30004B6025 /* CFNetwork.framework */,
+				1A6141401E6EDF30004B6025 /* CoreGraphics.framework */,
+				1A6141411E6EDF30004B6025 /* CoreText.framework */,
+				1A6141421E6EDF30004B6025 /* Foundation.framework */,
+				1A6141431E6EDF30004B6025 /* MobileCoreServices.framework */,
+				1A6141441E6EDF30004B6025 /* Security.framework */,
+				1A6141451E6EDF30004B6025 /* SystemConfiguration.framework */,
+				1A6141461E6EDF30004B6025 /* UIKit.framework */,
 				2289EF771D787CC500DB285E /* Intents.framework */,
 				2289EF621D7866BD00DB285E /* UserNotifications.framework */,
 				227DA89D1CF381B60041B1BF /* CoreTelephony.framework */,
