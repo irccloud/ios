@@ -2326,6 +2326,7 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.thumbnail.image = nil;
             cell.thumbnailWidth = 0;
             cell.thumbnailHeight = 0;
+            cell.spinner.hidden = YES;
         }
         
         if(e.rowType == ROW_FILE) {
