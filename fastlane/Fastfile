@@ -11,7 +11,7 @@
 
 # This is the minimum version number required.
 # Update this, if you use features of a newer version
-fastlane_version "2.1.3"
+fastlane_version "2.19.2"
 
 default_platform :ios
 
@@ -19,8 +19,15 @@ platform :ios do
   desc "Check all certs and provisioning profiles from github"
   lane :certs do
     app_root = "com.irccloud."
-    for type in ["appstore", "development"] do
-      match(type: type, app_identifier: ["#{app_root}IRCCloud", "#{app_root}IRCCloud.ShareExtension", "#{app_root}enterprise", "#{app_root}enterprise.ShareExtension"])
+    for type in ["development"] do
+      match(type: type, app_identifier: [
+        "#{app_root}IRCCloud",
+        "#{app_root}IRCCloud.ShareExtension",
+        "#{app_root}IRCCloud.NotificationService",
+        "#{app_root}enterprise",
+        "#{app_root}enterprise.ShareExtension",
+        "#{app_root}enterprise.NotificationService"
+       ])
     end
   end
 
@@ -130,12 +137,14 @@ REVIEW_NOTES
   lane :updateadhoc do
     match(type: "adhoc", force_for_new_devices: true, app_identifier: "com.irccloud.IRCCloud")
     match(type: "adhoc", force_for_new_devices: true, app_identifier: "com.irccloud.IRCCloud.ShareExtension")
+    match(type: "adhoc", force_for_new_devices: true, app_identifier: "com.irccloud.IRCCloud.NotificationService")
   end
 
   desc "Build and upload an ad-hoc release to Crashlytics"
   lane :beta do
     match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud")
     match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud.ShareExtension")
+    match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud.NotificationService")
     
     root_directory = "#{File.expand_path(File.dirname(__FILE__))}/../"
     CRASHLYTICS_TOKEN=Fastlane::Actions.sh_control_output("grep CRASHLYTICS_TOKEN #{root_directory}IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'",print_command_output: false).strip
