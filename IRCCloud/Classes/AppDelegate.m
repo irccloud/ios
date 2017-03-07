@@ -28,7 +28,7 @@
 #import "URLHandler.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "AvatarsDataSource.h"
-#import "imageCache.h"
+#import "ImageCache.h"
 
 #ifdef DEBUG
 @implementation NSURLRequest(CertificateHack)

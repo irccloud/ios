@@ -15,7 +15,7 @@
 //  limitations under the License.
 
 #import "FileMetadataViewController.h"
-#import "imageViewController.h"
+#import "ImageViewController.h"
 #import "AppDelegate.h"
 #import "UIColor+IRCCloud.h"
 
