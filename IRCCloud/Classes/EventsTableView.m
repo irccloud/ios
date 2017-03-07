@@ -2302,6 +2302,7 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.mimeType.text = [NSString stringWithFormat:@"%@ • %@", [e.entities objectForKey:@"mime_type"], e.msg];
             cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
             if(!cell.thumbnail.image) {
+                cell.spinner.hidden = YES;
                 [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(UIImage *img) {
                     if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
                         NSMutableDictionary *entities = [e.entities mutableCopy];
