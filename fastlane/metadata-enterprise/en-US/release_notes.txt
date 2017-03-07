@@ -1,7 +1,13 @@
-• Added /clear command and "Clear Backlog" menu option to temporarily clear the visible backlog
-• Added a spam detection warning and a dialog for bulk removing private messages
-• Added support for a few additional minor IRC message types
-• Improved color formatting
-• Fixed a crash when 3D Touch previewing a Pastebin URL
-• Fixed a few issues with updating the icon badge count
+Messages consisting entirely of emoji are now enlarged so you can enjoy their glorious detail. Of course, emoji-haters can turn this off in settings.
+
+We're also now treating images uploaded through the app as first class citizens. Thumbnails are now shown in push notifications and embedded in your message history.
+
+Other new features and fixes:
+
+• Added dialogs for changing your password and deleting your account
+• Added support for /whowas
+• Added support for /links
+• Tapping an archived channel will now automatically load a page of backlog
+• Improved collapsing of quits and joins during a netsplit
+• Fixed the "Load More Backlog" button appearing in new or empty channels
 • Stability improvements, and minor fixes
