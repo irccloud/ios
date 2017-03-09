@@ -1081,7 +1081,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    if(data)
+        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    else
+        return nil;
 }
 
 -(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token impression:(NSString *)impression {
@@ -1151,10 +1154,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    if (!data) {
-        return nil;
-    }
-    
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
@@ -1206,7 +1205,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    if(data)
+        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    else
+        return nil;
 }
 
 -(NSDictionary *)getPastebins:(int)page {
@@ -1227,7 +1229,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    if(data)
+        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    else
+        return nil;
 }
 
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args {
@@ -1287,7 +1292,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         CLS_LOG(@"HTTP request failed: %@ %@", error.localizedDescription, error.localizedFailureReason);
     }
     
-    return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    if(data)
+        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    else
+        return nil;
 }
 
 -(NSDictionary *)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid {
