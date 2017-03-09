@@ -273,7 +273,14 @@
 }
 
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection {
-#ifndef EXTENSION
+#ifdef EXTENSION
+#ifdef ENTERPRISE
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+#else
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
     
