@@ -1151,6 +1151,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    if (!data) {
+        return nil;
+    }
+    
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
