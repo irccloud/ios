@@ -1390,6 +1390,8 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 -(void)_addItem:(Event *)e eid:(NSTimeInterval)eid {
+    if(!e)
+        return;
     @synchronized(self) {
         [_lock lock];
         NSInteger insertPos = -1;
