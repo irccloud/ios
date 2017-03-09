@@ -1,3 +1,5 @@
+This is a bug fix update for 3.6 that prevents a crash for enterprise hosts. Sorry about that! 3.6 update notes follow:
+
 Messages consisting entirely of emoji are now enlarged so you can enjoy their glorious detail. Of course, emoji-haters can turn this off in settings.
 
 We're also now treating images uploaded through the app as first class citizens. Thumbnails are now shown in push notifications and embedded in your message history.
