@@ -2683,7 +2683,8 @@
 				OTHER_CFLAGS = "-DEXTENSION";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "match Development com.irccloud.IRCCloud.NotificationService";
+				PROVISIONING_PROFILE = "9e446215-fc55-424f-b54d-c67dac5b1840";
+				PROVISIONING_PROFILE_SPECIFIER = "NotificationService development";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;

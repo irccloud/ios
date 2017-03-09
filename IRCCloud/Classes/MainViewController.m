@@ -3993,10 +3993,10 @@ extern NSDictionary *emojiMap;
             [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
         }]];
     }
-    [alert addAction:[UIAlertAction actionWithTitle:@"Start a Pastebin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+    [alert addAction:[UIAlertAction actionWithTitle:@"Start a Text Snippet" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         [self _startPastebin];
     }]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Pastebins" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+    [alert addAction:[UIAlertAction actionWithTitle:@"Text Snippets" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         [self _showPastebins];
     }]];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
@@ -4128,8 +4128,6 @@ extern NSDictionary *emojiMap;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             [self presentViewController:nc animated:YES completion:nil];
-        } else if([action isEqualToString:@"Start a Pastebin"]) {
-            [self _startPastebin];
         } else if([action isEqualToString:@"Take a Photo"] || [action isEqualToString:@"Take Photo or Video"]) {
             if(self.presentedViewController)
                 [self dismissViewControllerAnimated:NO completion:nil];
@@ -4144,9 +4142,9 @@ extern NSDictionary *emojiMap;
             [self _chooseFile];
         } else if([action isEqualToString:@"File Uploads"]) {
             [self _showUploads];
-        } else if([action isEqualToString:@"Pastebins"]) {
+        } else if([action isEqualToString:@"Text Snippets"]) {
             [self _showPastebins];
-        } else if([action isEqualToString:@"Start a Pastebin"]) {
+        } else if([action isEqualToString:@"Start a Text Snippet"]) {
             [self _startPastebin];
         } else if([action isEqualToString:@"Mark All As Read"]) {
             [self _markAllAsRead];

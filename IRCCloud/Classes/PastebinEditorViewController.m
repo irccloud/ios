@@ -35,13 +35,13 @@
 -(id)initWithBuffer:(Buffer *)buffer {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
-        self.navigationItem.title = @"Pastebin";
+        self.navigationItem.title = @"Text Snippet";
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
         _buffer = buffer;
         _pastereqid = _sayreqid = -1;
         
-        _type = [[UISegmentedControl alloc] initWithItems:@[@"Pastebin", @"Messages"]];
+        _type = [[UISegmentedControl alloc] initWithItems:@[@"Snippet", @"Messages"]];
         _type.selectedSegmentIndex = 0;
         [_type addTarget:self action:@selector(_typeToggled) forControlEvents:UIControlEventValueChanged];
         self.navigationItem.titleView = _type;
@@ -51,12 +51,13 @@
 
 -(void)_typeToggled {
     [self.tableView reloadData];
+    [self textViewDidChange:_text];
 }
 
 -(id)initWithPasteID:(NSString *)pasteID {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
-        self.navigationItem.title = @"Pastebin";
+        self.navigationItem.title = @"Text Snippet";
         _pasteID = pasteID;
         _pastereqid = _sayreqid = -1;
         UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
@@ -237,6 +238,8 @@
     _messageFooter.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
     _messageFooter.textAlignment = NSTextAlignmentCenter;
     _messageFooter.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    _messageFooter.numberOfLines = 0;
+    _messageFooter.adjustsFontSizeToFitWidth = YES;
     
     _text = [[UITextView alloc] initWithFrame:CGRectZero];
     _text.backgroundColor = [UIColor clearColor];
@@ -278,7 +281,10 @@
         for (NSString *line in lines) {
             count += ceil((float)line.length / 1080.0f);
         }
-        _messageFooter.text = [NSString stringWithFormat:@"Text will be sent as %i message%@", count, (count == 1)?@"":@"s"];
+        if(_type.selectedSegmentIndex == 1)
+            _messageFooter.text = [NSString stringWithFormat:@"Text will be sent as %i message%@", count, (count == 1)?@"":@"s"];
+        else
+            _messageFooter.text = @"Text snippets are visible to anyone with the URL but are not publicly listed or indexed.";
     }
 }
 
@@ -324,14 +330,14 @@
 }
 
 -(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
-    if(_type.selectedSegmentIndex == 1 && section == 0) {
+    if(section == 0) {
         return _messageFooter;
     }
     return nil;
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
-    if(_type.selectedSegmentIndex == 1 && section == 0) {
+    if(section == 0) {
         return 32;
     }
     return 0;

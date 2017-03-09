@@ -768,7 +768,7 @@
     if([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
         [device addObject:@{@"title":@"Show Sidebars In Landscape", @"accessory":_tabletMode}];
     }
-    [device addObject:@{@"title":@"Ask to Pastebin", @"accessory":_pastebin}];
+    [device addObject:@{@"title":@"Ask To Post A Snippet", @"accessory":_pastebin}];
     [device addObject:@{@"title":@"Open Images in Browser", @"accessory":_imageViewer}];
     [device addObject:@{@"title":@"Open Videos in Browser", @"accessory":_videoViewer}];
     [device addObject:@{@"title":@"Retry Failed Images in Browser", @"accessory":_browserWarning}];

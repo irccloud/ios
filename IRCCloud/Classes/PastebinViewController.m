@@ -190,7 +190,7 @@
 }
 
 -(void)_removePaste {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete Pastebin" message:@"Are you sure you want to delete this pastebin?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Delete", nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete Snippet" message:@"Are you sure you want to delete this text snippet?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Delete", nil];
     [alert show];
 }
 

@@ -91,7 +91,7 @@
 -(instancetype)init {
     self = [super initWithStyle:UITableViewStylePlain];
     if(self) {
-        self.navigationItem.title = @"Pastebins";
+        self.navigationItem.title = @"Text Snippets";
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
         _extensions = [[NSMutableDictionary alloc] init];
@@ -265,7 +265,7 @@
             reqid = [[o objectForKey:@"_reqid"] intValue];
             if(reqid == _reqid) {
                 CLS_LOG(@"Error deleting pastebin: %@", o);
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete pastebin, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete snippet, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
                 _pages = 0;
                 _pastes = nil;
@@ -304,7 +304,7 @@
         if(!_pastes.count) {
             CLS_LOG(@"Pastebin list is empty");
             UILabel *fail = [[UILabel alloc] init];
-            fail.text = @"\nYou haven't created any pastebins yet.\n";
+            fail.text = @"\nYou haven't created any text snippets yet.\n";
             fail.numberOfLines = 3;
             fail.textAlignment = NSTextAlignmentCenter;
             fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
@@ -315,7 +315,7 @@
         CLS_LOG(@"Failed to load pastebin list for page %i: %@", _pages, d);
         _canLoadMore = NO;
         UILabel *fail = [[UILabel alloc] init];
-        fail.text = @"\nUnable to load pastebins.\nPlease try again later.\n";
+        fail.text = @"\nUnable to load snippet.\nPlease try again later.\n";
         fail.numberOfLines = 4;
         fail.textAlignment = NSTextAlignmentCenter;
         fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
@@ -462,7 +462,7 @@
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
         if(!_pastes.count) {
             UILabel *fail = [[UILabel alloc] init];
-            fail.text = @"\nYou haven't created any pastebins yet.\n";
+            fail.text = @"\nYou haven't created any text snippets yet.\n";
             fail.numberOfLines = 3;
             fail.textAlignment = NSTextAlignmentCenter;
             fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
