@@ -1808,7 +1808,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     @synchronized(self) {
         if(!_prefs && self.userInfo && [[self.userInfo objectForKey:@"prefs"] isKindOfClass:[NSString class]] && [[self.userInfo objectForKey:@"prefs"] length]) {
             NSError *error;
-            _prefs = [NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:[[self.userInfo objectForKey:@"prefs"] UTF8String] length:[[self.userInfo objectForKey:@"prefs"] length]] options:kNilOptions error:&error];
+            _prefs = [NSJSONSerialization JSONObjectWithData:[[self.userInfo objectForKey:@"prefs"] dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
             if(error) {
                 CLS_LOG(@"Prefs parse error: %@", error);
                 CLS_LOG(@"JSON string: %@", [self.userInfo objectForKey:@"prefs"]);
