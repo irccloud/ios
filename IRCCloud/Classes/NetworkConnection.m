@@ -1157,7 +1157,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 #endif
-    _config = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    if(data)
+        _config = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
 #ifdef ENTERPRISE
     if(![[_config objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
         _globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [_config objectForKey:@"ios_app"]];
