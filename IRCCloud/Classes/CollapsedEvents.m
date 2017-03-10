@@ -706,7 +706,7 @@
     NSMutableString *output = [[NSMutableString alloc] initWithFormat:@"%c", BOLD];
     BOOL showSymbol = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue];
     
-    if(colorize) {
+    if(colorize && nick) {
         color = [UIColor colorForNick:nick];
     }
     

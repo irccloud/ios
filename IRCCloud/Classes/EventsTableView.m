@@ -1283,7 +1283,10 @@ extern UIImage *__socketClosedBackgroundImage;
         e1.msg = [NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1]];
     }
     e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:parent.bgColor;
-    e1.type = parent.type;
+    if([parent.type isEqualToString:@"buffer_me_msg"])
+        e1.type = @"buffer_msg";
+    else
+        e1.type = parent.type;
     e1.entities = properties;
 
     return e1;
