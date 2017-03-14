@@ -1207,6 +1207,8 @@ extern UIImage *__socketClosedBackgroundImage;
                     else if(event.server.length)
                         event.formattedMsg = [NSString stringWithFormat:@"The server %c%@%c %@", BOLD, event.server, CLEAR, event.msg];
                 }
+            } else if([type isEqualToString:@"user_chghost"]) {
+                event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO], event.msg];
             }
         }
         

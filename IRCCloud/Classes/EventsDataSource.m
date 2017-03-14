@@ -803,9 +803,10 @@
                           },
                           @"user_chghost":^(Event *event, IRCCloudJSONObject *object) {
                               if(object) {
-                                  event.from = event.nick;
-                                  event.msg = [NSString stringWithFormat:@"changed host: %@@@%@ → %@@@%@", [object objectForKey:@"user"], [object objectForKey:@"userhost"], [object objectForKey:@"from_name"], [object objectForKey:@"from_host"]];
+                                  event.msg = [NSString stringWithFormat:@"changed host: %@@%@ → %@@%@", [object objectForKey:@"user"], [object objectForKey:@"userhost"], [object objectForKey:@"from_name"], [object objectForKey:@"from_host"]];
                               }
+                              event.color = [UIColor collapsedRowTextColor];
+                              event.linkify = NO;
                           },
       };
     }
