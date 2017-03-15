@@ -1273,7 +1273,7 @@ extern UIImage *__socketClosedBackgroundImage;
     e1.fromMode = parent.fromMode;
     e1.realname = parent.realname;
     e1.hostmask = parent.hostmask;
-    if([[properties objectForKey:@"mime_type"] hasPrefix:@"image/"])
+    if([[properties objectForKey:@"mime_type"] hasPrefix:@"image/"] && ![[properties objectForKey:@"mime_type"] isEqualToString:@"image/webp"])
         e1.rowType = ROW_THUMBNAIL;
     else
         e1.rowType = ROW_FILE;
