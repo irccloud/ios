@@ -37,8 +37,9 @@
     CGFloat _savedScrollOffset;
     Buffer *_lastBuffer;
     Buffer *_nextBuffer;
+    int _extraHighlights;
 }
-@property (nonatomic, assign) int bid, cid, archived, deferred, timeout;
+@property (nonatomic, assign) int bid, cid, archived, deferred, timeout, extraHighlights;
 @property (nonatomic, assign) NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom, created;
 @property (nonatomic, assign) CGFloat savedScrollOffset;
 @property (nonatomic, copy) NSString *name, *type, *away_msg, *chantypes;

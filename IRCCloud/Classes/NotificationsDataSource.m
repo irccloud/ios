@@ -195,11 +195,18 @@
                 NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
                 NSMutableArray *identifiers = [[NSMutableArray alloc] init];
                 
+                for(Buffer *b in buffers) {
+                    b.extraHighlights = 0;
+                }
+                
                 for(UNNotification *n in notifications) {
                     NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
                     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
-                    if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
+                    NSTimeInterval eid = [[d objectAtIndex:2] doubleValue];
+                    if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || eid <= b.last_seen_eid) {
                         [identifiers addObject:n.request.identifier];
+                    } else if(![[EventsDataSource sharedInstance] event:eid buffer:b.bid]) {
+                        b.extraHighlights++;
                     }
                 }
                 
@@ -211,13 +218,12 @@
                         highlights = 0;
                     count += highlights;
                 }
-                if((notifications.count - identifiers.count) > count)
-                    count = notifications.count - identifiers.count;
 
                 if([UIApplication sharedApplication].applicationIconBadgeNumber != count)
                     CLS_LOG(@"Setting iOS icon badge to %lu", (unsigned long)count);
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [UIApplication sharedApplication].applicationIconBadgeNumber = count;
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:nil userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventRefresh]}];
                 }];
             }];
         }];

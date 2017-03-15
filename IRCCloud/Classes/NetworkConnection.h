@@ -95,7 +95,8 @@ typedef enum {
     kIRCEventWhoWas,
     kIRCEventFailureMsg,
     kIRCEventSuccess,
-    kIRCEventAlert
+    kIRCEventAlert,
+    kIRCEventRefresh
 } kIRCEvent;
 
 typedef enum {

@@ -1077,7 +1077,7 @@
             count++;
         }
     }
-    return count;
+    return count + b.extraHighlights;
 }
 
 -(int)highlightStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
@@ -1100,7 +1100,7 @@
             return 1;
         }
     }
-    return 0;
+    return b.extraHighlights ? 1 : 0;
 }
 
 -(void)clearFormattingCache {
