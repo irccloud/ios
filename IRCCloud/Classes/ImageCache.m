@@ -98,9 +98,11 @@
     if(![_images objectForKey:url]) {
         NSURL *cache = [self pathForURL:url];
         UIImage *img = [UIImage imageWithContentsOfFile:cache.path];
-        if(img) {
+        if(img.size.width) {
             img = [UIImage imageWithCGImage:img.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
             [_images setObject:img forKey:url.absoluteString];
+        } else {
+            CLS_LOG(@"Unable to load %@ from cache", url);
         }
     }
     return [_images objectForKey:url.absoluteString];

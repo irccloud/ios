@@ -298,7 +298,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 if(width < _thumbnailWidth + 16)
                     width = _thumbnailWidth + 16;
                 _thumbbackground.frame = CGRectMake(frame.origin.x, frame.origin.y + 1, width, frame.size.height - 8);
-                _thumbnail.frame = CGRectMake(frame.origin.x + 8, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
+                if(_thumbnail.image)
+                    _thumbnail.frame = CGRectMake(frame.origin.x + 8, frame.origin.y + 8, _thumbnailWidth, _thumbnailHeight);
             }
             _thumbbackground.hidden = NO;
             _timestamp.hidden = YES;
@@ -2296,7 +2297,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         if(e.rowType == ROW_THUMBNAIL) {
             float width = self.tableView.bounds.size.width/2;
-            if([[e.entities objectForKey:@"properties"] objectForKey:@"width"] && [[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
+            if([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] intValue] && [[[e.entities objectForKey:@"properties"] objectForKey:@"height"] intValue]) {
                 if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
                     width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
                 float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
@@ -2310,15 +2311,28 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
             cell.spinner.hidden = (cell.thumbnail.image != nil);
             if(!cell.thumbnail.image) {
-                [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(UIImage *img) {
-                    if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
-                        NSMutableDictionary *entities = [e.entities mutableCopy];
-                        [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
-                        e.entities = entities;
-                    }
-                    [self _calculateHeight:e];
-                    [self.tableView reloadData];
-                }];
+                if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)].path]) {
+                    [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(UIImage *img) {
+                        if(img) {
+                            if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
+                                NSMutableDictionary *entities = [e.entities mutableCopy];
+                                [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
+                                e.entities = entities;
+                            }
+                            [self _calculateHeight:e];
+                        } else {
+                            e.rowType = ROW_FILE;
+                        }
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [self.tableView reloadData];
+                        }];
+                    }];
+                } else {
+                    e.rowType = ROW_FILE;
+                    cell.thumbnailWidth = 0;
+                    cell.thumbnailHeight = 0;
+                    cell.spinner.hidden = YES;
+                }
             } else if(![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
                 NSMutableDictionary *entities = [e.entities mutableCopy];
                 [entities setObject:@{@"width":@(cell.thumbnail.image.size.width), @"height":@(cell.thumbnail.image.size.height)} forKey:@"properties"];
@@ -2345,6 +2359,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
             cell.extension.text = extension.uppercaseString;
             cell.mimeType.text = [e.entities objectForKey:@"mime_type"];
+            cell.spinner.hidden = YES;
         }
         
         cell.filename.text = [e.entities objectForKey:@"name"];
