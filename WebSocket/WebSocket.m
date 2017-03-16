@@ -1102,11 +1102,11 @@ WebSocketWaitingState waitingState;
                         CFDataRef data = SecCertificateCopyData(cert);
                         const unsigned char *bytes = CFDataGetBytePtr(data);
                         CFIndex len = CFDataGetLength(data);
-                        unsigned char sha1[CC_SHA1_DIGEST_LENGTH];
-                        CC_SHA1(bytes, (CC_LONG)len, sha1);
+                        unsigned char sha256[CC_SHA256_DIGEST_LENGTH];
+                        CC_SHA256(bytes, (CC_LONG)len, sha256);
                         NSMutableString *hex = [[NSMutableString alloc] initWithCapacity:len*2];
-                        for(int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
-                            [hex appendFormat:@"%02X", sha1[i]];
+                        for(int i = 0; i < CC_SHA256_DIGEST_LENGTH; i++) {
+                            [hex appendFormat:@"%02X", sha256[i]];
                         }
                         CFRelease(data);
                         CFRelease(tm);

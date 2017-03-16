@@ -1635,7 +1635,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                                                                          (NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
                                                                          (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kTLSProtocol1),
 #ifndef ENTERPRISE
-                                                                                        @"fingerprints":@[@"E6B8B984CA03D68389A227021B11C496770DE26A", @"8D3BE1983F75F4A4546F42F5EC189BC65A9D3A42"]
+                                                                                        @"fingerprints":@[@"54A0A7A4EE83A09B71F867581627EB242BD2398EAAA1DC7AB4CCE26E6EED8EB8",@"E68F27E003ED788159670B6A4C6C5328F1D1FDA81CB19CC8B816F9364684233B"]
 #endif
 #endif
                                                                                         } mutableCopy]
