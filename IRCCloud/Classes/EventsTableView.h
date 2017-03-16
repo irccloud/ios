@@ -83,6 +83,7 @@
     NSUInteger _hiddenAvatarRow;
     NSMutableDictionary *_rowCache;
     NSMutableDictionary *_filePropsCache;
+    NSMutableSet *_closedPreviews;
 }
 @property (readonly) UITableView *tableView;
 @property (readonly) UIView *topUnreadView;
@@ -105,5 +106,6 @@
 -(void)refresh;
 -(void)clearCachedHeights;
 -(void)uncacheFile:(NSString *)fileID;
+-(void)closePreview:(Event *)event;
 -(NSString *)YUNoHeartbeat;
 @end

@@ -406,6 +406,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _collapsedEvents = [[CollapsedEvents alloc] init];
         _unseenHighlightPositions = [[NSMutableArray alloc] init];
         _filePropsCache = [[NSMutableDictionary alloc] init];
+        _closedPreviews = [[NSMutableSet alloc] init];
         _buffer = nil;
         _ignore = [[Ignore alloc] init];
         _eidToOpen = -1;
@@ -426,6 +427,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _collapsedEvents = [[CollapsedEvents alloc] init];
         _unseenHighlightPositions = [[NSMutableArray alloc] init];
         _filePropsCache = [[NSMutableDictionary alloc] init];
+        _closedPreviews = [[NSMutableSet alloc] init];
         _buffer = nil;
         _ignore = [[Ignore alloc] init];
         _eidToOpen = -1;
@@ -763,6 +765,11 @@ extern UIImage *__socketClosedBackgroundImage;
     @synchronized (_filePropsCache) {
         [_filePropsCache removeObjectForKey:fileID];
     }
+}
+
+-(void)closePreview:(Event *)event {
+    [_closedPreviews addObject:@(event.eid)];
+    [self refresh];
 }
 
 -(void)clearCachedHeights {
@@ -1238,6 +1245,9 @@ extern UIImage *__socketClosedBackgroundImage;
             NSTimeInterval entity_eid = event.eid;
             for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
                 entity_eid += 1;
+                if([_closedPreviews containsObject:@(entity_eid)])
+                    continue;
+                    
                 @synchronized (_filePropsCache) {
                     NSDictionary *properties = [_filePropsCache objectForKey:[entity objectForKey:@"id"]];
                     if(properties) {

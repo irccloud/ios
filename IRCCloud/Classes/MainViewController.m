@@ -3147,6 +3147,8 @@ extern NSDictionary *emojiMap;
         if([[_selectedEvent.entities objectForKey:@"own_file"] intValue]) {
             [sheet addButtonWithTitle:@"Delete File"];
         }
+        if(_selectedEvent.rowType == ROW_THUMBNAIL || _selectedEvent.rowType == ROW_FILE)
+            [sheet addButtonWithTitle:@"Close Preview"];
         [sheet addButtonWithTitle:@"Copy Message"];
     }
     if(_selectedUser) {
@@ -4044,6 +4046,8 @@ extern NSDictionary *emojiMap;
             [self.slidingViewController presentViewController:activityController animated:YES completion:nil];
         } else if([action isEqualToString:@"Delete File"]) {
             _deleteFileReqId = [[NetworkConnection sharedInstance] deleteFile:[_selectedEvent.entities objectForKey:@"id"]];
+        } else if([action isEqualToString:@"Close Preview"]) {
+            [_eventsView closePreview:_selectedEvent];
         } else if([action isEqualToString:@"Archive"]) {
             [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
         } else if([action isEqualToString:@"Unarchive"]) {
