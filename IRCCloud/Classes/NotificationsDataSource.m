@@ -207,6 +207,7 @@
                         [identifiers addObject:n.request.identifier];
                     } else if(![[EventsDataSource sharedInstance] event:eid buffer:b.bid]) {
                         b.extraHighlights++;
+                        CLS_LOG(@"bid%i has notification eid%.0f that's not in the loaded backlog, extraHighlights: %i", b.bid, eid, b.extraHighlights);
                     }
                 }
                 
