@@ -1279,6 +1279,7 @@ extern UIImage *__socketClosedBackgroundImage;
     e1.bid = parent.bid;
     e1.eid = eid;
     e1.from = parent.from;
+    e1.nick = parent.nick;
     e1.isSelf = parent.isSelf;
     e1.fromMode = parent.fromMode;
     e1.realname = parent.realname;
