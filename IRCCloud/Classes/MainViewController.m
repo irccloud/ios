@@ -3182,6 +3182,7 @@ extern NSDictionary *emojiMap;
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
         [sheet showInView:self.view];
     } else {
+        _selectedRect = rect;
         if(_selectedEvent)
             [sheet showFromRect:rect inView:_eventsView.tableView animated:NO];
         else
@@ -4043,6 +4044,8 @@ extern NSDictionary *emojiMap;
             [pb setValue:_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
         } else if([action isEqualToString:@"Share URL"]) {
             UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:_selectedURL]] type:@"URL"];
+            activityController.popoverPresentationController.sourceView = self.slidingViewController.view;
+            activityController.popoverPresentationController.sourceRect = [_eventsView.tableView convertRect:_selectedRect toView:self.slidingViewController.view];
             [self.slidingViewController presentViewController:activityController animated:YES completion:nil];
         } else if([action isEqualToString:@"Delete File"]) {
             _deleteFileReqId = [[NetworkConnection sharedInstance] deleteFile:[_selectedEvent.entities objectForKey:@"id"]];

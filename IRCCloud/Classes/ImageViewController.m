@@ -57,6 +57,8 @@
                  
                  UIActivityViewController *activityController = [URLHandler activityControllerForItems:_imageView.image?@[_url,_imageView.image]:@[_url] type:_movieController?@"Animation":@"Image"];
 
+                 activityController.popoverPresentationController.sourceView = mainViewController.slidingViewController.view;
+                 
                  [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
              }],
              [UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {

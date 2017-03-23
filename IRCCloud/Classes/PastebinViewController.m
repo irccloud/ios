@@ -61,7 +61,7 @@
                                   MainViewController *mainViewController = [appDelegate mainViewController];
                                   
                                   UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[url] type:@"Pastebin"];
-                                  
+                                  activityController.popoverPresentationController.sourceView = mainViewController.slidingViewController.view;
                                   [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
                               }],
                               [UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {

@@ -2782,4 +2782,18 @@ extern UIImage *__socketClosedBackgroundImage;
     else
         return @"Table view is not scrolled to the bottom";
 }
+
+-(CGRect)rectForEvent:(Event *)event {
+    int i = 0;
+    for(Event *e in _data) {
+        if(event == e)
+            break;
+        i++;
+    }
+    if(i < _data.count) {
+        return [self.tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
+    } else {
+        return CGRectZero;
+    }
+}
 @end

@@ -38,6 +38,7 @@
                  MainViewController *mainViewController = [appDelegate mainViewController];
                  
                  UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[_url] type:@"URL"];
+                 activityController.popoverPresentationController.sourceView = mainViewController.slidingViewController.view;
                  [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
              }]
      ].mutableCopy;

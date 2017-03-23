@@ -108,4 +108,5 @@
 -(void)uncacheFile:(NSString *)fileID;
 -(void)closePreview:(Event *)event;
 -(NSString *)YUNoHeartbeat;
+-(CGRect)rectForEvent:(Event *)event;
 @end
