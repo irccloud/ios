@@ -2363,7 +2363,7 @@ extern UIImage *__socketClosedBackgroundImage;
         
         if(e.rowType == ROW_FILE) {
             NSString *extension = [e.entities objectForKey:@"extension"];
-            if(extension)
+            if(extension.length)
                 extension = [extension substringFromIndex:1];
             else
                 extension = [[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location];
