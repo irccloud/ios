@@ -1643,8 +1643,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #endif
 #endif
                                                                                         } mutableCopy]
-                                                                             headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"],
-                                                                                        [HandshakeHeader headerWithValue:[NSString stringWithFormat:@"session=%@",self.session] forKey:@"Cookie"]] mutableCopy]
+                                                                             headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
                                                                    verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
         _socket = [WebSocket webSocketWithConfig:config delegate:self];
         
@@ -1704,6 +1703,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _state = kIRCCloudStateConnected;
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         [self performSelectorInBackground:@selector(requestConfiguration) withObject:nil];
+        [self _sendRequest:@"auth" args:@{@"cookie":self.session}];
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");
     }
