@@ -763,7 +763,8 @@ extern UIImage *__socketClosedBackgroundImage;
 
 -(void)uncacheFile:(NSString *)fileID {
     @synchronized (_filePropsCache) {
-        [_filePropsCache removeObjectForKey:fileID];
+        if(fileID)
+            [_filePropsCache removeObjectForKey:fileID];
     }
 }
 
