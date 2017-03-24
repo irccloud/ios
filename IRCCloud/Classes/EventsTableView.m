@@ -108,11 +108,11 @@ extern UIImage *__socketClosedBackgroundImage;
     UIView *_thumbbackground;
     UIImageView *_thumbnail;
     UILabel *_filename, *_mimeTypr, *_extension;
-    float _thumbnailWidth, _thumbnailHeight;
+    float _thumbnailWidth, _thumbnailHeight, _messageWidth;
     BOOL _emojiOnly;
 }
 @property int type;
-@property float timestampPosition, accessoryOffset, thumbnailWidth, thumbnailHeight;
+@property float timestampPosition, accessoryOffset, thumbnailWidth, thumbnailHeight, messageWidth;
 @property (readonly) UILabel *timestamp, *accessory, *filename, *mimeType, *extension;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar, *thumbnail;
@@ -350,6 +350,12 @@ extern UIImage *__socketClosedBackgroundImage;
         }
 
         _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, frame.size.width - 4 - __timestampWidth, floorf([_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height) + 1);
+        if(_messageWidth > 0 && _message.frame.size.width != _messageWidth) {
+            CLS_LOG(@"Unexpected message width: %f estimated width was: %f", _message.frame.size.width, _messageWidth);
+            CGRect f = _message.frame;
+            f.size.width = _messageWidth;
+            _message.frame = f;
+        }
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(
                                        frame.origin.x + (__timeLeftPref ? (__timestampWidth + 4) : 0),
@@ -2085,6 +2091,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if(!__compact)
             e.height += MESSAGE_LINE_PADDING;
         e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
+        e.estimatedWidth = estimatedWidth;
         
         if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
             e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + (__compact?1:MESSAGE_LINE_PADDING);
@@ -2196,6 +2203,7 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.accessibilityValue = e.accessibilityValue;
         cell.accessibilityHint = nil;
         cell.accessibilityElementsHidden = NO;
+        cell.messageWidth = e.estimatedWidth;
 
         if(cell.messageTextColor != e.color || ![cell.message.attributedText.string isEqualToString:e.formatted.string]) {
             cell.messageTextColor = e.color;

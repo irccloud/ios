@@ -83,6 +83,7 @@
     BOOL _isHeader;
     NSTimeInterval _serverTime;
     BOOL _isEmojiOnly;
+    float _estimatedWidth;
 }
 @property (nonatomic, assign) int cid, bid, rowType, reqId;
 @property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime;
@@ -91,7 +92,7 @@
 @property (nonatomic, copy) NSDictionary *ops,*entities;
 @property (nonatomic, strong) UIColor *color, *bgColor;
 @property (nonatomic, copy) NSAttributedString *formatted, *formattedNick, *formattedRealname;
-@property (nonatomic, assign) float height, timestampPosition, avatarHeight;
+@property (nonatomic, assign) float height, timestampPosition, avatarHeight, estimatedWidth;
 @property (nonatomic, strong) NSArray *links, *realnameLinks;
 @property (nonatomic, strong) NSTimer *expirationTimer;
 -(NSComparisonResult)compare:(Event *)aEvent;
