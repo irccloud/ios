@@ -368,6 +368,114 @@
 		2291EEDC1E3B755500FBC003 /* Crashlytics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4B18B7F1FD00343583 /* Crashlytics.framework */; };
 		2291EEDD1E3B756A00FBC003 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
 		2292AD591D5B55CC00BEE269 /* LinkLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE91781D59160B0014B25C /* LinkLabel.m */; };
+		2293240B1E8945D700ADAA22 /* configuration_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323D91E8945D700ADAA22 /* configuration_utils.m */; };
+		2293240C1E8945D700ADAA22 /* configuration_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323D91E8945D700ADAA22 /* configuration_utils.m */; };
+		2293240D1E8945D700ADAA22 /* configuration_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323D91E8945D700ADAA22 /* configuration_utils.m */; };
+		2293240E1E8945D700ADAA22 /* configuration_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323D91E8945D700ADAA22 /* configuration_utils.m */; };
+		2293240F1E8945D700ADAA22 /* configuration_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323D91E8945D700ADAA22 /* configuration_utils.m */; };
+		229324101E8945D700ADAA22 /* configuration_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323D91E8945D700ADAA22 /* configuration_utils.m */; };
+		229324111E8945D700ADAA22 /* assert.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323DE1E8945D700ADAA22 /* assert.c */; };
+		229324121E8945D700ADAA22 /* assert.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323DE1E8945D700ADAA22 /* assert.c */; };
+		229324131E8945D700ADAA22 /* assert.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323DE1E8945D700ADAA22 /* assert.c */; };
+		229324141E8945D700ADAA22 /* assert.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323DE1E8945D700ADAA22 /* assert.c */; };
+		229324151E8945D700ADAA22 /* assert.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323DE1E8945D700ADAA22 /* assert.c */; };
+		229324161E8945D700ADAA22 /* assert.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323DE1E8945D700ADAA22 /* assert.c */; };
+		229324171E8945D700ADAA22 /* init_registry_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E01E8945D700ADAA22 /* init_registry_tables.c */; };
+		229324181E8945D700ADAA22 /* init_registry_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E01E8945D700ADAA22 /* init_registry_tables.c */; };
+		229324191E8945D700ADAA22 /* init_registry_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E01E8945D700ADAA22 /* init_registry_tables.c */; };
+		2293241A1E8945D700ADAA22 /* init_registry_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E01E8945D700ADAA22 /* init_registry_tables.c */; };
+		2293241B1E8945D700ADAA22 /* init_registry_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E01E8945D700ADAA22 /* init_registry_tables.c */; };
+		2293241C1E8945D700ADAA22 /* init_registry_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E01E8945D700ADAA22 /* init_registry_tables.c */; };
+		2293241D1E8945D700ADAA22 /* registry_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E11E8945D700ADAA22 /* registry_search.c */; };
+		2293241E1E8945D700ADAA22 /* registry_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E11E8945D700ADAA22 /* registry_search.c */; };
+		2293241F1E8945D700ADAA22 /* registry_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E11E8945D700ADAA22 /* registry_search.c */; };
+		229324201E8945D700ADAA22 /* registry_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E11E8945D700ADAA22 /* registry_search.c */; };
+		229324211E8945D700ADAA22 /* registry_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E11E8945D700ADAA22 /* registry_search.c */; };
+		229324221E8945D700ADAA22 /* registry_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E11E8945D700ADAA22 /* registry_search.c */; };
+		229324231E8945D700ADAA22 /* trie_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E51E8945D700ADAA22 /* trie_search.c */; };
+		229324241E8945D700ADAA22 /* trie_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E51E8945D700ADAA22 /* trie_search.c */; };
+		229324251E8945D700ADAA22 /* trie_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E51E8945D700ADAA22 /* trie_search.c */; };
+		229324261E8945D700ADAA22 /* trie_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E51E8945D700ADAA22 /* trie_search.c */; };
+		229324271E8945D700ADAA22 /* trie_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E51E8945D700ADAA22 /* trie_search.c */; };
+		229324281E8945D700ADAA22 /* trie_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E51E8945D700ADAA22 /* trie_search.c */; };
+		2293242F1E8945D700ADAA22 /* RSSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323EC1E8945D700ADAA22 /* RSSwizzle.m */; };
+		229324301E8945D700ADAA22 /* RSSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323EC1E8945D700ADAA22 /* RSSwizzle.m */; };
+		229324311E8945D700ADAA22 /* RSSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323EC1E8945D700ADAA22 /* RSSwizzle.m */; };
+		229324321E8945D700ADAA22 /* RSSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323EC1E8945D700ADAA22 /* RSSwizzle.m */; };
+		229324331E8945D700ADAA22 /* RSSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323EC1E8945D700ADAA22 /* RSSwizzle.m */; };
+		229324341E8945D700ADAA22 /* RSSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323EC1E8945D700ADAA22 /* RSSwizzle.m */; };
+		2293243B1E8945D700ADAA22 /* parse_configuration.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F01E8945D700ADAA22 /* parse_configuration.m */; };
+		2293243C1E8945D700ADAA22 /* parse_configuration.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F01E8945D700ADAA22 /* parse_configuration.m */; };
+		2293243D1E8945D700ADAA22 /* parse_configuration.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F01E8945D700ADAA22 /* parse_configuration.m */; };
+		2293243E1E8945D700ADAA22 /* parse_configuration.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F01E8945D700ADAA22 /* parse_configuration.m */; };
+		2293243F1E8945D700ADAA22 /* parse_configuration.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F01E8945D700ADAA22 /* parse_configuration.m */; };
+		229324401E8945D700ADAA22 /* parse_configuration.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F01E8945D700ADAA22 /* parse_configuration.m */; };
+		229324411E8945D700ADAA22 /* public_key_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F31E8945D700ADAA22 /* public_key_utils.m */; };
+		229324421E8945D700ADAA22 /* public_key_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F31E8945D700ADAA22 /* public_key_utils.m */; };
+		229324431E8945D700ADAA22 /* public_key_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F31E8945D700ADAA22 /* public_key_utils.m */; };
+		229324441E8945D700ADAA22 /* public_key_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F31E8945D700ADAA22 /* public_key_utils.m */; };
+		229324451E8945D700ADAA22 /* public_key_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F31E8945D700ADAA22 /* public_key_utils.m */; };
+		229324461E8945D700ADAA22 /* public_key_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F31E8945D700ADAA22 /* public_key_utils.m */; };
+		229324471E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F51E8945D700ADAA22 /* ssl_pin_verifier.m */; };
+		229324481E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F51E8945D700ADAA22 /* ssl_pin_verifier.m */; };
+		229324491E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F51E8945D700ADAA22 /* ssl_pin_verifier.m */; };
+		2293244A1E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F51E8945D700ADAA22 /* ssl_pin_verifier.m */; };
+		2293244B1E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F51E8945D700ADAA22 /* ssl_pin_verifier.m */; };
+		2293244C1E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F51E8945D700ADAA22 /* ssl_pin_verifier.m */; };
+		2293244D1E8945D700ADAA22 /* reporting_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F81E8945D700ADAA22 /* reporting_utils.m */; };
+		2293244E1E8945D700ADAA22 /* reporting_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F81E8945D700ADAA22 /* reporting_utils.m */; };
+		2293244F1E8945D700ADAA22 /* reporting_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F81E8945D700ADAA22 /* reporting_utils.m */; };
+		229324501E8945D700ADAA22 /* reporting_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F81E8945D700ADAA22 /* reporting_utils.m */; };
+		229324511E8945D700ADAA22 /* reporting_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F81E8945D700ADAA22 /* reporting_utils.m */; };
+		229324521E8945D700ADAA22 /* reporting_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F81E8945D700ADAA22 /* reporting_utils.m */; };
+		229324531E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FA1E8945D700ADAA22 /* TSKBackgroundReporter.m */; };
+		229324541E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FA1E8945D700ADAA22 /* TSKBackgroundReporter.m */; };
+		229324551E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FA1E8945D700ADAA22 /* TSKBackgroundReporter.m */; };
+		229324561E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FA1E8945D700ADAA22 /* TSKBackgroundReporter.m */; };
+		229324571E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FA1E8945D700ADAA22 /* TSKBackgroundReporter.m */; };
+		229324581E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FA1E8945D700ADAA22 /* TSKBackgroundReporter.m */; };
+		229324591E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FC1E8945D700ADAA22 /* TSKPinFailureReport.m */; };
+		2293245A1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FC1E8945D700ADAA22 /* TSKPinFailureReport.m */; };
+		2293245B1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FC1E8945D700ADAA22 /* TSKPinFailureReport.m */; };
+		2293245C1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FC1E8945D700ADAA22 /* TSKPinFailureReport.m */; };
+		2293245D1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FC1E8945D700ADAA22 /* TSKPinFailureReport.m */; };
+		2293245E1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FC1E8945D700ADAA22 /* TSKPinFailureReport.m */; };
+		2293245F1E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FE1E8945D700ADAA22 /* TSKReportsRateLimiter.m */; };
+		229324601E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FE1E8945D700ADAA22 /* TSKReportsRateLimiter.m */; };
+		229324611E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FE1E8945D700ADAA22 /* TSKReportsRateLimiter.m */; };
+		229324621E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FE1E8945D700ADAA22 /* TSKReportsRateLimiter.m */; };
+		229324631E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FE1E8945D700ADAA22 /* TSKReportsRateLimiter.m */; };
+		229324641E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FE1E8945D700ADAA22 /* TSKReportsRateLimiter.m */; };
+		229324651E8945D700ADAA22 /* vendor_identifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324001E8945D700ADAA22 /* vendor_identifier.m */; };
+		229324661E8945D700ADAA22 /* vendor_identifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324001E8945D700ADAA22 /* vendor_identifier.m */; };
+		229324671E8945D700ADAA22 /* vendor_identifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324001E8945D700ADAA22 /* vendor_identifier.m */; };
+		229324681E8945D700ADAA22 /* vendor_identifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324001E8945D700ADAA22 /* vendor_identifier.m */; };
+		229324691E8945D700ADAA22 /* vendor_identifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324001E8945D700ADAA22 /* vendor_identifier.m */; };
+		2293246A1E8945D700ADAA22 /* vendor_identifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324001E8945D700ADAA22 /* vendor_identifier.m */; };
+		2293246B1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324031E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m */; };
+		2293246C1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324031E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m */; };
+		2293246D1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324031E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m */; };
+		2293246E1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324031E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m */; };
+		2293246F1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324031E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m */; };
+		229324701E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324031E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m */; };
+		229324711E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324051E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m */; };
+		229324721E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324051E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m */; };
+		229324731E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324051E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m */; };
+		229324741E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324051E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m */; };
+		229324751E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324051E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m */; };
+		229324761E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324051E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m */; };
+		229324771E8945D700ADAA22 /* TrustKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324081E8945D700ADAA22 /* TrustKit.m */; };
+		229324781E8945D700ADAA22 /* TrustKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324081E8945D700ADAA22 /* TrustKit.m */; };
+		229324791E8945D700ADAA22 /* TrustKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324081E8945D700ADAA22 /* TrustKit.m */; };
+		2293247A1E8945D700ADAA22 /* TrustKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324081E8945D700ADAA22 /* TrustKit.m */; };
+		2293247B1E8945D700ADAA22 /* TrustKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324081E8945D700ADAA22 /* TrustKit.m */; };
+		2293247C1E8945D700ADAA22 /* TrustKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324081E8945D700ADAA22 /* TrustKit.m */; };
+		2293247D1E8945D700ADAA22 /* TSKPinningValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293240A1E8945D700ADAA22 /* TSKPinningValidator.m */; };
+		2293247E1E8945D700ADAA22 /* TSKPinningValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293240A1E8945D700ADAA22 /* TSKPinningValidator.m */; };
+		2293247F1E8945D700ADAA22 /* TSKPinningValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293240A1E8945D700ADAA22 /* TSKPinningValidator.m */; };
+		229324801E8945D700ADAA22 /* TSKPinningValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293240A1E8945D700ADAA22 /* TSKPinningValidator.m */; };
+		229324811E8945D700ADAA22 /* TSKPinningValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293240A1E8945D700ADAA22 /* TSKPinningValidator.m */; };
+		229324821E8945D700ADAA22 /* TSKPinningValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293240A1E8945D700ADAA22 /* TSKPinningValidator.m */; };
 		2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */ = {isa = PBXBuildFile; fileRef = 2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */; };
 		229C85411B502920004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
 		229C85421B50292D004964DE /* CoreMedia.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 229C85401B502920004964DE /* CoreMedia.framework */; };
@@ -811,6 +919,46 @@
 		228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayOptionsViewController.m; sourceTree = "<group>"; };
 		228F69711DF8A3F30079E276 /* SpamViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpamViewController.h; sourceTree = "<group>"; };
 		228F69721DF8A3F30079E276 /* SpamViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpamViewController.m; sourceTree = "<group>"; };
+		229323D81E8945D700ADAA22 /* configuration_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = configuration_utils.h; sourceTree = "<group>"; };
+		229323D91E8945D700ADAA22 /* configuration_utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = configuration_utils.m; sourceTree = "<group>"; };
+		229323DC1E8945D700ADAA22 /* domain_registry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = domain_registry.h; sourceTree = "<group>"; };
+		229323DE1E8945D700ADAA22 /* assert.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = assert.c; sourceTree = "<group>"; };
+		229323DF1E8945D700ADAA22 /* assert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = assert.h; sourceTree = "<group>"; };
+		229323E01E8945D700ADAA22 /* init_registry_tables.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = init_registry_tables.c; sourceTree = "<group>"; };
+		229323E11E8945D700ADAA22 /* registry_search.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = registry_search.c; sourceTree = "<group>"; };
+		229323E21E8945D700ADAA22 /* registry_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = registry_types.h; sourceTree = "<group>"; };
+		229323E31E8945D700ADAA22 /* string_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = string_util.h; sourceTree = "<group>"; };
+		229323E41E8945D700ADAA22 /* trie_node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trie_node.h; sourceTree = "<group>"; };
+		229323E51E8945D700ADAA22 /* trie_search.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = trie_search.c; sourceTree = "<group>"; };
+		229323E61E8945D700ADAA22 /* trie_search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trie_search.h; sourceTree = "<group>"; };
+		229323E81E8945D700ADAA22 /* registry_tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = registry_tables.h; sourceTree = "<group>"; };
+		229323EB1E8945D700ADAA22 /* RSSwizzle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSSwizzle.h; sourceTree = "<group>"; };
+		229323EC1E8945D700ADAA22 /* RSSwizzle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RSSwizzle.m; sourceTree = "<group>"; };
+		229323EF1E8945D700ADAA22 /* parse_configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = parse_configuration.h; sourceTree = "<group>"; };
+		229323F01E8945D700ADAA22 /* parse_configuration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = parse_configuration.m; sourceTree = "<group>"; };
+		229323F21E8945D700ADAA22 /* public_key_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = public_key_utils.h; sourceTree = "<group>"; };
+		229323F31E8945D700ADAA22 /* public_key_utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = public_key_utils.m; sourceTree = "<group>"; };
+		229323F41E8945D700ADAA22 /* ssl_pin_verifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ssl_pin_verifier.h; sourceTree = "<group>"; };
+		229323F51E8945D700ADAA22 /* ssl_pin_verifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ssl_pin_verifier.m; sourceTree = "<group>"; };
+		229323F71E8945D700ADAA22 /* reporting_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reporting_utils.h; sourceTree = "<group>"; };
+		229323F81E8945D700ADAA22 /* reporting_utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = reporting_utils.m; sourceTree = "<group>"; };
+		229323F91E8945D700ADAA22 /* TSKBackgroundReporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKBackgroundReporter.h; sourceTree = "<group>"; };
+		229323FA1E8945D700ADAA22 /* TSKBackgroundReporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKBackgroundReporter.m; sourceTree = "<group>"; };
+		229323FB1E8945D700ADAA22 /* TSKPinFailureReport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKPinFailureReport.h; sourceTree = "<group>"; };
+		229323FC1E8945D700ADAA22 /* TSKPinFailureReport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKPinFailureReport.m; sourceTree = "<group>"; };
+		229323FD1E8945D700ADAA22 /* TSKReportsRateLimiter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKReportsRateLimiter.h; sourceTree = "<group>"; };
+		229323FE1E8945D700ADAA22 /* TSKReportsRateLimiter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKReportsRateLimiter.m; sourceTree = "<group>"; };
+		229323FF1E8945D700ADAA22 /* vendor_identifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vendor_identifier.h; sourceTree = "<group>"; };
+		229324001E8945D700ADAA22 /* vendor_identifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = vendor_identifier.m; sourceTree = "<group>"; };
+		229324021E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKNSURLConnectionDelegateProxy.h; sourceTree = "<group>"; };
+		229324031E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKNSURLConnectionDelegateProxy.m; sourceTree = "<group>"; };
+		229324041E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKNSURLSessionDelegateProxy.h; sourceTree = "<group>"; };
+		229324051E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKNSURLSessionDelegateProxy.m; sourceTree = "<group>"; };
+		229324061E8945D700ADAA22 /* TrustKit+Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "TrustKit+Private.h"; sourceTree = "<group>"; };
+		229324071E8945D700ADAA22 /* TrustKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TrustKit.h; sourceTree = "<group>"; };
+		229324081E8945D700ADAA22 /* TrustKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TrustKit.m; sourceTree = "<group>"; };
+		229324091E8945D700ADAA22 /* TSKPinningValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TSKPinningValidator.h; sourceTree = "<group>"; };
+		2293240A1E8945D700ADAA22 /* TSKPinningValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TSKPinningValidator.m; sourceTree = "<group>"; };
 		2293AEFF17F9CCD10022BD06 /* NSURL+IDN.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURL+IDN.m"; path = "NSURL+IDN/NSURL+IDN.m"; sourceTree = SOURCE_ROOT; };
 		2293AF0017F9CCD10022BD06 /* NSURL+IDN.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+IDN.h"; path = "NSURL+IDN/NSURL+IDN.h"; sourceTree = SOURCE_ROOT; };
 		2296E0B619805751002D59E3 /* ShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = ShareExtension.entitlements; sourceTree = "<group>"; };
@@ -1281,6 +1429,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				229323D71E8945D700ADAA22 /* TrustKit */,
 				22EE12801C9B1DE000E7AE8D /* OpenInFirefoxClient */,
 				2236BD671BAA600900015753 /* FontAwesome.h */,
 				22C0F14B1B8F61AF001D109D /* YTPlayerView */,
@@ -1455,6 +1604,117 @@
 				22D4F9101743F3790095EE8F /* Localizable.strings */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		229323D71E8945D700ADAA22 /* TrustKit */ = {
+			isa = PBXGroup;
+			children = (
+				229323D81E8945D700ADAA22 /* configuration_utils.h */,
+				229323D91E8945D700ADAA22 /* configuration_utils.m */,
+				229323DA1E8945D700ADAA22 /* Dependencies */,
+				229323EF1E8945D700ADAA22 /* parse_configuration.h */,
+				229323F01E8945D700ADAA22 /* parse_configuration.m */,
+				229323F11E8945D700ADAA22 /* Pinning */,
+				229323F61E8945D700ADAA22 /* Reporting */,
+				229324011E8945D700ADAA22 /* Swizzling */,
+				229324061E8945D700ADAA22 /* TrustKit+Private.h */,
+				229324071E8945D700ADAA22 /* TrustKit.h */,
+				229324081E8945D700ADAA22 /* TrustKit.m */,
+				229324091E8945D700ADAA22 /* TSKPinningValidator.h */,
+				2293240A1E8945D700ADAA22 /* TSKPinningValidator.m */,
+			);
+			path = TrustKit;
+			sourceTree = SOURCE_ROOT;
+		};
+		229323DA1E8945D700ADAA22 /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				229323DB1E8945D700ADAA22 /* domain_registry */,
+				229323EA1E8945D700ADAA22 /* RSSwizzle */,
+			);
+			path = Dependencies;
+			sourceTree = "<group>";
+		};
+		229323DB1E8945D700ADAA22 /* domain_registry */ = {
+			isa = PBXGroup;
+			children = (
+				229323DC1E8945D700ADAA22 /* domain_registry.h */,
+				229323DD1E8945D700ADAA22 /* private */,
+				229323E71E8945D700ADAA22 /* registry_tables_genfiles */,
+			);
+			path = domain_registry;
+			sourceTree = "<group>";
+		};
+		229323DD1E8945D700ADAA22 /* private */ = {
+			isa = PBXGroup;
+			children = (
+				229323DE1E8945D700ADAA22 /* assert.c */,
+				229323DF1E8945D700ADAA22 /* assert.h */,
+				229323E01E8945D700ADAA22 /* init_registry_tables.c */,
+				229323E11E8945D700ADAA22 /* registry_search.c */,
+				229323E21E8945D700ADAA22 /* registry_types.h */,
+				229323E31E8945D700ADAA22 /* string_util.h */,
+				229323E41E8945D700ADAA22 /* trie_node.h */,
+				229323E51E8945D700ADAA22 /* trie_search.c */,
+				229323E61E8945D700ADAA22 /* trie_search.h */,
+			);
+			path = private;
+			sourceTree = "<group>";
+		};
+		229323E71E8945D700ADAA22 /* registry_tables_genfiles */ = {
+			isa = PBXGroup;
+			children = (
+				229323E81E8945D700ADAA22 /* registry_tables.h */,
+			);
+			path = registry_tables_genfiles;
+			sourceTree = "<group>";
+		};
+		229323EA1E8945D700ADAA22 /* RSSwizzle */ = {
+			isa = PBXGroup;
+			children = (
+				229323EB1E8945D700ADAA22 /* RSSwizzle.h */,
+				229323EC1E8945D700ADAA22 /* RSSwizzle.m */,
+			);
+			path = RSSwizzle;
+			sourceTree = "<group>";
+		};
+		229323F11E8945D700ADAA22 /* Pinning */ = {
+			isa = PBXGroup;
+			children = (
+				229323F21E8945D700ADAA22 /* public_key_utils.h */,
+				229323F31E8945D700ADAA22 /* public_key_utils.m */,
+				229323F41E8945D700ADAA22 /* ssl_pin_verifier.h */,
+				229323F51E8945D700ADAA22 /* ssl_pin_verifier.m */,
+			);
+			path = Pinning;
+			sourceTree = "<group>";
+		};
+		229323F61E8945D700ADAA22 /* Reporting */ = {
+			isa = PBXGroup;
+			children = (
+				229323F71E8945D700ADAA22 /* reporting_utils.h */,
+				229323F81E8945D700ADAA22 /* reporting_utils.m */,
+				229323F91E8945D700ADAA22 /* TSKBackgroundReporter.h */,
+				229323FA1E8945D700ADAA22 /* TSKBackgroundReporter.m */,
+				229323FB1E8945D700ADAA22 /* TSKPinFailureReport.h */,
+				229323FC1E8945D700ADAA22 /* TSKPinFailureReport.m */,
+				229323FD1E8945D700ADAA22 /* TSKReportsRateLimiter.h */,
+				229323FE1E8945D700ADAA22 /* TSKReportsRateLimiter.m */,
+				229323FF1E8945D700ADAA22 /* vendor_identifier.h */,
+				229324001E8945D700ADAA22 /* vendor_identifier.m */,
+			);
+			path = Reporting;
+			sourceTree = "<group>";
+		};
+		229324011E8945D700ADAA22 /* Swizzling */ = {
+			isa = PBXGroup;
+			children = (
+				229324021E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.h */,
+				229324031E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m */,
+				229324041E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.h */,
+				229324051E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m */,
+			);
+			path = Swizzling;
 			sourceTree = "<group>";
 		};
 		22B15CF617301BAE0075EBA7 /* ECSlidingViewController */ = {
@@ -2081,38 +2341,56 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				229324191E8945D700ADAA22 /* init_registry_tables.c in Sources */,
 				2210352F197F1AD400AB414F /* UIColor+IRCCloud.m in Sources */,
 				2210352B197EFEF600AB414F /* HighlightsCountView.m in Sources */,
 				2210352A197EFE7800AB414F /* BuffersTableView.m in Sources */,
 				22103526197EFCCA00AB414F /* Ignore.m in Sources */,
 				222C80E51E4A112D00A243E7 /* SBJson5StreamWriterState.m in Sources */,
+				229324311E8945D700ADAA22 /* RSSwizzle.m in Sources */,
 				22103508197EFC6200AB414F /* BuffersDataSource.m in Sources */,
 				222C80E31E4A112D00A243E7 /* SBJson5StreamTokeniser.m in Sources */,
+				2293241F1E8945D700ADAA22 /* registry_search.c in Sources */,
+				2293243D1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				222C80D71E4A111700A243E7 /* SBJson5Parser.m in Sources */,
 				22103509197EFC6200AB414F /* ChannelsDataSource.m in Sources */,
+				229324671E8945D700ADAA22 /* vendor_identifier.m in Sources */,
 				22C8CDF81B01372100F637D2 /* ioapi.c in Sources */,
 				2210350A197EFC6200AB414F /* EventsDataSource.m in Sources */,
 				2210350B197EFC6200AB414F /* ImageUploader.m in Sources */,
 				2210350C197EFC6200AB414F /* IRCCloudJSONObject.m in Sources */,
+				229324611E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
+				229324131E8945D700ADAA22 /* assert.c in Sources */,
 				2210350D197EFC6200AB414F /* NetworkConnection.m in Sources */,
 				2210350E197EFC6200AB414F /* ServersDataSource.m in Sources */,
 				222C80E61E4A112D00A243E7 /* SBJson5Writer.m in Sources */,
+				229324791E8945D700ADAA22 /* TrustKit.m in Sources */,
+				229324431E8945D700ADAA22 /* public_key_utils.m in Sources */,
 				22C8CE001B01372100F637D2 /* unzip.c in Sources */,
 				2210350F197EFC6200AB414F /* UsersDataSource.m in Sources */,
 				22B203701B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
 				22D649261B1E0719003BFD86 /* CSURITemplate.m in Sources */,
 				22D46C691A13A9A900B142F7 /* FileUploader.m in Sources */,
 				22C8CDFC1B01372100F637D2 /* mztools.c in Sources */,
+				2293245B1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				222C80DF1E4A112300A243E7 /* SBJson5StreamParserState.m in Sources */,
 				2210351E197EFC6200AB414F /* GCDAsyncSocket.m in Sources */,
 				2210351F197EFC6200AB414F /* HandshakeHeader.m in Sources */,
 				222C80DB1E4A111D00A243E7 /* SBJson5StreamParser.m in Sources */,
 				22103520197EFC6200AB414F /* MutableQueue.m in Sources */,
+				229324491E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */,
+				2293244F1E8945D700ADAA22 /* reporting_utils.m in Sources */,
 				22103521197EFC6200AB414F /* NSData+Base64.m in Sources */,
 				22103522197EFC6200AB414F /* WebSocket.m in Sources */,
+				2293247F1E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
 				22103523197EFC6200AB414F /* WebSocketConnectConfig.m in Sources */,
+				229324551E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				22103524197EFC6200AB414F /* WebSocketFragment.m in Sources */,
 				22C8CE081B01372100F637D2 /* SSZipArchive.m in Sources */,
+				2293246D1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */,
+				229324731E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */,
+				229324251E8945D700ADAA22 /* trie_search.c in Sources */,
+				2293240D1E8945D700ADAA22 /* configuration_utils.m in Sources */,
 				22C8CE041B01372100F637D2 /* zip.c in Sources */,
 				22103525197EFC6200AB414F /* WebSocketMessage.m in Sources */,
 				221034ED197EFBAF00AB414F /* ShareViewController.m in Sources */,
@@ -2124,17 +2402,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2293244B1E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */,
+				229324631E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				221D4BD31E23F75300D403E6 /* HandshakeHeader.m in Sources */,
 				222C80EB1E4A112E00A243E7 /* SBJson5StreamTokeniser.m in Sources */,
+				229324571E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				221D4BB01E23F48300D403E6 /* Ignore.m in Sources */,
 				221D4BBE1E23F4D700D403E6 /* ServersDataSource.m in Sources */,
 				221D4BAE1E23F47900D403E6 /* NetworkConnection.m in Sources */,
 				221D4BD51E23F75300D403E6 /* NSData+Base64.m in Sources */,
+				229324811E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
 				221D4BC01E23F4DF00D403E6 /* UIColor+IRCCloud.m in Sources */,
+				229324271E8945D700ADAA22 /* trie_search.c in Sources */,
+				229324451E8945D700ADAA22 /* public_key_utils.m in Sources */,
+				2293246F1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */,
+				2293245D1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				221D4BB21E23F48A00D403E6 /* BuffersDataSource.m in Sources */,
 				221D4BFE1E291C5300D403E6 /* CSURITemplate.m in Sources */,
 				221D4BB61E23F49800D403E6 /* EventsDataSource.m in Sources */,
+				229324751E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */,
 				221D4BB81E23F4AF00D403E6 /* ColorFormatter.m in Sources */,
+				229324151E8945D700ADAA22 /* assert.c in Sources */,
+				2293243F1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				222C80ED1E4A112E00A243E7 /* SBJson5StreamWriterState.m in Sources */,
 				221D4BD41E23F75300D403E6 /* MutableQueue.m in Sources */,
 				222C80E11E4A112400A243E7 /* SBJson5StreamParserState.m in Sources */,
@@ -2147,13 +2436,20 @@
 				221D4BD81E23F75300D403E6 /* WebSocketFragment.m in Sources */,
 				221D4BB41E23F48E00D403E6 /* ChannelsDataSource.m in Sources */,
 				226F080A1E5DFEC1003EED23 /* ImageCache.m in Sources */,
+				2293241B1E8945D700ADAA22 /* init_registry_tables.c in Sources */,
 				221D4BD71E23F75300D403E6 /* WebSocketConnectConfig.m in Sources */,
+				229324511E8945D700ADAA22 /* reporting_utils.m in Sources */,
+				229324211E8945D700ADAA22 /* registry_search.c in Sources */,
 				221D4BC41E23F4FD00D403E6 /* UsersDataSource.m in Sources */,
 				221D4BD21E23F75300D403E6 /* GCDAsyncSocket.m in Sources */,
 				221D4B911E23EAD700D403E6 /* NotificationService.m in Sources */,
 				222C80EE1E4A112E00A243E7 /* SBJson5Writer.m in Sources */,
+				229324691E8945D700ADAA22 /* vendor_identifier.m in Sources */,
 				221D4BD61E23F75300D403E6 /* WebSocket.m in Sources */,
+				229324331E8945D700ADAA22 /* RSSwizzle.m in Sources */,
 				222C80D91E4A111900A243E7 /* SBJson5Parser.m in Sources */,
+				2293240F1E8945D700ADAA22 /* configuration_utils.m in Sources */,
+				2293247B1E8945D700ADAA22 /* TrustKit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2161,17 +2457,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2293244C1E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */,
+				229324641E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				221D4BDB1E23F75400D403E6 /* HandshakeHeader.m in Sources */,
 				222C80EF1E4A112F00A243E7 /* SBJson5StreamTokeniser.m in Sources */,
+				229324581E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				221D4BB11E23F48300D403E6 /* Ignore.m in Sources */,
 				221D4BBF1E23F4D800D403E6 /* ServersDataSource.m in Sources */,
 				221D4BAF1E23F47900D403E6 /* NetworkConnection.m in Sources */,
 				221D4BDD1E23F75400D403E6 /* NSData+Base64.m in Sources */,
+				229324821E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
 				221D4BC11E23F4DF00D403E6 /* UIColor+IRCCloud.m in Sources */,
+				229324281E8945D700ADAA22 /* trie_search.c in Sources */,
+				229324461E8945D700ADAA22 /* public_key_utils.m in Sources */,
+				229324701E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */,
+				2293245E1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				221D4BB31E23F48B00D403E6 /* BuffersDataSource.m in Sources */,
 				221D4BFF1E291C5400D403E6 /* CSURITemplate.m in Sources */,
 				221D4BB71E23F49800D403E6 /* EventsDataSource.m in Sources */,
+				229324761E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */,
 				221D4BB91E23F4B000D403E6 /* ColorFormatter.m in Sources */,
+				229324161E8945D700ADAA22 /* assert.c in Sources */,
+				229324401E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				222C80F11E4A112F00A243E7 /* SBJson5StreamWriterState.m in Sources */,
 				221D4BDC1E23F75400D403E6 /* MutableQueue.m in Sources */,
 				222C80E21E4A112500A243E7 /* SBJson5StreamParserState.m in Sources */,
@@ -2184,13 +2491,20 @@
 				221D4BE01E23F75400D403E6 /* WebSocketFragment.m in Sources */,
 				221D4BB51E23F48F00D403E6 /* ChannelsDataSource.m in Sources */,
 				226F080B1E5DFEC2003EED23 /* ImageCache.m in Sources */,
+				2293241C1E8945D700ADAA22 /* init_registry_tables.c in Sources */,
 				221D4BDF1E23F75400D403E6 /* WebSocketConnectConfig.m in Sources */,
+				229324521E8945D700ADAA22 /* reporting_utils.m in Sources */,
+				229324221E8945D700ADAA22 /* registry_search.c in Sources */,
 				221D4BC51E23F4FE00D403E6 /* UsersDataSource.m in Sources */,
 				221D4BDA1E23F75400D403E6 /* GCDAsyncSocket.m in Sources */,
 				221D4B9C1E23EB4900D403E6 /* NotificationService.m in Sources */,
 				222C80F21E4A112F00A243E7 /* SBJson5Writer.m in Sources */,
+				2293246A1E8945D700ADAA22 /* vendor_identifier.m in Sources */,
 				221D4BDE1E23F75400D403E6 /* WebSocket.m in Sources */,
+				229324341E8945D700ADAA22 /* RSSwizzle.m in Sources */,
 				222C80DA1E4A111A00A243E7 /* SBJson5Parser.m in Sources */,
+				229324101E8945D700ADAA22 /* configuration_utils.m in Sources */,
+				2293247C1E8945D700ADAA22 /* TrustKit.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2218,18 +2532,22 @@
 				225D974918AA995900065087 /* GCDAsyncSocket.m in Sources */,
 				225D974A18AA995900065087 /* HandshakeHeader.m in Sources */,
 				22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
+				2293245A1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				22E9C0AC1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */,
 				225D974B18AA995900065087 /* MutableQueue.m in Sources */,
 				225D974C18AA995900065087 /* NSData+Base64.m in Sources */,
+				229324541E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				225D974D18AA995900065087 /* WebSocket.m in Sources */,
 				225D974E18AA995900065087 /* WebSocketConnectConfig.m in Sources */,
 				225D974F18AA995900065087 /* WebSocketFragment.m in Sources */,
 				22BB94AB1D425D3800BFB6F0 /* SamlLoginViewController.m in Sources */,
 				225D975018AA995900065087 /* WebSocketMessage.m in Sources */,
+				2293243C1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				225D975118AA995900065087 /* IRCCloudJSONObject.m in Sources */,
 				225D975218AA995900065087 /* ServersDataSource.m in Sources */,
 				225D975318AA995900065087 /* NickCompletionView.m in Sources */,
 				222C80CA1E4A0BB600A243E7 /* SBJson5Parser.m in Sources */,
+				229324121E8945D700ADAA22 /* assert.c in Sources */,
 				22CE91761D58C81C0014B25C /* LinkTextView.m in Sources */,
 				2292AD591D5B55CC00BEE269 /* LinkLabel.m in Sources */,
 				22DB8D711C441C3000302271 /* YouTubeViewController.m in Sources */,
@@ -2238,18 +2556,26 @@
 				225D975618AA995900065087 /* ChannelsDataSource.m in Sources */,
 				225D975718AA995900065087 /* BuffersTableView.m in Sources */,
 				225D975818AA995900065087 /* MainViewController.m in Sources */,
+				229324601E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
+				2293240C1E8945D700ADAA22 /* configuration_utils.m in Sources */,
+				229324421E8945D700ADAA22 /* public_key_utils.m in Sources */,
 				22C8CDFF1B01372100F637D2 /* unzip.c in Sources */,
 				225D975918AA995900065087 /* UIColor+IRCCloud.m in Sources */,
 				22C8CE031B01372100F637D2 /* zip.c in Sources */,
 				225D975A18AA995900065087 /* UsersDataSource.m in Sources */,
 				225D975B18AA995900065087 /* UsersTableView.m in Sources */,
+				229324241E8945D700ADAA22 /* trie_search.c in Sources */,
+				229324181E8945D700ADAA22 /* init_registry_tables.c in Sources */,
 				225D975C18AA995900065087 /* EventsDataSource.m in Sources */,
 				22C8CE071B01372100F637D2 /* SSZipArchive.m in Sources */,
 				225D975D18AA995900065087 /* EventsTableView.m in Sources */,
+				229324661E8945D700ADAA22 /* vendor_identifier.m in Sources */,
+				229324301E8945D700ADAA22 /* RSSwizzle.m in Sources */,
 				225D975E18AA995900065087 /* ColorFormatter.m in Sources */,
 				22D46C681A13A9A900B142F7 /* FileUploader.m in Sources */,
 				221E3F4D1AD2DEE00090934B /* FilesTableViewController.m in Sources */,
 				225D975F18AA995900065087 /* CollapsedEvents.m in Sources */,
+				229324781E8945D700ADAA22 /* TrustKit.m in Sources */,
 				225D976018AA995900065087 /* HighlightsCountView.m in Sources */,
 				225D976118AA995900065087 /* Ignore.m in Sources */,
 				22C0F1521B8F61D9001D109D /* YTPlayerView.m in Sources */,
@@ -2262,11 +2588,14 @@
 				22E54AE11D10593B00891FE4 /* AvatarsDataSource.m in Sources */,
 				22C2E0591B0E2E4800387B4B /* PastebinViewController.m in Sources */,
 				223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */,
+				229324721E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */,
 				225D976518AA995900065087 /* UIExpandingTextViewInternal.m in Sources */,
 				22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */,
 				22C2075D1A19125700EDACA4 /* FileMetadataViewController.m in Sources */,
 				225D976618AA995900065087 /* EditConnectionViewController.m in Sources */,
+				2293244E1E8945D700ADAA22 /* reporting_utils.m in Sources */,
 				225D976718AA995900065087 /* ECSlidingViewController.m in Sources */,
+				229324481E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */,
 				22D649251B1E0719003BFD86 /* CSURITemplate.m in Sources */,
 				222C80D21E4A0BB600A243E7 /* SBJson5StreamWriter.m in Sources */,
 				222C80CC1E4A0BB600A243E7 /* SBJson5StreamParser.m in Sources */,
@@ -2287,14 +2616,17 @@
 				225D977218AA995900065087 /* ARChromeActivity.m in Sources */,
 				22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				225D977318AA995900065087 /* TUSafariActivity.m in Sources */,
+				2293247E1E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
 				226F080F1E6495C8003EED23 /* WhoWasTableViewController.m in Sources */,
 				225D977418AA995900065087 /* LicenseViewController.m in Sources */,
 				223C407D1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */,
 				225D977518AA995900065087 /* WhoListTableViewController.m in Sources */,
+				2293241E1E8945D700ADAA22 /* registry_search.c in Sources */,
 				225D977618AA995900065087 /* NamesListTableViewController.m in Sources */,
 				2271FDA21DCDF45C00A39F84 /* TextTableViewController.m in Sources */,
 				222C80D41E4A0BB600A243E7 /* SBJson5StreamWriterState.m in Sources */,
 				222C80CE1E4A0BB600A243E7 /* SBJson5StreamParserState.m in Sources */,
+				2293246C1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */,
 				222C80B71E48ABB200A243E7 /* ImageCache.m in Sources */,
 				225D977718AA995900065087 /* UINavigationController+iPadSux.m in Sources */,
 			);
@@ -2316,18 +2648,22 @@
 				22B4286816D831A800498507 /* GCDAsyncSocket.m in Sources */,
 				22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */,
 				22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
+				229324591E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				22E9C0AB1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */,
 				22B4286C16D831A800498507 /* MutableQueue.m in Sources */,
 				22B4286E16D831A800498507 /* NSData+Base64.m in Sources */,
+				229324531E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				22B4287016D831A800498507 /* WebSocket.m in Sources */,
 				22B4287A16D831A800498507 /* WebSocketConnectConfig.m in Sources */,
 				22B4287C16D831A800498507 /* WebSocketFragment.m in Sources */,
 				22BB94AA1D425A4F00BFB6F0 /* SamlLoginViewController.m in Sources */,
 				22B4287E16D831A800498507 /* WebSocketMessage.m in Sources */,
+				2293243B1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */,
 				2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */,
 				22032A6F1884529700BE4A10 /* NickCompletionView.m in Sources */,
 				222C80C91E4A0BB600A243E7 /* SBJson5Parser.m in Sources */,
+				229324111E8945D700ADAA22 /* assert.c in Sources */,
 				22CE91751D58C81C0014B25C /* LinkTextView.m in Sources */,
 				22CE91791D59160B0014B25C /* LinkLabel.m in Sources */,
 				22DB8D701C441C3000302271 /* YouTubeViewController.m in Sources */,
@@ -2336,18 +2672,26 @@
 				2236F60216DBC021007BE535 /* ChannelsDataSource.m in Sources */,
 				2236F60616DBCA85007BE535 /* BuffersTableView.m in Sources */,
 				2236F60B16DBCBC6007BE535 /* MainViewController.m in Sources */,
+				2293245F1E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
+				2293240B1E8945D700ADAA22 /* configuration_utils.m in Sources */,
+				229324411E8945D700ADAA22 /* public_key_utils.m in Sources */,
 				22C8CDFE1B01372100F637D2 /* unzip.c in Sources */,
 				2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */,
 				22C8CE021B01372100F637D2 /* zip.c in Sources */,
 				2236F64616DD138C007BE535 /* UsersDataSource.m in Sources */,
 				2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */,
+				229324231E8945D700ADAA22 /* trie_search.c in Sources */,
+				229324171E8945D700ADAA22 /* init_registry_tables.c in Sources */,
 				22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */,
 				22C8CE061B01372100F637D2 /* SSZipArchive.m in Sources */,
 				223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */,
+				229324651E8945D700ADAA22 /* vendor_identifier.m in Sources */,
+				2293242F1E8945D700ADAA22 /* RSSwizzle.m in Sources */,
 				2237E13D16E1214A00CA188F /* ColorFormatter.m in Sources */,
 				22D46C671A13A9A900B142F7 /* FileUploader.m in Sources */,
 				221E3F4C1AD2DEE00090934B /* FilesTableViewController.m in Sources */,
 				22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */,
+				229324771E8945D700ADAA22 /* TrustKit.m in Sources */,
 				227FF2A116FA128B00DBE3C5 /* HighlightsCountView.m in Sources */,
 				2230F8E817162ACD007F7C98 /* Ignore.m in Sources */,
 				22C0F1511B8F61D9001D109D /* YTPlayerView.m in Sources */,
@@ -2360,11 +2704,14 @@
 				22E54AE01D10593B00891FE4 /* AvatarsDataSource.m in Sources */,
 				22C2E0581B0E2E4800387B4B /* PastebinViewController.m in Sources */,
 				223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */,
+				229324711E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */,
 				22D430A81725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
 				22A363B419D0884D00500478 /* OnePasswordExtension.m in Sources */,
 				22C2075C1A19125700EDACA4 /* FileMetadataViewController.m in Sources */,
 				22B15CF4172ECCFF0075EBA7 /* EditConnectionViewController.m in Sources */,
+				2293244D1E8945D700ADAA22 /* reporting_utils.m in Sources */,
 				22B15CFB17301BAF0075EBA7 /* ECSlidingViewController.m in Sources */,
+				229324471E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */,
 				22D649241B1E0719003BFD86 /* CSURITemplate.m in Sources */,
 				222C80D11E4A0BB600A243E7 /* SBJson5StreamWriter.m in Sources */,
 				222C80CB1E4A0BB600A243E7 /* SBJson5StreamParser.m in Sources */,
@@ -2385,14 +2732,17 @@
 				225017631783434900066E71 /* ARChromeActivity.m in Sources */,
 				22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				2250176D1783434900066E71 /* TUSafariActivity.m in Sources */,
+				2293247D1E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
 				226F080E1E6495C8003EED23 /* WhoWasTableViewController.m in Sources */,
 				224FCF361787288400FC3879 /* LicenseViewController.m in Sources */,
 				223C407C1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */,
 				22A35F26178A317100529CDA /* WhoListTableViewController.m in Sources */,
+				2293241D1E8945D700ADAA22 /* registry_search.c in Sources */,
 				22A35F29178A3F3500529CDA /* NamesListTableViewController.m in Sources */,
 				2271FDA11DCDF45C00A39F84 /* TextTableViewController.m in Sources */,
 				222C80D31E4A0BB600A243E7 /* SBJson5StreamWriterState.m in Sources */,
 				222C80CD1E4A0BB600A243E7 /* SBJson5StreamParserState.m in Sources */,
+				2293246B1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */,
 				222C80B61E48ABB200A243E7 /* ImageCache.m in Sources */,
 				22A19C60178FCCAC00772C60 /* UINavigationController+iPadSux.m in Sources */,
 			);
@@ -2411,38 +2761,56 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2293241A1E8945D700ADAA22 /* init_registry_tables.c in Sources */,
 				22DB24FC1982DF2B0008728E /* UIColor+IRCCloud.m in Sources */,
 				22DB24FD1982DF2B0008728E /* HighlightsCountView.m in Sources */,
 				22DB24FE1982DF2B0008728E /* BuffersTableView.m in Sources */,
 				22DB24FF1982DF2B0008728E /* Ignore.m in Sources */,
 				222C80E91E4A112D00A243E7 /* SBJson5StreamWriterState.m in Sources */,
+				229324321E8945D700ADAA22 /* RSSwizzle.m in Sources */,
 				22DB25001982DF2B0008728E /* BuffersDataSource.m in Sources */,
 				222C80E71E4A112D00A243E7 /* SBJson5StreamTokeniser.m in Sources */,
+				229324201E8945D700ADAA22 /* registry_search.c in Sources */,
+				2293243E1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				222C80D81E4A111800A243E7 /* SBJson5Parser.m in Sources */,
 				22DB25011982DF2B0008728E /* ChannelsDataSource.m in Sources */,
+				229324681E8945D700ADAA22 /* vendor_identifier.m in Sources */,
 				22C8CDF91B01372100F637D2 /* ioapi.c in Sources */,
 				22DB25021982DF2B0008728E /* EventsDataSource.m in Sources */,
 				22DB25031982DF2B0008728E /* ImageUploader.m in Sources */,
 				22DB25041982DF2B0008728E /* IRCCloudJSONObject.m in Sources */,
+				229324621E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
+				229324141E8945D700ADAA22 /* assert.c in Sources */,
 				22DB25051982DF2B0008728E /* NetworkConnection.m in Sources */,
 				22DB25061982DF2B0008728E /* ServersDataSource.m in Sources */,
 				222C80EA1E4A112D00A243E7 /* SBJson5Writer.m in Sources */,
+				2293247A1E8945D700ADAA22 /* TrustKit.m in Sources */,
+				229324441E8945D700ADAA22 /* public_key_utils.m in Sources */,
 				22C8CE011B01372100F637D2 /* unzip.c in Sources */,
 				22DB25071982DF2B0008728E /* UsersDataSource.m in Sources */,
 				22B203711B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
 				22D649271B1E0719003BFD86 /* CSURITemplate.m in Sources */,
 				22D46C6A1A13A9A900B142F7 /* FileUploader.m in Sources */,
 				22C8CDFD1B01372100F637D2 /* mztools.c in Sources */,
+				2293245C1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				222C80E01E4A112300A243E7 /* SBJson5StreamParserState.m in Sources */,
 				22DB25161982DF2B0008728E /* GCDAsyncSocket.m in Sources */,
 				22DB25171982DF2B0008728E /* HandshakeHeader.m in Sources */,
 				222C80DC1E4A111E00A243E7 /* SBJson5StreamParser.m in Sources */,
 				22DB25181982DF2B0008728E /* MutableQueue.m in Sources */,
+				2293244A1E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */,
+				229324501E8945D700ADAA22 /* reporting_utils.m in Sources */,
 				22DB25191982DF2B0008728E /* NSData+Base64.m in Sources */,
 				22DB251A1982DF2B0008728E /* WebSocket.m in Sources */,
+				229324801E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
 				22DB251B1982DF2B0008728E /* WebSocketConnectConfig.m in Sources */,
+				229324561E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				22DB251C1982DF2B0008728E /* WebSocketFragment.m in Sources */,
 				22C8CE091B01372100F637D2 /* SSZipArchive.m in Sources */,
+				2293246E1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */,
+				229324741E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */,
+				229324261E8945D700ADAA22 /* trie_search.c in Sources */,
+				2293240E1E8945D700ADAA22 /* configuration_utils.m in Sources */,
 				22C8CE051B01372100F637D2 /* zip.c in Sources */,
 				22DB251D1982DF2B0008728E /* WebSocketMessage.m in Sources */,
 				22DB251E1982DF2B0008728E /* ShareViewController.m in Sources */,
@@ -2677,7 +3045,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = NotificationService/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-DEXTENSION";
@@ -2714,7 +3082,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = NotificationService/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
@@ -2753,7 +3121,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = NotificationService/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
@@ -3031,6 +3399,7 @@
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -3077,6 +3446,7 @@
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -3408,6 +3778,7 @@
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;

@@ -20,6 +20,7 @@
 #import "IRCCloudJSONObject.h"
 #import "UIColor+IRCCloud.h"
 #import "ImageCache.h"
+#import "TrustKit.h"
 
 NSString *_userAgent = nil;
 NSString *kIRCCloudConnectivityNotification = @"com.irccloud.notification.connectivity";
@@ -226,6 +227,19 @@ volatile BOOL __socketPaused = NO;
     IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
 #endif
     if(self) {
+        [TrustKit initializeWithConfiguration:@{
+                                                kTSKSwizzleNetworkDelegates: @YES,
+                                                kTSKPinnedDomains : @{
+                                                        @"irccloud.com" : @{
+                                                                kTSKExpirationDate: @"2019-03-21",
+                                                                kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048],
+                                                                kTSKPublicKeyHashes : @[
+                                                                        @"hPUhE79j0hDUJDg/Zy+yqkLt/lJKEa9PWb0vrnp2oyQ=",
+                                                                        @"A0us4Wg8ZwLOrXMWm8W4BsECg+dz98ntmZZAmm8if9c=",
+                                                                        ],
+                                                                kTSKIncludeSubdomains : @YES
+                                                                }
+                                                        }}];
     __serializeLock = [[NSLock alloc] init];
     __userInfoLock = [[NSLock alloc] init];
     _queue = [[NSOperationQueue alloc] init];
@@ -1634,15 +1648,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
                                                                          tlsSettings:[@{
-#ifdef DEBUG
-                                                                         (NSString *)GCDAsyncSocketManuallyEvaluateTrust:@(YES)
-#else
                                                                          (NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
-                                                                         (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kTLSProtocol1),
-#ifndef ENTERPRISE
-                                                                                        @"fingerprints":@[@"54A0A7A4EE83A09B71F867581627EB242BD2398EAAA1DC7AB4CCE26E6EED8EB8",@"E68F27E003ED788159670B6A4C6C5328F1D1FDA81CB19CC8B816F9364684233B"]
-#endif
-#endif
+                                                                         (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kTLSProtocol1)
                                                                                         } mutableCopy]
                                                                              headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
                                                                    verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
