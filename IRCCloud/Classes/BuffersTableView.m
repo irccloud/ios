@@ -795,18 +795,10 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     Event *e = notification.object;
     switch(event) {
         case kIRCEventUserInfo:
-        case kIRCEventMakeServer:
-        case kIRCEventMakeBuffer:
-        case kIRCEventDeleteBuffer:
-        case kIRCEventChannelInit:
         case kIRCEventChannelTopic:
         case kIRCEventNickChange:
         case kIRCEventMemberUpdates:
         case kIRCEventUserChannelMode:
-        case kIRCEventBufferArchived:
-        case kIRCEventBufferUnarchived:
-        case kIRCEventRenameConversation:
-        case kIRCEventConnectionDeleted:
         case kIRCEventAway:
         case kIRCEventSelfBack:
         case kIRCEventChannelTimestamp:
@@ -827,7 +819,6 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         case kIRCEventConnectionLag:
         case kIRCEventGlobalMsg:
         case kIRCEventAcceptList:
-        case kIRCEventReorderConnections:
         case kIRCEventChannelTopicIs:
         case kIRCEventServerMap:
         case kIRCEventSessionDeleted:
@@ -884,6 +875,15 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                     [self refreshBuffer:b];
             }
             break;
+        case kIRCEventMakeServer:
+        case kIRCEventMakeBuffer:
+        case kIRCEventDeleteBuffer:
+        case kIRCEventChannelInit:
+        case kIRCEventBufferArchived:
+        case kIRCEventBufferUnarchived:
+        case kIRCEventRenameConversation:
+        case kIRCEventConnectionDeleted:
+        case kIRCEventReorderConnections:
         case kIRCEventRefresh:
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
             break;
