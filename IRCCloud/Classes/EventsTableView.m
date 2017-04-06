@@ -349,13 +349,11 @@ extern UIImage *__socketClosedBackgroundImage;
             _message.numberOfLines = 1;
         }
 
-        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, frame.size.width - 4 - __timestampWidth, floorf([_message sizeThatFits:CGSizeMake(frame.size.width - 4 - __timestampWidth, CGFLOAT_MAX)].height) + 1);
-        if(_messageWidth > 0 && _message.frame.size.width != _messageWidth) {
-            CLS_LOG(@"Unexpected message width: %f estimated width was: %f", _message.frame.size.width, _messageWidth);
-            CGRect f = _message.frame;
-            f.size.width = _messageWidth;
-            _message.frame = f;
+        if(_messageWidth == 0) {
+            _messageWidth = frame.size.width - 4 - __timestampWidth;
         }
+        
+        _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, _messageWidth, floorf([_message sizeThatFits:CGSizeMake(_messageWidth, CGFLOAT_MAX)].height) + 1);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(
                                        frame.origin.x + (__timeLeftPref ? (__timestampWidth + 4) : 0),
@@ -2087,7 +2085,20 @@ extern UIImage *__socketClosedBackgroundImage;
         if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
             estimatedWidth -= 4;
         
-        e.height = floorf([LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0));
+        static LinkLabel *message = nil;
+        if(!message) {
+            message = [[LinkLabel alloc] init];
+            message.backgroundColor = [UIColor clearColor];
+            message.textColor = [UIColor messageTextColor];
+            message.numberOfLines = 0;
+            message.lineBreakMode = NSLineBreakByWordWrapping;
+            message.userInteractionEnabled = YES;
+            message.baselineAdjustment = UIBaselineAdjustmentNone;
+            message.adjustsFontSizeToFitWidth = YES;
+        }
+        message.attributedText = e.formatted;
+        
+        e.height = floorf([message sizeThatFits:CGSizeMake(estimatedWidth, CGFLOAT_MAX)].height + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0));
         if(!__compact)
             e.height += MESSAGE_LINE_PADDING;
         e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
