@@ -2094,7 +2094,6 @@ extern UIImage *__socketClosedBackgroundImage;
             message.lineBreakMode = NSLineBreakByWordWrapping;
             message.userInteractionEnabled = YES;
             message.baselineAdjustment = UIBaselineAdjustmentNone;
-            message.adjustsFontSizeToFitWidth = YES;
         }
         message.attributedText = e.formatted;
         

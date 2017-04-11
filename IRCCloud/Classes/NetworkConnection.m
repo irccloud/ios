@@ -80,7 +80,7 @@ volatile BOOL __socketPaused = NO;
         }];
         _cancelled = NO;
         _running = NO;
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:15];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         [request setHTTPShouldHandleCookies:NO];
         [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
         [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
@@ -491,6 +491,15 @@ volatile BOOL __socketPaused = NO;
                        [_buffers invalidate];
                        [_channels invalidate];
                        [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
+                   },
+                   @"oob_timeout": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       CLS_LOG(@"OOB timed out");
+                       [self clearOOB];
+                       _highestEID = 0;
+                       _streamId = nil;
+                       [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
+                       _state = kIRCCloudStateDisconnected;
+                       [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        [__userInfoLock lock];
@@ -1091,7 +1100,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:accessLink cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:accessLink cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     
@@ -1167,7 +1176,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     
@@ -1192,7 +1201,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, fileID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:5];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, fileID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     
