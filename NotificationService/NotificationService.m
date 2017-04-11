@@ -29,9 +29,11 @@
 @implementation NotificationService
 
 - (void)didReceiveNotificationRequest:(UNNotificationRequest *)request withContentHandler:(void (^)(UNNotificationContent * _Nonnull))contentHandler {
+    NSURL *attachment = nil;
+    NSString *typeHint = (NSString *)kUTTypeJPEG;
     self.contentHandler = contentHandler;
     self.bestAttemptContent = [request.content mutableCopy];
-
+    
 #ifdef ENTERPRISE
     NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
@@ -40,50 +42,53 @@
     IRCCLOUD_HOST = [d objectForKey:@"host"];
     IRCCLOUD_PATH = [d objectForKey:@"path"];
 
-    [NetworkConnection sync];
-    NSURL *attachment = nil;
-    NSString *typeHint = (NSString *)kUTTypeJPEG;
+    if([d boolForKey:@"defaultSound"])
+        self.bestAttemptContent.sound = [UNNotificationSound defaultSound];
     
-    if([request.content.userInfo objectForKey:@"f"]) {
-        NSString *fileID = [[request.content.userInfo objectForKey:@"f"] objectAtIndex:0];
-        NSString *type = [[request.content.userInfo objectForKey:@"f"] objectAtIndex:1];
+    if(![d boolForKey:@"disableNotificationPreviews"]) {
+        [NetworkConnection sync];
         
-        typeHint = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (__bridge CFStringRef _Nonnull)(type), NULL);
-        
-        if(![NetworkConnection sharedInstance].config)
-            [NetworkConnection sharedInstance].config = [[NetworkConnection sharedInstance] requestConfiguration];
-        
-        CSURITemplate *template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
+        if([request.content.userInfo objectForKey:@"f"]) {
+            NSString *fileID = [[request.content.userInfo objectForKey:@"f"] objectAtIndex:0];
+            NSString *type = [[request.content.userInfo objectForKey:@"f"] objectAtIndex:1];
+            
+            typeHint = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (__bridge CFStringRef _Nonnull)(type), NULL);
+            
+            if(![NetworkConnection sharedInstance].config)
+                [NetworkConnection sharedInstance].config = [[NetworkConnection sharedInstance] requestConfiguration];
+            
+            CSURITemplate *template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
 
-        if([type hasPrefix:@"image/"])
-            attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", ([UIScreen mainScreen].bounds.size.width/2) * [UIScreen mainScreen].scale]} error:nil]];
-        else
-            attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"id":fileID} error:nil]];
-    } else {
-        NSDictionary *extensions = @{@"png":(NSString *)kUTTypePNG,
-                                     @"jpg":(NSString *)kUTTypeJPEG,
-                                     @"jpeg":(NSString *)kUTTypeJPEG,
-                                     @"gif":(NSString *)kUTTypeGIF,
-                                     @"m4v":(NSString *)kUTTypeMPEG4,
-                                     @"mp4":(NSString *)kUTTypeMPEG4,
-                                     @"mov":(NSString *)kUTTypeMPEG4,
-                                     @"m4a":(NSString *)kUTTypeMPEG4Audio,
-                                     @"mp3":(NSString *)kUTTypeMP3,
-                                     @"wav":(NSString *)kUTTypeWaveformAudio,
-                                     @"avi":(NSString *)kUTTypeAVIMovie,
-                                     @"aif":(NSString *)kUTTypeAudioInterchangeFileFormat,
-                                     @"aiff":(NSString *)kUTTypeAudioInterchangeFileFormat
-                                     };
-        NSArray *links;
-        [ColorFormatter format:request.content.body defaultColor:[UIColor blackColor] mono:NO linkify:YES server:nil links:&links];
+            if([type hasPrefix:@"image/"])
+                attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", ([UIScreen mainScreen].bounds.size.width/2) * [UIScreen mainScreen].scale]} error:nil]];
+            else
+                attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"id":fileID} error:nil]];
+        } else {
+            NSDictionary *extensions = @{@"png":(NSString *)kUTTypePNG,
+                                         @"jpg":(NSString *)kUTTypeJPEG,
+                                         @"jpeg":(NSString *)kUTTypeJPEG,
+                                         @"gif":(NSString *)kUTTypeGIF,
+                                         @"m4v":(NSString *)kUTTypeMPEG4,
+                                         @"mp4":(NSString *)kUTTypeMPEG4,
+                                         @"mov":(NSString *)kUTTypeMPEG4,
+                                         @"m4a":(NSString *)kUTTypeMPEG4Audio,
+                                         @"mp3":(NSString *)kUTTypeMP3,
+                                         @"wav":(NSString *)kUTTypeWaveformAudio,
+                                         @"avi":(NSString *)kUTTypeAVIMovie,
+                                         @"aif":(NSString *)kUTTypeAudioInterchangeFileFormat,
+                                         @"aiff":(NSString *)kUTTypeAudioInterchangeFileFormat
+                                         };
+            NSArray *links;
+            [ColorFormatter format:request.content.body defaultColor:[UIColor blackColor] mono:NO linkify:YES server:nil links:&links];
 
-        for(NSTextCheckingResult *r in links) {
-            if(r.resultType == NSTextCheckingTypeLink) {
-                NSString *type = [r.URL.pathExtension lowercaseString];
-                if([extensions objectForKey:type]) {
-                    attachment = r.URL;
-                    typeHint = [extensions objectForKey:type];
-                    break;
+            for(NSTextCheckingResult *r in links) {
+                if(r.resultType == NSTextCheckingTypeLink) {
+                    NSString *type = [r.URL.pathExtension lowercaseString];
+                    if([extensions objectForKey:type]) {
+                        attachment = r.URL;
+                        typeHint = [extensions objectForKey:type];
+                        break;
+                    }
                 }
             }
         }

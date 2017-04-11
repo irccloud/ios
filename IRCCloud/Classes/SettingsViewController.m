@@ -529,6 +529,8 @@
         [[NSUserDefaults standardUserDefaults] setBool:!_imageViewer.isOn forKey:@"imageViewer"];
         [[NSUserDefaults standardUserDefaults] setBool:!_videoViewer.isOn forKey:@"videoViewer"];
         [[NSUserDefaults standardUserDefaults] setBool:_inlineWifiOnly.isOn forKey:@"inlineWifiOnly"];
+        [[NSUserDefaults standardUserDefaults] setBool:_defaultSound.isOn forKey:@"defaultSound"];
+        [[NSUserDefaults standardUserDefaults] setBool:!_notificationPreviews.isOn forKey:@"disableNotificationPreviews"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -540,6 +542,8 @@
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] forKey:@"imageService"];
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] forKey:@"fontSize"];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"defaultSound"] forKey:@"defaultSound"];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"disableNotificationPreviews"] forKey:@"disableNotificationPreviews"];
         [d synchronize];
         
         if([ColorFormatter shouldClearFontCache]) {
@@ -794,6 +798,9 @@
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10) {
         [notifications addObject:@{@"title":@"Background Alert Sounds", @"accessory":_notificationSound}];
+    } else {
+        [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":_defaultSound}];
+        [notifications addObject:@{@"title":@"Media Previews", @"accessory":_notificationPreviews}];
     }
     [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":_notifyAll}];
     [notifications addObject:@{@"title":@"Show Unread Indicators", @"accessory":_showUnread}];
@@ -910,6 +917,8 @@
     _disableInlineFiles = [[UISwitch alloc] init];
     _disableBigEmoji = [[UISwitch alloc] init];
     _inlineWifiOnly = [[UISwitch alloc] init];
+    _defaultSound = [[UISwitch alloc] init];
+    _notificationPreviews = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1115,6 +1124,8 @@
     _fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
     _imageViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"imageViewer"];
     _videoViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"];
+    _defaultSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"defaultSound"];
+    _notificationPreviews.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"disableNotificationPreviews"];
 }
 
 -(void)hideJoinPartToggled:(id)sender {
