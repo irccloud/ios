@@ -51,6 +51,7 @@
     NSString *_accessibilityLabel;
     NSString *_accessibilityValue;
     NSAttributedString *_formatted;
+    NSAttributedString *_formattedPadded;
     NSAttributedString *_formattedNick;
     NSAttributedString *_formattedRealname;
     NSString *_realname;
@@ -91,7 +92,7 @@
 @property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly;
 @property (nonatomic, copy) NSDictionary *ops,*entities;
 @property (nonatomic, strong) UIColor *color, *bgColor;
-@property (nonatomic, copy) NSAttributedString *formatted, *formattedNick, *formattedRealname;
+@property (nonatomic, copy) NSAttributedString *formatted, *formattedNick, *formattedRealname, *formattedPadded;
 @property (nonatomic, assign) float height, timestampPosition, avatarHeight, estimatedWidth;
 @property (nonatomic, strong) NSArray *links, *realnameLinks;
 @property (nonatomic, strong) NSTimer *expirationTimer;

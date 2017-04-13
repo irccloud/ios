@@ -1988,6 +1988,13 @@ extern UIImage *__socketClosedBackgroundImage;
             e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
         else
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
+        
+        if(e.formatted.length) {
+            NSMutableAttributedString *padded = e.formatted.mutableCopy;
+            [padded appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
+            e.formattedPadded = padded;
+        }
+        
         if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
             NSMutableArray *mutableLinks = links.mutableCopy;
             for(int i = 0; i < mutableLinks.count; i++) {
@@ -2215,9 +2222,9 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.accessibilityElementsHidden = NO;
         cell.messageWidth = e.estimatedWidth;
 
-        if(cell.messageTextColor != e.color || ![cell.message.attributedText.string isEqualToString:e.formatted.string]) {
+        if(cell.messageTextColor != e.color || ![cell.message.attributedText.string isEqualToString:e.formattedPadded.string]) {
             cell.messageTextColor = e.color;
-            cell.message.attributedText = e.formatted;
+            cell.message.attributedText = e.formattedPadded;
             
             if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
                 if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
