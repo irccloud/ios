@@ -21,15 +21,11 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.8</string>
+	<string>3.9</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>GIT_VERSION</string>
-	<key>UIAppFonts</key>
-	<array>
-		<string>FontAwesome.otf</string>
-	</array>
 	<key>NSExtension</key>
 	<dict>
 		<key>NSExtensionAttributes</key>
@@ -41,10 +37,10 @@
     SUBQUERY (
         $extensionItem.attachments,
         $attachment,
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.image&quot; ||
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.movie&quot; ||
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.plain-text&quot; ||
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.url&quot;
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image" ||
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.movie" ||
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.plain-text" ||
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.url"
     ).@count == $extensionItem.attachments.@count).@count == 1 AND
 SUBQUERY (
     extensionItems,
@@ -52,8 +48,8 @@ SUBQUERY (
     SUBQUERY (
         $extensionItem.attachments,
         $attachment,
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.image&quot; ||
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.movie&quot;
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.image" ||
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.movie"
     ).@count &lt;= 1).@count == 1 AND
 SUBQUERY (
     extensionItems,
@@ -61,11 +57,11 @@ SUBQUERY (
     SUBQUERY (
         $extensionItem.attachments,
         $attachment,
-        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO &quot;public.file-url&quot;
+        ANY $attachment.registeredTypeIdentifiers UTI-CONFORMS-TO "public.file-url"
     ).@count &lt;= 1).@count == 1
 ) OR (
 SUBQUERY(extensionItems, $extensionItem, 
-SUBQUERY($extensionItem.attachments, $attachment, SUBQUERY($attachment.registeredTypeIdentifiers, $uti, $uti UTI-CONFORMS-TO &quot;public.url&quot; AND NOT $uti UTI-CONFORMS-TO &quot;public.file-url&quot;).@count == 1).@count == 1).@count == 1
+SUBQUERY($extensionItem.attachments, $attachment, SUBQUERY($attachment.registeredTypeIdentifiers, $uti, $uti UTI-CONFORMS-TO "public.url" AND NOT $uti UTI-CONFORMS-TO "public.file-url").@count == 1).@count == 1).@count == 1
 )</string>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>
@@ -73,5 +69,9 @@ SUBQUERY($extensionItem.attachments, $attachment, SUBQUERY($attachment.registere
 		<key>NSExtensionPrincipalClass</key>
 		<string>ShareViewController</string>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>FontAwesome.otf</string>
+	</array>
 </dict>
 </plist>

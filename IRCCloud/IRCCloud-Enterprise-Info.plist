@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleSpokenName</key>
-	<string>I R C Cloud</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -19,9 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.8</string>
+	<string>3.9</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleSpokenName</key>
+	<string>I R C Cloud</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -91,9 +91,26 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>${PRODUCT_NAME} requires access to your camera to share photos and videos on IRC</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>${PRODUCT_NAME} requires access to your microphone to record a video</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>${PRODUCT_NAME} requires access to your photo library to share photos and videos on IRC</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>com.irccloud.enterprise.buffer</string>
+	</array>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Hack-BoldItalic.otf</string>
+		<string>Hack-Italic.otf</string>
+		<string>Hack-Bold.otf</string>
+		<string>Hack-Regular.otf</string>
+		<string>SourceSansPro-LightIt.otf</string>
+		<string>SourceSansPro-Regular.otf</string>
+		<string>SourceSansPro-Semibold.otf</string>
+		<string>FontAwesome.otf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
@@ -132,22 +149,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>UIAppFonts</key>
-	<array>
-		<string>Hack-BoldItalic.otf</string>
-		<string>Hack-Italic.otf</string>
-		<string>Hack-Bold.otf</string>
-		<string>Hack-Regular.otf</string>
-		<string>SourceSansPro-LightIt.otf</string>
-		<string>SourceSansPro-Regular.otf</string>
-		<string>SourceSansPro-Semibold.otf</string>
-		<string>FontAwesome.otf</string>
-	</array>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>${PRODUCT_NAME} requires access to your photo library to share photos and videos on IRC</string>
-	<key>NSCameraUsageDescription</key>
-	<string>${PRODUCT_NAME} requires access to your camera to share photos and videos on IRC</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>${PRODUCT_NAME} requires access to your microphone to record a video</string>
 </dict>
 </plist>
