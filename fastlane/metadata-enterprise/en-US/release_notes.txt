@@ -1,4 +1,5 @@
-• Added a "Close Preview" option when you press and hold on an inline image preview
-• Fixed a crash when trying to display unsupported image types, such as webp
-• Fixed "user changed host" message display
+• Added settings for notifications to use the default system alert sound and to disable image previews
+• Fixed an issue that could prevent the conversations list from updating when receiving a new private message
+• Fixed an issue that could prevent the bottom line of a message from being displayed
+• Fixed a crash when selecting "Share URL" from the press-and-hold menu on iPad
 • Stability improvements, and minor fixes
