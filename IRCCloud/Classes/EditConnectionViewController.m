@@ -608,8 +608,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
         unverified.text = @"\nYou can't connect to external servers until you confirm your email address.\n\nIf you're still waiting for the email, you can tap here to send yourself another confirmation.";
         unverified.tag = 1;
         unverified.userInteractionEnabled = YES;
-        CGSize size = [unverified sizeThatFits:self.tableView.bounds.size];
-        unverified.frame = CGRectMake(0,0,self.tableView.bounds.size.width,size.height + 12);
 
         self.tableView.tableHeaderView = unverified;
     }
@@ -619,6 +617,16 @@ static NSString * const ServerHasSSLKey = @"ssl";
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     
     [self refresh];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    UILabel *unverified = (UILabel *)self.tableView.tableHeaderView;
+    
+    if(unverified) {
+        CGSize size = [unverified sizeThatFits:self.tableView.bounds.size];
+        unverified.frame = CGRectMake(0,0,self.tableView.bounds.size.width,size.height + 12);
+        self.tableView.tableHeaderView = unverified;
+    }
 }
 
 -(void)finalize {
