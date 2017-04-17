@@ -84,7 +84,7 @@ static NSData *getPublicKeyDataFromCertificate_unified(SecCertificateRef certifi
 #endif
 
 
-#if TARGET_OS_IOS && __IPHONE_OS_VERSION_MIN_REQUIRED < 100000
+#if TARGET_OS_IOS
 
 #pragma mark Public Key Converter - iOS before 10.0
 
