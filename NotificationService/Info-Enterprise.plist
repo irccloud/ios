@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.9</string>
+	<string>3.9.1</string>
 	<key>CFBundleVersion</key>
 	<string>GIT_VERSION</string>
 	<key>NSAppTransportSecurity</key>
