@@ -1851,41 +1851,45 @@ extern UIImage *__socketClosedBackgroundImage;
             _tableView.tableHeaderView = nil;
         }
 
-        if(_requestingBacklog && backlogEid > 0 && _buffer.scrolledUp) {
-            int markerPos = -1;
-            for(Event *e in _data) {
-                if(e.eid == backlogEid)
-                    break;
-                markerPos++;
-            }
-            if(markerPos < [_tableView numberOfRowsInSection:0])
-                [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-        } else if(_eidToOpen > 0) {
-            if(_eidToOpen <= _maxEid) {
-                int i = 0;
+        @try {
+            if(_requestingBacklog && backlogEid > 0 && _buffer.scrolledUp) {
+                int markerPos = -1;
                 for(Event *e in _data) {
-                    if(e.eid == _eidToOpen) {
-                        [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-                        _buffer.scrolledUpFrom = [[_data objectAtIndex:[[[_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)] lastObject] row]] eid];
+                    if(e.eid == backlogEid)
                         break;
-                    }
-                    i++;
+                    markerPos++;
                 }
-                _eidToOpen = -1;
-            } else {
-                if(!_buffer.scrolledUp)
-                    _buffer.scrolledUpFrom = -1;
-            }
-        } else if(_buffer.scrolledUp && _buffer.savedScrollOffset > 0) {
-            if((_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height) < _tableView.contentSize.height - _tableView.bounds.size.height) {
-                _tableView.contentOffset = CGPointMake(0, (_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height));
-            } else {
+                if(markerPos < [_tableView numberOfRowsInSection:0])
+                    [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:markerPos inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+            } else if(_eidToOpen > 0) {
+                if(_eidToOpen <= _maxEid) {
+                    int i = 0;
+                    for(Event *e in _data) {
+                        if(e.eid == _eidToOpen) {
+                            [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+                            _buffer.scrolledUpFrom = [[_data objectAtIndex:[[[_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)] lastObject] row]] eid];
+                            break;
+                        }
+                        i++;
+                    }
+                    _eidToOpen = -1;
+                } else {
+                    if(!_buffer.scrolledUp)
+                        _buffer.scrolledUpFrom = -1;
+                }
+            } else if(_buffer.scrolledUp && _buffer.savedScrollOffset > 0) {
+                if((_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height) < _tableView.contentSize.height - _tableView.bounds.size.height) {
+                    _tableView.contentOffset = CGPointMake(0, (_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height));
+                } else {
+                    [self _scrollToBottom];
+                    [self scrollToBottom];
+                }
+            } else if(!_buffer.scrolledUp || (_data.count && _scrollTimer)) {
                 [self _scrollToBottom];
                 [self scrollToBottom];
             }
-        } else if(!_buffer.scrolledUp || (_data.count && _scrollTimer)) {
-            [self _scrollToBottom];
-            [self scrollToBottom];
+        } @catch (NSException *e) {
+            NSLog(@"Unable to set scroll position: %@", e);
         }
         
         if(_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _conn.ready && !_requestingBacklog) {
