@@ -130,10 +130,20 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   
   if (_underLeftViewController) {
     _underLeftViewController.view.hidden = YES;
-    [self.view insertSubview:_underLeftViewController.view belowSubview:self.topView];
-    [self updateUnderLeftLayout];
-    [self addChildViewController:self.underLeftViewController];
+    @try {
+        [self addChildViewController:self.underLeftViewController];
+    } @catch (NSException *e) {
+    }
+    @try {
+        [self.view insertSubview:_underLeftViewController.view belowSubview:self.topView];
+    } @catch (NSException *e) {
+    }
+    @try {
+        [self addChildViewController:self.underLeftViewController];
+    } @catch (NSException *e) {
+    }
     [self.underLeftViewController didMoveToParentViewController:self];
+    [self updateUnderLeftLayout];
   }
 }
 

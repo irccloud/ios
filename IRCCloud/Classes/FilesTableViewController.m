@@ -179,7 +179,7 @@
 }
 
 -(void)_loadMore {
-    @synchronized (_files) {
+    @synchronized (self) {
         NSDictionary *d = [[NetworkConnection sharedInstance] getFiles:++_pages];
         if([[d objectForKey:@"success"] boolValue]) {
             CLS_LOG(@"Loaded file list for page %i", _pages);
@@ -215,8 +215,8 @@
             }];
             return;
         }
+        [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
     }
-    [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
 }
 
 -(void)_refreshFileID:(NSString *)fileID {
@@ -320,7 +320,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized (_files) {
+    @synchronized (self) {
         if (editingStyle == UITableViewCellEditingStyleDelete) {
             _reqid = [[NetworkConnection sharedInstance] deleteFile:[[_files objectAtIndex:indexPath.row] objectForKey:@"id"]];
             NSMutableArray *a = _files.mutableCopy;

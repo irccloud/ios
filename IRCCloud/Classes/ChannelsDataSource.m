@@ -220,7 +220,8 @@
 
 -(Channel *)channelForBuffer:(int)bid {
     @synchronized(_channels) {
-        for(Channel *channel in _channels) {
+        for(int i = 0; i < _channels.count; i++) {
+            Channel *channel = [_channels objectAtIndex:i];
             if(channel.bid == bid)
                 return channel;
         }
@@ -231,7 +232,8 @@
 -(NSArray *)channelsForServer:(int)cid {
     NSMutableArray *channels = [[NSMutableArray alloc] init];
     @synchronized(_channels) {
-        for(Channel *channel in _channels) {
+        for(int i = 0; i < _channels.count; i++) {
+            Channel *channel = [_channels objectAtIndex:i];
             if(channel.cid == cid)
                 [channels addObject:channel];
         }
