@@ -172,7 +172,10 @@
     _player.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
     _player.autoresizesSubviews = YES;
     _player.delegate = self;
-    [_player loadWithVideoId:videoID playerVars:params];
+    if(videoID)
+        [_player loadWithVideoId:videoID playerVars:params];
+    else
+        CLS_LOG(@"Unable to extract video ID from URL: %@", _url);
     [self.view addSubview:_player];
     
     _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
