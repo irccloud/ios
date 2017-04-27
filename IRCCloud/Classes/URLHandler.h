@@ -24,5 +24,5 @@
 + (BOOL)isYouTubeURL:(NSURL *)url;
 - (void)launchURL:(NSURL *)url;
 + (UIActivityViewController *)activityControllerForItems:(NSArray *)items type:(NSString *)type;
-
++ (int)URLtoBID:(NSURL *)url;
 @end

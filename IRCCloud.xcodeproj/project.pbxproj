@@ -223,6 +223,7 @@
 		223C407C1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */; };
 		223C407D1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */; };
 		223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
+		224291651EB22B1000878455 /* URLtoBIDTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 224291641EB22B1000878455 /* URLtoBIDTests.m */; };
 		224589C71DCA19BB00D3110A /* CollapsedEventsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 224589C61DCA19BB00D3110A /* CollapsedEventsTests.m */; };
 		2245E3771B542D0200B763D7 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2245E3761B542D0200B763D7 /* AVKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		2245E3781B542D0E00B763D7 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2245E3761B542D0200B763D7 /* AVKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -849,6 +850,7 @@
 		223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudSafariViewController.m; sourceTree = "<group>"; };
 		223DA90A16DFC626006FF808 /* EventsTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsTableView.h; sourceTree = "<group>"; };
 		223DA90B16DFC626006FF808 /* EventsTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsTableView.m; sourceTree = "<group>"; };
+		224291641EB22B1000878455 /* URLtoBIDTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLtoBIDTests.m; sourceTree = "<group>"; };
 		224589C41DCA19BB00D3110A /* IRCCloudUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IRCCloudUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		224589C61DCA19BB00D3110A /* CollapsedEventsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollapsedEventsTests.m; sourceTree = "<group>"; };
 		224589C81DCA19BB00D3110A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1305,6 +1307,7 @@
 			isa = PBXGroup;
 			children = (
 				224589C61DCA19BB00D3110A /* CollapsedEventsTests.m */,
+				224291641EB22B1000878455 /* URLtoBIDTests.m */,
 				224589C81DCA19BB00D3110A /* Info.plist */,
 			);
 			path = IRCCloudUnitTests;
@@ -2512,6 +2515,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				224291651EB22B1000878455 /* URLtoBIDTests.m in Sources */,
 				224589C71DCA19BB00D3110A /* CollapsedEventsTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -449,6 +449,10 @@
                 [self launchURL:[NSURL URLWithString:[userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
             } else if([userActivity.webpageURL.path hasPrefix:@"/pastebin/"]) {
                 [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-https://%@%@",userActivity.webpageURL.host,userActivity.webpageURL.path]]];
+            } else if([userActivity.webpageURL.path hasPrefix:@"/irc/"]) {
+                int bid = [URLHandler URLtoBID:userActivity.webpageURL];
+                if(bid)
+                    [self.mainViewController bufferSelected:bid];
             } else {
                 [[UIApplication sharedApplication] openURL:userActivity.webpageURL];
                 return NO;
