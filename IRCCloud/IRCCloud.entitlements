@@ -7,7 +7,10 @@
 	<key>com.apple.developer.associated-domains</key>
 	<array>
 		<string>activitycontinuation:www.irccloud.com</string>
+		<string>activitycontinuation:irccloud.com</string>
 		<string>webcredentials:www.irccloud.com</string>
+		<string>applinks:www.irccloud.com</string>
+		<string>applinks:irccloud.com</string>
 	</array>
 	<key>com.apple.developer.icloud-container-identifiers</key>
 	<array>
