@@ -930,6 +930,22 @@ extern NSDictionary *emojiMap;
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
+        case kIRCEventTraceResponse:
+            o = notification.object;
+            if(o.cid == _buffer.cid) {
+                TextTableViewController *tv = [[TextTableViewController alloc] initWithData:[o objectForKey:@"trace"]];
+                tv.navigationItem.title = [NSString stringWithFormat:@"Trace for %@", [o objectForKey:@"server"]];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                if(self.presentedViewController)
+                    [self dismissViewControllerAnimated:NO completion:nil];
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
         case kIRCEventLinksResponse:
             o = notification.object;
             if(o.cid == _buffer.cid) {
