@@ -63,7 +63,7 @@
                 attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", ([UIScreen mainScreen].bounds.size.width/2) * [UIScreen mainScreen].scale]} error:nil]];
             else
                 attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"id":fileID} error:nil]];
-        } else {
+        } else if([d boolForKey:@"thirdPartyNotificationPreviews"]) {
             NSDictionary *extensions = @{@"png":(NSString *)kUTTypePNG,
                                          @"jpg":(NSString *)kUTTypeJPEG,
                                          @"jpeg":(NSString *)kUTTypeJPEG,

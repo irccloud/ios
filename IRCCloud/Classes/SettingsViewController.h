@@ -62,6 +62,7 @@
     UISwitch *_inlineWifiOnly;
     UISwitch *_defaultSound;
     UISwitch *_notificationPreviews;
+    UISwitch *_thirdPartyNotificationPreviews;
     NSString *_version;
     UISlider *_fontSize;
     int _userinforeqid;

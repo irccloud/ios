@@ -80,6 +80,14 @@
     b.name = @"sam";
     
     [[BuffersDataSource sharedInstance] addBuffer:b];
+
+    b = [[Buffer alloc] init];
+    b.cid = 1;
+    b.bid = 3;
+    b.type = @"channel";
+    b.name = @"##test";
+    
+    [[BuffersDataSource sharedInstance] addBuffer:b];
 }
 
 - (void)tearDown {
@@ -90,8 +98,10 @@
 
 - (void)testURLs {
     XCTAssertEqual(-1, [URLHandler URLtoBID:[NSURL URLWithString:@"https://www.irccloud.com/irc/irccloud.com/channel/vip"]]);
+    XCTAssertEqual(-1, [URLHandler URLtoBID:[NSURL URLWithString:@"https://www.irccloud.com/irc/irccloud.com/channel/test"]]);
     XCTAssertEqual(1, [URLHandler URLtoBID:[NSURL URLWithString:@"https://www.irccloud.com/irc/irccloud.com/channel/feedback"]]);
     XCTAssertEqual(2, [URLHandler URLtoBID:[NSURL URLWithString:@"https://www.irccloud.com/irc/irccloud.com/messages/sam"]]);
+    XCTAssertEqual(3, [URLHandler URLtoBID:[NSURL URLWithString:@"https://www.irccloud.com/irc/irccloud.com/channel/%23%23test"]]);
 }
 
 @end

@@ -531,6 +531,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:_inlineWifiOnly.isOn forKey:@"inlineWifiOnly"];
         [[NSUserDefaults standardUserDefaults] setBool:_defaultSound.isOn forKey:@"defaultSound"];
         [[NSUserDefaults standardUserDefaults] setBool:!_notificationPreviews.isOn forKey:@"disableNotificationPreviews"];
+        [[NSUserDefaults standardUserDefaults] setBool:_thirdPartyNotificationPreviews.isOn forKey:@"thirdPartyNotificationPreviews"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -544,6 +545,7 @@
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] forKey:@"fontSize"];
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"defaultSound"] forKey:@"defaultSound"];
         [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"disableNotificationPreviews"] forKey:@"disableNotificationPreviews"];
+        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"thirdPartyNotificationPreviews"] forKey:@"thirdPartyNotificationPreviews"];
         [d synchronize];
         
         if([ColorFormatter shouldClearFontCache]) {
@@ -801,6 +803,7 @@
     } else {
         [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":_defaultSound}];
         [notifications addObject:@{@"title":@"Media Previews", @"accessory":_notificationPreviews}];
+        [notifications addObject:@{@"title":@"Download 3rd Party URLs", @"accessory":_thirdPartyNotificationPreviews}];
     }
     [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":_notifyAll}];
     [notifications addObject:@{@"title":@"Show Unread Indicators", @"accessory":_showUnread}];
@@ -919,6 +922,8 @@
     _inlineWifiOnly = [[UISwitch alloc] init];
     _defaultSound = [[UISwitch alloc] init];
     _notificationPreviews = [[UISwitch alloc] init];
+    [_notificationPreviews addTarget:self action:@selector(notificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
+    _thirdPartyNotificationPreviews = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1126,6 +1131,7 @@
     _videoViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"];
     _defaultSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"defaultSound"];
     _notificationPreviews.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"disableNotificationPreviews"];
+    _thirdPartyNotificationPreviews.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"thirdPartyNotificationPreviews"];
 }
 
 -(void)hideJoinPartToggled:(id)sender {
@@ -1152,6 +1158,10 @@
         _fontSizeCell.fontSample.font = [UIFont fontWithName:@"Hack" size:_fontSize.value - 1];
     else
         _fontSizeCell.fontSample.font = [UIFont fontWithDescriptor:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] size:_fontSize.value];
+}
+
+-(void)notificationPreviewsToggled:(id)sender {
+    _thirdPartyNotificationPreviews.enabled = _notificationPreviews.on;
 }
 
 -(void)sliderChanged:(UISlider *)slider {
