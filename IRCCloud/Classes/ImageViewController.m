@@ -787,6 +787,7 @@
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
     if(_movieController)
         [_movieController pause];
     [_hideTimer invalidate];

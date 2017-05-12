@@ -620,6 +620,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     UILabel *unverified = (UILabel *)self.tableView.tableHeaderView;
     
     if(unverified) {

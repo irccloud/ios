@@ -289,6 +289,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     if([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"]) {
         _headingFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
         _countFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];

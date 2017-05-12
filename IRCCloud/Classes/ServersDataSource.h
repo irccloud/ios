@@ -45,7 +45,7 @@
 @property (nonatomic, assign) int cid, port, ssl, order, deferred_archives;
 @property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname;
 @property (nonatomic, copy) NSDictionary *fail_info, *PREFIX;
-@property (nonatomic, copy) NSMutableDictionary *isupport;
+@property (nonatomic, copy) NSDictionary *isupport;
 @property (nonatomic, copy) NSArray *ignores;
 -(NSComparisonResult)compare:(Server *)aServer;
 @end

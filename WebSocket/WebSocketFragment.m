@@ -152,7 +152,7 @@
     if (self.fragment) {
         if (self.fragment.length >= bufferLength) {
             data = self.fragment;
-        } else {
+        } else if (aData) {
             NSMutableData* both = [NSMutableData dataWithData:self.fragment];
             //@todo: handle when data is 16 bytes - i.e. longer than buffer length
             if (aData.length - aOffset >= bufferLength - both.length) {
@@ -168,7 +168,7 @@
     {
         bufferLength = data.length - aOffset;
     }
-    if (bufferLength <= 0) {
+    if (!data || bufferLength <= 0) {
         return NO;
     }
     unsigned char buffer[bufferLength];
@@ -443,7 +443,8 @@
     {
         self.opCode = MessageOpCodeIllegal;
         self.fragment = [NSMutableData dataWithData:aData];
-        [self parseHeader];
+        if(aData)
+            [self parseHeader];
         if (self.messageLength <= [aData length])
         {
             [self parseContent];

@@ -1270,7 +1270,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args {
     @synchronized(_writer) {
         if(_state == kIRCCloudStateConnected) {
-            NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:args];
+            NSMutableDictionary *dict = args?[[NSMutableDictionary alloc] initWithDictionary:args]:[[NSMutableDictionary alloc] init];
             [dict setObject:method forKey:@"_method"];
             if(![method isEqualToString:@"auth"])
                 [dict setObject:@(++_lastReqId) forKey:@"_reqid"];
