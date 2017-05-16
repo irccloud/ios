@@ -1169,11 +1169,11 @@
     if(_thirdPartyNotificationPreviews.on) {
         UIAlertController *ac = [UIAlertController alertControllerWithTitle:@"Warning" message:@"External URLs may load insecurely from other sites and may result in your IP address being revealed" preferredStyle:UIAlertControllerStyleAlert];
         
-        [ac addAction:[UIAlertAction actionWithTitle:@"Enable" style:UIAlertActionStyleDefault handler:nil]];
-        
-        [ac addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [ac addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
             _thirdPartyNotificationPreviews.on = NO;
         }]];
+
+        [ac addAction:[UIAlertAction actionWithTitle:@"Enable" style:UIAlertActionStyleDefault handler:nil]];
 
         [self presentViewController:ac animated:YES completion:nil];
     }
