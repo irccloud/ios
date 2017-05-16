@@ -802,8 +802,8 @@
         [notifications addObject:@{@"title":@"Background Alert Sounds", @"accessory":_notificationSound}];
     } else {
         [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":_defaultSound}];
-        [notifications addObject:@{@"title":@"Media Previews", @"accessory":_notificationPreviews}];
-        [notifications addObject:@{@"title":@"Download 3rd Party URLs", @"accessory":_thirdPartyNotificationPreviews}];
+        [notifications addObject:@{@"title":@"Preview Uploaded Files", @"accessory":_notificationPreviews}];
+        [notifications addObject:@{@"title":@"Preview External URLs", @"accessory":_thirdPartyNotificationPreviews}];
     }
     [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":_notifyAll}];
     [notifications addObject:@{@"title":@"Show Unread Indicators", @"accessory":_showUnread}];
