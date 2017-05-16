@@ -1,9 +1,3 @@
-This is a bug fix release to address an issue that prevented the app from installing on iOS 9
-
-3.9 release notes:
-
-• Added settings for notifications to use the default system alert sound and to disable image previews
-• Fixed an issue that could prevent the conversations list from updating when receiving a new private message
-• Fixed an issue that could prevent the bottom line of a message from being displayed
-• Fixed a crash when selecting "Share URL" from the press-and-hold menu on iPad
-• Stability improvements, and minor fixes
+• Separated settings for previewing uploaded files and external URLs in notifications. Now, only file uploads are previewed by default and a warning is shown when enabling external URL previews.
+• Added support for /trace responses
+• Stability improvements and minor fixes
