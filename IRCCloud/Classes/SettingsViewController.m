@@ -924,6 +924,7 @@
     _notificationPreviews = [[UISwitch alloc] init];
     [_notificationPreviews addTarget:self action:@selector(notificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
     _thirdPartyNotificationPreviews = [[UISwitch alloc] init];
+    [_thirdPartyNotificationPreviews addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1162,6 +1163,20 @@
 
 -(void)notificationPreviewsToggled:(id)sender {
     _thirdPartyNotificationPreviews.enabled = _notificationPreviews.on;
+}
+
+-(void)thirdPartyNotificationPreviewsToggled:(id)sender {
+    if(_thirdPartyNotificationPreviews.on) {
+        UIAlertController *ac = [UIAlertController alertControllerWithTitle:@"Warning" message:@"External URLs may load insecurely from other sites and may result in your IP address being revealed" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [ac addAction:[UIAlertAction actionWithTitle:@"Enable" style:UIAlertActionStyleDefault handler:nil]];
+        
+        [ac addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            _thirdPartyNotificationPreviews.on = NO;
+        }]];
+
+        [self presentViewController:ac animated:YES completion:nil];
+    }
 }
 
 -(void)sliderChanged:(UISlider *)slider {
