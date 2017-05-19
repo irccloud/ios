@@ -789,7 +789,6 @@
 		221D4B901E23EAD700D403E6 /* NotificationService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NotificationService.m; sourceTree = "<group>"; };
 		221D4B921E23EAD700D403E6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		221D4BA31E23EB4900D403E6 /* NotificationService Enterprise.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "NotificationService Enterprise.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		221D4BA51E23EB7200D403E6 /* Info-Enterprise.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Info-Enterprise.plist"; sourceTree = "<group>"; };
 		221D4BAA1E23F24000D403E6 /* NotificationService.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = NotificationService.entitlements; sourceTree = "<group>"; };
 		221D4BAB1E23F24F00D403E6 /* NotificationService Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "NotificationService Enterprise.entitlements"; sourceTree = SOURCE_ROOT; };
 		221E3F4A1AD2DEE00090934B /* FilesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilesTableViewController.h; sourceTree = "<group>"; };
@@ -1298,7 +1297,6 @@
 				221D4B8F1E23EAD700D403E6 /* NotificationService.h */,
 				221D4B901E23EAD700D403E6 /* NotificationService.m */,
 				221D4B921E23EAD700D403E6 /* Info.plist */,
-				221D4BA51E23EB7200D403E6 /* Info-Enterprise.plist */,
 			);
 			path = NotificationService;
 			sourceTree = "<group>";
@@ -3163,7 +3161,7 @@
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = "NotificationService/Info-Enterprise.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/NotificationService/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -3199,7 +3197,7 @@
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = "NotificationService/Info-Enterprise.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/NotificationService/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -3238,7 +3236,7 @@
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				INFOPLIST_FILE = "NotificationService/Info-Enterprise.plist";
+				INFOPLIST_FILE = "$(SRCROOT)/NotificationService/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;

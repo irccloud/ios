@@ -1,10 +1,14 @@
 #!/bin/sh
+VERSION=`cat $PROJECT_DIR/build-scripts/VERSION`
+echo -n "#define VERSION_STRING " > $PROJECT_DIR/IRCCloud/InfoPlist.h
+echo $VERSION >> $PROJECT_DIR/IRCCloud/InfoPlist.h
+
 if [ $CONFIGURATION == "AppStore" ]; then
-    bN=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" $PROJECT_DIR/IRCCloud/IRCCloud-Info.plist)
+    bN=$VERSION
 else
     bN=$(/usr/bin/git rev-parse --short HEAD)
 fi
-echo -n "#define GIT_VERSION " > $PROJECT_DIR/IRCCloud/InfoPlist.h
+echo -n "#define GIT_VERSION " >> $PROJECT_DIR/IRCCloud/InfoPlist.h
 echo $bN >> $PROJECT_DIR/IRCCloud/InfoPlist.h
 
 CRASHLYTICS_TOKEN=`grep CRASHLYTICS_TOKEN $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/"//g'`
