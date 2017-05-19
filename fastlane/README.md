@@ -35,6 +35,11 @@ xcode-select --install
 fastlane ios certs
 ```
 Check all certs and provisioning profiles from github
+### ios bump
+```
+fastlane ios bump
+```
+Update version number
 ### ios push
 ```
 fastlane ios push

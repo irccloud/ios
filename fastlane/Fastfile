@@ -31,6 +31,11 @@ platform :ios do
     end
   end
 
+  desc "Update version number"
+  lane :bump do |options|
+    increment_version_number(version_number: options[:version])
+  end
+
   desc "Build and push to iTunes Connect"
   lane :push do |options|
     if options[:enterprise]
