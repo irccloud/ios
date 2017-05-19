@@ -421,7 +421,7 @@
         else
             _disableInlineFiles.on = YES;
     }
-    _collapseJoinPart.enabled = !_showJoinPart.on;
+    _collapseJoinPart.enabled = _showJoinPart.on;
 }
 
 - (void)viewDidLoad {
@@ -442,7 +442,7 @@
 }
 
 -(void)showJoinPartToggled:(id)sender {
-    _collapseJoinPart.enabled = !_showJoinPart.on;
+    _collapseJoinPart.enabled = _showJoinPart.on;
 }
 
 - (void)didReceiveMemoryWarning {
