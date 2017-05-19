@@ -402,6 +402,7 @@
             self.mainViewController.incomingDraft = [userActivity.userInfo objectForKey:@"draft"];
             CLS_LOG(@"Opening BID from handoff: %i", self.mainViewController.bidToOpen);
             [self.mainViewController bufferSelected:[[userActivity.userInfo objectForKey:@"bid"] intValue]];
+            [self showMainView:YES];
             return YES;
         }
     } else if([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]) {
@@ -451,8 +452,10 @@
                 [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-https://%@%@",userActivity.webpageURL.host,userActivity.webpageURL.path]]];
             } else if([userActivity.webpageURL.path hasPrefix:@"/irc/"]) {
                 int bid = [URLHandler URLtoBID:userActivity.webpageURL];
-                if(bid)
+                if(bid) {
                     [self.mainViewController bufferSelected:bid];
+                    [self showMainView:YES];
+                }
             } else {
                 [[UIApplication sharedApplication] openURL:userActivity.webpageURL];
                 return NO;
@@ -537,6 +540,7 @@
             [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
             [self.mainViewController applyTheme];
             [self.mainViewController bufferSelected:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
+            [self showMainView:YES];
         }
     }
 }
@@ -558,6 +562,7 @@
             [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
             [self.mainViewController applyTheme];
             [self.mainViewController bufferSelected:bid];
+            [self showMainView:YES];
         } else if(application.applicationState == UIApplicationStateBackground && (!_conn || (_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 CLS_LOG(@"Preloading backlog for bid%i from notification", bid);
@@ -624,6 +629,7 @@
             self.mainViewController.eidToOpen = [[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
             CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
             [self.mainViewController bufferSelected:[[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
+            [self showMainView:YES];
         }
         completionHandler();
     } else {
@@ -667,6 +673,7 @@
                 self.mainViewController.cidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue];
                 self.mainViewController.bufferToOpen = [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1];
             }
+            [self showMainView:YES];
         }
     } else {
         CLS_LOG(@"Failed: %@ %@", identifier, result);
@@ -789,39 +796,43 @@
 }
 
 -(void)showMainView:(BOOL)animated {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
-    [self.mainViewController applyTheme];
-    if(animated) {
-        if([NetworkConnection sharedInstance].session.length && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected)
-            [[NetworkConnection sharedInstance] connect:NO];
-
+    if([NetworkConnection sharedInstance].session.length) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+        [self.mainViewController applyTheme];
+        if(animated) {
+            if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected)
+                [[NetworkConnection sharedInstance] connect:NO];
+
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
+                self.slideViewController.view.alpha = 1;
+                if(self.window.rootViewController != self.slideViewController) {
+                    BOOL fromLoginView = (self.window.rootViewController == self.loginSplashViewController);
+                    UIView *v = self.window.rootViewController.view;
+                    self.window.rootViewController = self.slideViewController;
+                    [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
+                    if(fromLoginView)
+                        [self.loginSplashViewController hideLoginView];
+                    [UIView animateWithDuration:0.5f animations:^{
+                        v.alpha = 0;
+                    } completion:^(BOOL finished){
+                        [v removeFromSuperview];
+                        self.window.backgroundColor = [UIColor textareaBackgroundColor];
+                    }];
+                }
+            }];
+        } else if(self.window.rootViewController != self.slideViewController) {
             [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
             self.slideViewController.view.alpha = 1;
-            if(self.window.rootViewController != self.slideViewController) {
-                BOOL fromLoginView = (self.window.rootViewController == self.loginSplashViewController);
-                UIView *v = self.window.rootViewController.view;
-                self.window.rootViewController = self.slideViewController;
-                [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
-                if(fromLoginView)
-                    [self.loginSplashViewController hideLoginView];
-                [UIView animateWithDuration:0.5f animations:^{
-                    v.alpha = 0;
-                } completion:^(BOOL finished){
-                    [v removeFromSuperview];
-                    self.window.backgroundColor = [UIColor textareaBackgroundColor];
-                }];
-            }
+            [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+            self.window.rootViewController = self.slideViewController;
+            self.window.backgroundColor = [UIColor textareaBackgroundColor];
+        }
         }];
-    } else if(self.window.rootViewController != self.slideViewController) {
-        [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
-        self.slideViewController.view.alpha = 1;
-        [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-        self.window.rootViewController = self.slideViewController;
-        self.window.backgroundColor = [UIColor textareaBackgroundColor];
+        if(self.slideViewController.presentedViewController)
+            [self.slideViewController dismissViewControllerAnimated:animated completion:nil];
     }
-    }];
 }
 
 -(void)showConnectionView {
