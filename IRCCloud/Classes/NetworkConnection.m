@@ -969,14 +969,16 @@ volatile BOOL __socketPaused = NO;
                        NSDictionary *seenEids = [object objectForKey:@"seenEids"];
                        for(NSNumber *cid in seenEids.allKeys) {
                            NSDictionary *eids = [seenEids objectForKey:cid];
-                           for(NSNumber *bid in eids.allKeys) {
-                               NSTimeInterval eid = [[eids objectForKey:bid] doubleValue];
-                               Buffer *buffer = [_buffers getBuffer:bid.intValue];
-                               if(buffer) {
-                                   buffer.last_seen_eid = eid;
-                                   buffer.extraHighlights = 0;
+                           for(id bid in eids.allKeys) {
+                               if([[eids objectForKey:bid] isKindOfClass:NSNumber.class]) {
+                                   NSTimeInterval eid = [[eids objectForKey:bid] doubleValue];
+                                   Buffer *buffer = [_buffers getBuffer:[bid intValue]];
+                                   if(buffer) {
+                                       buffer.last_seen_eid = eid;
+                                       buffer.extraHighlights = 0;
+                                   }
+                                   [_notifications removeNotificationsForBID:[bid intValue] olderThan:eid];
                                }
-                               [_notifications removeNotificationsForBID:[bid intValue] olderThan:eid];
                            }
                        }
                        [_notifications updateBadgeCount];
