@@ -206,12 +206,18 @@
     NSMutableArray *sectionIndexes = [[NSMutableArray alloc] init];
     NSMutableArray *sectionSizes = [[NSMutableArray alloc] init];
     
+    NSString *opersGroupMode = @"Y";
+    
     for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
         if(user.nick.length) {
             NSString *mode = user.mode.lowercaseString;
-            if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && ([PREFIX objectForKey:s?s.MODE_OPER:@"Y"] || [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"]))
+            if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && ([PREFIX objectForKey:s?s.MODE_OPER:@"Y"] || [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"])) {
                 [opers addObject:user];
-            else if([mode rangeOfString:s?s.MODE_OWNER.lowercaseString:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
+                if([user.mode rangeOfString:s?s.MODE_OPER:@"Y"].location != NSNotFound)
+                    opersGroupMode = s.MODE_OPER;
+                else
+                    opersGroupMode = s.MODE_OPER.lowercaseString;
+            } else if([mode rangeOfString:s?s.MODE_OWNER.lowercaseString:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
                 [owners addObject:user];
             else if([mode rangeOfString:s?s.MODE_ADMIN.lowercaseString:@"a"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_ADMIN:@"a"])
                 [admins addObject:user];
@@ -226,7 +232,7 @@
         }
     }
     
-    NSString *operPrefix = [PREFIX objectForKey:s?s.MODE_OPER:@"Y"];
+    NSString *operPrefix = [PREFIX objectForKey:opersGroupMode];
     if(!operPrefix)
         operPrefix = [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"];
     
