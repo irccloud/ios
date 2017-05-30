@@ -484,9 +484,9 @@ extern UIImage *__socketClosedBackgroundImage;
     }
 
 #if TARGET_IPHONE_SIMULATOR
-    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
-    t.delegate = self;
-    [_tableView addGestureRecognizer:t];
+    //UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
+    //t.delegate = self;
+    //[_tableView addGestureRecognizer:t];
 #endif
 }
 

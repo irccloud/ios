@@ -202,12 +202,15 @@
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         if(NSClassFromString(@"AVPlayerViewController")) {
             AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
+            player.modalPresentationStyle = UIModalPresentationFullScreen;
             player.player = [[AVPlayer alloc] initWithURL:url];
             [mainViewController presentViewController:player animated:YES completion:nil];
         } else {
             MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
+            player.modalPresentationStyle = UIModalPresentationFullScreen;
             [mainViewController presentMoviePlayerViewControllerAnimated:player];
         }
+        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
         [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
