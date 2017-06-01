@@ -661,7 +661,7 @@ volatile BOOL __socketPaused = NO;
                            if(b) {
                                for(NSDictionary *user in [object objectForKey:@"users"]) {
                                    [_users updateHostmask:[user objectForKey:@"usermask"] nick:[user objectForKey:@"nick"] cid:b.cid bid:b.bid];
-                                   [_users updateAway:[[user objectForKey:@"away"] intValue] nick:[user objectForKey:@"nick"] cid:b.cid bid:b.bid];
+                                   [_users updateAway:[[user objectForKey:@"away"] intValue] nick:[user objectForKey:@"nick"] cid:b.cid];
                                }
                            }
                            [self postObject:object forEvent:kIRCEventWhoList];
@@ -891,33 +891,33 @@ volatile BOOL __socketPaused = NO;
                        NSString *nick;
                        while((nick = (NSString *)(keys.nextObject))) {
                            NSDictionary *update = [updates objectForKey:nick];
-                           [_users updateAway:[[update objectForKey:@"away"] intValue] nick:nick cid:object.cid bid:object.bid];
+                           [_users updateAway:[[update objectForKey:@"away"] intValue] nick:nick cid:object.cid];
                            [_users updateHostmask:[update objectForKey:@"usermask"] nick:nick cid:object.cid bid:object.bid];
                        }
                        if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventMemberUpdates];
                    },
                    @"user_away": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                       [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
                        [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
                        if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventAway];
                    },
                    @"away": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                       [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
                        [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
                        if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventAway];
                    },
                    @"user_back": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                       [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid];
                        [_buffers updateAway:@"" nick:[object objectForKey:@"nick"] server:object.cid];
                        if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventAway];
                    },
                    @"self_away": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if(!_resuming) {
-                           [_users updateAway:1 msg:[object objectForKey:@"away_msg"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                           [_users updateAway:1 msg:[object objectForKey:@"away_msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
                            [_servers updateAway:[object objectForKey:@"away_msg"] server:object.cid];
                            if(!backlog)
                                [self postObject:object forEvent:kIRCEventAway];
@@ -925,7 +925,7 @@ volatile BOOL __socketPaused = NO;
                    },
                    @"self_back": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        [_awayOverride setObject:@YES forKey:@(object.cid)];
-                       [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                       [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid];
                        [_servers updateAway:@"" server:object.cid];
                        if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventSelfBack];

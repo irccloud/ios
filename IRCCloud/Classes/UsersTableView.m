@@ -118,6 +118,7 @@
         case kIRCEventUserChannelMode:
         case kIRCEventKick:
         case kIRCEventWhoList:
+        case kIRCEventAway:
             if(!_refreshTimer) {
                 _refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(_refreshTimer) userInfo:nil repeats:NO];
             }

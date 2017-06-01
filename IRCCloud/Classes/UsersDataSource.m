@@ -194,21 +194,25 @@
     }
 }
 
--(void)updateAway:(int)away msg:(NSString *)msg nick:(NSString *)nick cid:(int)cid bid:(int)bid {
+-(void)updateAway:(int)away msg:(NSString *)msg nick:(NSString *)nick cid:(int)cid {
     @synchronized(_users) {
-        User *user = [self getUser:nick cid:cid bid:bid];
-        if(user) {
-            user.away = away;
-            user.away_msg = msg;
+        for(NSDictionary *buffer in _users.allValues) {
+            User *user = [buffer objectForKey:[nick lowercaseString]];
+            if(user && user.cid == cid) {
+                user.away = away;
+                user.away_msg = msg;
+            }
         }
     }
 }
 
--(void)updateAway:(int)away nick:(NSString *)nick cid:(int)cid bid:(int)bid {
+-(void)updateAway:(int)away nick:(NSString *)nick cid:(int)cid {
     @synchronized(_users) {
-        User *user = [self getUser:nick cid:cid bid:bid];
-        if(user) {
-            user.away = away;
+        for(NSDictionary *buffer in _users.allValues) {
+            User *user = [buffer objectForKey:[nick lowercaseString]];
+            if(user && user.cid == cid) {
+                user.away = away;
+            }
         }
     }
 }

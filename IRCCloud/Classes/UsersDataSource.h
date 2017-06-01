@@ -51,8 +51,8 @@
 -(void)removeUser:(NSString *)nick cid:(int)cid bid:(int)bid;
 -(void)removeUsersForBuffer:(int)bid;
 -(void)updateNick:(NSString *)nick oldNick:(NSString *)oldNick cid:(int)cid bid:(int)bid;
--(void)updateAway:(int)away msg:(NSString *)msg nick:(NSString *)nick cid:(int)cid bid:(int)bid;
--(void)updateAway:(int)away nick:(NSString *)nick cid:(int)cid bid:(int)bid;
+-(void)updateAway:(int)away msg:(NSString *)msg nick:(NSString *)nick cid:(int)cid;
+-(void)updateAway:(int)away nick:(NSString *)nick cid:(int)cid;
 -(void)updateHostmask:(NSString *)hostmask nick:(NSString *)nick cid:(int)cid bid:(int)bid;
 -(void)updateMode:(NSString *)mode nick:(NSString *)nick cid:(int)cid bid:(int)bid;
 @end
