@@ -228,8 +228,10 @@
                 NSMutableDictionary *events_sorted = [[NSMutableDictionary alloc] init];
                 for(Event *e in events) {
                     [events_sorted setObject:e forKey:@(e.eid)];
-                    if(![_lastEIDs objectForKey:@(e.bid)] || [[_lastEIDs objectForKey:@(e.bid)] doubleValue] < e.eid)
-                        [_lastEIDs setObject:@(e.eid) forKey:@(e.bid)];
+                    if(!e.pending) {
+                        if(![_lastEIDs objectForKey:@(e.bid)] || [[_lastEIDs objectForKey:@(e.bid)] doubleValue] < e.eid)
+                            [_lastEIDs setObject:@(e.eid) forKey:@(e.bid)];
+                    }
                 }
                 
                 if(events.count > 1000) {
@@ -875,7 +877,7 @@
             [_events_sorted setObject:events_sorted forKey:@(event.bid)];
         }
         [events_sorted setObject:event forKey:@(event.eid)];
-        if(![_lastEIDs objectForKey:@(event.bid)] || [[_lastEIDs objectForKey:@(event.bid)] doubleValue] < event.eid) {
+        if(!event.pending && (![_lastEIDs objectForKey:@(event.bid)] || [[_lastEIDs objectForKey:@(event.bid)] doubleValue] < event.eid)) {
             [_lastEIDs setObject:@(event.eid) forKey:@(event.bid)];
         } else {
             [_dirtyBIDs setObject:@YES forKey:@(event.bid)];
