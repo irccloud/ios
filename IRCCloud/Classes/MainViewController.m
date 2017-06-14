@@ -2288,7 +2288,7 @@ extern NSDictionary *emojiMap;
     else
         _titleOffsetXConstraint.constant = 0;
     if(_topicLabel.hidden == NO && _topicLabel.alpha == 1)
-        _titleOffsetYConstraint.constant = -6;
+        _titleOffsetYConstraint.constant = -10;
     else
         _titleOffsetYConstraint.constant = 0;
     [_titleView setNeedsUpdateConstraints];
