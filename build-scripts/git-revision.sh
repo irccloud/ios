@@ -3,7 +3,10 @@ VERSION=`cat $PROJECT_DIR/build-scripts/VERSION`
 echo -n "#define VERSION_STRING " > $PROJECT_DIR/IRCCloud/InfoPlist.h
 echo $VERSION >> $PROJECT_DIR/IRCCloud/InfoPlist.h
 
-if [ $CONFIGURATION == "AppStore" ]; then
+git rev-parse 2> /dev/null > /dev/null
+IS_GIT=$?
+
+if [ $CONFIGURATION == "AppStore" ] || [ $IS_GIT -ne 0 ]; then
     bN=$VERSION
 else
     bN=$(/usr/bin/git rev-parse --short HEAD)
