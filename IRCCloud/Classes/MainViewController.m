@@ -493,10 +493,6 @@ extern NSDictionary *emojiMap;
         }
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [self _showConnectingView];
-            _connectingStatus.text = @"Uploading";
-            _connectingProgress.progress = 0;
-            _connectingProgress.hidden = YES;
             if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] || ![i hasItemConformingToTypeIdentifier:@"public.image"]) {
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
@@ -3785,10 +3781,6 @@ extern NSDictionary *emojiMap;
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url {
-    [self _showConnectingView];
-    _connectingStatus.text = @"Uploading";
-    _connectingProgress.progress = 0;
-    _connectingProgress.hidden = YES;
     FileUploader *u = [[FileUploader alloc] init];
     u.delegate = self;
     u.bid = _buffer.bid;
@@ -3829,10 +3821,6 @@ extern NSDictionary *emojiMap;
             else if(UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(mediaURL.path))
                 UISaveVideoAtPathToSavedPhotosAlbum(mediaURL.path, nil, nil, nil);
         }
-        [self _showConnectingView];
-        _connectingStatus.text = @"Uploading";
-        _connectingProgress.progress = 0;
-        _connectingProgress.hidden = YES;
         if((!img || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
             FileUploader *u = [[FileUploader alloc] init];
             u.delegate = self;
@@ -3915,6 +3903,10 @@ extern NSDictionary *emojiMap;
                 }
             }
         } else {
+            [self _showConnectingView];
+            _connectingStatus.text = @"Uploading";
+            _connectingProgress.progress = 0;
+            _connectingProgress.hidden = YES;
             ImageUploader *u = [[ImageUploader alloc] init];
             u.delegate = self;
             u.bid = _buffer.bid;
@@ -3973,10 +3965,17 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)fileUploadProgress:(float)progress {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _connectingProgress.hidden = NO;
-        [_connectingProgress setProgress:progress animated:YES];
-    }];
+    if(!self.presentedViewController) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if(self.navigationItem.titleView != _connectingView) {
+                [self _showConnectingView];
+                _connectingStatus.text = @"Uploading";
+                _connectingProgress.progress = progress;
+            }
+            _connectingProgress.hidden = NO;
+            [_connectingProgress setProgress:progress animated:YES];
+        }];
+    }
 }
 
 -(void)fileUploadDidFail:(NSString *)reason {
