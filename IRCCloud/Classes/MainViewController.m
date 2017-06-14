@@ -17,6 +17,7 @@
 
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <MobileCoreServices/UTCoreTypes.h>
+#import <MobileCoreServices/UTType.h>
 #import <UserNotifications/UserNotifications.h>
 #import <Intents/Intents.h>
 #import "MainViewController.h"
@@ -368,6 +369,12 @@ extern NSDictionary *emojiMap;
     t.delegate = self;
     [self.navigationController.view addGestureRecognizer:t];
 #endif
+    
+#ifdef __IPHONE_11_0
+    if (@available(iOS 11.0, *)) {
+        [self.view addInteraction:[[UIDropInteraction alloc] initWithDelegate:self]];
+    }
+#endif
 }
 
 #if TARGET_IPHONE_SIMULATOR
@@ -381,6 +388,127 @@ extern NSDictionary *emojiMap;
 
 - (void)_test3DTouch:(UITapGestureRecognizer *)r {
     WFSimulate3DTouchPreview(__previewer, [r locationInView:self.navigationController.view]);
+}
+#endif
+
+#ifdef __IPHONE_11_0
+-(BOOL)dropInteraction:(UIDropInteraction *)interaction canHandleSession:(id<UIDropSession>)session {
+    NSLog(@"Incoming objects: %@", session.items);
+    for(UIDragItem *item in session.items) {
+        NSLog(@"%@", item.itemProvider.registeredTypeIdentifiers);
+    }
+    return [session hasItemsConformingToTypeIdentifiers:@[@"com.apple.DocumentManager.uti.FPItem.File", @"public.image", @"public.movie"]];
+}
+
+-(UIDropProposal *)dropInteraction:(UIDropInteraction *)interaction sessionDidUpdate:(id<UIDropSession>)session {
+    if (@available(iOS 11.0, *)) {
+        return [[UIDropProposal alloc] initWithDropOperation:UIDropOperationCopy];
+    } else {
+        return nil;
+    }
+}
+
+-(void)dropInteraction:(UIDropInteraction *)interaction performDrop:(id<UIDropSession>)session {
+    if (@available(iOS 11.0, *)) {
+        NSLog(@"Dropped objects: %@", session.items);
+        
+        NSItemProvider *i = nil;
+        for(UIDragItem *item in session.items) {
+            if(([item.itemProvider hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"] && ![item.itemProvider hasItemConformingToTypeIdentifier:@"public.image"]) || [item.itemProvider hasItemConformingToTypeIdentifier:@"public.movie"]) {
+                NSLog(@"Attachment is file URL");
+                i = item.itemProvider;
+                break;
+            }
+        }
+        if(!i) {
+            for(UIDragItem *item in session.items) {
+                if([item.itemProvider hasItemConformingToTypeIdentifier:@"public.image"]) {
+                    NSLog(@"Attachment is image");
+                    i = item.itemProvider;
+                    break;
+                }
+            }
+        }
+        if(!i)
+            i = session.items.firstObject.itemProvider;
+        
+        FileUploader *u = [[FileUploader alloc] init];
+        u.delegate = self;
+        u.bid = _buffer.bid;
+        NSString *UTI = i.registeredTypeIdentifiers.lastObject;
+        u.originalFilename = i.suggestedName;
+        if(![u.originalFilename containsString:@"."] && ![UTI hasPrefix:@"dyn."]) {
+            u.originalFilename = [u.originalFilename stringByAppendingPathExtension:[UTI componentsSeparatedByString:@"."].lastObject];
+        }
+        u.mimeType = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef _Nonnull)(UTI), kUTTagClassMIMEType);
+        FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+        u.metadatadelegate = fvc;
+        [i loadPreviewImageWithOptions:nil completionHandler:^(UIImage *preview, NSError *error) {
+            if(preview) {
+                [fvc setImage:preview];
+            } else if([i canLoadObjectOfClass:UIImage.class]) {
+                [i loadObjectOfClass:UIImage.class completionHandler:^(UIImage *item, NSError *error) {
+                    if(item) {
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [fvc setImage:item];
+                        }];
+                    }
+                }];
+            }
+        }];
+        
+        id imageHandler = ^(UIImage *item, NSError *error) {
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
+                NSLog(@"Uploading image to IRCCloud");
+                [u uploadImage:item];
+            } else {
+                NSLog(@"Uploading image to imgur");
+                ImageUploader *img = [[ImageUploader alloc] init];
+                img.delegate = self;
+                img.bid = _buffer.bid;
+                [img upload:item];
+            }
+        };
+        
+        if([i hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"]) {
+            if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
+                [i loadObjectOfClass:UIImage.class completionHandler:imageHandler];
+            } else {
+                [i loadInPlaceFileRepresentationForTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
+                    if(url) {
+                        NSLog(@"Uploading file to IRCCloud");
+                        [i hasItemConformingToTypeIdentifier:@"public.movie"]?[u uploadVideo:url]:[u uploadFile:url];
+                    }
+                }];
+            }
+        } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
+            [i loadInPlaceFileRepresentationForTypeIdentifier:@"public.movie" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
+                if(url) {
+                    NSLog(@"Uploading movie to IRCCloud");
+                    [u uploadVideo:url];
+                }
+            }];
+        } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
+            [i loadObjectOfClass:UIImage.class completionHandler:imageHandler];
+        }
+        
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self _showConnectingView];
+            _connectingStatus.text = @"Uploading";
+            _connectingProgress.progress = 0;
+            _connectingProgress.hidden = YES;
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] || ![i hasItemConformingToTypeIdentifier:@"public.image"]) {
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                [self presentViewController:nc animated:YES completion:nil];
+                [self _resetStatusBar];
+            }
+        }];
+    }
 }
 #endif
 
@@ -3845,116 +3973,134 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)fileUploadProgress:(float)progress {
-    _connectingProgress.hidden = NO;
-    [_connectingProgress setProgress:progress animated:YES];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _connectingProgress.hidden = NO;
+        [_connectingProgress setProgress:progress animated:YES];
+    }];
 }
 
 -(void)fileUploadDidFail:(NSString *)reason {
-    CLS_LOG(@"File upload failed: %@", reason);
-    NSString *msg;
-    if([reason isEqualToString:@"upload_limit_reached"]) {
-        msg = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
-    } else if([reason isEqualToString:@"upload_already_exists"]) {
-        msg = @"You’ve already uploaded this file";
-    } else if([reason isEqualToString:@"banned_content"]) {
-        msg = @"Banned content";
-    } else {
-        msg = @"Failed to upload file. Please try again shortly.";
-    }
-    [self dismissViewControllerAnimated:YES completion:nil];
-    _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-    [_alertView show];
-    [self _hideConnectingView];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        CLS_LOG(@"File upload failed: %@", reason);
+        NSString *msg;
+        if([reason isEqualToString:@"upload_limit_reached"]) {
+            msg = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
+        } else if([reason isEqualToString:@"upload_already_exists"]) {
+            msg = @"You’ve already uploaded this file";
+        } else if([reason isEqualToString:@"banned_content"]) {
+            msg = @"Banned content";
+        } else {
+            msg = @"Failed to upload file. Please try again shortly.";
+        }
+        [self dismissViewControllerAnimated:YES completion:nil];
+        _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [_alertView show];
+        [self _hideConnectingView];
+    }];
 }
 
 -(void)fileUploadTooLarge {
-    CLS_LOG(@"File upload too large");
-    [self dismissViewControllerAnimated:YES completion:nil];
-    _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-    [_alertView show];
-    [self _hideConnectingView];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        CLS_LOG(@"File upload too large");
+        [self dismissViewControllerAnimated:YES completion:nil];
+        _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [_alertView show];
+        [self _hideConnectingView];
+    }];
 }
 
 -(void)fileUploadDidFinish {
-    CLS_LOG(@"File upload did finish");
-    [self _hideConnectingView];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        CLS_LOG(@"File upload did finish");
+        [self _hideConnectingView];
+    }];
 }
 
 -(void)fileUploadWasCancelled {
-    NSLog(@"File upload was cancelled");
-    [self _hideConnectingView];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        NSLog(@"File upload was cancelled");
+        [self _hideConnectingView];
+    }];
 }
 
 -(void)imageUploadProgress:(float)progress {
-    _connectingProgress.hidden = NO;
-    [_connectingProgress setProgress:progress animated:YES];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _connectingProgress.hidden = NO;
+        [_connectingProgress setProgress:progress animated:YES];
+    }];
 }
 
 -(void)imageUploadDidFail {
-    _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-    [_alertView show];
-    [self _hideConnectingView];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [_alertView show];
+        [self _hideConnectingView];
+    }];
 }
 
 -(void)imageUploadNotAuthorized {
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    [self _hideConnectingView];
-    SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-    [nc pushViewController:[[ImgurLoginViewController alloc] init] animated:NO];
-    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-        nc.modalPresentationStyle = UIModalPresentationFormSheet;
-    else
-        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-    if(self.presentedViewController)
-        [self dismissViewControllerAnimated:NO completion:nil];
-    [self presentViewController:nc animated:YES completion:nil];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        [self _hideConnectingView];
+        SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        [nc pushViewController:[[ImgurLoginViewController alloc] init] animated:NO];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        if(self.presentedViewController)
+            [self dismissViewControllerAnimated:NO completion:nil];
+        [self presentViewController:nc animated:YES completion:nil];
+    }];
 }
 
 -(void)imageUploadDidFinish:(NSDictionary *)d bid:(int)bid {
-    if([[d objectForKey:@"success"] intValue] == 1) {
-        NSString *link = [[[d objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
-        Buffer *b = _buffer;
-        if(bid == _buffer.bid) {
-            if(_message.text.length == 0) {
-                _message.text = link;
-            } else {
-                if(![_message.text hasSuffix:@" "])
-                    _message.text = [_message.text stringByAppendingString:@" "];
-                _message.text = [_message.text stringByAppendingString:link];
-            }
-        } else {
-            b = [[BuffersDataSource sharedInstance] getBuffer:bid];
-            if(b) {
-                if(b.draft.length == 0) {
-                    b.draft = link;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if([[d objectForKey:@"success"] intValue] == 1) {
+            NSString *link = [[[d objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
+            Buffer *b = _buffer;
+            if(bid == _buffer.bid) {
+                if(_message.text.length == 0) {
+                    _message.text = link;
                 } else {
-                    if(![b.draft hasSuffix:@" "])
-                        b.draft = [b.draft stringByAppendingString:@" "];
-                    b.draft = [b.draft stringByAppendingString:link];
+                    if(![_message.text hasSuffix:@" "])
+                        _message.text = [_message.text stringByAppendingString:@" "];
+                    _message.text = [_message.text stringByAppendingString:link];
+                }
+            } else {
+                b = [[BuffersDataSource sharedInstance] getBuffer:bid];
+                if(b) {
+                    if(b.draft.length == 0) {
+                        b.draft = link;
+                    } else {
+                        if(![b.draft hasSuffix:@" "])
+                            b.draft = [b.draft stringByAppendingString:@" "];
+                        b.draft = [b.draft stringByAppendingString:link];
+                    }
                 }
             }
+            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+                UILocalNotification *alert = [[UILocalNotification alloc] init];
+                alert.fireDate = [NSDate date];
+                alert.alertBody = @"Your image has been uploaded and is ready to send";
+                alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
+                alert.soundName = @"a.caf";
+                [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+            }
+        } else {
+            CLS_LOG(@"imgur upload failed: %@", d);
+            [self imageUploadDidFail];
+            return;
         }
-        if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
-            UILocalNotification *alert = [[UILocalNotification alloc] init];
-            alert.fireDate = [NSDate date];
-            alert.alertBody = @"Your image has been uploaded and is ready to send";
-            alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-            alert.soundName = @"a.caf";
-            [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-        }
-    } else {
-        CLS_LOG(@"imgur upload failed: %@", d);
-        [self imageUploadDidFail];
-        return;
-    }
-    [self _hideConnectingView];
+        [self _hideConnectingView];
+    }];
 }
 
 -(void)_startPastebin {

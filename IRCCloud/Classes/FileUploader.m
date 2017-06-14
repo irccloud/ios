@@ -38,7 +38,7 @@
 
 -(void)cancel {
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     _cancelled = YES;
     _bid = -1;
@@ -154,12 +154,14 @@
     NSFileWrapper *wrapper = [[NSFileWrapper alloc] initWithURL:file options:0 error:nil];
     
     if(wrapper.regularFile) {
-        CFStringRef extension = (__bridge CFStringRef)[file pathExtension];
-        CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, extension, NULL);
-        _mimeType = CFBridgingRelease(UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType));
-        if(!_mimeType)
-            _mimeType = @"application/octet-stream";
-        CFRelease(UTI);
+        if(!_mimeType) {
+            CFStringRef extension = (__bridge CFStringRef)[file pathExtension];
+            CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, extension, NULL);
+            _mimeType = CFBridgingRelease(UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType));
+            if(!_mimeType)
+                _mimeType = @"application/octet-stream";
+            CFRelease(UTI);
+        }
         
         if(!_originalFilename)
             _originalFilename = wrapper.filename;
@@ -382,7 +384,7 @@
     CLS_LOG(@"Uploading %@ with boundary %@ (%lu bytes)", _originalFilename, _boundary, (unsigned long)_body.length);
     
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/upload", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10];
     [request setHTTPShouldHandleCookies:NO];
@@ -453,7 +455,7 @@
 
 -(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     CLS_LOG(@"Error: %@", error);
     [_delegate fileUploadDidFail:error.localizedDescription];
@@ -461,7 +463,7 @@
 
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection {
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     if(_cancelled)
         return;
