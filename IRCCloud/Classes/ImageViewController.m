@@ -829,6 +829,12 @@
 #endif
 }
 
+-(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    if(!_toolbar.hidden && CGRectContainsPoint(_toolbar.frame, [touch locationInView:self.view]))
+        return NO;
+    return YES;
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

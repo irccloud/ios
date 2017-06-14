@@ -19,7 +19,7 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import "OpenInChromeController.h"
 
-@interface ImageViewController : UIViewController<UIScrollViewDelegate,NSURLConnectionDataDelegate,UIPopoverPresentationControllerDelegate> {
+@interface ImageViewController : UIViewController<UIScrollViewDelegate,NSURLConnectionDataDelegate,UIPopoverPresentationControllerDelegate,UIGestureRecognizerDelegate> {
     IBOutlet UIImageView *_imageView;
     IBOutlet UIScrollView *_scrollView;
     MPMoviePlayerController *_movieController;
