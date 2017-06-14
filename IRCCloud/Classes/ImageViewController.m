@@ -650,8 +650,10 @@
     else
         img = [UIImage imageWithData:data];
     if(img) {
-        _progressView.progress = 1.f;
-        [self performSelectorOnMainThread:@selector(_setImage:) withObject:img waitUntilDone:NO];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            _progressView.progress = 1.f;
+            [self _setImage:img];
+        }];
     } else {
         [self fail:@"Unable to display image"];
     }

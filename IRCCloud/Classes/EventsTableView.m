@@ -2394,7 +2394,7 @@ extern UIImage *__socketClosedBackgroundImage;
             if(extension.length)
                 extension = [extension substringFromIndex:1];
             else
-                extension = [[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location];
+                extension = [[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1];
 
             cell.extension.text = extension.uppercaseString;
             cell.mimeType.text = [e.entities objectForKey:@"mime_type"];
