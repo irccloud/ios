@@ -470,10 +470,11 @@
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
     [activity startAnimating];
     activity.hidden = NO;
+    NSString *user = username.text;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
-            result = [[NetworkConnection sharedInstance] requestPassword:[username text] token:[result objectForKey:@"token"]];
+            result = [[NetworkConnection sharedInstance] requestPassword:user token:[result objectForKey:@"token"]];
             if([[result objectForKey:@"success"] intValue] == 1) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [UIView beginAnimations:nil context:nil];
@@ -697,6 +698,10 @@
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
     [activity startAnimating];
     activity.hidden = NO;
+    NSString *user = username.text;
+    NSString *pass = password.text;
+    NSString *realname = name.text;
+    CGFloat nameAlpha = name.alpha;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 #ifndef ENTERPRISE
         IRCCLOUD_HOST = @"www.irccloud.com";
@@ -707,10 +712,10 @@
         
         result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
-            if(name.alpha)
-                result = [[NetworkConnection sharedInstance] signup:[username text] password:[password text] realname:[name text] token:[result objectForKey:@"token"] impression:_impression?_impression:@""];
+            if(nameAlpha)
+                result = [[NetworkConnection sharedInstance] signup:user password:pass realname:realname token:[result objectForKey:@"token"] impression:_impression?_impression:@""];
             else
-                result = [[NetworkConnection sharedInstance] login:[username text] password:[password text] token:[result objectForKey:@"token"]];
+                result = [[NetworkConnection sharedInstance] login:user password:pass token:[result objectForKey:@"token"]];
             if([[result objectForKey:@"success"] intValue] == 1) {
                 if([result objectForKey:@"websocket_host"])
                     IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
@@ -730,13 +735,13 @@
                 [d setObject:IRCCLOUD_PATH forKey:@"path"];
                 [d synchronize];
 #ifndef ENTERPRISE
-                if(name.alpha) {
+                if(nameAlpha) {
                     [Answers logSignUpWithMethod:@"email" success:@YES customAttributes:nil];
                 } else {
                     [Answers logLoginWithMethod:@"email" success:@YES customAttributes:nil];
                 }
                 if(!_gotCredentialsFromPasswordManager) {
-                    SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)(username.text), (__bridge CFStringRef)(password.text), ^(CFErrorRef error) {
+                    SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)user, (__bridge CFStringRef)pass, ^(CFErrorRef error) {
                         if (error != NULL) {
                             NSLog(@"Unable to save shared credentials: %@", error);
                             return;
@@ -744,12 +749,14 @@
                     });
                 }
 #endif
-                loginHint.alpha = 0;
-                signupHint.alpha = 0;
-                enterpriseHint.alpha = 0;
-                forgotPasswordLogin.alpha = 0;
-                forgotPasswordSignup.alpha = 0;
-                [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    loginHint.alpha = 0;
+                    signupHint.alpha = 0;
+                    enterpriseHint.alpha = 0;
+                    forgotPasswordLogin.alpha = 0;
+                    forgotPasswordSignup.alpha = 0;
+                    [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
+                });
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [UIView beginAnimations:nil context:nil];
@@ -782,7 +789,7 @@
                     [alert show];
                 });
 #ifndef ENTERPRISE
-                if(name.alpha) {
+                if(nameAlpha) {
                     [Answers logSignUpWithMethod:@"email" success:@NO customAttributes:[result objectForKey:@"message"]?@{@"Failure": [result objectForKey:@"message"]}:nil];
                 } else {
                     [Answers logLoginWithMethod:@"email" success:@NO customAttributes:[result objectForKey:@"message"]?@{@"Failure": [result objectForKey:@"message"]}:nil];

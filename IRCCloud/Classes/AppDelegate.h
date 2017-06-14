@@ -31,7 +31,7 @@
     id _backlogCompletedObserver;
     id _backlogFailedObserver;
     id _IRCEventObserver;
-    void (^imageUploadCompletionHandler)();
+    void (^imageUploadCompletionHandler)(void);
     BOOL _movedToBackground;
     __block UIBackgroundTaskIdentifier _background_task;
     void (^_fetchHandler)(UIBackgroundFetchResult);

@@ -1380,14 +1380,14 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)backlogStarted:(NSNotification *)notification {
-    if(!_connectingView.hidden) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            _connectingStatus.textColor = [UIColor navBarHeadingColor];
-            [_connectingStatus setText:@"Loading"];
-            _connectingProgress.progress = 0;
-            _connectingProgress.hidden = NO;
+            if(!_connectingView.hidden) {
+                _connectingStatus.textColor = [UIColor navBarHeadingColor];
+                [_connectingStatus setText:@"Loading"];
+                _connectingProgress.progress = 0;
+                _connectingProgress.hidden = NO;
+            }
         }];
-    }
 }
 
 -(void)backlogProgress:(NSNotification *)notification {
@@ -2502,6 +2502,7 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)userActivityWillSave:(NSUserActivity *)activity {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
 #ifndef ENTERPRISE
     CFStringRef draft_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)(_message.text?_message.text:@""), NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
     Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
@@ -2521,6 +2522,7 @@ extern NSDictionary *emojiMap;
     CFRelease(draft_escaped);
 #endif
     [activity addUserInfoEntriesFromDictionary:@{@"bid":@(_buffer.bid), @"cid":@(_buffer.cid), @"draft":(_message.text?_message.text:@"")}];
+    }];
 }
 
 -(void)_updateGlobalMsg {
@@ -3998,7 +4000,7 @@ extern NSDictionary *emojiMap;
 -(void)uploadsButtonPressed:(id)sender {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
-    if(true || [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             if(self.presentedViewController)
                 [self dismissViewControllerAnimated:NO completion:nil];

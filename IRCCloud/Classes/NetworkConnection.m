@@ -103,7 +103,7 @@ volatile BOOL __socketPaused = NO;
         [_connection start];
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
 #ifndef EXTENSION
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+        [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
     } else {
         CLS_LOG(@"Failed to create NSURLConnection");
@@ -127,7 +127,7 @@ volatile BOOL __socketPaused = NO;
     _running = NO;
     _cancelled = YES;
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
@@ -141,7 +141,7 @@ volatile BOOL __socketPaused = NO;
     }];
     _running = NO;
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
@@ -549,7 +549,6 @@ volatile BOOL __socketPaused = NO;
 
                        [[NSUserDefaults standardUserDefaults] synchronize];
                        [_events reformat];
-                       [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalNever];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
                        CLS_LOG(@"Prefs: %@", [self prefs]);
@@ -1104,7 +1103,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	NSError *error = nil;
     
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:accessLink cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
@@ -1112,7 +1111,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     if(data)
         return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
@@ -1180,7 +1179,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSError *error = nil;
     
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
@@ -1188,7 +1187,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     if(data)
         _config = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
@@ -1205,7 +1204,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSError *error = nil;
     
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, fileID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
@@ -1213,7 +1212,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     if(data)
         return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
@@ -1227,7 +1226,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSError *error = nil;
     
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/files?page=%i", IRCCLOUD_HOST, page]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
@@ -1237,7 +1236,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     if(data)
         return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
@@ -1251,7 +1250,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSError *error = nil;
     
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/pastebins?page=%i", IRCCLOUD_HOST, page]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
@@ -1261,7 +1260,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     if(data)
         return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
@@ -1304,7 +1303,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [body appendFormat:@"&session=%@", self.session];
     
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, path]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
@@ -1320,7 +1319,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     
     if(error) {
@@ -1645,7 +1644,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         }
         
 #ifndef EXTENSION
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+        [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
         CLS_LOG(@"Connecting: %@", url);
         _notifier = notifier;
@@ -1718,7 +1717,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)webSocketDidOpen:(WebSocket *)socket {
     if(socket == _socket) {
 #ifndef EXTENSION
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
         CLS_LOG(@"Socket connected");
         _idleInterval = 20;
@@ -1749,7 +1748,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)webSocket:(WebSocket *)socket didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError {
     if(socket == _socket) {
 #ifndef EXTENSION
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
         CLS_LOG(@"Status Code: %lu", (unsigned long)aStatusCode);
         CLS_LOG(@"Close Message: %@", aMessage);
@@ -1772,7 +1771,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)webSocket:(WebSocket *)socket didReceiveError: (NSError*) aError {
     if(socket == _socket) {
 #ifndef EXTENSION
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
