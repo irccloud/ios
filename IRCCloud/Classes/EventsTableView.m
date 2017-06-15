@@ -58,7 +58,7 @@
 @end
 
 void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation) {
-    _UIViewControllerPreviewSourceViewRecord *record = (_UIViewControllerPreviewSourceViewRecord *)previewer;
+    /*_UIViewControllerPreviewSourceViewRecord *record = (_UIViewControllerPreviewSourceViewRecord *)previewer;
     UIPreviewInteractionController *interactionController = record.previewInteractionController;
     [interactionController startInteractivePreviewAtLocation:sourceLocation inView:record.sourceView];
     
@@ -68,7 +68,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
             [interactionController commitInteractivePreview];
             //[interactionController cancelInteractivePreview];
         });
-    });
+    });(/
 }
 #endif
 

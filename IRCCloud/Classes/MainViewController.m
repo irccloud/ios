@@ -365,9 +365,9 @@ extern NSDictionary *emojiMap;
     }
     
 #if TARGET_IPHONE_SIMULATOR
-    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
+    /*UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
     t.delegate = self;
-    [self.navigationController.view addGestureRecognizer:t];
+    [self.navigationController.view addGestureRecognizer:t];*/
 #endif
     
 #ifdef __IPHONE_11_0
