@@ -113,7 +113,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
+    _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
     _filename.textAlignment = NSTextAlignmentRight;
     _filename.textColor = [UITableViewCell appearance].detailTextLabelColor;
     _filename.autocapitalizationType = UITextAutocapitalizationTypeNone;

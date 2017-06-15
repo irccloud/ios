@@ -865,7 +865,7 @@
     
     self.navigationController.navigationBar.clipsToBounds = YES;
 
-    _email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
+    _email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
     _email.placeholder = @"john@example.com";
     _email.text = @"";
     _email.textAlignment = NSTextAlignmentRight;
@@ -876,7 +876,7 @@
     _email.returnKeyType = UIReturnKeyDone;
     _email.delegate = self;
     
-    _name = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
+    _name = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
     _name.placeholder = @"John Appleseed";
     _name.text = @"";
     _name.textAlignment = NSTextAlignmentRight;

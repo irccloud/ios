@@ -393,11 +393,7 @@ extern NSDictionary *emojiMap;
 
 #ifdef __IPHONE_11_0
 -(BOOL)dropInteraction:(UIDropInteraction *)interaction canHandleSession:(id<UIDropSession>)session {
-    NSLog(@"Incoming objects: %@", session.items);
-    for(UIDragItem *item in session.items) {
-        NSLog(@"%@", item.itemProvider.registeredTypeIdentifiers);
-    }
-    return [session hasItemsConformingToTypeIdentifiers:@[@"com.apple.DocumentManager.uti.FPItem.File", @"public.image", @"public.movie"]];
+    return session.items.count == 1 && [session hasItemsConformingToTypeIdentifiers:@[@"com.apple.DocumentManager.uti.FPItem.File", @"public.image", @"public.movie"]];
 }
 
 -(UIDropProposal *)dropInteraction:(UIDropInteraction *)interaction sessionDidUpdate:(id<UIDropSession>)session {
@@ -410,27 +406,7 @@ extern NSDictionary *emojiMap;
 
 -(void)dropInteraction:(UIDropInteraction *)interaction performDrop:(id<UIDropSession>)session {
     if (@available(iOS 11.0, *)) {
-        NSLog(@"Dropped objects: %@", session.items);
-        
-        NSItemProvider *i = nil;
-        for(UIDragItem *item in session.items) {
-            if(([item.itemProvider hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"] && ![item.itemProvider hasItemConformingToTypeIdentifier:@"public.image"]) || [item.itemProvider hasItemConformingToTypeIdentifier:@"public.movie"]) {
-                NSLog(@"Attachment is file URL");
-                i = item.itemProvider;
-                break;
-            }
-        }
-        if(!i) {
-            for(UIDragItem *item in session.items) {
-                if([item.itemProvider hasItemConformingToTypeIdentifier:@"public.image"]) {
-                    NSLog(@"Attachment is image");
-                    i = item.itemProvider;
-                    break;
-                }
-            }
-        }
-        if(!i)
-            i = session.items.firstObject.itemProvider;
+        NSItemProvider *i = session.items.firstObject.itemProvider;
         
         FileUploader *u = [[FileUploader alloc] init];
         u.delegate = self;
@@ -458,15 +434,19 @@ extern NSDictionary *emojiMap;
         }];
         
         id imageHandler = ^(UIImage *item, NSError *error) {
-            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
-                NSLog(@"Uploading image to IRCCloud");
-                [u uploadImage:item];
+            if(item) {
+                if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
+                    CLS_LOG(@"Uploading dropped image to IRCCloud");
+                    [u uploadImage:item];
+                } else {
+                    CLS_LOG(@"Uploading dropped image to imgur");
+                    ImageUploader *img = [[ImageUploader alloc] init];
+                    img.delegate = self;
+                    img.bid = _buffer.bid;
+                    [img upload:item];
+                }
             } else {
-                NSLog(@"Uploading image to imgur");
-                ImageUploader *img = [[ImageUploader alloc] init];
-                img.delegate = self;
-                img.bid = _buffer.bid;
-                [img upload:item];
+                CLS_LOG(@"Unable to handle dropped image: %@", error);
             }
         };
         
@@ -476,16 +456,20 @@ extern NSDictionary *emojiMap;
             } else {
                 [i loadInPlaceFileRepresentationForTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
                     if(url) {
-                        NSLog(@"Uploading file to IRCCloud");
+                        CLS_LOG(@"Uploading dropped file to IRCCloud");
                         [i hasItemConformingToTypeIdentifier:@"public.movie"]?[u uploadVideo:url]:[u uploadFile:url];
+                    } else {
+                        CLS_LOG(@"Unable to handle dropped file: %@", error);
                     }
                 }];
             }
         } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
             [i loadInPlaceFileRepresentationForTypeIdentifier:@"public.movie" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
                 if(url) {
-                    NSLog(@"Uploading movie to IRCCloud");
+                    CLS_LOG(@"Uploading dropped movie to IRCCloud");
                     [u uploadVideo:url];
+                } else {
+                    CLS_LOG(@"Unable to handle dropped movie: %@", error);
                 }
             }];
         } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
