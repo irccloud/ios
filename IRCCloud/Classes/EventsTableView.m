@@ -68,7 +68,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
             [interactionController commitInteractivePreview];
             //[interactionController cancelInteractivePreview];
         });
-    });(/
+    });*/
 }
 #endif
 
