@@ -897,22 +897,31 @@ volatile BOOL __socketPaused = NO;
                            [self postObject:object forEvent:kIRCEventMemberUpdates];
                    },
                    @"user_away": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
-                       [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventAway];
+                       Buffer *b = [_buffers getBuffer:object.bid];
+                       if([b.type isEqualToString:@"console"]) {
+                           [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
+                           [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
+                           if(!backlog && !_resuming)
+                               [self postObject:object forEvent:kIRCEventAway];
+                       }
                    },
                    @"away": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
-                       [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventAway];
+                       Buffer *b = [_buffers getBuffer:object.bid];
+                       if([b.type isEqualToString:@"console"]) {
+                           [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
+                           [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
+                           if(!backlog && !_resuming)
+                               [self postObject:object forEvent:kIRCEventAway];
+                       }
                    },
                    @"user_back": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid];
-                       [_buffers updateAway:@"" nick:[object objectForKey:@"nick"] server:object.cid];
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventAway];
+                       Buffer *b = [_buffers getBuffer:object.bid];
+                       if([b.type isEqualToString:@"console"]) {
+                           [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid];
+                           [_buffers updateAway:@"" nick:[object objectForKey:@"nick"] server:object.cid];
+                           if(!backlog && !_resuming)
+                               [self postObject:object forEvent:kIRCEventAway];
+                       }
                    },
                    @"self_away": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if(!_resuming) {

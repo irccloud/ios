@@ -106,8 +106,12 @@
 }
 
 - (void)handleEvent:(NSNotification *)notification {
+    IRCCloudJSONObject *o = notification.object;
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     switch(event) {
+        case kIRCEventAway:
+            if(o.cid != _buffer.cid)
+                break;
         case kIRCEventUserInfo:
         case kIRCEventChannelInit:
         case kIRCEventJoin:
@@ -118,7 +122,6 @@
         case kIRCEventUserChannelMode:
         case kIRCEventKick:
         case kIRCEventWhoList:
-        case kIRCEventAway:
             if(!_refreshTimer) {
                 _refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(_refreshTimer) userInfo:nil repeats:NO];
             }
