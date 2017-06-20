@@ -87,18 +87,11 @@
     [_toolbar setShadowImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny];
     [_toolbar setBarStyle:UIBarStyleBlack];
     _toolbar.translucent = YES;
-    if(NSClassFromString(@"UIActivityViewController")) {
-        _toolbar.items = @[
-                          [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(_YTShare:)],
-                          [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                          [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(_YTWrapperTapped)]
-                          ];
-    } else {
-        _toolbar.items = @[
-                          [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                          [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(_YTWrapperTapped)]
-                          ];
-    }
+    _toolbar.items = @[
+                      [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(_YTShare:)],
+                      [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                      [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(_YTWrapperTapped)]
+                      ];
     _toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
     [self.view addSubview:_toolbar];
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_YTWrapperTapped)];
@@ -202,12 +195,10 @@
 }
 
 -(void)_YTShare:(id)sender {
-    if(NSClassFromString(@"UIActivityViewController")) {
-        UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[_url] type:@"Youtube"];
-        activityController.popoverPresentationController.delegate = self;
-        activityController.popoverPresentationController.barButtonItem = sender;
-        [self presentViewController:activityController animated:YES completion:nil];
-    }
+    UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[_url] type:@"Youtube"];
+    activityController.popoverPresentationController.delegate = self;
+    activityController.popoverPresentationController.barButtonItem = sender;
+    [self presentViewController:activityController animated:YES completion:nil];
 }
 
 -(void)playerViewDidBecomeReady:(YTPlayerView *)playerView {

@@ -210,12 +210,10 @@
 }
 
 -(IBAction)shareButtonPressed:(id)sender {
-    if(NSClassFromString(@"UIActivityViewController")) {
-        UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:_url]] type:@"Pastebin"];
-        activityController.popoverPresentationController.delegate = self;
-        activityController.popoverPresentationController.barButtonItem = sender;
-        [self presentViewController:activityController animated:YES completion:nil];
-    }
+    UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:_url]] type:@"Pastebin"];
+    activityController.popoverPresentationController.delegate = self;
+    activityController.popoverPresentationController.barButtonItem = sender;
+    [self presentViewController:activityController animated:YES completion:nil];
 }
 
 -(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {

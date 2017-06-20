@@ -798,12 +798,12 @@
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
     
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10) {
-        [notifications addObject:@{@"title":@"Background Alert Sounds", @"accessory":_notificationSound}];
-    } else {
+    if(@available(iOS 10.0, *)) {
         [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":_defaultSound}];
         [notifications addObject:@{@"title":@"Preview Uploaded Files", @"accessory":_notificationPreviews}];
         [notifications addObject:@{@"title":@"Preview External URLs", @"accessory":_thirdPartyNotificationPreviews}];
+    } else {
+        [notifications addObject:@{@"title":@"Background Alert Sounds", @"accessory":_notificationSound}];
     }
     [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":_notifyAll}];
     [notifications addObject:@{@"title":@"Show Unread Indicators", @"accessory":_showUnread}];

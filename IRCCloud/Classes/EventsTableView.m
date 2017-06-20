@@ -557,18 +557,11 @@ extern UIImage *__socketClosedBackgroundImage;
     } else if([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"]) {
         previewingContext.sourceRect = cell.frame;
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-        if(NSClassFromString(@"AVPlayerViewController")) {
-            AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
-            player.player = [[AVPlayer alloc] initWithURL:url];
-            player.modalPresentationStyle = UIModalPresentationCurrentContext;
-            player.preferredContentSize = self.view.window.bounds.size;
-            return player;
-        } else {
-            MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
-            player.modalPresentationStyle = UIModalPresentationCurrentContext;
-            player.preferredContentSize = self.view.window.bounds.size;
-            return player;
-        }
+        AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
+        player.player = [[AVPlayer alloc] initWithURL:url];
+        player.modalPresentationStyle = UIModalPresentationCurrentContext;
+        player.preferredContentSize = self.view.window.bounds.size;
+        return player;
     } else if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
         previewingContext.sourceRect = cell.frame;
         IRCCloudSafariViewController *s = [[IRCCloudSafariViewController alloc] initWithURL:url];

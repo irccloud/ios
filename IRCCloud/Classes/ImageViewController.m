@@ -809,15 +809,13 @@
 }
 
 -(IBAction)shareButtonPressed:(id)sender {
-    if(NSClassFromString(@"UIActivityViewController")) {
-        UIActivityViewController *activityController = [URLHandler activityControllerForItems:_imageView.image?@[_url,_imageView.image]:@[_url] type:_movieController?@"Animation":@"Image"];
+    UIActivityViewController *activityController = [URLHandler activityControllerForItems:_imageView.image?@[_url,_imageView.image]:@[_url] type:_movieController?@"Animation":@"Image"];
 
-        activityController.popoverPresentationController.delegate = self;
-        activityController.popoverPresentationController.barButtonItem = sender;
-        [self presentViewController:activityController animated:YES completion:nil];
-        [_hideTimer invalidate];
-        _hideTimer = nil;
-    }
+    activityController.popoverPresentationController.delegate = self;
+    activityController.popoverPresentationController.barButtonItem = sender;
+    [self presentViewController:activityController animated:YES completion:nil];
+    [_hideTimer invalidate];
+    _hideTimer = nil;
 }
 
 -(IBAction)doneButtonPressed:(id)sender {

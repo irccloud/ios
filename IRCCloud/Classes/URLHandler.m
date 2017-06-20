@@ -200,16 +200,10 @@
         [self showImage:url];
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && ([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"])) {
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-        if(NSClassFromString(@"AVPlayerViewController")) {
-            AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
-            player.modalPresentationStyle = UIModalPresentationFullScreen;
-            player.player = [[AVPlayer alloc] initWithURL:url];
-            [mainViewController presentViewController:player animated:YES completion:nil];
-        } else {
-            MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:url];
-            player.modalPresentationStyle = UIModalPresentationFullScreen;
-            [mainViewController presentMoviePlayerViewControllerAnimated:player];
-        }
+        AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
+        player.modalPresentationStyle = UIModalPresentationFullScreen;
+        player.player = [[AVPlayer alloc] initWithURL:url];
+        [mainViewController presentViewController:player animated:YES completion:nil];
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
         [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
@@ -245,14 +239,9 @@
                     
                     if([[dict objectForKey:@"source"] length]) {
                         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-                        if(NSClassFromString(@"AVPlayerViewController")) {
-                            AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
-                            player.player = [[AVPlayer alloc] initWithURL:[NSURL URLWithString:[dict objectForKey:@"source"]]];
-                            [mainViewController presentViewController:player animated:YES completion:nil];
-                        } else {
-                            MPMoviePlayerViewController *player = [[MPMoviePlayerViewController alloc] initWithContentURL:[NSURL URLWithString:[dict objectForKey:@"source"]]];
-                            [mainViewController presentMoviePlayerViewControllerAnimated:player];
-                        }
+                        AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
+                        player.player = [[AVPlayer alloc] initWithURL:[NSURL URLWithString:[dict objectForKey:@"source"]]];
+                        [mainViewController presentViewController:player animated:YES completion:nil];
                         [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
                     } else {
                         NSLog(@"Facebook failure %@", dict);

@@ -718,7 +718,6 @@ extern NSDictionary *emojiMap;
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self dismissKeyboard];
                 [self.view.window endEditing:YES];
-            if(NSClassFromString(@"UIAlertController")) {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] preferredStyle:UIAlertControllerStyleAlert];
                 
                 [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
@@ -727,7 +726,7 @@ extern NSDictionary *emojiMap;
                         [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:_alertObject.cid];
                 }]];
                 
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1)
+                if(!@available(iOS 9.0, *))
                     [self presentViewController:alert animated:YES completion:nil];
                 
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
@@ -735,16 +734,8 @@ extern NSDictionary *emojiMap;
                     [textField becomeFirstResponder];
                 }];
                 
-                if(!([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1))
+                if(@available(iOS 9.0, *))
                     [self presentViewController:alert animated:YES completion:nil];
-            } else {
-                _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-                _alertView.tag = TAG_BADCHANNELKEY;
-                _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-                [_alertView textFieldAtIndex:0].delegate = self;
-                [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-                [_alertView show];
-            }
             }];}
             break;
         case kIRCEventInvalidNick: {
@@ -753,7 +744,7 @@ extern NSDictionary *emojiMap;
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self dismissKeyboard];
                 [self.view.window endEditing:YES];
-            if(NSClassFromString(@"UIAlertController")) {
+                
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." preferredStyle:UIAlertControllerStyleAlert];
                 
                 [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
@@ -762,7 +753,7 @@ extern NSDictionary *emojiMap;
                         [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:_alertObject.cid];
                 }]];
                 
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1)
+                if(!@available(iOS 9.0, *))
                     [self presentViewController:alert animated:YES completion:nil];
                 
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
@@ -770,17 +761,8 @@ extern NSDictionary *emojiMap;
                     [textField becomeFirstResponder];
                 }];
                 
-                if(!([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9 || [[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 1))
+                if(@available(iOS 9.0, *))
                     [self presentViewController:alert animated:YES completion:nil];
-            } else {
-                _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Change", nil];
-                _alertView.tag = TAG_INVALIDNICK;
-                _alertView.frame = CGRectMake(0,0,1000,1000);
-                _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-                [_alertView textFieldAtIndex:0].delegate = self;
-                [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-                [_alertView show];
-            }
             }];}
             break;
         case kIRCEventAlert:
@@ -1298,7 +1280,7 @@ extern NSDictionary *emojiMap;
                     if(e.ignoreMask && [ignore match:e.ignoreMask])
                         break;
                     if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
-                        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10 && [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
+                        if(!@available(iOS 10.0, *) && [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
                             _lastNotificationTime = [NSDate date].timeIntervalSince1970;
                             AudioServicesPlaySystemSound(alertSound);
                             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
@@ -1559,7 +1541,7 @@ extern NSDictionary *emojiMap;
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     int height = size.height;
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
+    if(@available(iOS 9.0, *)) {
         CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
         height = [UIScreen mainScreen].applicationFrame.size.height + [UIApplication sharedApplication].statusBarFrame.size.height - origin.y;
     }
@@ -1650,14 +1632,14 @@ extern NSDictionary *emojiMap;
     
     NSString *session = [NetworkConnection sharedInstance].session;
     if(session.length) {
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+        if(@available(iOS 10.0, *)) {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
             
             [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
                 if(!granted)
                     CLS_LOG(@"Notification permission denied: %@", error);
             }];
-        } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
+        } else if(@available(iOS 9.0, *)) {
             UIMutableUserNotificationAction *replyAction = [[UIMutableUserNotificationAction alloc] init];
             replyAction.identifier = @"reply";
             replyAction.title = @"Reply";
@@ -1971,7 +1953,7 @@ extern NSDictionary *emojiMap;
             } else if([_message.text isEqualToString:@"/badge"]) {
                 [_message clearText];
                 _buffer.draft = nil;
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+                if(@available(iOS 10.0, *)) {
                     [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                             NSMutableString *msg = [[NSMutableString alloc] init];
@@ -2204,7 +2186,7 @@ extern NSDictionary *emojiMap;
     if(suggestions.count == 0) {
         if(_nickCompletionView.alpha > 0) {
             [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:nil];
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+            if(!@available(iOS 9.0, *)) {
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
                 [_message.internalTextView reloadInputViews];
                 id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
@@ -2223,7 +2205,7 @@ extern NSDictionary *emojiMap;
             _message.delegate = nil;
             _message.text = text;
             _message.selectedRange = NSMakeRange(text.length, 0);
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+            if(@available(iOS 9.0, *)) {
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
                 [_message.internalTextView reloadInputViews];
                 id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
@@ -3378,29 +3360,24 @@ extern NSDictionary *emojiMap;
     } else {
         msg = [NSString stringWithFormat:@"Are you sure you want to clear your history with %@?", _selectedBuffer.name];
     }
-    if(NSClassFromString(@"UIAlertController")) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-            if([_selectedBuffer.type isEqualToString:@"console"]) {
-                [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
-            } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
-                if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
-                    [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
-                else
-                    [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
-            } else {
-                [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
-            }
-        }]];
-        
-        [self presentViewController:alert animated:YES completion:nil];
-    } else {
-        _alertView = [[UIAlertView alloc] initWithTitle:title message:msg delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Delete", nil];
-        _alertView.tag = TAG_DELETE;
-        [_alertView show];
-    }
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:msg preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+        if([_selectedBuffer.type isEqualToString:@"console"]) {
+            [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
+        } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
+            if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
+                [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
+            else
+                [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+        } else {
+            [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+        }
+    }]];
+    
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)_addNetwork {
@@ -4217,22 +4194,17 @@ extern NSDictionary *emojiMap;
         } else if([action isEqualToString:@"Logout"]) {
             [self dismissKeyboard];
             [self.view.window endEditing:YES];
-            if(NSClassFromString(@"UIAlertController")) {
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" preferredStyle:UIAlertControllerStyleAlert];
-                
-                [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-                [alert addAction:[UIAlertAction actionWithTitle:@"Logout" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-                    [[NetworkConnection sharedInstance] logout];
-                    [self bufferSelected:-1];
-                    [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
-                }]];
-                
-                [self presentViewController:alert animated:YES completion:nil];
-            } else {
-                _alertView = [[UIAlertView alloc] initWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Logout", nil];
-                _alertView.tag = TAG_LOGOUT;
-                [_alertView show];
-            }
+            
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Logout" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+                [[NetworkConnection sharedInstance] logout];
+                [self bufferSelected:-1];
+                [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+            }]];
+            
+            [self presentViewController:alert animated:YES completion:nil];
         } else if([action isEqualToString:@"Ignore List"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
@@ -4505,7 +4477,7 @@ Network type: %@\n",
 }
 
 -(NSArray<UIKeyCommand *> *)keyCommands {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
+    if(@available(iOS 9.0, *)) {
     return @[
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltUpPressed:) discoverabilityTitle:@"Switch to previous channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltDownPressed:) discoverabilityTitle:@"Switch to next channel"],
