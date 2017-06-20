@@ -14,11 +14,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <CoreText/CoreText.h>
 #import "LinkLabel.h"
-
-NSTextStorage *__LinkLabelTextStorage;
-NSTextContainer *__LinkLabelTextContainer;
-NSLayoutManager *__LinkLabelLayoutManager;
 
 @implementation LinkLabel
 
@@ -111,20 +108,16 @@ NSLayoutManager *__LinkLabelLayoutManager;
 }
 
 +(CGFloat)heightOfString:(NSAttributedString *)text constrainedToWidth:(CGFloat)width {
-    if(!__LinkLabelTextStorage) {
-        __LinkLabelTextStorage = [[NSTextStorage alloc] init];
-        __LinkLabelLayoutManager = [[NSLayoutManager alloc] init];
-        [__LinkLabelTextStorage addLayoutManager:__LinkLabelLayoutManager];
-        __LinkLabelTextContainer = [[NSTextContainer alloc] initWithSize:CGSizeZero];
-        __LinkLabelTextContainer.lineFragmentPadding = 0;
-        __LinkLabelTextContainer.lineBreakMode = NSLineBreakByWordWrapping;
-        [__LinkLabelLayoutManager addTextContainer:__LinkLabelTextContainer];
-    }
-    @synchronized (__LinkLabelTextStorage) {
-        __LinkLabelTextContainer.size = CGSizeMake(width, CGFLOAT_MAX);
-        [__LinkLabelTextStorage setAttributedString:text];
-        (void) [__LinkLabelLayoutManager glyphRangeForTextContainer:__LinkLabelTextContainer];
-        return [__LinkLabelLayoutManager usedRectForTextContainer:__LinkLabelTextContainer].size.height;
+    if(text) {
+        CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)text);
+        CFRange fitRange;
+        CGSize frameSize = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, 0), NULL, CGSizeMake(width, CGFLOAT_MAX), &fitRange);
+        
+        CFRelease(framesetter);
+        
+        return frameSize.height;
+    } else {
+        return 0;
     }
 }
 
