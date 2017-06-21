@@ -131,7 +131,11 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"calleridcell"];
     if(!cell)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"calleridcell"];
-    cell.textLabel.text = [[_nicks objectAtIndex:[indexPath row]] objectAtIndex:0];
+    id nick = [_nicks objectAtIndex:[indexPath row]];
+    if([nick isKindOfClass:[NSArray class]])
+        cell.textLabel.text = [nick objectAtIndex:0];
+    else
+        cell.textLabel.text = nick;
     return cell;
 }
 
