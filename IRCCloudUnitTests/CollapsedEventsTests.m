@@ -411,6 +411,14 @@
     AssertEvents(@"⇐︎ sam quit (sam@example.net): Leaving");
 }
 
+- (void)testMultiChannelQuitJoin {
+    _events.showChan = YES;
+    [self quit:@"Leaving" nick:@"sam" hostmask:@"sam@example.net"];
+    [self join:@"#test1" nick:@"sam" hostmask:@"sam@example.net"];
+    [self join:@"#test2" nick:@"sam" hostmask:@"sam@example.net"];
+    AssertEvents(@"↔︎ sam nipped out #test1 and #test2");
+}
+
 - (void)testNetSplit {
     [self quit:@"irc.example.net irc2.example.net" nick:@"sam" hostmask:@"sam@example.net"];
     [self quit:@"irc.example.net irc2.example.net" nick:@"james" hostmask:@"james@example.net"];
