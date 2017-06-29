@@ -259,6 +259,10 @@
                     for(e in _data) {
                         if(e.type == kCollapsedEventQuit) {
                             [_data removeObject:e];
+                            event.type = kCollapsedEventPopOut;
+                            break;
+                        } else if(e.type == kCollapsedEventPopOut) {
+                            event.type = kCollapsedEventPopOut;
                             break;
                         }
                     }
