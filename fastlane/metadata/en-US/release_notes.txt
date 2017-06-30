@@ -1,3 +1,8 @@
-• Separated settings for previewing uploaded files and external URLs in notifications. Now, only file uploads are previewed by default and a warning is shown when enabling external URL previews.
-• Added support for /trace responses
+• Fix the "Show joins/parts" and "Collapse joins/parts" settings in the Display Options dialog
+• Unicode 9 :emocodes:
+• Automatically close the image viewer when tapping a notification
+• Hide the in-call / tethering banner when playing videos
+• Fix display of kick messages
+• Show the correct symbol for Opers in the users list
+• Fix a crash when selecting "Save Image" from the share sheet
 • Stability improvements and minor fixes
