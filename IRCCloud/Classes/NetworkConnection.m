@@ -1913,7 +1913,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         } else {
             if([object objectForKey:@"success"] && ![[object objectForKey:@"success"] boolValue] && [object objectForKey:@"message"]) {
                 CLS_LOG(@"Failure: %@", object);
-                [self postObject:object forEvent:kIRCEventFailureMsg];
+                if([[object objectForKey:@"message"] isEqualToString:@"invalid_nick"])
+                    [self postObject:object forEvent:kIRCEventInvalidNick];
+                else
+                    [self postObject:object forEvent:kIRCEventFailureMsg];
             } else if([object objectForKey:@"success"]) {
                 [self postObject:object forEvent:kIRCEventSuccess];
             }

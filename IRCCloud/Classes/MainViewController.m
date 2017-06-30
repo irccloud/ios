@@ -745,13 +745,15 @@ extern NSDictionary *emojiMap;
                 [self dismissKeyboard];
                 [self.view.window endEditing:YES];
                 
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invalid nickname, try again." preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:s?[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port]:@"Invalid Nick" message:@"Invalid nickname, try again." preferredStyle:UIAlertControllerStyleAlert];
                 
-                [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-                [alert addAction:[UIAlertAction actionWithTitle:@"Change" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                    if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
-                        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:_alertObject.cid];
-                }]];
+                [alert addAction:[UIAlertAction actionWithTitle:s?@"Cancel":@"Close" style:UIAlertActionStyleCancel handler:nil]];
+                if(s) {
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Change" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                        if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
+                            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:_alertObject.cid];
+                    }]];
+                }
                 
                 if(!@available(iOS 9.0, *))
                     [self presentViewController:alert animated:YES completion:nil];
