@@ -2205,7 +2205,7 @@ extern NSDictionary *emojiMap;
             _message.delegate = nil;
             _message.text = text;
             _message.selectedRange = NSMakeRange(text.length, 0);
-            if(@available(iOS 9.0, *)) {
+            if(!@available(iOS 9.0, *)) {
                 _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
                 [_message.internalTextView reloadInputViews];
                 id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
