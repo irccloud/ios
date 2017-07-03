@@ -22,18 +22,21 @@ NSLayoutManager *__LinkTextViewLayoutManager;
 
 @implementation LinkTextView
 
-- (id)init {
-    return [self initWithFrame:CGRectZero];
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
+    NSTextCheckingResult *r = [self linkAtPoint:[touch locationInView:self]];
+    return (r && _linkDelegate);
 }
 
-- (id)initWithFrame:(CGRect)frame {
-    self = [super initWithFrame:frame];
-    if(self) {
-        _links = [[NSMutableArray alloc] init];
-        _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)];
-        [self addGestureRecognizer:_tapGesture];
-    }
-    return self;
+-(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRequireFailureOfGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return NO;
+}
+
+-(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldBeRequiredToFailByGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return NO;
+}
+
+-(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
+    return YES;
 }
 
 - (void)viewTapped:(UITapGestureRecognizer *)sender {
@@ -70,6 +73,14 @@ NSLayoutManager *__LinkTextViewLayoutManager;
 }
 
 - (void)addLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
+    if(!_links) {
+        _links = [[NSMutableArray alloc] init];
+    }
+    if(!_tapGesture) {
+        _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)];
+        _tapGesture.delegate = self;
+        [self addGestureRecognizer:_tapGesture];
+    }
     [_links addObject:result];
     [self.textStorage addAttributes:self.linkAttributes range:result.range];
 }

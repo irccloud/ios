@@ -18,7 +18,7 @@
 
 @protocol LinkTextViewDelegate;
 
-@interface LinkTextView : UITextView {
+@interface LinkTextView : UITextView<UIGestureRecognizerDelegate> {
     UITapGestureRecognizer *_tapGesture;
     NSMutableArray *_links;
 }
