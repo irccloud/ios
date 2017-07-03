@@ -1852,6 +1852,25 @@ extern NSDictionary *emojiMap;
             } else if([_message.text isEqualToString:@"/crash"]) {
                 CLS_LOG(@"/crash requested");
                 [[Crashlytics sharedInstance] crash];
+            } else if([_message.text isEqualToString:@"/compact 1"]) {
+                CLS_LOG(@"Set compact");
+                NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
+                [p setObject:@YES forKey:@"ascii-compact"];
+                SBJson5Writer *writer = [[SBJson5Writer alloc] init];
+                NSString *json = [writer stringWithObject:p];
+                [[NetworkConnection sharedInstance] setPrefs:json];
+                [_message clearText];
+                _buffer.draft = nil;
+                return;
+            } else if([_message.text isEqualToString:@"/compact 0"]) {
+                NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
+                [p setObject:@NO forKey:@"ascii-compact"];
+                SBJson5Writer *writer = [[SBJson5Writer alloc] init];
+                NSString *json = [writer stringWithObject:p];
+                [[NetworkConnection sharedInstance] setPrefs:json];
+                [_message clearText];
+                _buffer.draft = nil;
+                return;
             } else if([_message.text isEqualToString:@"/mono 1"]) {
                 CLS_LOG(@"Set monospace");
                 NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
