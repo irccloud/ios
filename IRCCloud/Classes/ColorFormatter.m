@@ -2043,7 +2043,7 @@ extern BOOL __compact;
     else
         paragraphStyle.lineSpacing = MESSAGE_LINE_SPACING;
     paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
-    [output addAttribute:(NSString*)NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [output length])];
+    [output addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [output length])];
     
     for(NSDictionary *dict in attributes) {
         [output addAttributes:dict range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];

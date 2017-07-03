@@ -2087,14 +2087,28 @@ extern UIImage *__socketClosedBackgroundImage;
         if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
             estimatedWidth -= 4;
         
-        e.height = [LinkLabel heightOfString:e.formatted constrainedToWidth:estimatedWidth] + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0);
+        static LinkLabel *message = nil;
+        if(!message) {
+            message = [[LinkLabel alloc] init];
+            message.backgroundColor = [UIColor clearColor];
+            message.textColor = [UIColor messageTextColor];
+            message.numberOfLines = 0;
+            message.lineBreakMode = NSLineBreakByWordWrapping;
+            message.userInteractionEnabled = YES;
+            message.baselineAdjustment = UIBaselineAdjustmentNone;
+        }
+        message.attributedText = e.formatted;
+        
+        e.height = floorf([message sizeThatFits:CGSizeMake(estimatedWidth, CGFLOAT_MAX)].height + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0));
         if(!__compact)
             e.height += MESSAGE_LINE_PADDING;
+        else
+            e.height += 2;
         e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
         e.estimatedWidth = estimatedWidth;
         
         if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
-            e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + (__compact?1:MESSAGE_LINE_PADDING);
+            e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + (__compact?2:MESSAGE_LINE_PADDING);
             if(e.height < __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING))
                 e.height = __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING);
         }
