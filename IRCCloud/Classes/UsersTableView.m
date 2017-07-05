@@ -212,7 +212,17 @@
     
     NSString *opersGroupMode = @"Y";
     
-    for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
+    NSArray *users = [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid];
+    if(users.count > 1000) {
+        NSMutableDictionary *disableNickSuggestions = [[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] mutableCopy];
+        if(![disableNickSuggestions objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]]) {
+            CLS_LOG(@"Channel has %lu members, disabling auto nick suggestions", (unsigned long)users.count);
+            [disableNickSuggestions setObject:@YES forKey:[NSString stringWithFormat:@"%i",_buffer.bid]];
+            [[NSUserDefaults standardUserDefaults] setObject:disableNickSuggestions forKey:@"disable-nick-suggestions"];
+        }
+    }
+    
+    for(User *user in users) {
         if(user.nick.length) {
             NSString *mode = user.mode.lowercaseString;
             if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && ([PREFIX objectForKey:s?s.MODE_OPER:@"Y"] || [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"])) {
