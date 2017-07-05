@@ -138,7 +138,7 @@
 
 - (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor headingColor:(UIColor *)headingColor data:(NSMutableArray *)data sectionTitles:(NSMutableArray *)sectionTitles sectionIndexes:(NSMutableArray *)sectionIndexes sectionSizes:(NSMutableArray *)sectionSizes {
     if(users.count && symbol) {
-        unichar lastChar = 0;
+        //unichar lastChar = 0;
         [data addObject:@{
          @"type":@TYPE_HEADING,
          @"text":heading,
@@ -151,9 +151,9 @@
          }];
         NSUInteger size = data.count;
         for(User *user in users) {
-            if(sectionTitles != nil) {
-                if(user.nick.length && [[user.nick lowercaseString] characterAtIndex:0] != lastChar) {
-                    lastChar = [[user.nick lowercaseString] characterAtIndex:0];
+            /*if(sectionTitles != nil) {
+                if(user.nick.length && [user.lowercase_nick characterAtIndex:0] != lastChar) {
+                    lastChar = [user.lowercase_nick characterAtIndex:0];
                     [sectionIndexes addObject:@(data.count)];
                     [sectionTitles addObject:[[user.nick uppercaseString] substringToIndex:1]];
                     [sectionSizes addObject:@(size)];
@@ -161,7 +161,7 @@
                 } else {
                     size++;
                 }
-            }
+            }*/
             [data addObject:@{
              @"type":@TYPE_USER,
              @"text":user.nick,
@@ -171,8 +171,8 @@
              @"borderColor":borderColor
              }];
         }
-        if(sectionSizes != nil)
-            [sectionSizes addObject:@(size)];
+        /*if(sectionSizes != nil)
+            [sectionSizes addObject:@(size)];*/
     }
 }
 
