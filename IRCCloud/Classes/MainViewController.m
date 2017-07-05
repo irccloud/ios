@@ -131,7 +131,7 @@ NSArray *_sortedChannels;
             _sortedChannels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
         
         if([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]) {
-            if(_atMention) {
+            if(_atMention || _force) {
                 if(_sortedUsers.count == 0)
                     _sortedUsers = nil;
             } else {
@@ -234,6 +234,21 @@ NSArray *_sortedChannels;
                         objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
                         objc_msgSend(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
                     }
+                }
+                if(_force && _nickCompletionView.selection == -1) {
+                    [_nickCompletionView setSelection:0];
+                    NSString *text = _message.text;
+                    if(text.length == 0) {
+                        _message.text = [_nickCompletionView suggestion];
+                    } else {
+                        while(text.length > 0 && [text characterAtIndex:text.length - 1] != ' ') {
+                            text = [text substringToIndex:text.length - 1];
+                        }
+                        text = [text stringByAppendingString:[_nickCompletionView suggestion]];
+                        _message.text = text;
+                    }
+                    if([text rangeOfString:@" "].location == NSNotFound)
+                        _message.text = [_message.text stringByAppendingString:@":"];
                 }
                 _message.delegate = delegate;
             }
@@ -2308,6 +2323,7 @@ NSArray *_sortedChannels;
     _updateSuggestionsTask.message = _message;
     _updateSuggestionsTask.buffer = _buffer;
     _updateSuggestionsTask.nickCompletionView = _nickCompletionView;
+    _updateSuggestionsTask.force = force;
     
     [_updateSuggestionsTask performSelectorInBackground:@selector(run) withObject:nil];
 }
@@ -4638,6 +4654,7 @@ Network type: %@\n",
             s++;
         [_nickCompletionView setSelection:s];
         NSString *text = _message.text;
+        _message.delegate = nil;
         if(text.length == 0) {
             _message.text = [_nickCompletionView suggestion];
         } else {
@@ -4649,6 +4666,7 @@ Network type: %@\n",
         }
         if([text rangeOfString:@" "].location == NSNotFound)
             _message.text = [_message.text stringByAppendingString:@":"];
+        _message.delegate = self;
     }
 }
 
