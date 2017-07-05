@@ -28,6 +28,7 @@
     UISwitch *_expandDisco;
     UISwitch *_readOnSelect;
     UISwitch *_disableInlineFiles;
+    UISwitch *_disableNickSuggestions;
     int _reqid;
 }
 @property (strong, nonatomic) Buffer *buffer;

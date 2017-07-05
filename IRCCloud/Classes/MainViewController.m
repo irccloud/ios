@@ -112,14 +112,7 @@ NSArray *_sortedChannels;
     NSMutableSet *suggestions_set = [[NSMutableSet alloc] init];
     NSMutableArray *suggestions = [[NSMutableArray alloc] init];
     
-    if(_message.text.length > 0 || [_message.text hasPrefix:@"@"]) {
-        if(!_sortedChannels)
-            _sortedChannels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
-        if(!_sortedUsers)
-            _sortedUsers = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
-        if(_cancelled)
-            return;
-        
+    if(_message.text.length > 0) {
         NSString *text = [_message.text lowercaseString];
         NSUInteger lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
         if(lastSpace != NSNotFound && lastSpace != text.length) {
@@ -133,6 +126,23 @@ NSArray *_sortedChannels;
         } else {
             _atMention = NO;
         }
+        
+        if(!_sortedChannels)
+            _sortedChannels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
+        
+        if([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]) {
+            if(_atMention) {
+                if(_sortedUsers.count == 0)
+                    _sortedUsers = nil;
+            } else {
+                _sortedUsers = @[];
+            }
+        }
+        if(!_sortedUsers)
+            _sortedUsers = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
+        if(_cancelled)
+            return;
+        
         if(text.length > 1 || _force) {
             if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text]) {
                 [suggestions_set addObject:_buffer.name.lowercaseString];

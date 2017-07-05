@@ -56,6 +56,13 @@
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
     
     if([_buffer.type isEqualToString:@"channel"]) {
+        NSMutableDictionary *disableNickSuggestions = [[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] mutableCopy];
+        if(!disableNickSuggestions)
+            disableNickSuggestions = [[NSMutableDictionary alloc] init];
+        
+        [disableNickSuggestions setObject:@(!_disableNickSuggestions.on) forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        [[NSUserDefaults standardUserDefaults] setObject:disableNickSuggestions forKey:@"disable-nick-suggestions"];
+        
         if([[prefs objectForKey:@"channel-enableReadOnSelect"] isKindOfClass:[NSDictionary class]])
             [enableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"channel-enableReadOnSelect"]];
         if([[prefs objectForKey:@"channel-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
@@ -422,6 +429,7 @@
             _disableInlineFiles.on = YES;
     }
     _collapseJoinPart.enabled = _showJoinPart.on;
+    _disableNickSuggestions.on = !([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]);
 }
 
 - (void)viewDidLoad {
@@ -437,6 +445,7 @@
     _expandDisco = [[UISwitch alloc] init];
     _readOnSelect = [[UISwitch alloc] init];
     _disableInlineFiles = [[UISwitch alloc] init];
+    _disableNickSuggestions = [[UISwitch alloc] init];
 
     [self refresh];
 }
@@ -482,7 +491,7 @@
     cell.accessoryView = nil;
     
     if(![_buffer.type isEqualToString:@"channel"] && row > 1)
-        row+=2;
+        row+=3;
     else if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && row > 1)
         row++;
     
@@ -504,6 +513,10 @@
             cell.accessoryView = _notifyAll;
             break;
         case 4:
+            cell.textLabel.text = @"Suggest nicks as you type";
+            cell.accessoryView = _disableNickSuggestions;
+            break;
+        case 5:
             if([_buffer.type isEqualToString:@"console"]) {
                 cell.textLabel.text = @"Group repeated disconnects";
                 cell.accessoryView = _expandDisco;
@@ -512,11 +525,11 @@
                 cell.accessoryView = _showJoinPart;
             }
             break;
-        case 5:
+        case 6:
             cell.textLabel.text = @"Collapse joins/parts";
             cell.accessoryView = _collapseJoinPart;
             break;
-        case 6:
+        case 7:
             cell.textLabel.text = @"Embed uploaded files";
             cell.accessoryView = _disableInlineFiles;
             break;
