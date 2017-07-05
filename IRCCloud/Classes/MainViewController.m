@@ -99,6 +99,149 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 
 extern NSDictionary *emojiMap;
 
+NSArray *_sortedUsers;
+NSArray *_sortedChannels;
+
+@implementation UpdateSuggestionsTask
+
+-(void)cancel {
+    _cancelled = YES;
+}
+
+-(void)run {
+    NSMutableSet *suggestions_set = [[NSMutableSet alloc] init];
+    NSMutableArray *suggestions = [[NSMutableArray alloc] init];
+    
+    if(_message.text.length > 0) {
+        NSString *text = [_message.text lowercaseString];
+        NSUInteger lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
+        if(lastSpace != NSNotFound && lastSpace != text.length) {
+            text = [text substringFromIndex:lastSpace + 1];
+        }
+        if([text hasSuffix:@":"])
+            text = [text substringToIndex:text.length - 1];
+        if([text hasPrefix:@"@"]) {
+            _atMention = YES;
+            text = [text substringFromIndex:1];
+        } else {
+            _atMention = NO;
+        }
+        
+        if(!_sortedChannels)
+            _sortedChannels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
+        
+        if([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]) {
+            if(_atMention) {
+                if(_sortedUsers.count == 0)
+                    _sortedUsers = nil;
+            } else {
+                _sortedUsers = @[];
+            }
+        }
+        if(!_sortedUsers)
+            _sortedUsers = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
+        if(_cancelled)
+            return;
+        
+        if(text.length > 1 || _force) {
+            if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text]) {
+                [suggestions_set addObject:_buffer.name.lowercaseString];
+                [suggestions addObject:_buffer.name];
+            }
+            for(Channel *channel in _sortedChannels) {
+                if(_cancelled)
+                    return;
+                
+                if(text.length > 0 && channel.name.length > 0 && [channel.name characterAtIndex:0] == [text characterAtIndex:0] && channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text] && ![suggestions_set containsObject:channel.name.lowercaseString]) {
+                    [suggestions_set addObject:channel.name.lowercaseString];
+                    [suggestions addObject:channel.name];
+                }
+            }
+            
+            for(User *user in _sortedUsers) {
+                if(_cancelled)
+                    return;
+                
+                NSString *nick = user.nick.lowercaseString;
+                NSUInteger location = [nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location;
+                if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 && location != NSNotFound && location > 0) {
+                    nick = [nick substringFromIndex:location];
+                }
+                if((text.length == 0 || [nick hasPrefix:text]) && ![suggestions_set containsObject:user.nick.lowercaseString]) {
+                    [suggestions_set addObject:user.nick.lowercaseString];
+                    [suggestions addObject:user.nick];
+                }
+            }
+        }
+        
+        if(text.length > 1 && [text hasPrefix:@":"]) {
+            NSString *q = [text substringFromIndex:1];
+            
+            for(NSString *emocode in emojiMap.keyEnumerator) {
+                if(_cancelled)
+                    return;
+                
+                if([emocode hasPrefix:q]) {
+                    NSString *emoji = [emojiMap objectForKey:emocode];
+                    if(![suggestions_set containsObject:emoji]) {
+                        [suggestions_set addObject:emoji];
+                        [suggestions addObject:emoji];
+                    }
+                }
+            }
+        }
+    }
+    
+    if(_cancelled)
+        return;
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        //TODO: refactor NickCompletionView to use a container that recycles views instead of creating a ton of UIButtons
+        if(_nickCompletionView.selection == -1 || suggestions.count == 0)
+            [_nickCompletionView setSuggestions:suggestions];
+        
+        if(_cancelled)
+            return;
+        
+        if(suggestions.count == 0) {
+            if(_nickCompletionView.alpha > 0) {
+                [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:nil];
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+                    _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
+                    [_message.internalTextView reloadInputViews];
+                    id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+                    if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
+                        objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), YES);
+                    }
+                }
+                _sortedChannels = nil;
+                _sortedUsers = nil;
+            }
+            _atMention = NO;
+        } else {
+            if(_nickCompletionView.alpha == 0) {
+                [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:nil];
+                NSString *text = _message.text;
+                id delegate = _message.delegate;
+                _message.delegate = nil;
+                _message.text = text;
+                _message.selectedRange = NSMakeRange(text.length, 0);
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+                    _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
+                    [_message.internalTextView reloadInputViews];
+                    id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+                    if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
+                        objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
+                        objc_msgSend(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
+                    }
+                }
+                _message.delegate = delegate;
+            }
+        }
+    }];
+}
+@end
+
 @implementation MainViewController
 
 -(instancetype)initWithCoder:(NSCoder *)aDecoder {
@@ -1584,7 +1727,7 @@ extern NSDictionary *emojiMap;
 
     [_buffersView scrollViewDidScroll:_buffersView.tableView];
     _nickCompletionView.alpha = 0;
-    _atMention = NO;
+    _updateSuggestionsTask.atMention = NO;
     [UIView commitAnimations];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -2121,7 +2264,7 @@ extern NSDictionary *emojiMap;
         }
     }
     
-    if(_atMention)
+    if(_updateSuggestionsTask.atMention)
         nick = [NSString stringWithFormat:@"@%@", nick];
 
     if(!isChannel && ![text hasPrefix:@":"] && [text rangeOfString:@" "].location == NSNotFound)
@@ -2142,102 +2285,15 @@ extern NSDictionary *emojiMap;
 }
 
 -(void)updateSuggestions:(BOOL)force {
-    NSMutableSet *suggestions_set = [[NSMutableSet alloc] init];
-    NSMutableArray *suggestions = [[NSMutableArray alloc] init];
+    if(_updateSuggestionsTask)
+        [_updateSuggestionsTask cancel];
     
-    if(_message.text.length > 0 || [_message.text hasPrefix:@"@"]) {
-        if(!_sortedChannels)
-            _sortedChannels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
-        if(!_sortedUsers)
-            _sortedUsers = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
-        NSString *text = [_message.text lowercaseString];
-        NSUInteger lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
-        if(lastSpace != NSNotFound && lastSpace != text.length) {
-            text = [text substringFromIndex:lastSpace + 1];
-        }
-        if([text hasSuffix:@":"])
-            text = [text substringToIndex:text.length - 1];
-        if([text hasPrefix:@"@"]) {
-            _atMention = YES;
-            text = [text substringFromIndex:1];
-        } else {
-            _atMention = NO;
-        }
-        if(text.length > 1 || force) {
-            if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text]) {
-                [suggestions_set addObject:_buffer.name.lowercaseString];
-                [suggestions addObject:_buffer.name];
-            }
-            for(Channel *channel in _sortedChannels) {
-                if(text.length > 0 && channel.name.length > 0 && [channel.name characterAtIndex:0] == [text characterAtIndex:0] && channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text] && ![suggestions_set containsObject:channel.name.lowercaseString]) {
-                    [suggestions_set addObject:channel.name.lowercaseString];
-                    [suggestions addObject:channel.name];
-                }
-            }
-            
-            for(User *user in _sortedUsers) {
-                NSString *nick = user.nick.lowercaseString;
-                NSUInteger location = [nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location;
-                if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 && location != NSNotFound && location > 0) {
-                    nick = [nick substringFromIndex:location];
-                }
-                if((text.length == 0 || [nick hasPrefix:text]) && ![suggestions_set containsObject:user.nick.lowercaseString]) {
-                    [suggestions_set addObject:user.nick.lowercaseString];
-                    [suggestions addObject:user.nick];
-                }
-            }
-        }
-        
-        if(text.length > 1 && [text hasPrefix:@":"]) {
-            NSString *q = [text substringFromIndex:1];
-            
-            for(NSString *emocode in emojiMap.keyEnumerator) {
-                if([emocode hasPrefix:q]) {
-                    NSString *emoji = [emojiMap objectForKey:emocode];
-                    if(![suggestions_set containsObject:emoji]) {
-                        [suggestions_set addObject:emoji];
-                        [suggestions addObject:emoji];
-                    }
-                }
-            }
-        }
-    }
-    if(_nickCompletionView.selection == -1 || suggestions.count == 0)
-        [_nickCompletionView setSuggestions:suggestions];
-    if(suggestions.count == 0) {
-        if(_nickCompletionView.alpha > 0) {
-            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:nil];
-            if(!@available(iOS 9.0, *)) {
-                _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
-                [_message.internalTextView reloadInputViews];
-                id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
-                if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
-                    objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), YES);
-                }
-            }
-            _sortedChannels = nil;
-            _sortedUsers = nil;
-        }
-        _atMention = NO;
-    } else {
-        if(_nickCompletionView.alpha == 0) {
-            [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:nil];
-            NSString *text = _message.text;
-            _message.delegate = nil;
-            _message.text = text;
-            _message.selectedRange = NSMakeRange(text.length, 0);
-            if(!@available(iOS 9.0, *)) {
-                _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
-                [_message.internalTextView reloadInputViews];
-                id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
-                if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
-                    objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
-                    objc_msgSend(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
-                }
-            }
-            _message.delegate = self;
-        }
-    }
+    _updateSuggestionsTask = [[UpdateSuggestionsTask alloc] init];
+    _updateSuggestionsTask.message = _message;
+    _updateSuggestionsTask.buffer = _buffer;
+    _updateSuggestionsTask.nickCompletionView = _nickCompletionView;
+    
+    [_updateSuggestionsTask performSelectorInBackground:@selector(run) withObject:nil];
 }
 
 -(void)_updateSuggestionsTimer {

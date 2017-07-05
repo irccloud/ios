@@ -23,13 +23,32 @@
 
 @implementation User
 
+-(NSString *)nick {
+    return _nick;
+}
+
+-(void)setNick:(NSString *)nick {
+    _nick = nick;
+    _lowercase_nick = nick.lowercaseString;
+}
+
+-(NSString *)lowercase_nick {
+    if(!_lowercase_nick)
+        _lowercase_nick = _nick.lowercaseString;
+    return _lowercase_nick;
+}
+
+-(void)setLowercase_nick:(NSString *)lowercase_nick {
+    _lowercase_nick = lowercase_nick;
+}
+
 -(NSComparisonResult)compare:(User *)aUser {
-    return [[_nick lowercaseString] localizedStandardCompare:[aUser.nick lowercaseString]];
+    return [_lowercase_nick localizedStandardCompare:aUser.lowercase_nick];
 }
 
 -(NSComparisonResult)compareByMentionTime:(User *)aUser {
     if(_lastMention == aUser.lastMention)
-        return [[_nick lowercaseString] localizedStandardCompare:[aUser.nick lowercaseString]];
+        return [_lowercase_nick localizedStandardCompare:aUser.lowercase_nick];
     else if(_lastMention > aUser.lastMention)
         return NSOrderedAscending;
     else
@@ -142,7 +161,7 @@
             users = [[NSMutableDictionary alloc] init];
             [_users setObject:users forKey:@(user.bid)];
         }
-        [users setObject:user forKey:[user.nick lowercaseString]];
+        [users setObject:user forKey:user.lowercase_nick];
     }
 #endif
 }

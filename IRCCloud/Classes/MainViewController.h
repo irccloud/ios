@@ -28,6 +28,24 @@
 #import "FilesTableViewController.h"
 #import "LinkLabel.h"
 
+@interface UpdateSuggestionsTask : NSObject {
+    BOOL _force, _atMention;
+    BOOL _cancelled;
+    UIExpandingTextView *_message;
+    Buffer *_buffer;
+    NickCompletionView *_nickCompletionView;
+}
+
+@property UIExpandingTextView *message;
+@property Buffer *buffer;
+@property NickCompletionView *nickCompletionView;
+@property BOOL force, atMention, cancelled;
+
+-(void)cancel;
+-(void)run;
+
+@end
+
 @interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate,LinkLabelDelegate
 #ifdef __IPHONE_11_0
 ,UIDropInteractionDelegate
@@ -88,15 +106,13 @@
     CGSize _kbSize;
     NickCompletionView *_nickCompletionView;
     NSTimer *_nickCompletionTimer;
-    NSArray *_sortedUsers;
-    NSArray *_sortedChannels;
     UIPopoverController *_popover;
     NSTimeInterval _lastNotificationTime;
     BOOL _isShowingPreview;
     NSString *_currentTheme;
-    BOOL _atMention;
     NSString *_bugReport;
     int _deleteFileReqId;
+    UpdateSuggestionsTask *_updateSuggestionsTask;
     
     id<UIViewControllerPreviewing> __previewer;
 }

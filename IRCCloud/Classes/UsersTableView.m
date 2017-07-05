@@ -138,7 +138,7 @@
 
 - (void)_addUsersFromList:(NSArray *)users heading:(NSString *)heading symbol:(NSString*)symbol groupColor:(UIColor *)groupColor borderColor:(UIColor *)borderColor headingColor:(UIColor *)headingColor data:(NSMutableArray *)data sectionTitles:(NSMutableArray *)sectionTitles sectionIndexes:(NSMutableArray *)sectionIndexes sectionSizes:(NSMutableArray *)sectionSizes {
     if(users.count && symbol) {
-        unichar lastChar = 0;
+        //unichar lastChar = 0;
         [data addObject:@{
          @"type":@TYPE_HEADING,
          @"text":heading,
@@ -151,9 +151,9 @@
          }];
         NSUInteger size = data.count;
         for(User *user in users) {
-            if(sectionTitles != nil) {
-                if(user.nick.length && [[user.nick lowercaseString] characterAtIndex:0] != lastChar) {
-                    lastChar = [[user.nick lowercaseString] characterAtIndex:0];
+            /*if(sectionTitles != nil) {
+                if(user.nick.length && [user.lowercase_nick characterAtIndex:0] != lastChar) {
+                    lastChar = [user.lowercase_nick characterAtIndex:0];
                     [sectionIndexes addObject:@(data.count)];
                     [sectionTitles addObject:[[user.nick uppercaseString] substringToIndex:1]];
                     [sectionSizes addObject:@(size)];
@@ -161,7 +161,7 @@
                 } else {
                     size++;
                 }
-            }
+            }*/
             [data addObject:@{
              @"type":@TYPE_USER,
              @"text":user.nick,
@@ -171,8 +171,8 @@
              @"borderColor":borderColor
              }];
         }
-        if(sectionSizes != nil)
-            [sectionSizes addObject:@(size)];
+        /*if(sectionSizes != nil)
+            [sectionSizes addObject:@(size)];*/
     }
 }
 
@@ -212,7 +212,17 @@
     
     NSString *opersGroupMode = @"Y";
     
-    for(User *user in [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid]) {
+    NSArray *users = [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid];
+    if(users.count > 1000) {
+        NSMutableDictionary *disableNickSuggestions = [[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] mutableCopy];
+        if(![disableNickSuggestions objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]]) {
+            CLS_LOG(@"Channel has %lu members, disabling auto nick suggestions", (unsigned long)users.count);
+            [disableNickSuggestions setObject:@YES forKey:[NSString stringWithFormat:@"%i",_buffer.bid]];
+            [[NSUserDefaults standardUserDefaults] setObject:disableNickSuggestions forKey:@"disable-nick-suggestions"];
+        }
+    }
+    
+    for(User *user in users) {
         if(user.nick.length) {
             NSString *mode = user.mode.lowercaseString;
             if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && ([PREFIX objectForKey:s?s.MODE_OPER:@"Y"] || [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"])) {
