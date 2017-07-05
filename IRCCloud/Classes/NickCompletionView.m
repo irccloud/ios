@@ -35,7 +35,7 @@
                                [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeading multiplier:1.0f constant:1.0f],
                                [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTrailing multiplier:1.0f constant:-1.0f]
                                ]];
-        [self setSuggestions:@[]];
+        [self setSuggestions:@[] completionHandler:nil];
     }
     return self;
 }
@@ -44,10 +44,9 @@
     return CGSizeMake(self.bounds.size.width, 36);
 }
 
--(void)setSuggestions:(NSArray *)suggestions {
+-(void)setSuggestions:(NSArray *)suggestions completionHandler:(void (^)(void))completionHandler {
+    NSMutableArray *subViews = [[NSMutableArray alloc] init];
     _suggestions = suggestions;
-    
-    [[_scrollView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     
     int x = 0;
     for(NSString *label in _suggestions) {
@@ -64,19 +63,30 @@
         frame.size.width += 20;
         frame.size.height = _scrollView.frame.size.height;
         b.frame = frame;
-        [_scrollView addSubview:b];
+        [subViews addObject:b];
         x += frame.size.width;
     }
-    if(_scrollView.frame.size.width < x) {
-        [_scrollView setContentInset:UIEdgeInsetsMake(0, 6, 0, 6)];
-    } else {
-        [_scrollView setContentInset:UIEdgeInsetsMake(0, (_scrollView.frame.size.width - x) / 2, 0, 0)];
-    }
-    [_scrollView setContentSize:CGSizeMake(x,_scrollView.frame.size.height)];
-    _selection = -1;
-    _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
-    self.backgroundColor = [UIColor bufferBorderColor];
-    _scrollView.backgroundColor = [UIColor bufferBackgroundColor];
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[_scrollView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+        
+        for(UIView *v in subViews)
+            [_scrollView addSubview:v];
+        
+        if(_scrollView.frame.size.width < x) {
+            [_scrollView setContentInset:UIEdgeInsetsMake(0, 6, 0, 6)];
+        } else {
+            [_scrollView setContentInset:UIEdgeInsetsMake(0, (_scrollView.frame.size.width - x) / 2, 0, 0)];
+        }
+        [_scrollView setContentSize:CGSizeMake(x,_scrollView.frame.size.height)];
+        _selection = -1;
+        _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+        self.backgroundColor = [UIColor bufferBorderColor];
+        _scrollView.backgroundColor = [UIColor bufferBackgroundColor];
+        
+        if(completionHandler)
+            completionHandler();
+    }];
 }
 
 -(NSString *)suggestion {

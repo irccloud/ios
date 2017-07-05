@@ -30,7 +30,7 @@
 @property (readonly) UIFont *font;
 @property (nonatomic, assign) id<NickCompletionViewDelegate> completionDelegate;
 @property int selection;
--(void)setSuggestions:(NSArray *)suggestions;
+-(void)setSuggestions:(NSArray *)suggestions completionHandler:(void (^)(void))completionHandler;
 -(NSUInteger)count;
 -(NSString *)suggestion;
 @end
