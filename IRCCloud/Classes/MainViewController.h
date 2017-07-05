@@ -39,7 +39,7 @@
 @property UIExpandingTextView *message;
 @property Buffer *buffer;
 @property NickCompletionView *nickCompletionView;
-@property BOOL force, atMention;
+@property BOOL force, atMention, cancelled;
 
 -(void)cancel;
 -(void)run;
