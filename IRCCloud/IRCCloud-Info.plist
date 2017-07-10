@@ -105,10 +105,10 @@
 	</array>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Hack-BoldItalic.otf</string>
-		<string>Hack-Italic.otf</string>
-		<string>Hack-Bold.otf</string>
-		<string>Hack-Regular.otf</string>
+		<string>Hack-BoldItalic.ttf</string>
+		<string>Hack-Italic.ttf</string>
+		<string>Hack-Bold.ttf</string>
+		<string>Hack-Regular.ttf</string>
 		<string>SourceSansPro-LightIt.otf</string>
 		<string>SourceSansPro-Regular.otf</string>
 		<string>SourceSansPro-Semibold.otf</string>

@@ -338,6 +338,14 @@
 		226F080F1E6495C8003EED23 /* WhoWasTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 226F080D1E6495C8003EED23 /* WhoWasTableViewController.m */; };
 		2271FDA11DCDF45C00A39F84 /* TextTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */; };
 		2271FDA21DCDF45C00A39F84 /* TextTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */; };
+		227392A61F0FE8C700606199 /* Hack-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 227392A21F0FE8C700606199 /* Hack-Italic.ttf */; };
+		227392A71F0FE8C700606199 /* Hack-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 227392A21F0FE8C700606199 /* Hack-Italic.ttf */; };
+		227392A81F0FE8C700606199 /* Hack-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 227392A31F0FE8C700606199 /* Hack-Bold.ttf */; };
+		227392A91F0FE8C700606199 /* Hack-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 227392A31F0FE8C700606199 /* Hack-Bold.ttf */; };
+		227392AA1F0FE8C700606199 /* Hack-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 227392A41F0FE8C700606199 /* Hack-Regular.ttf */; };
+		227392AB1F0FE8C700606199 /* Hack-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 227392A41F0FE8C700606199 /* Hack-Regular.ttf */; };
+		227392AC1F0FE8C700606199 /* Hack-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 227392A51F0FE8C700606199 /* Hack-BoldItalic.ttf */; };
+		227392AD1F0FE8C700606199 /* Hack-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 227392A51F0FE8C700606199 /* Hack-BoldItalic.ttf */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
 		227C63BA1C7B8C4800B674D6 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A1F1141C232B3A00AEC09A /* SafariServices.framework */; };
 		227DA89E1CF381B60041B1BF /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 227DA89D1CF381B60041B1BF /* CoreTelephony.framework */; };
@@ -565,14 +573,6 @@
 		22D46C681A13A9A900B142F7 /* FileUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D46C661A13A9A900B142F7 /* FileUploader.m */; };
 		22D46C691A13A9A900B142F7 /* FileUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D46C661A13A9A900B142F7 /* FileUploader.m */; };
 		22D46C6A1A13A9A900B142F7 /* FileUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D46C661A13A9A900B142F7 /* FileUploader.m */; };
-		22D4C9841D871745007C00B0 /* Hack-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 22D4C9801D871745007C00B0 /* Hack-Bold.otf */; };
-		22D4C9851D871745007C00B0 /* Hack-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 22D4C9801D871745007C00B0 /* Hack-Bold.otf */; };
-		22D4C9861D871745007C00B0 /* Hack-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 22D4C9811D871745007C00B0 /* Hack-BoldItalic.otf */; };
-		22D4C9871D871745007C00B0 /* Hack-BoldItalic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 22D4C9811D871745007C00B0 /* Hack-BoldItalic.otf */; };
-		22D4C9881D871745007C00B0 /* Hack-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 22D4C9821D871745007C00B0 /* Hack-Italic.otf */; };
-		22D4C9891D871745007C00B0 /* Hack-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 22D4C9821D871745007C00B0 /* Hack-Italic.otf */; };
-		22D4C98A1D871745007C00B0 /* Hack-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 22D4C9831D871745007C00B0 /* Hack-Regular.otf */; };
-		22D4C98B1D871745007C00B0 /* Hack-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 22D4C9831D871745007C00B0 /* Hack-Regular.otf */; };
 		22D4F9121743F3790095EE8F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 22D4F9101743F3790095EE8F /* Localizable.strings */; };
 		22D649241B1E0719003BFD86 /* CSURITemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649231B1E0719003BFD86 /* CSURITemplate.m */; };
 		22D649251B1E0719003BFD86 /* CSURITemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649231B1E0719003BFD86 /* CSURITemplate.m */; };
@@ -890,6 +890,10 @@
 		226F080D1E6495C8003EED23 /* WhoWasTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoWasTableViewController.m; sourceTree = "<group>"; };
 		2271FD9F1DCDF45C00A39F84 /* TextTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextTableViewController.h; sourceTree = "<group>"; };
 		2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TextTableViewController.m; sourceTree = "<group>"; };
+		227392A21F0FE8C700606199 /* Hack-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Hack-Italic.ttf"; path = "../../../../Downloads/Hack-v2_020-ttf (1)/Hack-Italic.ttf"; sourceTree = "<group>"; };
+		227392A31F0FE8C700606199 /* Hack-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Hack-Bold.ttf"; path = "../../../../Downloads/Hack-v2_020-ttf (1)/Hack-Bold.ttf"; sourceTree = "<group>"; };
+		227392A41F0FE8C700606199 /* Hack-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Hack-Regular.ttf"; path = "../../../../Downloads/Hack-v2_020-ttf (1)/Hack-Regular.ttf"; sourceTree = "<group>"; };
+		227392A51F0FE8C700606199 /* Hack-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Hack-BoldItalic.ttf"; path = "../../../../Downloads/Hack-v2_020-ttf (1)/Hack-BoldItalic.ttf"; sourceTree = "<group>"; };
 		2274F49D1756723F0039B4CB /* OpenInChromeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInChromeController.h; path = OpenInChrome/OpenInChromeController.h; sourceTree = SOURCE_ROOT; };
 		2274F49E1756723F0039B4CB /* OpenInChromeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = OpenInChromeController.m; path = OpenInChrome/OpenInChromeController.m; sourceTree = SOURCE_ROOT; };
 		227DA89D1CF381B60041B1BF /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
@@ -1052,10 +1056,6 @@
 		22D430A51725AAEA003C0684 /* UIExpandingTextViewInternal.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIExpandingTextViewInternal.m; sourceTree = "<group>"; };
 		22D46C651A13A9A900B142F7 /* FileUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileUploader.h; sourceTree = "<group>"; };
 		22D46C661A13A9A900B142F7 /* FileUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileUploader.m; sourceTree = "<group>"; };
-		22D4C9801D871745007C00B0 /* Hack-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hack-Bold.otf"; sourceTree = "<group>"; };
-		22D4C9811D871745007C00B0 /* Hack-BoldItalic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hack-BoldItalic.otf"; sourceTree = "<group>"; };
-		22D4C9821D871745007C00B0 /* Hack-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hack-Italic.otf"; sourceTree = "<group>"; };
-		22D4C9831D871745007C00B0 /* Hack-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Hack-Regular.otf"; sourceTree = "<group>"; };
 		22D4F9111743F3790095EE8F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		22D649221B1E0719003BFD86 /* CSURITemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSURITemplate.h; sourceTree = "<group>"; };
 		22D649231B1E0719003BFD86 /* CSURITemplate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CSURITemplate.m; sourceTree = "<group>"; };
@@ -1587,11 +1587,11 @@
 		228A05B416D3DB930029769C /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				227392A31F0FE8C700606199 /* Hack-Bold.ttf */,
+				227392A51F0FE8C700606199 /* Hack-BoldItalic.ttf */,
+				227392A21F0FE8C700606199 /* Hack-Italic.ttf */,
+				227392A41F0FE8C700606199 /* Hack-Regular.ttf */,
 				2236BD621BAA5E0900015753 /* FontAwesome.otf */,
-				22D4C9801D871745007C00B0 /* Hack-Bold.otf */,
-				22D4C9811D871745007C00B0 /* Hack-BoldItalic.otf */,
-				22D4C9821D871745007C00B0 /* Hack-Italic.otf */,
-				22D4C9831D871745007C00B0 /* Hack-Regular.otf */,
 				2236BD681BAC61A900015753 /* SourceSansPro-LightIt.otf */,
 				2236BD691BAC61A900015753 /* SourceSansPro-Regular.otf */,
 				225173E21DB13A5500D63405 /* SourceSansPro-Semibold.otf */,
@@ -2204,26 +2204,26 @@
 			buildActionMask = 2147483647;
 			files = (
 				22EEA94E18D0AC08007D5022 /* EnterpriseImages.xcassets in Resources */,
+				227392A91F0FE8C700606199 /* Hack-Bold.ttf in Resources */,
 				22F4A9CB1CB5424F00359049 /* Launch.storyboard in Resources */,
 				1A7382AD18D0A9AC0039FDB3 /* EnterpriseLogo.xcassets in Resources */,
 				225D978D18AA995900065087 /* Localizable.strings in Resources */,
 				225D979018AA995900065087 /* ARChromeActivity.png in Resources */,
-				22D4C9851D871745007C00B0 /* Hack-Bold.otf in Resources */,
 				225D979118AA995900065087 /* ARChromeActivity@2x.png in Resources */,
+				227392AD1F0FE8C700606199 /* Hack-BoldItalic.ttf in Resources */,
 				225173E81DB13A5500D63405 /* SourceSansPro-Semibold.otf in Resources */,
 				225D979218AA995900065087 /* ARChromeActivity@2x~ipad.png in Resources */,
 				22A363B319D0884D00500478 /* 1Password.xcassets in Resources */,
+				227392A71F0FE8C700606199 /* Hack-Italic.ttf in Resources */,
 				22EB4CF51CCEE2ED004F9CFC /* ImageViewController.xib in Resources */,
 				225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */,
 				22D268C31BF4F40800B682AE /* MainStoryboard.storyboard in Resources */,
+				227392AB1F0FE8C700606199 /* Hack-Regular.ttf in Resources */,
 				22EE12851C9B20DF00E7AE8D /* Firefox.png in Resources */,
-				22D4C9871D871745007C00B0 /* Hack-BoldItalic.otf in Resources */,
 				225D979418AA995900065087 /* Safari.png in Resources */,
 				2236BD6B1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
-				22D4C9891D871745007C00B0 /* Hack-Italic.otf in Resources */,
 				22EE12891C9B20DF00E7AE8D /* Firefox@3x.png in Resources */,
 				225D979518AA995900065087 /* Safari@2x.png in Resources */,
-				22D4C98B1D871745007C00B0 /* Hack-Regular.otf in Resources */,
 				2236BD6D1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
 				2236BD641BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				225D979618AA995900065087 /* Safari@2x~ipad.png in Resources */,
@@ -2242,19 +2242,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				22C0F1541B8F6829001D109D /* Assets in Resources */,
-				22D4C9861D871745007C00B0 /* Hack-BoldItalic.otf in Resources */,
+				227392A81F0FE8C700606199 /* Hack-Bold.ttf in Resources */,
 				22EE12841C9B20DF00E7AE8D /* Firefox.png in Resources */,
 				22EE12861C9B20DF00E7AE8D /* Firefox@2x.png in Resources */,
 				22EE12881C9B20DF00E7AE8D /* Firefox@3x.png in Resources */,
-				22D4C9881D871745007C00B0 /* Hack-Italic.otf in Resources */,
 				2236BD6C1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
 				225173E71DB13A5500D63405 /* SourceSansPro-Semibold.otf in Resources */,
+				227392AC1F0FE8C700606199 /* Hack-BoldItalic.ttf in Resources */,
 				22D4F9121743F3790095EE8F /* Localizable.strings in Resources */,
 				22D268C21BF4F40800B682AE /* MainStoryboard.storyboard in Resources */,
 				225017641783434900066E71 /* ARChromeActivity.png in Resources */,
+				227392A61F0FE8C700606199 /* Hack-Italic.ttf in Resources */,
 				225017651783434900066E71 /* ARChromeActivity@2x.png in Resources */,
 				2236BD6A1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
 				22EEA95418D0B198007D5022 /* Icons.xcassets in Resources */,
+				227392AA1F0FE8C700606199 /* Hack-Regular.ttf in Resources */,
 				2236BD631BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				22A363B219D0884D00500478 /* 1Password.xcassets in Resources */,
 				1A7382AC18D0A9A30039FDB3 /* Logo.xcassets in Resources */,
@@ -2263,13 +2265,11 @@
 				225017691783434900066E71 /* Safari.png in Resources */,
 				22EEA95118D0B117007D5022 /* Images.xcassets in Resources */,
 				22EB4CF41CCEE298004F9CFC /* ImageViewController.xib in Resources */,
-				22D4C98A1D871745007C00B0 /* Hack-Regular.otf in Resources */,
 				2250176A1783434900066E71 /* Safari@2x.png in Resources */,
 				2250176B1783434900066E71 /* Safari@2x~ipad.png in Resources */,
 				22F4A9CA1CB5424F00359049 /* Launch.storyboard in Resources */,
 				2250176C1783434900066E71 /* Safari~ipad.png in Resources */,
 				224FCF331787286000FC3879 /* licenses.txt in Resources */,
-				22D4C9841D871745007C00B0 /* Hack-Bold.otf in Resources */,
 				22F5C4BD1791F205005E09A9 /* a.caf in Resources */,
 				2251693317B5A8040093ADC5 /* TUSafariActivity.strings in Resources */,
 			);
