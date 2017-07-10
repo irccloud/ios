@@ -903,7 +903,7 @@
     event.bid = object.bid;
     event.eid = object.eid;
     event.type = object.type;
-    event.msg = [object objectForKey:@"msg"];
+    event.msg = [[object objectForKey:@"msg"] precomposedStringWithCanonicalMapping];
     event.hostmask = [object objectForKey:@"hostmask"];
     event.from = [object objectForKey:@"from"];
     event.fromMode = [object objectForKey:@"from_mode"];
