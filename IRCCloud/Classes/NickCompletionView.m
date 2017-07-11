@@ -18,22 +18,58 @@
 #import "UIColor+IRCCloud.h"
 #import "ColorFormatter.h"
 
+@interface NickCompletionCell : UICollectionViewCell {
+    UILabel *_label;
+}
+@property (readonly)UILabel *label;
+@end
+
+@implementation NickCompletionCell
+-(instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
+        _label = [[UILabel alloc] init];
+        _label.textAlignment = NSTextAlignmentCenter;
+        _label.textColor = [UIColor bufferTextColor];
+        [self.contentView addSubview:_label];
+    }
+    return self;
+}
+
+-(void)layoutSubviews {
+    _label.frame = self.bounds;
+}
+
+-(void)setSelected:(BOOL)selected {
+    self.contentView.backgroundColor = selected ? [UIColor selectedBufferBackgroundColor] : [UIColor clearColor];
+    _label.textColor = selected ? [UIColor selectedBufferTextColor] : [UIColor bufferTextColor];
+}
+@end
+
 @implementation NickCompletionView
 
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
         _selection = -1;
-        _scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
-        _scrollView.translatesAutoresizingMaskIntoConstraints = NO;
-        _scrollView.layer.masksToBounds = YES;
-        _scrollView.layer.cornerRadius = 4;
-        [self addSubview:_scrollView];
+        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
+        layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+        layout.sectionInset = UIEdgeInsetsMake(0, 6, 0, 6);
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+        _collectionView.dataSource = self;
+        _collectionView.delegate = self;
+        [_collectionView registerClass:NickCompletionCell.class forCellWithReuseIdentifier:@"NickCompletionCell"];
+        _collectionView.translatesAutoresizingMaskIntoConstraints = NO;
+        _collectionView.layer.masksToBounds = YES;
+        _collectionView.layer.cornerRadius = 4;
+        _collectionView.allowsSelection = YES;
+        _collectionView.allowsMultipleSelection = NO;
+        [self addSubview:_collectionView];
         [self addConstraints:@[
-                               [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0f constant:1.0f],
-                               [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-1.0f],
-                               [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeading multiplier:1.0f constant:1.0f],
-                               [NSLayoutConstraint constraintWithItem:_scrollView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTrailing multiplier:1.0f constant:-1.0f]
+                               [NSLayoutConstraint constraintWithItem:_collectionView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0f constant:1.0f],
+                               [NSLayoutConstraint constraintWithItem:_collectionView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-1.0f],
+                               [NSLayoutConstraint constraintWithItem:_collectionView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeading multiplier:1.0f constant:1.0f],
+                               [NSLayoutConstraint constraintWithItem:_collectionView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTrailing multiplier:1.0f constant:-1.0f]
                                ]];
         [self setSuggestions:@[]];
     }
@@ -46,37 +82,11 @@
 
 -(void)setSuggestions:(NSArray *)suggestions {
     _suggestions = suggestions;
-    
-    [[_scrollView subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    
-    int x = 0;
-    for(NSString *label in _suggestions) {
-        UIButton *b = [UIButton buttonWithType:UIButtonTypeCustom];
-        b.titleLabel.font = _font;
-        [b setTitle:label forState:UIControlStateNormal];
-        [b setTitleColor:[UIColor bufferTextColor] forState:UIControlStateNormal];
-        [b addTarget:self action:@selector(suggestionTapped:) forControlEvents:UIControlEventTouchUpInside];
-        [b sizeToFit];
-        CGRect frame = b.frame;
-        frame.origin.x = x;
-        if(frame.size.width < 32)
-            frame.size.width = 32;
-        frame.size.width += 20;
-        frame.size.height = _scrollView.frame.size.height;
-        b.frame = frame;
-        [_scrollView addSubview:b];
-        x += frame.size.width;
-    }
-    if(_scrollView.frame.size.width < x) {
-        [_scrollView setContentInset:UIEdgeInsetsMake(0, 6, 0, 6)];
-    } else {
-        [_scrollView setContentInset:UIEdgeInsetsMake(0, (_scrollView.frame.size.width - x) / 2, 0, 0)];
-    }
-    [_scrollView setContentSize:CGSizeMake(x,_scrollView.frame.size.height)];
     _selection = -1;
     _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     self.backgroundColor = [UIColor bufferBorderColor];
-    _scrollView.backgroundColor = [UIColor bufferBackgroundColor];
+    _collectionView.backgroundColor = [UIColor bufferBackgroundColor];
+    [_collectionView reloadData];
 }
 
 -(NSString *)suggestion {
@@ -84,7 +94,6 @@
         return nil;
     return [_suggestions objectAtIndex:_selection];
 }
-
 
 -(NSUInteger)count {
     return _suggestions.count;
@@ -96,31 +105,34 @@
 
 -(void)setSelection:(int)selection {
     _selection = selection;
-    
-    if(_selection >= 0) {
-        int i = 0;
-        for(UIButton *b in [_scrollView subviews]) {
-            if([b isKindOfClass:[UIButton class]]) {
-                if(i == selection) {
-                    [b setTitleColor:[UIColor selectedBufferTextColor] forState:UIControlStateNormal];
-                    b.titleLabel.superview.backgroundColor = [UIColor selectedBufferBackgroundColor];
-                    [_scrollView scrollRectToVisible:b.frame animated:YES];
-                } else {
-                    [b setTitleColor:[UIColor bufferTextColor] forState:UIControlStateNormal];
-                    b.titleLabel.superview.backgroundColor = [UIColor clearColor];
-                }
-                i++;
-            }
-        }
-    }
+    [_collectionView selectItemAtIndexPath:[NSIndexPath indexPathForRow:selection inSection:0] animated:YES scrollPosition:UICollectionViewScrollPositionCenteredHorizontally];
 }
 
--(void)suggestionTapped:(UIButton *)sender {
+-(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
+    return 1;
+}
+
+- (NSInteger)collectionView:(nonnull UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
+    return _suggestions.count;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    NickCompletionCell *cell = [_collectionView dequeueReusableCellWithReuseIdentifier:@"NickCompletionCell" forIndexPath:indexPath];
+    cell.label.font = _font;
+    cell.label.text = [_suggestions objectAtIndex:indexPath.row];
+    return cell;
+}
+
+-(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
+    return CGSizeMake([[_suggestions objectAtIndex:indexPath.row] sizeWithAttributes:@{NSFontAttributeName:_font}].width + 8, _collectionView.frame.size.height - 1);
+}
+
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [[UIDevice currentDevice] playInputClick];
-    [_completionDelegate nickSelected:sender.titleLabel.text];
+    [_completionDelegate nickSelected:[_suggestions objectAtIndex:indexPath.row]];
 }
 
-- (BOOL) enableInputClicksWhenVisible {
+-(BOOL)enableInputClicksWhenVisible {
     return YES;
 }
 @end

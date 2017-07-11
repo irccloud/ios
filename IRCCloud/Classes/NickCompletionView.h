@@ -20,9 +20,8 @@
 -(void)nickSelected:(NSString *)nick;
 @end
 
-
-@interface NickCompletionView : UIView<UIInputViewAudioFeedback> {
-    UIScrollView *_scrollView;
+@interface NickCompletionView : UIView<UIInputViewAudioFeedback,UICollectionViewDelegate,UICollectionViewDataSource,UICollectionViewDelegateFlowLayout> {
+    UICollectionView *_collectionView;
     NSArray *_suggestions;
     UIFont *_font;
     int _selection;
