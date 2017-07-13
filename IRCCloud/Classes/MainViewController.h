@@ -111,7 +111,6 @@
     BOOL _isShowingPreview;
     NSString *_currentTheme;
     NSString *_bugReport;
-    int _deleteFileReqId;
     UpdateSuggestionsTask *_updateSuggestionsTask;
     
     id<UIViewControllerPreviewing> __previewer;

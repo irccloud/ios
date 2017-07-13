@@ -146,7 +146,12 @@
             cids = [cids stringByAppendingString:@","];
         cids = [cids stringByAppendingFormat:@"%i", s.cid];
     }
-    [[NetworkConnection sharedInstance] reorderConnections:cids];
+    [[NetworkConnection sharedInstance] reorderConnections:cids handler:^(IRCCloudJSONObject *result) {
+        if(![[result objectForKey:@"success"] boolValue]) {
+            UIAlertView *v = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to reorder connections: %@. Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+            [v show];
+        }
+    }];
 }
 
 - (UITableViewCellEditingStyle)tableView:(UITableView *)tableView editingStyleForRowAtIndexPath:(NSIndexPath *)indexPath {

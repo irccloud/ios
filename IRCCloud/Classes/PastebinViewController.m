@@ -196,7 +196,7 @@
 
 -(void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
     if([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Delete"]) {
-        [[NetworkConnection sharedInstance] deletePaste:_pasteID];
+        [[NetworkConnection sharedInstance] deletePaste:_pasteID handler:nil];
         if(self.navigationController.viewControllers.count == 1)
             [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         else

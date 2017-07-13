@@ -143,7 +143,7 @@
     } else if(event == kIRCEventBufferMsg) {
         e = notification.object;
         if(e.cid == _event.cid && e.bid == _bid && [e.type isEqualToString:@"channel_mode_list_change"]) {
-            [[NetworkConnection sharedInstance] mode:_mode chan:[_event objectForKey:@"channel"] cid:_event.cid];
+            [[NetworkConnection sharedInstance] mode:_mode chan:[_event objectForKey:@"channel"] cid:_event.cid handler:nil];
         }
     }
 }
@@ -248,7 +248,7 @@
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete && indexPath.row < _data.count) {
         NSDictionary *row = [_data objectAtIndex:indexPath.row];
-        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@", _mode, [row objectForKey:_mask]] chan:[_event objectForKey:@"channel"] cid:_event.cid];
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@", _mode, [row objectForKey:_mask]] chan:[_event objectForKey:@"channel"] cid:_event.cid handler:nil];
     }
 }
 
@@ -262,7 +262,7 @@
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
     if([title isEqualToString:@"Add"]) {
-        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@", _mode, [alertView textFieldAtIndex:0].text] chan:[_event objectForKey:@"channel"] cid:_event.cid];
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@", _mode, [alertView textFieldAtIndex:0].text] chan:[_event objectForKey:@"channel"] cid:_event.cid handler:nil];
     }
     
     _alertView = nil;

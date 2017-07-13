@@ -39,7 +39,7 @@
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
         _buffer = buffer;
-        _pastereqid = _sayreqid = -1;
+        _sayreqid = -1;
         
         _type = [[UISegmentedControl alloc] initWithItems:@[@"Snippet", @"Messages"]];
         _type.selectedSegmentIndex = 0;
@@ -59,7 +59,7 @@
     if (self) {
         self.navigationItem.title = @"Text Snippet";
         _pasteID = pasteID;
-        _pastereqid = _sayreqid = -1;
+        _sayreqid = -1;
         UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
         [spinny startAnimating];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
@@ -100,7 +100,12 @@
         } else {
             _buffer.draft = _text.text;
         }
-        _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid];
+        _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
+            if(![result objectForKey:@"success"]) {
+                UIAlertView *v = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Failed to send message: %@", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                [v show];
+            }
+        }];
     } else {
         if([_filename.text rangeOfString:@"."].location != NSNotFound) {
             NSString *extension = [_filename.text substringFromIndex:[_filename.text rangeOfString:@"." options:NSBackwardsSearch].location + 1];
@@ -114,10 +119,35 @@
                 _extension = @"txt";
         }
         
+        IRCCloudAPIResultHandler pasteHandler = ^(IRCCloudJSONObject *result) {
+            if([result objectForKey:@"success"]) {
+                if(_pasteID) {
+                    [self.tableView endEditing:YES];
+                    [self.navigationController popViewControllerAnimated:YES];
+                } else {
+                    if(_message.text.length) {
+                        _buffer.draft = [NSString stringWithFormat:@"%@ %@", _message.text, [result objectForKey:@"url"]];
+                    } else {
+                        _buffer.draft = [result objectForKey:@"url"];
+                    }
+                    _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
+                        if(![result objectForKey:@"success"]) {
+                            UIAlertView *v = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Failed to send message: %@", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                            [v show];
+                        }
+                    }];
+                }
+            } else {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save pastebin, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:_pasteID?@"Save":@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
+            }
+        };
+        
         if(_pasteID)
-            _pastereqid = [[NetworkConnection sharedInstance] editPaste:_pasteID name:_filename.text contents:_text.text extension:_extension];
+            [[NetworkConnection sharedInstance] editPaste:_pasteID name:_filename.text contents:_text.text extension:_extension handler:pasteHandler];
         else
-            _pastereqid = [[NetworkConnection sharedInstance] paste:_filename.text contents:_text.text extension:_extension];
+            [[NetworkConnection sharedInstance] paste:_filename.text contents:_text.text extension:_extension handler:pasteHandler];
     }
 }
 
@@ -147,45 +177,9 @@
 
 -(void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-    IRCCloudJSONObject *o;
     Event *e;
-    int reqid;
     
     switch(event) {
-        case kIRCEventFailureMsg:
-            o = notification.object;
-            reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _pastereqid) {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save pastebin, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
-                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:_pasteID?@"Save":@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
-            } else if(reqid == _sayreqid) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self.tableView endEditing:YES];
-                    [self dismissViewControllerAnimated:YES completion:nil];
-                }];
-            }
-            break;
-        case kIRCEventSuccess:
-            o = notification.object;
-            reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _pastereqid) {
-                if(_pasteID) {
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [self.tableView endEditing:YES];
-                        [self.navigationController popViewControllerAnimated:YES];
-                    }];
-                } else {
-                    if(_message.text.length) {
-                        _buffer.draft = [NSString stringWithFormat:@"%@ %@", _message.text, [o objectForKey:@"url"]];
-                    } else {
-                        _buffer.draft = [o objectForKey:@"url"];
-                    }
-                    _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid];
-                }
-                _pastereqid = -1;
-            }
-            break;
         case kIRCEventBufferMsg:
             e = notification.object;
             if(_sayreqid > 0 && e.bid == _buffer.bid && (e.reqId == _sayreqid || (e.isSelf && [e.from isEqualToString:_buffer.name]))) {

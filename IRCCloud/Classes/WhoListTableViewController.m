@@ -161,11 +161,11 @@
     switch(buttonIndex) {
         case 0:
             [self dismissViewControllerAnimated:YES completion:nil];
-            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [_selectedRow objectForKey:@"nick"]] to:nil cid:_event.cid];
+            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [_selectedRow objectForKey:@"nick"]] to:nil cid:_event.cid handler:nil];
             break;
         case 1:
             [self dismissViewControllerAnimated:YES completion:nil];
-            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/whois %@", [_selectedRow objectForKey:@"nick"]] to:nil cid:_event.cid];
+            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/whois %@", [_selectedRow objectForKey:@"nick"]] to:nil cid:_event.cid handler:nil];
             break;
         case 2:
         {

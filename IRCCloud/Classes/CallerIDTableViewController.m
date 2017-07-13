@@ -146,8 +146,8 @@
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSString *nick = [[_nicks objectAtIndex:indexPath.row] objectAtIndex:0];
-        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/accept -%@", nick] to:nil cid:_event.cid];
-        [[NetworkConnection sharedInstance] say:@"/accept *" to:nil cid:_event.cid];
+        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/accept -%@", nick] to:nil cid:_event.cid handler:nil];
+        [[NetworkConnection sharedInstance] say:@"/accept *" to:nil cid:_event.cid handler:nil];
     }
 }
 
@@ -161,8 +161,8 @@
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
     if([title isEqualToString:@"Allow"]) {
-        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/accept %@", [alertView textFieldAtIndex:0].text] to:nil cid:_event.cid];
-        [[NetworkConnection sharedInstance] say:@"/accept *" to:nil cid:_event.cid];
+        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/accept %@", [alertView textFieldAtIndex:0].text] to:nil cid:_event.cid handler:nil];
+        [[NetworkConnection sharedInstance] say:@"/accept *" to:nil cid:_event.cid handler:nil];
     }
     
     _alertView = nil;

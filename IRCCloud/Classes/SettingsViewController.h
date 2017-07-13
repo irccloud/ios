@@ -65,13 +65,6 @@
     UISwitch *_thirdPartyNotificationPreviews;
     NSString *_version;
     UISlider *_fontSize;
-    int _userinforeqid;
-    int _prefsreqid;
-    int _emailreqid;
-    int _changepasswordreqid;
-    int _deleteaccountreqid;
-    BOOL _userinfosaved;
-    BOOL _prefssaved;
     NSString *_oldTheme;
     UIAlertView *_alertView;
     NSArray *_data;

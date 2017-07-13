@@ -141,7 +141,7 @@
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self dismissViewControllerAnimated:YES completion:nil];
     NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [row objectForKey:@"nick"]] to:nil cid:_event.cid];
+    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [row objectForKey:@"nick"]] to:nil cid:_event.cid handler:nil];
 }
 
 @end

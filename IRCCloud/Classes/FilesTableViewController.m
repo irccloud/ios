@@ -138,46 +138,6 @@
     [[ImageCache sharedInstance] clear];
 }
 
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-}
-
--(void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
--(void)handleEvent:(NSNotification *)notification {
-    kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-    IRCCloudJSONObject *o;
-    int reqid;
-    
-    switch(event) {
-        case kIRCEventFailureMsg:
-            o = notification.object;
-            reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _reqid) {
-                CLS_LOG(@"Error deleting file: %@", o);
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
-                _pages = 0;
-                _files = nil;
-                _canLoadMore = YES;
-                [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
-            }
-            break;
-        case kIRCEventSuccess:
-            o = notification.object;
-            reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _reqid)
-                CLS_LOG(@"File deleted successfully");
-            break;
-        default:
-            break;
-    }
-}
-
 -(void)_loadMore {
     @synchronized (self) {
         NSDictionary *d = [[NetworkConnection sharedInstance] getFiles:++_pages];
@@ -322,7 +282,19 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized (self) {
         if (editingStyle == UITableViewCellEditingStyleDelete) {
-            _reqid = [[NetworkConnection sharedInstance] deleteFile:[[_files objectAtIndex:indexPath.row] objectForKey:@"id"]];
+            [[NetworkConnection sharedInstance] deleteFile:[[_files objectAtIndex:indexPath.row] objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
+                if([[result objectForKey:@"success"] boolValue]) {
+                    CLS_LOG(@"File deleted successfully");
+                } else {
+                    CLS_LOG(@"Error deleting file: %@", result);
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                    _pages = 0;
+                    _files = nil;
+                    _canLoadMore = YES;
+                    [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
+                }
+            }];
             NSMutableArray *a = _files.mutableCopy;
             [a removeObjectAtIndex:indexPath.row];
             _files = [NSArray arrayWithArray:a];

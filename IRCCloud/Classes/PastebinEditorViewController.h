@@ -22,7 +22,6 @@
     UITextField *_filename;
     UITextView *_message;
     UITextView *_text;
-    int _pastereqid;
     int _sayreqid;
     Buffer *_buffer;
     NSString *_pasteID;

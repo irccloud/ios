@@ -336,13 +336,46 @@ static NSString * const ServerHasSSLKey = @"ssl";
     UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
     [spinny startAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+    
+    IRCCloudAPIResultHandler handler = ^(IRCCloudJSONObject *result) {
+        if([[result objectForKey:@"success"] boolValue]) {
+            if(self.presentingViewController) {
+                [self.tableView endEditing:YES];
+                [self dismissViewControllerAnimated:YES completion:nil];
+                [[NSNotificationCenter defaultCenter] removeObserver:self];
+            } else {
+                _cid = [[result objectForKey:@"cid"] intValue];
+            }
+        } else {
+            NSString *msg = [result objectForKey:@"message"];
+            if([msg isEqualToString:@"hostname"]) {
+                msg = @"Invalid hostname";
+            } else if([msg isEqualToString:@"nickname"]) {
+                msg = @"Invalid nickname";
+            } else if([msg isEqualToString:@"realname"]) {
+                msg = @"Invalid real name";
+            } else if([msg isEqualToString:@"passworded_servers"]) {
+                msg = @"You can’t connect to passworded servers with free accounts";
+            } else if([msg isEqualToString:@"networks"]) {
+                msg = @"You’ve exceeded the connection limit for free accounts";
+            } else if([msg isEqualToString:@"sts_policy"]) {
+                msg = @"You can’t disable secure connections to this network because it’s using a strict transport security policy";
+            } else if([msg isEqualToString:@"unverified"]) {
+                msg = @"You can’t connect to external servers until you confirm your email address";
+            }
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [alert show];
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
+        }
+    };
+    
     if(_cid == -1) {
-        _reqid = [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text];
+        [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text handler:handler];
     } else {
         _netname = _network.text;
         if([_netname.lowercaseString isEqualToString:_server.text.lowercaseString])
             _netname = nil;
-        _reqid = [[NetworkConnection sharedInstance] editServer:_cid hostname:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text];
+        [[NetworkConnection sharedInstance] editServer:_cid hostname:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text handler:handler];
     }
 }
 
@@ -462,9 +495,15 @@ static NSString * const ServerHasSSLKey = @"ssl";
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     if(touch.view.tag == 1) {
-        [[NetworkConnection sharedInstance] resendVerifyEmail];
-        UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-        [av show];
+        [[NetworkConnection sharedInstance] resendVerifyEmailWithHandler:^(IRCCloudJSONObject *result) {
+            if([[result objectForKey:@"success"] boolValue]) {
+                UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                [av show];
+            } else {
+                UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Confirmation Failed" message:[NSString stringWithFormat:@"Unable to send confirmation message: %@. Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                [av show];
+            }
+        }];
     }
     return ![touch.view isKindOfClass:[UIControl class]];
 }
@@ -654,9 +693,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 
 -(void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-    IRCCloudJSONObject *o;
     Server *s;
-    int reqid;
     
     switch(event) {
         case kIRCEventUserInfo:
@@ -666,44 +703,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
                 [[NSNotificationCenter defaultCenter] removeObserver:self];
             } else {
                 [self refresh];
-            }
-            break;
-        case kIRCEventFailureMsg:
-            o = notification.object;
-            reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _reqid) {
-                NSString *msg = [o objectForKey:@"message"];
-                if([msg isEqualToString:@"hostname"]) {
-                    msg = @"Invalid hostname";
-                } else if([msg isEqualToString:@"nickname"]) {
-                    msg = @"Invalid nickname";
-                } else if([msg isEqualToString:@"realname"]) {
-                    msg = @"Invalid real name";
-                } else if([msg isEqualToString:@"passworded_servers"]) {
-                    msg = @"You can’t connect to passworded servers with free accounts";
-                } else if([msg isEqualToString:@"networks"]) {
-                    msg = @"You’ve exceeded the connection limit for free accounts";
-                } else if([msg isEqualToString:@"sts_policy"]) {
-                    msg = @"You can’t disable secure connections to this network because it’s using a strict transport security policy";
-                } else if([msg isEqualToString:@"unverified"]) {
-                    msg = @"You can’t connect to external servers until you confirm your email address";
-                }
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
-                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
-            }
-            break;
-        case kIRCEventSuccess:
-            o = notification.object;
-            reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _reqid) {
-                if(self.presentingViewController) {
-                    [self.tableView endEditing:YES];
-                    [self dismissViewControllerAnimated:YES completion:nil];
-                    [[NSNotificationCenter defaultCenter] removeObserver:self];
-                } else {
-                    _cid = [[o objectForKey:@"cid"] intValue];
-                }
             }
             break;
         case kIRCEventMakeServer:

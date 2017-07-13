@@ -94,8 +94,7 @@ typedef enum {
     kIRCEventLinksResponse,
     kIRCEventWhoWas,
     kIRCEventTraceResponse,
-    kIRCEventFailureMsg,
-    kIRCEventSuccess,
+    kIRCEventAuthFailure,
     kIRCEventAlert,
     kIRCEventRefresh
 } kIRCEvent;
@@ -111,6 +110,8 @@ typedef enum {
     kIRCCloudReachable,
     kIRCCloudUnknown
 } kIRCCloudReachability;
+
+typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 
 @interface NetworkConnection : NSObject<WebSocketDelegate> {
     WebSocket *_socket;
@@ -143,7 +144,6 @@ typedef enum {
     int _accrued;
     BOOL _ready;
     BOOL _mock;
-    
     kIRCCloudState _state;
     NSDictionary *_userInfo;
     NSDictionary *_prefs;
@@ -156,11 +156,10 @@ typedef enum {
     NSDictionary *_parserMap;
     NSString *_globalMsg;
     NSString *_session;
-    
     int _keychainFailCount;
     NSTimeInterval _highestEID;
-    
     Ignore *_ignore;
+    NSMutableDictionary *_resultHandlers;
 }
 @property (readonly) kIRCCloudState state;
 @property NSDictionary *userInfo;
@@ -198,50 +197,50 @@ typedef enum {
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid completion:(void (^)(BOOL))completionHandler;
 -(void)requestBacklogForBuffer:(int)bid server:(int)cid beforeId:(NSTimeInterval)eid completion:(void (^)(BOOL))completionHandler;
 -(NSDictionary *)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid;
--(int)say:(NSString *)message to:(NSString *)to cid:(int)cid;
--(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid;
--(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids;
--(int)join:(NSString *)channel key:(NSString *)key cid:(int)cid;
--(int)part:(NSString *)channel msg:(NSString *)msg cid:(int)cid;
--(int)kick:(NSString *)nick chan:(NSString *)chan msg:(NSString *)msg cid:(int)cid;
--(int)mode:(NSString *)mode chan:(NSString *)chan cid:(int)cid;
--(int)invite:(NSString *)nick chan:(NSString *)chan cid:(int)cid;
--(int)archiveBuffer:(int)bid cid:(int)cid;
--(int)unarchiveBuffer:(int)bid cid:(int)cid;
--(int)deleteBuffer:(int)bid cid:(int)cid;
--(int)deleteServer:(int)cid;
--(int)addServer:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands channels:(NSString *)channels;
--(int)editServer:(int)cid hostname:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands;
--(int)ignore:(NSString *)mask cid:(int)cid;
--(int)unignore:(NSString *)mask cid:(int)cid;
--(int)setPrefs:(NSString *)prefs;
--(int)setRealname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway;
--(int)ns_help_register:(int)cid;
--(int)setNickservPass:(NSString *)nspass cid:(int)cid;
--(int)whois:(NSString *)nick server:(NSString *)server cid:(int)cid;
--(int)topic:(NSString *)topic chan:(NSString *)chan cid:(int)cid;
--(int)back:(int)cid;
--(int)disconnect:(int)cid msg:(NSString *)msg;
--(int)reconnect:(int)cid;
--(int)reorderConnections:(NSString *)cids;
+-(int)say:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid handler:(IRCCloudAPIResultHandler)handler;
+-(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids handler:(IRCCloudAPIResultHandler)handler;
+-(int)join:(NSString *)channel key:(NSString *)key cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)part:(NSString *)channel msg:(NSString *)msg cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)kick:(NSString *)nick chan:(NSString *)chan msg:(NSString *)msg cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)mode:(NSString *)mode chan:(NSString *)chan cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)invite:(NSString *)nick chan:(NSString *)chan cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)archiveBuffer:(int)bid cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)unarchiveBuffer:(int)bid cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)deleteBuffer:(int)bid cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)deleteServer:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)addServer:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands channels:(NSString *)channels handler:(IRCCloudAPIResultHandler)handler;
+-(int)editServer:(int)cid hostname:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands handler:(IRCCloudAPIResultHandler)handler;
+-(int)ignore:(NSString *)mask cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)unignore:(NSString *)mask cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)setPrefs:(NSString *)prefs handler:(IRCCloudAPIResultHandler)handler;
+-(int)setRealname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway handler:(IRCCloudAPIResultHandler)handler;
+-(int)ns_help_register:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)setNickservPass:(NSString *)nspass cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)whois:(NSString *)nick server:(NSString *)server cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)topic:(NSString *)topic chan:(NSString *)chan cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)back:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)disconnect:(int)cid msg:(NSString *)msg handler:(IRCCloudAPIResultHandler)handler;
+-(int)reconnect:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(int)reorderConnections:(NSString *)cids handler:(IRCCloudAPIResultHandler)handler;
 -(NSDictionary *)registerAPNs:(NSData *)token;
 -(NSDictionary *)unregisterAPNs:(NSData *)token session:(NSString *)session;
 -(void)logout;
 -(void)fail;
 -(NSDictionary *)requestPassword:(NSString *)email token:(NSString *)token;
--(int)resendVerifyEmail;
--(int)changeEmail:(NSString *)email password:(NSString *)password;
+-(int)resendVerifyEmailWithHandler:(IRCCloudAPIResultHandler)handler;
+-(int)changeEmail:(NSString *)email password:(NSString *)password handler:(IRCCloudAPIResultHandler)handler;
 -(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename;
 -(NSDictionary *)getFiles:(int)page;
--(int)deleteFile:(NSString *)fileID;
--(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension;
--(int)deletePaste:(NSString *)pasteID;
--(int)editPaste:(NSString *)pasteID name:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension;
+-(int)deleteFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)handler;
+-(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension handler:(IRCCloudAPIResultHandler)handler;
+-(int)deletePaste:(NSString *)pasteID handler:(IRCCloudAPIResultHandler)handler;
+-(int)editPaste:(NSString *)pasteID name:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension handler:(IRCCloudAPIResultHandler)handler;
 -(NSDictionary *)getPastebins:(int)page;
 -(void)requestArchives:(int)cid;
 -(void)setLastSelectedBID:(int)bid;
 -(void)parse:(NSDictionary *)object backlog:(BOOL)backlog;
 -(NSDictionary *)propertiesForFile:(NSString *)fileID;
--(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword;
--(int)deleteAccount:(NSString *)password;
+-(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword handler:(IRCCloudAPIResultHandler)handler;
+-(int)deleteAccount:(NSString *)password handler:(IRCCloudAPIResultHandler)handler;
 @end

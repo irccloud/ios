@@ -238,7 +238,7 @@
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     if(self.tableView.editing && !editing && _topicChanged) {
-        [[NetworkConnection sharedInstance] topic:_topicEdit.text chan:_channel.name cid:_channel.cid];
+        [[NetworkConnection sharedInstance] topic:_topicEdit.text chan:_channel.name cid:_channel.cid handler:nil];
     }
     [super setEditing:editing animated:animated];
     [self.tableView reloadData];

@@ -152,7 +152,7 @@
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete && indexPath.row < _ignores.count) {
         NSString *mask = [_ignores objectAtIndex:indexPath.row];
-        [[NetworkConnection sharedInstance] unignore:mask cid:_cid];
+        [[NetworkConnection sharedInstance] unignore:mask cid:_cid handler:nil];
     }
 }
 
@@ -166,7 +166,7 @@
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
     if([title isEqualToString:@"Ignore"]) {
-        [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:_cid];
+        [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:_cid handler:nil];
     }
     
     _alertView = nil;

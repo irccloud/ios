@@ -506,7 +506,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                 channel = [channel substringToIndex:pos];
             }
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [[NetworkConnection sharedInstance] join:channel key:key cid:(int)alertView.tag];
+                [[NetworkConnection sharedInstance] join:channel key:key cid:(int)alertView.tag handler:nil];
             }];
         }
     }
@@ -830,8 +830,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         case kIRCEventChannelQuery:
         case kIRCEventLinksResponse:
         case kIRCEventWhoWas:
-        case kIRCEventFailureMsg:
-        case kIRCEventSuccess:
+        case kIRCEventAuthFailure:
         case kIRCEventAlert:
             break;
         case kIRCEventJoin:

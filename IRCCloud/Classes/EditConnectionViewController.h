@@ -33,7 +33,6 @@
     UITextView *_commands;
     UITextView *_channels;
     int _cid;
-    int _reqid;
     NSString *_netname;
     NSURL *_url;
     BOOL keyboardShown;

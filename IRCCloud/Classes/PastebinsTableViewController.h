@@ -24,7 +24,6 @@
 @interface PastebinsTableViewController : UITableViewController {
     int _pages;
     NSArray *_pastes;
-    int _reqid;
     BOOL _canLoadMore;
     id<PastebinsTableViewDelegate> _delegate;
     UIView *_footerView;

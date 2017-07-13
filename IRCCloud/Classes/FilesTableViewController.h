@@ -28,7 +28,6 @@
     NSMutableDictionary *_spinners;
     NSMutableDictionary *_extensions;
     NSDateFormatter *_formatter;
-    int _reqid;
     BOOL _canLoadMore;
     id<FilesTableViewDelegate> _delegate;
     UIView *_footerView;

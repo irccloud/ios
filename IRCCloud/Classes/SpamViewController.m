@@ -64,7 +64,7 @@
 
 - (void)deleteButtonPressed:(id)sender {
     for(Buffer *b in _buffersToDelete) {
-        [[NetworkConnection sharedInstance] deleteBuffer:b.bid cid:b.cid];
+        [[NetworkConnection sharedInstance] deleteBuffer:b.bid cid:b.cid handler:nil];
     }
     [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
         if(_buffersToDelete.count) {

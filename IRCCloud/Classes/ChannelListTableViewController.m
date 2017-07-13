@@ -212,7 +212,7 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     NSDictionary *row = [_data objectAtIndex:indexPath.row];
-    [[NetworkConnection sharedInstance] join:[row objectForKey:@"name"] key:nil cid:_event.cid];
+    [[NetworkConnection sharedInstance] join:[row objectForKey:@"name"] key:nil cid:_event.cid handler:nil];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

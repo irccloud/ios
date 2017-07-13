@@ -116,6 +116,12 @@
 }
 
 - (void)viewDidLoad {
+    __weak ShareViewController *weakSelf = self;
+    _resultHandler = ^(IRCCloudJSONObject *result) {
+        NSLog(@"Say result: %@", result);
+        [weakSelf.extensionContext completeRequestReturningItems:nil completionHandler:nil];
+        AudioServicesPlaySystemSound(weakSelf.sound);
+    };
     [UIColor setTheme:@"dawn"];
     [super viewDidLoad];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -215,13 +221,9 @@
                     [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
                 } else {
                     if(self.contentText.length)
-                        [_conn say:[NSString stringWithFormat:@"%@ %@",self.contentText,item.absoluteString] to:_buffer.name cid:_buffer.cid];
+                        [_conn say:[NSString stringWithFormat:@"%@ %@",self.contentText,item.absoluteString] to:_buffer.name cid:_buffer.cid handler:_resultHandler];
                     else
-                        [_conn say:item.absoluteString to:_buffer.name cid:_buffer.cid];
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
-                        AudioServicesPlaySystemSound(_sound);
-                    }];
+                        [_conn say:item.absoluteString to:_buffer.name cid:_buffer.cid handler:_resultHandler];
                 }
             };
             
@@ -232,19 +234,15 @@
             } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
                 [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
             } else if([i hasItemConformingToTypeIdentifier:@"public.plain-text"]) {
-                [_conn say:self.contentText to:_buffer.name cid:_buffer.cid];
-                [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
-                AudioServicesPlaySystemSound(_sound);
+                [_conn say:self.contentText to:_buffer.name cid:_buffer.cid handler:_resultHandler];
             } else {
-                CLS_LOG(@"Unknown attachment type: %@", output.attachments.firstObject);
+                NSLog(@"Unknown attachment type: %@", output.attachments.firstObject);
                 [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
                 AudioServicesPlaySystemSound(_sound);
             }
         }
     } else {
-        [_conn say:self.contentText to:_buffer.name cid:_buffer.cid];
-        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
-        AudioServicesPlaySystemSound(_sound);
+        [_conn say:self.contentText to:_buffer.name cid:_buffer.cid handler:_resultHandler];
     }
 }
 
@@ -429,9 +427,9 @@
         NSLog(@"Image upload successful");
         NSString *link = [[[d objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
         if(self.contentText.length)
-            [_conn say:[NSString stringWithFormat:@"%@ %@", self.contentText, link] to:_buffer.name cid:_buffer.cid];
+            [_conn say:[NSString stringWithFormat:@"%@ %@", self.contentText, link] to:_buffer.name cid:_buffer.cid handler:_resultHandler];
         else
-            [_conn say:link to:_buffer.name cid:_buffer.cid];
+            [_conn say:link to:_buffer.name cid:_buffer.cid handler:_resultHandler];
     } else {
         NSLog(@"Image upload failed");
     }

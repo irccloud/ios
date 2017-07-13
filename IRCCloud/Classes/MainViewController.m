@@ -804,13 +804,6 @@ NSArray *_sortedChannels;
     NSString *msg = nil;
     NSString *type = nil;
     switch(event) {
-        case kIRCEventSuccess:
-            o = notification.object;
-            if([[o objectForKey:@"_reqid"] intValue] == _deleteFileReqId) {
-                [_eventsView uncacheFile:[_selectedEvent.entities objectForKey:@"id"]];
-                [_eventsView refresh];
-            }
-            break;
         case kIRCEventSessionDeleted:
             [self bufferSelected:-1];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
@@ -881,7 +874,10 @@ NSArray *_sortedChannels;
                 [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Join" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                     if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
-                        [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:_alertObject.cid];
+                        [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:_alertObject.cid handler:^(IRCCloudJSONObject *result) {
+                            UIAlertView *v = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to join channel: %@. Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                            [v show];
+                        }];
                 }]];
                 
                 if(!@available(iOS 9.0, *))
@@ -909,7 +905,7 @@ NSArray *_sortedChannels;
                 if(s) {
                     [alert addAction:[UIAlertAction actionWithTitle:@"Change" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                         if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
-                            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:_alertObject.cid];
+                            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:_alertObject.cid handler:nil];
                     }]];
                 }
                 
@@ -1358,60 +1354,10 @@ NSArray *_sortedChannels;
             [self _updateTitleArea];
             [self _updateUserListVisibility];
             break;
-        case kIRCEventFailureMsg:
-            o = notification.object;
-            if(_deleteFileReqId > 0 && [[o objectForKey:@"_reqid"] intValue] == _deleteFileReqId) {
-                CLS_LOG(@"Error deleting file: %@", o);
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
-            } else if([o objectForKey:@"_reqid"] && [[o objectForKey:@"_reqid"] intValue] > 0) {
-                int reqid = [[o objectForKey:@"_reqid"] intValue];
-                for(Event *e in _pendingEvents) {
-                    if(e.reqId == reqid) {
-                        [_pendingEvents removeObject:e];
-                        e.height = 0;
-                        e.pending = NO;
-                        e.rowType = ROW_FAILED;
-                        e.color = [UIColor networkErrorColor];
-                        e.bgColor = [UIColor errorBackgroundColor];
-                        [e.expirationTimer invalidate];
-                        e.expirationTimer = nil;
-                        [_eventsView.tableView reloadData];
-                        break;
-                    }
-                }
-            } else if(![NetworkConnection sharedInstance].notifier) {
-                if([[o objectForKey:@"message"] isEqualToString:@"auth"]) {
-                    [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(logout) withObject:nil waitUntilDone:YES];
-                    [self bufferSelected:-1];
-                    [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
-                } else if([[o objectForKey:@"message"] isEqualToString:@"set_shard"]) {
-                    if([o objectForKey:@"websocket_host"])
-                        IRCCLOUD_HOST = [o objectForKey:@"websocket_host"];
-                    if([o objectForKey:@"websocket_path"])
-                        IRCCLOUD_PATH = [o objectForKey:@"websocket_path"];
-                    [NetworkConnection sharedInstance].session = [o objectForKey:@"cookie"];
-                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
-                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
-                    [[NSUserDefaults standardUserDefaults] synchronize];
-#ifdef ENTERPRISE
-                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
-#else
-                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
-#endif
-                    [d setObject:IRCCLOUD_HOST forKey:@"host"];
-                    [d setObject:IRCCLOUD_PATH forKey:@"path"];
-                    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
-                    [d synchronize];
-                    [[NetworkConnection sharedInstance] connect:NO];
-                } else {
-                    CLS_LOG(@"Got an error, reconnecting: %@", o);
-                    [[NetworkConnection sharedInstance] disconnect];
-                    [[NetworkConnection sharedInstance] fail];
-                    [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
-                    [self connectivityChanged:nil];
-                }
-            }
+        case kIRCEventAuthFailure:
+            [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(logout) withObject:nil waitUntilDone:YES];
+            [self bufferSelected:-1];
+            [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
             break;
         case kIRCEventBufferMsg:
             e = notification.object;
@@ -1611,7 +1557,19 @@ NSArray *_sortedChannels;
                 if(e.reqId == -1 && (([[NSDate date] timeIntervalSince1970] - (e.eid/1000000) - [NetworkConnection sharedInstance].clockOffset) < 60)) {
                     [e.expirationTimer invalidate];
                     e.expirationTimer = nil;
-                    e.reqId = [[NetworkConnection sharedInstance] say:e.command to:e.to cid:e.cid];
+                    e.reqId = [[NetworkConnection sharedInstance] say:e.command to:e.to cid:e.cid handler:^(IRCCloudJSONObject *result) {
+                        if(![[result objectForKey:@"success"] boolValue]) {
+                            [_pendingEvents removeObject:e];
+                            e.height = 0;
+                            e.pending = NO;
+                            e.rowType = ROW_FAILED;
+                            e.color = [UIColor networkErrorColor];
+                            e.bgColor = [UIColor errorBackgroundColor];
+                            [e.expirationTimer invalidate];
+                            e.expirationTimer = nil;
+                            [_eventsView.tableView reloadData];
+                        }
+                    }];
                     if(e.reqId < 0)
                         e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
                 } else {
@@ -1947,9 +1905,9 @@ NSArray *_sortedChannels;
     Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
     if(s) {
         if([s.status isEqualToString:@"disconnected"])
-            [[NetworkConnection sharedInstance] reconnect:_buffer.cid];
+            [[NetworkConnection sharedInstance] reconnect:_buffer.cid handler:nil];
         else if([s.away isKindOfClass:[NSString class]] && s.away.length) {
-            [[NetworkConnection sharedInstance] back:_buffer.cid];
+            [[NetworkConnection sharedInstance] back:_buffer.cid handler:nil];
             s.away = @"";
             [self _updateServerStatus];
         }
@@ -2000,7 +1958,7 @@ NSArray *_sortedChannels;
                 [p setObject:@YES forKey:@"ascii-compact"];
                 SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                 NSString *json = [writer stringWithObject:p];
-                [[NetworkConnection sharedInstance] setPrefs:json];
+                [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
                 [_message clearText];
                 _buffer.draft = nil;
                 return;
@@ -2009,7 +1967,7 @@ NSArray *_sortedChannels;
                 [p setObject:@NO forKey:@"ascii-compact"];
                 SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                 NSString *json = [writer stringWithObject:p];
-                [[NetworkConnection sharedInstance] setPrefs:json];
+                [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
                 [_message clearText];
                 _buffer.draft = nil;
                 return;
@@ -2019,7 +1977,7 @@ NSArray *_sortedChannels;
                 [p setObject:@"mono" forKey:@"font"];
                 SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                 NSString *json = [writer stringWithObject:p];
-                [[NetworkConnection sharedInstance] setPrefs:json];
+                [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
                 [_message clearText];
                 _buffer.draft = nil;
                 return;
@@ -2028,7 +1986,7 @@ NSArray *_sortedChannels;
                 [p setObject:@"sans" forKey:@"font"];
                 SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                 NSString *json = [writer stringWithObject:p];
-                [[NetworkConnection sharedInstance] setPrefs:json];
+                [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
                 [_message clearText];
                 _buffer.draft = nil;
                 return;
@@ -2244,7 +2202,19 @@ NSArray *_sortedChannels;
             msg = e.command.mutableCopy;
             if(!disableConvert)
                 [ColorFormatter emojify:msg];
-            e.reqId = [[NetworkConnection sharedInstance] say:msg to:_buffer.name cid:_buffer.cid];
+            e.reqId = [[NetworkConnection sharedInstance] say:msg to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
+                if(![[result objectForKey:@"success"] boolValue]) {
+                    [_pendingEvents removeObject:e];
+                    e.height = 0;
+                    e.pending = NO;
+                    e.rowType = ROW_FAILED;
+                    e.color = [UIColor networkErrorColor];
+                    e.bgColor = [UIColor errorBackgroundColor];
+                    [e.expirationTimer invalidate];
+                    e.expirationTimer = nil;
+                    [_eventsView.tableView reloadData];
+                }
+            }];
             if(e.reqId < 0)
                 e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
             CLS_LOG(@"Sending message with reqid %i", e.reqId);
@@ -2506,7 +2476,7 @@ NSArray *_sortedChannels;
             if(b)
                 [self bufferSelected:b.bid];
             else if(state == kIRCCloudStateConnected)
-                [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid];
+                [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid handler:nil];
             else
                 match = NO;
         }
@@ -2529,7 +2499,7 @@ NSArray *_sortedChannels;
                     if(b)
                         [self bufferSelected:b.bid];
                     else if(state == kIRCCloudStateConnected)
-                        [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid];
+                        [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid handler:nil];
                     else
                         match = NO;
                 } else {
@@ -2585,7 +2555,7 @@ NSArray *_sortedChannels;
                     eid = last.eid;
                 }
                 if(eid >= 0 && eid >= lastBuffer.last_seen_eid) {
-                    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:lastBuffer.cid bid:lastBuffer.bid lastSeenEid:eid];
+                    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:lastBuffer.cid bid:lastBuffer.bid lastSeenEid:eid handler:nil];
                     lastBuffer.last_seen_eid = eid;
                 }
             }
@@ -3424,7 +3394,7 @@ NSArray *_sortedChannels;
         }
     }
     
-    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cids:cids bids:bids lastSeenEids:eids];
+    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cids:cids bids:bids lastSeenEids:eids handler:nil];
 }
 
 -(void)_editConnection {
@@ -3459,14 +3429,14 @@ NSArray *_sortedChannels;
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
         if([_selectedBuffer.type isEqualToString:@"console"]) {
-            [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
+            [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid handler:nil];
         } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
             if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                 [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
             else
                 [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
         } else {
-            [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+            [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
         }
     }]];
     
@@ -3527,14 +3497,14 @@ NSArray *_sortedChannels;
         Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
         if([s.status isEqualToString:@"disconnected"]) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Reconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid];
+                [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid handler:nil];
             }]];
             [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
                 [self _deleteSelectedBuffer];
             }]];
         } else {
             [alert addAction:[UIAlertAction actionWithTitle:@"Disconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil];
+                [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil handler:nil];
             }]];
         }
         [alert addAction:[UIAlertAction actionWithTitle:@"Edit Connection" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
@@ -3543,22 +3513,22 @@ NSArray *_sortedChannels;
     } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
         if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Leave" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid];
+                [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid handler:nil];
             }]];
             [alert addAction:[UIAlertAction actionWithTitle:@"Invite to Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 [self _inviteToChannel];
             }]];
         } else {
             [alert addAction:[UIAlertAction actionWithTitle:@"Rejoin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid];
+                [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid handler:nil];
             }]];
             if(_selectedBuffer.archived) {
                 [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                    [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+                    [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
                 }]];
             } else {
                 [alert addAction:[UIAlertAction actionWithTitle:@"Archive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                    [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+                    [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
                 }]];
             }
             [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
@@ -3568,11 +3538,11 @@ NSArray *_sortedChannels;
     } else {
         if(_selectedBuffer.archived) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+                [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
             }]];
         } else {
             [alert addAction:[UIAlertAction actionWithTitle:@"Archive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+                [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
             }]];
         }
         [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
@@ -3688,40 +3658,40 @@ NSArray *_sortedChannels;
         case TAG_BAN:
             if([title isEqualToString:@"Ban"]) {
                 if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", [alertView textFieldAtIndex:0].text] chan:_buffer.name cid:_buffer.cid];
+                    [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", [alertView textFieldAtIndex:0].text] chan:_buffer.name cid:_buffer.cid handler:nil];
             }
             break;
         case TAG_IGNORE:
             if([title isEqualToString:@"Ignore"]) {
                 if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:_buffer.cid];
+                    [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:_buffer.cid handler:nil];
             }
             break;
         case TAG_KICK:
             if([title isEqualToString:@"Kick"]) {
-               [[NetworkConnection sharedInstance] kick:_selectedUser.nick chan:_buffer.name msg:[alertView textFieldAtIndex:0].text cid:_buffer.cid];
+               [[NetworkConnection sharedInstance] kick:_selectedUser.nick chan:_buffer.name msg:[alertView textFieldAtIndex:0].text cid:_buffer.cid handler:nil];
             }
             break;
         case TAG_INVITE:
             if([title isEqualToString:@"Invite"]) {
                 if([alertView textFieldAtIndex:0].text.length) {
                     if(_selectedUser)
-                        [[NetworkConnection sharedInstance] invite:_selectedUser.nick chan:[alertView textFieldAtIndex:0].text cid:_buffer.cid];
+                        [[NetworkConnection sharedInstance] invite:_selectedUser.nick chan:[alertView textFieldAtIndex:0].text cid:_buffer.cid handler:nil];
                     else
-                        [[NetworkConnection sharedInstance] invite:[alertView textFieldAtIndex:0].text chan:_selectedBuffer.name cid:_selectedBuffer.cid];
+                        [[NetworkConnection sharedInstance] invite:[alertView textFieldAtIndex:0].text chan:_selectedBuffer.name cid:_selectedBuffer.cid handler:nil];
                 }
             }
             break;
         case TAG_BADCHANNELKEY:
             if([title isEqualToString:@"Join"]) {
                 if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:[alertView textFieldAtIndex:0].text cid:_alertObject.cid];
+                    [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:[alertView textFieldAtIndex:0].text cid:_alertObject.cid handler:nil];
             }
             break;
         case TAG_INVALIDNICK:
             if([title isEqualToString:@"Change"]) {
                 if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",[alertView textFieldAtIndex:0].text] to:nil cid:_alertObject.cid];
+                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",[alertView textFieldAtIndex:0].text] to:nil cid:_alertObject.cid handler:nil];
             }
             break;
         case TAG_FAILEDMSG:
@@ -3730,7 +3700,7 @@ NSArray *_sortedChannels;
                 _selectedEvent.rowType = ROW_MESSAGE;
                 _selectedEvent.bgColor = [UIColor selfBackgroundColor];
                 _selectedEvent.pending = YES;
-                _selectedEvent.reqId = [[NetworkConnection sharedInstance] say:_selectedEvent.command to:_buffer.name cid:_buffer.cid];
+                _selectedEvent.reqId = [[NetworkConnection sharedInstance] say:_selectedEvent.command to:_buffer.name cid:_buffer.cid handler:nil];
                 if(_selectedEvent.msg)
                     [_pendingEvents addObject:_selectedEvent];
                 [_eventsView.tableView reloadData];
@@ -3748,21 +3718,21 @@ NSArray *_sortedChannels;
         case TAG_DELETE:
             if([title isEqualToString:@"Delete"]) {
                 if([_selectedBuffer.type isEqualToString:@"console"]) {
-                    [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid];
+                    [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid handler:nil];
                 } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
                     if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                         [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
                     else
                         [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
                 } else {
-                    [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+                    [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
                 }
             }
             break;
         case TAG_JOIN:
             if([title isEqualToString:@"Join"]) {
                 if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/join %@",[alertView textFieldAtIndex:0].text] to:nil cid:_selectedBuffer.cid];
+                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/join %@",[alertView textFieldAtIndex:0].text] to:nil cid:_selectedBuffer.cid handler:nil];
             }
             break;
         case TAG_BUGREPORT:
@@ -4015,7 +3985,7 @@ NSArray *_sortedChannels;
     if(message.length)
         message = [message stringByAppendingString:@" "];
     message = [message stringByAppendingString:[file objectForKey:@"url"]];
-    [[NetworkConnection sharedInstance] say:message to:_buffer.name cid:_buffer.cid];
+    [[NetworkConnection sharedInstance] say:message to:_buffer.name cid:_buffer.cid handler:nil];
 }
 
 -(void)fileUploadProgress:(float)progress {
@@ -4265,25 +4235,34 @@ NSArray *_sortedChannels;
             activityController.popoverPresentationController.sourceRect = [_eventsView.tableView convertRect:_selectedRect toView:self.slidingViewController.view];
             [self.slidingViewController presentViewController:activityController animated:YES completion:nil];
         } else if([action isEqualToString:@"Delete File"]) {
-            _deleteFileReqId = [[NetworkConnection sharedInstance] deleteFile:[_selectedEvent.entities objectForKey:@"id"]];
+            [[NetworkConnection sharedInstance] deleteFile:[_selectedEvent.entities objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
+                if([[result objectForKey:@"success"] boolValue]) {
+                    [_eventsView uncacheFile:[_selectedEvent.entities objectForKey:@"id"]];
+                    [_eventsView refresh];
+                } else {
+                    CLS_LOG(@"Error deleting file: %@", result);
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                }
+            }];
         } else if([action isEqualToString:@"Close Preview"]) {
             [_eventsView closePreview:_selectedEvent];
         } else if([action isEqualToString:@"Archive"]) {
-            [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+            [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Unarchive"]) {
-            [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid];
+            [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Delete"]) {
             [self _deleteSelectedBuffer];
         } else if([action isEqualToString:@"Leave"]) {
-            [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid];
+            [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Rejoin"]) {
-            [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid];
+            [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Ban List"]) {
-            [[NetworkConnection sharedInstance] mode:@"b" chan:_selectedBuffer.name cid:_selectedBuffer.cid];
+            [[NetworkConnection sharedInstance] mode:@"b" chan:_selectedBuffer.name cid:_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Disconnect"]) {
-            [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil];
+            [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil handler:nil];
         } else if([action isEqualToString:@"Reconnect"]) {
-            [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid];
+            [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Logout"]) {
             [self dismissKeyboard];
             [self.view.window endEditing:YES];
@@ -4378,11 +4357,11 @@ NSArray *_sortedChannels;
         } else if([action isEqualToString:@"Whois"]) {
             if(_selectedUser && _selectedUser.nick.length > 0) {
                 if(_selectedUser.parted)
-                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid];
+                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid handler:nil];
                 else
-                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:_selectedUser.ircserver.length?_selectedUser.ircserver:_selectedUser.nick cid:_buffer.cid];
+                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:_selectedUser.ircserver.length?_selectedUser.ircserver:_selectedUser.nick cid:_buffer.cid handler:nil];
             } else if([_buffer.type isEqualToString:@"conversation"]) {
-                [[NetworkConnection sharedInstance] whois:_buffer.name server:_buffer.name cid:_buffer.cid];
+                [[NetworkConnection sharedInstance] whois:_buffer.name server:_buffer.name cid:_buffer.cid handler:nil];
             }
         } else if([action isEqualToString:@"Send Feedback"]) {
 #ifdef APPSTORE
@@ -4485,20 +4464,20 @@ Network type: %@\n",
             if(b) {
                 [self bufferSelected:b.bid];
             } else {
-                [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:_buffer.cid];
+                [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:_buffer.cid handler:nil];
             }
         } else if([action isEqualToString:@"Op"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
         } else if([action isEqualToString:@"Deop"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
         } else if([action isEqualToString:@"Voice"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
         } else if([action isEqualToString:@"Devoice"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
         } else if([action isEqualToString:@"Ban"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
@@ -4645,7 +4624,7 @@ Network type: %@\n",
 }
 
 -(void)onCmdRPressed:(UIKeyCommand *)sender {
-    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:[[EventsDataSource sharedInstance] lastEidForBuffer:_buffer.bid]];
+    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:[[EventsDataSource sharedInstance] lastEidForBuffer:_buffer.bid] handler:nil];
     _buffer.last_seen_eid = [[EventsDataSource sharedInstance] lastEidForBuffer:_buffer.bid];
 }
 

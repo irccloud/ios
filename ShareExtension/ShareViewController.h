@@ -24,5 +24,7 @@
     NSString *_filename;
     UIImage *_item;
     BOOL _uploadStarted;
+    IRCCloudAPIResultHandler _resultHandler;
 }
+@property SystemSoundID sound;
 @end

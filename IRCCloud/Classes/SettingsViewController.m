@@ -455,7 +455,19 @@
         [spinny startAnimating];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
         
-        _emailreqid = [[NetworkConnection sharedInstance] changeEmail:_email.text password:[alertView textFieldAtIndex:0].text];
+        [[NetworkConnection sharedInstance] changeEmail:_email.text password:[alertView textFieldAtIndex:0].text handler:^(IRCCloudJSONObject *result) {
+            if([[result objectForKey:@"success"] boolValue]) {
+                [self saveButtonPressed:nil];
+            } else {
+                if([[result objectForKey:@"message"] isEqualToString:@"oldpassword"]) {
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Incorrect password, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                } else {
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [alert show];
+                }
+            }
+        }];
     }
     
     _alertView = nil;
@@ -510,10 +522,24 @@
         SBJson5Writer *writer = [[SBJson5Writer alloc] init];
         NSString *json = [writer stringWithObject:prefs];
         
-        _userinfosaved = NO;
-        _prefssaved = NO;
-        _userinforeqid = [[NetworkConnection sharedInstance] setRealname:_name.text highlights:_highlights.text autoaway:_autoaway.isOn];
-        _prefsreqid = [[NetworkConnection sharedInstance] setPrefs:json];
+        [[NetworkConnection sharedInstance] setRealname:_name.text highlights:_highlights.text autoaway:_autoaway.isOn handler:^(IRCCloudJSONObject *result) {
+            if([[result objectForKey:@"success"] boolValue]) {
+                [[NetworkConnection sharedInstance] setPrefs:json handler:^(IRCCloudJSONObject *result) {
+                    if([[result objectForKey:@"success"] boolValue]) {
+                        [self.tableView endEditing:YES];
+                        [self dismissViewControllerAnimated:YES completion:nil];
+                    } else {
+                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                        [alert show];
+                        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
+                    }
+                }];
+            } else {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
+            }
+        }];
         
         [[NSUserDefaults standardUserDefaults] setBool:_screen.on forKey:@"keepScreenOn"];
         [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
@@ -607,81 +633,30 @@
 
 -(void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-    IRCCloudJSONObject *o;
-    int reqid;
     
     switch(event) {
         case kIRCEventUserInfo:
-            if(_userinforeqid == 0 && _prefsreqid == 0 && _emailreqid == 0) {
-                [self setFromPrefs];
-                [self refresh];
-            }
-            break;
-        case kIRCEventFailureMsg:
-            o = notification.object;
-            reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _userinforeqid || reqid == _prefsreqid || reqid == _emailreqid) {
-                if([[o objectForKey:@"message"] isEqualToString:@"oldpassword"]) {
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Incorrect password, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
-                } else {
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
-                }
-                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
-            } else if(reqid == _changepasswordreqid || reqid == _deleteaccountreqid) {
-                NSString *msg = [o objectForKey:@"message"];
-                if([msg isEqualToString:@"oldpassword"]) {
-                    msg = @"Current password incorrect";
-                } else if([msg isEqualToString:@"bad_pass"]) {
-                    msg = @"Incorrect password, please try again";
-                } else if([msg isEqualToString:@"rate_limited"]) {
-                    msg = @"Rate limited, try again in a few minutes";
-                } else if([msg isEqualToString:@"newpassword"] || [msg isEqualToString:@"password_error"]) {
-                    msg = @"Invalid password, please try again";
-                } else if([msg isEqualToString:@"last_admin_cant_leave"]) {
-                    msg = @"You can’t delete your account as the last admin of a team.  Please transfer ownership before continuing.";
-                }
-                if(reqid == _changepasswordreqid) {
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error Changing Password" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
-                    CLS_LOG(@"Password not changed: %@", [o objectForKey:@"message"]);
-                } else {
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error Deleting Account" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
-                    CLS_LOG(@"Account not deleted: %@", [o objectForKey:@"message"]);
-                }
-                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
-            }
-            break;
-        case kIRCEventSuccess:
-            o = notification.object;
-            reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _emailreqid) {
-                _emailreqid = 0;
-                [self saveButtonPressed:nil];
-            } else if(reqid == _changepasswordreqid) {
-                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Password Changed" message:@"Your password has been successfully updated and all your other sessions have been logged out" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
-                return;
-            } else if(reqid == _deleteaccountreqid) {
-                [self.tableView endEditing:YES];
-                [self dismissViewControllerAnimated:YES completion:nil];
-                return;
-            }
-            if(reqid == _userinforeqid)
-                _userinfosaved = YES;
-            if(reqid == _prefsreqid)
-                _prefssaved = YES;
-            if(_userinfosaved == YES && _prefssaved == YES) {
-                [self.tableView endEditing:YES];
-                [self dismissViewControllerAnimated:YES completion:nil];
-            }
+            [self setFromPrefs];
+            [self refresh];
             break;
         default:
             break;
     }
+}
+
+-(NSString *)accountMsg:(NSString *)msg {
+    if([msg isEqualToString:@"oldpassword"]) {
+        msg = @"Current password incorrect";
+    } else if([msg isEqualToString:@"bad_pass"]) {
+        msg = @"Incorrect password, please try again";
+    } else if([msg isEqualToString:@"rate_limited"]) {
+        msg = @"Rate limited, try again in a few minutes";
+    } else if([msg isEqualToString:@"newpassword"] || [msg isEqualToString:@"password_error"]) {
+        msg = @"Invalid password, please try again";
+    } else if([msg isEqualToString:@"last_admin_cant_leave"]) {
+        msg = @"You can’t delete your account as the last admin of a team.  Please transfer ownership before continuing.";
+    }
+    return msg;
 }
 
 -(void)refresh {
@@ -712,7 +687,18 @@
                             [spinny startAnimating];
                             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
 
-                            _changepasswordreqid = [[NetworkConnection sharedInstance] changePassword:[alert.textFields objectAtIndex:0].text newPassword:[alert.textFields objectAtIndex:0].text];
+                            [[NetworkConnection sharedInstance] changePassword:[alert.textFields objectAtIndex:0].text newPassword:[alert.textFields objectAtIndex:0].text handler:^(IRCCloudJSONObject *result) {
+                                if([[result objectForKey:@"success"] boolValue]) {
+                                    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
+                                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Password Changed" message:@"Your password has been successfully updated and all your other sessions have been logged out" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                                    [alert show];
+                                } else {
+                                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error Changing Password" message:[self accountMsg:[result objectForKey:@"message"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                                    [alert show];
+                                    CLS_LOG(@"Password not changed: %@", [result objectForKey:@"message"]);
+                                    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
+                                }
+                            }];
                         }]];
                         
                         [self presentViewController:alert animated:YES completion:nil];
@@ -732,7 +718,17 @@
                             [spinny startAnimating];
                             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
                             
-                            _deleteaccountreqid = [[NetworkConnection sharedInstance] deleteAccount:[alert.textFields objectAtIndex:0].text];
+                            [[NetworkConnection sharedInstance] deleteAccount:[alert.textFields objectAtIndex:0].text handler:^(IRCCloudJSONObject *result) {
+                                if([[result objectForKey:@"success"] boolValue]) {
+                                    [self.tableView endEditing:YES];
+                                    [self dismissViewControllerAnimated:YES completion:nil];
+                                } else {
+                                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error Deleting Account" message:[self accountMsg:[result objectForKey:@"message"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                                    [alert show];
+                                    CLS_LOG(@"Account not deleted: %@", [result objectForKey:@"message"]);
+                                    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
+                                }
+                            }];
                         }]];
                         
                         [self presentViewController:alert animated:YES completion:nil];

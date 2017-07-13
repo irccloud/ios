@@ -277,7 +277,15 @@
     SBJson5Writer *writer = [[SBJson5Writer alloc] init];
     NSString *json = [writer stringWithObject:prefs];
     
-    _reqid = [[NetworkConnection sharedInstance] setPrefs:json];
+    [[NetworkConnection sharedInstance] setPrefs:json handler:^(IRCCloudJSONObject *result) {
+        if([[result objectForKey:@"success"] boolValue]) {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        } else {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+            [alert show];
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
+        }
+    }];
 }
 
 -(void)cancelButtonPressed:(id)sender {
@@ -296,28 +304,10 @@
 
 -(void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
-    IRCCloudJSONObject *o;
-    int reqid;
     
     switch(event) {
         case kIRCEventUserInfo:
-            if(_reqid == 0)
-                [self refresh];
-            break;
-        case kIRCEventFailureMsg:
-            o = notification.object;
-            reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _reqid) {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
-                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
-            }
-            break;
-        case kIRCEventSuccess:
-            o = notification.object;
-            reqid = [[o objectForKey:@"_reqid"] intValue];
-            if(reqid == _reqid)
-                [self dismissViewControllerAnimated:YES completion:nil];
+            [self refresh];
             break;
         default:
             break;

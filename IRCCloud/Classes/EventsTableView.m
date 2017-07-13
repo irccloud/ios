@@ -620,9 +620,9 @@ extern UIImage *__socketClosedBackgroundImage;
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
         [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
             if([_buffer.type isEqualToString:@"console"]) {
-                [_conn deleteServer:_buffer.cid];
+                [_conn deleteServer:_buffer.cid handler:nil];
             } else {
-                [_conn deleteBuffer:_buffer.bid cid:_buffer.cid];
+                [_conn deleteBuffer:_buffer.bid cid:_buffer.cid handler:nil];
             }
         }]];
         
@@ -633,11 +633,11 @@ extern UIImage *__socketClosedBackgroundImage;
     }];
     
     UIPreviewAction *archiveAction = [UIPreviewAction actionWithTitle:@"Archive" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-        [_conn archiveBuffer:_buffer.bid cid:_buffer.cid];
+        [_conn archiveBuffer:_buffer.bid cid:_buffer.cid handler:nil];
     }];
     
     UIPreviewAction *unarchiveAction = [UIPreviewAction actionWithTitle:@"Unarchive" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-        [_conn unarchiveBuffer:_buffer.bid cid:_buffer.cid];
+        [_conn unarchiveBuffer:_buffer.bid cid:_buffer.cid handler:nil];
     }];
     
     NSMutableArray *items = [[NSMutableArray alloc] init];
@@ -645,12 +645,12 @@ extern UIImage *__socketClosedBackgroundImage;
     if([_buffer.type isEqualToString:@"console"]) {
         if([_server.status isEqualToString:@"disconnected"]) {
             [items addObject:[UIPreviewAction actionWithTitle:@"Reconnect" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-                [_conn reconnect:_buffer.cid];
+                [_conn reconnect:_buffer.cid handler:nil];
             }]];
             [items addObject:deleteAction];
         } else {
             [items addObject:[UIPreviewAction actionWithTitle:@"Disconnect" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-                [_conn disconnect:_buffer.cid msg:nil];
+                [_conn disconnect:_buffer.cid msg:nil handler:nil];
             }]];
             
         }
@@ -672,7 +672,7 @@ extern UIImage *__socketClosedBackgroundImage;
     } else if([_buffer.type isEqualToString:@"channel"]) {
         if([[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             [items addObject:[UIPreviewAction actionWithTitle:@"Leave" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-                [_conn part:_buffer.name msg:nil cid:_buffer.cid];
+                [_conn part:_buffer.name msg:nil cid:_buffer.cid handler:nil];
             }]];
             [items addObject:[UIPreviewAction actionWithTitle:@"Invite to Channel" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                 [((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController _setSelectedBuffer:_buffer];
@@ -686,7 +686,7 @@ extern UIImage *__socketClosedBackgroundImage;
             }]];
         } else {
             [items addObject:[UIPreviewAction actionWithTitle:@"Rejoin" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-                [_conn join:_buffer.name key:nil cid:_buffer.cid];
+                [_conn join:_buffer.name key:nil cid:_buffer.cid handler:nil];
             }]];
             if(_buffer.archived) {
                 [items addObject:unarchiveAction];
@@ -869,7 +869,7 @@ extern UIImage *__socketClosedBackgroundImage;
             }
         }
         if(eid >= 0 && eid >= _buffer.last_seen_eid) {
-            [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid];
+            [_conn heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:eid handler:nil];
             _buffer.last_seen_eid = eid;
         }
     }
@@ -2687,9 +2687,9 @@ extern UIImage *__socketClosedBackgroundImage;
         } else if(indexPath.row < _data.count) {
             Event *e = [_data objectAtIndex:indexPath.row];
             if([e.type isEqualToString:@"channel_invite"])
-                [_conn join:e.oldNick key:nil cid:e.cid];
+                [_conn join:e.oldNick key:nil cid:e.cid handler:nil];
             else if([e.type isEqualToString:@"callerid"])
-                [_conn say:[NSString stringWithFormat:@"/accept %@", e.nick] to:nil cid:e.cid];
+                [_conn say:[NSString stringWithFormat:@"/accept %@", e.nick] to:nil cid:e.cid handler:nil];
             else if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE) {
                 NSString *extension = [e.entities objectForKey:@"extension"];
                 if(!extension.length)

@@ -266,6 +266,7 @@ volatile BOOL __socketPaused = NO;
     _reachabilityValid = NO;
     _reachability = nil;
     _ignore = [[Ignore alloc] init];
+    _resultHandlers = [[NSMutableDictionary alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogStarted:) name:kIRCCloudBacklogStartedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
@@ -1277,7 +1278,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         return nil;
 }
 
--(int)_sendRequest:(NSString *)method args:(NSDictionary *)args {
+-(int)_sendRequest:(NSString *)method args:(NSDictionary *)args handler:(IRCCloudAPIResultHandler)resultHandler {
     @synchronized(_writer) {
         if(_state == kIRCCloudStateConnected) {
             NSMutableDictionary *dict = args?[[NSMutableDictionary alloc] initWithDictionary:args]:[[NSMutableDictionary alloc] init];
@@ -1285,6 +1286,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             if(![method isEqualToString:@"auth"])
                 [dict setObject:@(++_lastReqId) forKey:@"_reqid"];
             [_socket sendText:[_writer stringWithObject:dict]];
+            if(resultHandler)
+                [_resultHandlers setObject:resultHandler forKey:@(_lastReqId)];
             return _lastReqId;
         } else {
             CLS_LOG(@"Discarding request '%@' on disconnected socket", method);
@@ -1348,14 +1351,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         return [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":@"*", @"cid":[@(cid) stringValue]}];
 }
 
--(int)say:(NSString *)message to:(NSString *)to cid:(int)cid {
+-(int)say:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
     if(to)
-        return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":to}];
+        return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":to} handler:resultHandler];
     else
-        return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":@"*"}];
+        return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":@"*"} handler:resultHandler];
 }
 
--(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids {
+-(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids handler:(IRCCloudAPIResultHandler)resultHandler {
     @synchronized(_writer) {
         NSMutableDictionary *heartbeat = [[NSMutableDictionary alloc] init];
         for(int i = 0; i < cids.count; i++) {
@@ -1372,67 +1375,67 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [d setObject:@(selectedBuffer) forKey:@"last_selected_bid"];
         _userInfo = d;
         [__userInfoLock unlock];
-        return [self _sendRequest:@"heartbeat" args:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids}];
+        return [self _sendRequest:@"heartbeat" args:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids} handler:resultHandler];
     }
 }
--(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid {
-    return [self heartbeat:selectedBuffer cids:@[@(cid)] bids:@[@(bid)] lastSeenEids:@[@(lastSeenEid)]];
+-(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self heartbeat:selectedBuffer cids:@[@(cid)] bids:@[@(bid)] lastSeenEids:@[@(lastSeenEid)] handler:resultHandler];
 }
 
--(int)join:(NSString *)channel key:(NSString *)key cid:(int)cid {
+-(int)join:(NSString *)channel key:(NSString *)key cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
     if(key.length) {
-        return [self _sendRequest:@"join" args:@{@"cid":@(cid), @"channel":channel, @"key":key}];
+        return [self _sendRequest:@"join" args:@{@"cid":@(cid), @"channel":channel, @"key":key} handler:resultHandler];
     } else {
-        return [self _sendRequest:@"join" args:@{@"cid":@(cid), @"channel":channel}];
+        return [self _sendRequest:@"join" args:@{@"cid":@(cid), @"channel":channel} handler:resultHandler];
     }
 }
 
--(int)part:(NSString *)channel msg:(NSString *)msg cid:(int)cid {
+-(int)part:(NSString *)channel msg:(NSString *)msg cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
     if(msg.length) {
-        return [self _sendRequest:@"part" args:@{@"cid":@(cid), @"channel":channel, @"msg":msg}];
+        return [self _sendRequest:@"part" args:@{@"cid":@(cid), @"channel":channel, @"msg":msg} handler:resultHandler];
     } else {
-        return [self _sendRequest:@"part" args:@{@"cid":@(cid), @"channel":channel}];
+        return [self _sendRequest:@"part" args:@{@"cid":@(cid), @"channel":channel} handler:resultHandler];
     }
 }
 
--(int)kick:(NSString *)nick chan:(NSString *)chan msg:(NSString *)msg cid:(int)cid {
-    return [self say:[NSString stringWithFormat:@"/kick %@ %@",nick,(msg.length)?msg:@""] to:chan cid:cid];
+-(int)kick:(NSString *)nick chan:(NSString *)chan msg:(NSString *)msg cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self say:[NSString stringWithFormat:@"/kick %@ %@",nick,(msg.length)?msg:@""] to:chan cid:cid handler:resultHandler];
 }
 
--(int)mode:(NSString *)mode chan:(NSString *)chan cid:(int)cid {
-    return [self say:[NSString stringWithFormat:@"/mode %@ %@",chan,mode] to:chan cid:cid];
+-(int)mode:(NSString *)mode chan:(NSString *)chan cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self say:[NSString stringWithFormat:@"/mode %@ %@",chan,mode] to:chan cid:cid handler:resultHandler];
 }
 
--(int)invite:(NSString *)nick chan:(NSString *)chan cid:(int)cid {
-    return [self say:[NSString stringWithFormat:@"/invite %@ %@",nick,chan] to:chan cid:cid];
+-(int)invite:(NSString *)nick chan:(NSString *)chan cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self say:[NSString stringWithFormat:@"/invite %@ %@",nick,chan] to:chan cid:cid handler:resultHandler];
 }
 
--(int)archiveBuffer:(int)bid cid:(int)cid {
-    return [self _sendRequest:@"archive-buffer" args:@{@"cid":@(cid),@"id":@(bid)}];
+-(int)archiveBuffer:(int)bid cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"archive-buffer" args:@{@"cid":@(cid),@"id":@(bid)} handler:resultHandler];
 }
 
--(int)unarchiveBuffer:(int)bid cid:(int)cid {
-    return [self _sendRequest:@"unarchive-buffer" args:@{@"cid":@(cid),@"id":@(bid)}];
+-(int)unarchiveBuffer:(int)bid cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"unarchive-buffer" args:@{@"cid":@(cid),@"id":@(bid)} handler:resultHandler];
 }
 
--(int)deleteBuffer:(int)bid cid:(int)cid {
-    return [self _sendRequest:@"delete-buffer" args:@{@"cid":@(cid),@"id":@(bid)}];
+-(int)deleteBuffer:(int)bid cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"delete-buffer" args:@{@"cid":@(cid),@"id":@(bid)} handler:resultHandler];
 }
 
--(int)deleteServer:(int)cid {
-    return [self _sendRequest:@"delete-connection" args:@{@"cid":@(cid)}];
+-(int)deleteServer:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"delete-connection" args:@{@"cid":@(cid)} handler:(IRCCloudAPIResultHandler)resultHandler];
 }
 
--(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword {
-    return [self _sendRequest:@"change-password" args:@{@"password":password,@"newPassword":newPassword}];
+-(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"change-password" args:@{@"password":password,@"newPassword":newPassword} handler:resultHandler];
 }
 
--(int)deleteAccount:(NSString *)password {
-    return [self _sendRequest:@"delete-account" args:@{@"password":password}];
+-(int)deleteAccount:(NSString *)password handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"delete-account" args:@{@"password":password} handler:resultHandler];
 }
 
 
--(int)addServer:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands channels:(NSString *)channels {
+-(int)addServer:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands channels:(NSString *)channels handler:(IRCCloudAPIResultHandler)resultHandler {
     return [self _sendRequest:@"add-server" args:@{
                                                    @"hostname":hostname?hostname:@"",
                                                    @"port":@(port),
@@ -1443,10 +1446,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                                                    @"server_pass":serverPass?serverPass:@"",
                                                    @"nspass":nickservPass?nickservPass:@"",
                                                    @"joincommands":joinCommands?joinCommands:@"",
-                                                   @"channels":channels?channels:@""}];
+                                                   @"channels":channels?channels:@""} handler:resultHandler];
 }
 
--(int)editServer:(int)cid hostname:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands {
+-(int)editServer:(int)cid hostname:(NSString *)hostname port:(int)port ssl:(int)ssl netname:(NSString *)netname nick:(NSString *)nick realname:(NSString *)realname serverPass:(NSString *)serverPass nickservPass:(NSString *)nickservPass joinCommands:(NSString *)joinCommands handler:(IRCCloudAPIResultHandler)resultHandler {
     return [self _sendRequest:@"edit-server" args:@{
                                                     @"hostname":hostname?hostname:@"",
                                                     @"port":@(port),
@@ -1457,74 +1460,74 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                                                     @"server_pass":serverPass?serverPass:@"",
                                                     @"nspass":nickservPass?nickservPass:@"",
                                                     @"joincommands":joinCommands?joinCommands:@"",
-                                                    @"cid":@(cid)}];
+                                                    @"cid":@(cid)} handler:resultHandler];
 }
 
--(int)ignore:(NSString *)mask cid:(int)cid {
-    return [self _sendRequest:@"ignore" args:@{@"cid":@(cid),@"mask":mask}];
+-(int)ignore:(NSString *)mask cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"ignore" args:@{@"cid":@(cid),@"mask":mask} handler:resultHandler];
 }
 
--(int)unignore:(NSString *)mask cid:(int)cid {
-    return [self _sendRequest:@"unignore" args:@{@"cid":@(cid),@"mask":mask}];
+-(int)unignore:(NSString *)mask cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"unignore" args:@{@"cid":@(cid),@"mask":mask} handler:resultHandler];
 }
 
--(int)setPrefs:(NSString *)prefs {
+-(int)setPrefs:(NSString *)prefs handler:(IRCCloudAPIResultHandler)resultHandler {
     _prefs = nil;
-    return [self _sendRequest:@"set-prefs" args:@{@"prefs":prefs}];
+    return [self _sendRequest:@"set-prefs" args:@{@"prefs":prefs} handler:resultHandler];
 }
 
--(int)setRealname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway {
+-(int)setRealname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway handler:(IRCCloudAPIResultHandler)resultHandler {
     return [self _sendRequest:@"user-settings" args:@{
                                                       @"realname":realname,
                                                       @"hwords":highlights,
-                                                      @"autoaway":autoaway?@"1":@"0"}];
+                                                      @"autoaway":autoaway?@"1":@"0"} handler:resultHandler];
 }
 
--(int)changeEmail:(NSString *)email password:(NSString *)password {
+-(int)changeEmail:(NSString *)email password:(NSString *)password handler:(IRCCloudAPIResultHandler)resultHandler {
     return [self _sendRequest:@"change-password" args:@{
                                                       @"email":email,
-                                                      @"password":password}];
+                                                      @"password":password} handler:resultHandler];
 }
 
--(int)ns_help_register:(int)cid {
-    return [self _sendRequest:@"ns-help-register" args:@{@"cid":@(cid)}];
+-(int)ns_help_register:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"ns-help-register" args:@{@"cid":@(cid)} handler:resultHandler];
 }
 
--(int)setNickservPass:(NSString *)nspass cid:(int)cid {
-    return [self _sendRequest:@"set-nspass" args:@{@"cid":@(cid),@"nspass":nspass}];
+-(int)setNickservPass:(NSString *)nspass cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"set-nspass" args:@{@"cid":@(cid),@"nspass":nspass} handler:resultHandler];
 }
 
--(int)whois:(NSString *)nick server:(NSString *)server cid:(int)cid {
+-(int)whois:(NSString *)nick server:(NSString *)server cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
     if(server.length) {
-        return [self _sendRequest:@"whois" args:@{@"cid":@(cid), @"nick":nick, @"server":server}];
+        return [self _sendRequest:@"whois" args:@{@"cid":@(cid), @"nick":nick, @"server":server} handler:resultHandler];
     } else {
-        return [self _sendRequest:@"whois" args:@{@"cid":@(cid), @"nick":nick}];
+        return [self _sendRequest:@"whois" args:@{@"cid":@(cid), @"nick":nick} handler:resultHandler];
     }
 }
 
--(int)topic:(NSString *)topic chan:(NSString *)chan cid:(int)cid {
-    return [self _sendRequest:@"topic" args:@{@"cid":@(cid),@"channel":chan,@"topic":topic}];
+-(int)topic:(NSString *)topic chan:(NSString *)chan cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"topic" args:@{@"cid":@(cid),@"channel":chan,@"topic":topic} handler:resultHandler];
 }
 
--(int)back:(int)cid {
-    return [self _sendRequest:@"back" args:@{@"cid":@(cid)}];
+-(int)back:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"back" args:@{@"cid":@(cid)} handler:resultHandler];
 }
 
--(int)resendVerifyEmail {
-    return [self _sendRequest:@"resend-verify-email" args:nil];
+-(int)resendVerifyEmailWithHandler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"resend-verify-email" args:nil handler:resultHandler];
 }
 
--(int)disconnect:(int)cid msg:(NSString *)msg {
+-(int)disconnect:(int)cid msg:(NSString *)msg handler:(IRCCloudAPIResultHandler)resultHandler {
     CLS_LOG(@"Disconnecting cid%i", cid);
     if(msg.length)
-        return [self _sendRequest:@"disconnect" args:@{@"cid":@(cid), @"msg":msg}];
+        return [self _sendRequest:@"disconnect" args:@{@"cid":@(cid), @"msg":msg} handler:resultHandler];
     else
-        return [self _sendRequest:@"disconnect" args:@{@"cid":@(cid)}];
+        return [self _sendRequest:@"disconnect" args:@{@"cid":@(cid)} handler:resultHandler];
 }
 
--(int)reconnect:(int)cid {
+-(int)reconnect:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
     CLS_LOG(@"Reconnecting cid%i", cid);
-    int reqid = [self _sendRequest:@"reconnect" args:@{@"cid":@(cid)}];
+    int reqid = [self _sendRequest:@"reconnect" args:@{@"cid":@(cid)} handler:resultHandler];
     if(reqid > 0) {
         Server *s = [_servers getServer:cid];
         if(s) {
@@ -1535,35 +1538,35 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return reqid;
 }
 
--(int)reorderConnections:(NSString *)cids {
-    return [self _sendRequest:@"reorder-connections" args:@{@"cids":cids}];
+-(int)reorderConnections:(NSString *)cids handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"reorder-connections" args:@{@"cids":cids} handler:resultHandler];
 }
 
 -(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename {
     return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename}];
 }
 
--(int)deleteFile:(NSString *)fileID {
-    return [self _sendRequest:@"delete-file" args:@{@"file":fileID}];
+-(int)deleteFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"delete-file" args:@{@"file":fileID} handler:resultHandler];
 }
 
--(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension {
+-(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension handler:(IRCCloudAPIResultHandler)resultHandler {
     if(name.length) {
-        return [self _sendRequest:@"paste" args:@{@"name":name, @"contents":contents, @"extension":extension}];
+        return [self _sendRequest:@"paste" args:@{@"name":name, @"contents":contents, @"extension":extension} handler:resultHandler];
     } else {
-        return [self _sendRequest:@"paste" args:@{@"contents":contents, @"extension":extension}];
+        return [self _sendRequest:@"paste" args:@{@"contents":contents, @"extension":extension} handler:resultHandler];
     }
 }
 
--(int)deletePaste:(NSString *)pasteID {
-    return [self _sendRequest:@"delete-pastebin" args:@{@"id":pasteID}];
+-(int)deletePaste:(NSString *)pasteID handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"delete-pastebin" args:@{@"id":pasteID} handler:resultHandler];
 }
 
--(int)editPaste:(NSString *)pasteID name:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension {
+-(int)editPaste:(NSString *)pasteID name:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension handler:(IRCCloudAPIResultHandler)resultHandler {
     if(name.length) {
-        return [self _sendRequest:@"edit-pastebin" args:@{@"id":pasteID, @"name":name, @"body":contents, @"extension":extension}];
+        return [self _sendRequest:@"edit-pastebin" args:@{@"id":pasteID, @"name":name, @"body":contents, @"extension":extension} handler:resultHandler];
     } else {
-        return [self _sendRequest:@"edit-pastebin" args:@{@"id":pasteID, @"body":contents, @"extension":extension}];
+        return [self _sendRequest:@"edit-pastebin" args:@{@"id":pasteID, @"body":contents, @"extension":extension} handler:resultHandler];
     }
 }
 
@@ -1667,6 +1670,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _ready = NO;
         _firstEID = 0;
         __socketPaused = NO;
+        _lastReqId = 1;
+        [_resultHandlers removeAllObjects];
         
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
@@ -1734,7 +1739,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _state = kIRCCloudStateConnected;
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         [self performSelectorInBackground:@selector(requestConfiguration) withObject:nil];
-        [self _sendRequest:@"auth" args:@{@"cookie":self.session}];
+        [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:^(IRCCloudJSONObject *result) {
+            if(![[result objectForKey:@"success"] boolValue])
+                [self postObject:result forEvent:kIRCEventAuthFailure];
+        }];
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");
     }
@@ -1913,12 +1921,39 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         } else {
             if([object objectForKey:@"success"] && ![[object objectForKey:@"success"] boolValue] && [object objectForKey:@"message"]) {
                 CLS_LOG(@"Failure: %@", object);
-                if([[object objectForKey:@"message"] isEqualToString:@"invalid_nick"])
+                if([[object objectForKey:@"message"] isEqualToString:@"invalid_nick"]) {
                     [self postObject:object forEvent:kIRCEventInvalidNick];
-                else
-                    [self postObject:object forEvent:kIRCEventFailureMsg];
+                } else if([[object objectForKey:@"message"] isEqualToString:@"auth"]) {
+                    [self postObject:object forEvent:kIRCEventAuthFailure];
+                } else if([[object objectForKey:@"message"] isEqualToString:@"set_shard"]) {
+                    if([object objectForKey:@"websocket_host"])
+                        IRCCLOUD_HOST = [object objectForKey:@"websocket_host"];
+                    if([object objectForKey:@"websocket_path"])
+                        IRCCLOUD_PATH = [object objectForKey:@"websocket_path"];
+                    [self setSession:[object objectForKey:@"cookie"]];
+                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+#ifdef ENTERPRISE
+                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+                    [d setObject:IRCCLOUD_HOST forKey:@"host"];
+                    [d setObject:IRCCLOUD_PATH forKey:@"path"];
+                    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
+                    [d synchronize];
+                    [self connect:NO];
+                } else if([_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])]) {
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        ((IRCCloudAPIResultHandler)[_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])(object);
+                    }];
+                }
             } else if([object objectForKey:@"success"]) {
-                [self postObject:object forEvent:kIRCEventSuccess];
+                if([_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        ((IRCCloudAPIResultHandler)[_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])(object);
+                    }];
             }
         }
         if(!backlog && _reconnectTimestamp != 0)
@@ -2281,7 +2316,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     _notifier = notifier;
     if(_state == kIRCCloudStateConnected && !notifier) {
         CLS_LOG(@"Upgrading websocket");
-        [self _sendRequest:@"upgrade_notifier" args:nil];
+        [self _sendRequest:@"upgrade_notifier" args:nil handler:nil];
     }
 }
 
