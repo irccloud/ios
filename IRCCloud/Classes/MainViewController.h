@@ -76,6 +76,7 @@
     IBOutlet NSLayoutConstraint *_bottomBarHeightConstraint;
     IBOutlet NSLayoutConstraint *_titleOffsetXConstraint;
     IBOutlet NSLayoutConstraint *_titleOffsetYConstraint;
+    IBOutlet NSLayoutConstraint *_topicWidthConstraint;
     IBOutlet NSLayoutConstraint *_topUnreadBarYOffsetConstraint;
     IBOutlet NSLayoutConstraint *_bottomUnreadBarYOffsetConstraint;
     UIProgressView *_connectingProgress;

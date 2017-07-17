@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.17" systemVersion="16F73" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="QPs-Li-UDL">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13156.6" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="QPs-Li-UDL">
     <device id="ipad9_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13137.5"/>
         <capability name="Alignment constraints with different attributes" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -105,14 +105,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" image="login_logo" translatesAutoresizingMaskIntoConstraints="NO" id="sfr-SS-1jI">
-                                <rect key="frame" x="272" y="68" width="48" height="48"/>
+                                <rect key="frame" x="272" y="48" width="48" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="EgP-kr-Ryh"/>
                                     <constraint firstAttribute="width" constant="48" id="Fu8-gd-2du"/>
                                 </constraints>
                             </imageView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="70" placeholderIntrinsicHeight="infinite" text="IRC" textAlignment="right" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="70" translatesAutoresizingMaskIntoConstraints="NO" id="Hgu-D2-Mph">
-                                <rect key="frame" x="334" y="68" width="70" height="48"/>
+                                <rect key="frame" x="334" y="48" width="70" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="PHw-Q2-KdF"/>
                                 </constraints>
@@ -121,7 +121,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="120" placeholderIntrinsicHeight="infinite" text="Cloud" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="120" translatesAutoresizingMaskIntoConstraints="NO" id="KFZ-UT-EG5">
-                                <rect key="frame" x="404" y="68" width="120" height="48"/>
+                                <rect key="frame" x="404" y="48" width="120" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="kqu-oJ-dEp"/>
                                 </constraints>
@@ -130,7 +130,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="320" placeholderIntrinsicHeight="32" text="Enterprise Edition" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="320" translatesAutoresizingMaskIntoConstraints="NO" id="iSf-t4-0KQ">
-                                <rect key="frame" x="224" y="132" width="320" height="32"/>
+                                <rect key="frame" x="224" y="112" width="320" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="320" id="Itp-RM-P45"/>
                                     <constraint firstAttribute="height" constant="32" id="UNl-kc-ZYN"/>
@@ -140,7 +140,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lUW-Yp-Apz" customClass="UIControl">
-                                <rect key="frame" x="302" y="132" width="65" height="32"/>
+                                <rect key="frame" x="302" y="112" width="65" height="32"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Login" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="65" translatesAutoresizingMaskIntoConstraints="NO" id="g3i-pB-ttr">
                                         <rect key="frame" x="0.0" y="5" width="65" height="22"/>
@@ -162,7 +162,7 @@
                                 </connections>
                             </view>
                             <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RjR-3c-mm2" customClass="UIControl">
-                                <rect key="frame" x="402" y="132" width="65" height="32"/>
+                                <rect key="frame" x="402" y="112" width="65" height="32"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sign Up" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="65" translatesAutoresizingMaskIntoConstraints="NO" id="2IH-5B-3G7">
                                         <rect key="frame" x="1" y="5" width="64" height="22"/>
@@ -183,7 +183,7 @@
                                 </connections>
                             </view>
                             <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vjV-1j-Hve" customClass="UIControl">
-                                <rect key="frame" x="292" y="132" width="184" height="32"/>
+                                <rect key="frame" x="292" y="112" width="184" height="32"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="150" placeholderIntrinsicHeight="infinite" text="Need an account?" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="150" translatesAutoresizingMaskIntoConstraints="NO" id="Qgw-oW-fa6">
                                         <rect key="frame" x="0.0" y="0.0" width="150" height="32"/>
@@ -214,7 +214,7 @@
                                 </connections>
                             </view>
                             <view autoresizesSubviews="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lmN-wO-9gf" customClass="UIControl">
-                                <rect key="frame" x="276" y="132" width="216" height="32"/>
+                                <rect key="frame" x="276" y="112" width="216" height="32"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="210" placeholderIntrinsicHeight="infinite" text="Already have an account?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="210" translatesAutoresizingMaskIntoConstraints="NO" id="RQO-72-9Fj">
                                         <rect key="frame" x="0.0" y="0.0" width="210" height="32"/>
@@ -245,7 +245,7 @@
                                 </connections>
                             </view>
                             <view autoresizesSubviews="NO" opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zTV-Zl-uPd" userLabel="Loading View">
-                                <rect key="frame" x="0.0" y="180" width="768" height="844"/>
+                                <rect key="frame" x="0.0" y="160" width="768" height="864"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Loading" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="320" translatesAutoresizingMaskIntoConstraints="NO" id="2LD-X7-x0T">
                                         <rect key="frame" x="0.0" y="30" width="768" height="21"/>
@@ -721,7 +721,7 @@
                                 <rect key="frame" x="10" y="20" width="48" height="48"/>
                             </imageView>
                             <view alpha="0.0" contentMode="scaleToFill" placeholderIntrinsicWidth="768" placeholderIntrinsicHeight="32" translatesAutoresizingMaskIntoConstraints="NO" id="fvC-nM-NHm" userLabel="Top Unread View" customClass="UIControl">
-                                <rect key="frame" x="0.0" y="20" width="768" height="32"/>
+                                <rect key="frame" x="0.0" y="0.0" width="768" height="32"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="↑" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="14" translatesAutoresizingMaskIntoConstraints="NO" id="nV2-yC-Cav">
                                         <rect key="frame" x="6" y="7" width="13" height="17"/>
@@ -974,6 +974,7 @@
                         <outlet property="_titleView" destination="nlM-WR-4UV" id="Qxd-kS-1zf"/>
                         <outlet property="_topUnreadBarYOffsetConstraint" destination="Rzg-lw-y1f" id="af9-uk-T0A"/>
                         <outlet property="_topicLabel" destination="Pau-R1-cSx" id="hA1-42-nVB"/>
+                        <outlet property="_topicWidthConstraint" destination="XlM-mS-AXU" id="rFn-FH-R0V"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="y4g-wn-AmU" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1077,6 +1078,9 @@
                         </label>
                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="12" preferredMaxLayoutWidth="500" translatesAutoresizingMaskIntoConstraints="NO" id="Pau-R1-cSx">
                             <rect key="frame" x="0.0" y="31" width="500" height="9"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="500" id="XlM-mS-AXU"/>
+                            </constraints>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
                             <color key="textColor" red="0.33333333333333331" green="0.33333333333333331" blue="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <nil key="highlightedColor"/>

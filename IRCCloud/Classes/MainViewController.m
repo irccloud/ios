@@ -2896,7 +2896,7 @@ NSArray *_sortedChannels;
         frame.size.height = (size.width > size.height)?24:40;
         _topicLabel.alpha = (size.width > size.height)?0:1;
     }
-    frame.size.width = size.width - 128;
+    _topicWidthConstraint.constant = frame.size.width = size.width - 128;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && (size.width > size.height))
         frame.size.width -= _buffersView.tableView.frame.size.width;
     _connectingView.frame = _titleView.frame = frame;
