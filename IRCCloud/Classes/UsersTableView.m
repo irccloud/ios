@@ -149,7 +149,7 @@
          @"symbol":symbol,
          @"borderColor":borderColor
          }];
-        NSUInteger size = data.count;
+        //NSUInteger size = data.count;
         for(User *user in users) {
             /*if(sectionTitles != nil) {
                 if(user.nick.length && [user.lowercase_nick characterAtIndex:0] != lastChar) {

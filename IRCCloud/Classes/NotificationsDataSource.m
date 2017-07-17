@@ -39,7 +39,8 @@
         if(!_notifications)
             _notifications = [[NSMutableDictionary alloc] init];
         
-        if(!@available(iOS 10.0, *) && [[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
+        if(@available(iOS 10.0, *)) {
+        } else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"notifications"];
             
             @try {
@@ -146,7 +147,8 @@
 #ifndef EXTENSION
     @synchronized(_notifications) {
         NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
-        if(!@available(iOS 10.0, *)) {
+        if(@available(iOS 10.0, *)) {
+        } else {
             for(UILocalNotification *n in ns) {
                 NSArray *d = [n.userInfo objectForKey:@"d"];
                 if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] <= eid) {

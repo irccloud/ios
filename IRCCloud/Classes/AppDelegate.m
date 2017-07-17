@@ -625,7 +625,7 @@
     completionHandler(UNNotificationPresentationOptionNone);
 }
 
--(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [self.mainViewController applyTheme];
     if([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
@@ -941,7 +941,8 @@
         }
     }
     
-    if(!@available(iOS 10.0, *)) {
+    if(@available(iOS 10.0, *)) {
+    } else {
         [[NotificationsDataSource sharedInstance] clear];
     }
     [[NotificationsDataSource sharedInstance] updateBadgeCount];

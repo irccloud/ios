@@ -880,8 +880,10 @@ NSArray *_sortedChannels;
                         }];
                 }]];
                 
-                if(!@available(iOS 9.0, *))
+                if(@available(iOS 9.0, *)) {
+                } else {
                     [self presentViewController:alert animated:YES completion:nil];
+                }
                 
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                     textField.delegate = self;
@@ -1386,7 +1388,8 @@ NSArray *_sortedChannels;
                     if(e.ignoreMask && [ignore match:e.ignoreMask])
                         break;
                     if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
-                        if(!@available(iOS 10.0, *) && [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
+                        if(@available(iOS 10.0, *)) {
+                        } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
                             _lastNotificationTime = [NSDate date].timeIntervalSince1970;
                             AudioServicesPlaySystemSound(alertSound);
                             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
