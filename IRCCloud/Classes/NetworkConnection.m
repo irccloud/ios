@@ -1619,7 +1619,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             SCNetworkReachabilitySetCallback(_reachability, ReachabilityCallback, NULL);
         } else {
             kIRCCloudReachability reachability = [self reachable];
-            if(reachability != kIRCCloudReachable) {
+            if(_reachabilityValid && reachability != kIRCCloudReachable) {
                 CLS_LOG(@"IRCCloud is unreachable");
                 _reconnectTimestamp = -1;
                 _state = kIRCCloudStateDisconnected;
