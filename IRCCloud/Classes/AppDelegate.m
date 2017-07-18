@@ -901,6 +901,8 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     _conn = [NetworkConnection sharedInstance];
+    CLS_LOG(@"App became active, state: %i notifier: %i movedToBackground: %i", _conn.state, _conn.notifier, _movedToBackground);
+    
     if(_backlogCompletedObserver) {
         NSLog(@"Backlog completed observer was registered, removing");
         [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];

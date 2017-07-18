@@ -74,7 +74,10 @@ volatile BOOL __socketPaused = NO;
         _url = URL;
         _bid = -1;
         _parser = [SBJson5Parser unwrapRootArrayParserWithBlock:^(id item, BOOL *stop) {
-            [conn parse:item backlog:YES];
+            if(_cancelled)
+                *stop = YES;
+            else
+                [conn parse:item backlog:YES];
         } errorHandler:^(NSError *error) {
             CLS_LOG(@"OOB JSON ERROR: %@", error);
         }];
@@ -91,12 +94,16 @@ volatile BOOL __socketPaused = NO;
     return self;
 }
 -(void)cancel {
+    CLS_LOG(@"Cancelled OOB fetcher for URL: %@", _url);
     _cancelled = YES;
+    _running = NO;
     [_connection cancel];
 }
 -(void)start {
-    if(_cancelled || _running)
+    if(_cancelled || _running) {
+        CLS_LOG(@"Not starting cancelled OOB fetcher");
         return;
+    }
     
     if(_connection) {
         _running = YES;
@@ -116,8 +123,10 @@ volatile BOOL __socketPaused = NO;
     return nil;
 }
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    if(_cancelled)
+    if(_cancelled) {
+        CLS_LOG(@"Request failed for cancelled OOB fetcher, ignoring");
         return;
+    }
 	CLS_LOG(@"Request failed: %@", error);
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
@@ -131,8 +140,10 @@ volatile BOOL __socketPaused = NO;
 #endif
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    if(_cancelled)
+    if(_cancelled) {
+        CLS_LOG(@"Connection finished loading for cancelled OOB fetcher, ignoring");
         return;
+    }
 	CLS_LOG(@"Backlog download completed");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
@@ -151,7 +162,7 @@ volatile BOOL __socketPaused = NO;
 	return request;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
-	if([response statusCode] != 200) {
+	if(!_cancelled && [response statusCode] != 200) {
         CLS_LOG(@"HTTP status code: %li", (long)[response statusCode]);
 		CLS_LOG(@"HTTP headers: %@", [response allHeaderFields]);
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -166,6 +177,8 @@ volatile BOOL __socketPaused = NO;
     //NSLog(@"%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     if(!_cancelled) {
         [_parser parse:data];
+    } else {
+        CLS_LOG(@"Ignoring data for cancelled OOB fetcher");
     }
 }
 
@@ -1618,11 +1631,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         }
         
         if(_oobQueue.count) {
-            NSLog(@"Cancelling pending OOB requests");
+            CLS_LOG(@"Cancelling pending OOB requests");
             for(OOBFetcher *fetcher in _oobQueue) {
                 [fetcher cancel];
             }
             [_oobQueue removeAllObjects];
+            _streamId = nil;
+            _highestEID = 0;
         }
         NSString *url = [NSString stringWithFormat:@"wss://%@%@",IRCCLOUD_HOST,IRCCLOUD_PATH];
         if(_highestEID > 0 && _streamId.length) {
@@ -1702,10 +1717,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         CFRelease(_reachability);
     _reachability = nil;
     _reachabilityValid = NO;
-    for(OOBFetcher *fetcher in _oobQueue) {
-        [fetcher cancel];
+    if(_oobQueue.count) {
+        for(OOBFetcher *fetcher in _oobQueue) {
+            [fetcher cancel];
+        }
+        [_oobQueue removeAllObjects];
+        _streamId = nil;
+        _highestEID = 0;
     }
-    [_oobQueue removeAllObjects];
     _reconnectTimestamp = 0;
     [self cancelIdleTimer];
     _state = kIRCCloudStateDisconnected;
@@ -2165,6 +2184,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         __socketPaused = NO;
         _state = kIRCCloudStateDisconnected;
         _streamId = nil;
+        _highestEID = 0;
         [self fail];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }
