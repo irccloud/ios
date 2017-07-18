@@ -51,7 +51,12 @@
     return _eid;
 }
 -(id)objectForKey:(NSString *)key {
-    return [_dict objectForKey:key];
+    id obj = [_dict objectForKey:key];
+    if(obj)
+        return obj;
+    if([key isEqualToString:@"success"])
+        return @YES;
+    return nil;
 }
 -(NSString *)description {
     return [_dict description];

@@ -1933,6 +1933,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                     _currentCount++;
                 }
             }
+            if(!backlog && [object objectForKey:@"reqid"] && [_resultHandlers objectForKey:@([[object objectForKey:@"reqid"] intValue])]) {
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        ((IRCCloudAPIResultHandler)[_resultHandlers objectForKey:@([[object objectForKey:@"reqid"] intValue])])(object);
+                    }];
+            }
             if([NSDate timeIntervalSinceReferenceDate] - start > _longestEventTime) {
                 _longestEventTime = [NSDate timeIntervalSinceReferenceDate] - start;
                 _longestEventType = object.type;

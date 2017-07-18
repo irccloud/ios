@@ -904,12 +904,12 @@
     CLS_LOG(@"App became active, state: %i notifier: %i movedToBackground: %i", _conn.state, _conn.notifier, _movedToBackground);
     
     if(_backlogCompletedObserver) {
-        NSLog(@"Backlog completed observer was registered, removing");
+        CLS_LOG(@"Backlog completed observer was registered, removing");
         [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
         _backlogCompletedObserver = nil;
     }
     if(_backlogFailedObserver) {
-        NSLog(@"Backlog failed observer was registered, removing");
+        CLS_LOG(@"Backlog failed observer was registered, removing");
         [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
         _backlogFailedObserver = nil;
     }
