@@ -114,6 +114,7 @@
 -(void)serialize;
 -(void)clear;
 -(void)clearFormattingCache;
+-(void)clearHeightCache;
 -(void)addEvent:(Event *)event;
 -(Event *)addJSONObject:(IRCCloudJSONObject *)object;
 -(Event *)event:(NSTimeInterval)eid buffer:(int)bid;

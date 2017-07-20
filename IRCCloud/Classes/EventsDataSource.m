@@ -1122,6 +1122,17 @@
     }
 }
 
+
+-(void)clearHeightCache {
+    @synchronized(_events) {
+        for(NSNumber *bid in _events) {
+            NSArray *events = [_events objectForKey:bid];
+            for(Event *e in events) {
+                e.height = 0;
+            }
+        }
+    }
+}
 -(void)reformat {
     @synchronized(_events) {
         for(NSNumber *bid in _events) {

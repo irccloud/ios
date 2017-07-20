@@ -709,6 +709,9 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    [[EventsDataSource sharedInstance] clearHeightCache];
+    [_tableView reloadData];
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
