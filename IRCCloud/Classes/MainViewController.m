@@ -3165,8 +3165,8 @@ NSArray *_sortedChannels;
         } else {
             [sheet addButtonWithTitle:@"Rejoin"];
             [sheet addButtonWithTitle:(_buffer.archived)?@"Unarchive":@"Archive"];
-            [sheet addButtonWithTitle:@"Delete"];
         }
+        [sheet addButtonWithTitle:@"Delete"];
     } else {
         [sheet addButtonWithTitle:@"Whois"];
         if(_buffer.archived) {
@@ -3534,10 +3534,10 @@ NSArray *_sortedChannels;
                     [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
                 }]];
             }
-            [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
-                [self _deleteSelectedBuffer];
-            }]];
         }
+        [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
+            [self _deleteSelectedBuffer];
+        }]];
     } else {
         if(_selectedBuffer.archived) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
