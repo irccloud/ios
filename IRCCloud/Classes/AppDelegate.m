@@ -353,7 +353,6 @@
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
             //Store the session in the keychain again to update the access policy
             [NetworkConnection sharedInstance].session = session;
-            [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
             self.window.backgroundColor = [UIColor textareaBackgroundColor];
             self.window.rootViewController = self.slideViewController;
         } else {

@@ -95,10 +95,10 @@
 	<string>${PRODUCT_NAME} requires access to your camera to share photos and videos on IRC</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>${PRODUCT_NAME} requires access to your microphone to record a video</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>${PRODUCT_NAME} requires access to your photo library to share photos and videos on IRC</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>${PRODUCT_NAME} requires access to your photo library to download photos and videos</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>${PRODUCT_NAME} requires access to your photo library to share photos and videos on IRC</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>com.irccloud.buffer</string>
