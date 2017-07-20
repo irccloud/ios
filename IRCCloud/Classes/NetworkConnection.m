@@ -146,9 +146,11 @@ volatile BOOL __socketPaused = NO;
     }
 	CLS_LOG(@"Backlog download completed");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
-        if(_completionHandler)
-            _completionHandler(YES);
+        if(!_cancelled) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
+            if(_completionHandler)
+                _completionHandler(YES);
+        }
     }];
     _running = NO;
 #ifndef EXTENSION
@@ -615,6 +617,7 @@ volatile BOOL __socketPaused = NO;
                    },
                    @"backlog_complete": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                           CLS_LOG(@"backlog_complete from websocket");
                            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
                        }];
                    },
