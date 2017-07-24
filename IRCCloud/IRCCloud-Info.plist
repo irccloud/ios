@@ -101,7 +101,7 @@
 	<string>${PRODUCT_NAME} requires access to your photo library to share photos and videos on IRC</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
-		<key>iCloud.com.irccloud.IRCCloud</key>
+		<key>iCloud.com.irccloud.IRCCloud.public</key>
 		<dict>
 			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
 			<true/>

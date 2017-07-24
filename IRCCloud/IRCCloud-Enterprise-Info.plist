@@ -4,7 +4,7 @@
 <dict>
 	<key>NSUbiquitousContainers</key>
 	<dict>
-		<key>iCloud.com.irccloud.enterprise</key>
+		<key>iCloud.com.irccloud.enterprise.public</key>
 		<dict>
 			<key>NSUbiquitousContainerIsDocumentScopePublic</key>
 			<true/>
