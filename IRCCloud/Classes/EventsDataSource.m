@@ -81,7 +81,7 @@
     }
     return _ignoreMask;
 }
--(id)initWithCoder:(NSCoder *)aDecoder{
+-(instancetype)initWithCoder:(NSCoder *)aDecoder{
     self = [super init];
     if(self) {
         decodeInt(_cid);
@@ -208,6 +208,7 @@
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
             
             @try {
+                [NSKeyedUnarchiver setClass:Event.class forClassName:@"Event"];
                 _events = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
             } @catch(NSException *e) {
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
