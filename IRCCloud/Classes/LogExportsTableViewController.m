@@ -331,8 +331,37 @@
             break;
         case 2:
             if([[NSFileManager defaultManager] ubiquityIdentityToken]) {
-                NSURL *url = [NSURL URLWithString:[[_available objectAtIndex:indexPath.row] objectForKey:@"redirect_url"]];
-                [self download:url];
+                NSFileManager *fm = [NSFileManager defaultManager];
+                NSURL *docs = [[fm URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents"];
+                NSURL *file = [docs URLByAppendingPathComponent:[[_available objectAtIndex:indexPath.row] objectForKey:@"file_name"]];
+                if([fm fileExistsAtPath:file.path]) {
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            _interactionController = [UIDocumentInteractionController interactionControllerWithURL:file];
+                            [_interactionController presentOpenInMenuFromRect:[self.view convertRect:[self.tableView rectForRowAtIndexPath:indexPath] fromView:self.tableView] inView:self.view animated:YES];
+                        }];
+                    }]];
+                    
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Delete from iCloud" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
+                        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+                        [coordinator coordinateWritingItemAtURL:file options:NSFileCoordinatorWritingForDeleting error:nil byAccessor:^(NSURL *writingURL) {
+                            NSError *error;
+                            [fm removeItemAtPath:writingURL.path error:NULL];
+                            if(error)
+                                NSLog(@"Error: %@", error);
+                        }];
+                        [self.tableView reloadData];
+                    }]];
+
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                    alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
+                    alert.popoverPresentationController.sourceView = self.tableView;
+                    [self presentViewController:alert animated:YES completion:nil];
+                } else {
+                    NSURL *url = [NSURL URLWithString:[[_available objectAtIndex:indexPath.row] objectForKey:@"redirect_url"]];
+                    [self download:url];
+                }
             } else {
                 //TODO: add buttons for copy URL and open in Safari
                 [[[UIAlertView alloc] initWithTitle:@"iCloud Unavailable" message:@"Downloading logs requires an iCloud account.  Please configure iCloud on your device and try again." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];

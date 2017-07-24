@@ -23,6 +23,7 @@
     NSArray *_inprogress;
     NSArray *_expired;
     NSMutableDictionary *_downloadingURLs;
+    UIDocumentInteractionController *_interactionController;
     
     Buffer *_buffer;
     Server *_server;
