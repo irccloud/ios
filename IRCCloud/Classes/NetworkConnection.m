@@ -727,6 +727,10 @@ volatile BOOL __socketPaused = NO;
                        if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventTraceResponse];
                    },
+                   @"export_finished": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       if(!backlog && !_resuming)
+                           [self postObject:object forEvent:kIRCEventLogExportFinished];
+                   },
                    @"connection_deleted": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        [_servers removeAllDataForServer:object.cid];
                        if(!backlog && !_resuming)
@@ -1199,7 +1203,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _postRequest:@"/chat/auth-formtoken" args:@{}];
 }
 
--(NSDictionary *)requestConfiguration {
+-(NSData *)_get:(NSURL *)url {
     NSData *data;
     NSURLResponse *response = nil;
     NSError *error = nil;
@@ -1207,14 +1211,22 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 #ifndef EXTENSION
     [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+    if(self.session.length)
+        [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
 #ifndef EXTENSION
     [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
+    return data;
+}
+
+-(NSDictionary *)requestConfiguration {
+    NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]]];
+    NSError *error = nil;
     if(data)
         _config = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
 #ifdef ENTERPRISE
@@ -1225,21 +1237,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)propertiesForFile:(NSString *)fileID {
-    NSData *data;
-    NSURLResponse *response = nil;
+    NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, fileID]]];
     NSError *error = nil;
     
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
-#endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, fileID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
     if(data)
         return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
     else
@@ -1247,23 +1247,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)getFiles:(int)page {
-    NSData *data;
-    NSURLResponse *response = nil;
+    NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/files?page=%i", IRCCLOUD_HOST, page]]];
     NSError *error = nil;
     
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
-#endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/files?page=%i", IRCCLOUD_HOST, page]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    if(self.session.length)
-        [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
-    
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
     if(data)
         return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
     else
@@ -1271,23 +1257,19 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)getPastebins:(int)page {
-    NSData *data;
-    NSURLResponse *response = nil;
+    NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/pastebins?page=%i", IRCCLOUD_HOST, page]]];
     NSError *error = nil;
     
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
-#endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/pastebins?page=%i", IRCCLOUD_HOST, page]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    if(self.session.length)
-        [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
+    if(data)
+        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+    else
+        return nil;
+}
+
+-(NSDictionary *)getLogExports {
+    NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/log-exports", IRCCLOUD_HOST]]];
+    NSError *error = nil;
     
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
     if(data)
         return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
     else
@@ -1585,6 +1567,19 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         return [self _sendRequest:@"edit-pastebin" args:@{@"id":pasteID, @"body":contents, @"extension":extension} handler:resultHandler];
     }
 }
+
+-(int)exportLog:(NSString *)timezone cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)resultHandler {
+    if(cid > 0) {
+        if(bid > 0) {
+            return [self _sendRequest:@"export-log" args:@{@"cid":@(cid), @"bid":@(bid), @"timezone":timezone} handler:resultHandler];
+        } else {
+            return [self _sendRequest:@"export-log" args:@{@"cid":@(cid), @"timezone":timezone} handler:resultHandler];
+        }
+    } else {
+        return [self _sendRequest:@"export-log" args:@{@"timezone":timezone} handler:resultHandler];
+    }
+}
+
 
 -(void)connect:(BOOL)notifier {
     @synchronized(self) {

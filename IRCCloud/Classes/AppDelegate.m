@@ -462,6 +462,9 @@
                     [self.mainViewController bufferSelected:bid];
                     [self showMainView:YES];
                 }
+            } else if([userActivity.webpageURL.path hasPrefix:@"/log-export/"]) {
+                [self showMainView:YES];
+                [self.mainViewController launchURL:userActivity.webpageURL];
             } else {
                 [[UIApplication sharedApplication] openURL:userActivity.webpageURL];
                 return NO;
@@ -620,6 +623,8 @@
             completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
             return;
         }
+    } else {
+        completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
     }
     completionHandler(UNNotificationPresentationOptionNone);
 }

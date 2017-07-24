@@ -56,6 +56,7 @@
 #import "SpamViewController.h"
 #import "LinksListTableViewController.h"
 #import "WhoWasTableViewController.h"
+#import "LogExportsTableViewController.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -803,6 +804,7 @@ NSArray *_sortedChannels;
     Server *s = nil;
     NSString *msg = nil;
     NSString *type = nil;
+    UIAlertController *ac = nil;
     switch(event) {
         case kIRCEventSessionDeleted:
             [self bufferSelected:-1];
@@ -1502,6 +1504,31 @@ NSArray *_sortedChannels;
                 }
             }
             [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
+            break;
+        case kIRCEventLogExportFinished:
+            o = notification.object;
+            if([o objectForKey:@"export"]) {
+                NSDictionary *export = [o objectForKey:@"export"];
+                Server *s = ![[export objectForKey:@"cid"] isKindOfClass:[NSNull class]] ? [[ServersDataSource sharedInstance] getServer:[[export objectForKey:@"cid"] intValue]] : nil;
+                Buffer *b = ![[export objectForKey:@"bid"] isKindOfClass:[NSNull class]] ? [[BuffersDataSource sharedInstance] getBuffer:[[export objectForKey:@"bid"] intValue]] : nil;
+                
+                NSString *serverName = s ? (s.name.length ? s.name : s.hostname) : [NSString stringWithFormat:@"Unknown Network (%@)", [export objectForKey:@"cid"]];
+                NSString *bufferName = b ? b.name : [NSString stringWithFormat:@"Unknown Log (%@)", [export objectForKey:@"bid"]];
+                
+                NSString *msg = @"Your log export is ready for download";
+                if(![[export objectForKey:@"bid"] isKindOfClass:[NSNull class]])
+                    msg = [NSString stringWithFormat:@"Logs for %@: %@ are ready for download", serverName, bufferName];
+                else if(![[export objectForKey:@"cid"] isKindOfClass:[NSNull class]])
+                    msg = [NSString stringWithFormat:@"Logs for %@ are ready for download", serverName];
+
+                ac = [UIAlertController alertControllerWithTitle:@"Export Finished" message:msg preferredStyle:UIAlertControllerStyleAlert];
+                [ac addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+                [ac addAction:[UIAlertAction actionWithTitle:@"Download" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                    [self launchURL:[NSURL URLWithString:[export objectForKey:@"redirect_url"]]];
+                }]];
+                
+                [self presentViewController:ac animated:YES completion:nil];
+            }
             break;
         default:
             break;
@@ -2451,6 +2478,18 @@ NSArray *_sortedChannels;
 }
 
 -(void)launchURL:(NSURL *)url {
+    if([url.path hasPrefix:@"/log-export/"]) {
+        LogExportsTableViewController *lvc;
+        
+        if([self.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[LogExportsTableViewController class]])
+            lvc = (LogExportsTableViewController *)(((UINavigationController *)self.presentedViewController).topViewController);
+        else
+            lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        
+        [lvc download:url];
+        return;
+    }
+    
     if(self.presentedViewController)
         [self dismissViewControllerAnimated:NO completion:nil];
     
@@ -3180,6 +3219,7 @@ NSArray *_sortedChannels;
     [sheet addButtonWithTitle:@"Add Network"];
     [sheet addButtonWithTitle:@"Join a Channel"];
     [sheet addButtonWithTitle:@"Display Options"];
+    [sheet addButtonWithTitle:@"Download Logs"];
     [sheet addButtonWithTitle:@"Settings"];
     [sheet addButtonWithTitle:@"Send Feedback"];
     [sheet addButtonWithTitle:@"Logout"];
@@ -4314,6 +4354,17 @@ NSArray *_sortedChannels;
             dvc.buffer = _buffer;
             dvc.navigationItem.title = _titleLabel.text;
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:dvc];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            [self presentViewController:nc animated:YES completion:nil];
+        } else if([action isEqualToString:@"Download Logs"]) {
+            LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            lvc.buffer = _buffer;
+            lvc.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                 nc.modalPresentationStyle = UIModalPresentationFormSheet;

@@ -94,6 +94,7 @@ typedef enum {
     kIRCEventLinksResponse,
     kIRCEventWhoWas,
     kIRCEventTraceResponse,
+    kIRCEventLogExportFinished,
     kIRCEventAuthFailure,
     kIRCEventAlert,
     kIRCEventRefresh
@@ -243,4 +244,6 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(NSDictionary *)propertiesForFile:(NSString *)fileID;
 -(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword handler:(IRCCloudAPIResultHandler)handler;
 -(int)deleteAccount:(NSString *)password handler:(IRCCloudAPIResultHandler)handler;
+-(NSDictionary *)getLogExports;
+-(int)exportLog:(NSString *)timezone cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)handler;
 @end

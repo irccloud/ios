@@ -200,6 +200,8 @@
 		222C80F21E4A112F00A243E7 /* SBJson5Writer.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80C81E4A0BB600A243E7 /* SBJson5Writer.m */; };
 		2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		2230F8E817162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
+		223154FD1F26245800BDE367 /* LogExportsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223154FC1F26245800BDE367 /* LogExportsTableViewController.m */; };
+		223154FE1F26245800BDE367 /* LogExportsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223154FC1F26245800BDE367 /* LogExportsTableViewController.m */; };
 		22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
 		223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
@@ -820,6 +822,8 @@
 		2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		2230F8E617162ACC007F7C98 /* Ignore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Ignore.h; sourceTree = "<group>"; };
 		2230F8E717162ACC007F7C98 /* Ignore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Ignore.m; sourceTree = "<group>"; };
+		223154FB1F26245800BDE367 /* LogExportsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LogExportsTableViewController.h; sourceTree = "<group>"; };
+		223154FC1F26245800BDE367 /* LogExportsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LogExportsTableViewController.m; sourceTree = "<group>"; };
 		22324FDF177DE51A008B6912 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		223581C1191AD79B00A4B124 /* ImageUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUploader.h; sourceTree = "<group>"; };
 		223581C2191AD79B00A4B124 /* ImageUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUploader.m; sourceTree = "<group>"; };
@@ -1528,6 +1532,8 @@
 				22CE91741D58C81C0014B25C /* LinkTextView.m */,
 				221D4B881E1BE30700D403E6 /* LinksListTableViewController.h */,
 				221D4B851E1BE2F700D403E6 /* LinksListTableViewController.m */,
+				223154FB1F26245800BDE367 /* LogExportsTableViewController.h */,
+				223154FC1F26245800BDE367 /* LogExportsTableViewController.m */,
 				228A05DB16D3E40E0029769C /* LoginSplashViewController.h */,
 				228A05DC16D3E40E0029769C /* LoginSplashViewController.m */,
 				2236F60816DBCBC6007BE535 /* MainViewController.h */,
@@ -2548,6 +2554,7 @@
 				225D975118AA995900065087 /* IRCCloudJSONObject.m in Sources */,
 				225D975218AA995900065087 /* ServersDataSource.m in Sources */,
 				225D975318AA995900065087 /* NickCompletionView.m in Sources */,
+				223154FE1F26245800BDE367 /* LogExportsTableViewController.m in Sources */,
 				222C80CA1E4A0BB600A243E7 /* SBJson5Parser.m in Sources */,
 				229324121E8945D700ADAA22 /* assert.c in Sources */,
 				22CE91761D58C81C0014B25C /* LinkTextView.m in Sources */,
@@ -2664,6 +2671,7 @@
 				22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */,
 				2236F5FA16DA765C007BE535 /* ServersDataSource.m in Sources */,
 				22032A6F1884529700BE4A10 /* NickCompletionView.m in Sources */,
+				223154FD1F26245800BDE367 /* LogExportsTableViewController.m in Sources */,
 				222C80C91E4A0BB600A243E7 /* SBJson5Parser.m in Sources */,
 				229324111E8945D700ADAA22 /* assert.c in Sources */,
 				22CE91751D58C81C0014B25C /* LinkTextView.m in Sources */,
