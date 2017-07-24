@@ -251,7 +251,12 @@
                     [spinner startAnimating];
                     cell.accessoryView = spinner;
                 } else {
-                    cell.accessoryType = UITableViewCellAccessoryNone;
+                    NSFileManager *fm = [NSFileManager defaultManager];
+                    NSURL *docs = [[fm URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents"];
+                    if([fm fileExistsAtPath:[docs URLByAppendingPathComponent:[row objectForKey:@"file_name"]].path])
+                        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+                    else
+                        cell.accessoryType = UITableViewCellAccessoryNone;
                 }
                 break;
             case 3:
