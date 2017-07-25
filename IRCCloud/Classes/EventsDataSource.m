@@ -203,12 +203,15 @@
 -(id)init {
     self = [super init];
     if(self) {
+        [NSKeyedArchiver setClassName:@"IRCCloudEvent" forClass:Event.class];
+        [NSKeyedUnarchiver setClass:Event.class forClassName:@"IRCCloudEvent"];
+        [NSKeyedUnarchiver setClass:Event.class forClassName:@"Event"];
+
 #ifndef EXTENSION
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
             
             @try {
-                [NSKeyedUnarchiver setClass:Event.class forClassName:@"Event"];
                 _events = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
             } @catch(NSException *e) {
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
