@@ -24,12 +24,50 @@
     [super viewDidLoad];
     _downloaded = [[NSMutableArray alloc] init];
     _downloadingURLs = [[NSMutableDictionary alloc] init];
+    _iCloudLogs = [[UISwitch alloc] init];
+    [_iCloudLogs addTarget:self action:@selector(iCloudLogsChanged:) forControlEvents:UIControlEventValueChanged];
     self.navigationItem.title = @"Download Logs";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
 }
 
 -(void)doneButtonPressed:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+-(void)iCloudLogsChanged:(id)sender {
+    BOOL on = _iCloudLogs.on;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        @synchronized(self) {
+            [[NSUserDefaults standardUserDefaults] setBool:on forKey:@"iCloudLogs"];
+            
+            NSFileManager *fm = [NSFileManager defaultManager];
+            NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+            NSURL *iCloudPath = [[fm URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents"];
+            NSURL *localPath = [[fm URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
+            
+            NSURL *source,*dest;
+            
+            if(on) {
+                source = localPath;
+                dest = iCloudPath;
+            } else {
+                source = iCloudPath;
+                dest = localPath;
+            }
+            
+            for(NSURL *file in [fm contentsOfDirectoryAtURL:source includingPropertiesForKeys:nil options:0 error:nil]) {
+                [coordinator coordinateReadingItemAtURL:file options:0 writingItemAtURL:[dest URLByAppendingPathComponent:file.lastPathComponent] options:NSFileCoordinatorWritingForReplacing error:nil byAccessor:^(NSURL *newReadingURL, NSURL *newWritingURL) {
+                    CLS_LOG(@"Moving %@ to %@", newReadingURL, newWritingURL);
+                    NSError *error;
+                    [fm removeItemAtURL:[dest URLByAppendingPathComponent:file.lastPathComponent] error:nil];
+                    [fm setUbiquitous:on itemAtURL:newReadingURL destinationURL:newWritingURL error:&error];
+                    if(error)
+                        CLS_LOG(@"Error moving file: %@", error);
+                }];
+            }
+        }
+    });
 }
 
 - (void)didReceiveMemoryWarning {
@@ -81,6 +119,7 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    _iCloudLogs.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"])
         [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
@@ -137,7 +176,7 @@
     
     switch(section) {
         case 0:
-            return 3;
+            return [[NSFileManager defaultManager] ubiquityIdentityToken]?4:3;
         case 1:
             return _inprogress.count;
         case 2:
@@ -254,10 +293,10 @@
 
 - (NSURL *)downloadsPath {
     NSFileManager *fm = [NSFileManager defaultManager];
-    if([fm ubiquityIdentityToken])
+    if([fm ubiquityIdentityToken] && [[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"])
         return [[fm URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents"];
     else
-        return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
+        return [[fm URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -280,6 +319,11 @@
             case 2:
                 cell.textLabel.text = @"All Networks";
                 cell.detailTextLabel.text = [NSString stringWithFormat:@"%lu networks", (unsigned long)[ServersDataSource sharedInstance].count];
+                break;
+            case 3:
+                cell.textLabel.text = @"Store Logs on iCloud Drive";
+                cell.detailTextLabel.text = nil;
+                cell.accessoryView = _iCloudLogs;
                 break;
         }
         cell.accessoryType = UITableViewCellAccessoryNone;

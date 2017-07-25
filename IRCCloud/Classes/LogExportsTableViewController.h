@@ -25,6 +25,7 @@
     NSArray *_expired;
     NSMutableDictionary *_downloadingURLs;
     UIDocumentInteractionController *_interactionController;
+    UISwitch *_iCloudLogs;
     
     Buffer *_buffer;
     Server *_server;

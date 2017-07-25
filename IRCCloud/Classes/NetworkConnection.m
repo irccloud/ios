@@ -2243,6 +2243,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"uploadsAvailable"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"theme"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"logs_cache"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [UIColor setTheme:@"dawn"];
     [self clearPrefs];
