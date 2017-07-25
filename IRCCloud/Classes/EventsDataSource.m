@@ -203,9 +203,8 @@
 -(id)init {
     self = [super init];
     if(self) {
-        [NSKeyedArchiver setClassName:@"IRCCloudEvent" forClass:Event.class];
-        [NSKeyedUnarchiver setClass:Event.class forClassName:@"IRCCloudEvent"];
-        [NSKeyedUnarchiver setClass:Event.class forClassName:@"Event"];
+        [NSKeyedArchiver setClassName:@"IRCCloud.Event" forClass:Event.class];
+        [NSKeyedUnarchiver setClass:Event.class forClassName:@"IRCCloud.Event"];
 
 #ifndef EXTENSION
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {

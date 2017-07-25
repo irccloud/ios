@@ -106,6 +106,9 @@
 -(id)init {
     self = [super init];
     if(self) {
+        [NSKeyedArchiver setClassName:@"IRCCloud.User" forClass:User.class];
+        [NSKeyedUnarchiver setClass:User.class forClassName:@"IRCCloud.User"];
+
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"users"];
             

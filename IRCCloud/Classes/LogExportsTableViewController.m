@@ -22,6 +22,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _downloaded = [[NSMutableArray alloc] init];
     _downloadingURLs = [[NSMutableDictionary alloc] init];
     self.navigationItem.title = @"Download Logs";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
@@ -40,9 +41,31 @@
     @synchronized(self) {
         NSDictionary *logs = [[NetworkConnection sharedInstance] getLogExports];
         
+        [_downloaded removeAllObjects];
         _inprogress = [logs objectForKey:@"inprogress"];
-        _available = [logs objectForKey:@"available"];
-        _expired = [logs objectForKey:@"expired"];
+        NSMutableArray *available = [[logs objectForKey:@"available"] mutableCopy];
+        NSMutableArray *expired = [[logs objectForKey:@"expired"] mutableCopy];
+        
+        for(int i = 0; i < available.count; i++) {
+            NSDictionary *d = [available objectAtIndex:i];
+            if([self downloadExists:d]) {
+                [_downloaded addObject:d];
+                [available removeObject:d];
+                i--;
+            }
+        }
+        
+        for(int i = 0; i < expired.count; i++) {
+            NSDictionary *d = [expired objectAtIndex:i];
+            if([self downloadExists:d]) {
+                [_downloaded addObject:d];
+                [expired removeObject:d];
+                i--;
+            }
+        }
+        
+        _available = available;
+        _expired = expired;
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self.tableView reloadData];
@@ -91,44 +114,54 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1 + (_inprogress.count > 0) + (_available.count > 0) + (_expired.count > 0);
+    return 1 + (_inprogress.count > 0) + (_downloaded.count > 0) + (_available.count > 0) + (_expired.count > 0);
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if(section > 1 && _available.count == 0)
-        section++;
-    
     if(section > 0 && _inprogress.count == 0)
         section++;
+    
+    if(section > 1 && _downloaded.count == 0)
+        section++;
 
+    if(section > 2 && _available.count == 0)
+        section++;
+    
     switch(section) {
         case 0:
             return 3;
         case 1:
             return _inprogress.count;
         case 2:
-            return _available.count;
+            return _downloaded.count;
         case 3:
+            return _available.count;
+        case 4:
             return _expired.count;
     }
     return 0;
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(section > 1 && _available.count == 0)
-        section++;
-    
     if(section > 0 && _inprogress.count == 0)
         section++;
+    
+    if(section > 1 && _downloaded.count == 0)
+        section++;
 
+    if(section > 2 && _available.count == 0)
+        section++;
+    
     switch(section) {
         case 0:
             return @"Export Logs";
         case 1:
             return @"Pending Downloads";
         case 2:
-            return @"Available Downloads";
+            return @"On Device";
         case 3:
+            return @"Available Downloads";
+        case 4:
             return @"Expired Downloads";
     }
     return nil;
@@ -199,6 +232,26 @@
     return date;
 }
 
+- (BOOL)downloadExists:(NSDictionary *)row {
+    if([row objectForKey:@"file_name"] && ![[row objectForKey:@"file_name"] isKindOfClass:[NSNull class]]) {
+        return ([[NSFileManager defaultManager] fileExistsAtPath:[[self downloadsPath] URLByAppendingPathComponent:[row objectForKey:@"file_name"]].path]);
+    } else {
+        return NO;
+    }
+}
+
+- (NSURL *)fileForDownload:(NSDictionary *)row {
+    return [[self downloadsPath] URLByAppendingPathComponent:[row objectForKey:@"file_name"]];
+}
+
+- (NSURL *)downloadsPath {
+    NSFileManager *fm = [NSFileManager defaultManager];
+    if([fm ubiquityIdentityToken])
+        return [[fm URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents"];
+    else
+        return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"LogExport"];
     if(!cell)
@@ -225,12 +278,15 @@
     } else {
         NSInteger section = indexPath.section;
         
-        if(section > 1 && _available.count == 0)
-            section++;
-        
         if(section > 0 && _inprogress.count == 0)
             section++;
+        
+        if(section > 1 && _downloaded.count == 0)
+            section++;
 
+        if(section > 2 && _available.count == 0)
+            section++;
+        
         UIActivityIndicatorView *spinner;
         NSDictionary *row = nil;
         switch(section) {
@@ -243,6 +299,10 @@
                 cell.accessoryView = spinner;
                 break;
             case 2:
+                row = [_downloaded objectAtIndex:indexPath.row];
+                cell.accessoryType = UITableViewCellAccessoryNone;
+                break;
+            case 3:
                 row = [_available objectAtIndex:indexPath.row];
                 if([_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]]) {
                     cell.accessoryType = UITableViewCellAccessoryNone;
@@ -251,15 +311,10 @@
                     [spinner startAnimating];
                     cell.accessoryView = spinner;
                 } else {
-                    NSFileManager *fm = [NSFileManager defaultManager];
-                    NSURL *docs = [[fm URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents"];
-                    if([fm fileExistsAtPath:[docs URLByAppendingPathComponent:[row objectForKey:@"file_name"]].path])
-                        cell.accessoryType = UITableViewCellAccessoryCheckmark;
-                    else
-                        cell.accessoryType = UITableViewCellAccessoryNone;
+                    cell.accessoryType = UITableViewCellAccessoryNone;
                 }
                 break;
-            case 3:
+            case 4:
                 row = [_expired objectAtIndex:indexPath.row];
                 cell.accessoryType = UITableViewCellAccessoryNone;
                 break;
@@ -277,8 +332,8 @@
         else
             cell.textLabel.text = @"All Networks";
 
-        if([[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]])
-            cell.detailTextLabel.text = [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]];
+        if(section == 2 || [[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]])
+            cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
         else
             cell.detailTextLabel.text = [NSString stringWithFormat:([NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue] < 0)?@"Exported %@ ago\nExpires in %@":@"Exported %@ ago\nExpired %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue]]];
         cell.detailTextLabel.numberOfLines = 0;
@@ -294,12 +349,15 @@
     
     NSInteger section = indexPath.section;
     
-    if(section > 1 && _available.count == 0)
-        section++;
-    
     if(section > 0 && _inprogress.count == 0)
         section++;
-
+    
+    if(section > 1 && _downloaded.count == 0)
+        section++;
+    
+    if(section > 2 && _available.count == 0)
+        section++;
+    
     IRCCloudAPIResultHandler exportHandler = ^(IRCCloudJSONObject *result) {
         if([[result objectForKey:@"success"] boolValue]) {
             NSMutableArray *inprogress = _inprogress.mutableCopy;
@@ -330,42 +388,35 @@
             [[[UIAlertView alloc] initWithTitle:@"Preparing Download" message:@"This export is being prepared.  You will recieve a notification when it is ready for download." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
             break;
         case 2:
-            if([[NSFileManager defaultManager] ubiquityIdentityToken]) {
-                NSFileManager *fm = [NSFileManager defaultManager];
-                NSURL *docs = [[fm URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents"];
-                NSURL *file = [docs URLByAppendingPathComponent:[[_available objectAtIndex:indexPath.row] objectForKey:@"file_name"]];
-                if([fm fileExistsAtPath:file.path]) {
-                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-                    [alert addAction:[UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            _interactionController = [UIDocumentInteractionController interactionControllerWithURL:file];
-                            [_interactionController presentOpenInMenuFromRect:[self.view convertRect:[self.tableView rectForRowAtIndexPath:indexPath] fromView:self.tableView] inView:self.view animated:YES];
-                        }];
-                    }]];
-                    
-                    [alert addAction:[UIAlertAction actionWithTitle:@"Delete from iCloud" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
-                        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-                        [coordinator coordinateWritingItemAtURL:file options:NSFileCoordinatorWritingForDeleting error:nil byAccessor:^(NSURL *writingURL) {
-                            NSError *error;
-                            [fm removeItemAtPath:writingURL.path error:NULL];
-                            if(error)
-                                NSLog(@"Error: %@", error);
-                        }];
-                        [self.tableView reloadData];
-                    }]];
+        {
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    _interactionController = [UIDocumentInteractionController interactionControllerWithURL:[self fileForDownload:[_downloaded objectAtIndex:indexPath.row]]];
+                    [_interactionController presentOpenInMenuFromRect:[self.view convertRect:[self.tableView rectForRowAtIndexPath:indexPath] fromView:self.tableView] inView:self.view animated:YES];
+                }];
+            }]];
+            
+            [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
+                NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+                [coordinator coordinateWritingItemAtURL:[self fileForDownload:[_downloaded objectAtIndex:indexPath.row]] options:NSFileCoordinatorWritingForDeleting error:nil byAccessor:^(NSURL *writingURL) {
+                    NSError *error;
+                    [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
+                    if(error)
+                        NSLog(@"Error: %@", error);
+                    [self performSelectorInBackground:@selector(refresh) withObject:nil];
+                }];
+                [self.tableView reloadData];
+            }]];
 
-                    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-                    alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
-                    alert.popoverPresentationController.sourceView = self.tableView;
-                    [self presentViewController:alert animated:YES completion:nil];
-                } else {
-                    NSURL *url = [NSURL URLWithString:[[_available objectAtIndex:indexPath.row] objectForKey:@"redirect_url"]];
-                    [self download:url];
-                }
-            } else {
-                //TODO: add buttons for copy URL and open in Safari
-                [[[UIAlertView alloc] initWithTitle:@"iCloud Unavailable" message:@"Downloading logs requires an iCloud account.  Please configure iCloud on your device and try again." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
-            }
+            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
+            alert.popoverPresentationController.sourceView = self.tableView;
+            [self presentViewController:alert animated:YES completion:nil];
+            break;
+        }
+        case 3:
+            [self download:[NSURL URLWithString:[[_available objectAtIndex:indexPath.row] objectForKey:@"redirect_url"]]];
             break;
     }
 }
@@ -373,7 +424,7 @@
 -(void)download:(NSURL *)url {
     NSURLSession *session;
     NSURLSessionConfiguration *config;
-    config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+    config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.logs.%li", time(NULL)]];
 #ifdef ENTERPRISE
     config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
 #else
@@ -407,9 +458,13 @@
             alert.alertBody = [NSString stringWithFormat:@"Unable to download logs: %@", error.description];
         } else {
             alert.alertTitle = @"Download Complete";
-            alert.alertBody = @"Logs are now available on iCloud Drive";
+            alert.alertBody = @"Logs are now available";
+            alert.category = @"view_logs";
+            alert.userInfo = @{@"view_logs":@(YES)};
         }
         [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+        if(self.completionHandler)
+            self.completionHandler();
     }];
 }
 
@@ -418,7 +473,7 @@
     NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
     NSFileManager *fm = [NSFileManager defaultManager];
     
-    NSURL *dest = [[fm URLForUbiquityContainerIdentifier:nil] URLByAppendingPathComponent:@"Documents"];
+    NSURL *dest = [self downloadsPath];
     [coordinator coordinateWritingItemAtURL:dest options:0 error:&error byAccessor:^(NSURL *newURL) {
         [fm createDirectoryAtURL:dest withIntermediateDirectories:YES attributes:nil error:NULL];
     }];
@@ -435,7 +490,22 @@
     
     [_downloadingURLs removeObjectForKey:downloadTask.originalRequest.URL];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        NSMutableArray *available = _available.mutableCopy;
+        
+        for(int i = 0; i < available.count; i++) {
+            if([[[available objectAtIndex:i] objectForKey:@"redirect_url"] isEqualToString:downloadTask.originalRequest.URL.absoluteString]) {
+                [_downloaded addObject:[available objectAtIndex:i]];
+                [available removeObjectAtIndex:i];
+                break;
+            }
+        }
+        
+        _available = available;
+        
         [self.tableView reloadData];
+
+        if(self.completionHandler)
+            self.completionHandler();
     }];
 }
 @end

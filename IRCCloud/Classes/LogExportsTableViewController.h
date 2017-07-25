@@ -19,6 +19,7 @@
 #import "ServersDataSource.h"
 
 @interface LogExportsTableViewController : UITableViewController<NSURLSessionDownloadDelegate> {
+    NSMutableArray *_downloaded;
     NSArray *_available;
     NSArray *_inprogress;
     NSArray *_expired;
@@ -31,6 +32,7 @@
 
 @property Buffer *buffer;
 @property Server *server;
+@property (nonatomic, copy) void (^completionHandler)(void);
 
 -(void)download:(NSURL *)url;
 

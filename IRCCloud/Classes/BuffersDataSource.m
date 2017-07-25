@@ -142,6 +142,9 @@
 -(id)init {
     self = [super init];
     if(self) {
+        [NSKeyedArchiver setClassName:@"IRCCloud.Buffer" forClass:Buffer.class];
+        [NSKeyedUnarchiver setClass:Buffer.class forClassName:@"IRCCloud.Buffer"];
+
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"buffers"];
             

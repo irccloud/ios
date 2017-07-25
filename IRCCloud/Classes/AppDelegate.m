@@ -29,6 +29,7 @@
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "AvatarsDataSource.h"
 #import "ImageCache.h"
+#import "LogExportsTableViewController.h"
 
 #ifdef DEBUG
 @implementation NSURLRequest(CertificateHack)
@@ -93,7 +94,7 @@
         UNNotificationAction *joinAction = [UNNotificationAction actionWithIdentifier:@"join" title:@"Join" options:UNNotificationActionOptionForeground];
         UNNotificationAction *acceptAction = [UNNotificationAction actionWithIdentifier:@"accept" title:@"Accept" options:UNNotificationActionOptionNone];
         UNNotificationAction *retryAction = [UNNotificationAction actionWithIdentifier:@"retry" title:@"Retry" options:UNNotificationActionOptionNone];
-        
+
         [center setNotificationCategories:[NSSet setWithObjects:
                                            [UNNotificationCategory categoryWithIdentifier:@"buffer_msg" actions:@[replyAction] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
                                            [UNNotificationCategory categoryWithIdentifier:@"buffer_me_msg" actions:@[replyAction] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
@@ -540,8 +541,24 @@
     CLS_LOG(@"Error in APNs registration. Error: %@", err);
 }
 
+-(void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
+    [self application:application didReceiveRemoteNotification:[notification.userInfo objectForKey:@"userInfo"]];
+}
+
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    if(_movedToBackground && application.applicationState != UIApplicationStateActive) {
+    if([userInfo objectForKey:@"view_logs"]) {
+        LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        lvc.buffer = _mainViewController.buffer;
+        lvc.server = [[ServersDataSource sharedInstance] getServer:_mainViewController.buffer.cid];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self showMainView:YES];
+        [_mainViewController presentViewController:nc animated:YES completion:nil];
+    } else if(_movedToBackground && application.applicationState != UIApplicationStateActive) {
         if([userInfo objectForKey:@"d"]) {
             self.mainViewController.bidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
             self.mainViewController.eidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
@@ -623,7 +640,7 @@
             completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
             return;
         }
-    } else {
+    } else if([notification.request.content.userInfo objectForKey:@"view_logs"]) {
         completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
     }
     completionHandler(UNNotificationPresentationOptionNone);
@@ -635,13 +652,7 @@
     if([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:((UNTextInputNotificationResponse *)response).userText completionHandler:completionHandler];
     } else if([response.actionIdentifier isEqualToString:UNNotificationDefaultActionIdentifier]) {
-        if([response.notification.request.content.userInfo objectForKey:@"d"]) {
-            self.mainViewController.bidToOpen = [[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
-            self.mainViewController.eidToOpen = [[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
-            CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
-            [self.mainViewController bufferSelected:[[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
-            [self showMainView:YES];
-        }
+        [self application:[UIApplication sharedApplication] didReceiveRemoteNotification:response.notification.request.content.userInfo];
         completionHandler();
     } else {
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:nil completionHandler:completionHandler];
@@ -894,8 +905,23 @@
     config.URLCache = nil;
     config.requestCachePolicy = NSURLCacheStorageNotAllowed;
     config.discretionary = NO;
-    [[NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]] finishTasksAndInvalidate];
-    imageUploadCompletionHandler = completionHandler;
+    if([identifier hasPrefix:@"com.irccloud.logs."]) {
+        LogExportsTableViewController *lvc;
+        
+        if([_mainViewController.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)_mainViewController.presentedViewController).topViewController isKindOfClass:[LogExportsTableViewController class]])
+            lvc = (LogExportsTableViewController *)(((UINavigationController *)_mainViewController.presentedViewController).topViewController);
+        else
+            lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        
+        lvc.completionHandler = completionHandler;
+        [[NSURLSession sessionWithConfiguration:config delegate:lvc delegateQueue:[NSOperationQueue mainQueue]] finishTasksAndInvalidate];
+    } else if([identifier hasPrefix:@"com.irccloud.share."]) {
+        [[NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]] finishTasksAndInvalidate];
+        imageUploadCompletionHandler = completionHandler;
+    } else {
+        CLS_LOG(@"Unrecognized background task: %@", identifier);
+        completionHandler();
+    }
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
