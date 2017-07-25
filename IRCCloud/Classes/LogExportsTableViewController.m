@@ -205,7 +205,7 @@
         case 1:
             return @"Pending Downloads";
         case 2:
-            return @"On Device";
+            return @"Downloaded";
         case 3:
             return @"Available Downloads";
         case 4:
