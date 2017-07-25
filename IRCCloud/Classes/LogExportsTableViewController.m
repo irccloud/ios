@@ -37,45 +37,53 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(void)refresh:(NSDictionary *)logs {
+    [_downloaded removeAllObjects];
+    _inprogress = [logs objectForKey:@"inprogress"];
+    NSMutableArray *available = [[logs objectForKey:@"available"] mutableCopy];
+    NSMutableArray *expired = [[logs objectForKey:@"expired"] mutableCopy];
+    
+    for(int i = 0; i < available.count; i++) {
+        NSDictionary *d = [available objectAtIndex:i];
+        if([self downloadExists:d]) {
+            [_downloaded addObject:d];
+            [available removeObject:d];
+            i--;
+        }
+    }
+    
+    for(int i = 0; i < expired.count; i++) {
+        NSDictionary *d = [expired objectAtIndex:i];
+        if([self downloadExists:d]) {
+            [_downloaded addObject:d];
+            [expired removeObject:d];
+            i--;
+        }
+    }
+    
+    _available = available;
+    _expired = expired;
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self.tableView reloadData];
+    }];
+}
+
 -(void)refresh {
     @synchronized(self) {
-        NSDictionary *logs = [[NetworkConnection sharedInstance] getLogExports];
+        NSMutableDictionary *logs = [[NetworkConnection sharedInstance] getLogExports].mutableCopy;
+        [logs removeObjectForKey:@"timezones"];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:logs] forKey:@"logs_cache"];
         
-        [_downloaded removeAllObjects];
-        _inprogress = [logs objectForKey:@"inprogress"];
-        NSMutableArray *available = [[logs objectForKey:@"available"] mutableCopy];
-        NSMutableArray *expired = [[logs objectForKey:@"expired"] mutableCopy];
-        
-        for(int i = 0; i < available.count; i++) {
-            NSDictionary *d = [available objectAtIndex:i];
-            if([self downloadExists:d]) {
-                [_downloaded addObject:d];
-                [available removeObject:d];
-                i--;
-            }
-        }
-        
-        for(int i = 0; i < expired.count; i++) {
-            NSDictionary *d = [expired objectAtIndex:i];
-            if([self downloadExists:d]) {
-                [_downloaded addObject:d];
-                [expired removeObject:d];
-                i--;
-            }
-        }
-        
-        _available = available;
-        _expired = expired;
-        
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [self.tableView reloadData];
-        }];
+        [self refresh:logs];
     }
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"])
+        [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
     [self performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
