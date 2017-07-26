@@ -264,10 +264,11 @@
         if(!_pastes.count) {
             CLS_LOG(@"Pastebin list is empty");
             UILabel *fail = [[UILabel alloc] init];
-            fail.text = @"\nYou haven't created any text snippets yet.\n";
+            fail.text = @"\nYou haven't created any\ntext snippets yet.\n";
             fail.numberOfLines = 3;
             fail.textAlignment = NSTextAlignmentCenter;
             fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+            fail.textColor = [UIColor messageTextColor];
             [fail sizeToFit];
             [self setFooterView:fail];
         }
@@ -279,6 +280,7 @@
         fail.numberOfLines = 4;
         fail.textAlignment = NSTextAlignmentCenter;
         fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+        fail.textColor = [UIColor messageTextColor];
         [fail sizeToFit];
         [self setFooterView:fail];
         return;
