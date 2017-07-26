@@ -89,6 +89,10 @@
 		221067211F28C3BB0075A18F /* Hack-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2210671D1F28C3BB0075A18F /* Hack-BoldItalic.ttf */; };
 		221067221F28C3BB0075A18F /* Hack-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2210671E1F28C3BB0075A18F /* Hack-Italic.ttf */; };
 		221067231F28C3BB0075A18F /* Hack-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2210671F1F28C3BB0075A18F /* Hack-Regular.ttf */; };
+		221067241F28C3F30075A18F /* Hack-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2210671C1F28C3BB0075A18F /* Hack-Bold.ttf */; };
+		221067251F28C3F60075A18F /* Hack-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2210671D1F28C3BB0075A18F /* Hack-BoldItalic.ttf */; };
+		221067261F28C3F90075A18F /* Hack-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2210671E1F28C3BB0075A18F /* Hack-Italic.ttf */; };
+		221067271F28C3FB0075A18F /* Hack-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2210671F1F28C3BB0075A18F /* Hack-Regular.ttf */; };
 		2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
 		221390FE1B115CD000ECF001 /* PastebinEditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221390FD1B115CD000ECF001 /* PastebinEditorViewController.m */; };
 		221390FF1B115CD000ECF001 /* PastebinEditorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221390FD1B115CD000ECF001 /* PastebinEditorViewController.m */; };
@@ -2221,15 +2225,19 @@
 				225D979418AA995900065087 /* Safari.png in Resources */,
 				2236BD6B1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
 				22EE12891C9B20DF00E7AE8D /* Firefox@3x.png in Resources */,
+				221067251F28C3F60075A18F /* Hack-BoldItalic.ttf in Resources */,
 				225D979518AA995900065087 /* Safari@2x.png in Resources */,
 				2236BD6D1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
 				2236BD641BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				225D979618AA995900065087 /* Safari@2x~ipad.png in Resources */,
+				221067261F28C3F90075A18F /* Hack-Italic.ttf in Resources */,
 				22EE12871C9B20DF00E7AE8D /* Firefox@2x.png in Resources */,
 				225D979718AA995900065087 /* Safari~ipad.png in Resources */,
+				221067241F28C3F30075A18F /* Hack-Bold.ttf in Resources */,
 				22EEA95518D0B198007D5022 /* Icons.xcassets in Resources */,
 				225D979918AA995900065087 /* licenses.txt in Resources */,
 				225D979A18AA995900065087 /* a.caf in Resources */,
+				221067271F28C3FB0075A18F /* Hack-Regular.ttf in Resources */,
 				225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */,
 				22C0F1551B8F6829001D109D /* Assets in Resources */,
 			);
