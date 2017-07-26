@@ -86,7 +86,7 @@
 -(void)cacheFileSize:(NSDictionary *)d {
     NSUInteger bytes = [[[[NSFileManager defaultManager] attributesOfItemAtPath:[[self downloadsPath] URLByAppendingPathComponent:[d objectForKey:@"file_name"]].path error:nil] objectForKey:NSFileSize] intValue];
     if(bytes < 1024) {
-        [_fileSizes setObject:[NSString stringWithFormat:@"%li B", bytes] forKey:[d objectForKey:@"file_name"]];
+        [_fileSizes setObject:[NSString stringWithFormat:@"%li B", (long)bytes] forKey:[d objectForKey:@"file_name"]];
     } else {
         int exp = (int)(log(bytes) / log(1024));
         [_fileSizes setObject:[NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp-1]] forKey:[d objectForKey:@"file_name"]];
@@ -601,7 +601,7 @@
         [fm copyItemAtPath:newReadingURL.path toPath:newWritingURL.path error:&error];
         NSUInteger bytes = [[[[NSFileManager defaultManager] attributesOfItemAtPath:newWritingURL.path error:nil] objectForKey:NSFileSize] intValue];
         if(bytes < 1024) {
-            [_fileSizes setObject:[NSString stringWithFormat:@"%li B", (long)bytes] forKey:downloadTask.originalRequest.URL.lastPathComponent];
+            [_fileSizes setObject:[NSString stringWithFormat:@"%li B", bytes] forKey:downloadTask.originalRequest.URL.lastPathComponent];
         } else {
             int exp = (int)(log(bytes) / log(1024));
             [_fileSizes setObject:[NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp-1]] forKey:downloadTask.originalRequest.URL.lastPathComponent];
