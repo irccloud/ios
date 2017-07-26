@@ -599,6 +599,13 @@
         NSError *error;
         [fm removeItemAtPath:newWritingURL.path error:NULL];
         [fm copyItemAtPath:newReadingURL.path toPath:newWritingURL.path error:&error];
+        NSUInteger bytes = [[[[NSFileManager defaultManager] attributesOfItemAtPath:newWritingURL.path error:nil] objectForKey:NSFileSize] intValue];
+        if(bytes < 1024) {
+            [_fileSizes setObject:[NSString stringWithFormat:@"%li B", bytes] forKey:downloadTask.originalRequest.URL.lastPathComponent];
+        } else {
+            int exp = (int)(log(bytes) / log(1024));
+            [_fileSizes setObject:[NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp-1]] forKey:downloadTask.originalRequest.URL.lastPathComponent];
+        }
         if(error)
             NSLog(@"Error: %@", error);
     }];
