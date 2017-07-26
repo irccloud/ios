@@ -3391,7 +3391,10 @@ NSArray *_sortedChannels;
         }
         [sheet addButtonWithTitle:@"Copy Hostmask"];
     }
-    [sheet addButtonWithTitle:@"Clear Backlog"];
+    
+    if(_selectedEvent)
+        [sheet addButtonWithTitle:@"Clear Backlog"];
+
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
         [sheet showInView:self.view];
@@ -4266,8 +4269,9 @@ NSArray *_sortedChannels;
                 [pb setValue:[NSString stringWithFormat:@"%@ %@", _selectedEvent.timestamp, [[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
             }
         } else if([action isEqualToString:@"Clear Backlog"]) {
-            [[EventsDataSource sharedInstance] removeEventsForBuffer:_selectedBuffer.bid];
-            if(_buffer.bid == _selectedBuffer.bid)
+            int bid = _selectedBuffer?_selectedBuffer.bid:_selectedEvent.bid;
+            [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
+            if(_buffer.bid == bid)
                 [_eventsView refresh];
         } else if([action isEqualToString:@"Copy URL"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
