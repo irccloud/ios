@@ -39,7 +39,7 @@
         if(!_notifications)
             _notifications = [[NSMutableDictionary alloc] init];
         
-        if(@available(iOS 10.0, *)) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
         } else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"notifications"];
             
@@ -62,7 +62,7 @@
 }
 
 -(void)serialize {
-    if(@available(iOS 10.0, *)) {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
         return;
     }
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"notifications"];
@@ -93,7 +93,7 @@
         [UIApplication sharedApplication].applicationIconBadgeNumber = 1;
         [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
         [[UIApplication sharedApplication] cancelAllLocalNotifications];
-        if(@available(iOS 10.0, *)) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
             [[UNUserNotificationCenter currentNotificationCenter] removeAllDeliveredNotifications];
         }
 #endif
@@ -102,7 +102,7 @@
 
 -(void)notify:(NSString *)alert category:(NSString *)category cid:(int)cid bid:(int)bid eid:(NSTimeInterval)eid {
 #ifndef EXTENSION
-    if(@available(iOS 10.0, *)) {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
 #if TARGET_IPHONE_SIMULATOR
         UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
         content.title = @"IRCCloud";
@@ -147,7 +147,7 @@
 #ifndef EXTENSION
     @synchronized(_notifications) {
         NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
-        if(@available(iOS 10.0, *)) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
         } else {
             for(UILocalNotification *n in ns) {
                 NSArray *d = [n.userInfo objectForKey:@"d"];
@@ -167,7 +167,7 @@
 #ifndef EXTENSION
     @synchronized(_notifications) {
         NSArray *ns = [NSArray arrayWithArray:[_notifications objectForKey:@(bid)]];
-        if(@available(iOS 10.0, *)) {
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
             for(UNNotification *n in ns) {
                 NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
                 if([[d objectAtIndex:1] intValue] == bid && [[d objectAtIndex:2] doubleValue] == eid) {
@@ -189,7 +189,7 @@
 
 -(void)updateBadgeCount {
 #ifndef EXTENSION
-    if(@available(iOS 10.0, *)) {
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
         [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 NSUInteger count = 0;
