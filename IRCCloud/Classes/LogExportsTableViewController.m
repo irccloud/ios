@@ -336,7 +336,7 @@
                     cell.detailTextLabel.text = [NSString stringWithFormat:@"%lu networks", (unsigned long)[ServersDataSource sharedInstance].count];
                     break;
                 case 3:
-                    cell.textLabel.text = @"Sync Logs With iCloud Drive";
+                    cell.textLabel.text = @"Sync Downloads With iCloud Drive";
                     cell.detailTextLabel.text = nil;
                     cell.accessoryView = _iCloudLogs;
                     break;
