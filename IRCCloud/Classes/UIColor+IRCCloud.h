@@ -26,6 +26,7 @@
 +(UIColor *)colorWithHue:(CGFloat)hue saturation:(CGFloat)saturation lightness:(CGFloat)brightness alpha:(CGFloat)alpha;
 +(BOOL)isDarkTheme;
 +(void)setTheme:(NSString *)theme;
++(void)clearTheme;
 +(UIColor *)contentBackgroundColor;
 +(UIColor *)messageTextColor;
 +(UIColor *)opersGroupColor;

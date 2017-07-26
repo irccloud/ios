@@ -18,7 +18,7 @@
 #import "BuffersDataSource.h"
 #import "ServersDataSource.h"
 
-@interface LogExportsTableViewController : UITableViewController<NSURLSessionDownloadDelegate> {
+@interface LogExportsTableViewController : UITableViewController<NSURLSessionDownloadDelegate,UIDocumentInteractionControllerDelegate> {
     NSMutableArray *_downloaded;
     NSArray *_available;
     NSArray *_inprogress;

@@ -75,6 +75,14 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(void)documentInteractionControllerWillPresentOpenInMenu:(UIDocumentInteractionController *)controller {
+    [UIColor clearTheme];
+}
+
+-(void)documentInteractionControllerDidDismissOpenInMenu:(UIDocumentInteractionController *)controller {
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+}
+
 -(void)refresh:(NSDictionary *)logs {
     [_downloaded removeAllObjects];
     _inprogress = [logs objectForKey:@"inprogress"];
@@ -118,6 +126,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [super viewWillAppear:animated];
     _iCloudLogs.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
@@ -445,6 +454,7 @@
             [alert addAction:[UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     _interactionController = [UIDocumentInteractionController interactionControllerWithURL:[self fileForDownload:[_downloaded objectAtIndex:indexPath.row]]];
+                    _interactionController.delegate = self;
                     [_interactionController presentOpenInMenuFromRect:[self.view convertRect:[self.tableView rectForRowAtIndexPath:indexPath] fromView:self.tableView] inView:self.view animated:YES];
                 }];
             }]];

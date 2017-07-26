@@ -662,6 +662,34 @@ BOOL __compact = NO;
     __current_theme = theme?theme:@"dawn";
 }
 
++(void)clearTheme {
+    [[UITableView appearance] setBackgroundColor:nil];
+    [[UITableView appearance] setSeparatorColor:nil];
+    [[UITableViewCell appearance] setBackgroundColor:nil];
+    [[UITableViewCell appearance] setSelectedBackgroundView:nil];
+    [[UITableViewCell appearance] setTextLabelColor:nil];
+    [[UITableViewCell appearance] setDetailTextLabelColor:nil];
+    [[UITableViewCell appearance] setTintColor:nil];
+    [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:nil];
+    [[UISwitch appearance] setOnTintColor:nil];
+    [[UISlider appearance] setTintColor:nil];
+    
+    [[UITextField appearance] setTintColor:nil];
+    [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceDefault];
+    
+    [[UITextView appearance] setTintColor:nil];
+    [[UITextView appearance] setTextColor:nil];
+    
+    [[UIScrollView appearance] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
+    
+    [[UITableViewCell appearanceWhenContainedIn:[UIImagePickerController class], nil] setBackgroundColor:nil];
+    [[UIScrollView appearanceWhenContainedIn:[UIImagePickerController class], nil] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
+    
+    [[UINavigationBar appearance] setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
+    [[UINavigationBar appearance] setTitleTextAttributes:nil];
+    [[UINavigationBar appearance] setTintColor:nil];
+}
+
 +(NSString *)currentTheme {
     return __current_theme;
 }
