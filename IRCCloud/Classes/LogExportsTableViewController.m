@@ -363,52 +363,66 @@
             NSDictionary *row = nil;
             switch(section) {
                 case 1:
-                    row = [_inprogress objectAtIndex:indexPath.row];
-                    cell.accessoryType = UITableViewCellAccessoryNone;
-                    spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-                    [spinner sizeToFit];
-                    [spinner startAnimating];
-                    cell.accessoryView = spinner;
-                    break;
-                case 2:
-                    row = [_downloaded objectAtIndex:indexPath.row];
-                    cell.accessoryType = UITableViewCellAccessoryNone;
-                    break;
-                case 3:
-                    row = [_available objectAtIndex:indexPath.row];
-                    if([_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]]) {
+                    if(indexPath.row < _inprogress.count) {
+                        row = [_inprogress objectAtIndex:indexPath.row];
                         cell.accessoryType = UITableViewCellAccessoryNone;
                         spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
                         [spinner sizeToFit];
                         [spinner startAnimating];
                         cell.accessoryView = spinner;
-                    } else {
+                    }
+                    break;
+                case 2:
+                    if(indexPath.row < _downloaded.count) {
+                        row = [_downloaded objectAtIndex:indexPath.row];
                         cell.accessoryType = UITableViewCellAccessoryNone;
                     }
                     break;
+                case 3:
+                    if(indexPath.row < _available.count) {
+                        row = [_available objectAtIndex:indexPath.row];
+                        if([_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]]) {
+                            cell.accessoryType = UITableViewCellAccessoryNone;
+                            spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+                            [spinner sizeToFit];
+                            [spinner startAnimating];
+                            cell.accessoryView = spinner;
+                        } else {
+                            cell.accessoryType = UITableViewCellAccessoryNone;
+                        }
+                    }
+                    break;
                 case 4:
-                    row = [_expired objectAtIndex:indexPath.row];
-                    cell.accessoryType = UITableViewCellAccessoryNone;
+                    if(indexPath.row < _expired.count) {
+                        row = [_expired objectAtIndex:indexPath.row];
+                        cell.accessoryType = UITableViewCellAccessoryNone;
+                    }
                     break;
             }
-            Server *s = ![[row objectForKey:@"cid"] isKindOfClass:[NSNull class]] ? [[ServersDataSource sharedInstance] getServer:[[row objectForKey:@"cid"] intValue]] : nil;
-            Buffer *b = ![[row objectForKey:@"bid"] isKindOfClass:[NSNull class]] ? [[BuffersDataSource sharedInstance] getBuffer:[[row objectForKey:@"bid"] intValue]] : nil;
             
-            NSString *serverName = s ? (s.name.length ? s.name : s.hostname) : [NSString stringWithFormat:@"Unknown Network (%@)", [row objectForKey:@"cid"]];
-            NSString *bufferName = b ? b.name : [NSString stringWithFormat:@"Unknown Log (%@)", [row objectForKey:@"bid"]];
-            
-            if(![[row objectForKey:@"bid"] isKindOfClass:[NSNull class]])
-                cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", serverName, bufferName];
-            else if(![[row objectForKey:@"cid"] isKindOfClass:[NSNull class]])
-                cell.textLabel.text = serverName;
-            else
-                cell.textLabel.text = @"All Networks";
+            if(row) {
+                Server *s = ![[row objectForKey:@"cid"] isKindOfClass:[NSNull class]] ? [[ServersDataSource sharedInstance] getServer:[[row objectForKey:@"cid"] intValue]] : nil;
+                Buffer *b = ![[row objectForKey:@"bid"] isKindOfClass:[NSNull class]] ? [[BuffersDataSource sharedInstance] getBuffer:[[row objectForKey:@"bid"] intValue]] : nil;
+                
+                NSString *serverName = s ? (s.name.length ? s.name : s.hostname) : [NSString stringWithFormat:@"Unknown Network (%@)", [row objectForKey:@"cid"]];
+                NSString *bufferName = b ? b.name : [NSString stringWithFormat:@"Unknown Log (%@)", [row objectForKey:@"bid"]];
+                
+                if(![[row objectForKey:@"bid"] isKindOfClass:[NSNull class]])
+                    cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", serverName, bufferName];
+                else if(![[row objectForKey:@"cid"] isKindOfClass:[NSNull class]])
+                    cell.textLabel.text = serverName;
+                else
+                    cell.textLabel.text = @"All Networks";
 
-            if(section == 2 || [[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]])
-                cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
-            else
-                cell.detailTextLabel.text = [NSString stringWithFormat:([NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue] < 0)?@"Exported %@ ago\nExpires in %@":@"Exported %@ ago\nExpired %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue]]];
-            cell.detailTextLabel.numberOfLines = 0;
+                if(section == 2 || [[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]])
+                    cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
+                else
+                    cell.detailTextLabel.text = [NSString stringWithFormat:([NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue] < 0)?@"Exported %@ ago\nExpires in %@":@"Exported %@ ago\nExpired %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue]]];
+                cell.detailTextLabel.numberOfLines = 0;
+            } else {
+                CLS_LOG(@"Requested row %li not found for section %li, reloading table", (long)indexPath.row, (long)indexPath.section);
+                [self.tableView reloadData];
+            }
         }
         
         return cell;
@@ -482,8 +496,9 @@
                         [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
                         if(error)
                             NSLog(@"Error: %@", error);
-                        [self performSelectorInBackground:@selector(refresh) withObject:nil];
+                        [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
                         [self.tableView reloadData];
+                        [self performSelectorInBackground:@selector(refresh) withObject:nil];
                     }];
                 }]];
 
@@ -501,6 +516,10 @@
 }
 
 -(void)download:(NSURL *)url {
+    if([_downloadingURLs objectForKey:url.absoluteString]) {
+        CLS_LOG(@"Ignoring duplicate download request for %@", url);
+        return;
+    }
     NSURLSession *session;
     NSURLSessionConfiguration *config;
     config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.logs.%li", time(NULL)]];
