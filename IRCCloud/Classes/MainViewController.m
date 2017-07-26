@@ -4442,7 +4442,10 @@ Network type: %@\n",
             [report appendString:@"==========\nPrefs:\n"];
             [report appendFormat:@"%@\n", [[NetworkConnection sharedInstance] prefs]];
             [report appendString:@"==========\nNSUserDefaults:\n"];
-            [report appendFormat:@"%@\n", [NSUserDefaults standardUserDefaults].dictionaryRepresentation];
+            NSMutableDictionary *d = [NSUserDefaults standardUserDefaults].dictionaryRepresentation.mutableCopy;
+            [d removeObjectForKey:@"logs_cache"];
+            [d removeObjectForKey:@"AppleITunesStoreItemKinds"];
+            [report appendFormat:@"%@\n", d];
 
             NSURL *caches = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
             NSArray *folders = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[caches URLByAppendingPathComponent:@"com.crashlytics.data"] includingPropertiesForKeys:nil options:0 error:nil];
