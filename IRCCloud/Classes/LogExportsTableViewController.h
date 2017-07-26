@@ -23,6 +23,7 @@
     NSArray *_available;
     NSArray *_inprogress;
     NSMutableDictionary *_downloadingURLs;
+    NSMutableDictionary *_fileSizes;
     UIDocumentInteractionController *_interactionController;
     UISwitch *_iCloudLogs;
     

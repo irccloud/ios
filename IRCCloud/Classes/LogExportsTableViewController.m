@@ -22,6 +22,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _fileSizes = [[NSMutableDictionary alloc] init];
     _downloadingURLs = [[NSMutableDictionary alloc] init];
     _iCloudLogs = [[UISwitch alloc] init];
     [_iCloudLogs addTarget:self action:@selector(iCloudLogsChanged:) forControlEvents:UIControlEventValueChanged];
@@ -82,6 +83,16 @@
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
 }
 
+-(void)cacheFileSize:(NSDictionary *)d {
+    NSUInteger bytes = [[[[NSFileManager defaultManager] attributesOfItemAtPath:[[self downloadsPath] URLByAppendingPathComponent:[d objectForKey:@"file_name"]].path error:nil] objectForKey:NSFileSize] intValue];
+    if(bytes < 1024) {
+        [_fileSizes setObject:[NSString stringWithFormat:@"%li B", bytes] forKey:[d objectForKey:@"file_name"]];
+    } else {
+        int exp = (int)(log(bytes) / log(1024));
+        [_fileSizes setObject:[NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp-1]] forKey:[d objectForKey:@"file_name"]];
+    }
+}
+
 -(void)refresh:(NSDictionary *)logs {
     _inprogress = [logs objectForKey:@"inprogress"];
     NSMutableArray *available = [[logs objectForKey:@"available"] mutableCopy];
@@ -91,6 +102,7 @@
     for(int i = 0; i < available.count; i++) {
         NSDictionary *d = [available objectAtIndex:i];
         if([self downloadExists:d]) {
+            [self cacheFileSize:d];
             [downloaded addObject:d];
             [available removeObject:d];
             i--;
@@ -100,6 +112,7 @@
     for(int i = 0; i < expired.count; i++) {
         NSDictionary *d = [expired objectAtIndex:i];
         if([self downloadExists:d]) {
+            [self cacheFileSize:d];
             [downloaded addObject:d];
             [expired removeObject:d];
             i--;
@@ -403,10 +416,14 @@
                 else
                     cell.textLabel.text = @"All Networks";
 
-                if(section == 2 || [[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]])
-                    cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
-                else
+                if(section == 2 || [[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]]) {
+                    if([_fileSizes objectForKey:[row objectForKey:@"file_name"]])
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago\n%@", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [_fileSizes objectForKey:[row objectForKey:@"file_name"]]];
+                    else
+                        cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
+                } else {
                     cell.detailTextLabel.text = [NSString stringWithFormat:([NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue] < 0)?@"Exported %@ ago\nExpires in %@":@"Exported %@ ago\nExpired %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue]]];
+                }
                 cell.detailTextLabel.numberOfLines = 0;
             } else {
                 CLS_LOG(@"Requested row %li not found for section %li, reloading table", (long)indexPath.row, (long)indexPath.section);
@@ -470,7 +487,7 @@
             {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
                 NSURL *file = [self fileForDownload:[_downloaded objectAtIndex:indexPath.row]];
-                [alert addAction:[UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         _interactionController = [UIDocumentInteractionController interactionControllerWithURL:file];
                         _interactionController.delegate = self;
@@ -478,17 +495,26 @@
                     }];
                 }]];
                 
-                [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
-                    NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-                    [coordinator coordinateWritingItemAtURL:file options:NSFileCoordinatorWritingForDeleting error:nil byAccessor:^(NSURL *writingURL) {
-                        NSError *error;
-                        [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
-                        if(error)
-                            NSLog(@"Error: %@", error);
-                        [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
-                        [self.tableView reloadData];
-                        [self performSelectorInBackground:@selector(refresh) withObject:nil];
-                    }];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Download" message:[[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"]?@"Are you sure you want to delete this download?  It will be removed from your device and all other devices that are syncing with iCloud Drive.":@"Are you sure you want to delete this download from your device?" preferredStyle:UIAlertControllerStyleAlert];
+                    
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+                        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+                        [coordinator coordinateWritingItemAtURL:file options:NSFileCoordinatorWritingForDeleting error:nil byAccessor:^(NSURL *writingURL) {
+                            NSError *error;
+                            [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
+                            if(error)
+                                NSLog(@"Error: %@", error);
+                            [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
+                            [self.tableView reloadData];
+                            [self performSelectorInBackground:@selector(refresh) withObject:nil];
+                        }];
+                    }]];
+                    
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                    alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
+                    alert.popoverPresentationController.sourceView = self.tableView;
+                    [self presentViewController:alert animated:YES completion:nil];
                 }]];
 
                 [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
