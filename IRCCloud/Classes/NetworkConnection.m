@@ -109,9 +109,6 @@ volatile BOOL __socketPaused = NO;
         _running = YES;
         [_connection start];
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
-#ifndef EXTENSION
-        [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
-#endif
     } else {
         CLS_LOG(@"Failed to create NSURLConnection");
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
@@ -135,9 +132,6 @@ volatile BOOL __socketPaused = NO;
     }];
     _running = NO;
     _cancelled = YES;
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if(_cancelled) {
@@ -153,9 +147,6 @@ volatile BOOL __socketPaused = NO;
         }
     }];
     _running = NO;
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
     if(_cancelled)
@@ -1132,17 +1123,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	NSURLResponse *response = nil;
 	NSError *error = nil;
     
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
-#endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:accessLink cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
     if(data)
         return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
     else
@@ -1208,9 +1193,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSURLResponse *response = nil;
     NSError *error = nil;
     
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
-#endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
@@ -1218,9 +1200,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
     return data;
 }
 
@@ -1312,9 +1291,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(self.session.length && ![args objectForKey:@"session"])
         [body appendFormat:@"&session=%@", self.session];
     
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
-#endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, path]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
@@ -1328,9 +1304,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
     
     if(error) {
         CLS_LOG(@"HTTP request failed: %@ %@", error.localizedDescription, error.localizedFailureReason);
@@ -1668,9 +1641,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 url = [url stringByAppendingFormat:@"&limit=%i", limit];
         }
         
-#ifndef EXTENSION
-        [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
-#endif
         CLS_LOG(@"Connecting: %@", url);
         _notifier = notifier;
         _state = kIRCCloudStateConnecting;
@@ -1747,9 +1717,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocketDidOpen:(WebSocket *)socket {
     if(socket == _socket) {
-#ifndef EXTENSION
-        [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
         CLS_LOG(@"Socket connected");
         _idleInterval = 20;
         _reconnectTimestamp = -1;
@@ -1781,9 +1748,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocket:(WebSocket *)socket didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError {
     if(socket == _socket) {
-#ifndef EXTENSION
-        [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
         CLS_LOG(@"Status Code: %lu", (unsigned long)aStatusCode);
         CLS_LOG(@"Close Message: %@", aMessage);
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
@@ -1804,9 +1768,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocket:(WebSocket *)socket didReceiveError: (NSError*) aError {
     if(socket == _socket) {
-#ifndef EXTENSION
-        [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
         __socketPaused = NO;
