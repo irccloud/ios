@@ -1434,6 +1434,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if(e.groupMsg && !e.formattedMsg) {
             e.formattedMsg = e.groupMsg;
             e.formatted = nil;
+            e.height = 0;
         }
         e.groupEid = _currentCollapsedEid;
         
