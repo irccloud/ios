@@ -1,6 +1,18 @@
 {
   "images" : [
     {
+      "size" : "20x20",
+      "idiom" : "iphone",
+      "filename" : "iOS7-Notifications@2x-1.png",
+      "scale" : "2x"
+    },
+    {
+      "size" : "20x20",
+      "idiom" : "iphone",
+      "filename" : "iOS7-Notifications@3x.png",
+      "scale" : "3x"
+    },
+    {
       "size" : "29x29",
       "idiom" : "iphone",
       "filename" : "iOS7-Settings.png",
@@ -53,6 +65,18 @@
       "idiom" : "iphone",
       "filename" : "iOS7-iPhone@3x.png",
       "scale" : "3x"
+    },
+    {
+      "size" : "20x20",
+      "idiom" : "ipad",
+      "filename" : "iOS7-Notifications@1x.png",
+      "scale" : "1x"
+    },
+    {
+      "size" : "20x20",
+      "idiom" : "ipad",
+      "filename" : "iOS7-Notifications@2x.png",
+      "scale" : "2x"
     },
     {
       "size" : "29x29",
