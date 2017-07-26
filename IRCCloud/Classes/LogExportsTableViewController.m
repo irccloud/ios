@@ -108,7 +108,6 @@
     
     @synchronized (self.tableView) {
         _available = available;
-        _expired = expired;
         _downloaded = downloaded;
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -173,7 +172,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     @synchronized (self.tableView) {
-        return 1 + (_inprogress.count > 0) + (_downloaded.count > 0) + (_available.count > 0) + (_expired.count > 0);
+        return 1 + (_inprogress.count > 0) + (_downloaded.count > 0) + (_available.count > 0);
     }
 }
 
@@ -197,8 +196,6 @@
                 return _downloaded.count;
             case 3:
                 return _available.count;
-            case 4:
-                return _expired.count;
         }
         return 0;
     }
@@ -219,13 +216,11 @@
             case 0:
                 return @"Export Logs";
             case 1:
-                return @"Pending Downloads";
+                return @"Pending";
             case 2:
                 return @"Downloaded";
             case 3:
-                return @"Available Downloads";
-            case 4:
-                return @"Expired Downloads";
+                return @"Available";
         }
         return nil;
     }
@@ -390,12 +385,6 @@
                         } else {
                             cell.accessoryType = UITableViewCellAccessoryNone;
                         }
-                    }
-                    break;
-                case 4:
-                    if(indexPath.row < _expired.count) {
-                        row = [_expired objectAtIndex:indexPath.row];
-                        cell.accessoryType = UITableViewCellAccessoryNone;
                     }
                     break;
             }

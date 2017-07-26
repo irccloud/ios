@@ -641,7 +641,10 @@
             return;
         }
     } else if([notification.request.content.userInfo objectForKey:@"view_logs"]) {
-        completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
+        if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && [_mainViewController.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)_mainViewController.presentedViewController).topViewController isKindOfClass:[LogExportsTableViewController class]])
+            completionHandler(UNNotificationPresentationOptionNone);
+        else
+            completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
     }
     completionHandler(UNNotificationPresentationOptionNone);
 }
