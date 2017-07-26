@@ -22,7 +22,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _downloaded = [[NSMutableArray alloc] init];
     _downloadingURLs = [[NSMutableDictionary alloc] init];
     _iCloudLogs = [[UISwitch alloc] init];
     [_iCloudLogs addTarget:self action:@selector(iCloudLogsChanged:) forControlEvents:UIControlEventValueChanged];
@@ -84,15 +83,15 @@
 }
 
 -(void)refresh:(NSDictionary *)logs {
-    [_downloaded removeAllObjects];
     _inprogress = [logs objectForKey:@"inprogress"];
     NSMutableArray *available = [[logs objectForKey:@"available"] mutableCopy];
     NSMutableArray *expired = [[logs objectForKey:@"expired"] mutableCopy];
+    NSMutableArray *downloaded = [[NSMutableArray alloc] init];
     
     for(int i = 0; i < available.count; i++) {
         NSDictionary *d = [available objectAtIndex:i];
         if([self downloadExists:d]) {
-            [_downloaded addObject:d];
+            [downloaded addObject:d];
             [available removeObject:d];
             i--;
         }
@@ -101,22 +100,25 @@
     for(int i = 0; i < expired.count; i++) {
         NSDictionary *d = [expired objectAtIndex:i];
         if([self downloadExists:d]) {
-            [_downloaded addObject:d];
+            [downloaded addObject:d];
             [expired removeObject:d];
             i--;
         }
     }
     
-    _available = available;
-    _expired = expired;
-    
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [self.tableView reloadData];
-    }];
+    @synchronized (self.tableView) {
+        _available = available;
+        _expired = expired;
+        _downloaded = downloaded;
+        
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self.tableView reloadData];
+        }];
+    }
 }
 
 -(void)refresh {
-    @synchronized(self) {
+    @synchronized(self.tableView) {
         NSMutableDictionary *logs = [[NetworkConnection sharedInstance] getLogExports].mutableCopy;
         [logs removeObjectForKey:@"timezones"];
         [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:logs] forKey:@"logs_cache"];
@@ -170,64 +172,72 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1 + (_inprogress.count > 0) + (_downloaded.count > 0) + (_available.count > 0) + (_expired.count > 0);
+    @synchronized (self.tableView) {
+        return 1 + (_inprogress.count > 0) + (_downloaded.count > 0) + (_available.count > 0) + (_expired.count > 0);
+    }
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if(section > 0 && _inprogress.count == 0)
-        section++;
-    
-    if(section > 1 && _downloaded.count == 0)
-        section++;
+    @synchronized (self.tableView) {
+        if(section > 0 && _inprogress.count == 0)
+            section++;
+        
+        if(section > 1 && _downloaded.count == 0)
+            section++;
 
-    if(section > 2 && _available.count == 0)
-        section++;
-    
-    switch(section) {
-        case 0:
-            return [[NSFileManager defaultManager] ubiquityIdentityToken]?4:3;
-        case 1:
-            return _inprogress.count;
-        case 2:
-            return _downloaded.count;
-        case 3:
-            return _available.count;
-        case 4:
-            return _expired.count;
+        if(section > 2 && _available.count == 0)
+            section++;
+        
+        switch(section) {
+            case 0:
+                return [[NSFileManager defaultManager] ubiquityIdentityToken]?4:3;
+            case 1:
+                return _inprogress.count;
+            case 2:
+                return _downloaded.count;
+            case 3:
+                return _available.count;
+            case 4:
+                return _expired.count;
+        }
+        return 0;
     }
-    return 0;
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(section > 0 && _inprogress.count == 0)
-        section++;
-    
-    if(section > 1 && _downloaded.count == 0)
-        section++;
+    @synchronized (self.tableView) {
+        if(section > 0 && _inprogress.count == 0)
+            section++;
+        
+        if(section > 1 && _downloaded.count == 0)
+            section++;
 
-    if(section > 2 && _available.count == 0)
-        section++;
-    
-    switch(section) {
-        case 0:
-            return @"Export Logs";
-        case 1:
-            return @"Pending Downloads";
-        case 2:
-            return @"Downloaded";
-        case 3:
-            return @"Available Downloads";
-        case 4:
-            return @"Expired Downloads";
+        if(section > 2 && _available.count == 0)
+            section++;
+        
+        switch(section) {
+            case 0:
+                return @"Export Logs";
+            case 1:
+                return @"Pending Downloads";
+            case 2:
+                return @"Downloaded";
+            case 3:
+                return @"Available Downloads";
+            case 4:
+                return @"Expired Downloads";
+        }
+        return nil;
     }
-    return nil;
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.section == 0)
-        return 44;
-    else
-        return 64;
+    @synchronized (self.tableView) {
+        if(indexPath.section == 0)
+            return 44;
+        else
+            return 64;
+    }
 }
 
 - (NSString *)relativeTime:(double)seconds {
@@ -309,34 +319,108 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"LogExport"];
-    if(!cell)
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"LogExport"];
-    
-    cell.accessoryView = nil;
-    
-    if(indexPath.section == 0) {
-        switch(indexPath.row) {
-            case 0:
-                cell.textLabel.text = @"This Network";
-                cell.detailTextLabel.text = _server.name.length ? _server.name : _server.hostname;
-                break;
-            case 1:
-                cell.textLabel.text = @"This Channel";
-                cell.detailTextLabel.text = _buffer.name;
-                break;
-            case 2:
+    @synchronized (self.tableView) {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"LogExport"];
+        if(!cell)
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"LogExport"];
+        
+        cell.accessoryView = nil;
+        
+        if(indexPath.section == 0) {
+            switch(indexPath.row) {
+                case 0:
+                    cell.textLabel.text = @"This Network";
+                    cell.detailTextLabel.text = _server.name.length ? _server.name : _server.hostname;
+                    break;
+                case 1:
+                    cell.textLabel.text = @"This Channel";
+                    cell.detailTextLabel.text = _buffer.name;
+                    break;
+                case 2:
+                    cell.textLabel.text = @"All Networks";
+                    cell.detailTextLabel.text = [NSString stringWithFormat:@"%lu networks", (unsigned long)[ServersDataSource sharedInstance].count];
+                    break;
+                case 3:
+                    cell.textLabel.text = @"Sync Logs With iCloud Drive";
+                    cell.detailTextLabel.text = nil;
+                    cell.accessoryView = _iCloudLogs;
+                    break;
+            }
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        } else {
+            NSInteger section = indexPath.section;
+            
+            if(section > 0 && _inprogress.count == 0)
+                section++;
+            
+            if(section > 1 && _downloaded.count == 0)
+                section++;
+
+            if(section > 2 && _available.count == 0)
+                section++;
+            
+            UIActivityIndicatorView *spinner;
+            NSDictionary *row = nil;
+            switch(section) {
+                case 1:
+                    row = [_inprogress objectAtIndex:indexPath.row];
+                    cell.accessoryType = UITableViewCellAccessoryNone;
+                    spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+                    [spinner sizeToFit];
+                    [spinner startAnimating];
+                    cell.accessoryView = spinner;
+                    break;
+                case 2:
+                    row = [_downloaded objectAtIndex:indexPath.row];
+                    cell.accessoryType = UITableViewCellAccessoryNone;
+                    break;
+                case 3:
+                    row = [_available objectAtIndex:indexPath.row];
+                    if([_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]]) {
+                        cell.accessoryType = UITableViewCellAccessoryNone;
+                        spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+                        [spinner sizeToFit];
+                        [spinner startAnimating];
+                        cell.accessoryView = spinner;
+                    } else {
+                        cell.accessoryType = UITableViewCellAccessoryNone;
+                    }
+                    break;
+                case 4:
+                    row = [_expired objectAtIndex:indexPath.row];
+                    cell.accessoryType = UITableViewCellAccessoryNone;
+                    break;
+            }
+            Server *s = ![[row objectForKey:@"cid"] isKindOfClass:[NSNull class]] ? [[ServersDataSource sharedInstance] getServer:[[row objectForKey:@"cid"] intValue]] : nil;
+            Buffer *b = ![[row objectForKey:@"bid"] isKindOfClass:[NSNull class]] ? [[BuffersDataSource sharedInstance] getBuffer:[[row objectForKey:@"bid"] intValue]] : nil;
+            
+            NSString *serverName = s ? (s.name.length ? s.name : s.hostname) : [NSString stringWithFormat:@"Unknown Network (%@)", [row objectForKey:@"cid"]];
+            NSString *bufferName = b ? b.name : [NSString stringWithFormat:@"Unknown Log (%@)", [row objectForKey:@"bid"]];
+            
+            if(![[row objectForKey:@"bid"] isKindOfClass:[NSNull class]])
+                cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", serverName, bufferName];
+            else if(![[row objectForKey:@"cid"] isKindOfClass:[NSNull class]])
+                cell.textLabel.text = serverName;
+            else
                 cell.textLabel.text = @"All Networks";
-                cell.detailTextLabel.text = [NSString stringWithFormat:@"%lu networks", (unsigned long)[ServersDataSource sharedInstance].count];
-                break;
-            case 3:
-                cell.textLabel.text = @"Store Logs on iCloud Drive";
-                cell.detailTextLabel.text = nil;
-                cell.accessoryView = _iCloudLogs;
-                break;
+
+            if(section == 2 || [[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]])
+                cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
+            else
+                cell.detailTextLabel.text = [NSString stringWithFormat:([NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue] < 0)?@"Exported %@ ago\nExpires in %@":@"Exported %@ ago\nExpired %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue]]];
+            cell.detailTextLabel.numberOfLines = 0;
         }
-        cell.accessoryType = UITableViewCellAccessoryNone;
-    } else {
+        
+        return cell;
+    }
+}
+
+#pragma mark - Table view delegate
+
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    @synchronized (self.tableView) {
+        [tableView deselectRowAtIndexPath:indexPath animated:NO];
+        
         NSInteger section = indexPath.section;
         
         if(section > 0 && _inprogress.count == 0)
@@ -344,142 +428,75 @@
         
         if(section > 1 && _downloaded.count == 0)
             section++;
-
+        
         if(section > 2 && _available.count == 0)
             section++;
         
-        UIActivityIndicatorView *spinner;
-        NSDictionary *row = nil;
-        switch(section) {
-            case 1:
-                row = [_inprogress objectAtIndex:indexPath.row];
-                cell.accessoryType = UITableViewCellAccessoryNone;
-                spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-                [spinner sizeToFit];
-                [spinner startAnimating];
-                cell.accessoryView = spinner;
-                break;
-            case 2:
-                row = [_downloaded objectAtIndex:indexPath.row];
-                cell.accessoryType = UITableViewCellAccessoryNone;
-                break;
-            case 3:
-                row = [_available objectAtIndex:indexPath.row];
-                if([_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]]) {
-                    cell.accessoryType = UITableViewCellAccessoryNone;
-                    spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-                    [spinner sizeToFit];
-                    [spinner startAnimating];
-                    cell.accessoryView = spinner;
+        IRCCloudAPIResultHandler exportHandler = ^(IRCCloudJSONObject *result) {
+            @synchronized (self.tableView) {
+                if([[result objectForKey:@"success"] boolValue]) {
+                    NSMutableArray *inprogress = _inprogress.mutableCopy;
+                    [inprogress insertObject:[result objectForKey:@"export"] atIndex:0];
+                    _inprogress = inprogress;
+                    [self.tableView reloadData];
+                    [[[UIAlertView alloc] initWithTitle:@"Exporting" message:@"Your log export is in progress.  We'll email you when it's ready." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
                 } else {
-                    cell.accessoryType = UITableViewCellAccessoryNone;
+                    [[[UIAlertView alloc] initWithTitle:@"Export Failed" message:[NSString stringWithFormat:@"Unable to export log: %@.  Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
+                }
+            }
+        };
+        
+        switch(section) {
+            case 0:
+                switch(indexPath.row) {
+                    case 0:
+                        [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:_server.cid bid:-1 handler:exportHandler];
+                        break;
+                    case 1:
+                        [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:_server.cid bid:_buffer.bid handler:exportHandler];
+                        break;
+                    case 2:
+                        [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:-1 bid:-1 handler:exportHandler];
+                        break;
                 }
                 break;
-            case 4:
-                row = [_expired objectAtIndex:indexPath.row];
-                cell.accessoryType = UITableViewCellAccessoryNone;
+            case 1:
+                [[[UIAlertView alloc] initWithTitle:@"Preparing Download" message:@"This export is being prepared.  You will recieve a notification when it is ready for download." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
+                break;
+            case 2:
+            {
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+                NSURL *file = [self fileForDownload:[_downloaded objectAtIndex:indexPath.row]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        _interactionController = [UIDocumentInteractionController interactionControllerWithURL:file];
+                        _interactionController.delegate = self;
+                        [_interactionController presentOpenInMenuFromRect:[self.view convertRect:[self.tableView rectForRowAtIndexPath:indexPath] fromView:self.tableView] inView:self.view animated:YES];
+                    }];
+                }]];
+                
+                [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
+                    NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+                    [coordinator coordinateWritingItemAtURL:file options:NSFileCoordinatorWritingForDeleting error:nil byAccessor:^(NSURL *writingURL) {
+                        NSError *error;
+                        [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
+                        if(error)
+                            NSLog(@"Error: %@", error);
+                        [self performSelectorInBackground:@selector(refresh) withObject:nil];
+                        [self.tableView reloadData];
+                    }];
+                }]];
+
+                [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
+                alert.popoverPresentationController.sourceView = self.tableView;
+                [self presentViewController:alert animated:YES completion:nil];
+                break;
+            }
+            case 3:
+                [self download:[NSURL URLWithString:[[_available objectAtIndex:indexPath.row] objectForKey:@"redirect_url"]]];
                 break;
         }
-        Server *s = ![[row objectForKey:@"cid"] isKindOfClass:[NSNull class]] ? [[ServersDataSource sharedInstance] getServer:[[row objectForKey:@"cid"] intValue]] : nil;
-        Buffer *b = ![[row objectForKey:@"bid"] isKindOfClass:[NSNull class]] ? [[BuffersDataSource sharedInstance] getBuffer:[[row objectForKey:@"bid"] intValue]] : nil;
-        
-        NSString *serverName = s ? (s.name.length ? s.name : s.hostname) : [NSString stringWithFormat:@"Unknown Network (%@)", [row objectForKey:@"cid"]];
-        NSString *bufferName = b ? b.name : [NSString stringWithFormat:@"Unknown Log (%@)", [row objectForKey:@"bid"]];
-        
-        if(![[row objectForKey:@"bid"] isKindOfClass:[NSNull class]])
-            cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", serverName, bufferName];
-        else if(![[row objectForKey:@"cid"] isKindOfClass:[NSNull class]])
-            cell.textLabel.text = serverName;
-        else
-            cell.textLabel.text = @"All Networks";
-
-        if(section == 2 || [[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]])
-            cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
-        else
-            cell.detailTextLabel.text = [NSString stringWithFormat:([NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue] < 0)?@"Exported %@ ago\nExpires in %@":@"Exported %@ ago\nExpired %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue]]];
-        cell.detailTextLabel.numberOfLines = 0;
-    }
-    
-    return cell;
-}
-
-#pragma mark - Table view delegate
-
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    
-    NSInteger section = indexPath.section;
-    
-    if(section > 0 && _inprogress.count == 0)
-        section++;
-    
-    if(section > 1 && _downloaded.count == 0)
-        section++;
-    
-    if(section > 2 && _available.count == 0)
-        section++;
-    
-    IRCCloudAPIResultHandler exportHandler = ^(IRCCloudJSONObject *result) {
-        if([[result objectForKey:@"success"] boolValue]) {
-            NSMutableArray *inprogress = _inprogress.mutableCopy;
-            [inprogress insertObject:[result objectForKey:@"export"] atIndex:0];
-            _inprogress = inprogress;
-            [self.tableView reloadData];
-            [[[UIAlertView alloc] initWithTitle:@"Exporting" message:@"Your log export is in progress.  We'll email you when it's ready." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
-        } else {
-            [[[UIAlertView alloc] initWithTitle:@"Export Failed" message:[NSString stringWithFormat:@"Unable to export log: %@.  Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
-        }
-    };
-    
-    switch(section) {
-        case 0:
-            switch(indexPath.row) {
-                case 0:
-                    [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:_server.cid bid:-1 handler:exportHandler];
-                    break;
-                case 1:
-                    [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:_server.cid bid:_buffer.bid handler:exportHandler];
-                    break;
-                case 2:
-                    [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:-1 bid:-1 handler:exportHandler];
-                    break;
-            }
-            break;
-        case 1:
-            [[[UIAlertView alloc] initWithTitle:@"Preparing Download" message:@"This export is being prepared.  You will recieve a notification when it is ready for download." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
-            break;
-        case 2:
-        {
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-            [alert addAction:[UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    _interactionController = [UIDocumentInteractionController interactionControllerWithURL:[self fileForDownload:[_downloaded objectAtIndex:indexPath.row]]];
-                    _interactionController.delegate = self;
-                    [_interactionController presentOpenInMenuFromRect:[self.view convertRect:[self.tableView rectForRowAtIndexPath:indexPath] fromView:self.tableView] inView:self.view animated:YES];
-                }];
-            }]];
-            
-            [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
-                NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-                [coordinator coordinateWritingItemAtURL:[self fileForDownload:[_downloaded objectAtIndex:indexPath.row]] options:NSFileCoordinatorWritingForDeleting error:nil byAccessor:^(NSURL *writingURL) {
-                    NSError *error;
-                    [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
-                    if(error)
-                        NSLog(@"Error: %@", error);
-                    [self performSelectorInBackground:@selector(refresh) withObject:nil];
-                }];
-                [self.tableView reloadData];
-            }]];
-
-            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-            alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
-            alert.popoverPresentationController.sourceView = self.tableView;
-            [self presentViewController:alert animated:YES completion:nil];
-            break;
-        }
-        case 3:
-            [self download:[NSURL URLWithString:[[_available objectAtIndex:indexPath.row] objectForKey:@"redirect_url"]]];
-            break;
     }
 }
 
@@ -504,7 +521,9 @@
     
     [[session downloadTaskWithRequest:request] resume];
 
-    [_downloadingURLs setObject:@(YES) forKey:url.absoluteString];
+    @synchronized (self.tableView) {
+        [_downloadingURLs setObject:@(YES) forKey:url.absoluteString];
+    }
     [self.tableView reloadData];
 }
 
@@ -552,20 +571,20 @@
     
     [_downloadingURLs removeObjectForKey:downloadTask.originalRequest.URL];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        NSMutableArray *available = _available.mutableCopy;
-        
-        for(int i = 0; i < available.count; i++) {
-            if([[[available objectAtIndex:i] objectForKey:@"redirect_url"] isEqualToString:downloadTask.originalRequest.URL.absoluteString]) {
-                [_downloaded addObject:[available objectAtIndex:i]];
-                [available removeObjectAtIndex:i];
-                break;
+        @synchronized (self.tableView) {
+            NSMutableArray *available = _available.mutableCopy;
+            
+            for(int i = 0; i < available.count; i++) {
+                if([[[available objectAtIndex:i] objectForKey:@"redirect_url"] isEqualToString:downloadTask.originalRequest.URL.absoluteString]) {
+                    [_downloaded addObject:[available objectAtIndex:i]];
+                    [available removeObjectAtIndex:i];
+                    break;
+                }
             }
+            
+            _available = available;
         }
-        
-        _available = available;
-        
         [self.tableView reloadData];
-
         if(self.completionHandler)
             self.completionHandler();
     }];
