@@ -544,8 +544,8 @@
                                 [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
                                 if(error)
                                     NSLog(@"Error: %@", error);
-                                [_downloadingURLs removeObjectForKey:url];
                                 [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
+                                [_downloadingURLs removeObjectForKey:url];
                                 [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
                                 [self refresh];
                             }];
