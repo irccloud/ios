@@ -373,31 +373,16 @@
                 case 1:
                     if(indexPath.row < _inprogress.count) {
                         row = [_inprogress objectAtIndex:indexPath.row];
-                        cell.accessoryType = UITableViewCellAccessoryNone;
-                        spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-                        [spinner sizeToFit];
-                        [spinner startAnimating];
-                        cell.accessoryView = spinner;
                     }
                     break;
                 case 2:
                     if(indexPath.row < _downloaded.count) {
                         row = [_downloaded objectAtIndex:indexPath.row];
-                        cell.accessoryType = UITableViewCellAccessoryNone;
                     }
                     break;
                 case 3:
                     if(indexPath.row < _available.count) {
                         row = [_available objectAtIndex:indexPath.row];
-                        if([_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]]) {
-                            cell.accessoryType = UITableViewCellAccessoryNone;
-                            spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-                            [spinner sizeToFit];
-                            [spinner startAnimating];
-                            cell.accessoryView = spinner;
-                        } else {
-                            cell.accessoryType = UITableViewCellAccessoryNone;
-                        }
                     }
                     break;
             }
@@ -425,6 +410,16 @@
                     cell.detailTextLabel.text = [NSString stringWithFormat:([NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue] < 0)?@"Exported %@ ago\nExpires in %@":@"Exported %@ ago\nExpired %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue]]];
                 }
                 cell.detailTextLabel.numberOfLines = 0;
+                
+                if(section == 1 || [_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]]) {
+                    cell.accessoryType = UITableViewCellAccessoryNone;
+                    spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+                    [spinner sizeToFit];
+                    [spinner startAnimating];
+                    cell.accessoryView = spinner;
+                } else {
+                    cell.accessoryType = UITableViewCellAccessoryNone;
+                }
             } else {
                 CLS_LOG(@"Requested row %li not found for section %li, reloading table", (long)indexPath.row, (long)indexPath.section);
                 [self.tableView reloadData];
@@ -487,6 +482,7 @@
             {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
                 NSURL *file = [self fileForDownload:[_downloaded objectAtIndex:indexPath.row]];
+                NSURL *url = [[_downloaded objectAtIndex:indexPath.row] objectForKey:@"redirect_url"];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         _interactionController = [UIDocumentInteractionController interactionControllerWithURL:file];
@@ -499,16 +495,20 @@
                     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Download" message:[[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"]?@"Are you sure you want to delete this download?  It will be removed from your device and all other devices that are syncing with iCloud Drive.":@"Are you sure you want to delete this download from your device?" preferredStyle:UIAlertControllerStyleAlert];
                     
                     [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-                        NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-                        [coordinator coordinateWritingItemAtURL:file options:NSFileCoordinatorWritingForDeleting error:nil byAccessor:^(NSURL *writingURL) {
-                            NSError *error;
-                            [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
-                            if(error)
-                                NSLog(@"Error: %@", error);
-                            [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
-                            [self.tableView reloadData];
-                            [self performSelectorInBackground:@selector(refresh) withObject:nil];
-                        }];
+                        [_downloadingURLs setObject:@(YES) forKey:url];
+                        [self.tableView reloadData];
+                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                            NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+                            [coordinator coordinateWritingItemAtURL:file options:NSFileCoordinatorWritingForDeleting error:nil byAccessor:^(NSURL *writingURL) {
+                                NSError *error;
+                                [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
+                                if(error)
+                                    NSLog(@"Error: %@", error);
+                                [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
+                                [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
+                                [self refresh];
+                            }];
+                        });
                     }]];
                     
                     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
