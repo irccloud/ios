@@ -18,6 +18,39 @@
 #import "NetworkConnection.h"
 #import "UIColor+IRCCloud.h"
 
+@interface LogExportsCell : UITableViewCell {
+    UIProgressView *_progress;
+}
+
+@property (readonly) UIProgressView *progress;
+@end
+
+@implementation LogExportsCell
+
+-(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
+    if (self) {
+        self.selectionStyle = UITableViewCellSelectionStyleNone;
+        
+        _progress = [[UIProgressView alloc] initWithFrame:CGRectZero];
+        _progress.tintColor = UITableViewCell.appearance.detailTextLabelColor;
+        _progress.trackTintColor = UITableViewCell.appearance.backgroundColor;
+        [self.contentView addSubview:_progress];
+    }
+    return self;
+}
+
+-(void)layoutSubviews {
+    [super layoutSubviews];
+    [_progress sizeToFit];
+    CGRect frame = _progress.frame;
+    frame.origin.x = 0;
+    frame.origin.y = self.contentView.bounds.size.height - frame.size.height;
+    frame.size.width = self.contentView.bounds.size.width;
+    _progress.frame = frame;
+}
+@end
+
 @implementation LogExportsTableViewController
 
 - (void)viewDidLoad {
@@ -298,10 +331,7 @@
         else
             date = [NSString stringWithFormat:@"%i minutes", (int)minutes];
     } else {
-        if((int)seconds == 1)
-            date = [NSString stringWithFormat:@"%i second", (int)seconds];
-        else
-            date = [NSString stringWithFormat:@"%i seconds", (int)seconds];
+        date = @"less than a minute";
     }
     return date;
 }
@@ -328,11 +358,12 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized (self.tableView) {
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"LogExport"];
+        LogExportsCell *cell = [tableView dequeueReusableCellWithIdentifier:@"LogExport"];
         if(!cell)
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"LogExport"];
+            cell = [[LogExportsCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"LogExport"];
         
         cell.accessoryView = nil;
+        cell.progress.hidden = YES;
         
         if(indexPath.section == 0) {
             switch(indexPath.row) {
@@ -401,22 +432,31 @@
                 else
                     cell.textLabel.text = @"All Networks";
 
-                if(section == 2 || [[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]]) {
-                    if([_fileSizes objectForKey:[row objectForKey:@"file_name"]])
-                        cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago\n%@", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [_fileSizes objectForKey:[row objectForKey:@"file_name"]]];
-                    else
-                        cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
+                if(section > 1) {
+                    if(section == 2 || [[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]]) {
+                        if([_fileSizes objectForKey:[row objectForKey:@"file_name"]])
+                            cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago\n%@", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [_fileSizes objectForKey:[row objectForKey:@"file_name"]]];
+                        else
+                            cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
+                    } else {
+                        cell.detailTextLabel.text = [NSString stringWithFormat:([NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue] < 0)?@"Exported %@ ago\nExpires in %@":@"Exported %@ ago\nExpired %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue]]];
+                    }
                 } else {
-                    cell.detailTextLabel.text = [NSString stringWithFormat:([NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue] < 0)?@"Exported %@ ago\nExpires in %@":@"Exported %@ ago\nExpired %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"expirydate"] doubleValue]]];
+                    cell.detailTextLabel.text = [NSString stringWithFormat:@"Started %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
                 }
                 cell.detailTextLabel.numberOfLines = 0;
                 
                 if(section == 1 || [_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]]) {
                     cell.accessoryType = UITableViewCellAccessoryNone;
-                    spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-                    [spinner sizeToFit];
-                    [spinner startAnimating];
-                    cell.accessoryView = spinner;
+                    [cell.progress setProgress:[[_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]] floatValue] animated:YES];
+                    if(cell.progress.progress > 0) {
+                        cell.progress.hidden = NO;
+                    } else {
+                        spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+                        [spinner sizeToFit];
+                        [spinner startAnimating];
+                        cell.accessoryView = spinner;
+                    }
                 } else {
                     cell.accessoryType = UITableViewCellAccessoryNone;
                 }
@@ -495,7 +535,7 @@
                     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Download" message:[[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"]?@"Are you sure you want to delete this download?  It will be removed from your device and all other devices that are syncing with iCloud Drive.":@"Are you sure you want to delete this download from your device?" preferredStyle:UIAlertControllerStyleAlert];
                     
                     [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-                        [_downloadingURLs setObject:@(YES) forKey:url];
+                        [_downloadingURLs setObject:@(0) forKey:url];
                         [self.tableView reloadData];
                         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                             NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
@@ -504,6 +544,7 @@
                                 [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
                                 if(error)
                                     NSLog(@"Error: %@", error);
+                                [_downloadingURLs removeObjectForKey:url];
                                 [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
                                 [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
                                 [self refresh];
@@ -556,8 +597,13 @@
     [[session downloadTaskWithRequest:request] resume];
 
     @synchronized (self.tableView) {
-        [_downloadingURLs setObject:@(YES) forKey:url.absoluteString];
+        [_downloadingURLs setObject:@(0) forKey:url.absoluteString];
     }
+    [self.tableView reloadData];
+}
+
+-(void)URLSession:(NSURLSession *)session downloadTask:(nonnull NSURLSessionDownloadTask *)downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
+    [_downloadingURLs setObject:@((float)totalBytesWritten / (float)totalBytesExpectedToWrite) forKey:downloadTask.originalRequest.URL.absoluteString];
     [self.tableView reloadData];
 }
 
