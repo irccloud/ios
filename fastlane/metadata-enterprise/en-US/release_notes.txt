@@ -1,3 +1,7 @@
+This release fixes a crash on startup, 3.12 release notes below.
+
+---
+
 You can now download logs to your device as a zip file, and sync with iCloud Drive. You can then open them with any app that can extract zip files.
 
 • Sped up nickname and emoji suggestions. If it's still too slow in larger channels, you can now turn off "Suggest nicks as you type" for a channel in Display Options.
