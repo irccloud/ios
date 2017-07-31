@@ -58,6 +58,7 @@
     _fileSizes = [[NSMutableDictionary alloc] init];
     _downloadingURLs = [[NSMutableDictionary alloc] init];
     _iCloudLogs = [[UISwitch alloc] init];
+    _pendingExport = -1;
     [_iCloudLogs addTarget:self action:@selector(iCloudLogsChanged:) forControlEvents:UIControlEventValueChanged];
     self.navigationItem.title = @"Download Logs";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
@@ -358,6 +359,7 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized (self.tableView) {
+        UIActivityIndicatorView *spinner;
         LogExportsCell *cell = [tableView dequeueReusableCellWithIdentifier:@"LogExport"];
         if(!cell)
             cell = [[LogExportsCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"LogExport"];
@@ -385,7 +387,14 @@
                     cell.accessoryView = _iCloudLogs;
                     break;
             }
-            cell.accessoryType = UITableViewCellAccessoryNone;
+            if(_pendingExport == indexPath.row) {
+                spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+                [spinner sizeToFit];
+                [spinner startAnimating];
+                cell.accessoryView = spinner;
+            } else {
+                cell.accessoryType = UITableViewCellAccessoryNone;
+            }
         } else {
             NSInteger section = indexPath.section;
             
@@ -398,7 +407,6 @@
             if(section > 2 && _available.count == 0)
                 section++;
             
-            UIActivityIndicatorView *spinner;
             NSDictionary *row = nil;
             switch(section) {
                 case 1:
@@ -472,6 +480,38 @@
 
 #pragma mark - Table view delegate
 
+-(void)requestExport:(int)cid bid:(int)bid {
+    for(NSDictionary *d in _inprogress) {
+        int e_cid = -1;
+        int e_bid = -1;
+        if(![[d objectForKey:@"cid"] isKindOfClass:[NSNull class]])
+            e_cid = [[d objectForKey:@"cid"] intValue];
+        if(![[d objectForKey:@"bid"] isKindOfClass:[NSNull class]])
+            e_bid = [[d objectForKey:@"bid"] intValue];
+        
+        if(cid == e_cid && bid == e_bid) {
+            [[[UIAlertView alloc] initWithTitle:@"Export In Progress" message:@"This export is already in progress.  We'll email you when it's ready." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
+            _pendingExport = -1;
+            return;
+        }
+    }
+    
+    [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:cid bid:bid handler:^(IRCCloudJSONObject *result) {
+        @synchronized (self.tableView) {
+            if([[result objectForKey:@"success"] boolValue]) {
+                NSMutableArray *inprogress = _inprogress.mutableCopy;
+                [inprogress insertObject:[result objectForKey:@"export"] atIndex:0];
+                _inprogress = inprogress;
+                [[[UIAlertView alloc] initWithTitle:@"Exporting" message:@"Your log export is in progress.  We'll email you when it's ready." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
+            } else {
+                [[[UIAlertView alloc] initWithTitle:@"Export Failed" message:[NSString stringWithFormat:@"Unable to export log: %@.  Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
+            }
+            _pendingExport = -1;
+            [self.tableView reloadData];
+        }
+    }];
+}
+
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized (self.tableView) {
         [tableView deselectRowAtIndexPath:indexPath animated:NO];
@@ -487,31 +527,23 @@
         if(section > 2 && _available.count == 0)
             section++;
         
-        IRCCloudAPIResultHandler exportHandler = ^(IRCCloudJSONObject *result) {
-            @synchronized (self.tableView) {
-                if([[result objectForKey:@"success"] boolValue]) {
-                    NSMutableArray *inprogress = _inprogress.mutableCopy;
-                    [inprogress insertObject:[result objectForKey:@"export"] atIndex:0];
-                    _inprogress = inprogress;
-                    [self.tableView reloadData];
-                    [[[UIAlertView alloc] initWithTitle:@"Exporting" message:@"Your log export is in progress.  We'll email you when it's ready." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
-                } else {
-                    [[[UIAlertView alloc] initWithTitle:@"Export Failed" message:[NSString stringWithFormat:@"Unable to export log: %@.  Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
-                }
-            }
-        };
-        
         switch(section) {
             case 0:
+                if(indexPath.row < 3) {
+                    if(_pendingExport != -1)
+                        break;
+                    _pendingExport = indexPath.row;
+                    [self.tableView reloadData];
+                }
                 switch(indexPath.row) {
                     case 0:
-                        [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:_server.cid bid:-1 handler:exportHandler];
+                        [self requestExport:_server.cid bid:-1];
                         break;
                     case 1:
-                        [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:_server.cid bid:_buffer.bid handler:exportHandler];
+                        [self requestExport:_server.cid bid:_buffer.bid];
                         break;
                     case 2:
-                        [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:-1 bid:-1 handler:exportHandler];
+                        [self requestExport:-1 bid:-1];
                         break;
                 }
                 break;

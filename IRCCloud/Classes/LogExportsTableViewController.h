@@ -29,6 +29,8 @@
     
     Buffer *_buffer;
     Server *_server;
+    
+    NSInteger _pendingExport;
 }
 
 @property Buffer *buffer;
