@@ -374,8 +374,16 @@
                     cell.detailTextLabel.text = _server.name.length ? _server.name : _server.hostname;
                     break;
                 case 1:
-                    cell.textLabel.text = @"This Channel";
-                    cell.detailTextLabel.text = _buffer.name;
+                    if([_buffer.type isEqualToString:@"channel"])
+                        cell.textLabel.text = @"This Channel";
+                    else if([_buffer.type isEqualToString:@"console"])
+                        cell.textLabel.text = @"This Network Console";
+                    else
+                        cell.textLabel.text = @"This Conversation";
+                    if([_buffer.type isEqualToString:@"console"])
+                        cell.detailTextLabel.text = _server.name.length ? _server.name : _server.hostname;
+                    else
+                        cell.detailTextLabel.text = _buffer.name;
                     break;
                 case 2:
                     cell.textLabel.text = @"All Networks";
