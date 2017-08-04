@@ -17,12 +17,14 @@
 #import <Foundation/Foundation.h>
 #import "ServersDataSource.h"
 
-#define BOLD 2
-#define COLOR_MIRC 3
-#define COLOR_RGB 4
-#define CLEAR 15
-#define ITALICS 22
-#define UNDERLINE 31
+#define BOLD 0x02
+#define COLOR_MIRC 0x03
+#define COLOR_RGB 0x04
+#define MONO 0x11
+#define CLEAR 0x0f
+#define REVERSE 0x16
+#define ITALICS 0x1d
+#define UNDERLINE 0x1f
 
 #define FONT_MIN 10
 #define FONT_MAX 24

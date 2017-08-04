@@ -1816,8 +1816,8 @@ extern BOOL __compact;
     if(!color)
         color = [UIColor messageTextColor];
     
-    int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1;
-    UIColor *fgColor = nil, *bgColor = nil;
+    int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, code = -1;
+    UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
     
@@ -1861,6 +1861,10 @@ extern BOOL __compact;
                 if(bold == -1) {
                     bold = i;
                 } else {
+                    if(code != -1) {
+                        [self setFont:Courier start:code length:(bold - code) attributes:attributes];
+                        code = i;
+                    }
                     if(italics != -1) {
                         if(italics < bold - 1) {
                             [self setFont:italicFont start:italics length:(bold - italics) attributes:attributes];
@@ -1876,10 +1880,13 @@ extern BOOL __compact;
                 i--;
                 continue;
             case ITALICS:
-            case 29:
                 if(italics == -1) {
                     italics = i;
                 } else {
+                    if(code != -1) {
+                        [self setFont:Courier start:code length:(italics - code) attributes:attributes];
+                        code = i;
+                    }
                     if(bold != -1) {
                         if(bold < italics - 1) {
                             [self setFont:boldFont start:bold length:(italics - bold) attributes:attributes];
@@ -1890,6 +1897,23 @@ extern BOOL __compact;
                         [self setFont:italicFont start:italics length:(i - italics) attributes:attributes];
                     }
                     italics = -1;
+                }
+                [text deleteCharactersInRange:NSMakeRange(i,1)];
+                i--;
+                continue;
+            case MONO:
+                if(code == -1) {
+                    code = i;
+                    boldFont = CourierBold;
+                    italicFont = CourierOblique;
+                    boldItalicFont = CourierBoldOblique;
+                } else {
+                    [self setFont:Courier start:code length:(i - code) attributes:attributes];
+                    if(!mono) {
+                        boldFont = HelveticaBold;
+                        italicFont = HelveticaOblique;
+                        boldItalicFont = HelveticaBoldOblique;
+                    }
                 }
                 [text deleteCharactersInRange:NSMakeRange(i,1)];
                 i--;
@@ -1905,6 +1929,32 @@ extern BOOL __compact;
                      }];
                     underline = -1;
                 }
+                [text deleteCharactersInRange:NSMakeRange(i,1)];
+                i--;
+                continue;
+            case REVERSE:
+            case 0x12:
+                if(fg != -1 && fgColor)
+                        [attributes addObject:@{
+                                                NSForegroundColorAttributeName:fgColor,
+                                                @"start":@(fg),
+                                                @"length":@(i - fg)
+                                                }];
+                if(bg != -1 && bgColor)
+                        [attributes addObject:@{
+                                                NSBackgroundColorAttributeName:bgColor,
+                                                @"start":@(bg),
+                                                @"length":@(i - bg)
+                                                }];
+                
+                fg = bg = i;
+                oldFgColor = fgColor;
+                fgColor = bgColor;
+                bgColor = oldFgColor;
+                if(!fgColor)
+                    fgColor = [UIColor mIRCColor:1 background:NO];
+                if(!bgColor)
+                    bgColor = [UIColor mIRCColor:0 background:YES];
                 [text deleteCharactersInRange:NSMakeRange(i,1)];
                 i--;
                 continue;
@@ -2001,6 +2051,9 @@ extern BOOL __compact;
                      }];
                     bg = -1;
                 }
+                if(code != -1) {
+                    [self setFont:Courier start:code length:(i - code) attributes:attributes];
+                }
                 if(bold != -1 && italics != -1) {
                     if(bold < italics) {
                         [self setFont:boldFont start:bold length:(italics - bold) attributes:attributes];
@@ -2023,6 +2076,7 @@ extern BOOL __compact;
                 bold = -1;
                 italics = -1;
                 underline = -1;
+                code = -1;
                 [text deleteCharactersInRange:NSMakeRange(i,1)];
                 i--;
                 continue;
