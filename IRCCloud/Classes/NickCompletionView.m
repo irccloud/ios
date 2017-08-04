@@ -55,6 +55,8 @@
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         layout.sectionInset = UIEdgeInsetsMake(0, 6, 0, 6);
+        layout.minimumInteritemSpacing = 0;
+        layout.minimumLineSpacing = 0;
         _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
         _collectionView.dataSource = self;
         _collectionView.delegate = self;
@@ -88,7 +90,7 @@
     
     CGFloat width = 0;
     for(NSString *s in _suggestions) {
-        width += [s sizeWithAttributes:@{NSFontAttributeName:_font}].width + 8;
+        width += [s sizeWithAttributes:@{NSFontAttributeName:_font}].width + 12;
         if(width > self.bounds.size.width)
             break;
     }
@@ -139,7 +141,7 @@
 }
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake([[_suggestions objectAtIndex:indexPath.row] sizeWithAttributes:@{NSFontAttributeName:_font}].width + 8, _collectionView.frame.size.height - 1);
+    return CGSizeMake([[_suggestions objectAtIndex:indexPath.row] sizeWithAttributes:@{NSFontAttributeName:_font}].width + 12, _collectionView.frame.size.height - 1);
 }
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
