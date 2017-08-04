@@ -1952,9 +1952,9 @@ extern BOOL __compact;
                 fgColor = bgColor;
                 bgColor = oldFgColor;
                 if(!fgColor)
-                    fgColor = [UIColor mIRCColor:1 background:NO];
+                    fgColor = [UIColor mIRCColor:[UIColor isDarkTheme]?1:0 background:NO];
                 if(!bgColor)
-                    bgColor = [UIColor mIRCColor:0 background:YES];
+                    bgColor = [UIColor mIRCColor:[UIColor isDarkTheme]?0:1 background:YES];
                 [text deleteCharactersInRange:NSMakeRange(i,1)];
                 i--;
                 continue;
