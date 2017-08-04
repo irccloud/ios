@@ -2481,11 +2481,20 @@ NSArray *_sortedChannels;
     if([url.path hasPrefix:@"/log-export/"]) {
         LogExportsTableViewController *lvc;
         
-        if([self.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[LogExportsTableViewController class]])
+        if([self.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[LogExportsTableViewController class]]) {
             lvc = (LogExportsTableViewController *)(((UINavigationController *)self.presentedViewController).topViewController);
-        else
+        } else {
             lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        
+            lvc.buffer = _buffer;
+            lvc.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            [self presentViewController:nc animated:YES completion:nil];
+        }
         [lvc download:url];
         return;
     }
