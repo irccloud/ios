@@ -64,6 +64,7 @@
         _collectionView.layer.cornerRadius = 4;
         _collectionView.allowsSelection = YES;
         _collectionView.allowsMultipleSelection = NO;
+        _collectionView.scrollEnabled = NO;
         [self addSubview:_collectionView];
         [self addConstraints:@[
                                [NSLayoutConstraint constraintWithItem:_collectionView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0f constant:1.0f],
@@ -84,6 +85,20 @@
     _suggestions = suggestions;
     _selection = -1;
     _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    
+    CGFloat width = 0;
+    for(NSString *s in _suggestions) {
+        width += [s sizeWithAttributes:@{NSFontAttributeName:_font}].width + 8;
+        if(width > self.bounds.size.width)
+            break;
+    }
+    
+    if(width < self.bounds.size.width)
+        _collectionView.contentInset = UIEdgeInsetsMake(0, ((self.bounds.size.width - width) / 2) - 4, 0, 0);
+    else
+        _collectionView.contentInset = UIEdgeInsetsZero;
+    _collectionView.scrollEnabled = width > self.bounds.size.width;
+
     self.backgroundColor = [UIColor bufferBorderColor];
     _collectionView.backgroundColor = [UIColor bufferBackgroundColor];
     [_collectionView reloadData];

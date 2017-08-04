@@ -168,6 +168,7 @@ NSArray *_sortedChannels;
                 if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 && location != NSNotFound && location > 0) {
                     nick = [nick substringFromIndex:location];
                 }
+                
                 if((text.length == 0 || [nick hasPrefix:text]) && ![suggestions_set containsObject:user.nick.lowercaseString]) {
                     [suggestions_set addObject:user.nick.lowercaseString];
                     [suggestions addObject:user.nick];
@@ -197,7 +198,6 @@ NSArray *_sortedChannels;
         return;
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        //TODO: refactor NickCompletionView to use a container that recycles views instead of creating a ton of UIButtons
         if(_nickCompletionView.selection == -1 || suggestions.count == 0)
             [_nickCompletionView setSuggestions:suggestions];
         
