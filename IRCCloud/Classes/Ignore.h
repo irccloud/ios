@@ -19,6 +19,7 @@
 
 @interface Ignore : NSObject {
     NSMutableArray *_ignores;
+    NSMutableDictionary *_ignoreCache;
 }
 -(void)addMask:(NSString *)mask;
 -(void)setIgnores:(NSArray *)ignores;

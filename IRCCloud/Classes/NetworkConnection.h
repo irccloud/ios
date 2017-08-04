@@ -25,7 +25,6 @@
 #import "UsersDataSource.h"
 #import "EventsDataSource.h"
 #import "NotificationsDataSource.h"
-#import "Ignore.h"
 
 extern NSString *IRCCLOUD_HOST;
 extern NSString *IRCCLOUD_PATH;
@@ -159,7 +158,6 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
     NSString *_session;
     int _keychainFailCount;
     NSTimeInterval _highestEID;
-    Ignore *_ignore;
     NSMutableDictionary *_resultHandlers;
 }
 @property (readonly) kIRCCloudState state;

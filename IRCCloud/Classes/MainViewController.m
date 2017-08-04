@@ -1385,8 +1385,7 @@ NSArray *_sortedChannels;
                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
                 if(b && [e isImportant:b.type]) {
                     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
-                    Ignore *ignore = [[Ignore alloc] init];
-                    [ignore setIgnores:s.ignores];
+                    Ignore *ignore = s.ignore;
                     if(e.ignoreMask && [ignore match:e.ignoreMask])
                         break;
                     if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {

@@ -30,6 +30,7 @@
         _MODE_OP = @"o";
         _MODE_HALFOP = @"h";
         _MODE_VOICED = @"v";
+        _ignore = [[Ignore alloc] init];
     }
     return self;
 }
@@ -102,9 +103,19 @@
         decodeObject(_MODE_OP);
         decodeObject(_MODE_HALFOP);
         decodeObject(_MODE_VOICED);
+        _ignore = [[Ignore alloc] init];
+        [_ignore setIgnores:_ignores];
     }
     return self;
 }
+-(NSArray *)ignores {
+    return _ignores;
+}
+-(void)setIgnores:(NSArray *)ignores {
+    _ignores = ignores;
+    [_ignore setIgnores:_ignores];
+}
+
 @end
 
 @implementation ServersDataSource

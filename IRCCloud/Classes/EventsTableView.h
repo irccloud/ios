@@ -20,7 +20,6 @@
 #import "CollapsedEvents.h"
 #import "NetworkConnection.h"
 #import "HighlightsCountView.h"
-#import "Ignore.h"
 #import "CSURITemplate.h"
 #import "LinkLabel.h"
 
@@ -64,7 +63,6 @@
     BOOL _requestingBacklog, _ready;
     NSTimer *_heartbeatTimer;
     NSTimer *_scrollTimer;
-    Ignore *_ignore;
     NSRecursiveLock *_lock;
     
     IBOutlet id<EventsTableViewDelegate> _delegate;

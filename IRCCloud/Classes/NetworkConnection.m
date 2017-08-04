@@ -271,7 +271,6 @@ volatile BOOL __socketPaused = NO;
     _writer = [[SBJson5Writer alloc] init];
     _reachabilityValid = NO;
     _reachability = nil;
-    _ignore = [[Ignore alloc] init];
     _resultHandlers = [[NSMutableDictionary alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogStarted:) name:kIRCCloudBacklogStartedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
@@ -361,8 +360,7 @@ volatile BOOL __socketPaused = NO;
                 }
                 if(event.eid > b.last_seen_eid && [event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"])) {
                     BOOL show = YES;
-                    [_ignore setIgnores:[_servers getServer:event.cid].ignores];
-                    if([_ignore match:event.ignoreMask] || [[[[self prefs] objectForKey:@"buffer-disableTrackUnread"] objectForKey:@(b.bid)] integerValue]) {
+                    if([[_servers getServer:event.cid].ignore match:event.ignoreMask] || [[[[self prefs] objectForKey:@"buffer-disableTrackUnread"] objectForKey:@(b.bid)] integerValue]) {
                         show = NO;
                     }
                     

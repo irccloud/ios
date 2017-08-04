@@ -412,7 +412,6 @@ extern UIImage *__socketClosedBackgroundImage;
         _filePropsCache = [[NSMutableDictionary alloc] init];
         _closedPreviews = [[NSMutableSet alloc] init];
         _buffer = nil;
-        _ignore = [[Ignore alloc] init];
         _eidToOpen = -1;
     }
     return self;
@@ -433,7 +432,6 @@ extern UIImage *__socketClosedBackgroundImage;
         _filePropsCache = [[NSMutableDictionary alloc] init];
         _closedPreviews = [[NSMutableSet alloc] init];
         _buffer = nil;
-        _ignore = [[Ignore alloc] init];
         _eidToOpen = -1;
     }
     return self;
@@ -1145,7 +1143,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         
         if(event.ignoreMask.length && [event isMessage]) {
-            if((!_buffer || ![_buffer.type isEqualToString:@"conversation"]) && [_ignore match:event.ignoreMask]) {
+            if((!_buffer || ![_buffer.type isEqualToString:@"conversation"]) && [_server.ignore match:event.ignoreMask]) {
                 if(_topUnreadView.alpha == 0 && _bottomUnreadView.alpha == 0)
                     [self sendHeartbeat];
                 return;
@@ -1771,7 +1769,6 @@ extern UIImage *__socketClosedBackgroundImage;
         
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         if(events.count) {
-            [_ignore setIgnores:_server.ignores];
             for(Event *e in events) {
                 [self insertEvent:e backlog:true nextIsGrouped:false];
             }

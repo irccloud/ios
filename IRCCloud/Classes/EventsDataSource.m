@@ -1044,8 +1044,7 @@
         return 0;
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
-    Ignore *ignore = [[Ignore alloc] init];
-    [ignore setIgnores:s.ignores];
+    Ignore *ignore = s.ignore;
     NSArray *copy;
     @synchronized(_events) {
         copy = [self eventsForBuffer:bid];
@@ -1068,8 +1067,7 @@
     int count = 0;
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
-    Ignore *ignore = [[Ignore alloc] init];
-    [ignore setIgnores:s.ignores];
+    Ignore *ignore = s.ignore;
     NSArray *copy;
     @synchronized(_events) {
         copy = [self eventsForBuffer:bid];
@@ -1091,8 +1089,7 @@
         return 0;
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
-    Ignore *ignore = [[Ignore alloc] init];
-    [ignore setIgnores:s.ignores];
+    Ignore *ignore = s.ignore;
     NSArray *copy;
     @synchronized(_events) {
         copy = [self eventsForBuffer:bid];

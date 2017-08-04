@@ -21,13 +21,19 @@
 -(void)addMask:(NSString *)mask {
     if(!_ignores)
         _ignores = [[NSMutableArray alloc] init];
+    if(!_ignoreCache)
+        _ignoreCache = [[NSMutableDictionary alloc] init];
     [_ignores addObject:mask];
+    [_ignoreCache removeAllObjects];
 }
 
 -(void)setIgnores:(NSArray *)ignores {
     if(!_ignores)
         _ignores = [[NSMutableArray alloc] init];
+    if(!_ignoreCache)
+        _ignoreCache = [[NSMutableDictionary alloc] init];
     [_ignores removeAllObjects];
+    [_ignoreCache removeAllObjects];
     for(NSString *ignore in ignores) {
         NSString *mask = [ignore lowercaseString];
         mask = [mask stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
@@ -69,15 +75,20 @@
 }
 
 -(BOOL)match:(NSString *)usermask {
+    if(usermask && [_ignoreCache objectForKey:usermask])
+        return [[_ignoreCache objectForKey:usermask] boolValue];
     if(usermask && _ignores.count) {
         for(NSString *ignore in _ignores) {
             if(ignore) {
                 usermask = [[usermask stringByReplacingOccurrencesOfString:@"!~" withString:@"!"] lowercaseString];
                 NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^%@$",ignore] options:0 error:NULL];
-                if([regex rangeOfFirstMatchInString:usermask options:0 range:NSMakeRange(0, [usermask length])].location != NSNotFound)
+                if([regex rangeOfFirstMatchInString:usermask options:0 range:NSMakeRange(0, [usermask length])].location != NSNotFound) {
+                    [_ignoreCache setObject:@(YES) forKey:usermask];
                     return YES;
+                }
             }
         }
+        [_ignoreCache setObject:@(NO) forKey:usermask];
     }
     return NO;
 }
