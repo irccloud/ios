@@ -1816,7 +1816,7 @@ extern BOOL __compact;
     if(!color)
         color = [UIColor messageTextColor];
     
-    int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, code = -1;
+    int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, code = -1, strike = -1;
     UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
@@ -1928,6 +1928,20 @@ extern BOOL __compact;
                      @"length":@(i - underline)
                      }];
                     underline = -1;
+                }
+                [text deleteCharactersInRange:NSMakeRange(i,1)];
+                i--;
+                continue;
+            case STRIKETHROUGH:
+                if(strike == -1) {
+                    strike = i;
+                } else {
+                    [attributes addObject:@{
+                                            NSStrikethroughStyleAttributeName:@1,
+                                            @"start":@(strike),
+                                            @"length":@(i - strike)
+                                            }];
+                    strike = -1;
                 }
                 [text deleteCharactersInRange:NSMakeRange(i,1)];
                 i--;
@@ -2066,17 +2080,22 @@ extern BOOL __compact;
                     [self setFont:boldFont start:bold length:(i - bold) attributes:attributes];
                 } else if(italics != -1) {
                     [self setFont:italicFont start:italics length:(i - italics) attributes:attributes];
-                } else if(underline != -1) {
+                }
+                if(underline != -1) {
                     [attributes addObject:@{
                      NSUnderlineStyleAttributeName:@1,
                      @"start":@(underline),
                      @"length":@(i - underline)
                      }];
                 }
-                bold = -1;
-                italics = -1;
-                underline = -1;
-                code = -1;
+                if(strike != -1) {
+                    [attributes addObject:@{
+                                            NSStrikethroughStyleAttributeName:@1,
+                                            @"start":@(underline),
+                                            @"length":@(i - underline)
+                                            }];
+                }
+                bold = italics = underline = code = strike = -1;
                 [text deleteCharactersInRange:NSMakeRange(i,1)];
                 i--;
                 continue;

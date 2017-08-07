@@ -24,6 +24,7 @@
 #define CLEAR 0x0f
 #define REVERSE 0x16
 #define ITALICS 0x1d
+#define STRIKETHROUGH 0x1e
 #define UNDERLINE 0x1f
 
 #define FONT_MIN 10
