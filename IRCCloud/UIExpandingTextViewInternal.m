@@ -68,4 +68,16 @@
     originalRect.size.height = 19.4;
     return originalRect;
 }
+
+- (void)paste:(id)sender {
+    UIResponder *next = self.nextResponder;
+    while(next != nil) {
+        if([next respondsToSelector:@selector(paste:)]) {
+            [next paste:sender];
+            return;
+        }
+        next = next.nextResponder;
+    }
+    [super paste:sender];
+}
 @end

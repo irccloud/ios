@@ -15,6 +15,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <CoreText/CoreText.h>
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <MobileCoreServices/UTType.h>
@@ -474,6 +475,7 @@ NSArray *_sortedChannels;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
     _message.translatesAutoresizingMaskIntoConstraints = NO;
+    _message.internalTextView.allowsEditingTextAttributes = YES;
     _messageWidthConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:0.0f];
     _messageHeightConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:36.0f];
     [_message addConstraints:@[_messageWidthConstraint, _messageHeightConstraint]];
@@ -2176,9 +2178,65 @@ NSArray *_sortedChannels;
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
             Event *e = [[Event alloc] init];
             NSMutableString *msg = _message.text.mutableCopy;
+            NSMutableString *formattedMsg = [[NSMutableString alloc] init];
+            
+            int index = 0;
+            NSRange range;
+            while(index < _message.attributedText.length) {
+                for(NSString *key in [_message.attributedText attributesAtIndex:index effectiveRange:&range]) {
+                    NSString *fgColor = nil;
+                    NSString *bgColor = nil;
+                    int fgColormIRC = -1;
+                    int bgColormIRC = -1;
+                    if([key isEqualToString:NSFontAttributeName]) {
+                        UIFont *font = [_message.attributedText attribute:key atIndex:index effectiveRange:nil];
+                        if(font.fontDescriptor.symbolicTraits & kCTFontBoldTrait)
+                            [formattedMsg appendFormat:@"%c", BOLD];
+                        if(font.fontDescriptor.symbolicTraits & kCTFontItalicTrait)
+                            [formattedMsg appendFormat:@"%c", ITALICS];
+                    } else if([key isEqualToString:NSUnderlineStyleAttributeName]) {
+                        NSNumber *style = [_message.attributedText attribute:key atIndex:index effectiveRange:nil];
+                        if(style.integerValue != NSUnderlineStyleNone)
+                            [formattedMsg appendFormat:@"%c", UNDERLINE];
+                    } else if([key isEqualToString:NSStrikethroughStyleAttributeName]) {
+                        [formattedMsg appendFormat:@"%c", STRIKETHROUGH];
+                    } else if([key isEqualToString:NSForegroundColorAttributeName]) {
+                        UIColor *c = [_message.attributedText attribute:key atIndex:index effectiveRange:nil];
+                        if(![c isEqual:_message.textColor]) {
+                            fgColor = [c toHexString];
+                            fgColormIRC = [UIColor mIRCColor:c];
+                        }
+                    } else if([key isEqualToString:NSBackgroundColorAttributeName]) {
+                        UIColor *c = [_message.attributedText attribute:key atIndex:index effectiveRange:nil];
+                        if(![c isEqual:_message.textColor]) {
+                            bgColor = [c toHexString];
+                            bgColormIRC = [UIColor mIRCColor:c];
+                        }
+                    }
+                    
+                    if(fgColor || bgColor) {
+                        if((fgColormIRC != -1 && (!bgColor || bgColormIRC != -1)) || (!fgColor && bgColormIRC != -1)) {
+                            [formattedMsg appendFormat:@"%c", COLOR_MIRC];
+                            if(fgColormIRC != -1)
+                                [formattedMsg appendFormat:@"%i",fgColormIRC];
+                            if(bgColormIRC != -1)
+                                [formattedMsg appendFormat:@",%i",bgColormIRC];
+                        } else {
+                            [formattedMsg appendFormat:@"%c", COLOR_RGB];
+                            if(fgColor)
+                                [formattedMsg appendString:fgColor];
+                            if(bgColor)
+                                [formattedMsg appendFormat:@",%@",bgColor];
+                        }
+                    }
+                }
+                [formattedMsg appendFormat:@"%@%c", [msg substringWithRange:range], CLEAR];
+                index += range.length;
+            }
+            
             BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
             if(!disableConvert)
-                [ColorFormatter emojify:msg];
+                [ColorFormatter emojify:formattedMsg];
             
             if([msg hasPrefix:@"//"])
                 [msg deleteCharactersInRange:NSMakeRange(0, 1)];
@@ -2223,7 +2281,7 @@ NSArray *_sortedChannels;
                 }];
             }
             e.to = _buffer.name;
-            e.command = _message.text;
+            e.command = formattedMsg;
             if(e.msg)
                 [_pendingEvents addObject:e];
             [_message clearText];
@@ -4269,12 +4327,14 @@ NSArray *_sortedChannels;
         if([action isEqualToString:@"Copy Message"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
             if(_selectedEvent.groupMsg.length) {
-                [pb setValue:[NSString stringWithFormat:@"%@ %@", _selectedEvent.timestamp, [[ColorFormatter format:([_selectedEvent.groupMsg hasPrefix:@"   "])?[_selectedEvent.groupMsg substringFromIndex:3]:_selectedEvent.groupMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                NSAttributedString *msg = [ColorFormatter format:[NSString stringWithFormat:@"%@ %@",_selectedEvent.timestamp,_selectedEvent.groupMsg] defaultColor:nil mono:NO linkify:NO server:nil links:nil];
+                pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string}];
             } else if(_selectedEvent.from.length || [_selectedEvent.type isEqualToString:@"buffer_me_msg"]) {
-                NSString *plaintext = [_selectedEvent.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ — %@ %@", _selectedEvent.timestamp,_selectedEvent.nick,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]]:[NSString stringWithFormat:@"%@ <%@> %@", _selectedEvent.timestamp,_selectedEvent.from,[[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
-                [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                NSAttributedString *msg = [_selectedEvent.type isEqualToString:@"buffer_me_msg"]?[ColorFormatter format:[NSString stringWithFormat:@"%@ %c— %@%c %@",_selectedEvent.timestamp,BOLD,_selectedEvent.nick,CLEAR,_selectedEvent.msg] defaultColor:nil mono:NO linkify:NO server:nil links:nil]:[ColorFormatter format:[NSString stringWithFormat:@"%@ %c<%@>%c %@",_selectedEvent.timestamp,BOLD,_selectedEvent.from,CLEAR,_selectedEvent.msg] defaultColor:nil mono:NO linkify:NO server:nil links:nil];
+                pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string}];
             } else {
-                [pb setValue:[NSString stringWithFormat:@"%@ %@", _selectedEvent.timestamp, [[ColorFormatter format:_selectedEvent.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                NSAttributedString *msg = [ColorFormatter format:[NSString stringWithFormat:@"%@ %@",_selectedEvent.timestamp,_selectedEvent.msg] defaultColor:nil mono:NO linkify:NO server:nil links:nil];
+                pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string}];
             }
         } else if([action isEqualToString:@"Clear Backlog"]) {
             int bid = _selectedBuffer?_selectedBuffer.bid:_selectedEvent.bid;
@@ -4592,7 +4652,6 @@ Network type: %@\n",
 }
 
 -(BOOL)canPerformAction:(SEL)action withSender:(id)sender {
-    
     if (action == @selector(paste:)) {
         return [UIPasteboard generalPasteboard].image != nil;
     }
@@ -4601,7 +4660,39 @@ Network type: %@\n",
     
 }
 
+-(NSAttributedString *)pasteForIRC:(NSAttributedString *)input {
+    NSMutableAttributedString *output = [[NSMutableAttributedString alloc] initWithString:input.string];
+    [output addAttribute:NSForegroundColorAttributeName value:_message.textColor range:NSMakeRange(0, input.length)];
+    
+    int index = 0;
+    NSRange range;
+    while(index < input.length) {
+        for(NSString *key in [input attributesAtIndex:index effectiveRange:&range]) {
+            if([key isEqualToString:NSFontAttributeName]) {
+                UIFont *font = [input attribute:key atIndex:index effectiveRange:nil];
+                [output addAttribute:key value:[UIFont fontWithDescriptor:font.fontDescriptor size:_message.font.pointSize] range:range];
+            } else if([key isEqualToString:NSForegroundColorAttributeName] || [key isEqualToString:NSBackgroundColorAttributeName]) {
+                UIColor *c = [input attribute:key atIndex:index effectiveRange:nil];
+                CGFloat r,g,b,a;
+                [c getRed:&r green:&g blue:&b alpha:&a];
+                if([key isEqualToString:NSForegroundColorAttributeName] && (r > 0 || g > 0 || b > 0)) {
+                    [output addAttribute:key value:c range:range];
+                }
+                if([key isEqualToString:NSBackgroundColorAttributeName] && !(r == 1 && g == 1 && b == 1)) {
+                    [output addAttribute:key value:c range:range];
+                }
+            } else if([key isEqualToString:NSUnderlineStyleAttributeName] || [key isEqualToString:NSStrikethroughStyleAttributeName]) {
+                [output addAttribute:key value:[input attribute:key atIndex:index effectiveRange:nil] range:range];
+            }
+        }
+        index += range.length;
+    }
+    
+    return output;
+}
+
 -(void)paste:(id)sender {
+    NSLog(@"%@", [UIPasteboard generalPasteboard].items);
     if([UIPasteboard generalPasteboard].image) {
         for(NSString *type in [UIPasteboard generalPasteboard].pasteboardTypes) {
             if([type isEqualToString:(__bridge NSString *)kUTTypeGIF]) {
@@ -4610,6 +4701,28 @@ Network type: %@\n",
             }
         }
         [self imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image}];
+    } else if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"]) {
+        NSDictionary *d = [NSPropertyListSerialization propertyListWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"] options:NSPropertyListImmutable format:NULL error:NULL];
+        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
+        if(_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:_message.selectedRange];
+        [msg insertAttributedString:[self pasteForIRC:[[NSAttributedString alloc] initWithData:[[d objectForKey:@"WebMainResource"] objectForKey:@"WebResourceData"] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType} documentAttributes:nil error:nil]] atIndex:_message.internalTextView.selectedRange.location];
+        
+        [_message setAttributedText:msg];
+    } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD]) {
+        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
+        if(_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:_message.selectedRange];
+        [msg insertAttributedString:[self pasteForIRC:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil]] atIndex:_message.internalTextView.selectedRange.location];
+        
+        [_message setAttributedText:msg];
+    } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF]) {
+        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
+        if(_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:_message.selectedRange];
+        [msg insertAttributedString:[self pasteForIRC:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil]] atIndex:_message.internalTextView.selectedRange.location];
+        
+        [_message setAttributedText:msg];
     }
 }
 

@@ -1813,9 +1813,6 @@ extern BOOL __compact;
     return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO];
 }
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji {
-    if(!color)
-        color = [UIColor messageTextColor];
-    
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, code = -1, strike = -1;
     UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
@@ -2091,8 +2088,8 @@ extern BOOL __compact;
                 if(strike != -1) {
                     [attributes addObject:@{
                                             NSStrikethroughStyleAttributeName:@1,
-                                            @"start":@(underline),
-                                            @"length":@(i - underline)
+                                            @"start":@(strike),
+                                            @"length":@(i - strike)
                                             }];
                 }
                 bold = italics = underline = code = strike = -1;
@@ -2104,7 +2101,8 @@ extern BOOL __compact;
     
     NSMutableAttributedString *output = [[NSMutableAttributedString alloc] initWithString:text];
     [output addAttributes:@{NSFontAttributeName:font} range:NSMakeRange(0, text.length)];
-    [output addAttributes:@{(NSString *)NSForegroundColorAttributeName:color} range:NSMakeRange(0, text.length)];
+    if(color)
+        [output addAttributes:@{(NSString *)NSForegroundColorAttributeName:color} range:NSMakeRange(0, text.length)];
 
     for(NSNumber *i in arrowIndex) {
         [output addAttributes:@{NSFontAttributeName:arrowFont} range:NSMakeRange([i intValue], 2)];

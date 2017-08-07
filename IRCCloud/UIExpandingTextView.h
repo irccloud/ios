@@ -78,6 +78,7 @@
 
 @property (weak) NSObject<UIExpandingTextViewDelegate> *delegate;
 @property (nonatomic) NSString *text;
+@property (nonatomic) NSAttributedString *attributedText;
 @property (nonatomic) UIFont *font;
 @property (nonatomic) UIColor *textColor;
 @property (nonatomic) NSTextAlignment textAlignment;

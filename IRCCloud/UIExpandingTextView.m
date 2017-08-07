@@ -330,6 +330,17 @@
 	return internalTextView.text;
 }
 
+-(void)setAttributedText:(NSAttributedString *)atext
+{
+    internalTextView.attributedText = atext;
+    [self performSelector:@selector(textViewDidChange:) withObject:internalTextView];
+}
+
+-(NSAttributedString*)attributedText
+{
+    return internalTextView.attributedText;
+}
+
 -(void)setFont:(UIFont *)afont
 {
 	internalTextView.font= afont;
