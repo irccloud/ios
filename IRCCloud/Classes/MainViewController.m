@@ -4692,7 +4692,6 @@ Network type: %@\n",
 }
 
 -(void)paste:(id)sender {
-    NSLog(@"%@", [UIPasteboard generalPasteboard].items);
     if([UIPasteboard generalPasteboard].image) {
         for(NSString *type in [UIPasteboard generalPasteboard].pasteboardTypes) {
             if([type isEqualToString:(__bridge NSString *)kUTTypeGIF]) {
@@ -4701,12 +4700,11 @@ Network type: %@\n",
             }
         }
         [self imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image}];
-    } else if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"]) {
-        NSDictionary *d = [NSPropertyListSerialization propertyListWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"] options:NSPropertyListImmutable format:NULL error:NULL];
+    } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF]) {
         NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
         if(_message.selectedRange.length > 0)
             [msg deleteCharactersInRange:_message.selectedRange];
-        [msg insertAttributedString:[self pasteForIRC:[[NSAttributedString alloc] initWithData:[[d objectForKey:@"WebMainResource"] objectForKey:@"WebResourceData"] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType} documentAttributes:nil error:nil]] atIndex:_message.internalTextView.selectedRange.location];
+        [msg insertAttributedString:[self pasteForIRC:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil]] atIndex:_message.internalTextView.selectedRange.location];
         
         [_message setAttributedText:msg];
     } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD]) {
@@ -4716,11 +4714,20 @@ Network type: %@\n",
         [msg insertAttributedString:[self pasteForIRC:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil]] atIndex:_message.internalTextView.selectedRange.location];
         
         [_message setAttributedText:msg];
-    } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF]) {
+    } else if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"]) {
+        NSDictionary *d = [NSPropertyListSerialization propertyListWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"] options:NSPropertyListImmutable format:NULL error:NULL];
         NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
         if(_message.selectedRange.length > 0)
             [msg deleteCharactersInRange:_message.selectedRange];
-        [msg insertAttributedString:[self pasteForIRC:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil]] atIndex:_message.internalTextView.selectedRange.location];
+        [msg insertAttributedString:[self pasteForIRC:[[NSAttributedString alloc] initWithData:[[d objectForKey:@"WebMainResource"] objectForKey:@"WebResourceData"] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType} documentAttributes:nil error:nil]] atIndex:_message.internalTextView.selectedRange.location];
+        
+        [_message setAttributedText:msg];
+    } else if([UIPasteboard generalPasteboard].string) {
+        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
+        if(_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:_message.selectedRange];
+        
+        [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:_message.font,NSForegroundColorAttributeName:_message.textColor}] atIndex:_message.selectedRange.location];
         
         [_message setAttributedText:msg];
     }
