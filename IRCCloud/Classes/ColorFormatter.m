@@ -1814,7 +1814,7 @@ extern BOOL __compact;
 }
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, code = -1, strike = -1;
-    UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil;
+    UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil, *oldBgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
     
@@ -1971,24 +1971,8 @@ extern BOOL __compact;
                 continue;
             case COLOR_MIRC:
             case COLOR_RGB:
-                if(fg != -1) {
-                    if(fgColor)
-                        [attributes addObject:@{
-                         NSForegroundColorAttributeName:fgColor,
-                         @"start":@(fg),
-                         @"length":@(i - fg)
-                         }];
-                    fg = -1;
-                }
-                if(bg != -1) {
-                    if(bgColor)
-                        [attributes addObject:@{
-                         NSBackgroundColorAttributeName:bgColor,
-                         @"start":@(bg),
-                         @"length":@(i - bg)
-                         }];
-                    bg = -1;
-                }
+                oldFgColor = fgColor;
+                oldBgColor = bgColor;
                 BOOL rgb = [text characterAtIndex:i] == COLOR_RGB;
                 int count = 0;
                 int fg_color = -1;
@@ -2011,8 +1995,19 @@ extern BOOL __compact;
                             fgColor = [UIColor colorFromHexString:[text substringWithRange:NSMakeRange(i, count)]];
                             fg_color = -1;
                         }
+                        if(fg != -1) {
+                            if(oldFgColor)
+                                [attributes addObject:@{
+                                                        NSForegroundColorAttributeName:oldFgColor,
+                                                        @"start":@(fg),
+                                                        @"length":@(i - fg)
+                                                        }];
+                        }
                         [text deleteCharactersInRange:NSMakeRange(i,count)];
                         fg = i;
+                    } else {
+                        fgColor = nil;
+                        bgColor = nil;
                     }
                 }
                 if(i < text.length && [text characterAtIndex:i] == ',') {
@@ -2035,6 +2030,14 @@ extern BOOL __compact;
                         } else {
                             bgColor = [UIColor colorFromHexString:[text substringWithRange:NSMakeRange(i, count)]];
                         }
+                        if(bg != -1) {
+                            if(oldBgColor)
+                                [attributes addObject:@{
+                                                        NSBackgroundColorAttributeName:oldBgColor,
+                                                        @"start":@(bg),
+                                                        @"length":@(i - bg)
+                                                        }];
+                        }
                         [text deleteCharactersInRange:NSMakeRange(i,count)];
                         bg = i;
                     } else {
@@ -2043,6 +2046,24 @@ extern BOOL __compact;
                 }
                 if(fg_color != -1)
                     fgColor = [UIColor mIRCColor:fg_color background:bgColor != nil];
+                if(fg != -1 && fgColor == nil) {
+                    if(oldFgColor)
+                        [attributes addObject:@{
+                                                NSForegroundColorAttributeName:oldFgColor,
+                                                @"start":@(fg),
+                                                @"length":@(i - fg)
+                                                }];
+                    fg = -1;
+                }
+                if(bg != -1 && bgColor == nil) {
+                    if(oldBgColor)
+                        [attributes addObject:@{
+                                                NSBackgroundColorAttributeName:oldBgColor,
+                                                @"start":@(bg),
+                                                @"length":@(i - bg)
+                                                }];
+                    bg = -1;
+                }
                 i--;
                 continue;
             case CLEAR:

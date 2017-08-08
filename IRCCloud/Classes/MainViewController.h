@@ -27,6 +27,7 @@
 #import "FileUploader.h"
 #import "FilesTableViewController.h"
 #import "LinkLabel.h"
+#import "IRCColorPickerView.h"
 
 @interface UpdateSuggestionsTask : NSObject {
     BOOL _force, _atMention;
@@ -46,7 +47,7 @@
 
 @end
 
-@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate,LinkLabelDelegate
+@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIActionSheetDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate,LinkLabelDelegate,IRCColorPickerViewDelegate
 #ifdef __IPHONE_11_0
 ,UIDropInteractionDelegate
 #endif
@@ -113,6 +114,8 @@
     NSString *_currentTheme;
     NSString *_bugReport;
     UpdateSuggestionsTask *_updateSuggestionsTask;
+    IRCColorPickerView *_colorPickerView;
+    NSDictionary *_currentMessageAttributes;
     
     id<UIViewControllerPreviewing> __previewer;
 }

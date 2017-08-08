@@ -638,6 +638,8 @@
 		22EE12871C9B20DF00E7AE8D /* Firefox@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */; };
 		22EE12881C9B20DF00E7AE8D /* Firefox@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */; };
 		22EE12891C9B20DF00E7AE8D /* Firefox@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */; };
+		22EE41FA1F39F66E00D74E8C /* IRCColorPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22EE41F91F39F66E00D74E8C /* IRCColorPickerView.m */; };
+		22EE41FB1F39F66E00D74E8C /* IRCColorPickerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22EE41F91F39F66E00D74E8C /* IRCColorPickerView.m */; };
 		22EEA94E18D0AC08007D5022 /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */; };
 		22EEA95118D0B117007D5022 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95018D0B117007D5022 /* Images.xcassets */; };
 		22EEA95418D0B198007D5022 /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95318D0B198007D5022 /* Icons.xcassets */; };
@@ -1080,6 +1082,8 @@
 		22EE12811C9B20DF00E7AE8D /* Firefox.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Firefox.png; path = OpenInFirefoxClient/Firefox.png; sourceTree = SOURCE_ROOT; };
 		22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Firefox@2x.png"; path = "OpenInFirefoxClient/Firefox@2x.png"; sourceTree = SOURCE_ROOT; };
 		22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Firefox@3x.png"; path = "OpenInFirefoxClient/Firefox@3x.png"; sourceTree = SOURCE_ROOT; };
+		22EE41F81F39F66E00D74E8C /* IRCColorPickerView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IRCColorPickerView.h; sourceTree = "<group>"; };
+		22EE41F91F39F66E00D74E8C /* IRCColorPickerView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = IRCColorPickerView.m; sourceTree = "<group>"; };
 		22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = EnterpriseImages.xcassets; sourceTree = "<group>"; };
 		22EEA95018D0B117007D5022 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		22EEA95318D0B198007D5022 /* Icons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icons.xcassets; sourceTree = "<group>"; };
@@ -1524,6 +1528,8 @@
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
 				223C407A1C60FE880081B02B /* IRCCloudSafariViewController.h */,
 				223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */,
+				22EE41F81F39F66E00D74E8C /* IRCColorPickerView.h */,
+				22EE41F91F39F66E00D74E8C /* IRCColorPickerView.m */,
 				224FCF341787288400FC3879 /* LicenseViewController.h */,
 				224FCF351787288400FC3879 /* LicenseViewController.m */,
 				22CE91771D59160B0014B25C /* LinkLabel.h */,
@@ -2562,6 +2568,7 @@
 				22DB8D711C441C3000302271 /* YouTubeViewController.m in Sources */,
 				225D975418AA995900065087 /* NSURL+IDN.m in Sources */,
 				225D975518AA995900065087 /* BuffersDataSource.m in Sources */,
+				22EE41FB1F39F66E00D74E8C /* IRCColorPickerView.m in Sources */,
 				225D975618AA995900065087 /* ChannelsDataSource.m in Sources */,
 				225D975718AA995900065087 /* BuffersTableView.m in Sources */,
 				225D975818AA995900065087 /* MainViewController.m in Sources */,
@@ -2679,6 +2686,7 @@
 				22DB8D701C441C3000302271 /* YouTubeViewController.m in Sources */,
 				2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */,
 				2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */,
+				22EE41FA1F39F66E00D74E8C /* IRCColorPickerView.m in Sources */,
 				2236F60216DBC021007BE535 /* ChannelsDataSource.m in Sources */,
 				2236F60616DBCA85007BE535 /* BuffersTableView.m in Sources */,
 				2236F60B16DBCBC6007BE535 /* MainViewController.m in Sources */,
