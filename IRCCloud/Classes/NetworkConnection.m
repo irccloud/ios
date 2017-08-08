@@ -258,13 +258,6 @@ volatile BOOL __socketPaused = NO;
     _state = kIRCCloudStateDisconnected;
     _oobQueue = [[NSMutableArray alloc] init];
     _awayOverride = nil;
-    _parser = [SBJson5Parser multiRootParserWithBlock:^(id item, BOOL *stop) {
-        [self parse:item backlog:NO];
-    } errorHandler:^(NSError *error) {
-        CLS_LOG(@"JSON ERROR: %@", error);
-        _streamId = nil;
-        _highestEID = 0;
-    }];
     _lastReqId = 1;
     _idleInterval = 20;
     _reconnectTimestamp = -1;
@@ -1657,6 +1650,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         __socketPaused = NO;
         _lastReqId = 1;
         [_resultHandlers removeAllObjects];
+        _parser = [SBJson5Parser multiRootParserWithBlock:^(id item, BOOL *stop) {
+            [self parse:item backlog:NO];
+        } errorHandler:^(NSError *error) {
+            CLS_LOG(@"JSON ERROR: %@", error);
+            _streamId = nil;
+            _highestEID = 0;
+        }];
+
         
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
