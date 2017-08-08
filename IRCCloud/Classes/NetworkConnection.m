@@ -607,10 +607,12 @@ volatile BOOL __socketPaused = NO;
                        }
                    },
                    @"backlog_complete": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                           CLS_LOG(@"backlog_complete from websocket");
-                           [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
-                       }];
+                       if(!backlog) {
+                           [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                               CLS_LOG(@"backlog_complete from websocket");
+                               [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
+                           }];
+                       }
                    },
                    @"bad_channel_key": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if(!backlog && !_resuming)
