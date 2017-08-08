@@ -1755,6 +1755,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
         _state = kIRCCloudStateDisconnected;
         __socketPaused = NO;
+        if(aStatusCode == WebSocketCloseStatusProtocolError) {
+            _streamId = nil;
+            _highestEID = 0;
+        }
         if([self reachable] == kIRCCloudReachable && _reconnectTimestamp != 0) {
             [self fail];
         } else {
