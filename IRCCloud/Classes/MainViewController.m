@@ -505,7 +505,7 @@ NSArray *_sortedChannels;
                                 [NSLayoutConstraint constraintWithItem:_colorPickerView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeTop multiplier:1.0f constant:-2.0f]
                                 ]];
     
-    [UIMenuController sharedMenuController].menuItems = @[[[UIMenuItem alloc] initWithTitle:@"Foreground" action:@selector(chooseFGColor:)],
+    [UIMenuController sharedMenuController].menuItems = @[[[UIMenuItem alloc] initWithTitle:@"Color" action:@selector(chooseFGColor:)],
                                                           [[UIMenuItem alloc] initWithTitle:@"Background" action:@selector(chooseBGColor:)],
                                                           [[UIMenuItem alloc] initWithTitle:@"Reset Colors" action:@selector(resetColors:)],
                                                           ];

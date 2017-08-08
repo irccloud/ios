@@ -26,9 +26,13 @@
         [self addSubview:_background];
         for(int i = 0; i < 16; i++) {
             _fg[i] = [UIButton buttonWithType:UIButtonTypeCustom];
+            _fg[i].layer.borderColor = [UIColor blackColor].CGColor;
+            _fg[i].layer.borderWidth = 1;
             [_fg[i] addTarget:self action:@selector(fgButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
             [_background addSubview:_fg[i]];
             _bg[i] = [UIButton buttonWithType:UIButtonTypeCustom];
+            _bg[i].layer.borderColor = [UIColor blackColor].CGColor;
+            _bg[i].layer.borderWidth = 1;
             [_bg[i] addTarget:self action:@selector(bgButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
             [_background addSubview:_bg[i]];
         }
@@ -60,12 +64,16 @@
 
     for(int i = 0; i < 8; i++) {
         _fg[i].frame = CGRectMake(i*bw + 1, 0, bw - 2, 32);
+        _fg[i].layer.cornerRadius = 16;
         _bg[i].frame = CGRectMake(i*bw + 1, 0, bw - 2, 32);
+        _bg[i].layer.cornerRadius = 16;
     }
 
     for(int i = 0; i < 8; i++) {
         _fg[i+8].frame = CGRectMake(i*bw + 1, 34, bw - 2, 32);
+        _fg[i+8].layer.cornerRadius = 16;
         _bg[i+8].frame = CGRectMake(i*bw + 1, 34, bw - 2, 32);
+        _bg[i+8].layer.cornerRadius = 16;
     }
 }
 
