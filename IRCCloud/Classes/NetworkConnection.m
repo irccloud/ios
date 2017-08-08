@@ -262,6 +262,8 @@ volatile BOOL __socketPaused = NO;
         [self parse:item backlog:NO];
     } errorHandler:^(NSError *error) {
         CLS_LOG(@"JSON ERROR: %@", error);
+        _streamId = nil;
+        _highestEID = 0;
     }];
     _lastReqId = 1;
     _idleInterval = 20;
