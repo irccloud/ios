@@ -14,6 +14,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <MobileCoreServices/UTCoreTypes.h>
+#import <MobileCoreServices/UTType.h>
 #import "ChannelInfoViewController.h"
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
@@ -67,7 +69,9 @@
     _topicEdit.returnKeyType = UIReturnKeyDone;
     _topicEdit.delegate = self;
     _topicEdit.backgroundColor = [UIColor clearColor];
+    _topicEdit.textColor = [UIColor textareaTextColor];
     _topicEdit.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    _topicEdit.allowsEditingTextAttributes = YES;
     [self refresh];
 }
 
@@ -111,8 +115,47 @@
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    
-    if([text isEqualToString:@"\n"]) {
+    if([text isEqualToString:[UIPasteboard generalPasteboard].string]) {
+        if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"]) {
+            NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
+            if(_topicEdit.selectedRange.length > 0)
+                [msg deleteCharactersInRange:_topicEdit.selectedRange];
+            [msg insertAttributedString:[ColorFormatter format:[[NSString alloc] initWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"] encoding:NSUTF8StringEncoding] defaultColor:_topicEdit.textColor mono:NO linkify:NO server:nil links:nil] atIndex:_topicEdit.selectedRange.location];
+            
+            [_topicEdit setAttributedText:msg];
+        } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF]) {
+            NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
+            if(_topicEdit.selectedRange.length > 0)
+                [msg deleteCharactersInRange:_topicEdit.selectedRange];
+            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil] fontSize:_topicEdit.font.pointSize] atIndex:_topicEdit.selectedRange.location];
+            
+            [_topicEdit setAttributedText:msg];
+        } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD]) {
+            NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
+            if(_topicEdit.selectedRange.length > 0)
+                [msg deleteCharactersInRange:_topicEdit.selectedRange];
+            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil] fontSize:_topicEdit.font.pointSize] atIndex:_topicEdit.selectedRange.location];
+            
+            [_topicEdit setAttributedText:msg];
+        } else if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"]) {
+            NSDictionary *d = [NSPropertyListSerialization propertyListWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"] options:NSPropertyListImmutable format:NULL error:NULL];
+            NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
+            if(_topicEdit.selectedRange.length > 0)
+                [msg deleteCharactersInRange:_topicEdit.selectedRange];
+            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[d objectForKey:@"WebMainResource"] objectForKey:@"WebResourceData"] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType} documentAttributes:nil error:nil] fontSize:_topicEdit.font.pointSize] atIndex:_topicEdit.selectedRange.location];
+            
+            [_topicEdit setAttributedText:msg];
+        } else if([UIPasteboard generalPasteboard].string) {
+            NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
+            if(_topicEdit.selectedRange.length > 0)
+                [msg deleteCharactersInRange:_topicEdit.selectedRange];
+            
+            [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:_topicEdit.font,NSForegroundColorAttributeName:_topicEdit.textColor}] atIndex:_topicEdit.selectedRange.location];
+            
+            [_topicEdit setAttributedText:msg];
+        }
+        return NO;
+    } else if([text isEqualToString:@"\n"]) {
         [self setEditing:NO animated:YES];
         return NO;
     }
@@ -127,7 +170,7 @@
     Server *server = [[ServersDataSource sharedInstance] getServer:_channel.cid];
     if([_channel.topic_text isKindOfClass:[NSString class]] && _channel.topic_text.length) {
         NSArray *links;
-        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor messageTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
+        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor textareaTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
         _topicLabel.attributedText = _topic;
         _topicLabel.linkAttributes = [UIColor linkAttributes];
         
@@ -146,7 +189,7 @@
                 [_topicLabel addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
             }
         }
-        _topicEdit.text = [_topic string];
+        _topicEdit.attributedText = _topic;
         
         if(_channel.topic_author) {
             _topicSetBy = [NSString stringWithFormat:@"Set by %@", _channel.topic_author];
@@ -161,7 +204,7 @@
             _topicSetBy = nil;
         }
     } else {
-        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
+        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor textareaTextColor] mono:NO linkify:NO server:nil links:nil];
         _topicLabel.attributedText = _topic;
         _topicEdit.text = @"";
         _topicSetBy = nil;
@@ -219,6 +262,17 @@
     return header;
 }
 
+-(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,4,self.view.frame.size.width - 32, 20)];
+    label.text = [self tableView:tableView titleForFooterInSection:section];
+    label.font = [UIFont systemFontOfSize:12];
+    label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
+    label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    [header addSubview:label];
+    return header;
+}
+
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if([_channel.mode isKindOfClass:[NSString class]] && _channel.mode.length)
         return 2;
@@ -237,8 +291,8 @@
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
-    if(self.tableView.editing && !editing && _topicChanged) {
-        [[NetworkConnection sharedInstance] topic:_topicEdit.text chan:_channel.name cid:_channel.cid handler:nil];
+    if(self.tableView.editing && !editing) {
+        [[NetworkConnection sharedInstance] topic:[ColorFormatter toIRC:_topicEdit.attributedText] chan:_channel.name cid:_channel.cid handler:nil];
     }
     [super setEditing:editing animated:animated];
     [self.tableView reloadData];

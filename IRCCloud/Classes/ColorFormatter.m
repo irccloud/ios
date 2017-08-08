@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+#import <CoreText/CoreText.h>
 #import "ColorFormatter.h"
 #import "LinkTextView.h"
 #import "UIColor+IRCCloud.h"
@@ -2277,6 +2277,99 @@ extern BOOL __compact;
     }
     return output;
 }
+
++(NSString *)toIRC:(NSAttributedString *)string {
+    NSString *text = string.string;
+    NSMutableString *formattedMsg = [[NSMutableString alloc] init];
+    
+    int index = 0;
+    NSRange range;
+    while(index < string.length) {
+        for(NSString *key in [string attributesAtIndex:index effectiveRange:&range]) {
+            NSString *fgColor = nil;
+            NSString *bgColor = nil;
+            int fgColormIRC = -1;
+            int bgColormIRC = -1;
+            if([key isEqualToString:NSFontAttributeName]) {
+                UIFont *font = [string attribute:key atIndex:index effectiveRange:nil];
+                if(font.fontDescriptor.symbolicTraits & kCTFontBoldTrait)
+                    [formattedMsg appendFormat:@"%c", BOLD];
+                if(font.fontDescriptor.symbolicTraits & kCTFontItalicTrait)
+                    [formattedMsg appendFormat:@"%c", ITALICS];
+            } else if([key isEqualToString:NSUnderlineStyleAttributeName]) {
+                NSNumber *style = [string attribute:key atIndex:index effectiveRange:nil];
+                if(style.integerValue != NSUnderlineStyleNone)
+                    [formattedMsg appendFormat:@"%c", UNDERLINE];
+            } else if([key isEqualToString:NSStrikethroughStyleAttributeName]) {
+                [formattedMsg appendFormat:@"%c", STRIKETHROUGH];
+            } else if([key isEqualToString:NSForegroundColorAttributeName]) {
+                UIColor *c = [string attribute:key atIndex:index effectiveRange:nil];
+                if(![c isEqual:[UIColor textareaTextColor]]) {
+                    fgColor = [c toHexString];
+                    fgColormIRC = [UIColor mIRCColor:c];
+                }
+            } else if([key isEqualToString:NSBackgroundColorAttributeName]) {
+                UIColor *c = [string attribute:key atIndex:index effectiveRange:nil];
+                if(![c isEqual:[UIColor textareaTextColor]]) {
+                    bgColor = [c toHexString];
+                    bgColormIRC = [UIColor mIRCColor:c];
+                }
+            }
+            
+            if(fgColor || bgColor) {
+                if((fgColormIRC != -1 && (!bgColor || bgColormIRC != -1)) || (!fgColor && bgColormIRC != -1)) {
+                    [formattedMsg appendFormat:@"%c", COLOR_MIRC];
+                    if(fgColormIRC != -1)
+                        [formattedMsg appendFormat:@"%i",fgColormIRC];
+                    if(bgColormIRC != -1)
+                        [formattedMsg appendFormat:@",%i",bgColormIRC];
+                } else {
+                    [formattedMsg appendFormat:@"%c", COLOR_RGB];
+                    if(fgColor)
+                        [formattedMsg appendString:fgColor];
+                    if(bgColor)
+                        [formattedMsg appendFormat:@",%@",bgColor];
+                }
+            }
+        }
+        [formattedMsg appendFormat:@"%@%c", [text substringWithRange:range], CLEAR];
+        index += range.length;
+    }
+    
+    return formattedMsg;
+}
+
++(NSAttributedString *)stripUnsupportedAttributes:(NSAttributedString *)input fontSize:(CGFloat)fontSize {
+    NSMutableAttributedString *output = [[NSMutableAttributedString alloc] initWithString:input.string];
+    [output addAttribute:NSForegroundColorAttributeName value:[UIColor messageTextColor] range:NSMakeRange(0, input.length)];
+    
+    int index = 0;
+    NSRange range;
+    while(index < input.length) {
+        for(NSString *key in [input attributesAtIndex:index effectiveRange:&range]) {
+            if([key isEqualToString:NSFontAttributeName]) {
+                UIFont *font = [input attribute:key atIndex:index effectiveRange:nil];
+                [output addAttribute:key value:[UIFont fontWithDescriptor:font.fontDescriptor size:fontSize] range:range];
+            } else if([key isEqualToString:NSForegroundColorAttributeName] || [key isEqualToString:NSBackgroundColorAttributeName]) {
+                UIColor *c = [input attribute:key atIndex:index effectiveRange:nil];
+                CGFloat r,g,b,a;
+                [c getRed:&r green:&g blue:&b alpha:&a];
+                if([key isEqualToString:NSForegroundColorAttributeName] && (r > 0 || g > 0 || b > 0)) {
+                    [output addAttribute:key value:c range:range];
+                }
+                if([key isEqualToString:NSBackgroundColorAttributeName] && !(r == 1 && g == 1 && b == 1)) {
+                    [output addAttribute:key value:c range:range];
+                }
+            } else if([key isEqualToString:NSUnderlineStyleAttributeName] || [key isEqualToString:NSStrikethroughStyleAttributeName]) {
+                [output addAttribute:key value:[input attribute:key atIndex:index effectiveRange:nil] range:range];
+            }
+        }
+        index += range.length;
+    }
+    
+    return output;
+}
+
 @end
 
 @implementation NSString (ColorFormatter)
