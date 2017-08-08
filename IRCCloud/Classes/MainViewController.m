@@ -2376,18 +2376,21 @@ NSArray *_sortedChannels;
 }
 
 -(BOOL)expandingTextView:(UIExpandingTextView *)expandingTextView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    if(range.location == expandingTextView.text.length)
+    _textIsChanging = YES;
+    if(range.location == expandingTextView.text.length) {
         _currentMessageAttributes = expandingTextView.internalTextView.typingAttributes;
-    else
+    } else {
         _currentMessageAttributes = nil;
+    }
     return YES;
 }
 
 -(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
-    if(_currentMessageAttributes)
-        expandingTextView.internalTextView.typingAttributes = _currentMessageAttributes;
-    else
+    if(!_textIsChanging)
         _currentMessageAttributes = expandingTextView.internalTextView.typingAttributes;
+    else
+        expandingTextView.internalTextView.typingAttributes = _currentMessageAttributes;
+    _textIsChanging = NO;
     [self.view layoutIfNeeded];
     [UIView beginAnimations:nil context:nil];
     [self _updateMessageWidth];

@@ -116,6 +116,7 @@
     UpdateSuggestionsTask *_updateSuggestionsTask;
     IRCColorPickerView *_colorPickerView;
     NSDictionary *_currentMessageAttributes;
+    BOOL _textIsChanging;
     
     id<UIViewControllerPreviewing> __previewer;
 }
