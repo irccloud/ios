@@ -607,7 +607,7 @@ volatile BOOL __socketPaused = NO;
                        }
                    },
                    @"backlog_complete": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog) {
+                       if(!backlog && _oobQueue.count == 0) {
                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                CLS_LOG(@"backlog_complete from websocket");
                                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
