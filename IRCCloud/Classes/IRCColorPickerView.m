@@ -76,8 +76,8 @@
 
 -(void)updateButtonColors:(BOOL)background {
     self.backgroundColor = [UIColor bufferBackgroundColor];
-    self.layer.borderWidth = 1;
-    self.layer.borderColor = [UIColor bufferBorderColor].CGColor;
+    //self.layer.borderWidth = 1;
+    //self.layer.borderColor = [UIColor bufferBorderColor].CGColor;
 
     for(int i = 0; i < 16; i++)
         _fg[i].backgroundColor = [UIColor mIRCColor:i background:NO];

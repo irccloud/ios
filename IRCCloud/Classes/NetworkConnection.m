@@ -1657,7 +1657,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             _streamId = nil;
             _highestEID = 0;
         }];
-
         
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
