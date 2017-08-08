@@ -25,7 +25,6 @@
 @interface IRCColorPickerView : UIControl {
     UIButton *_fg[16];
     UIButton *_bg[16];
-    UIView *_background;
 }
 @property (nonatomic, assign) id<IRCColorPickerViewDelegate> delegate;
 -(void)updateButtonColors:(BOOL)background;

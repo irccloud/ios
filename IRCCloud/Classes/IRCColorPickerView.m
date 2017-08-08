@@ -22,15 +22,17 @@
 -(instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _background = [[UIView alloc] initWithFrame:CGRectZero];
-        [self addSubview:_background];
         for(int i = 0; i < 16; i++) {
             _fg[i] = [UIButton buttonWithType:UIButtonTypeCustom];
+            _fg[i].layer.borderColor = [UIColor blackColor].CGColor;
+            _fg[i].layer.borderWidth = 1;
             [_fg[i] addTarget:self action:@selector(fgButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-            [_background addSubview:_fg[i]];
+            [self addSubview:_fg[i]];
             _bg[i] = [UIButton buttonWithType:UIButtonTypeCustom];
+            _bg[i].layer.borderColor = [UIColor blackColor].CGColor;
+            _bg[i].layer.borderWidth = 1;
             [_bg[i] addTarget:self action:@selector(bgButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-            [_background addSubview:_bg[i]];
+            [self addSubview:_bg[i]];
         }
         self.layer.masksToBounds = YES;
         self.layer.cornerRadius = 4;
@@ -51,12 +53,11 @@
 }
 
 -(CGSize)intrinsicContentSize {
-    return CGSizeMake(308, 76);
+    return CGSizeMake(304, 73);
 }
 
 -(void)layoutSubviews {
-    _background.frame = CGRectInset(self.bounds, 2, 2);
-    CGFloat bw = _background.bounds.size.width / 8;
+    CGFloat bw = self.bounds.size.width / 8;
 
     for(int i = 0; i < 8; i++) {
         _fg[i].frame = CGRectMake(i*bw + 3, 3, bw - 6, bw - 6);
@@ -74,9 +75,10 @@
 }
 
 -(void)updateButtonColors:(BOOL)background {
-    self.backgroundColor = [UIColor bufferBorderColor];
-    _background.backgroundColor = [UIColor bufferBackgroundColor];
-    
+    self.backgroundColor = [UIColor bufferBackgroundColor];
+    self.layer.borderWidth = 1;
+    self.layer.borderColor = [UIColor bufferBorderColor].CGColor;
+
     for(int i = 0; i < 16; i++)
         _fg[i].backgroundColor = [UIColor mIRCColor:i background:NO];
 
