@@ -327,7 +327,6 @@ NSArray *_sortedChannels;
     [self _resetStatusBar];
     
     _globalMsg.linkAttributes = [UIColor lightLinkAttributes];
-    [_colorPickerView updateButtonColors];
 }
 
 - (void)viewDidLoad {
@@ -506,7 +505,10 @@ NSArray *_sortedChannels;
                                 [NSLayoutConstraint constraintWithItem:_colorPickerView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeTop multiplier:1.0f constant:-2.0f]
                                 ]];
     
-    [UIMenuController sharedMenuController].menuItems = @[[[UIMenuItem alloc] initWithTitle:@"Colors" action:@selector(chooseColors:)]];
+    [UIMenuController sharedMenuController].menuItems = @[[[UIMenuItem alloc] initWithTitle:@"Foreground" action:@selector(chooseFGColor:)],
+                                                          [[UIMenuItem alloc] initWithTitle:@"Background" action:@selector(chooseBGColor:)],
+                                                          [[UIMenuItem alloc] initWithTitle:@"Reset Colors" action:@selector(resetColors:)],
+                                                          ];
     
     _connectingProgress = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
     [_connectingProgress sizeToFit];
@@ -4628,15 +4630,33 @@ Network type: %@\n",
 -(BOOL)canPerformAction:(SEL)action withSender:(id)sender {
     if (action == @selector(paste:)) {
         return [UIPasteboard generalPasteboard].image != nil;
-    } else if(action == @selector(chooseColors:)) {
+    } else if(action == @selector(chooseFGColor:) || action == @selector(chooseBGColor:) || action == @selector(resetColors:)) {
         return YES;
     }
     
     return [super canPerformAction:action withSender:sender];
-    
 }
 
--(void)chooseColors:(id)sender {
+-(void)resetColors:(id)sender {
+    if(_message.selectedRange.length) {
+        NSRange selection = _message.selectedRange;
+        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
+        [msg removeAttribute:NSForegroundColorAttributeName range:_message.selectedRange];
+        [msg removeAttribute:NSBackgroundColorAttributeName range:_message.selectedRange];
+        _message.attributedText = msg;
+        _message.selectedRange = selection;
+    } else {
+        _currentMessageAttributes = _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_message.font };
+    }
+}
+
+-(void)chooseFGColor:(id)sender {
+    [_colorPickerView updateButtonColors:NO];
+    [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 1; } completion:nil];
+}
+
+-(void)chooseBGColor:(id)sender {
+    [_colorPickerView updateButtonColors:YES];
     [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 1; } completion:nil];
 }
 

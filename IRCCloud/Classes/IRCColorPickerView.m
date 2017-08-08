@@ -39,7 +39,6 @@
             [self addSubview:_bg[i]];
             [self addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpOutside];
         }
-        [self updateButtonColors];
     }
     return self;
 }
@@ -57,33 +56,25 @@
 }
 
 -(CGSize)intrinsicContentSize {
-    return CGSizeMake(272, 176);
+    return CGSizeMake(272, 88);
 }
 
 -(void)layoutSubviews {
     CGFloat bw = self.frame.size.width / 8;
-    _fgLabel.frame = CGRectMake(0,2,self.frame.size.width,16);
-    
+    _fgLabel.frame = _bgLabel.frame = CGRectMake(0,2,self.frame.size.width,16);
+
     for(int i = 0; i < 8; i++) {
         _fg[i].frame = CGRectMake(i*bw + 1, 20, bw - 2, 32);
+        _bg[i].frame = CGRectMake(i*bw + 1, 20, bw - 2, 32);
     }
 
     for(int i = 0; i < 8; i++) {
         _fg[i+8].frame = CGRectMake(i*bw + 1, 54, bw - 2, 32);
-    }
-    
-    _bgLabel.frame = CGRectMake(0,88,self.frame.size.width,16);
-    
-    for(int i = 0; i < 8; i++) {
-        _bg[i].frame = CGRectMake(i*bw + 1, 108, bw - 2, 32);
-    }
-    
-    for(int i = 0; i < 8; i++) {
-        _bg[i+8].frame = CGRectMake(i*bw + 1, 142, bw - 2, 32);
+        _bg[i+8].frame = CGRectMake(i*bw + 1, 54, bw - 2, 32);
     }
 }
 
--(void)updateButtonColors {
+-(void)updateButtonColors:(BOOL)background {
     self.backgroundColor = [UIColor textareaBackgroundColor];
     _fgLabel.textColor = _bgLabel.textColor = [UIColor navBarHeadingColor];
     
@@ -92,6 +83,22 @@
 
     for(int i = 0; i < 16; i++)
         _bg[i].backgroundColor = [UIColor mIRCColor:i background:YES];
+    
+    if(background) {
+        for(int i = 0; i < 16; i++)
+            _fg[i].hidden = YES;
+        _fgLabel.hidden = YES;
+        for(int i = 0; i < 16; i++)
+            _bg[i].hidden = NO;
+        _bgLabel.hidden = NO;
+    } else {
+        for(int i = 0; i < 16; i++)
+            _fg[i].hidden = NO;
+        _fgLabel.hidden = NO;
+        for(int i = 0; i < 16; i++)
+            _bg[i].hidden = YES;
+        _bgLabel.hidden = YES;
+    }
 }
 
 @end

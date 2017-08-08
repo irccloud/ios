@@ -73,6 +73,13 @@
     _topicEdit.textColor = [UIColor textareaTextColor];
     _topicEdit.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     _topicEdit.allowsEditingTextAttributes = YES;
+    
+    _colorPickerView = [[IRCColorPickerView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width / 2 - 272 / 2,20,272,88)];
+    _colorPickerView.delegate = self;
+    _colorPickerView.alpha = 0;
+    [_colorPickerView updateButtonColors:YES];
+    [self.navigationController.view addSubview:_colorPickerView];
+
     [self refresh];
 }
 
@@ -119,7 +126,88 @@
     _topicChanged = YES;
 }
 
+-(BOOL)canPerformAction:(SEL)action withSender:(id)sender {
+    if(action == @selector(chooseFGColor:) || action == @selector(chooseBGColor:) || action == @selector(resetColors:)) {
+        return YES;
+    }
+    
+    return [super canPerformAction:action withSender:sender];
+}
+
+-(void)resetColors:(id)sender {
+    if(_topicEdit.selectedRange.length) {
+        NSRange selection = _topicEdit.selectedRange;
+        NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
+        [msg removeAttribute:NSForegroundColorAttributeName range:_topicEdit.selectedRange];
+        [msg removeAttribute:NSBackgroundColorAttributeName range:_topicEdit.selectedRange];
+        _topicEdit.attributedText = msg;
+        _topicEdit.selectedRange = selection;
+    } else {
+        _currentMessageAttributes = _topicEdit.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_topicEdit.font };
+    }
+}
+
+-(void)chooseFGColor:(id)sender {
+    [_colorPickerView updateButtonColors:NO];
+    [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 1; } completion:nil];
+}
+
+-(void)chooseBGColor:(id)sender {
+    [_colorPickerView updateButtonColors:YES];
+    [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 1; } completion:nil];
+}
+
+-(void)foregroundColorPicked:(UIColor *)color {
+    if(_topicEdit.selectedRange.length) {
+        NSRange selection = _topicEdit.selectedRange;
+        NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
+        [msg addAttribute:NSForegroundColorAttributeName value:color range:_topicEdit.selectedRange];
+        _topicEdit.attributedText = msg;
+        _topicEdit.selectedRange = selection;
+    } else {
+        NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:_topicEdit.typingAttributes];
+        [d setObject:color forKey:NSForegroundColorAttributeName];
+        _topicEdit.typingAttributes = d;
+    }
+    [self closeColorPicker];
+}
+
+-(void)backgroundColorPicked:(UIColor *)color {
+    if(_topicEdit.selectedRange.length) {
+        NSRange selection = _topicEdit.selectedRange;
+        NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
+        [msg addAttribute:NSBackgroundColorAttributeName value:color range:_topicEdit.selectedRange];
+        _topicEdit.attributedText = msg;
+        _topicEdit.selectedRange = selection;
+    } else {
+        NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:_topicEdit.typingAttributes];
+        [d setObject:color forKey:NSBackgroundColorAttributeName];
+        _topicEdit.typingAttributes = d;
+    }
+    [self closeColorPicker];
+}
+
+-(void)closeColorPicker {
+    [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 0; } completion:nil];
+}
+
+-(void)textViewDidChangeSelection:(UITextView *)textView {
+    [self closeColorPicker];
+}
+
+-(void)textViewDidChange:(UITextView *)textView {
+    if(_currentMessageAttributes)
+        textView.typingAttributes = _currentMessageAttributes;
+    else
+        _currentMessageAttributes = textView.typingAttributes;
+}
+
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    if(range.location == textView.text.length)
+        _currentMessageAttributes = textView.typingAttributes;
+    else
+        _currentMessageAttributes = nil;
+
     if([text isEqualToString:[UIPasteboard generalPasteboard].string]) {
         if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"]) {
             NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;

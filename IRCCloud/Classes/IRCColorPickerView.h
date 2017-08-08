@@ -29,6 +29,6 @@
     UILabel *_bgLabel;
 }
 @property (nonatomic, assign) id<IRCColorPickerViewDelegate> delegate;
--(void)updateButtonColors;
+-(void)updateButtonColors:(BOOL)background;
 @end
 

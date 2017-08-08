@@ -18,8 +18,9 @@
 #import <UIKit/UIKit.h>
 #import "ChannelsDataSource.h"
 #import "LinkTextView.h"
+#import "IRCColorPickerView.h"
 
-@interface ChannelInfoViewController : UITableViewController<UITextViewDelegate,LinkTextViewDelegate,NSTextStorageDelegate> {
+@interface ChannelInfoViewController : UITableViewController<UITextViewDelegate,LinkTextViewDelegate,NSTextStorageDelegate,IRCColorPickerViewDelegate> {
     Channel *_channel;
     UITextView *_topicEdit;
     NSAttributedString *_topic;
@@ -28,6 +29,8 @@
     NSString *_topicSetBy;
     BOOL _topicChanged;
     int offset;
+    IRCColorPickerView *_colorPickerView;
+    NSDictionary *_currentMessageAttributes;
 }
 -(id)initWithChannel:(Channel *)channel;
 @end
