@@ -68,6 +68,7 @@
     _topicEdit.font = [UIFont systemFontOfSize:14];
     _topicEdit.returnKeyType = UIReturnKeyDone;
     _topicEdit.delegate = self;
+    _topicEdit.textStorage.delegate = self;
     _topicEdit.backgroundColor = [UIColor clearColor];
     _topicEdit.textColor = [UIColor textareaTextColor];
     _topicEdit.keyboardAppearance = [UITextField appearance].keyboardAppearance;
@@ -112,6 +113,10 @@
         default:
             break;
     }
+}
+
+-(void)textStorage:(NSTextStorage *)textStorage didProcessEditing:(NSTextStorageEditActions)editedMask range:(NSRange)editedRange changeInLength:(NSInteger)delta {
+    _topicChanged = YES;
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
@@ -291,13 +296,15 @@
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
-    if(self.tableView.editing && !editing) {
+    if(self.tableView.editing && !editing && _topicChanged) {
         [[NetworkConnection sharedInstance] topic:[ColorFormatter toIRC:_topicEdit.attributedText] chan:_channel.name cid:_channel.cid handler:nil];
     }
     [super setEditing:editing animated:animated];
     [self.tableView reloadData];
-    if(editing)
+    if(editing) {
         [_topicEdit becomeFirstResponder];
+        _topicChanged = NO;
+    }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {

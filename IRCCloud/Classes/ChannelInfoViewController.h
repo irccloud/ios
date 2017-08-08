@@ -19,7 +19,7 @@
 #import "ChannelsDataSource.h"
 #import "LinkTextView.h"
 
-@interface ChannelInfoViewController : UITableViewController<UITextViewDelegate,LinkTextViewDelegate> {
+@interface ChannelInfoViewController : UITableViewController<UITextViewDelegate,LinkTextViewDelegate,NSTextStorageDelegate> {
     Channel *_channel;
     UITextView *_topicEdit;
     NSAttributedString *_topic;
