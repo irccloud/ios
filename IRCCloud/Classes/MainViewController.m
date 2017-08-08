@@ -4326,16 +4326,16 @@ NSArray *_sortedChannels;
         
         if([action isEqualToString:@"Copy Message"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
+            NSString *irc;
             if(_selectedEvent.groupMsg.length) {
-                NSAttributedString *msg = [ColorFormatter format:[NSString stringWithFormat:@"%@ %@",_selectedEvent.timestamp,_selectedEvent.groupMsg] defaultColor:nil mono:NO linkify:NO server:nil links:nil];
-                pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string}];
+                irc = [NSString stringWithFormat:@"%@ %@",_selectedEvent.timestamp,_selectedEvent.groupMsg];
             } else if(_selectedEvent.from.length || [_selectedEvent.type isEqualToString:@"buffer_me_msg"]) {
-                NSAttributedString *msg = [_selectedEvent.type isEqualToString:@"buffer_me_msg"]?[ColorFormatter format:[NSString stringWithFormat:@"%@ %c— %@%c %@",_selectedEvent.timestamp,BOLD,_selectedEvent.nick,CLEAR,_selectedEvent.msg] defaultColor:nil mono:NO linkify:NO server:nil links:nil]:[ColorFormatter format:[NSString stringWithFormat:@"%@ %c<%@>%c %@",_selectedEvent.timestamp,BOLD,_selectedEvent.from,CLEAR,_selectedEvent.msg] defaultColor:nil mono:NO linkify:NO server:nil links:nil];
-                pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string}];
+                irc = [_selectedEvent.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ %c— %@%c %@",_selectedEvent.timestamp,BOLD,_selectedEvent.nick,CLEAR,_selectedEvent.msg]:[NSString stringWithFormat:@"%@ %c<%@>%c %@",_selectedEvent.timestamp,BOLD,_selectedEvent.from,CLEAR,_selectedEvent.msg];
             } else {
-                NSAttributedString *msg = [ColorFormatter format:[NSString stringWithFormat:@"%@ %@",_selectedEvent.timestamp,_selectedEvent.msg] defaultColor:nil mono:NO linkify:NO server:nil links:nil];
-                pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string}];
+                irc = [NSString stringWithFormat:@"%@ %@",_selectedEvent.timestamp,_selectedEvent.msg];
             }
+            NSAttributedString *msg = [ColorFormatter format:irc defaultColor:nil mono:NO linkify:NO server:nil links:nil];
+            pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string,@"IRC formatting type":[irc dataUsingEncoding:NSUTF8StringEncoding]}];
         } else if([action isEqualToString:@"Clear Backlog"]) {
             int bid = _selectedBuffer?_selectedBuffer.bid:_selectedEvent.bid;
             [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
@@ -4700,6 +4700,13 @@ Network type: %@\n",
             }
         }
         [self imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image}];
+    } else if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"]) {
+        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
+        if(_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:_message.selectedRange];
+        [msg insertAttributedString:[ColorFormatter format:[[NSString alloc] initWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"] encoding:NSUTF8StringEncoding] defaultColor:_message.textColor mono:NO linkify:NO server:nil links:nil] atIndex:_message.internalTextView.selectedRange.location];
+        
+        [_message setAttributedText:msg];
     } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF]) {
         NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
         if(_message.selectedRange.length > 0)
