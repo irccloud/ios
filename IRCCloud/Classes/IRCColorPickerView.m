@@ -22,23 +22,18 @@
 -(instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
+        _background = [[UIView alloc] initWithFrame:CGRectZero];
+        [self addSubview:_background];
         for(int i = 0; i < 16; i++) {
-            _fgLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-            _fgLabel.font = [UIFont boldSystemFontOfSize:14];
-            _fgLabel.text = @"Foreground Color";
-            [self addSubview:_fgLabel];
             _fg[i] = [UIButton buttonWithType:UIButtonTypeCustom];
             [_fg[i] addTarget:self action:@selector(fgButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:_fg[i]];
-            _bgLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-            _bgLabel.font = [UIFont boldSystemFontOfSize:14];
-            _bgLabel.text = @"Background Color";
-            [self addSubview:_bgLabel];
+            [_background addSubview:_fg[i]];
             _bg[i] = [UIButton buttonWithType:UIButtonTypeCustom];
             [_bg[i] addTarget:self action:@selector(bgButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:_bg[i]];
-            [self addTarget:self action:@selector(close:) forControlEvents:UIControlEventTouchUpOutside];
+            [_background addSubview:_bg[i]];
         }
+        self.layer.masksToBounds = YES;
+        self.layer.cornerRadius = 4;
     }
     return self;
 }
@@ -56,27 +51,27 @@
 }
 
 -(CGSize)intrinsicContentSize {
-    return CGSizeMake(272, 88);
+    return CGSizeMake(274, 70);
 }
 
 -(void)layoutSubviews {
-    CGFloat bw = self.frame.size.width / 8;
-    _fgLabel.frame = _bgLabel.frame = CGRectMake(0,2,self.frame.size.width,16);
+    _background.frame = CGRectInset(self.bounds, 2, 2);
+    CGFloat bw = _background.bounds.size.width / 8;
 
     for(int i = 0; i < 8; i++) {
-        _fg[i].frame = CGRectMake(i*bw + 1, 20, bw - 2, 32);
-        _bg[i].frame = CGRectMake(i*bw + 1, 20, bw - 2, 32);
+        _fg[i].frame = CGRectMake(i*bw + 1, 0, bw - 2, 32);
+        _bg[i].frame = CGRectMake(i*bw + 1, 0, bw - 2, 32);
     }
 
     for(int i = 0; i < 8; i++) {
-        _fg[i+8].frame = CGRectMake(i*bw + 1, 54, bw - 2, 32);
-        _bg[i+8].frame = CGRectMake(i*bw + 1, 54, bw - 2, 32);
+        _fg[i+8].frame = CGRectMake(i*bw + 1, 34, bw - 2, 32);
+        _bg[i+8].frame = CGRectMake(i*bw + 1, 34, bw - 2, 32);
     }
 }
 
 -(void)updateButtonColors:(BOOL)background {
-    self.backgroundColor = [UIColor textareaBackgroundColor];
-    _fgLabel.textColor = _bgLabel.textColor = [UIColor navBarHeadingColor];
+    self.backgroundColor = [UIColor bufferBorderColor];
+    _background.backgroundColor = [UIColor bufferBackgroundColor];
     
     for(int i = 0; i < 16; i++)
         _fg[i].backgroundColor = [UIColor mIRCColor:i background:NO];
@@ -87,17 +82,13 @@
     if(background) {
         for(int i = 0; i < 16; i++)
             _fg[i].hidden = YES;
-        _fgLabel.hidden = YES;
         for(int i = 0; i < 16; i++)
             _bg[i].hidden = NO;
-        _bgLabel.hidden = NO;
     } else {
         for(int i = 0; i < 16; i++)
             _fg[i].hidden = NO;
-        _fgLabel.hidden = NO;
         for(int i = 0; i < 16; i++)
             _bg[i].hidden = YES;
-        _bgLabel.hidden = YES;
     }
 }
 

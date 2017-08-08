@@ -74,7 +74,7 @@
     _topicEdit.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     _topicEdit.allowsEditingTextAttributes = YES;
     
-    _colorPickerView = [[IRCColorPickerView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width / 2 - 272 / 2,20,272,88)];
+    _colorPickerView = [[IRCColorPickerView alloc] initWithFrame:CGRectMake(self.view.bounds.size.width / 2 - 274 / 2,20,274,70)];
     _colorPickerView.delegate = self;
     _colorPickerView.alpha = 0;
     [_colorPickerView updateButtonColors:YES];
