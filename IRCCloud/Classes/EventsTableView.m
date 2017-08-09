@@ -1964,15 +1964,6 @@ extern UIImage *__socketClosedBackgroundImage;
     @synchronized (e) {
         NSArray *links;
         [_lock lock];
-        if(!__disableBigEmojiPref) {
-            NSMutableString *msg = [e.msg mutableCopy];
-            if(msg) {
-                [ColorFormatter emojify:msg];
-                e.isEmojiOnly = [ColorFormatter emojiOnly:msg];
-            }
-        } else {
-            e.isEmojiOnly = NO;
-        }
         if(e.from.length)
             e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf) defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43"] defaultColor:e.color mono:__monospacePref linkify:NO server:nil links:nil];
         if([e.realname isKindOfClass:[NSString class]] && e.realname.length) {
@@ -1985,6 +1976,12 @@ extern UIImage *__socketClosedBackgroundImage;
         else
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
         
+        if(!__disableBigEmojiPref) {
+            e.isEmojiOnly = [ColorFormatter emojiOnly:e.formatted.string];
+        } else {
+            e.isEmojiOnly = NO;
+        }
+
         if(e.formatted.length) {
             NSMutableAttributedString *padded = e.formatted.mutableCopy;
             [padded appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];

@@ -2306,6 +2306,7 @@ extern BOOL __compact;
     int index = 0;
     NSRange range;
     while(index < string.length) {
+        BOOL shouldClear = NO;
         for(NSString *key in [string attributesAtIndex:index effectiveRange:&range]) {
             NSString *fgColor = nil;
             NSString *bgColor = nil;
@@ -2313,16 +2314,22 @@ extern BOOL __compact;
             int bgColormIRC = -1;
             if([key isEqualToString:NSFontAttributeName]) {
                 UIFont *font = [string attribute:key atIndex:index effectiveRange:nil];
-                if(font.fontDescriptor.symbolicTraits & kCTFontBoldTrait)
+                if(font.fontDescriptor.symbolicTraits & kCTFontBoldTrait) {
                     [formattedMsg appendFormat:@"%c", BOLD];
-                if(font.fontDescriptor.symbolicTraits & kCTFontItalicTrait)
+                    shouldClear = YES;
+                }
+                if(font.fontDescriptor.symbolicTraits & kCTFontItalicTrait) {
                     [formattedMsg appendFormat:@"%c", ITALICS];
+                    shouldClear = YES;
+                }
             } else if([key isEqualToString:NSUnderlineStyleAttributeName]) {
                 NSNumber *style = [string attribute:key atIndex:index effectiveRange:nil];
                 if(style.integerValue != NSUnderlineStyleNone)
                     [formattedMsg appendFormat:@"%c", UNDERLINE];
+                shouldClear = YES;
             } else if([key isEqualToString:NSStrikethroughStyleAttributeName]) {
                 [formattedMsg appendFormat:@"%c", STRIKETHROUGH];
+                shouldClear = YES;
             } else if([key isEqualToString:NSForegroundColorAttributeName]) {
                 UIColor *c = [string attribute:key atIndex:index effectiveRange:nil];
                 if(![c isEqual:[UIColor textareaTextColor]]) {
@@ -2351,9 +2358,11 @@ extern BOOL __compact;
                     if(bgColor)
                         [formattedMsg appendFormat:@",%@",bgColor];
                 }
+                shouldClear = YES;
             }
         }
-        [formattedMsg appendFormat:@"%@%c", [text substringWithRange:range], CLEAR];
+        if(shouldClear)
+            [formattedMsg appendFormat:@"%@%c", [text substringWithRange:range], CLEAR];
         index += range.length;
     }
     
