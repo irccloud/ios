@@ -1548,6 +1548,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
+-(void)_createJSONParser {
+    _parser = [SBJson5Parser multiRootParserWithBlock:^(id item, BOOL *stop) {
+        [self parse:item backlog:NO];
+    } errorHandler:^(NSError *error) {
+        CLS_LOG(@"JSON ERROR: %@", error);
+        _streamId = nil;
+        _highestEID = 0;
+    }];
+}
 
 -(void)connect:(BOOL)notifier {
     @synchronized(self) {
@@ -1650,14 +1659,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         __socketPaused = NO;
         _lastReqId = 1;
         [_resultHandlers removeAllObjects];
-        _parser = [SBJson5Parser multiRootParserWithBlock:^(id item, BOOL *stop) {
-            [self parse:item backlog:NO];
-        } errorHandler:^(NSError *error) {
-            CLS_LOG(@"JSON ERROR: %@", error);
-            _streamId = nil;
-            _highestEID = 0;
-        }];
         
+        [self performSelectorOnMainThread:@selector(_createJSONParser) withObject:nil waitUntilDone:YES];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
                                                                          tlsSettings:[@{
