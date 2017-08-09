@@ -2361,8 +2361,12 @@ extern BOOL __compact;
                 shouldClear = YES;
             }
         }
+        
         if(shouldClear)
             [formattedMsg appendFormat:@"%@%c", [text substringWithRange:range], CLEAR];
+        else
+            [formattedMsg appendString:[text substringWithRange:range]];
+
         index += range.length;
     }
     
