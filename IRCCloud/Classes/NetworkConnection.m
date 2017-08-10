@@ -263,6 +263,7 @@ volatile BOOL __socketPaused = NO;
     _reconnectTimestamp = -1;
     _failCount = 0;
     _notifier = NO;
+    [self _createJSONParser];
     _writer = [[SBJson5Writer alloc] init];
     _reachabilityValid = NO;
     _reachability = nil;
@@ -1660,7 +1661,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _lastReqId = 1;
         [_resultHandlers removeAllObjects];
         
-        [self performSelectorOnMainThread:@selector(_createJSONParser) withObject:nil waitUntilDone:YES];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
                                                                          tlsSettings:[@{
