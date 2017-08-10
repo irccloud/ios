@@ -1636,7 +1636,7 @@ extern BOOL __compact;
     
     static NSPredicate *_pattern;
     if(!_pattern) {
-        NSString *pattern = [[NSString stringWithFormat:@"(?:%@)+", [emojiMap.allValues componentsJoinedByString:@"|"]] stringByReplacingOccurrencesOfString:@"|:)" withString:@""];
+        NSString *pattern = [[NSString stringWithFormat:@"(?:%@|\xE2\x80\x8D|\xEF\xB8\x8F)+", [emojiMap.allValues componentsJoinedByString:@"|"]] stringByReplacingOccurrencesOfString:@"|:)" withString:@""];
         NSMutableString *pattern_escaped = [@"" mutableCopy];
         
         NSScanner *scanner = [NSScanner scannerWithString:pattern];
