@@ -3860,14 +3860,15 @@ NSArray *_sortedChannels;
 
 -(void)_choosePhoto:(UIImagePickerControllerSourceType)sourceType {
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-    [picker.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     picker.sourceType = sourceType;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])
         picker.mediaTypes = [UIImagePickerController availableMediaTypesForSourceType:sourceType];
     picker.delegate = (id)self;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
+        [UIColor clearTheme];
         [self presentViewController:picker animated:YES completion:nil];
     } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone]) {
+        [UIColor clearTheme];
         picker.modalPresentationStyle = UIModalPresentationFormSheet;
         picker.preferredContentSize = CGSizeMake(540, 576);
         [self presentViewController:picker animated:YES completion:nil];
@@ -3887,8 +3888,10 @@ NSArray *_sortedChannels;
     else {
         documentPicker.modalPresentationStyle = UIModalPresentationCurrentContext;
     }
-    if(documentPicker)
+    if(documentPicker) {
+        [UIColor clearTheme];
         [self presentViewController:documentPicker animated:YES completion:nil];
+    }
 }
 
 -(void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
@@ -3917,6 +3920,7 @@ NSArray *_sortedChannels;
 }
 
 - (void)_resetStatusBar {
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
 }
 
