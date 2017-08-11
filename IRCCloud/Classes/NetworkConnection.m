@@ -1728,10 +1728,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         _state = kIRCCloudStateConnected;
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         [self performSelectorInBackground:@selector(requestConfiguration) withObject:nil];
-        [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:^(IRCCloudJSONObject *result) {
-            if(![[result objectForKey:@"success"] boolValue])
-                [self postObject:result forEvent:kIRCEventAuthFailure];
-        }];
+        [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:nil];
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");
     }
