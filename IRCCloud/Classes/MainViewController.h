@@ -117,6 +117,7 @@
     IRCColorPickerView *_colorPickerView;
     NSDictionary *_currentMessageAttributes;
     BOOL _textIsChanging;
+    UIFont *_defaultTextareaFont;
     
     id<UIViewControllerPreviewing> __previewer;
 }

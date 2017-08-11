@@ -164,7 +164,6 @@
 
 -(void)clearText
 {
-    internalTextView.typingAttributes = @{NSForegroundColorAttributeName:self.textColor, NSFontAttributeName:self.font };
     self.text = nil;
     [self textViewDidChange:self.internalTextView];
 }

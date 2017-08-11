@@ -475,6 +475,7 @@ NSArray *_sortedChannels;
     _message.autoresizesSubviews = NO;
     _message.translatesAutoresizingMaskIntoConstraints = NO;
     _message.internalTextView.allowsEditingTextAttributes = YES;
+    _defaultTextareaFont = _message.internalTextView.font;
     _messageWidthConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:0.0f];
     _messageHeightConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:36.0f];
     [_message addConstraints:@[_messageWidthConstraint, _messageHeightConstraint]];
@@ -1969,6 +1970,9 @@ NSArray *_sortedChannels;
         
         NSAttributedString *messageText = _message.attributedText;
         [self resetColors:nil];
+        _message.internalTextView.font = _defaultTextareaFont;
+        _message.internalTextView.textColor = [UIColor textareaTextColor];
+        _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
         
         if(messageText.length > 1 && [messageText.string hasSuffix:@" "])
             messageText = [messageText attributedSubstringFromRange:NSMakeRange(0, messageText.length - 1)];
