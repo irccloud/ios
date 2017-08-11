@@ -324,8 +324,8 @@ NSArray *_sortedChannels;
     [_buffersView performSelectorInBackground:@selector(refresh) withObject:nil];
     [_usersView performSelectorInBackground:@selector(refresh) withObject:nil];
     
-    [self _resetStatusBar];
-    
+    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
+
     _globalMsg.linkAttributes = [UIColor lightLinkAttributes];
 }
 
@@ -1967,12 +1967,17 @@ NSArray *_sortedChannels;
             objc_msgSend(k, sel);
         }
         
-        if(_message.text.length > 1 && [_message.text hasSuffix:@" "])
-            _message.text = [_message.text substringToIndex:_message.text.length - 1];
+        NSAttributedString *messageText = _message.attributedText;
+        [self resetColors:nil];
+        
+        if(messageText.length > 1 && [messageText.string hasSuffix:@" "])
+            messageText = [messageText attributedSubstringFromRange:NSMakeRange(0, messageText.length - 1)];
+
+        NSString *messageString = messageText.string;
         
         Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         if(s) {
-            if([_message.text isEqualToString:@"/ignore"]) {
+            if([messageString isEqualToString:@"/ignore"]) {
                 [_message clearText];
                 _buffer.draft = nil;
                 IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
@@ -1987,17 +1992,17 @@ NSArray *_sortedChannels;
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 [self presentViewController:nc animated:YES completion:nil];
                 return;
-            } else if([_message.text isEqualToString:@"/clear"]) {
+            } else if([messageString isEqualToString:@"/clear"]) {
                 [_message clearText];
                 _buffer.draft = nil;
                 [[EventsDataSource sharedInstance] removeEventsForBuffer:_buffer.bid];
                 [_eventsView refresh];
                 return;
 #ifndef APPSTORE
-            } else if([_message.text isEqualToString:@"/crash"]) {
+            } else if([messageString isEqualToString:@"/crash"]) {
                 CLS_LOG(@"/crash requested");
                 [[Crashlytics sharedInstance] crash];
-            } else if([_message.text isEqualToString:@"/compact 1"]) {
+            } else if([messageString isEqualToString:@"/compact 1"]) {
                 CLS_LOG(@"Set compact");
                 NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
                 [p setObject:@YES forKey:@"ascii-compact"];
@@ -2007,7 +2012,7 @@ NSArray *_sortedChannels;
                 [_message clearText];
                 _buffer.draft = nil;
                 return;
-            } else if([_message.text isEqualToString:@"/compact 0"]) {
+            } else if([messageString isEqualToString:@"/compact 0"]) {
                 NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
                 [p setObject:@NO forKey:@"ascii-compact"];
                 SBJson5Writer *writer = [[SBJson5Writer alloc] init];
@@ -2016,7 +2021,7 @@ NSArray *_sortedChannels;
                 [_message clearText];
                 _buffer.draft = nil;
                 return;
-            } else if([_message.text isEqualToString:@"/mono 1"]) {
+            } else if([messageString isEqualToString:@"/mono 1"]) {
                 CLS_LOG(@"Set monospace");
                 NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
                 [p setObject:@"mono" forKey:@"font"];
@@ -2026,7 +2031,7 @@ NSArray *_sortedChannels;
                 [_message clearText];
                 _buffer.draft = nil;
                 return;
-            } else if([_message.text isEqualToString:@"/mono 0"]) {
+            } else if([messageString isEqualToString:@"/mono 0"]) {
                 NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
                 [p setObject:@"sans" forKey:@"font"];
                 SBJson5Writer *writer = [[SBJson5Writer alloc] init];
@@ -2035,9 +2040,9 @@ NSArray *_sortedChannels;
                 [_message clearText];
                 _buffer.draft = nil;
                 return;
-            } else if([_message.text hasPrefix:@"/fontsize "]) {
+            } else if([messageString hasPrefix:@"/fontsize "]) {
                 [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:
-                                                                  MIN(FONT_MAX, MAX(FONT_MIN, [[_message.text substringFromIndex:10] intValue]))
+                                                                  MIN(FONT_MAX, MAX(FONT_MIN, [[messageString substringFromIndex:10] intValue]))
                                                                   ]
                                                           forKey:@"fontSize"];
                 if([ColorFormatter shouldClearFontCache]) {
@@ -2052,14 +2057,14 @@ NSArray *_sortedChannels;
                 [_message clearText];
                 _buffer.draft = nil;
                 return;
-            } else if([_message.text isEqualToString:@"/read"]) {
+            } else if([messageString isEqualToString:@"/read"]) {
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:_eventsView.YUNoHeartbeat delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
                 [alert show];
                 [_message clearText];
                 _buffer.draft = nil;
                 return;
 #endif
-            } else if(_message.text.length > 1080 || [_message.text isEqualToString:@"/paste"] || [_message.text hasPrefix:@"/paste "] || [_message.text rangeOfString:@"\n"].location < _message.text.length - 1) {
+            } else if(messageString.length > 1080 || [messageString isEqualToString:@"/paste"] || [messageString hasPrefix:@"/paste "] || [messageString rangeOfString:@"\n"].location < messageString.length - 1) {
                 BOOL prompt = YES;
                 if([[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
                     prompt = ![[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] boolValue];
@@ -2067,12 +2072,12 @@ NSArray *_sortedChannels;
                     prompt = YES;
                 }
 
-                if(prompt || [_message.text isEqualToString:@"/paste"] || [_message.text hasPrefix:@"/paste "]) {
-                    if([_message.text isEqualToString:@"/paste"])
+                if(prompt || [messageString isEqualToString:@"/paste"] || [messageString hasPrefix:@"/paste "]) {
+                    if([messageString isEqualToString:@"/paste"])
                        [_message clearText];
-                    else if([_message.text hasPrefix:@"/paste "])
-                        _message.text = [_message.text substringFromIndex:7];
-                    _buffer.draft = _message.text;
+                    else if([messageString hasPrefix:@"/paste "])
+                        messageString = [messageString substringFromIndex:7];
+                    _buffer.draft = messageString;
                     PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
                     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
                     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
@@ -2086,7 +2091,7 @@ NSArray *_sortedChannels;
                     return;
                 }
 #ifndef APPSTORE
-            } else if([_message.text isEqualToString:@"/buffers"]) {
+            } else if([messageString isEqualToString:@"/buffers"]) {
                 [_message clearText];
                 _buffer.draft = nil;
                 NSMutableString *msg = [[NSMutableString alloc] init];
@@ -2132,7 +2137,7 @@ NSArray *_sortedChannels;
                 [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
                 return;
 #endif
-            } else if([_message.text isEqualToString:@"/badge"]) {
+            } else if([messageString isEqualToString:@"/badge"]) {
                 [_message clearText];
                 _buffer.draft = nil;
                 if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
@@ -2191,8 +2196,8 @@ NSArray *_sortedChannels;
             
             User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
             Event *e = [[Event alloc] init];
-            NSMutableString *msg = _message.text.mutableCopy;
-            NSMutableString *formattedMsg = [ColorFormatter toIRC:_message.attributedText].mutableCopy;
+            NSMutableString *msg = messageString.mutableCopy;
+            NSMutableString *formattedMsg = [ColorFormatter toIRC:messageText].mutableCopy;
             
             BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
             if(!disableConvert)
@@ -2213,10 +2218,10 @@ NSArray *_sortedChannels;
                 e.nick = s.nick;
                 if(u)
                     e.fromMode = u.mode;
-                e.msg = msg;
+                e.msg = formattedMsg;
                 if(msg && [[msg lowercaseString] hasPrefix:@"/me "]) {
                     e.type = @"buffer_me_msg";
-                    e.msg = [msg substringFromIndex:4];
+                    e.msg = [formattedMsg substringFromIndex:4];
                 } else {
                     e.type = @"buffer_msg";
                 }
@@ -3921,6 +3926,7 @@ NSArray *_sortedChannels;
 
 - (void)_resetStatusBar {
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [self applyTheme];
     [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
 }
 
