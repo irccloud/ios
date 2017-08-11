@@ -2628,6 +2628,13 @@ NSArray *_sortedChannels;
         _eidToOpen = -1;
     }
 
+    if(changed) {
+        [self resetColors:nil];
+        _message.internalTextView.font = _defaultTextareaFont;
+        _message.internalTextView.textColor = [UIColor textareaTextColor];
+        _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
+    }
+    
     Buffer *lastBuffer = _buffer;
     _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if(lastBuffer && changed) {
