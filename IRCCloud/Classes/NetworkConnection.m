@@ -449,6 +449,8 @@ volatile BOOL __socketPaused = NO;
     _parserMap = @{
                    @"idle":ignored, @"end_of_backlog":ignored, @"oob_skipped":ignored, @"num_invites":ignored, @"user_account":ignored,
                    @"header": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       _state = kIRCCloudStateConnected;
+                       [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
                        _idleInterval = ([[object objectForKey:@"idle_interval"] doubleValue] / 1000.0) + 10;
                        _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
                        _streamId = [object objectForKey:@"streamid"];
@@ -1253,7 +1255,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args handler:(IRCCloudAPIResultHandler)resultHandler {
     @synchronized(_writer) {
-        if(_state == kIRCCloudStateConnected) {
+        if(_state == kIRCCloudStateConnected || [method isEqualToString:@"auth"]) {
             NSMutableDictionary *dict = args?[[NSMutableDictionary alloc] initWithDictionary:args]:[[NSMutableDictionary alloc] init];
             [dict setObject:method forKey:@"_method"];
             if(![method isEqualToString:@"auth"])
@@ -1725,10 +1727,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         CLS_LOG(@"Socket connected");
         _idleInterval = 20;
         _reconnectTimestamp = -1;
-        _state = kIRCCloudStateConnected;
+        [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:nil];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         [self performSelectorInBackground:@selector(requestConfiguration) withObject:nil];
-        [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:nil];
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");
     }
