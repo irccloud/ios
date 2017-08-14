@@ -1762,7 +1762,8 @@ extern UIImage *__socketClosedBackgroundImage;
             __timestampWidth += [@":88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
         if(!__24hrPref)
             __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:f}].width;
-        __timestampWidth += 4;
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 11)
+            __timestampWidth += 4;
         
         _file_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
         _paste_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
