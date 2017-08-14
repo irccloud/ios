@@ -4785,6 +4785,11 @@ Network type: %@\n",
              [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:) discoverabilityTitle:@"Complete nicknames and channels"],
              [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(onCmdRPressed:) discoverabilityTitle:@"Mark channel as read"],
              [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftCmdRPressed:) discoverabilityTitle:@"Mark all channels as read"],
+             [UIKeyCommand keyCommandWithInput:@"b" modifierFlags:UIKeyModifierCommand action:@selector(onCmdBPressed:) discoverabilityTitle:@"Bold"],
+             [UIKeyCommand keyCommandWithInput:@"i" modifierFlags:UIKeyModifierCommand action:@selector(onCmdIPressed:) discoverabilityTitle:@"Italic"],
+             [UIKeyCommand keyCommandWithInput:@"u" modifierFlags:UIKeyModifierCommand action:@selector(onCmdUPressed:) discoverabilityTitle:@"Underline"],
+             [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageUp" modifierFlags:0 action:@selector(onPgUpPressed:)],
+             [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageDown" modifierFlags:0 action:@selector(onPgDownPressed:)],
              ];
     } else {
         return @[
@@ -4799,7 +4804,73 @@ Network type: %@\n",
             [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:)],
             [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(onCmdRPressed:)],
             [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftCmdRPressed:)],
+            [UIKeyCommand keyCommandWithInput:@"b" modifierFlags:UIKeyModifierCommand action:@selector(onCmdBPressed:)],
+            [UIKeyCommand keyCommandWithInput:@"i" modifierFlags:UIKeyModifierCommand action:@selector(onCmdIPressed:)],
+            [UIKeyCommand keyCommandWithInput:@"u" modifierFlags:UIKeyModifierCommand action:@selector(onCmdUPressed:)],
+            [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageUp" modifierFlags:0 action:@selector(onPgUpPressed:)],
+            [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageDown" modifierFlags:0 action:@selector(onPgDownPressed:)],
         ];
+    }
+}
+
+-(void)getMessageAttributesBold:(BOOL *)bold italic:(BOOL *)italic underline:(BOOL *)underline {
+    UIFont *font = [_message.internalTextView.typingAttributes objectForKey:NSFontAttributeName];
+    
+    *bold = font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold;
+    *italic = font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitItalic;
+    *underline = [[_message.internalTextView.typingAttributes objectForKey:NSUnderlineStyleAttributeName] intValue] == NSUnderlineStyleSingle;
+}
+
+-(void)setMessageAttributesBold:(BOOL)bold italic:(BOOL)italic underline:(BOOL)underline {
+    UIFont *font = [_message.internalTextView.typingAttributes objectForKey:NSFontAttributeName];
+    UIFontDescriptorSymbolicTraits traits = 0;
+    
+    if(bold)
+        traits |= UIFontDescriptorTraitBold;
+    
+    if(italic)
+        traits |= UIFontDescriptorTraitItalic;
+    
+    font = [UIFont fontWithDescriptor:[font.fontDescriptor fontDescriptorWithSymbolicTraits:traits] size:font.pointSize];
+    
+    NSMutableDictionary *attributes = _message.internalTextView.typingAttributes.mutableCopy;
+    [attributes setObject:@(underline?NSUnderlineStyleSingle:NSUnderlineStyleNone) forKey:NSUnderlineStyleAttributeName];
+    [attributes setObject:font forKey:NSFontAttributeName];
+    _message.internalTextView.typingAttributes = attributes;
+}
+
+-(void)onCmdBPressed:(UIKeyCommand *)sender {
+    BOOL hasBold, hasItalic, hasUnderline;
+    
+    [self getMessageAttributesBold:&hasBold italic:&hasItalic underline:&hasUnderline];
+    [self setMessageAttributesBold:!hasBold italic:hasItalic underline:hasUnderline];
+}
+
+-(void)onCmdIPressed:(UIKeyCommand *)sender {
+    BOOL hasBold, hasItalic, hasUnderline;
+    
+    [self getMessageAttributesBold:&hasBold italic:&hasItalic underline:&hasUnderline];
+    [self setMessageAttributesBold:hasBold italic:!hasItalic underline:hasUnderline];
+}
+
+-(void)onCmdUPressed:(UIKeyCommand *)sender {
+    BOOL hasBold, hasItalic, hasUnderline;
+    
+    [self getMessageAttributesBold:&hasBold italic:&hasItalic underline:&hasUnderline];
+    [self setMessageAttributesBold:hasBold italic:hasItalic underline:!hasUnderline];
+}
+
+-(void)onPgUpPressed:(UIKeyCommand *)sender {
+    NSIndexPath *first = [_eventsView.tableView indexPathsForVisibleRows].firstObject;
+    if(first && first.row > 0) {
+        [_eventsView.tableView scrollToRowAtIndexPath:first atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+    }
+}
+
+-(void)onPgDownPressed:(UIKeyCommand *)sender {
+    NSIndexPath *last = [_eventsView.tableView indexPathsForVisibleRows].lastObject;
+    if(last && last.row > 0) {
+        [_eventsView.tableView scrollToRowAtIndexPath:last atScrollPosition:UITableViewScrollPositionTop animated:YES];
     }
 }
 
