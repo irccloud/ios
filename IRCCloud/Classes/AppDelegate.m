@@ -558,7 +558,7 @@
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self showMainView:YES];
         [_mainViewController presentViewController:nc animated:YES completion:nil];
-    } else if(_movedToBackground && application.applicationState != UIApplicationStateActive) {
+    } else {
         if([userInfo objectForKey:@"d"]) {
             self.mainViewController.bidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
             self.mainViewController.eidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
