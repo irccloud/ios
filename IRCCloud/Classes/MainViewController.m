@@ -3911,10 +3911,14 @@ NSArray *_sortedChannels;
 }
 
 -(void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [self applyTheme];
     [self _resetStatusBar];
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url {
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [self applyTheme];
     FileUploader *u = [[FileUploader alloc] init];
     u.delegate = self;
     u.bid = _buffer.bid;
@@ -3931,17 +3935,19 @@ NSArray *_sortedChannels;
 }
 
 -(void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [self applyTheme];
     [self _resetStatusBar];
     _popover = nil;
 }
 
 - (void)_resetStatusBar {
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
-    [self applyTheme];
     [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [self applyTheme];
     FileMetadataViewController *fvc = nil;
     NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
     NSURL *mediaURL = [info valueForKey:UIImagePickerControllerMediaURL];
@@ -4086,6 +4092,8 @@ NSArray *_sortedChannels;
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     CLS_LOG(@"Image picker was cancelled");
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [self applyTheme];
     [self dismissViewControllerAnimated:YES completion:nil];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
