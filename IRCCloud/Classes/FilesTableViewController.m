@@ -241,7 +241,7 @@
     
     NSString *e = [file objectForKey:@"extension"];
     if(!e.length && [[file objectForKey:@"mime_type"] rangeOfString:@"/"].location != NSNotFound)
-        e = [[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location];
+        e = [[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1];
     if([e hasPrefix:@"."])
         e = [e substringFromIndex:1];
     cell.extension.text = [e uppercaseString];
