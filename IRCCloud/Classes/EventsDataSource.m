@@ -346,6 +346,8 @@
             if(object) {
                 if([event.type isEqualToString:@"cap_ls"])
                     event.msg = [NSString stringWithFormat:@"%cCAP%c Server supports: ", BOLD, BOLD];
+                else if([event.type isEqualToString:@"cap_list"])
+                    event.msg = [NSString stringWithFormat:@"%cCAP%c Enabled: ", BOLD, BOLD];
                 else if([event.type isEqualToString:@"cap_req"])
                     event.msg = [NSString stringWithFormat:@"%cCAP%c Requesting: ", BOLD, BOLD];
                 else if([event.type isEqualToString:@"cap_ack"])
@@ -358,6 +360,8 @@
                     event.msg = [NSString stringWithFormat:@"%cCAP%c Server removed: ", BOLD, BOLD];
                 else if([event.type isEqualToString:@"cap_raw"])
                     event.msg = [object objectForKey:@"line"];
+                else if([event.type isEqualToString:@"cap_invalid"])
+                    event.msg = [NSString stringWithFormat:@"%cCAP%c %@", BOLD, BOLD, event.msg];
                 if([object objectForKey:@"caps"])
                     event.msg = [event.msg stringByAppendingString:[[object objectForKey:@"caps"] componentsJoinedByString:@" | "]];
             }
@@ -377,7 +381,7 @@
                           @"btn_metadata_set": status, @"logged_in_as": status, @"sasl_success": status, @"you_are_operator": status,
                           @"server_snomask": status, @"starircd_welcome": status, @"zurna_motd": status, @"codepage": status, @"logged_out": status,
                           @"nick_locked": status, @"text": status, @"admin_info": status,
-                          @"cap_ls": cap, @"cap_req": cap, @"cap_ack": cap, @"cap_raw": cap, @"cap_nak": cap, @"cap_new": cap, @"cap_del": cap,
+                          @"cap_ls": cap, @"cap_list": cap, @"cap_req": cap, @"cap_ack": cap, @"cap_raw": cap, @"cap_nak": cap, @"cap_new": cap, @"cap_del": cap, @"cap_invalid": cap, 
                           @"unhandled_line":unhandled_line, @"unparsed_line":unhandled_line,
                           @"kicked_channel":kicked_channel, @"you_kicked_channel":kicked_channel,
                           @"motd_response":motd, @"server_motd":motd, @"info_response":motd,
