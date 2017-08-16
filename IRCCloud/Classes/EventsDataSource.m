@@ -818,6 +818,35 @@
                               event.color = [UIColor collapsedRowTextColor];
                               event.linkify = NO;
                           },
+                          @"loaded_module":^(Event *event, IRCCloudJSONObject *object) {
+                              if(object) {
+                                  event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"module"], BOLD, [object objectForKey:@"msg"]];
+                              }
+                              event.bgColor = [UIColor statusBackgroundColor];
+                              event.linkify = NO;
+                              event.monospace = YES;
+                          },
+                          @"unloaded_module":^(Event *event, IRCCloudJSONObject *object) {
+                              if(object) {
+                                  event.msg = [NSString stringWithFormat:@"%c%@%c %@", BOLD, [object objectForKey:@"module"], BOLD, [object objectForKey:@"msg"]];
+                              }
+                              event.bgColor = [UIColor statusBackgroundColor];
+                              event.linkify = NO;
+                              event.monospace = YES;
+                          },
+                          @"invite_notify":^(Event *event, IRCCloudJSONObject *object) {
+                              if(object) {
+                                  event.msg = [NSString stringWithFormat:@"invited %@ to join %@", [object objectForKey:@"target"], [object objectForKey:@"channel"]];
+                              }
+                              event.bgColor = [UIColor statusBackgroundColor];
+                              event.linkify = YES;
+                              event.monospace = YES;
+                          },
+                          @"channel_name_change":^(Event *event, IRCCloudJSONObject *object) {
+                              if(object) {
+                                  event.msg = [NSString stringWithFormat:@"renamed the channel: %@ → %c%@%c", [object objectForKey:@"old_name"], BOLD, [object objectForKey:@"new_name"], BOLD];
+                              }
+                          },
       };
     }
     return self;

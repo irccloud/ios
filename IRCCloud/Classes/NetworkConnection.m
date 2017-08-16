@@ -447,7 +447,7 @@ volatile BOOL __socketPaused = NO;
     };
     
     _parserMap = @{
-                   @"idle":ignored, @"end_of_backlog":ignored, @"oob_skipped":ignored, @"num_invites":ignored, @"user_account":ignored,
+                   @"idle":ignored, @"end_of_backlog":ignored, @"oob_skipped":ignored, @"num_invites":ignored, @"user_account":ignored, @"twitch_hosttarget_start":ignored, @"twitch_hosttarget_stop":ignored, @"twitch_usernotice":ignored,
                    @"header": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        _state = kIRCCloudStateConnected;
                        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
@@ -777,7 +777,7 @@ volatile BOOL __socketPaused = NO;
                    @"sasl_aborted": msg, @"sasl_already": msg, @"you_are_operator": msg,
                    @"btn_metadata_set": msg, @"sasl_success": msg, @"cap_ls": msg, @"cap_list": msg, @"cap_new": msg, @"cap_del": msg, @"cap_req": msg,@"cap_ack": msg,@"cap_nak": msg,@"cap_raw": msg,@"cap_invalid": msg,
                    @"help_topics_start": msg, @"help_topics": msg, @"help_topics_end": msg, @"helphdr": msg, @"helpop": msg, @"helptlr": msg, @"helphlp": msg, @"helpfwd": msg, @"helpign": msg, @"version": msg,
-                   @"newsflash": msg, @"invited": msg, @"server_snomask": msg, @"codepage": msg, @"logged_out": msg, @"nick_locked": msg, @"info_response": msg, @"generic_server_info": msg, @"unknown_umode": msg, @"bad_ping": msg, @"cap_raw": msg, @"rehashed_config": msg, @"knock": msg, @"bad_channel_mask": msg, @"kill_deny": msg, @"chan_own_priv_needed": msg, @"not_for_halfops": msg, @"chan_forbidden": msg, @"starircd_welcome": msg, @"zurna_motd": msg, @"ambiguous_error_message": msg, @"list_usage": msg, @"list_syntax": msg, @"who_syntax": msg, @"text": msg, @"admin_info": msg, @"watch_status": msg, @"sqline_nick": msg, @"user_chghost": msg,
+                   @"newsflash": msg, @"invited": msg, @"server_snomask": msg, @"codepage": msg, @"logged_out": msg, @"nick_locked": msg, @"info_response": msg, @"generic_server_info": msg, @"unknown_umode": msg, @"bad_ping": msg, @"cap_raw": msg, @"rehashed_config": msg, @"knock": msg, @"bad_channel_mask": msg, @"kill_deny": msg, @"chan_own_priv_needed": msg, @"not_for_halfops": msg, @"chan_forbidden": msg, @"starircd_welcome": msg, @"zurna_motd": msg, @"ambiguous_error_message": msg, @"list_usage": msg, @"list_syntax": msg, @"who_syntax": msg, @"text": msg, @"admin_info": msg, @"watch_status": msg, @"sqline_nick": msg, @"user_chghost": msg, @"loaded_module": msg, @"unloaded_module": msg, @"invite_notify":msg, @"channel_name_change": msg,
                    @"time": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        Event *event = [_events addJSONObject:object];
                        if(!backlog && !_resuming) {

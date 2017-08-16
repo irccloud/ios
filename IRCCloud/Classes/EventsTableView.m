@@ -1217,6 +1217,15 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
             } else if([type isEqualToString:@"user_chghost"]) {
                 event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO], event.msg];
+            } else if([type isEqualToString:@"channel_name_change"]) {
+                if(event.from.length) {
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.msg];
+                } else {
+                    NSString *from = @"The server ";
+                    if(event.server.length)
+                        from = [from stringByAppendingFormat:@"%@ ",event.server];
+                    event.formattedMsg = [NSString stringWithFormat:@"%@%@", from, event.msg];
+                }
             }
         }
         
