@@ -110,6 +110,7 @@
     NSMutableDictionary *_lastEIDs;
     NSDictionary *_formatterMap;
 }
+@property (readonly) NSDictionary *formatterMap;
 +(EventsDataSource *)sharedInstance;
 -(void)serialize;
 -(void)clear;

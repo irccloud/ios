@@ -160,6 +160,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
     NSTimeInterval _highestEID;
     NSMutableDictionary *_resultHandlers;
 }
+@property (readonly) NSDictionary *parserMap;
 @property (readonly) kIRCCloudState state;
 @property NSDictionary *userInfo;
 @property (readonly) NSTimeInterval clockOffset;

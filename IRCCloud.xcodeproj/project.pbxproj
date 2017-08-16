@@ -257,6 +257,7 @@
 		2251693317B5A8040093ADC5 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
 		225173E71DB13A5500D63405 /* SourceSansPro-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 225173E21DB13A5500D63405 /* SourceSansPro-Semibold.otf */; };
 		225173E81DB13A5500D63405 /* SourceSansPro-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 225173E21DB13A5500D63405 /* SourceSansPro-Semibold.otf */; };
+		2252EE5B1F4485C000307010 /* MessageTypeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2252EE5A1F4485C000307010 /* MessageTypeTests.m */; };
 		2253BA251770CD7200CCA77F /* ChannelListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */; };
 		225D973818AA995900065087 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A057B16D3DABA0029769C /* main.m */; };
 		225D973918AA995900065087 /* ServerReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22462B5118906B03009EF986 /* ServerReorderViewController.m */; };
@@ -886,6 +887,7 @@
 		225017601783434900066E71 /* TUSafariActivity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TUSafariActivity.m; sourceTree = "<group>"; };
 		2251693217B5A8040093ADC5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/TUSafariActivity.strings; sourceTree = "<group>"; };
 		225173E21DB13A5500D63405 /* SourceSansPro-Semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-Semibold.otf"; sourceTree = "<group>"; };
+		2252EE5A1F4485C000307010 /* MessageTypeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessageTypeTests.m; sourceTree = "<group>"; };
 		2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelListTableViewController.m; sourceTree = "<group>"; };
 		2253BA261770CDC500CCA77F /* ChannelListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelListTableViewController.h; sourceTree = "<group>"; };
 		225D979F18AA995900065087 /* IRCEnterprise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCEnterprise.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1315,6 +1317,7 @@
 				224589C61DCA19BB00D3110A /* CollapsedEventsTests.m */,
 				224291641EB22B1000878455 /* URLtoBIDTests.m */,
 				224589C81DCA19BB00D3110A /* Info.plist */,
+				2252EE5A1F4485C000307010 /* MessageTypeTests.m */,
 			);
 			path = IRCCloudUnitTests;
 			sourceTree = "<group>";
@@ -2526,6 +2529,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				224291651EB22B1000878455 /* URLtoBIDTests.m in Sources */,
+				2252EE5B1F4485C000307010 /* MessageTypeTests.m in Sources */,
 				224589C71DCA19BB00D3110A /* CollapsedEventsTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

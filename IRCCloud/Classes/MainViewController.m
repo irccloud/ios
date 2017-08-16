@@ -105,6 +105,15 @@ NSArray *_sortedChannels;
 
 @implementation UpdateSuggestionsTask
 
+-(UIExpandingTextView *)message {
+    return _message;
+}
+
+-(void)setMessage:(UIExpandingTextView *)message {
+    _message = message;
+    _text = message.text;
+}
+
 -(void)cancel {
     _cancelled = YES;
 }
@@ -113,8 +122,8 @@ NSArray *_sortedChannels;
     NSMutableSet *suggestions_set = [[NSMutableSet alloc] init];
     NSMutableArray *suggestions = [[NSMutableArray alloc] init];
     
-    if(_message.text.length > 0) {
-        NSString *text = [_message.text lowercaseString];
+    if(_text.length > 0) {
+        NSString *text = _text.lowercaseString;
         NSUInteger lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
         if(lastSpace != NSNotFound && lastSpace != text.length) {
             text = [text substringFromIndex:lastSpace + 1];

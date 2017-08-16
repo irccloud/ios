@@ -35,6 +35,7 @@
     UIExpandingTextView *_message;
     Buffer *_buffer;
     NickCompletionView *_nickCompletionView;
+    NSString *_text;
 }
 
 @property UIExpandingTextView *message;
