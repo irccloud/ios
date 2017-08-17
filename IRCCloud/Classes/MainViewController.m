@@ -1032,6 +1032,50 @@ NSArray *_sortedChannels;
                 }
                 msg = [msg stringByAppendingFormat:@" — %@", [o objectForKey:@"time_server"]];
             }
+            else if([type isEqualToString:@"blocked_channel"])
+                msg = @"This channel is blocked, you have been disconnected.";
+            else if([type isEqualToString:@"unknown_error"])
+                msg = [NSString stringWithFormat:@"Unknown Error [%@] %@", [o objectForKey:@"command"], [o objectForKey:@"msg"]];
+            else if([type isEqualToString:@"pong"]) {
+                if([o objectForKey:@"origin"])
+                    msg = [NSString stringWithFormat:@"PONG from %@: %@", [o objectForKey:@"origin"], [o objectForKey:@"msg"]];
+                else
+                    msg = [NSString stringWithFormat:@"PONG: %@", [o objectForKey:@"msg"]];
+            }
+            else if([type isEqualToString:@"monitor_full"]) {
+                if([[o objectForKey:@"limit"] respondsToSelector:@selector(intValue)] && [[o objectForKey:@"limit"] intValue])
+                    msg = [NSString stringWithFormat:@"%@: %@ (limit: %i)", [o objectForKey:@"targets"], [o objectForKey:@"msg"], [[o objectForKey:@"limit"] intValue]];
+                else
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"targets"], [o objectForKey:@"msg"]];
+            }
+            else if([type isEqualToString:@"mlock_restricted"])
+                msg = [NSString stringWithFormat:@"%@: %@\nMLOCK: %@\nRequested mode change: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"], [o objectForKey:@"mlock"], [o objectForKey:@"mode_change"]];
+            else if([type isEqualToString:@"cannot_do_cmd"]) {
+                if([o objectForKey:@"cmd"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"cmd"], [o objectForKey:@"msg"]];
+                else
+                    msg = [o objectForKey:@"msg"];
+            }
+            else if([type isEqualToString:@"cannot_change_chan_mode"]) {
+                if([o objectForKey:@"mode"])
+                    msg = [NSString stringWithFormat:@"You can't change channel mode: %@; %@", [o objectForKey:@"mode"], [o objectForKey:@"msg"]];
+                else
+                    msg = [NSString stringWithFormat:@"You can't change channel mode; %@", [o objectForKey:@"msg"]];
+            }
+            else if([type isEqualToString:@"metadata_limit"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"msg"], [o objectForKey:@"target"]];
+            else if([type isEqualToString:@"metadata_targetinvalid"])
+                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"msg"], [o objectForKey:@"target"]];
+            else if([type isEqualToString:@"metadata_nomatchingkey"])
+                msg = [NSString stringWithFormat:@"%@: %@ for target %@", [o objectForKey:@"msg"], [o objectForKey:@"key"], [o objectForKey:@"target"]];
+            else if([type isEqualToString:@"metadata_keyinvalid"])
+                msg = [NSString stringWithFormat:@"Invalid metadata key: %@", [o objectForKey:@"key"]];
+            else if([type isEqualToString:@"metadata_keynotset"])
+                msg = [NSString stringWithFormat:@"%@: %@ for target %@", [o objectForKey:@"msg"], [o objectForKey:@"key"], [o objectForKey:@"target"]];
+            else if([type isEqualToString:@"metadata_keynopermission"])
+                msg = [NSString stringWithFormat:@"%@: %@ for target %@", [o objectForKey:@"msg"], [o objectForKey:@"key"], [o objectForKey:@"target"]];
+            else if([type isEqualToString:@"metadata_toomanysubs"])
+                msg = [NSString stringWithFormat:@"Metadata key subscription limit reached, keys after and including '%@' are not subscribed", [o objectForKey:@"key"]];
             else
                 msg = [o objectForKey:@"msg"];
 

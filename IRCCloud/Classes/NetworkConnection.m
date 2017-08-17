@@ -937,7 +937,14 @@ volatile BOOL __socketPaused = NO;
                                 @"operator_fail", @"not_on_channel", @"ban_on_chan",
                                 @"cannot_send_to_chan", @"user_on_channel", @"no_nick_given",
                                 @"no_text_to_send", @"no_origin", @"only_servers_can_change_mode",
-                                @"silence", @"no_channel_topic", @"invite_only_chan", @"channel_full", @"channel_key_set",]) {
+                                @"silence", @"no_channel_topic", @"invite_only_chan", @"channel_full", @"channel_key_set",
+                                @"blocked_channel",@"unknown_error",@"channame_in_use",@"pong",
+                                @"monitor_full",@"mlock_restricted",@"cannot_do_cmd",@"secure_only_chan",
+                                @"cannot_change_chan_mode",@"knock_delivered",@"too_many_knocks",
+                                @"chan_open",@"knock_on_chan",@"knock_disabled",@"cannotknock",@"ownmode",
+                                @"nossl",@"redirect_error",@"invalid_flood",@"join_flood",@"metadata_limit",
+                                @"metadata_targetinvalid",@"metadata_nomatchingkey",@"metadata_keyinvalid",
+                                @"metadata_keynotset",@"metadata_keynopermission",@"metadata_toomanysubs"]) {
             [parserMap setObject:alert forKey:type];
         }
         
