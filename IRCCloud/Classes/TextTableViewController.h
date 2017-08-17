@@ -24,9 +24,10 @@
     LinkLabel *tv;
     UIScrollView *sv;
     NSString *_type;
+    NSString *_placeholder;
 }
 @property Server *server;
-@property NSString *type;
+@property NSString *type, *placeholder;
 -(id)initWithData:(NSArray *)data;
 -(void)appendData:(NSArray *)data;
 @end

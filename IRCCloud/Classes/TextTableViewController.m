@@ -42,16 +42,21 @@
 
 - (void)refresh {
     NSMutableString *text = [[NSMutableString alloc] init];
-    for(id item in _data) {
-        NSString *s;
-        if([item isKindOfClass:[NSString class]]) {
-            s = item;
-        } else if([item isKindOfClass:[NSArray class]]) {
-            s = [(NSArray *)item componentsJoinedByString:@"\t"];
-        } else {
-            s = [item description];
+    
+    if(_data.count) {
+        for(id item in _data) {
+            NSString *s;
+            if([item isKindOfClass:[NSString class]]) {
+                s = item;
+            } else if([item isKindOfClass:[NSArray class]]) {
+                s = [(NSArray *)item componentsJoinedByString:@"\t"];
+            } else {
+                s = [item description];
+            }
+            [text appendFormat:@"%@\n", s];
         }
-        [text appendFormat:@"%@\n", s];
+    } else {
+        [text appendString:_placeholder];
     }
     
     NSArray *links;

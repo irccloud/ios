@@ -446,7 +446,7 @@ volatile BOOL __socketPaused = NO;
         }
     };
     
-    _parserMap = @{
+    NSMutableDictionary *parserMap = @{
                    @"idle":ignored, @"end_of_backlog":ignored, @"oob_skipped":ignored, @"num_invites":ignored, @"user_account":ignored, @"twitch_hosttarget_start":ignored, @"twitch_hosttarget_stop":ignored, @"twitch_usernotice":ignored,
                    @"header": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        _state = kIRCCloudStateConnected;
@@ -610,56 +610,6 @@ volatile BOOL __socketPaused = NO;
                            }];
                        }
                    },
-                   @"bad_channel_key": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventBadChannelKey];
-                   },
-                   @"channel_query": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventChannelQuery];
-                   },
-                   @"too_many_channels": alert, @"no_such_channel": alert, @"bad_channel_name": alert,
-                   @"no_such_nick": alert, @"invalid_nick_change": alert, @"chan_privs_needed": alert,
-                   @"accept_exists": alert, @"banned_from_channel": alert, @"oper_only": alert,
-                   @"no_nick_change": alert, @"no_messages_from_non_registered": alert, @"not_registered": alert,
-                   @"already_registered": alert, @"too_many_targets": alert, @"no_such_server": alert,
-                   @"unknown_command": alert, @"help_not_found": alert, @"accept_full": alert,
-                   @"accept_not": alert, @"nick_collision": alert, @"nick_too_fast": alert, @"need_registered_nick": alert,
-                   @"save_nick": alert, @"unknown_mode": alert, @"user_not_in_channel": alert,
-                   @"need_more_params": alert, @"users_dont_match": alert, @"users_disabled": alert,
-                   @"invalid_operator_password": alert, @"flood_warning": alert, @"privs_needed": alert,
-                   @"operator_fail": alert, @"not_on_channel": alert, @"ban_on_chan": alert,
-                   @"cannot_send_to_chan": alert, @"user_on_channel": alert, @"no_nick_given": alert,
-                   @"no_text_to_send": alert, @"no_origin": alert, @"only_servers_can_change_mode": alert,
-                   @"silence": alert, @"no_channel_topic": alert, @"invite_only_chan": alert, @"channel_full": alert, @"channel_key_set": alert,
-                   @"open_buffer": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventOpenBuffer];
-                   },
-                   @"invalid_nick": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventInvalidNick];
-                   },
-                   @"ban_list": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventBanList];
-                   },
-                   @"accept_list": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventAcceptList];
-                   },
-                   @"quiet_list": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventQuietList];
-                   },
-                   @"ban_exception_list": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventBanExceptionList];
-                   },
-                   @"invite_list": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventInviteList];
-                   },
                    @"who_response": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if(!backlog && !_resuming) {
                            Buffer *b = [_buffers getBufferWithName:[object objectForKey:@"subject"] server:[[object objectForKey:@"cid"] intValue]];
@@ -671,54 +621,6 @@ volatile BOOL __socketPaused = NO;
                            }
                            [self postObject:object forEvent:kIRCEventWhoList];
                        }
-                   },
-                   @"names_reply": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventNamesList];
-                   },
-                   @"whois_response": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventWhois];
-                   },
-                   @"list_response_fetching": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventListResponseFetching];
-                   },
-                   @"list_response_toomany": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventListResponseTooManyChannels];
-                   },
-                   @"list_response": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventListResponse];
-                   },
-                   @"map_list": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventServerMap];
-                   },
-                   @"who_special_response": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventWhoSpecialResponse];
-                   },
-                   @"modules_list": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventModulesList];
-                   },
-                   @"links_response": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventLinksResponse];
-                   },
-                   @"whowas_response": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventWhoWas];
-                   },
-                   @"trace_response": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventTraceResponse];
-                   },
-                   @"export_finished": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming)
-                           [self postObject:object forEvent:kIRCEventLogExportFinished];
                    },
                    @"connection_deleted": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        [_servers removeAllDataForServer:object.cid];
@@ -758,26 +660,6 @@ volatile BOOL __socketPaused = NO;
                            [self postObject:object forEvent:kIRCEventStatusChanged];
                        }
                    },
-                   @"buffer_msg": msg, @"buffer_me_msg": msg, @"wait": msg,
-                   @"banned": msg, @"kill": msg, @"connecting_cancelled": msg,
-                   @"target_callerid": msg, @"notice": msg, @"server_motdstart": msg,
-                   @"server_welcome": msg, @"server_motd": msg, @"server_endofmotd": msg,
-                   @"server_nomotd": msg, @"server_luserclient": msg, @"server_luserop": msg,
-                   @"server_luserconns": msg, @"server_luserme": msg, @"server_n_local": msg,
-                   @"server_luserchannels": msg, @"server_n_global": msg, @"server_yourhost": msg,
-                   @"server_created": msg, @"server_luserunknown": msg, @"services_down": msg,
-                   @"your_unique_id": msg, @"callerid": msg, @"target_notified": msg,
-                   @"myinfo": msg, @"hidden_host_set": msg, @"unhandled_line": msg,
-                   @"unparsed_line": msg, @"connecting_failed": msg, @"nickname_in_use": msg,
-                   @"channel_invite": msg, @"motd_response": msg, @"socket_closed": msg,
-                   @"channel_mode_list_change": msg, @"msg_services": msg,
-                   @"stats": msg, @"statslinkinfo": msg, @"statscommands": msg, @"statscline": msg, @"statsnline": msg, @"statsiline": msg, @"statskline": msg, @"statsqline": msg, @"statsyline": msg, @"statsbline": msg, @"statsgline": msg, @"statstline": msg, @"statseline": msg, @"statsvline": msg, @"statslline": msg, @"statsuptime": msg, @"statsoline": msg, @"statshline": msg, @"statssline": msg, @"statsuline": msg, @"statsdebug": msg, @"spamfilter": msg, @"endofstats": msg,
-                   @"inviting_to_channel": msg, @"error": msg, @"too_fast": msg, @"no_bots": msg,
-                   @"wallops": msg, @"logged_in_as": msg, @"sasl_fail": msg, @"sasl_too_long": msg,
-                   @"sasl_aborted": msg, @"sasl_already": msg, @"you_are_operator": msg,
-                   @"btn_metadata_set": msg, @"sasl_success": msg, @"cap_ls": msg, @"cap_list": msg, @"cap_new": msg, @"cap_del": msg, @"cap_req": msg,@"cap_ack": msg,@"cap_nak": msg,@"cap_raw": msg,@"cap_invalid": msg,
-                   @"help_topics_start": msg, @"help_topics": msg, @"help_topics_end": msg, @"helphdr": msg, @"helpop": msg, @"helptlr": msg, @"helphlp": msg, @"helpfwd": msg, @"helpign": msg, @"version": msg,
-                   @"newsflash": msg, @"invited": msg, @"server_snomask": msg, @"codepage": msg, @"logged_out": msg, @"nick_locked": msg, @"info_response": msg, @"generic_server_info": msg, @"unknown_umode": msg, @"bad_ping": msg, @"cap_raw": msg, @"rehashed_config": msg, @"knock": msg, @"bad_channel_mask": msg, @"kill_deny": msg, @"chan_own_priv_needed": msg, @"not_for_halfops": msg, @"chan_forbidden": msg, @"starircd_welcome": msg, @"zurna_motd": msg, @"ambiguous_error_message": msg, @"list_usage": msg, @"list_syntax": msg, @"who_syntax": msg, @"text": msg, @"admin_info": msg, @"watch_status": msg, @"sqline_nick": msg, @"user_chghost": msg, @"loaded_module": msg, @"unloaded_module": msg, @"invite_notify":msg, @"channel_name_change": msg,
                    @"time": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        Event *event = [_events addJSONObject:object];
                        if(!backlog && !_resuming) {
@@ -1018,7 +900,78 @@ volatile BOOL __socketPaused = NO;
                        [self logout];
                        [self postObject:object forEvent:kIRCEventSessionDeleted];
                    }
-               };
+               }.mutableCopy;
+        
+        for(NSString *type in @[@"buffer_msg", @"buffer_me_msg", @"wait", @"banned", @"kill", @"connecting_cancelled",
+                                @"target_callerid", @"notice", @"server_motdstart", @"server_welcome", @"server_motd", @"server_endofmotd",
+                                @"server_nomotd", @"server_luserclient", @"server_luserop", @"server_luserconns", @"server_luserme", @"server_n_local",
+                                @"server_luserchannels", @"server_n_global", @"server_yourhost",@"server_created", @"server_luserunknown",
+                                @"services_down", @"your_unique_id", @"callerid", @"target_notified", @"myinfo", @"hidden_host_set", @"unhandled_line",
+                                @"unparsed_line", @"connecting_failed", @"nickname_in_use", @"channel_invite", @"motd_response", @"socket_closed",
+                                @"channel_mode_list_change", @"msg_services", @"stats", @"statslinkinfo", @"statscommands", @"statscline",
+                                @"statsnline", @"statsiline", @"statskline", @"statsqline", @"statsyline", @"statsbline", @"statsgline", @"statstline",
+                                @"statseline", @"statsvline", @"statslline", @"statsuptime", @"statsoline", @"statshline", @"statssline", @"statsuline",
+                                @"statsdebug", @"spamfilter", @"endofstats", @"inviting_to_channel", @"error", @"too_fast", @"no_bots",
+                                @"wallops", @"logged_in_as", @"sasl_fail", @"sasl_too_long", @"sasl_aborted", @"sasl_already",
+                                @"you_are_operator", @"btn_metadata_set", @"sasl_success", @"version", @"channel_name_change",
+                                @"cap_ls", @"cap_list", @"cap_new", @"cap_del", @"cap_req",@"cap_ack",@"cap_nak",@"cap_raw",@"cap_invalid",
+                                @"help_topics_start", @"help_topics", @"help_topics_end", @"helphdr", @"helpop", @"helptlr", @"helphlp", @"helpfwd", @"helpign",
+                                @"newsflash", @"invited", @"server_snomask", @"codepage", @"logged_out", @"nick_locked", @"info_response", @"generic_server_info",
+                                @"unknown_umode", @"bad_ping", @"cap_raw", @"rehashed_config", @"knock", @"bad_channel_mask", @"kill_deny",
+                                @"chan_own_priv_needed", @"not_for_halfops", @"chan_forbidden", @"starircd_welcome", @"zurna_motd",
+                                @"ambiguous_error_message", @"list_usage", @"list_syntax", @"who_syntax", @"text", @"admin_info",
+                                @"watch_status", @"sqline_nick", @"user_chghost", @"loaded_module", @"unloaded_module", @"invite_notify"]) {
+            [parserMap setObject:msg forKey:type];
+        }
+        
+        for(NSString *type in @[@"too_many_channels", @"no_such_channel", @"bad_channel_name",
+                                @"no_such_nick", @"invalid_nick_change", @"chan_privs_needed",
+                                @"accept_exists", @"banned_from_channel", @"oper_only",
+                                @"no_nick_change", @"no_messages_from_non_registered", @"not_registered",
+                                @"already_registered", @"too_many_targets", @"no_such_server",
+                                @"unknown_command", @"help_not_found", @"accept_full",
+                                @"accept_not", @"nick_collision", @"nick_too_fast", @"need_registered_nick",
+                                @"save_nick", @"unknown_mode", @"user_not_in_channel",
+                                @"need_more_params", @"users_dont_match", @"users_disabled",
+                                @"invalid_operator_password", @"flood_warning", @"privs_needed",
+                                @"operator_fail", @"not_on_channel", @"ban_on_chan",
+                                @"cannot_send_to_chan", @"user_on_channel", @"no_nick_given",
+                                @"no_text_to_send", @"no_origin", @"only_servers_can_change_mode",
+                                @"silence", @"no_channel_topic", @"invite_only_chan", @"channel_full", @"channel_key_set",]) {
+            [parserMap setObject:alert forKey:type];
+        }
+        
+        NSDictionary *broadcastMap = @{    @"bad_channel_key":@(kIRCEventBadChannelKey),
+                                           @"channel_query":@(kIRCEventChannelQuery),
+                                           @"open_buffer":@(kIRCEventOpenBuffer),
+                                           @"invalid_nick":@(kIRCEventInvalidNick),
+                                           @"ban_list":@(kIRCEventBanList),
+                                           @"accept_list":@(kIRCEventAcceptList),
+                                           @"quiet_list":@(kIRCEventQuietList),
+                                           @"ban_exception_list":@(kIRCEventBanExceptionList),
+                                           @"invite_list":@(kIRCEventInviteList),
+                                           @"names_reply":@(kIRCEventNamesList),
+                                           @"whois_response":@(kIRCEventWhois),
+                                           @"list_response_fetching":@(kIRCEventListResponseFetching),
+                                           @"list_response_toomany":@(kIRCEventListResponseTooManyChannels),
+                                           @"list_response":@(kIRCEventListResponse),
+                                           @"map_list":@(kIRCEventServerMap),
+                                           @"who_special_response":@(kIRCEventWhoSpecialResponse),
+                                           @"modules_list":@(kIRCEventModulesList),
+                                           @"links_response":@(kIRCEventLinksResponse),
+                                           @"whowas_response":@(kIRCEventWhoWas),
+                                           @"trace_response":@(kIRCEventTraceResponse),
+                                           @"export_finished":@(kIRCEventLogExportFinished)};
+        void (^broadcast)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
+            if(!backlog && !_resuming)
+                [self postObject:object forEvent:[[broadcastMap objectForKey:object.type] intValue]];
+        };
+
+        for(NSString *type in broadcastMap.allKeys) {
+            [parserMap setObject:broadcast forKey:type];
+        }
+        
+        _parserMap = parserMap;
     }
     return self;
 }
