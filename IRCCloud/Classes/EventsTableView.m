@@ -363,7 +363,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         
         if(!_quoteBorder.hidden) {
-            _quoteBorder.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, 3, frame.size.height);
+            _quoteBorder.frame = CGRectMake(frame.origin.x+ (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y + 2, 3, frame.size.height - 4);
             frame.origin.x += 12;
             frame.size.width -= 12;
         }

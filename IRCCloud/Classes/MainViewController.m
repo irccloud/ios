@@ -4382,14 +4382,17 @@ NSArray *_sortedChannels;
         NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
         
         if([action isEqualToString:@"Copy Message"]) {
+            Event *e = _selectedEvent;
+            if(e.parent)
+                e = [[EventsDataSource sharedInstance] event:e.parent buffer:e.bid];
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
             NSString *irc;
-            if(_selectedEvent.groupMsg.length) {
-                irc = [NSString stringWithFormat:@"%@ %@",_selectedEvent.timestamp,_selectedEvent.groupMsg];
-            } else if(_selectedEvent.from.length || [_selectedEvent.type isEqualToString:@"buffer_me_msg"]) {
-                irc = [_selectedEvent.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ %c— %@%c %@",_selectedEvent.timestamp,BOLD,_selectedEvent.nick,CLEAR,_selectedEvent.msg]:[NSString stringWithFormat:@"%@ %c<%@>%c %@",_selectedEvent.timestamp,BOLD,_selectedEvent.from,CLEAR,_selectedEvent.msg];
+            if(e.groupMsg.length) {
+                irc = [NSString stringWithFormat:@"%@ %@",e.timestamp,e.groupMsg];
+            } else if(e.from.length || [e.type isEqualToString:@"buffer_me_msg"]) {
+                irc = [e.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ %c— %@%c %@",e.timestamp,BOLD,e.nick,CLEAR,e.msg]:[NSString stringWithFormat:@"%@ %c<%@>%c %@",e.timestamp,BOLD,e.from,CLEAR,e.msg];
             } else {
-                irc = [NSString stringWithFormat:@"%@ %@",_selectedEvent.timestamp,_selectedEvent.msg];
+                irc = [NSString stringWithFormat:@"%@ %@",e.timestamp,e.msg];
             }
             NSAttributedString *msg = [ColorFormatter format:irc defaultColor:nil mono:NO linkify:NO server:nil links:nil];
             pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string,@"IRC formatting type":[irc dataUsingEncoding:NSUTF8StringEncoding]}];
