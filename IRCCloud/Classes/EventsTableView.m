@@ -2555,9 +2555,6 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.emojiOnly = e.isEmojiOnly;
         cell.codeBlockBackground.backgroundColor = [UIColor codeSpanBackgroundColor];
         cell.codeBlockBackground.hidden = !e.isCodeBlock;
-        if(e.isCodeBlock && !cell.avatar.hidden) {
-            NSLog(@"%@", e);
-        }
         return cell;
     }
 }
