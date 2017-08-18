@@ -380,7 +380,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         
         _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, _messageWidth, floorf([_message sizeThatFits:CGSizeMake(_messageWidth, CGFLOAT_MAX)].height) + 1);
-        _codeBlockBackground.frame = CGRectMake(_message.frame.origin.x - 4, _message.frame.origin.y - 2, _message.frame.size.width + 8, frame.size.height + 4);
+        _codeBlockBackground.frame = CGRectMake(_message.frame.origin.x - 4, _message.frame.origin.y - 2, _message.frame.size.width + 8, frame.size.height + 2);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(
                                        frame.origin.x + (__timeLeftPref ? (__timestampWidth + 4) : 0),
