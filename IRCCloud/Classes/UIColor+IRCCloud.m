@@ -115,6 +115,8 @@ UIColor *__selectedArchivedBufferHighlightColor;
 UIColor *__selectedArchivedBufferBackgroundColor;
 UIColor *__selfNickColor;
 UIColor *__socketClosedBarColor;
+UIColor *__codeSpanForegroundColor;
+UIColor *__codeSpanBackgroundColor;
 
 UIColor *__mIRCColors_BG[16];
 UIColor *__mIRCColors_FG[16];
@@ -322,6 +324,9 @@ BOOL __compact = NO;
         __archivedBufferHighlightColor = [UIColor colorWithRed:0.776 green:0.855 blue:1 alpha:1];
         __selectedArchivedBufferHighlightColor = [UIColor colorWithWhite:0.667 alpha:1];
         __selectedArchivedBufferBackgroundColor = [UIColor colorWithWhite:0.667 alpha:1];
+        
+        __codeSpanForegroundColor = [UIColor colorWithWhite:0.33 alpha:1];
+        __codeSpanBackgroundColor = [UIColor colorWithWhite:1.0 alpha:1];
         
         __opersBorderColor = [UIColor colorWithRed:0.878 green:0.137 blue:0.02 alpha:1];
         __ownersBorderColor = [UIColor colorWithRed:0.906 green:0.667 blue:0 alpha:1];
@@ -560,6 +565,8 @@ BOOL __compact = NO;
         __selectedArchivedBufferHighlightColor = color_text6;
         __selectedArchivedBufferBackgroundColor = color_text6;
         __socketClosedBarColor = color_border5;
+        __codeSpanForegroundColor = color_text3;
+        __codeSpanBackgroundColor = color_background1;
 
         __opersBorderColor = [UIColor colorWithHue:30.0/360.0 saturation:0.85 lightness:0.25 alpha:1.0];
         __ownersBorderColor = [UIColor colorWithHue:47.0/360.0 saturation:0.68 lightness:0.25 alpha:1.0];
@@ -1147,6 +1154,12 @@ BOOL __compact = NO;
 }
 +(UIColor *)selectedArchivedBufferBackgroundColor {
     return __selectedArchivedBufferBackgroundColor;
+}
++(UIColor *)codeSpanForegroundColor {
+    return __codeSpanForegroundColor;
+}
++(UIColor *)codeSpanBackgroundColor {
+    return __codeSpanBackgroundColor;
 }
 +(NSDictionary *)linkAttributes {
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];

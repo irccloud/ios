@@ -518,7 +518,8 @@
         [prefs setObject:[NSNumber numberWithBool:_compact.isOn] forKey:@"ascii-compact"];
         [prefs setObject:[NSNumber numberWithBool:!_disableInlineFiles.isOn] forKey:@"files-disableinline"];
         [prefs setObject:[NSNumber numberWithBool:!_disableBigEmoji.isOn] forKey:@"emoji-nobig"];
-        
+        [prefs setObject:[NSNumber numberWithBool:!_disableCodeSpan.isOn] forKey:@"chat-nocodespan"];
+
         SBJson5Writer *writer = [[SBJson5Writer alloc] init];
         NSString *json = [writer stringWithObject:prefs];
         
@@ -831,6 +832,7 @@
                          @{@"title":@"Collapse Joins, Parts, Quits", @"accessory":_expandJoinPart},
                          @{@"title":@"Embed Uploaded Files", @"accessory":_disableInlineFiles},
                          @{@"title":@"Embed Files Only Over Wi-Fi", @"accessory":_inlineWifiOnly},
+                         @{@"title":@"Format inline code", @"accessory":_disableCodeSpan},
                          ]},
               @{@"title":@"Device", @"items":device},
               @{@"title":@"Notifications", @"items":notifications},
@@ -921,6 +923,7 @@
     [_notificationPreviews addTarget:self action:@selector(notificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
     _thirdPartyNotificationPreviews = [[UISwitch alloc] init];
     [_thirdPartyNotificationPreviews addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
+    _disableCodeSpan = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1116,6 +1119,12 @@
         _disableBigEmoji.on = ![[prefs objectForKey:@"emoji-nobig"] boolValue];
     } else {
         _disableBigEmoji.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"chat-nocodespan"] isKindOfClass:[NSNumber class]]) {
+        _disableCodeSpan.on = ![[prefs objectForKey:@"chat-nocodespan"] boolValue];
+    } else {
+        _disableCodeSpan.on = YES;
     }
     
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];

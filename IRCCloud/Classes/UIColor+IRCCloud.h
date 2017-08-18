@@ -125,4 +125,6 @@
 +(NSDictionary *)lightLinkAttributes;
 +(UIColor *)selfNickColor;
 -(NSString *)toHexString;
++(UIColor *)codeSpanForegroundColor;
++(UIColor *)codeSpanBackgroundColor;
 @end

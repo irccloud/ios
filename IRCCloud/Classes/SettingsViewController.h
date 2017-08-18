@@ -63,6 +63,7 @@
     UISwitch *_defaultSound;
     UISwitch *_notificationPreviews;
     UISwitch *_thirdPartyNotificationPreviews;
+    UISwitch *_disableCodeSpan;
     NSString *_version;
     UISlider *_fontSize;
     NSString *_oldTheme;

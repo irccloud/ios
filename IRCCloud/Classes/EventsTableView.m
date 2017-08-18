@@ -85,6 +85,7 @@ BOOL __norealnamePref = NO;
 BOOL __monospacePref = NO;
 BOOL __disableInlineFilesPref = NO;
 BOOL __disableBigEmojiPref = NO;
+BOOL __disableCodeSpanPref = NO;
 int __smallAvatarHeight;
 int __largeAvatarHeight = 32;
 
@@ -1661,6 +1662,7 @@ extern UIImage *__socketClosedBackgroundImage;
         __disableInlineFilesPref = NO;
         __compact = NO;
         __disableBigEmojiPref = NO;
+        __disableCodeSpanPref = NO;
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         if(prefs) {
             __monospacePref = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
@@ -1675,7 +1677,8 @@ extern UIImage *__socketClosedBackgroundImage;
             __norealnamePref = [[NSUserDefaults standardUserDefaults] boolForKey:@"chat-norealname"];
             __compact = [[prefs objectForKey:@"ascii-compact"] boolValue];
             __disableBigEmojiPref = [[prefs objectForKey:@"emoji-nobig"] boolValue];
-            
+            __disableCodeSpanPref = [[prefs objectForKey:@"chat-nocodespan"] boolValue];
+
             NSDictionary *hiddenMap;
             
             if([_buffer.type isEqualToString:@"channel"]) {
@@ -1994,9 +1997,9 @@ extern UIImage *__socketClosedBackgroundImage;
             links = nil;
         }
         if(e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE)
-            e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
+            e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly codeSpans:!__disableCodeSpanPref];
         else
-            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
+            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly codeSpans:!__disableCodeSpanPref];
         
         if(e.formatted.length) {
             NSMutableAttributedString *padded = e.formatted.mutableCopy;

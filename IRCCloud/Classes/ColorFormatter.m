@@ -1753,6 +1753,18 @@ extern BOOL __compact;
             error:nil];
 }
 
++(NSRegularExpression *)codeSpan {
+    static NSRegularExpression *_pattern = nil;
+    if(!_pattern) {
+        NSString *pattern = @"`([^`\\n]+?)`";
+        _pattern = [NSRegularExpression
+                    regularExpressionWithPattern:pattern
+                    options:NSRegularExpressionCaseInsensitive
+                    error:nil];
+    }
+    return _pattern;
+}
+
 +(BOOL)unbalanced:(NSString *)input {
     if(!quotes)
         quotes = @{@"\"":@"\"",@"'": @"'",@")": @"(",@"]": @"[",@"}": @"{",@">": @"<",@"”": @"“",@"’": @"‘",@"»": @"«"};
@@ -1810,10 +1822,10 @@ extern BOOL __compact;
 }
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
-    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO];
+    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO codeSpans:NO];
 }
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji {
-    int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, code = -1, strike = -1;
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji codeSpans:(BOOL)codeSpans {
+    int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, mono = -1, strike = -1;
     UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil, *oldBgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
@@ -1824,7 +1836,7 @@ extern BOOL __compact;
         });
     }
     
-    if(mono) {
+    if(monospace) {
         font = Courier;
         boldFont = CourierBold;
         italicFont = CourierOblique;
@@ -1858,9 +1870,9 @@ extern BOOL __compact;
                 if(bold == -1) {
                     bold = i;
                 } else {
-                    if(code != -1) {
-                        [self setFont:Courier start:code length:(bold - code) attributes:attributes];
-                        code = i;
+                    if(mono != -1) {
+                        [self setFont:Courier start:mono length:(bold - mono) attributes:attributes];
+                        mono = i;
                     }
                     if(italics != -1) {
                         if(italics < bold - 1) {
@@ -1880,9 +1892,9 @@ extern BOOL __compact;
                 if(italics == -1) {
                     italics = i;
                 } else {
-                    if(code != -1) {
-                        [self setFont:Courier start:code length:(italics - code) attributes:attributes];
-                        code = i;
+                    if(mono != -1) {
+                        [self setFont:Courier start:mono length:(italics - mono) attributes:attributes];
+                        mono = i;
                     }
                     if(bold != -1) {
                         if(bold < italics - 1) {
@@ -1899,14 +1911,14 @@ extern BOOL __compact;
                 i--;
                 continue;
             case MONO:
-                if(code == -1) {
-                    code = i;
+                if(mono == -1) {
+                    mono = i;
                     boldFont = CourierBold;
                     italicFont = CourierOblique;
                     boldItalicFont = CourierBoldOblique;
                 } else {
-                    [self setFont:Courier start:code length:(i - code) attributes:attributes];
-                    if(!mono) {
+                    [self setFont:Courier start:mono length:(i - mono) attributes:attributes];
+                    if(!monospace) {
                         boldFont = HelveticaBold;
                         italicFont = HelveticaOblique;
                         boldItalicFont = HelveticaBoldOblique;
@@ -2083,8 +2095,8 @@ extern BOOL __compact;
                      }];
                     bg = -1;
                 }
-                if(code != -1) {
-                    [self setFont:Courier start:code length:(i - code) attributes:attributes];
+                if(mono != -1) {
+                    [self setFont:Courier start:mono length:(i - mono) attributes:attributes];
                 }
                 if(bold != -1 && italics != -1) {
                     if(bold < italics) {
@@ -2113,7 +2125,7 @@ extern BOOL __compact;
                                             @"length":@(i - strike)
                                             }];
                 }
-                bold = italics = underline = code = strike = -1;
+                bold = italics = underline = mono = strike = -1;
                 [text deleteCharactersInRange:NSMakeRange(i,1)];
                 i--;
                 continue;
@@ -2286,6 +2298,18 @@ extern BOOL __compact;
     if(links)
         *links = [NSArray arrayWithArray:matches];
     
+    if(codeSpans) {
+        NSArray *result = [[self codeSpan] matchesInString:output.string options:0 range:NSMakeRange(0, output.length)];
+        while(result.count) {
+            NSRange range = [[result objectAtIndex:0] range];
+            [output addAttributes:@{NSFontAttributeName:Courier, NSForegroundColorAttributeName:[UIColor codeSpanForegroundColor], NSBackgroundColorAttributeName:[UIColor codeSpanBackgroundColor]} range:range];
+            [output deleteCharactersInRange:NSMakeRange(range.location + range.length - 1, 1)];
+            [output deleteCharactersInRange:NSMakeRange(range.location, 1)];
+            result = [[self codeSpan] matchesInString:output.string options:0 range:NSMakeRange(range.location + range.length - 2, output.length - (range.location + range.length - 2))];
+            largeEmoji = NO;
+        }
+    }
+
     if(largeEmoji) {
         NSUInteger start = 0;
         if(![self emojiOnly:text]) {
