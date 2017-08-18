@@ -127,4 +127,5 @@
 -(NSString *)toHexString;
 +(UIColor *)codeSpanForegroundColor;
 +(UIColor *)codeSpanBackgroundColor;
++(UIColor *)quoteBorderColor;
 @end

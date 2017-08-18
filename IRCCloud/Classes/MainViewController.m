@@ -329,10 +329,6 @@ NSArray *_sortedChannels;
     
     _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
     
-    [_eventsView refresh];
-    [_buffersView performSelectorInBackground:@selector(refresh) withObject:nil];
-    [_usersView performSelectorInBackground:@selector(refresh) withObject:nil];
-    
     [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
 
     _globalMsg.linkAttributes = [UIColor lightLinkAttributes];

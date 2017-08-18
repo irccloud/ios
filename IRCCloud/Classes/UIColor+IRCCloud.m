@@ -117,6 +117,7 @@ UIColor *__selfNickColor;
 UIColor *__socketClosedBarColor;
 UIColor *__codeSpanForegroundColor;
 UIColor *__codeSpanBackgroundColor;
+UIColor *__quoteBorderColor;
 
 UIColor *__mIRCColors_BG[16];
 UIColor *__mIRCColors_FG[16];
@@ -665,7 +666,8 @@ BOOL __compact = NO;
     __usersDrawerBackgroundImage = nil;
     __socketClosedBackgroundImage = nil;
     __unreadBlueColor = [UIColor colorWithRed:0.118 green:0.447 blue:1 alpha:1];
-    
+    __quoteBorderColor = [UIColor colorWithWhite:0.87 alpha:1];
+
     __current_theme = theme?theme:@"dawn";
 }
 
@@ -1160,6 +1162,9 @@ BOOL __compact = NO;
 }
 +(UIColor *)codeSpanBackgroundColor {
     return __codeSpanBackgroundColor;
+}
++(UIColor *)quoteBorderColor {
+    return __quoteBorderColor;
 }
 +(NSDictionary *)linkAttributes {
     NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];

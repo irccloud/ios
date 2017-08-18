@@ -85,11 +85,13 @@
     NSTimeInterval _serverTime;
     BOOL _isEmojiOnly;
     float _estimatedWidth;
+    BOOL _isQuoted;
+    int _childEventCount;
 }
-@property (nonatomic, assign) int cid, bid, rowType, reqId;
+@property (nonatomic, assign) int cid, bid, rowType, reqId, childEventCount;
 @property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime;
 @property (nonatomic, copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue;
-@property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly;
+@property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted;
 @property (nonatomic, copy) NSDictionary *ops,*entities;
 @property (nonatomic, strong) UIColor *color, *bgColor;
 @property (nonatomic, copy) NSAttributedString *formatted, *formattedNick, *formattedRealname, *formattedPadded;
@@ -101,6 +103,7 @@
 -(BOOL)isMessage;
 -(NSString *)ignoreMask;
 -(NSTimeInterval)time;
+-(Event *)copy;
 @end
 
 @interface EventsDataSource : NSObject {

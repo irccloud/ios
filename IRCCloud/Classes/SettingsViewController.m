@@ -519,6 +519,7 @@
         [prefs setObject:[NSNumber numberWithBool:!_disableInlineFiles.isOn] forKey:@"files-disableinline"];
         [prefs setObject:[NSNumber numberWithBool:!_disableBigEmoji.isOn] forKey:@"emoji-nobig"];
         [prefs setObject:[NSNumber numberWithBool:!_disableCodeSpan.isOn] forKey:@"chat-nocodespan"];
+        [prefs setObject:[NSNumber numberWithBool:!_disableQuote.isOn] forKey:@"chat-noquote"];
 
         SBJson5Writer *writer = [[SBJson5Writer alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -833,6 +834,7 @@
                          @{@"title":@"Embed Uploaded Files", @"accessory":_disableInlineFiles},
                          @{@"title":@"Embed Files Only Over Wi-Fi", @"accessory":_inlineWifiOnly},
                          @{@"title":@"Format inline code", @"accessory":_disableCodeSpan},
+                         @{@"title":@"Format quoted text", @"accessory":_disableQuote},
                          ]},
               @{@"title":@"Device", @"items":device},
               @{@"title":@"Notifications", @"items":notifications},
@@ -924,6 +926,7 @@
     _thirdPartyNotificationPreviews = [[UISwitch alloc] init];
     [_thirdPartyNotificationPreviews addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
     _disableCodeSpan = [[UISwitch alloc] init];
+    _disableQuote = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1125,6 +1128,12 @@
         _disableCodeSpan.on = ![[prefs objectForKey:@"chat-nocodespan"] boolValue];
     } else {
         _disableCodeSpan.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"chat-noquote"] isKindOfClass:[NSNumber class]]) {
+        _disableQuote.on = ![[prefs objectForKey:@"chat-noquote"] boolValue];
+    } else {
+        _disableQuote.on = YES;
     }
     
     _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];

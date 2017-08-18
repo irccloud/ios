@@ -81,6 +81,9 @@
     }
     return _ignoreMask;
 }
+-(Event *)copy {
+    return [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]];
+}
 -(instancetype)initWithCoder:(NSCoder *)aDecoder{
     self = [super init];
     if(self) {
