@@ -974,11 +974,13 @@ extern UIImage *__socketClosedBackgroundImage;
                 } else if(e.reqId != -1) {
                     CLS_LOG(@"Searching for pending message matching reqid %i", e.reqId);
                     int reqid = e.reqId;
+                    NSTimeInterval eid = -1;
                     [_lock lock];
                     for(int i = 0; i < _data.count; i++) {
                         e = [_data objectAtIndex:i];
                         if(e.reqId == reqid && (e.pending || e.rowType == ROW_FAILED)) {
                             CLS_LOG(@"Found at position %i", i);
+                            eid = e.eid;
                             if(i>0) {
                                 Event *p = [_data objectAtIndex:i-1];
                                 if(p.rowType == ROW_TIMESTAMP) {
@@ -988,6 +990,11 @@ extern UIImage *__socketClosedBackgroundImage;
                                 }
                             }
                             CLS_LOG(@"Removing pending event");
+                            [_data removeObject:e];
+                            i--;
+                        }
+                        if(e.parent == eid) {
+                            CLS_LOG(@"Removing child event");
                             [_data removeObject:e];
                             i--;
                         }
@@ -1278,8 +1285,6 @@ extern UIImage *__socketClosedBackgroundImage;
             }
             
             NSString *msg = event.formattedMsg;
-            BOOL pending = event.pending;
-            event.pending = NO;
             NSArray *matches = [_pattern matchesInString:msg options:0 range:NSMakeRange(0, msg.length)];
             if(matches.count) {
                 NSUInteger start = 0;
@@ -1297,7 +1302,6 @@ extern UIImage *__socketClosedBackgroundImage;
                         e.timestamp = @"";
                         e.parent = event.eid;
                         e.isHeader = NO;
-                        e.pending = pending;
                         [self _addItem:e eid:e.eid];
                     } else {
                         event.formattedMsg = lastChunk;
@@ -1317,7 +1321,6 @@ extern UIImage *__socketClosedBackgroundImage;
                         e.isHeader = NO;
                         e.color = [UIColor codeSpanForegroundColor];
                         e.monospace = YES;
-                        e.pending = pending;
                         [self _addItem:e eid:e.eid];
                     }
                     start = result.range.location + result.range.length;
@@ -1331,11 +1334,9 @@ extern UIImage *__socketClosedBackgroundImage;
                     e.timestamp = @"";
                     e.parent = event.eid;
                     e.isHeader = NO;
-                    e.pending = pending;
                     if(e.formattedMsg.length)
                         [self _addItem:e eid:e.eid];
                 }
-                event.pending = pending;
             }
         } else {
             event.isCodeBlock = NO;

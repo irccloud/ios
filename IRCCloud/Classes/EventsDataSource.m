@@ -82,7 +82,11 @@
     return _ignoreMask;
 }
 -(Event *)copy {
-    return [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]];
+    BOOL pending = _pending;
+    _pending = NO;
+    Event *e = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]];
+    _pending = e.pending = pending;
+    return e;
 }
 -(instancetype)initWithCoder:(NSCoder *)aDecoder{
     self = [super init];
