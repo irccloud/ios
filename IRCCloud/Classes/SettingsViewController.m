@@ -519,6 +519,7 @@
         [prefs setObject:[NSNumber numberWithBool:!_disableInlineFiles.isOn] forKey:@"files-disableinline"];
         [prefs setObject:[NSNumber numberWithBool:!_disableBigEmoji.isOn] forKey:@"emoji-nobig"];
         [prefs setObject:[NSNumber numberWithBool:!_disableCodeSpan.isOn] forKey:@"chat-nocodespan"];
+        [prefs setObject:[NSNumber numberWithBool:!_disableCodeBlock.isOn] forKey:@"chat-nocodeblock"];
         [prefs setObject:[NSNumber numberWithBool:!_disableQuote.isOn] forKey:@"chat-noquote"];
 
         SBJson5Writer *writer = [[SBJson5Writer alloc] init];
@@ -834,6 +835,7 @@
                          @{@"title":@"Embed Uploaded Files", @"accessory":_disableInlineFiles},
                          @{@"title":@"Embed Files Only Over Wi-Fi", @"accessory":_inlineWifiOnly},
                          @{@"title":@"Format inline code", @"accessory":_disableCodeSpan},
+                         @{@"title":@"Format code blocks", @"accessory":_disableCodeBlock},
                          @{@"title":@"Format quoted text", @"accessory":_disableQuote},
                          ]},
               @{@"title":@"Device", @"items":device},
@@ -926,6 +928,7 @@
     _thirdPartyNotificationPreviews = [[UISwitch alloc] init];
     [_thirdPartyNotificationPreviews addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
     _disableCodeSpan = [[UISwitch alloc] init];
+    _disableCodeBlock = [[UISwitch alloc] init];
     _disableQuote = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
@@ -1128,6 +1131,12 @@
         _disableCodeSpan.on = ![[prefs objectForKey:@"chat-nocodespan"] boolValue];
     } else {
         _disableCodeSpan.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"chat-nocodeblock"] isKindOfClass:[NSNumber class]]) {
+        _disableCodeBlock.on = ![[prefs objectForKey:@"chat-nocodeblock"] boolValue];
+    } else {
+        _disableCodeBlock.on = YES;
     }
     
     if([[prefs objectForKey:@"chat-noquote"] isKindOfClass:[NSNumber class]]) {

@@ -1153,6 +1153,8 @@
                 e.timestamp = nil;
                 e.height = 0;
                 e.isHeader = NO;
+                e.isCodeBlock = NO;
+                e.isQuoted = NO;
             }
         }
     }

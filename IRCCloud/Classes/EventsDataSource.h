@@ -86,12 +86,14 @@
     BOOL _isEmojiOnly;
     float _estimatedWidth;
     BOOL _isQuoted;
+    BOOL _isCodeBlock;
     int _childEventCount;
+    NSTimeInterval _parent;
 }
 @property (nonatomic, assign) int cid, bid, rowType, reqId, childEventCount;
-@property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime;
+@property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime, parent;
 @property (nonatomic, copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue;
-@property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted;
+@property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted, isCodeBlock;
 @property (nonatomic, copy) NSDictionary *ops,*entities;
 @property (nonatomic, strong) UIColor *color, *bgColor;
 @property (nonatomic, copy) NSAttributedString *formatted, *formattedNick, *formattedRealname, *formattedPadded;

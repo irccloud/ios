@@ -86,6 +86,7 @@ BOOL __monospacePref = NO;
 BOOL __disableInlineFilesPref = NO;
 BOOL __disableBigEmojiPref = NO;
 BOOL __disableCodeSpanPref = NO;
+BOOL __disableCodeBlockPref = NO;
 BOOL __disableQuotePref = NO;
 int __smallAvatarHeight;
 int __largeAvatarHeight = 32;
@@ -104,6 +105,7 @@ extern UIImage *__socketClosedBackgroundImage;
     UIView *_topBorder;
     UIView *_bottomBorder;
     UIView *_quoteBorder;
+    UIView *_codeBlockBackground;
     float _timestampPosition;
     float _accessoryOffset;
     UIColor *_messageTextColor;
@@ -120,7 +122,7 @@ extern UIImage *__socketClosedBackgroundImage;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar, *thumbnail;
 @property (readonly) UIActivityIndicatorView *spinner;
-@property (readonly) UIView *quoteBorder;
+@property (readonly) UIView *quoteBorder, *codeBlockBackground;
 @property UIColor *messageTextColor;
 @property BOOL emojiOnly;
 @end
@@ -135,6 +137,10 @@ extern UIImage *__socketClosedBackgroundImage;
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         self.backgroundColor = [UIColor contentBackgroundColor];
         
+        _codeBlockBackground = [[UIView alloc] initWithFrame:CGRectZero];
+        _codeBlockBackground.hidden = YES;
+        [self.contentView addSubview:_codeBlockBackground];
+
         _socketClosedBar = [[UIView alloc] initWithFrame:CGRectZero];
         _socketClosedBar.hidden = YES;
         [self.contentView addSubview:_socketClosedBar];
@@ -217,7 +223,6 @@ extern UIImage *__socketClosedBackgroundImage;
         _quoteBorder = [[UIView alloc] initWithFrame:CGRectZero];
         _quoteBorder.hidden = YES;
         [self.contentView addSubview:_quoteBorder];
-        
     }
     return self;
 }
@@ -363,11 +368,19 @@ extern UIImage *__socketClosedBackgroundImage;
             frame.size.width -= 12;
         }
 
+        if(!_codeBlockBackground.hidden) {
+            frame.origin.x += 4;
+            frame.size.width -= 8;
+            frame.origin.y += 4;
+            frame.size.height -= 8;
+        }
+        
         if(_messageWidth == 0) {
             _messageWidth = frame.size.width - 4 - __timestampWidth;
         }
         
         _message.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y - 0.5, _messageWidth, floorf([_message sizeThatFits:CGSizeMake(_messageWidth, CGFLOAT_MAX)].height) + 1);
+        _codeBlockBackground.frame = CGRectMake(_message.frame.origin.x - 4, _message.frame.origin.y - 2, _message.frame.size.width + 8, frame.size.height + 4);
         if(!__avatarsOffPref && (__chatOneLinePref || _type == ROW_ME_MESSAGE) && !_avatar.hidden) {
             _avatar.frame = CGRectMake(
                                        frame.origin.x + (__timeLeftPref ? (__timestampWidth + 4) : 0),
@@ -1210,6 +1223,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         e1.eid = event.eid + ++event.childEventCount;
                         e1.timestamp = @"";
                         e1.formattedMsg = event.formattedMsg;
+                        e1.parent = event.eid;
                         [self _addItem:e1 eid:e1.eid];
                         event.formattedMsg = [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors];
                     } else {
@@ -1251,6 +1265,74 @@ extern UIImage *__socketClosedBackgroundImage;
                     event.formattedMsg = [NSString stringWithFormat:@"%@%@", from, event.msg];
                 }
             }
+        }
+        
+        if(!__disableCodeBlockPref && event.rowType == ROW_MESSAGE && event.formattedMsg.length) {
+            static NSRegularExpression *_pattern = nil;
+            if(!_pattern) {
+                NSString *pattern = @"```([\\s\\S]+?)```(?=(?!`)[\\W\\s\\n]|$)";
+                _pattern = [NSRegularExpression
+                            regularExpressionWithPattern:pattern
+                            options:NSRegularExpressionCaseInsensitive
+                            error:nil];
+            }
+            
+            NSString *msg = event.formattedMsg;
+            NSArray *matches = [_pattern matchesInString:msg options:0 range:NSMakeRange(0, msg.length)];
+            if(matches.count) {
+                NSUInteger start = 0;
+                
+                for(NSTextCheckingResult *result in matches) {
+                    NSString *lastChunk = @"";
+                    if(result.range.location)
+                        lastChunk = [msg substringWithRange:NSMakeRange(start, result.range.location - start)];
+                    if([lastChunk hasPrefix:@" "] && lastChunk.length > 1)
+                        lastChunk = [lastChunk substringFromIndex:1];
+                    if(start > 0) {
+                        Event *e = [event copy];
+                        e.eid = event.eid + ++event.childEventCount;
+                        e.formattedMsg = lastChunk;
+                        e.timestamp = @"";
+                        e.parent = event.eid;
+                        e.isHeader = NO;
+                        [self _addItem:e eid:e.eid];
+                    } else {
+                        event.formattedMsg = lastChunk;
+                    }
+                    if(result.range.location == 0 && !__chatOneLinePref) {
+                        event.formattedMsg = [msg substringWithRange:NSMakeRange(result.range.location + 3, result.range.length - 6)];
+                        event.isCodeBlock = YES;
+                        event.color = [UIColor codeSpanForegroundColor];
+                        event.monospace = YES;
+                    } else {
+                        Event *e = [event copy];
+                        e.eid = event.eid + ++event.childEventCount;
+                        e.formattedMsg = [msg substringWithRange:NSMakeRange(result.range.location + 3, result.range.length - 6)];
+                        e.timestamp = @"";
+                        e.parent = event.eid;
+                        e.isCodeBlock = YES;
+                        e.isHeader = NO;
+                        e.color = [UIColor codeSpanForegroundColor];
+                        e.monospace = YES;
+                        [self _addItem:e eid:e.eid];
+                    }
+                    start = result.range.location + result.range.length;
+                }
+                if(start < msg.length) {
+                    Event *e = [event copy];
+                    e.eid = event.eid + ++event.childEventCount;
+                    e.formattedMsg = [msg substringWithRange:NSMakeRange(start, msg.length - start)];
+                    if([e.formattedMsg hasPrefix:@" "] && e.formattedMsg.length > 1)
+                        e.formattedMsg = [e.formattedMsg substringFromIndex:1];
+                    e.timestamp = @"";
+                    e.parent = event.eid;
+                    e.isHeader = NO;
+                    if(e.formattedMsg.length)
+                        [self _addItem:e eid:e.eid];
+                }
+            }
+        } else {
+            event.isCodeBlock = NO;
         }
         
         [self _addItem:event eid:eid];
@@ -1317,6 +1399,7 @@ extern UIImage *__socketClosedBackgroundImage;
     e1.fromMode = parent.fromMode;
     e1.realname = parent.realname;
     e1.hostmask = parent.hostmask;
+    e1.parent = parent.eid;
     if([[properties objectForKey:@"mime_type"] hasPrefix:@"image/"] && ![[properties objectForKey:@"mime_type"] isEqualToString:@"image/webp"])
         e1.rowType = ROW_THUMBNAIL;
     else
@@ -1571,7 +1654,7 @@ extern UIImage *__socketClosedBackgroundImage;
             Event *prev = [_data objectAtIndex:insertPos - 1];
             if(prev.rowType == ROW_LASTSEENEID)
                 prev = [_data objectAtIndex:insertPos - 2];
-            e.isHeader = (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from]));
+            e.isHeader = !__chatOneLinePref && (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from]));
             e.height = 0;
         }
         
@@ -1686,6 +1769,7 @@ extern UIImage *__socketClosedBackgroundImage;
         __compact = NO;
         __disableBigEmojiPref = NO;
         __disableCodeSpanPref = NO;
+        __disableCodeBlockPref = NO;
         __disableQuotePref = NO;
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         if(prefs) {
@@ -1702,6 +1786,7 @@ extern UIImage *__socketClosedBackgroundImage;
             __compact = [[prefs objectForKey:@"ascii-compact"] boolValue];
             __disableBigEmojiPref = [[prefs objectForKey:@"emoji-nobig"] boolValue];
             __disableCodeSpanPref = [[prefs objectForKey:@"chat-nocodespan"] boolValue];
+            __disableCodeBlockPref = [[prefs objectForKey:@"chat-nocodeblock"] boolValue];
             __disableQuotePref = [[prefs objectForKey:@"chat-noquote"] boolValue];
 
             NSDictionary *hiddenMap;
@@ -2031,7 +2116,7 @@ extern UIImage *__socketClosedBackgroundImage;
         } else {
             e.isQuoted = NO;
         }
-        if(e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && !e.isQuoted)
+        if(e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0)
             e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly codeSpans:!__disableCodeSpanPref];
         else
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly codeSpans:!__disableCodeSpanPref];
@@ -2142,6 +2227,9 @@ extern UIImage *__socketClosedBackgroundImage;
         if(!__disableQuotePref && e.isQuoted)
             estimatedWidth -= 12;
         
+        if(e.isCodeBlock)
+            estimatedWidth -= 8;
+        
         static LinkLabel *message = nil;
         if(!message) {
             message = [[LinkLabel alloc] init];
@@ -2167,6 +2255,9 @@ extern UIImage *__socketClosedBackgroundImage;
             if(e.height < __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING))
                 e.height = __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING);
         }
+        
+        if(e.isCodeBlock)
+            e.height += 8;
     }
 }
 
@@ -2248,10 +2339,7 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.quoteBorder.hidden = YES;
         } else {
             cell.nickname.text = nil;
-            if(e.isQuoted && __chatOneLinePref)
-                cell.avatar.hidden = YES;
-            else
-                cell.avatar.hidden = !((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && e.groupEid < 1);
+            cell.avatar.hidden = !((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && e.parent == 0 && e.groupEid < 1);
             cell.quoteBorder.hidden = !e.isQuoted;
             cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];
         }
@@ -2459,6 +2547,11 @@ extern UIImage *__socketClosedBackgroundImage;
         
         cell.filename.text = [e.entities objectForKey:@"name"];
         cell.emojiOnly = e.isEmojiOnly;
+        cell.codeBlockBackground.backgroundColor = [UIColor codeSpanBackgroundColor];
+        cell.codeBlockBackground.hidden = !e.isCodeBlock;
+        if(e.isCodeBlock && !cell.avatar.hidden) {
+            NSLog(@"%@", e);
+        }
         return cell;
     }
 }

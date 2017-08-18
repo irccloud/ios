@@ -64,6 +64,7 @@
     UISwitch *_notificationPreviews;
     UISwitch *_thirdPartyNotificationPreviews;
     UISwitch *_disableCodeSpan;
+    UISwitch *_disableCodeBlock;
     UISwitch *_disableQuote;
     NSString *_version;
     UISlider *_fontSize;
