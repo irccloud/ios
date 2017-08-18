@@ -1278,6 +1278,8 @@ extern UIImage *__socketClosedBackgroundImage;
             }
             
             NSString *msg = event.formattedMsg;
+            BOOL pending = event.pending;
+            event.pending = NO;
             NSArray *matches = [_pattern matchesInString:msg options:0 range:NSMakeRange(0, msg.length)];
             if(matches.count) {
                 NSUInteger start = 0;
@@ -1295,6 +1297,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         e.timestamp = @"";
                         e.parent = event.eid;
                         e.isHeader = NO;
+                        e.pending = pending;
                         [self _addItem:e eid:e.eid];
                     } else {
                         event.formattedMsg = lastChunk;
@@ -1314,6 +1317,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         e.isHeader = NO;
                         e.color = [UIColor codeSpanForegroundColor];
                         e.monospace = YES;
+                        e.pending = pending;
                         [self _addItem:e eid:e.eid];
                     }
                     start = result.range.location + result.range.length;
@@ -1327,9 +1331,11 @@ extern UIImage *__socketClosedBackgroundImage;
                     e.timestamp = @"";
                     e.parent = event.eid;
                     e.isHeader = NO;
+                    e.pending = pending;
                     if(e.formattedMsg.length)
                         [self _addItem:e eid:e.eid];
                 }
+                event.pending = pending;
             }
         } else {
             event.isCodeBlock = NO;
