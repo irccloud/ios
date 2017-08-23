@@ -45,11 +45,12 @@
 +(UIFont *)awesomeFont;
 +(UIFont *)messageFont:(BOOL)mono;
 +(void)emojify:(NSMutableString *)text;
-+(BOOL)emojiOnly:(NSString *)text;
 +(NSString *)toIRC:(NSAttributedString *)string;
 +(NSAttributedString *)stripUnsupportedAttributes:(NSAttributedString *)input fontSize:(CGFloat)fontSize;
 @end
 
 @interface NSString (ColorFormatter)
 -(NSString *)stripIRCFormatting;
+-(BOOL)isBlockQuote;
+-(BOOL)isEmojiOnly;
 @end

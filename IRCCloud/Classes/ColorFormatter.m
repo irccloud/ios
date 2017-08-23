@@ -1657,10 +1657,6 @@ extern BOOL __compact;
     return _pattern;
 }
 
-+(BOOL)emojiOnly:(NSString *)text {
-    return [[self emojiOnlyPattern] evaluateWithObject:text];
-}
-
 +(NSRegularExpression *)spotify {
     static NSRegularExpression *_pattern = nil;
     if(!_pattern) {
@@ -2312,9 +2308,9 @@ extern BOOL __compact;
 
     if(largeEmoji) {
         NSUInteger start = 0;
-        if(![self emojiOnly:text]) {
+        if(![text isEmojiOnly]) {
             for(; start < text.length; start++)
-                if([self emojiOnly:[text substringFromIndex:start]])
+                if([[text substringFromIndex:start] isEmojiOnly])
                     break;
         }
         
@@ -2433,5 +2429,15 @@ extern BOOL __compact;
 @implementation NSString (ColorFormatter)
 -(NSString *)stripIRCFormatting {
     return [[ColorFormatter format:self defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+}
+-(BOOL)isEmojiOnly {
+    return [[ColorFormatter emojiOnlyPattern] evaluateWithObject:self];
+}
+-(BOOL)isBlockQuote {
+    static NSPredicate *_pattern;
+    if(!_pattern) {
+        _pattern = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"(^|\\n)>(?![<>]|[\\W_](?:[<>/Dpb|\\\\{}()\\[\\]](?=\\s|$)))([^\\n]+)"];
+    }
+    return [_pattern evaluateWithObject:self];
 }
 @end

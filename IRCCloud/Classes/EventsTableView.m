@@ -1225,7 +1225,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:event.msg];
                 }
                 if(event.from.length && __chatOneLinePref && event.rowType != ROW_THUMBNAIL && event.rowType != ROW_FILE) {
-                    if(!__disableQuotePref && event.formattedMsg.length > 0 && [event.formattedMsg hasPrefix:@">"]) {
+                    if(!__disableQuotePref && event.formattedMsg.length > 0 && [event.formattedMsg isBlockQuote]) {
                         Event *e1 = event.copy;
                         e1.eid = event.eid + ++event.childEventCount;
                         e1.timestamp = @"";
@@ -1307,7 +1307,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         event.formattedMsg = lastChunk;
                     }
                     if(result.range.location == 0 && !__chatOneLinePref) {
-                        event.formattedMsg = [msg substringWithRange:NSMakeRange(result.range.location + 3, result.range.length - 6)];
+                        event.formattedMsg = [msg substringWithRange:NSMakeRange(3, result.range.length - 6)];
                         event.isCodeBlock = YES;
                         event.color = [UIColor codeSpanForegroundColor];
                         event.monospace = YES;
@@ -2105,7 +2105,7 @@ extern UIImage *__socketClosedBackgroundImage;
             NSMutableString *msg = [[e.msg stripIRCFormatting] mutableCopy];
             if(msg) {
                 [ColorFormatter emojify:msg];
-                e.isEmojiOnly = [ColorFormatter emojiOnly:msg];
+                e.isEmojiOnly = [msg isEmojiOnly];
             }
         } else {
             e.isEmojiOnly = NO;
@@ -2117,7 +2117,7 @@ extern UIImage *__socketClosedBackgroundImage;
             e.realnameLinks = links;
             links = nil;
         }
-        if(!__disableQuotePref && e.rowType == ROW_MESSAGE && e.formattedMsg.length > 1 && [e.formattedMsg hasPrefix:@">"]) {
+        if(!__disableQuotePref && e.rowType == ROW_MESSAGE && e.formattedMsg.length > 1 && [e.formattedMsg isBlockQuote]) {
             e.formattedMsg = [e.formattedMsg substringFromIndex:1];
             e.isQuoted = YES;
         } else {
