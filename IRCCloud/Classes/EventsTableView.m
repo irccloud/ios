@@ -1187,6 +1187,8 @@ extern UIImage *__socketClosedBackgroundImage;
             }
         }
         
+        event.childEventCount = 0;
+        
         if(!event.formatted) {
             if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
                 if(event.nick.length)
