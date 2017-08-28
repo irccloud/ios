@@ -2337,6 +2337,8 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.backgroundView = nil;
         cell.backgroundColor = nil;
         cell.contentView.backgroundColor = e.bgColor;
+        cell.quoteBorder.hidden = !e.isQuoted;
+        cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];
         if(e.isHeader) {
             NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithAttributedString:e.formattedNick];
             if(e.formattedRealname && ([e.realname isKindOfClass:[NSString class]] && ![e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) && !__norealnamePref) {
@@ -2345,12 +2347,9 @@ extern UIImage *__socketClosedBackgroundImage;
             }
             cell.nickname.attributedText = s;
             cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
-            cell.quoteBorder.hidden = YES;
         } else {
             cell.nickname.text = nil;
             cell.avatar.hidden = !((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && e.parent == 0 && e.groupEid < 1);
-            cell.quoteBorder.hidden = !e.isQuoted;
-            cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];
         }
         if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE) {
             cell.avatar.image = nil;
