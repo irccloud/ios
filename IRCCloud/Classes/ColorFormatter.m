@@ -1749,18 +1749,6 @@ extern BOOL __compact;
             error:nil];
 }
 
-+(NSRegularExpression *)codeSpan {
-    static NSRegularExpression *_pattern = nil;
-    if(!_pattern) {
-        NSString *pattern = @"`([^`\\n]+?)`";
-        _pattern = [NSRegularExpression
-                    regularExpressionWithPattern:pattern
-                    options:NSRegularExpressionCaseInsensitive
-                    error:nil];
-    }
-    return _pattern;
-}
-
 +(BOOL)unbalanced:(NSString *)input {
     if(!quotes)
         quotes = @{@"\"":@"\"",@"'": @"'",@")": @"(",@"]": @"[",@"}": @"{",@">": @"<",@"”": @"“",@"’": @"‘",@"»": @"«"};
@@ -1818,9 +1806,9 @@ extern BOOL __compact;
 }
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
-    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO codeSpans:NO];
+    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO];
 }
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji codeSpans:(BOOL)codeSpans {
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, mono = -1, strike = -1;
     UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil, *oldBgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
@@ -1912,12 +1900,31 @@ extern BOOL __compact;
                     boldFont = CourierBold;
                     italicFont = CourierOblique;
                     boldItalicFont = CourierBoldOblique;
+                    if(!fgColor && !bgColor) {
+                        fg = bg = i;
+                        fgColor = [UIColor codeSpanForegroundColor];
+                        bgColor = [UIColor codeSpanBackgroundColor];
+                    }
                 } else {
                     [self setFont:Courier start:mono length:(i - mono) attributes:attributes];
                     if(!monospace) {
                         boldFont = HelveticaBold;
                         italicFont = HelveticaOblique;
                         boldItalicFont = HelveticaBoldOblique;
+                    }
+                    if(fg >= mono || bg >= mono) {
+                        [attributes addObject:@{
+                                                NSBackgroundColorAttributeName:fgColor,
+                                                @"start":@(fg),
+                                                @"length":@(i - fg)
+                                                }];
+                        [attributes addObject:@{
+                                                NSBackgroundColorAttributeName:bgColor,
+                                                @"start":@(bg),
+                                                @"length":@(i - bg)
+                                                }];
+                        fgColor = bgColor = nil;
+                        fg = bg = -1;
                     }
                 }
                 [text deleteCharactersInRange:NSMakeRange(i,1)];
@@ -2294,18 +2301,6 @@ extern BOOL __compact;
     if(links)
         *links = [NSArray arrayWithArray:matches];
     
-    if(codeSpans) {
-        NSArray *result = [[self codeSpan] matchesInString:output.string options:0 range:NSMakeRange(0, output.length)];
-        while(result.count) {
-            NSRange range = [[result objectAtIndex:0] range];
-            [output addAttributes:@{NSFontAttributeName:Courier, NSForegroundColorAttributeName:[UIColor codeSpanForegroundColor], NSBackgroundColorAttributeName:[UIColor codeSpanBackgroundColor]} range:range];
-            [output deleteCharactersInRange:NSMakeRange(range.location + range.length - 1, 1)];
-            [output deleteCharactersInRange:NSMakeRange(range.location, 1)];
-            result = [[self codeSpan] matchesInString:output.string options:0 range:NSMakeRange(range.location + range.length - 2, output.length - (range.location + range.length - 2))];
-            largeEmoji = NO;
-        }
-    }
-
     if(largeEmoji) {
         NSUInteger start = 0;
         if(![text isEmojiOnly]) {
@@ -2439,5 +2434,24 @@ extern BOOL __compact;
         _pattern = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"(^|\\n)>(?![<>]|[\\W_](?:[<>/Dpb|\\\\{}()\\[\\]](?=\\s|$)))([^\\n]+)"];
     }
     return [_pattern evaluateWithObject:self];
+}
+-(NSString *)insertCodeSpans {
+    static NSRegularExpression *_pattern = nil;
+    if(!_pattern) {
+        NSString *pattern = @"`([^`\\n]+?)`";
+        _pattern = [NSRegularExpression
+                    regularExpressionWithPattern:pattern
+                    options:NSRegularExpressionCaseInsensitive
+                    error:nil];
+    }
+    NSMutableString *output = self.mutableCopy;
+    NSArray *result = [_pattern matchesInString:self options:0 range:NSMakeRange(0, self.length)];
+    while(result.count) {
+        NSRange range = [[result objectAtIndex:0] range];
+        [output replaceCharactersInRange:NSMakeRange(range.location, 1) withString:[NSString stringWithFormat:@"%c", MONO]];
+        [output replaceCharactersInRange:NSMakeRange(range.location + range.length - 1, 1) withString:[NSString stringWithFormat:@"%c", MONO]];
+        result = [_pattern matchesInString:self options:0 range:NSMakeRange(range.location + range.length, self.length - range.location - range.length)];
+    }
+    return output;
 }
 @end

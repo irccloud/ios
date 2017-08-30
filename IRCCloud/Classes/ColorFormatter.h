@@ -36,7 +36,7 @@
 @interface ColorFormatter : NSObject
 +(NSRegularExpression*)ircChannelRegexForServer:(Server *)s;
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links;
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji codeSpans:(BOOL)codeSpans;
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji;
 +(BOOL)shouldClearFontCache;
 +(void)clearFontCache;
 +(void)loadFonts;
@@ -51,6 +51,7 @@
 
 @interface NSString (ColorFormatter)
 -(NSString *)stripIRCFormatting;
+-(NSString *)insertCodeSpans;
 -(BOOL)isBlockQuote;
 -(BOOL)isEmojiOnly;
 @end
