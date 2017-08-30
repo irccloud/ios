@@ -83,8 +83,7 @@
     self = [super initWithStyle:style];
     if (self) {
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
-        _placeholder.backgroundColor = [UIColor contentBackgroundColor];
-        _placeholder.font = [UIFont systemFontOfSize:18];
+        _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
         _placeholder.numberOfLines = 0;
         _placeholder.textAlignment = NSTextAlignmentCenter;
         _placeholder.textColor = [UIColor messageTextColor];
@@ -165,7 +164,9 @@
             o = notification.object;
             if(o.cid == _event.cid) {
                 _event = o;
-                _placeholder.text = [NSString stringWithFormat:@"Too many channels to list for %@\n\nTry limiting the list to only respond with channels that have more than e.g. 50 members: /LIST >50", [o objectForKey:@"server"]];
+                _placeholder.text = [NSString stringWithFormat:@"Too many channels to list for %@\n\nTry limiting the list to only respond with channels that have more than e.g. 50 members: `/LIST >50`\n", [o objectForKey:@"server"]];
+                _placeholder.attributedText = [ColorFormatter format:[_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
+                _placeholder.textAlignment = NSTextAlignmentCenter;
                 [_activity stopAnimating];
             }
             break;
@@ -194,6 +195,10 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if([_data count])
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
+    else
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     return [_data count];
 }
 

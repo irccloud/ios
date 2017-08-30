@@ -78,11 +78,9 @@
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
         _placeholder.text = placeholder;
         _placeholder.numberOfLines = 0;
-        _placeholder.backgroundColor = [UIColor contentBackgroundColor];
-        _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor messageTextColor];
         _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        _placeholder.attributedText = [ColorFormatter format:[_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
+        _placeholder.textAlignment = NSTextAlignmentCenter;
 
         _list = list;
         _bid = bid;

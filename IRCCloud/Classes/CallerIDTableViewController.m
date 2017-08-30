@@ -17,6 +17,7 @@
 
 #import "CallerIDTableViewController.h"
 #import "NetworkConnection.h"
+#import "ColorFormatter.h"
 #import "UIColor+IRCCloud.h"
 
 @implementation CallerIDTableViewController
@@ -26,12 +27,11 @@
     if (self) {
         _addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
         _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
-        _placeholder.text = @"No accepted nicks.\n\nYou can accept someone by tapping their message request or by using /accept.";
+        _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         _placeholder.numberOfLines = 0;
-        _placeholder.backgroundColor = [UIColor contentBackgroundColor];
-        _placeholder.font = [UIFont systemFontOfSize:18];
+        _placeholder.text = @"No accepted nicks.\n\nYou can accept someone by tapping their message request or by using `/accept`.\n";
+        _placeholder.attributedText = [ColorFormatter format:[_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
         _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor messageTextColor];
     }
     return self;
 }
