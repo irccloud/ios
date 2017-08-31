@@ -175,6 +175,14 @@
         url = [NSURL URLWithString:[NSString stringWithFormat:@"irc%@://%@:%i/%@",(ssl > 0)?@"s":@"",host,port,channel]];
     }
     
+#ifdef ENTERPRISE
+    if([url.host isEqualToString:IRCCLOUD_HOST] && [url.path hasPrefix:@"/pastebin/"]) {
+#else
+    if([url.host hasSuffix:@"irccloud.com"] && [url.path hasPrefix:@"/pastebin/"]) {
+#endif
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@://%@%@",url.scheme,url.host,url.path]];
+    }
+
     if(![url.scheme hasPrefix:@"irc"]) {
         [mainViewController dismissKeyboard];
     }
