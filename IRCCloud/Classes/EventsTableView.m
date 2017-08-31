@@ -1202,6 +1202,9 @@ extern UIImage *__socketClosedBackgroundImage;
                 event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], msg];
                 event.rowType = ROW_ME_MESSAGE;
             } else if([type isEqualToString:@"notice"] || [type isEqualToString:@"buffer_msg"]) {
+                event.isCodeBlock = NO;
+                event.color = [UIColor messageTextColor];
+                event.bgColor = [UIColor contentBackgroundColor];
                 Server *s = [[ServersDataSource sharedInstance] getServer:event.cid];
                 if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OPER]])
                     event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO],BOLD];
