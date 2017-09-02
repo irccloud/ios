@@ -1204,7 +1204,6 @@ extern UIImage *__socketClosedBackgroundImage;
             } else if([type isEqualToString:@"notice"] || [type isEqualToString:@"buffer_msg"]) {
                 event.isCodeBlock = NO;
                 event.color = [UIColor messageTextColor];
-                event.bgColor = event.isSelf ? [UIColor selfBackgroundColor] : [UIColor contentBackgroundColor];
                 Server *s = [[ServersDataSource sharedInstance] getServer:event.cid];
                 if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OPER]])
                     event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO],BOLD];
