@@ -3488,12 +3488,12 @@ NSArray *_sortedChannels;
                     [sheet addButtonWithTitle:@"Deop"];
                 else
                     [sheet addButtonWithTitle:@"Op"];
+            }
+            if([me.mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
                 if([_selectedUser.mode rangeOfString:server?server.MODE_VOICED:@"v"].location != NSNotFound)
                     [sheet addButtonWithTitle:@"Devoice"];
                 else
                     [sheet addButtonWithTitle:@"Voice"];
-            }
-            if([me.mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
                 [sheet addButtonWithTitle:@"Kick"];
                 [sheet addButtonWithTitle:@"Ban"];
             }
