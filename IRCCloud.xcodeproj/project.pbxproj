@@ -160,7 +160,6 @@
 		221E3F4D1AD2DEE00090934B /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */; };
 		221F0BC5177368B40008EE04 /* CallerIDTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */; };
 		2223C6AA1768D7150032544B /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
-		2223C6B01768F36F0032544B /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */; };
 		2223C6B61768F4500032544B /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
 		222C80B61E48ABB200A243E7 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
 		222C80B71E48ABB200A243E7 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
@@ -299,7 +298,6 @@
 		225D976918AA995900065087 /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
 		225D976A18AA995900065087 /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
 		225D976B18AA995900065087 /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
-		225D976C18AA995900065087 /* UIImage+animatedGIF.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */; };
 		225D976D18AA995900065087 /* ChannelListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */; };
 		225D976E18AA995900065087 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF8221772063F00394114 /* SettingsViewController.m */; };
 		225D976F18AA995900065087 /* CallerIDTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */; };
@@ -565,6 +563,18 @@
 		22CE91751D58C81C0014B25C /* LinkTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE91741D58C81C0014B25C /* LinkTextView.m */; };
 		22CE91761D58C81C0014B25C /* LinkTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE91741D58C81C0014B25C /* LinkTextView.m */; };
 		22CE91791D59160B0014B25C /* LinkLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CE91781D59160B0014B25C /* LinkLabel.m */; };
+		22D22DED1F602FEB00F7A856 /* FLAnimatedImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEA1F602FEB00F7A856 /* FLAnimatedImage.m */; };
+		22D22DEE1F602FEB00F7A856 /* FLAnimatedImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEC1F602FEB00F7A856 /* FLAnimatedImageView.m */; };
+		22D22DEF1F60363500F7A856 /* FLAnimatedImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEA1F602FEB00F7A856 /* FLAnimatedImage.m */; };
+		22D22DF01F60363600F7A856 /* FLAnimatedImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEA1F602FEB00F7A856 /* FLAnimatedImage.m */; };
+		22D22DF11F60363700F7A856 /* FLAnimatedImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEA1F602FEB00F7A856 /* FLAnimatedImage.m */; };
+		22D22DF21F60363900F7A856 /* FLAnimatedImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEA1F602FEB00F7A856 /* FLAnimatedImage.m */; };
+		22D22DF31F60363900F7A856 /* FLAnimatedImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEA1F602FEB00F7A856 /* FLAnimatedImage.m */; };
+		22D22DF41F60363E00F7A856 /* FLAnimatedImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEC1F602FEB00F7A856 /* FLAnimatedImageView.m */; };
+		22D22DF51F60363F00F7A856 /* FLAnimatedImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEC1F602FEB00F7A856 /* FLAnimatedImageView.m */; };
+		22D22DF61F60364000F7A856 /* FLAnimatedImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEC1F602FEB00F7A856 /* FLAnimatedImageView.m */; };
+		22D22DF71F60364100F7A856 /* FLAnimatedImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEC1F602FEB00F7A856 /* FLAnimatedImageView.m */; };
+		22D22DF81F60364200F7A856 /* FLAnimatedImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D22DEC1F602FEB00F7A856 /* FLAnimatedImageView.m */; };
 		22D268C21BF4F40800B682AE /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22D268C11BF4F40800B682AE /* MainStoryboard.storyboard */; };
 		22D268C31BF4F40800B682AE /* MainStoryboard.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22D268C11BF4F40800B682AE /* MainStoryboard.storyboard */; };
 		22D268C61BF4F95200B682AE /* SplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D268C51BF4F95200B682AE /* SplashViewController.m */; };
@@ -806,8 +816,6 @@
 		221F0BC4177368B40008EE04 /* CallerIDTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CallerIDTableViewController.m; sourceTree = "<group>"; };
 		2223C6A71768D7150032544B /* ImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageViewController.h; sourceTree = "<group>"; };
 		2223C6A81768D7150032544B /* ImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageViewController.m; sourceTree = "<group>"; };
-		2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+animatedGIF.m"; sourceTree = "<group>"; };
-		2223C6AF1768F36F0032544B /* UIImage+animatedGIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+animatedGIF.h"; sourceTree = "<group>"; };
 		2223C6B51768F4500032544B /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		222C80B41E48ABB200A243E7 /* ImageCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageCache.h; sourceTree = "<group>"; };
 		222C80B51E48ABB200A243E7 /* ImageCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageCache.m; sourceTree = "<group>"; };
@@ -1053,6 +1061,10 @@
 		22CE91741D58C81C0014B25C /* LinkTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LinkTextView.m; sourceTree = "<group>"; };
 		22CE91771D59160B0014B25C /* LinkLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinkLabel.h; sourceTree = "<group>"; };
 		22CE91781D59160B0014B25C /* LinkLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LinkLabel.m; sourceTree = "<group>"; };
+		22D22DE91F602FEB00F7A856 /* FLAnimatedImage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLAnimatedImage.h; sourceTree = "<group>"; };
+		22D22DEA1F602FEB00F7A856 /* FLAnimatedImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLAnimatedImage.m; sourceTree = "<group>"; };
+		22D22DEB1F602FEB00F7A856 /* FLAnimatedImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLAnimatedImageView.h; sourceTree = "<group>"; };
+		22D22DEC1F602FEB00F7A856 /* FLAnimatedImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLAnimatedImageView.m; sourceTree = "<group>"; };
 		22D268C11BF4F40800B682AE /* MainStoryboard.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = MainStoryboard.storyboard; sourceTree = "<group>"; };
 		22D268C41BF4F95200B682AE /* SplashViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SplashViewController.h; sourceTree = "<group>"; };
 		22D268C51BF4F95200B682AE /* SplashViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SplashViewController.m; sourceTree = "<group>"; };
@@ -1441,6 +1453,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				22D22DE81F602FEB00F7A856 /* FLAnimatedImage */,
 				229323D71E8945D700ADAA22 /* TrustKit */,
 				22EE12801C9B1DE000E7AE8D /* OpenInFirefoxClient */,
 				2236BD671BAA600900015753 /* FontAwesome.h */,
@@ -1467,8 +1480,6 @@
 				22D430A31725AAEA003C0684 /* UIExpandingTextView.m */,
 				22D430A41725AAEA003C0684 /* UIExpandingTextViewInternal.h */,
 				22D430A51725AAEA003C0684 /* UIExpandingTextViewInternal.m */,
-				2223C6AF1768F36F0032544B /* UIImage+animatedGIF.h */,
-				2223C6AE1768F36F0032544B /* UIImage+animatedGIF.m */,
 				22B4284A16D831A800498507 /* WebSocket */,
 			);
 			name = "Supporting Files";
@@ -1836,6 +1847,17 @@
 			);
 			path = UITests;
 			sourceTree = "<group>";
+		};
+		22D22DE81F602FEB00F7A856 /* FLAnimatedImage */ = {
+			isa = PBXGroup;
+			children = (
+				22D22DE91F602FEB00F7A856 /* FLAnimatedImage.h */,
+				22D22DEA1F602FEB00F7A856 /* FLAnimatedImage.m */,
+				22D22DEB1F602FEB00F7A856 /* FLAnimatedImageView.h */,
+				22D22DEC1F602FEB00F7A856 /* FLAnimatedImageView.m */,
+			);
+			path = FLAnimatedImage;
+			sourceTree = SOURCE_ROOT;
 		};
 		22D649201B1E0719003BFD86 /* CSURITemplate */ = {
 			isa = PBXGroup;
@@ -2369,6 +2391,7 @@
 				2293241F1E8945D700ADAA22 /* registry_search.c in Sources */,
 				2293243D1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				222C80D71E4A111700A243E7 /* SBJson5Parser.m in Sources */,
+				22D22DF01F60363600F7A856 /* FLAnimatedImage.m in Sources */,
 				22103509197EFC6200AB414F /* ChannelsDataSource.m in Sources */,
 				229324671E8945D700ADAA22 /* vendor_identifier.m in Sources */,
 				22C8CDF81B01372100F637D2 /* ioapi.c in Sources */,
@@ -2391,6 +2414,7 @@
 				2293245B1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				222C80DF1E4A112300A243E7 /* SBJson5StreamParserState.m in Sources */,
 				2210351E197EFC6200AB414F /* GCDAsyncSocket.m in Sources */,
+				22D22DF51F60363F00F7A856 /* FLAnimatedImageView.m in Sources */,
 				2210351F197EFC6200AB414F /* HandshakeHeader.m in Sources */,
 				222C80DB1E4A111D00A243E7 /* SBJson5StreamParser.m in Sources */,
 				22103520197EFC6200AB414F /* MutableQueue.m in Sources */,
@@ -2425,6 +2449,7 @@
 				229324571E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				221D4BB01E23F48300D403E6 /* Ignore.m in Sources */,
 				221D4BBE1E23F4D700D403E6 /* ServersDataSource.m in Sources */,
+				22D22DF71F60364100F7A856 /* FLAnimatedImageView.m in Sources */,
 				221D4BAE1E23F47900D403E6 /* NetworkConnection.m in Sources */,
 				221D4BD51E23F75300D403E6 /* NSData+Base64.m in Sources */,
 				229324811E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
@@ -2447,6 +2472,7 @@
 				221D4BFC1E23FD3B00D403E6 /* NSURL+IDN.m in Sources */,
 				222C80DD1E4A111F00A243E7 /* SBJson5StreamParser.m in Sources */,
 				222C80EC1E4A112E00A243E7 /* SBJson5StreamWriter.m in Sources */,
+				22D22DF21F60363900F7A856 /* FLAnimatedImage.m in Sources */,
 				221D4BD91E23F75300D403E6 /* WebSocketMessage.m in Sources */,
 				221D4BBC1E23F4CD00D403E6 /* NotificationsDataSource.m in Sources */,
 				221D4BD81E23F75300D403E6 /* WebSocketFragment.m in Sources */,
@@ -2480,6 +2506,7 @@
 				229324581E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				221D4BB11E23F48300D403E6 /* Ignore.m in Sources */,
 				221D4BBF1E23F4D800D403E6 /* ServersDataSource.m in Sources */,
+				22D22DF81F60364200F7A856 /* FLAnimatedImageView.m in Sources */,
 				221D4BAF1E23F47900D403E6 /* NetworkConnection.m in Sources */,
 				221D4BDD1E23F75400D403E6 /* NSData+Base64.m in Sources */,
 				229324821E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
@@ -2502,6 +2529,7 @@
 				221D4BFD1E23FD3B00D403E6 /* NSURL+IDN.m in Sources */,
 				222C80DE1E4A112000A243E7 /* SBJson5StreamParser.m in Sources */,
 				222C80F01E4A112F00A243E7 /* SBJson5StreamWriter.m in Sources */,
+				22D22DF31F60363900F7A856 /* FLAnimatedImage.m in Sources */,
 				221D4BE11E23F75400D403E6 /* WebSocketMessage.m in Sources */,
 				221D4BBD1E23F4CE00D403E6 /* NotificationsDataSource.m in Sources */,
 				221D4BE01E23F75400D403E6 /* WebSocketFragment.m in Sources */,
@@ -2569,11 +2597,13 @@
 				229324121E8945D700ADAA22 /* assert.c in Sources */,
 				22CE91761D58C81C0014B25C /* LinkTextView.m in Sources */,
 				2292AD591D5B55CC00BEE269 /* LinkLabel.m in Sources */,
+				22D22DF41F60363E00F7A856 /* FLAnimatedImageView.m in Sources */,
 				22DB8D711C441C3000302271 /* YouTubeViewController.m in Sources */,
 				225D975418AA995900065087 /* NSURL+IDN.m in Sources */,
 				225D975518AA995900065087 /* BuffersDataSource.m in Sources */,
 				22EE41FB1F39F66E00D74E8C /* IRCColorPickerView.m in Sources */,
 				225D975618AA995900065087 /* ChannelsDataSource.m in Sources */,
+				22D22DEF1F60363500F7A856 /* FLAnimatedImage.m in Sources */,
 				225D975718AA995900065087 /* BuffersTableView.m in Sources */,
 				225D975818AA995900065087 /* MainViewController.m in Sources */,
 				229324601E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
@@ -2626,7 +2656,6 @@
 				22C8CDF71B01372100F637D2 /* ioapi.c in Sources */,
 				22C8CDFB1B01372100F637D2 /* mztools.c in Sources */,
 				225D976B18AA995900065087 /* ImageViewController.m in Sources */,
-				225D976C18AA995900065087 /* UIImage+animatedGIF.m in Sources */,
 				225D976D18AA995900065087 /* ChannelListTableViewController.m in Sources */,
 				225D976E18AA995900065087 /* SettingsViewController.m in Sources */,
 				225D976F18AA995900065087 /* CallerIDTableViewController.m in Sources */,
@@ -2687,11 +2716,13 @@
 				229324111E8945D700ADAA22 /* assert.c in Sources */,
 				22CE91751D58C81C0014B25C /* LinkTextView.m in Sources */,
 				22CE91791D59160B0014B25C /* LinkLabel.m in Sources */,
+				22D22DEE1F602FEB00F7A856 /* FLAnimatedImageView.m in Sources */,
 				22DB8D701C441C3000302271 /* YouTubeViewController.m in Sources */,
 				2293AF0117F9CCD10022BD06 /* NSURL+IDN.m in Sources */,
 				2236F5FE16DA8928007BE535 /* BuffersDataSource.m in Sources */,
 				22EE41FA1F39F66E00D74E8C /* IRCColorPickerView.m in Sources */,
 				2236F60216DBC021007BE535 /* ChannelsDataSource.m in Sources */,
+				22D22DED1F602FEB00F7A856 /* FLAnimatedImage.m in Sources */,
 				2236F60616DBCA85007BE535 /* BuffersTableView.m in Sources */,
 				2236F60B16DBCBC6007BE535 /* MainViewController.m in Sources */,
 				2293245F1E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
@@ -2744,7 +2775,6 @@
 				22C8CDF61B01372100F637D2 /* ioapi.c in Sources */,
 				22C8CDFA1B01372100F637D2 /* mztools.c in Sources */,
 				2223C6AA1768D7150032544B /* ImageViewController.m in Sources */,
-				2223C6B01768F36F0032544B /* UIImage+animatedGIF.m in Sources */,
 				2253BA251770CD7200CCA77F /* ChannelListTableViewController.m in Sources */,
 				227FF8231772063F00394114 /* SettingsViewController.m in Sources */,
 				221F0BC5177368B40008EE04 /* CallerIDTableViewController.m in Sources */,
@@ -2795,6 +2825,7 @@
 				229324201E8945D700ADAA22 /* registry_search.c in Sources */,
 				2293243E1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				222C80D81E4A111800A243E7 /* SBJson5Parser.m in Sources */,
+				22D22DF11F60363700F7A856 /* FLAnimatedImage.m in Sources */,
 				22DB25011982DF2B0008728E /* ChannelsDataSource.m in Sources */,
 				229324681E8945D700ADAA22 /* vendor_identifier.m in Sources */,
 				22C8CDF91B01372100F637D2 /* ioapi.c in Sources */,
@@ -2817,6 +2848,7 @@
 				2293245C1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				222C80E01E4A112300A243E7 /* SBJson5StreamParserState.m in Sources */,
 				22DB25161982DF2B0008728E /* GCDAsyncSocket.m in Sources */,
+				22D22DF61F60364000F7A856 /* FLAnimatedImageView.m in Sources */,
 				22DB25171982DF2B0008728E /* HandshakeHeader.m in Sources */,
 				222C80DC1E4A111E00A243E7 /* SBJson5StreamParser.m in Sources */,
 				22DB25181982DF2B0008728E /* MutableQueue.m in Sources */,

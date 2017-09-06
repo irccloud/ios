@@ -111,7 +111,7 @@ extern UIImage *__socketClosedBackgroundImage;
     UIColor *_messageTextColor;
     UIActivityIndicatorView *_spinner;
     UIView *_thumbbackground;
-    UIImageView *_thumbnail;
+    FLAnimatedImageView *_thumbnail;
     UILabel *_filename, *_mimeTypr, *_extension;
     float _thumbnailWidth, _thumbnailHeight, _messageWidth;
     BOOL _emojiOnly;
@@ -120,7 +120,8 @@ extern UIImage *__socketClosedBackgroundImage;
 @property float timestampPosition, accessoryOffset, thumbnailWidth, thumbnailHeight, messageWidth;
 @property (readonly) UILabel *timestamp, *accessory, *filename, *mimeType, *extension;
 @property (readonly) LinkLabel *message, *nickname;
-@property (readonly) UIImageView *avatar, *thumbnail;
+@property (readonly) UIImageView *avatar;
+@property (readonly) FLAnimatedImageView *thumbnail;
 @property (readonly) UIActivityIndicatorView *spinner;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground;
 @property UIColor *messageTextColor;
@@ -205,7 +206,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _avatar = [[UIImageView alloc] init];
         [self.contentView addSubview:_avatar];
         
-        _thumbnail = [[UIImageView alloc] init];
+        _thumbnail = [[FLAnimatedImageView alloc] init];
         [self.contentView addSubview:_thumbnail];
         
         _spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
@@ -2512,14 +2513,18 @@ extern UIImage *__socketClosedBackgroundImage;
                 cell.thumbnailHeight = 48;
             }
             cell.mimeType.text = [NSString stringWithFormat:@"%@ • %@", [e.entities objectForKey:@"mime_type"], e.msg];
-            cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
-            cell.spinner.hidden = (cell.thumbnail.image != nil);
-            if(!cell.thumbnail.image) {
+            cell.thumbnail.animatedImage = [[ImageCache sharedInstance] animatedImageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+            if(!cell.thumbnail.animatedImage)
+                cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+            cell.spinner.hidden = (cell.thumbnail.image != nil || cell.thumbnail.animatedImage != nil);
+            cell.thumbnail.hidden = !cell.spinner.hidden;
+            if(!cell.thumbnail.image && !cell.thumbnail.animatedImage) {
                 if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)].path]) {
-                    [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(UIImage *img) {
-                        if(img) {
+                    [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(BOOL success) {
+                        if(success) {
                             if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
                                 NSMutableDictionary *entities = [e.entities mutableCopy];
+                                UIImage *img = [UIImage imageWithContentsOfFile:[[ImageCache sharedInstance] pathForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)].path];
                                 [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
                                 e.entities = entities;
                             }
@@ -2549,6 +2554,8 @@ extern UIImage *__socketClosedBackgroundImage;
             }
         } else {
             cell.thumbnail.image = nil;
+            cell.thumbnail.animatedImage = nil;
+            cell.thumbnail.hidden = YES;
             cell.thumbnailWidth = 0;
             cell.thumbnailHeight = 0;
             cell.spinner.hidden = YES;

@@ -18,9 +18,10 @@
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import "OpenInChromeController.h"
+#import "FLAnimatedImageView.h"
 
 @interface ImageViewController : UIViewController<UIScrollViewDelegate,NSURLConnectionDataDelegate,UIPopoverPresentationControllerDelegate,UIGestureRecognizerDelegate> {
-    IBOutlet UIImageView *_imageView;
+    IBOutlet FLAnimatedImageView *_imageView;
     IBOutlet UIScrollView *_scrollView;
     MPMoviePlayerController *_movieController;
     __weak IBOutlet UIProgressView *_progressView;
@@ -28,7 +29,6 @@
     NSURL *_url;
     NSTimer *_hideTimer;
     OpenInChromeController *_chrome;
-    float _progressScale;
     NSURLConnection *_connection;
     BOOL _previewing;
     UIPanGestureRecognizer *_panGesture;

@@ -16,8 +16,9 @@
 
 #import <Foundation/Foundation.h>
 #import "CSURITemplate.h"
+#import "FLAnimatedImage.h"
 
-typedef void (^imageCompletionHandler)(UIImage *);
+typedef void (^imageCompletionHandler)(BOOL);
 
 @interface ImageCache : NSObject {
     NSURL *_cachePath;
@@ -37,6 +38,9 @@ typedef void (^imageCompletionHandler)(UIImage *);
 -(UIImage *)imageForURL:(NSURL *)url;
 -(UIImage *)imageForFileID:(NSString *)fileID;
 -(UIImage *)imageForFileID:(NSString *)fileID width:(int)width;
+-(FLAnimatedImage *)animatedImageForURL:(NSURL *)url;
+-(FLAnimatedImage *)animatedImageForFileID:(NSString *)fileID;
+-(FLAnimatedImage *)animatedImageForFileID:(NSString *)fileID width:(int)width;
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler;
 -(void)fetchFileID:(NSString *)fileID completionHandler:(imageCompletionHandler)handler;
 -(void)fetchFileID:(NSString *)fileID width:(int)width completionHandler:(imageCompletionHandler)handler;

@@ -20,7 +20,6 @@
 #import <SafariServices/SafariServices.h>
 #import "ImageViewController.h"
 #import "AppDelegate.h"
-#import "UIImage+animatedGIF.h"
 #import "OpenInFirefoxControllerObjC.h"
 #import "config.h"
 #import "ImageCache.h"
@@ -39,7 +38,6 @@
     if (self) {
         _url = url;
         _chrome = [[OpenInChromeController alloc] init];
-        _progressScale = 0;
     }
     return self;
 }
@@ -118,11 +116,18 @@
     }];
 }
 
--(void)_setImage:(UIImage *)img {
+-(void)_setImage:(UIImage *)img animatedImage:(FLAnimatedImage *)animatedImage {
     [_scrollView removeGestureRecognizer:_panGesture];
     [self.view addGestureRecognizer:_panGesture];
-    _imageView.image = img;
-    _imageView.frame = CGRectMake(0,0,img.size.width,img.size.height);
+    CGSize size;
+    if(animatedImage) {
+        size = animatedImage.size;
+        _imageView.animatedImage = animatedImage;
+    } else {
+        size = img.size;
+        _imageView.image = img;
+    }
+    _imageView.frame = CGRectMake(0,0,size.width,size.height);
     CGFloat xScale = _scrollView.bounds.size.width / _imageView.frame.size.width;
     CGFloat yScale = _scrollView.bounds.size.height / _imageView.frame.size.height;
     CGFloat minScale = MIN(xScale, yScale);
@@ -601,17 +606,8 @@
     _totalBytesReceived += receivedDataLength;
     [_imageData appendData:data];
 
-    if(_progressScale == 0 && _totalBytesReceived > 3) {
-        char GIF[3];
-        [data getBytes:&GIF length:3];
-        if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F')
-            _progressScale = 0.5;
-        else
-            _progressScale = 1.0;
-    }
-    
     if(_bytesExpected != NSURLResponseUnknownLength) {
-        float progress = (((_totalBytesReceived/(float)_bytesExpected) * 100.f) / 100.f) * _progressScale;
+        float progress = (((_totalBytesReceived/(float)_bytesExpected) * 100.f) / 100.f);
         if(_progressView.progress < progress)
             _progressView.progress = progress;
     }
@@ -642,27 +638,23 @@
 }
 
 - (void)_parseImageData:(NSData *)data {
+    FLAnimatedImage *animatedImg = nil;
     UIImage *img = nil;
     char GIF[3];
     [data getBytes:&GIF length:3];
-    if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F')
-        img = [UIImage animatedImageWithAnimatedGIFData:data];
-    else
+    if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F') {
+        animatedImg = [FLAnimatedImage animatedImageWithGIFData:data];
+    } else {
         img = [UIImage imageWithData:data];
-    if(img) {
+    }
+    if(animatedImg || img) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             _progressView.progress = 1.f;
-            [self _setImage:img];
+            [self _setImage:img animatedImage:animatedImg];
         }];
     } else {
         [self fail:@"Unable to display image"];
     }
-}
-
--(void)_gifProgress:(NSNotification *)n {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _progressView.progress = 0.5 + ([[n.userInfo objectForKey:@"progress"] floatValue] / 2.0f);
-    }];
 }
 
 - (void)viewDidLoad {
@@ -675,7 +667,6 @@
     _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panned:)];
     [_scrollView addGestureRecognizer:_panGesture];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_gifProgress:) name:UIImageAnimatedGIFProgressNotification object:nil];
     [self transitionToSize:self.view.bounds.size];
     [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
     

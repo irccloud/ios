@@ -98,7 +98,7 @@
         if([[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:attachment].path]) {
             [self downloadComplete:attachment typeHint:typeHint];
         } else {
-            [[ImageCache sharedInstance] fetchURL:attachment completionHandler:^(UIImage *image) {
+            [[ImageCache sharedInstance] fetchURL:attachment completionHandler:^(BOOL success) {
                 [self downloadComplete:attachment typeHint:typeHint];
             }];
         }
