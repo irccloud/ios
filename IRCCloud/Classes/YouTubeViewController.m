@@ -14,6 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#import <AVFoundation/AVFoundation.h>
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <SafariServices/SafariServices.h>
 #import "OpenInChromeController.h"
@@ -204,6 +205,7 @@
 -(void)playerViewDidBecomeReady:(YTPlayerView *)playerView {
     [_activity stopAnimating];
     playerView.hidden = NO;
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
 }
 
 -(void)playerView:(YTPlayerView *)playerView receivedError:(YTPlayerError)error {
