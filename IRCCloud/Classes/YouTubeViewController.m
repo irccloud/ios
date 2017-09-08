@@ -159,6 +159,7 @@
     int margin = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?YTMARGIN:0;
     CGFloat width = self.view.bounds.size.width - margin;
     CGFloat height = (width / 16.0f) * 9.0f;
+    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     _player = [[YTPlayerView alloc] initWithFrame:CGRectMake(margin/2, (self.view.bounds.size.height - height) / 2.0f, width, height)];
     _player.backgroundColor = [UIColor blackColor];
     _player.webView.backgroundColor = [UIColor blackColor];
@@ -205,7 +206,6 @@
 -(void)playerViewDidBecomeReady:(YTPlayerView *)playerView {
     [_activity stopAnimating];
     playerView.hidden = NO;
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
 }
 
 -(void)playerView:(YTPlayerView *)playerView receivedError:(YTPlayerError)error {
