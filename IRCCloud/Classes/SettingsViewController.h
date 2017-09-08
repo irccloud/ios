@@ -66,6 +66,7 @@
     UISwitch *_disableCodeSpan;
     UISwitch *_disableCodeBlock;
     UISwitch *_disableQuote;
+    UISwitch *_inlineImages;
     NSString *_version;
     UISlider *_fontSize;
     NSString *_oldTheme;

@@ -29,6 +29,7 @@
     UISwitch *_readOnSelect;
     UISwitch *_disableInlineFiles;
     UISwitch *_disableNickSuggestions;
+    UISwitch *_inlineImages;
 }
 @property (strong, nonatomic) Buffer *buffer;
 @end

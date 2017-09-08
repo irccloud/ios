@@ -23,7 +23,6 @@
 #import "ColorFormatter.h"
 #import "AppDelegate.h"
 #import "FontAwesome.h"
-#import "URLHandler.h"
 #import "ImageViewController.h"
 #import "PastebinViewController.h"
 #import "YouTubeViewController.h"
@@ -84,6 +83,7 @@ BOOL __chatOneLinePref = NO;
 BOOL __norealnamePref = NO;
 BOOL __monospacePref = NO;
 BOOL __disableInlineFilesPref = NO;
+BOOL __inlineMediaPref = NO;
 BOOL __disableBigEmojiPref = NO;
 BOOL __disableCodeSpanPref = NO;
 BOOL __disableCodeBlockPref = NO;
@@ -159,7 +159,6 @@ extern UIImage *__socketClosedBackgroundImage;
         _mimeType = [[UILabel alloc] init];
         _mimeType.textColor = [UIColor messageTextColor];
         _mimeType.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _mimeType.lineBreakMode = NSLineBreakByTruncatingTail;
         [self.contentView addSubview:_mimeType];
         
         _extension = [[UILabel alloc] init];
@@ -300,7 +299,10 @@ extern UIImage *__socketClosedBackgroundImage;
         _timestamp.textAlignment = __timeLeftPref?NSTextAlignmentCenter:NSTextAlignmentRight;
         
         if(_type == ROW_THUMBNAIL) {
-            _thumbbackground.backgroundColor = [UIColor bufferBackgroundColor];
+            if(_filename.text.length || _mimeType.text.length)
+                _thumbbackground.backgroundColor = [UIColor bufferBackgroundColor];
+            else
+                _thumbbackground.backgroundColor = [UIColor clearColor];
             if(__timeLeftPref) {
                 float width = frame.size.width - 16 - __timestampWidth;
                 if(width < _thumbnailWidth + 16)
@@ -321,7 +323,6 @@ extern UIImage *__socketClosedBackgroundImage;
             frame.origin.y += _thumbnailHeight + 10;
             frame.size.height -= _thumbnailHeight - 8;
             _spinner.center = self.contentView.center;
-            _spinner.hidden = (_thumbnail.image != nil);
             if(!_spinner.hidden && !_spinner.isAnimating)
                 [_spinner startAnimating];
             if(_filename.text.length) {
@@ -330,7 +331,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 frame.origin.y += FONT_SIZE + 2;
                 frame.size.height -= FONT_SIZE + 2;
             }
-            _mimeType.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 30 - __timestampWidth, FONT_SIZE + 2);
+            _mimeType.frame = CGRectMake(frame.origin.x + (__timeLeftPref?(__timestampWidth + 4):0), frame.origin.y, frame.size.width - 30 - __timestampWidth, _thumbbackground.frame.size.height - frame.origin.y);
             _mimeType.hidden = NO;
             _message.hidden = YES;
         } else if(_type == ROW_FILE) {
@@ -441,6 +442,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _closedPreviews = [[NSMutableSet alloc] init];
         _buffer = nil;
         _eidToOpen = -1;
+        _urlHandler = [[URLHandler alloc] init];
     }
     return self;
 }
@@ -461,6 +463,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _closedPreviews = [[NSMutableSet alloc] init];
         _buffer = nil;
         _eidToOpen = -1;
+        _urlHandler = [[URLHandler alloc] init];
     }
     return self;
 }
@@ -1223,7 +1226,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 
                 NSString *eventMsg = event.msg;
 
-                if(!__disableCodeBlockPref) {
+                if(!__disableCodeBlockPref && eventMsg) {
                     static NSRegularExpression *_pattern = nil;
                     if(!_pattern) {
                         NSString *pattern = @"```([\\s\\S]+?)```(?=(?!`)[\\W\\s\\n]|$)";
@@ -1305,7 +1308,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     } else {
                         event.formattedMsg = [event.formattedMsg stringByAppendingString:eventMsg];
                     }
-                } else {
+                } else if(eventMsg) {
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:eventMsg];
                 }
                 if(event.from.length && __chatOneLinePref && event.rowType != ROW_THUMBNAIL && event.rowType != ROW_FILE) {
@@ -1408,6 +1411,42 @@ extern UIImage *__socketClosedBackgroundImage;
             if(_buffer.last_seen_eid == event.eid)
                 _buffer.last_seen_eid = entity_eid;
         }
+        
+        if(__inlineMediaPref && event.linkify) {
+            NSTimeInterval entity_eid = event.eid;
+
+            NSArray *results = [ColorFormatter webURLs:event.msg];
+            for(NSTextCheckingResult *result in results) {
+                BOOL found = NO;
+                for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
+                    if([result.URL.absoluteString rangeOfString:[entity objectForKey:@"id"]].location != NSNotFound) {
+                        found = YES;
+                        break;
+                    }
+                }
+                
+                if(!found) {
+                    entity_eid = event.eid + ++event.childEventCount;
+                    if([URLHandler isImageURL:result.URL]) {
+                        if([_urlHandler MediaURLs:result.URL]) {
+                            Event *e1 = [self entity:event eid:entity_eid properties:[_urlHandler MediaURLs:result.URL]];
+                            [self insertEvent:e1 backlog:backlog nextIsGrouped:NO];
+                        } else {
+                            [_urlHandler fetchMediaURLs:result.URL result:^(BOOL success, NSString *error) {
+                                if([_data containsObject:event]) {
+                                    if(success) {
+                                        Event *e1 = [self entity:event eid:entity_eid properties:[_urlHandler MediaURLs:result.URL]];
+                                        [self insertEvent:e1 backlog:NO nextIsGrouped:NO];
+                                    } else {
+                                        NSLog(@"METADATA FAILED: %@: %@", result.URL, error);
+                                    }
+                                }
+                            }];
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -1423,17 +1462,22 @@ extern UIImage *__socketClosedBackgroundImage;
     e1.realname = parent.realname;
     e1.hostmask = parent.hostmask;
     e1.parent = parent.eid;
-    if([[properties objectForKey:@"mime_type"] hasPrefix:@"image/"] && ![[properties objectForKey:@"mime_type"] isEqualToString:@"image/webp"])
-        e1.rowType = ROW_THUMBNAIL;
-    else
-        e1.rowType = ROW_FILE;
     
-    int bytes = [[properties objectForKey:@"size"] intValue];
-    if(bytes < 1024) {
-        e1.msg = [NSString stringWithFormat:@"%lu B", (unsigned long)bytes];
+    if([properties objectForKey:@"id"]) {
+        if([[properties objectForKey:@"mime_type"] hasPrefix:@"image/"] && ![[properties objectForKey:@"mime_type"] isEqualToString:@"image/webp"])
+            e1.rowType = ROW_THUMBNAIL;
+        else
+            e1.rowType = ROW_FILE;
+        int bytes = [[properties objectForKey:@"size"] intValue];
+        if(bytes < 1024) {
+            e1.msg = [NSString stringWithFormat:@"%lu B", (unsigned long)bytes];
+        } else {
+            int exp = (int)(log(bytes) / log(1024));
+            e1.msg = [NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1]];
+        }
     } else {
-        int exp = (int)(log(bytes) / log(1024));
-        e1.msg = [NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1]];
+        e1.rowType = ROW_THUMBNAIL;
+        e1.msg = [properties objectForKey:@"description"] ? [properties objectForKey:@"description"] : @"";
     }
     e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:parent.bgColor;
     if([parent.type isEqualToString:@"buffer_me_msg"])
@@ -1441,7 +1485,9 @@ extern UIImage *__socketClosedBackgroundImage;
     else
         e1.type = parent.type;
     e1.entities = properties;
-    
+    e1.formattedMsg = e1.msg;
+    [self _format:e1];
+    [self _calculateHeight:e1];
     return e1;
 }
 
@@ -1794,6 +1840,7 @@ extern UIImage *__socketClosedBackgroundImage;
         __disableCodeSpanPref = NO;
         __disableCodeBlockPref = NO;
         __disableQuotePref = NO;
+        __inlineMediaPref = NO;
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         if(prefs) {
             __monospacePref = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
@@ -1847,9 +1894,36 @@ extern UIImage *__socketClosedBackgroundImage;
             
             if([[prefs objectForKey:@"files-disableinline"] boolValue] || (disableFilesMap && [[disableFilesMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
                 __disableInlineFilesPref = YES;
+
+            __inlineMediaPref = [[prefs objectForKey:@"inlineimages"] boolValue];
+            if(__inlineMediaPref) {
+                NSDictionary *disableMap;
+                
+                if([_buffer.type isEqualToString:@"channel"]) {
+                    disableMap = [prefs objectForKey:@"channel-inlineimages-disable"];
+                } else {
+                    disableMap = [prefs objectForKey:@"buffer-inlineimages-disable"];
+                }
+                
+                if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                    __inlineMediaPref = NO;
+            } else {
+                NSDictionary *enableMap;
+                
+                if([_buffer.type isEqualToString:@"channel"]) {
+                    enableMap = [prefs objectForKey:@"channel-inlineimages"];
+                } else {
+                    enableMap = [prefs objectForKey:@"buffer-inlineimages"];
+                }
+                
+                if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                    __inlineMediaPref = YES;
+            }
             
-            if([[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"] && ![NetworkConnection sharedInstance].isWifi)
+            if([[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"] && ![NetworkConnection sharedInstance].isWifi) {
                 __disableInlineFilesPref = YES;
+                __inlineMediaPref = NO;
+            }
         }
         __largeAvatarHeight = MIN(32, roundf(FONT_SIZE * 2) + (__compact ? 1 : 6));
         if(__monospacePref)
@@ -1956,7 +2030,7 @@ extern UIImage *__socketClosedBackgroundImage;
             NSEnumerator *i = [_data reverseObjectEnumerator];
             Event *event = [i nextObject];
             while(event) {
-                if(event.eid <= _buffer.last_seen_eid && event.rowType != ROW_LASTSEENEID)
+                if((event.eid <= _buffer.last_seen_eid || (event.parent > 0 && event.parent <= _buffer.last_seen_eid)) && event.rowType != ROW_LASTSEENEID)
                     break;
                 e.eid = event.eid - 1;
                 event = [i nextObject];
@@ -2217,13 +2291,63 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)_calculateHeight:(Event *)e {
+    static LinkLabel *message = nil;
+    if(!message) {
+        message = [[LinkLabel alloc] init];
+        message.backgroundColor = [UIColor clearColor];
+        message.textColor = [UIColor messageTextColor];
+        message.numberOfLines = 0;
+        message.lineBreakMode = NSLineBreakByWordWrapping;
+        message.userInteractionEnabled = YES;
+        message.baselineAdjustment = UIBaselineAdjustmentNone;
+    }
+    float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+17);
+    float estimatedWidth = _tableView.frame.size.width - 4 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0);
+    estimatedWidth -= (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?12:22;
+    if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
+        estimatedWidth -= 4;
+    
+    if(!__disableQuotePref && e.isQuoted)
+        estimatedWidth -= 12;
+    
+    if(e.isCodeBlock)
+        estimatedWidth -= 8;
+    
+    if(e.rowType == ROW_THUMBNAIL)
+        estimatedWidth -= 26;
+    
+    message.attributedText = e.formatted;
+
     if(e.rowType == ROW_THUMBNAIL) {
         float width = self.tableView.bounds.size.width/2;
         if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
-            UIImage *img = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
-            if(img) {
+            CGSize size = CGSizeZero;
+            
+            if([e.entities objectForKey:@"id"]) {
+                FLAnimatedImage *animation = [[ImageCache sharedInstance] animatedImageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+                if(animation) {
+                    size = animation.size;
+                } else {
+                    UIImage *img = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+                    if(img)
+                        size = img.size;
+                }
+            } else {
+                FLAnimatedImage *animation = [[ImageCache sharedInstance] animatedImageForURL:[e.entities objectForKey:@"thumb"]];
+                if(animation) {
+                    size = animation.size;
+                } else {
+                    UIImage *img = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
+                    if(img)
+                        size = img.size;
+                }
+            }
+            if(size.width > 0 && size.height > 0) {
                 NSMutableDictionary *entities = [e.entities mutableCopy];
-                [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
+                float ratio = width / size.width;
+                size.width = width;
+                size.height = size.height * ratio;
+                [entities setObject:@{@"width":@(size.width), @"height":@(size.height)} forKey:@"properties"];
                 e.entities = entities;
                 e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue]) + (__compact?18:24);
             } else {
@@ -2235,36 +2359,13 @@ extern UIImage *__socketClosedBackgroundImage;
             float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
             e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + (__compact?18:24);
         }
-        e.height += FONT_SIZE + 2;
+
+        e.height += floorf([message sizeThatFits:CGSizeMake(estimatedWidth, CGFLOAT_MAX)].height + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0));
         if([[e.entities objectForKey:@"name"] length])
             e.height += FONT_SIZE + 2;
     } else if(e.rowType == ROW_FILE) {
         e.height = FONT_SIZE * 3 + (__compact?24:30);
     } else {
-        float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+17);
-        float estimatedWidth = _tableView.frame.size.width - 4 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0);
-        estimatedWidth -= (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?12:22;
-        if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
-            estimatedWidth -= 4;
-        
-        if(!__disableQuotePref && e.isQuoted)
-            estimatedWidth -= 12;
-        
-        if(e.isCodeBlock)
-            estimatedWidth -= 8;
-        
-        static LinkLabel *message = nil;
-        if(!message) {
-            message = [[LinkLabel alloc] init];
-            message.backgroundColor = [UIColor clearColor];
-            message.textColor = [UIColor messageTextColor];
-            message.numberOfLines = 0;
-            message.lineBreakMode = NSLineBreakByWordWrapping;
-            message.userInteractionEnabled = YES;
-            message.baselineAdjustment = UIBaselineAdjustmentNone;
-        }
-        message.attributedText = e.formatted;
-        
         e.height = floorf([message sizeThatFits:CGSizeMake(estimatedWidth, CGFLOAT_MAX)].height + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0));
         if(!__compact)
             e.height += MESSAGE_LINE_PADDING;
@@ -2308,6 +2409,8 @@ extern UIImage *__socketClosedBackgroundImage;
             } else if(e.height == 0 && e.formatted) {
                 [self _calculateHeight:e];
                 //NSLog(@"MSG: %@ Height: %f", e.msg, e.height);
+                return e.height;
+            } else if(e.rowType == ROW_THUMBNAIL) {
                 return e.height;
             }
         } else if(e.rowType == ROW_LASTSEENEID) {
@@ -2512,35 +2615,69 @@ extern UIImage *__socketClosedBackgroundImage;
                 cell.thumbnailWidth = width;
                 cell.thumbnailHeight = 48;
             }
-            cell.mimeType.text = [NSString stringWithFormat:@"%@ • %@", [e.entities objectForKey:@"mime_type"], e.msg];
-            cell.thumbnail.animatedImage = [[ImageCache sharedInstance] animatedImageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
-            if(!cell.thumbnail.animatedImage)
-                cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
-            cell.spinner.hidden = (cell.thumbnail.image != nil || cell.thumbnail.animatedImage != nil);
-            cell.thumbnail.hidden = !cell.spinner.hidden;
+            if([e.entities objectForKey:@"id"]) {
+                cell.mimeType.text = [NSString stringWithFormat:@"%@ • %@", [e.entities objectForKey:@"mime_type"], e.msg];
+                cell.mimeType.numberOfLines = 1;
+                cell.mimeType.lineBreakMode = NSLineBreakByTruncatingTail;
+                cell.thumbnail.animatedImage = [[ImageCache sharedInstance] animatedImageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+                if(!cell.thumbnail.animatedImage)
+                    cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+            } else {
+                cell.mimeType.text = [e.entities objectForKey:@"description"];
+                cell.mimeType.numberOfLines = 0;
+                cell.mimeType.lineBreakMode = NSLineBreakByWordWrapping;
+                cell.thumbnail.animatedImage = [[ImageCache sharedInstance] animatedImageForURL:[e.entities objectForKey:@"thumb"]];
+                if(!cell.thumbnail.animatedImage)
+                    cell.thumbnail.image = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
+            }
+            cell.spinner.hidden = YES;
+            cell.thumbnail.hidden = !(cell.thumbnail.image != nil || cell.thumbnail.animatedImage != nil);
             if(!cell.thumbnail.image && !cell.thumbnail.animatedImage) {
-                if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)].path]) {
-                    [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(BOOL success) {
-                        if(success) {
-                            if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
-                                NSMutableDictionary *entities = [e.entities mutableCopy];
-                                UIImage *img = [UIImage imageWithContentsOfFile:[[ImageCache sharedInstance] pathForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)].path];
-                                [entities setObject:@{@"width":@(img.size.width), @"height":@(img.size.height)} forKey:@"properties"];
-                                e.entities = entities;
+                if([e.entities objectForKey:@"id"]) {
+                    if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)].path]) {
+                        cell.spinner.hidden = NO;
+                        [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(BOOL success) {
+                            if(success) {
+                                [self _calculateHeight:e];
+                            } else {
+                                e.rowType = ROW_FILE;
                             }
-                            [self _calculateHeight:e];
-                        } else {
-                            e.rowType = ROW_FILE;
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                cell.spinner.hidden = YES;
+                                [self.tableView reloadData];
+                            }];
+                        }];
+                    } else {
+                        e.rowType = ROW_FILE;
+                        cell.thumbnailWidth = 0;
+                        cell.thumbnailHeight = 0;
+                        cell.spinner.hidden = YES;
+                    }
+                } else {
+                    if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:[e.entities objectForKey:@"thumb"]].path]) {
+                        cell.spinner.hidden = NO;
+                        [[ImageCache sharedInstance] fetchURL:[e.entities objectForKey:@"thumb"] completionHandler:^(BOOL success) {
+                            if(success) {
+                                [self _calculateHeight:e];
+                            } else {
+                                @synchronized(_data) {
+                                    [_data removeObject:e];
+                                }
+                            }
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                cell.spinner.hidden = YES;
+                                [self.tableView reloadData];
+                            }];
+                        }];
+                    } else {
+                        cell.spinner.hidden = YES;
+                        @synchronized(_data) {
+                            [_data removeObject:e];
                         }
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                             [self.tableView reloadData];
                         }];
-                    }];
-                } else {
-                    e.rowType = ROW_FILE;
-                    cell.thumbnailWidth = 0;
-                    cell.thumbnailHeight = 0;
-                    cell.spinner.hidden = YES;
+                    }
                 }
             } else if(![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
                 NSMutableDictionary *entities = [e.entities mutableCopy];
@@ -2570,6 +2707,8 @@ extern UIImage *__socketClosedBackgroundImage;
             
             cell.extension.text = extension.uppercaseString;
             cell.mimeType.text = [e.entities objectForKey:@"mime_type"];
+            cell.mimeType.numberOfLines = 1;
+            cell.mimeType.lineBreakMode = NSLineBreakByTruncatingTail;
             cell.spinner.hidden = YES;
         }
         
@@ -2870,10 +3009,14 @@ extern UIImage *__socketClosedBackgroundImage;
             else if([e.type isEqualToString:@"callerid"])
                 [_conn say:[NSString stringWithFormat:@"/accept %@", e.nick] to:nil cid:e.cid handler:nil];
             else if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE) {
-                NSString *extension = [e.entities objectForKey:@"extension"];
-                if(!extension.length)
-                    extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
-                [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [_file_url_template relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]]];
+                if([e.entities objectForKey:@"id"]) {
+                    NSString *extension = [e.entities objectForKey:@"extension"];
+                    if(!extension.length)
+                        extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
+                    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [_file_url_template relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]]];
+                } else {
+                    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[e.entities objectForKey:@"url"]];
+                }
             } else
                 [_delegate rowSelected:e];
         }

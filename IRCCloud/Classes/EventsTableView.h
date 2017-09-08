@@ -22,6 +22,7 @@
 #import "HighlightsCountView.h"
 #import "CSURITemplate.h"
 #import "LinkLabel.h"
+#import "URLHandler.h"
 
 @protocol EventsTableViewDelegate<NSObject>
 -(void)rowSelected:(Event *)event;
@@ -82,6 +83,7 @@
     NSMutableDictionary *_rowCache;
     NSMutableDictionary *_filePropsCache;
     NSMutableSet *_closedPreviews;
+    URLHandler *_urlHandler;
 }
 @property (readonly) UITableView *tableView;
 @property (readonly) UIView *topUnreadView;

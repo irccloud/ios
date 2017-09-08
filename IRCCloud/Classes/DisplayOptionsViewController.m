@@ -53,6 +53,8 @@
     NSMutableDictionary *enableReadOnSelect = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *disableReadOnSelect = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *disableInlineFiles = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *inlineImages = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *disableInlineImages = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
     
     if([_buffer.type isEqualToString:@"channel"]) {
@@ -178,7 +180,29 @@
             [prefs setObject:disableInlineFiles forKey:@"channel-files-disableinline"];
         else
             [prefs removeObjectForKey:@"channel-files-disableinline"];
-    } else {
+
+        if([[prefs objectForKey:@"channel-inlineimages"] isKindOfClass:[NSDictionary class]])
+            [inlineImages addEntriesFromDictionary:[prefs objectForKey:@"channel-inlineimages"]];
+        if(_inlineImages.on)
+            [inlineImages setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [inlineImages removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(inlineImages.count)
+            [prefs setObject:inlineImages forKey:@"channel-inlineimages"];
+        else
+            [prefs removeObjectForKey:@"channel-inlineimages"];
+
+        if([[prefs objectForKey:@"channel-inlineimages-disable"] isKindOfClass:[NSDictionary class]])
+            [disableInlineImages addEntriesFromDictionary:[prefs objectForKey:@"channel-inlineimages-disable"]];
+        if(_inlineImages.on)
+            [disableInlineImages removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [disableInlineImages setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(disableInlineImages.count)
+            [prefs setObject:disableInlineImages forKey:@"channel-inlineimages-disable"];
+        else
+            [prefs removeObjectForKey:@"channel-inlineimages-disable"];
+} else {
         if([[prefs objectForKey:@"buffer-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
             [disableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableReadOnSelect"]];
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
@@ -373,6 +397,19 @@
             _disableInlineFiles.on = NO;
         else
             _disableInlineFiles.on = YES;
+        
+        _inlineImages.on = [[prefs objectForKey:@"inlineimages"] boolValue];
+        if(_inlineImages.on) {
+            NSDictionary *disableMap = [prefs objectForKey:@"channel-inlineimages-disable"];
+            
+            if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                _inlineImages.on = NO;
+        } else {
+            NSDictionary *enableMap = [prefs objectForKey:@"channel-inlineimages"];
+            
+            if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                _inlineImages.on = YES;
+        }
     } else {
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
             if([[[prefs objectForKey:@"buffer-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
@@ -417,6 +454,19 @@
             _disableInlineFiles.on = NO;
         else
             _disableInlineFiles.on = YES;
+        
+        _inlineImages.on = [[prefs objectForKey:@"inlineimages"] boolValue];
+        if(_inlineImages.on) {
+            NSDictionary *disableMap = [prefs objectForKey:@"buffer-inlineimages-disable"];
+            
+            if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                _inlineImages.on = NO;
+        } else {
+            NSDictionary *enableMap = [prefs objectForKey:@"buffer-inlineimages"];
+            
+            if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                _inlineImages.on = YES;
+        }
     }
     _collapseJoinPart.enabled = _showJoinPart.on;
     _disableNickSuggestions.on = !([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]);
@@ -436,6 +486,7 @@
     _readOnSelect = [[UISwitch alloc] init];
     _disableInlineFiles = [[UISwitch alloc] init];
     _disableNickSuggestions = [[UISwitch alloc] init];
+    _inlineImages = [[UISwitch alloc] init];
 
     [self refresh];
 }
@@ -464,11 +515,11 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if([_buffer.type isEqualToString:@"channel"])
-        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?6:7;
+        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?8:9;
     else if([_buffer.type isEqualToString:@"console"])
         return 3;
     else
-        return 5;
+        return 6;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -522,6 +573,10 @@
         case 7:
             cell.textLabel.text = @"Embed uploaded files";
             cell.accessoryView = _disableInlineFiles;
+            break;
+        case 8:
+            cell.textLabel.text = @"Embed external media";
+            cell.accessoryView = _inlineImages;
             break;
     }
     return cell;

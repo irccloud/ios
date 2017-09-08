@@ -227,6 +227,7 @@
                 [[ChannelsDataSource sharedInstance] clear];
                 [[UsersDataSource sharedInstance] clear];
             }
+            [_events removeAllObjects];
         }
 #endif
         _dirtyBIDs = [[NSMutableDictionary alloc] init];
