@@ -90,8 +90,8 @@
 
 #define IS_FLICKR(url) ([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [[url.path lowercaseString] hasPrefix:@"/photos/"])
 
-#define IS_INSTAGRAM(url) (([[url.host lowercaseString] isEqualToString:@"instagram.com"] || \
-                            [[url.host lowercaseString] isEqualToString:@"instagr.am"]) \
+#define IS_INSTAGRAM(url) (([[url.host lowercaseString] hasSuffix:@"instagram.com"] || \
+                            [[url.host lowercaseString] hasSuffix:@"instagr.am"]) \
                            && [[url.path lowercaseString] hasPrefix:@"/p/"])
 
 #define IS_DROPLR(url) (([[url.host lowercaseString] isEqualToString:@"droplr.com"] || \
@@ -108,8 +108,6 @@
 #define IS_LEET(url) (([url.host.lowercaseString hasSuffix:@"leetfiles.com"] || [url.host.lowercaseString hasSuffix:@"leetfil.es"]) \
                         && [url.path.lowercaseString hasPrefix:@"/image"])
 
-#define IS_GFYCAT(url) (([[url.host lowercaseString] isEqualToString:@"gfycat.com"] || [[url.host lowercaseString] isEqualToString:@"www.gfycat.com"]) && url.path.length > 1 && [url.path rangeOfString:@"/" options:NSBackwardsSearch].location == 0)
-
 #define IS_GIPHY(url) ((([url.host.lowercaseString isEqualToString:@"giphy.com"] || [url.host.lowercaseString isEqualToString:@"www.giphy.com"]) && [url.path.lowercaseString hasPrefix:@"/gifs/"]) || [url.host.lowercaseString isEqualToString:@"gph.is"])
 
 #define IS_YOUTUBE(url) ((([url.host.lowercaseString isEqualToString:@"youtube.com"] || [url.host.lowercaseString hasSuffix:@".youtube.com"]) && [url.path.lowercaseString hasPrefix:@"/watch"]) || [url.host.lowercaseString isEqualToString:@"youtu.be"])
@@ -118,11 +116,279 @@
 
 #define IS_TWIMG(url) ([url.host.lowercaseString hasSuffix:@".twimg.com"] && [url.path.lowercaseString hasPrefix:@"/media/"] && [url.path rangeOfString:@":"].location != NSNotFound && HAS_IMAGE_SUFFIX([url.path substringToIndex:[url.path rangeOfString:@":"].location].lowercaseString))
 
+-(instancetype)init {
+    self = [super init];
+    
+    if(self) {
+        _tasks = [[NSMutableDictionary alloc] init];
+        _mediaURLs = [[NSMutableDictionary alloc] init];
+    }
+    
+    return self;
+}
+
+-(NSDictionary *)MediaURLs:(NSURL *)original_url {
+    NSURL *url = original_url;
+    if([_mediaURLs objectForKey:url])
+        return [_mediaURLs objectForKey:url];
+    
+    if([[url.host lowercaseString] isEqualToString:@"www.dropbox.com"]) {
+        if([url.path hasPrefix:@"/s/"])
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"https://dl.dropboxusercontent.com%@", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        else
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?dl=1", url.absoluteString]];
+    } else if(([[url.host lowercaseString] isEqualToString:@"d.pr"] || [[url.host lowercaseString] isEqualToString:@"droplr.com"]) && [url.path hasPrefix:@"/i/"] && ![url.path hasSuffix:@"+"]) {
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"https://droplr.com%@+", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+    } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) {
+        return nil;
+    } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"]) {
+        return nil;
+    } else if(([[url.host lowercaseString] hasSuffix:@"giphy.com"] || [[url.host lowercaseString] isEqualToString:@"gph.is"]) && url.pathExtension.length == 0) {
+        return nil;
+    } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
+        return nil;
+    } else if(([[url.host lowercaseString] hasSuffix:@"instagram.com"] || [[url.host lowercaseString] hasSuffix:@"instagr.am"]) && [url.path hasPrefix:@"/p/"]) {
+        return nil;
+    } else if([url.host.lowercaseString isEqualToString:@"cl.ly"]) {
+        return nil;
+    } else if([url.path hasPrefix:@"/wiki/"] && [url.absoluteString containsString:@"/File:"]) {
+        return nil;
+    } else if([url.host hasSuffix:@"leetfiles.com"]) {
+        NSString *u = url.absoluteString;
+        u = [u stringByReplacingOccurrencesOfString:@"www." withString:@""];
+        u = [u stringByReplacingOccurrencesOfString:@"leetfiles.com/image" withString:@"i.leetfiles.com/"];
+        u = [u stringByReplacingOccurrencesOfString:@"?id=" withString:@""];
+        url = [NSURL URLWithString:u];
+    } else if([url.host hasSuffix:@"leetfil.es"]) {
+        NSString *u = url.absoluteString;
+        u = [u stringByReplacingOccurrencesOfString:@"www." withString:@""];
+        u = [u stringByReplacingOccurrencesOfString:@"leetfil.es/image" withString:@"i.leetfiles.com/"];
+        u = [u stringByReplacingOccurrencesOfString:@"?id=" withString:@""];
+        url = [NSURL URLWithString:u];
+    }
+    
+    [_mediaURLs setObject:@{@"thumb":url, @"image":url} forKey:original_url];
+    
+    return [_mediaURLs objectForKey:url];
+}
+
+-(void)fetchMediaURLs:(NSURL *)url result:(mediaURLResult)callback {
+    if([_mediaURLs objectForKey:url]) {
+        callback(YES, [_mediaURLs objectForKey:url]);
+    } else if(![_tasks objectForKey:url]) {
+        [_tasks setObject:@(YES) forKey:url];
+        
+        if([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) {
+            NSString *imageID = [url.path substringFromIndex:1];
+            if([imageID rangeOfString:@"/"].location == NSNotFound) {
+                [self _loadImgur:imageID type:@"image" result:callback original_url:url];
+            } else if([imageID hasPrefix:@"gallery/"]) {
+                [self _loadImgur:[imageID substringFromIndex:8] type:@"gallery" result:callback original_url:url];
+            } else if([imageID hasPrefix:@"a/"]) {
+                [self _loadImgur:[imageID substringFromIndex:2] type:@"album" result:callback original_url:url];
+            } else {
+                callback(NO, @"Invalid URL");
+            }
+        } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"]) {
+            [self _loadImgur:[url.path substringToIndex:[url.path rangeOfString:@"."].location] type:@"image" result:callback original_url:url];
+        } else if(([[url.host lowercaseString] hasSuffix:@"giphy.com"] || [[url.host lowercaseString] isEqualToString:@"gph.is"]) && url.pathExtension.length == 0) {
+            NSString *u = url.absoluteString;
+            if([u rangeOfString:@"/gifs/"].location != NSNotFound) {
+                u = [NSString stringWithFormat:@"http://giphy.com/gifs/%@", [url.pathComponents objectAtIndex:2]];
+            }
+            [self _loadOembed:[NSString stringWithFormat:@"https://giphy.com/services/oembed/?url=%@", u] result:callback original_url:url];
+        } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
+            [self _loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString] result:callback original_url:url];
+        } else if(([[url.host lowercaseString] hasSuffix:@"instagram.com"] || [[url.host lowercaseString] hasSuffix:@"instagr.am"]) && [url.path hasPrefix:@"/p/"]) {
+            [self _loadOembed:[NSString stringWithFormat:@"http://api.instagram.com/oembed?url=%@", url.absoluteString] result:callback original_url:url];
+        } else if([url.host.lowercaseString isEqualToString:@"cl.ly"]) {
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+            [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+            [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                if (error) {
+                    NSLog(@"Error fetching cl.ly metadata. Error %li : %@", (long)error.code, error.userInfo);
+                    callback(NO,error.localizedDescription);
+                } else {
+                    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                    if([[dict objectForKey:@"item_type"] isEqualToString:@"image"]) {
+                        [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"content_url"]],
+                                                @"image":[NSURL URLWithString:[dict objectForKey:@"content_url"]]
+                                                } forKey:url];
+                        callback(YES, nil);
+                    } else {
+                        NSLog(@"Invalid type from cl.ly");
+                        callback(NO,@"This image type is not supported");
+                    }
+                }
+            }];
+        } else if([url.path hasPrefix:@"/wiki/"] && [url.absoluteString containsString:@"/File:"]) {
+            NSString *title = [url.absoluteString substringFromIndex:[url.absoluteString rangeOfString:@"/File:"].location + 1];
+            NSURL *wikiurl = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@%@", url.scheme, url.host, url.port,[[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", title] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:wikiurl];
+            [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+            [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+                if (error) {
+                    NSLog(@"Error fetching MediaWiki metadata. Error %li : %@", (long)error.code, error.userInfo);
+                    callback(NO,error.localizedDescription);
+                } else {
+                    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                    NSDictionary *page = [[[[dict objectForKey:@"query"] objectForKey:@"pages"] allValues] objectAtIndex:0];
+                    if(page && [page objectForKey:@"imageinfo"]) {
+                        [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]],
+                                                @"image":[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]]
+                                                } forKey:url];
+                        callback(YES, nil);
+                    } else {
+                        NSLog(@"Invalid data from MediaWiki");
+                        callback(NO,@"This image type is not supported");
+                    }
+                }
+            }];
+        }
+    }
+}
+
+-(void)_loadOembed:(NSString *)url result:(mediaURLResult)callback original_url:(NSURL *)original_url {
+    NSURL *URL = [NSURL URLWithString:url];
+    NSURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error fetching oembed. Error %li : %@", (long)error.code, error.userInfo);
+            callback(NO,error.localizedDescription);
+        } else {
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+            if([[dict objectForKey:@"type"] isEqualToString:@"photo"]) {
+                [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"url"]],
+                                        @"image":[NSURL URLWithString:[dict objectForKey:@"url"]]
+                                        } forKey:original_url];
+                callback(YES, nil);
+            } else if([[dict objectForKey:@"provider_name"] isEqualToString:@"Instagram"]) {
+                [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"thumbnail_url"]],
+                                        @"image":[NSURL URLWithString:[dict objectForKey:@"thumbnail_url"]],
+                                        @"description":[dict objectForKey:@"title"]
+                                        } forKey:original_url];
+                callback(YES, nil);
+            } else if([[dict objectForKey:@"provider_name"] isEqualToString:@"Giphy"] && [[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location != NSNotFound) {
+                if([dict objectForKey:@"image"] && [[dict objectForKey:@"image"] hasSuffix:@".gif"]) {
+                    [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"image"]],
+                                            @"image":[NSURL URLWithString:[dict objectForKey:@"image"]]
+                                            } forKey:original_url];
+                    callback(YES, nil);
+                } else {
+                    [self _loadGiphy:[[dict objectForKey:@"url"] substringFromIndex:[[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location + 6] result:callback original_url:original_url];
+                }
+            } else {
+                NSLog(@"Invalid type from oembed");
+                callback(NO,@"This URL type is not supported");
+            }
+        }
+    }];
+}
+
+-(void)_loadGiphy:(NSString *)gifID result:(mediaURLResult)callback original_url:(NSURL *)original_url {
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.giphy.com/v1/gifs/%@?api_key=dc6zaTOxFJmzC", gifID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error fetching giphy. Error %li : %@", (long)error.code, error.userInfo);
+            callback(NO,error.localizedDescription);
+        } else {
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+            if([[[dict objectForKey:@"meta"] objectForKey:@"status"] intValue] == 200 && [[dict objectForKey:@"data"] objectForKey:@"images"]) {
+                dict = [[[dict objectForKey:@"data"] objectForKey:@"images"] objectForKey:@"original"];
+                if([[dict objectForKey:@"mp4"] length]) {
+                    [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"url"]],
+                                            @"mp4":[NSURL URLWithString:[dict objectForKey:@"mp4"]]
+                                            } forKey:original_url];
+                    callback(YES, nil);
+                } else if([[dict objectForKey:@"url"] hasSuffix:@".gif"]) {
+                    [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"url"]],
+                                            @"image":[NSURL URLWithString:[dict objectForKey:@"url"]]
+                                            } forKey:original_url];
+                    callback(YES, nil);
+                } else {
+                    CLS_LOG(@"Invalid type from giphy: %@", dict);
+                    callback(NO,@"This image type is not supported");
+                }
+            } else {
+                CLS_LOG(@"giphy failure: %@", dict);
+                callback(NO,@"Unexpected response from server");
+            }
+        }
+    }];
+}
+
+-(void)_loadImgur:(NSString *)ID type:(NSString *)type result:(mediaURLResult)callback original_url:(NSURL *)original_url {
+#ifdef MASHAPE_KEY
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://imgur-apiv3.p.mashape.com/3/%@/%@", type, ID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setValue:@MASHAPE_KEY forHTTPHeaderField:@"X-Mashape-Authorization"];
+#else
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.imgur.com/3/%@/%@", type, ID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+#endif
+    [request setHTTPShouldHandleCookies:NO];
+#ifdef IMGUR_KEY
+    [request setValue:[NSString stringWithFormat:@"Client-ID %@", @IMGUR_KEY] forHTTPHeaderField:@"Authorization"];
+#endif
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            CLS_LOG(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
+            callback(NO,error.localizedDescription);
+        } else {
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+            if([[dict objectForKey:@"success"] intValue]) {
+                dict = [dict objectForKey:@"data"];
+                NSString *title = [dict objectForKey:@"title"];
+                if([[dict objectForKey:@"images_count"] intValue] == 1 || [[dict objectForKey:@"is_album"] intValue] == 0) {
+                    if([dict objectForKey:@"images"] && [(NSDictionary *)[dict objectForKey:@"images"] count] == 1)
+                        dict = [[dict objectForKey:@"images"] objectAtIndex:0];
+                    if([[dict objectForKey:@"title"] length])
+                        title = [dict objectForKey:@"title"];
+                    if([[dict objectForKey:@"type"] hasPrefix:@"image/"] && [[dict objectForKey:@"animated"] intValue] == 0) {
+                        [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"link"]],
+                                                @"image":[NSURL URLWithString:[dict objectForKey:@"link"]],
+                                                @"title":title,
+                                                @"description":[dict objectForKey:@"description"]
+                                                } forKey:original_url];
+                        callback(YES, nil);
+                    } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
+                        if([[dict objectForKey:@"looping"] intValue] == 1) {
+                            [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"link"]],
+                                                    @"mp4_loop":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
+                                                    @"title":title,
+                                                    @"description":[dict objectForKey:@"description"]
+                                                    } forKey:original_url];
+                            callback(YES, nil);
+                        } else {
+                            [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"link"]],
+                                                    @"mp4":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
+                                                    @"title":title,
+                                                    @"description":[dict objectForKey:@"description"]
+                                                    } forKey:original_url];
+                            callback(YES, nil);
+                        }
+                    } else {
+                        CLS_LOG(@"Invalid type from imgur: %@", dict);
+                        callback(NO,@"This image type is not supported");
+                    }
+                } else {
+                    CLS_LOG(@"Too many images from imgur: %@", dict);
+                    callback(NO,@"Albums with multiple images are not supported");
+                }
+            } else {
+                CLS_LOG(@"Imgur failure: %@", dict);
+                callback(NO,@"Unexpected response from server");
+            }
+        }
+    }];
+}
+
 + (BOOL)isImageURL:(NSURL *)url
 {
     NSString *l = [url.path lowercaseString];
     // Use pre-processor macros instead of variables so conditions are still evaluated lazily
-    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GFYCAT(url) || IS_GIPHY(url) || IS_WIKI(url) || IS_TWIMG(url));
+    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GIPHY(url) || IS_WIKI(url) || IS_TWIMG(url));
 }
 
 + (BOOL)isYouTubeURL:(NSURL *)url

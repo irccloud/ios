@@ -19,6 +19,7 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import "OpenInChromeController.h"
 #import "FLAnimatedImageView.h"
+#import "URLHandler.h"
 
 @interface ImageViewController : UIViewController<UIScrollViewDelegate,NSURLConnectionDataDelegate,UIPopoverPresentationControllerDelegate,UIGestureRecognizerDelegate> {
     IBOutlet FLAnimatedImageView *_imageView;
@@ -32,6 +33,7 @@
     NSURLConnection *_connection;
     BOOL _previewing;
     UIPanGestureRecognizer *_panGesture;
+    URLHandler *_urlHandler;
 }
 @property BOOL previewing;
 -(id)initWithURL:(NSURL *)url;

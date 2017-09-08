@@ -16,7 +16,12 @@
 
 #import <Foundation/Foundation.h>
 
-@interface URLHandler : NSObject <UIAlertViewDelegate>
+typedef void (^mediaURLResult)(BOOL, NSString *);
+
+@interface URLHandler : NSObject <UIAlertViewDelegate> {
+    NSMutableDictionary *_tasks;
+    NSMutableDictionary *_mediaURLs;
+}
 
 @property (nonatomic, copy) NSURL *appCallbackURL;
 
@@ -25,4 +30,6 @@
 - (void)launchURL:(NSURL *)url;
 + (UIActivityViewController *)activityControllerForItems:(NSArray *)items type:(NSString *)type;
 + (int)URLtoBID:(NSURL *)url;
+- (NSDictionary *)MediaURLs:(NSURL *)url;
+- (void)fetchMediaURLs:(NSURL *)url result:(mediaURLResult)callback;
 @end
