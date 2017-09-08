@@ -21,7 +21,7 @@ Screenshots
 
 Requirements
 ------
-* XCode 6
+* Xcode 6
 * iOS 8.1 SDK
 * An iPhone, iPad, or iPod Touch running iOS 5.0 or newer
 
