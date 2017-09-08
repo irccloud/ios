@@ -47,6 +47,7 @@
 +(void)emojify:(NSMutableString *)text;
 +(NSString *)toIRC:(NSAttributedString *)string;
 +(NSAttributedString *)stripUnsupportedAttributes:(NSAttributedString *)input fontSize:(CGFloat)fontSize;
++(NSArray *)webURLs:(NSString *)string;
 @end
 
 @interface NSString (ColorFormatter)
