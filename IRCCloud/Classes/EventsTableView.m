@@ -2719,6 +2719,10 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.emojiOnly = e.isEmojiOnly;
         cell.codeBlockBackground.backgroundColor = [UIColor codeSpanBackgroundColor];
         cell.codeBlockBackground.hidden = !e.isCodeBlock;
+        if(cell.spinner.hidden && cell.spinner.animating)
+            [cell.spinner stopAnimating];
+        else if(!cell.spinner.hidden && !cell.spinner.animating)
+            [cell.spinner startAnimating];
         return cell;
     }
 }
