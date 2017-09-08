@@ -3472,7 +3472,8 @@ NSArray *_sortedChannels;
         }
         if(_selectedEvent.rowType == ROW_THUMBNAIL || _selectedEvent.rowType == ROW_FILE)
             [sheet addButtonWithTitle:@"Close Preview"];
-        [sheet addButtonWithTitle:@"Copy Message"];
+        if(_selectedEvent.msg.length)
+            [sheet addButtonWithTitle:@"Copy Message"];
     }
     if(_selectedUser) {
         [sheet addButtonWithTitle:@"Whois"];
@@ -3753,7 +3754,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect link:(NSString *)url {
-    if(event && (event.msg.length || event.groupMsg.length)) {
+    if(event && (event.msg.length || event.groupMsg.length || event.rowType == ROW_THUMBNAIL)) {
         NSString *from = event.from;
         if(!from.length)
             from = event.nick;

@@ -1427,6 +1427,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 
                 if(!found) {
                     entity_eid = event.eid + ++event.childEventCount;
+                    if([_closedPreviews containsObject:@(entity_eid)])
+                        continue;
                     if([URLHandler isImageURL:result.URL]) {
                         if([_urlHandler MediaURLs:result.URL]) {
                             Event *e1 = [self entity:event eid:entity_eid properties:[_urlHandler MediaURLs:result.URL]];
@@ -1477,7 +1479,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
     } else {
         e1.rowType = ROW_THUMBNAIL;
-        e1.msg = [properties objectForKey:@"description"] ? [properties objectForKey:@"description"] : @"";
+        e1.msg = @"";
     }
     e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:parent.bgColor;
     if([parent.type isEqualToString:@"buffer_me_msg"])
@@ -2319,6 +2321,7 @@ extern UIImage *__socketClosedBackgroundImage;
     message.attributedText = e.formatted;
 
     if(e.rowType == ROW_THUMBNAIL) {
+        message.attributedText = [ColorFormatter format:[e.entities objectForKey:@"description"] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:nil largeEmoji:NO];
         float width = self.tableView.bounds.size.width/2;
         if(![[e.entities objectForKey:@"properties"] objectForKey:@"width"] || ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
             CGSize size = CGSizeZero;
@@ -3050,7 +3053,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 EventsTableCell *c = (EventsTableCell *)[_tableView cellForRowAtIndexPath:indexPath];
                 NSURL *url;
                 if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE)
-                    url = [NSURL URLWithString:[e.entities objectForKey:@"url"]];
+                    url = [e.entities objectForKey:@"id"]?[NSURL URLWithString:[e.entities objectForKey:@"url"]]:[e.entities objectForKey:@"url"];
                 else
                     url = [c.message linkAtPoint:[gestureRecognizer locationInView:c.message]].URL;
                 if(url) {
