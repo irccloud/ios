@@ -86,7 +86,7 @@
 
 #define HAS_IMAGE_SUFFIX(l) ([l hasSuffix:@"jpg"] || [l hasSuffix:@"jpeg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"] || [l hasSuffix:@"bmp"])
 
-#define IS_IMGUR(url) (([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) || ([[url.host lowercaseString] isEqualToString:@"i.imgur.com"] && ([url.path hasSuffix:@".gifv"] || [url.path hasSuffix:@".webm"])))
+#define IS_IMGUR(url) (([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) || ([[url.host lowercaseString] isEqualToString:@"i.imgur.com"] && url.path.length > 1 && ([url.path hasSuffix:@".gifv"] || [url.path hasSuffix:@".webm"])))
 
 #define IS_FLICKR(url) ([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [[url.path lowercaseString] hasPrefix:@"/photos/"])
 
@@ -178,7 +178,7 @@
     } else if(![_tasks objectForKey:url]) {
         [_tasks setObject:@(YES) forKey:url];
         
-        if([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) {
+        if(([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) && url.path.length > 1) {
             NSString *imageID = [url.path substringFromIndex:1];
             if([imageID rangeOfString:@"/"].location == NSNotFound) {
                 [self _loadImgur:imageID type:@"image" result:callback original_url:url];

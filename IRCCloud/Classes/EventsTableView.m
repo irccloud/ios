@@ -552,10 +552,14 @@ extern UIImage *__socketClosedBackgroundImage;
     
     NSURL *url;
     if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE) {
+        if([e.entities objectForKey:@"id"]) {
         NSString *extension = [e.entities objectForKey:@"extension"];
-        if(!extension.length)
-            extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
-        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [_file_url_template relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]];
+            if(!extension.length)
+                extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [_file_url_template relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]];
+        } else {
+            url = [e.entities objectForKey:@"url"];
+        }
     } else {
         NSTextCheckingResult *r = [cell.message linkAtPoint:[_tableView convertPoint:location toView:cell.message]];
         url = r.URL;
