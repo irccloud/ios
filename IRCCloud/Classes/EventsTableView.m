@@ -1721,14 +1721,6 @@ extern UIImage *__socketClosedBackgroundImage;
             [_data insertObject:d atIndex:insertPos++];
         }
         
-        if(insertPos > 0) {
-            Event *prev = [_data objectAtIndex:insertPos - 1];
-            if(prev.rowType == ROW_LASTSEENEID)
-                prev = [_data objectAtIndex:insertPos - 2];
-            e.isHeader = !__chatOneLinePref && (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from]));
-            e.height = 0;
-        }
-        
         if(insertPos < _data.count - 1) {
             Event *next = [_data objectAtIndex:insertPos + 1];
             if(![e isMessage] && e.rowType != ROW_LASTSEENEID) {
@@ -1740,6 +1732,14 @@ extern UIImage *__socketClosedBackgroundImage;
                 e.isHeader = NO;
                 e.height = 0;
             }
+        }
+        
+        if(insertPos > 0 && e.parent == 0) {
+            Event *prev = [_data objectAtIndex:insertPos - 1];
+            if(prev.rowType == ROW_LASTSEENEID)
+                prev = [_data objectAtIndex:insertPos - 2];
+            e.isHeader = !__chatOneLinePref && (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from]));
+            e.height = 0;
         }
         
         [_lock unlock];
