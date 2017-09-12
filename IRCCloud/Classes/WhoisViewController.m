@@ -181,23 +181,10 @@
         for(NSString *channel in channels) {
             NSUInteger offset = data.length;
             [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@" • %@\n", channel] defaultColor:[UIColor messageTextColor] mono:NO linkify:YES server:s links:&matches]];
-            for(NSTextCheckingResult *result in matches) {
-                NSURL *u;
-                if(result.resultType == NSTextCheckingTypeLink) {
-                    u = result.URL;
-                } else {
-                    NSString *url = [[data attributedSubstringFromRange:NSMakeRange(result.range.location+offset, result.range.length)] string];
-                    if(![url hasPrefix:@"irc"]) {
-                        CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                        if(url_escaped != NULL) {
-                            url = [NSString stringWithFormat:@"irc://%i/%@", s.cid, url_escaped];
-                            CFRelease(url_escaped);
-                        }
-                    }
-                    u = [NSURL URLWithString:url];
-
-                }
-                [links addObject:[NSTextCheckingResult linkCheckingResultWithRange:NSMakeRange(result.range.location+offset, result.range.length) URL:u]];
+            CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)channel, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+            if(url_escaped != NULL) {
+                [links addObject:[NSTextCheckingResult linkCheckingResultWithRange:NSMakeRange(offset + 3, data.length - offset - 3) URL:[NSURL URLWithString:[NSString stringWithFormat:@"irc://%i/%@", s.cid, url_escaped]]]];
+                CFRelease(url_escaped);
             }
         }
     }
