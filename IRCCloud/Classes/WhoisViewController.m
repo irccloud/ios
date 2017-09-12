@@ -175,12 +175,11 @@
 }
 
 -(void)addChannels:(NSArray *)channels forGroup:(NSString *)group attributedString:(NSMutableAttributedString *)data links:(NSMutableArray *)links server:(Server *)s {
-    NSArray *matches;
     if(channels.count) {
         [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:[group isEqualToString:@"Member"]?@"%@ of:\n":@"%@ in:\n", group] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil]];
         for(NSString *channel in channels) {
             NSUInteger offset = data.length;
-            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@" • %@\n", channel] defaultColor:[UIColor messageTextColor] mono:NO linkify:YES server:s links:&matches]];
+            [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@" • %@\n", channel] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
             CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)channel, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
             if(url_escaped != NULL) {
                 [links addObject:[NSTextCheckingResult linkCheckingResultWithRange:NSMakeRange(offset + 3, data.length - offset - 3) URL:[NSURL URLWithString:[NSString stringWithFormat:@"irc://%i/%@", s.cid, url_escaped]]]];
