@@ -2832,7 +2832,7 @@ extern UIImage *__socketClosedBackgroundImage;
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
     if(!_ready || !_buffer || _requestingBacklog || [UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
         _stickyAvatar.hidden = YES;
-        if(_hiddenAvatarRow != -1) {
+        if(_data.count && _hiddenAvatarRow != -1) {
             EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
             cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
             _hiddenAvatarRow = -1;
