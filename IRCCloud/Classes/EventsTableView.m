@@ -1847,8 +1847,14 @@ extern UIImage *__socketClosedBackgroundImage;
     @synchronized(self) {
         [_reloadTimer invalidate];
         
-        _reloadTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:_tableView selector:@selector(reloadData) userInfo:nil repeats:NO];
+        _reloadTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_reloadData) userInfo:nil repeats:NO];
     }
+}
+
+- (void)_reloadData {
+    [_tableView reloadData];
+    if(!_buffer.scrolledUp)
+        [self _scrollToBottom];
 }
 
 - (void)refresh {
