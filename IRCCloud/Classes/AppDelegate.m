@@ -86,7 +86,7 @@
 #ifdef CRASHLYTICS_TOKEN
     [Fabric with:@[CrashlyticsKit]];
 #endif
-    if ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+    if (@available(iOS 10, *)) {
         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
         center.delegate = self;
         UNTextInputNotificationAction *replyAction = [UNTextInputNotificationAction actionWithIdentifier:@"reply" title:@"Reply" options:UNNotificationActionOptionAuthenticationRequired textInputButtonTitle:@"Send" textInputPlaceholder:@""];
@@ -107,7 +107,7 @@
     NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
     [[NSFileManager defaultManager] removeItemAtURL:caches error:nil];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+    if(@available(iOS 10, *)) {
 #ifdef ENTERPRISE
         NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
 #else
@@ -649,11 +649,7 @@
     completionHandler(UNNotificationPresentationOptionNone);
 }
 
-#ifdef __IPHONE_11_0
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
-#else
--(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
-#endif
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [self.mainViewController applyTheme];
     if([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
@@ -887,7 +883,7 @@
         }
     }
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+    if(@available(iOS 10, *)) {
     } else {
         [[NotificationsDataSource sharedInstance] clear];
     }
@@ -900,13 +896,8 @@
     [_conn serialize];
 }
 
-#ifdef __IPHONE_11_0
 - (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)(void))completionHandler {
     NSURLSessionConfiguration *config;
-#else
-- (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)())completionHandler {
-        NSURLSessionConfiguration *config;
-#endif
     config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:identifier];
 #ifdef ENTERPRISE
     config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";

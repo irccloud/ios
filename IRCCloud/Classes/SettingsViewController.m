@@ -798,7 +798,7 @@
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
     
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+    if(@available(iOS 10, *)) {
         [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":_defaultSound}];
         [notifications addObject:@{@"title":@"Preview Uploaded Files", @"accessory":_notificationPreviews}];
         [notifications addObject:@{@"title":@"Preview External URLs", @"accessory":_thirdPartyNotificationPreviews}];

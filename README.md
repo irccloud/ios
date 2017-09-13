@@ -8,7 +8,7 @@ Chat on IRC from anywhere, and never miss a message.
 * Fully syncs with IRCCloud.com on the web
 * Works on iPhone and iPad
 
-Join our #feedback channel on irc.irccloud.com for feedback and suggestions so we can improve the app.
+Join our #ios channel on irc.irccloud.com for feedback and suggestions so we can improve the app.
 You can also email us on team@irccloud.com or find us on Twitter [@irccloud](https://twitter.com/irccloud).
 
 IRCCloud for iOS is available in the [App Store](https://itunes.apple.com/us/app/irccloud/id672699103).
@@ -21,16 +21,16 @@ Screenshots
 
 Requirements
 ------
-* XCode 6
-* iOS 8.1 SDK
-* An iPhone, iPad, or iPod Touch running iOS 5.0 or newer
+* Xcode 9
+* iOS 11 SDK
+* An iPhone, iPad, or iPod Touch running iOS 8.0 or newer
 
 _A code signing key from Apple is required to deploy apps to a device.
 Without a developer key, the app can only be installed on the iPhone/iPad Simulator._
 
 License
 ------
-Copyright (C) 2015 IRCCloud, Ltd.
+Copyright (C) 2017 IRCCloud, Ltd.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at

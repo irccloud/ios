@@ -551,11 +551,9 @@ NSArray *_sortedChannels;
     [self.navigationController.view addGestureRecognizer:t];*/
 #endif
     
-#ifdef __IPHONE_11_0
-    if ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 11) {
+    if (@available(iOS 11, *)) {
         [self.view addInteraction:[[UIDropInteraction alloc] initWithDelegate:self]];
     }
-#endif
 }
 
 #if TARGET_IPHONE_SIMULATOR
@@ -572,21 +570,20 @@ NSArray *_sortedChannels;
 }
 #endif
 
-#ifdef __IPHONE_11_0
--(BOOL)dropInteraction:(UIDropInteraction *)interaction canHandleSession:(id<UIDropSession>)session {
+-(BOOL)dropInteraction:(UIDropInteraction *)interaction canHandleSession:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
     return session.items.count == 1 && [session hasItemsConformingToTypeIdentifiers:@[@"com.apple.DocumentManager.uti.FPItem.File", @"public.image", @"public.movie"]];
 }
 
--(UIDropProposal *)dropInteraction:(UIDropInteraction *)interaction sessionDidUpdate:(id<UIDropSession>)session {
-    if ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 11) {
+-(UIDropProposal *)dropInteraction:(UIDropInteraction *)interaction sessionDidUpdate:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
+    if (@available(iOS 11, *)) {
         return [[UIDropProposal alloc] initWithDropOperation:UIDropOperationCopy];
     } else {
         return nil;
     }
 }
 
--(void)dropInteraction:(UIDropInteraction *)interaction performDrop:(id<UIDropSession>)session {
-    if ([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 11) {
+-(void)dropInteraction:(UIDropInteraction *)interaction performDrop:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
+    if (@available(iOS 11, *)) {
         NSItemProvider *i = session.items.firstObject.itemProvider;
         
         FileUploader *u = [[FileUploader alloc] init];
@@ -671,7 +668,6 @@ NSArray *_sortedChannels;
         }];
     }
 }
-#endif
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
     if(CGRectContainsPoint(_titleView.frame, [_titleView convertPoint:location fromView:self.navigationController.view])) {
@@ -904,8 +900,7 @@ NSArray *_sortedChannels;
                         }];
                 }]];
                 
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
-                } else {
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
                     [self presentViewController:alert animated:YES completion:nil];
                 }
                 
@@ -1455,8 +1450,7 @@ NSArray *_sortedChannels;
                     if(e.ignoreMask && [ignore match:e.ignoreMask])
                         break;
                     if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
-                        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
-                        } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
+                        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10 && [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
                             _lastNotificationTime = [NSDate date].timeIntervalSince1970;
                             AudioServicesPlaySystemSound(alertSound);
                             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
@@ -1754,7 +1748,7 @@ NSArray *_sortedChannels;
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     int height = size.height;
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
+    if(@available(iOS 9, *)) {
         CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
         height = [UIScreen mainScreen].applicationFrame.size.height + [UIApplication sharedApplication].statusBarFrame.size.height - origin.y;
     }
@@ -1845,14 +1839,14 @@ NSArray *_sortedChannels;
     
     NSString *session = [NetworkConnection sharedInstance].session;
     if(session.length) {
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+        if(@available(iOS 10, *)) {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
             
             [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
                 if(!granted)
                     CLS_LOG(@"Notification permission denied: %@", error);
             }];
-        } else if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
+        } else if(@available(iOS 9, *)) {
             UIMutableUserNotificationAction *replyAction = [[UIMutableUserNotificationAction alloc] init];
             replyAction.identifier = @"reply";
             replyAction.title = @"Reply";
@@ -2193,7 +2187,7 @@ NSArray *_sortedChannels;
             } else if([messageString isEqualToString:@"/badge"]) {
                 [_message clearText];
                 _buffer.draft = nil;
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 10) {
+                if(@available(iOS 9, *)) {
                     [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                             NSMutableString *msg = [[NSMutableString alloc] init];
@@ -4833,7 +4827,7 @@ Network type: %@\n",
 }
 
 -(NSArray<UIKeyCommand *> *)keyCommands {
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9) {
+    if(@available(iOS 9, *)) {
     return @[
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltUpPressed:) discoverabilityTitle:@"Switch to previous channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltDownPressed:) discoverabilityTitle:@"Switch to next channel"],

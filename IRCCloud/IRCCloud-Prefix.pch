@@ -27,8 +27,4 @@
 #define decodeFloat(x) x = [aDecoder decodeFloatForKey:OBJC_STRINGIFY(x)]
 #define decodeBool(x) x = [aDecoder decodeBoolForKey:OBJC_STRINGIFY(x)]
 
-#ifdef __IPHONE_9_0
 #define SupportedOrientationsReturnType UIInterfaceOrientationMask
-#else
-#define SupportedOrientationsReturnType NSUInteger
-#endif
