@@ -1433,16 +1433,18 @@ extern UIImage *__socketClosedBackgroundImage;
                     entity_eid = event.eid + ++event.childEventCount;
                     if([_closedPreviews containsObject:@(entity_eid)])
                         continue;
-                    if([URLHandler isImageURL:result.URL]) {
+                    if([URLHandler isImageURL:result.URL] && [[ImageCache sharedInstance] isValidURL:result.URL]) {
                         if([_urlHandler MediaURLs:result.URL]) {
                             Event *e1 = [self entity:event eid:entity_eid properties:[_urlHandler MediaURLs:result.URL]];
-                            [self insertEvent:e1 backlog:backlog nextIsGrouped:NO];
+                            if([[ImageCache sharedInstance] isValidURL:[e1.entities objectForKey:@"url"]])
+                                [self insertEvent:e1 backlog:backlog nextIsGrouped:NO];
                         } else {
                             [_urlHandler fetchMediaURLs:result.URL result:^(BOOL success, NSString *error) {
                                 if([_data containsObject:event]) {
                                     if(success) {
                                         Event *e1 = [self entity:event eid:entity_eid properties:[_urlHandler MediaURLs:result.URL]];
-                                        [self insertEvent:e1 backlog:NO nextIsGrouped:NO];
+                                        if([[ImageCache sharedInstance] isValidURL:[e1.entities objectForKey:@"url"]])
+                                            [self insertEvent:e1 backlog:NO nextIsGrouped:NO];
                                     } else {
                                         NSLog(@"METADATA FAILED: %@: %@", result.URL, error);
                                     }
@@ -2395,9 +2397,7 @@ extern UIImage *__socketClosedBackgroundImage;
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     [_lock lock];
     if(indexPath.row >= _data.count) {
-        CLS_LOG(@"Requested height for out of bounds row, refreshing");
         [_lock unlock];
-        [self refresh];
         return 0;
     }
     Event *e = [_data objectAtIndex:indexPath.row];

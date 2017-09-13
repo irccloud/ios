@@ -26,12 +26,14 @@ typedef void (^imageCompletionHandler)(BOOL);
     CSURITemplate *_template;
     NSMutableDictionary *_tasks;
     NSMutableDictionary *_images;
+    NSMutableDictionary *_failures;
 }
 
 +(ImageCache *)sharedInstance;
 -(void)prune;
 -(void)clear;
 -(void)purge;
+-(BOOL)isValidURL:(NSURL *)url;
 -(NSURL *)pathForURL:(NSURL *)url;
 -(NSURL *)pathForFileID:(NSString *)fileID;
 -(NSURL *)pathForFileID:(NSString *)fileID width:(int)width;

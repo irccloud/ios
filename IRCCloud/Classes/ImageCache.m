@@ -43,6 +43,7 @@
         _session = [NSURLSession sharedSession];
         _tasks = [[NSMutableDictionary alloc] init];
         _images = [[NSMutableDictionary alloc] init];
+        _failures = [[NSMutableDictionary alloc] init];
         [self clear];
     }
     return self;
@@ -94,20 +95,29 @@
             ];  
 }
 
+-(BOOL)isValidURL:(NSURL *)url {
+    return [_failures objectForKey:url] == nil;
+}
+
 -(UIImage *)imageForURL:(NSURL *)url {
-    if(![_images objectForKey:url]) {
+    if([_failures objectForKey:url])
+        return nil;
+    else if(![_images objectForKey:url]) {
         NSURL *cache = [self pathForURL:url];
-        NSData *data = [NSData dataWithContentsOfURL:cache];
-        char GIF[3];
-        [data getBytes:&GIF length:3];
-        if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F')
-            return nil;
-        UIImage *img = [UIImage imageWithData:data];
-        if(img.size.width) {
-            img = [UIImage imageWithCGImage:img.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
-            [_images setObject:img forKey:url.absoluteString];
-        } else {
-            CLS_LOG(@"Unable to load %@ from cache", url);
+        if([[NSFileManager defaultManager] fileExistsAtPath:cache.path]) {
+            NSData *data = [NSData dataWithContentsOfURL:cache];
+            char GIF[3];
+            [data getBytes:&GIF length:3];
+            if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F')
+                return nil;
+            UIImage *img = [UIImage imageWithData:data];
+            if(img.size.width) {
+                img = [UIImage imageWithCGImage:img.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
+                [_images setObject:img forKey:url.absoluteString];
+            } else {
+                CLS_LOG(@"Unable to load %@ from cache", url);
+                [_failures setObject:@(YES) forKey:url];
+            }
         }
     }
     if([[_images objectForKey:url.absoluteString] isKindOfClass:UIImage.class])
@@ -125,7 +135,9 @@
 }
 
 -(FLAnimatedImage *)animatedImageForURL:(NSURL *)url {
-    if(![_images objectForKey:url]) {
+    if([_failures objectForKey:url])
+        return nil;
+    else if(![_images objectForKey:url]) {
         NSURL *cache = [self pathForURL:url];
         NSData *data = [NSData dataWithContentsOfURL:cache];
         char GIF[3];
@@ -137,6 +149,7 @@
             [_images setObject:img forKey:url.absoluteString];
         } else {
             CLS_LOG(@"Unable to load %@ from cache", url);
+            [_failures setObject:@(YES) forKey:url];
         }
     }
     if([[_images objectForKey:url.absoluteString] isKindOfClass:FLAnimatedImage.class])
@@ -155,13 +168,14 @@
 
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler {
     @synchronized (_tasks) {
-        if([_tasks objectForKey:url]) {
+        if([_tasks objectForKey:url] || [_failures objectForKey:url]) {
             return;
         }
         NSURLSessionDownloadTask *task = [[NSURLSession sharedSession] downloadTaskWithURL:url completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
             [_tasks removeObjectForKey:url];
             if(error) {
                 CLS_LOG(@"Download failed: %@", error);
+                [_failures setObject:@(YES) forKey:url];
             } else if(location) {
                 NSURL *cache = [self pathForURL:url];
                 [[NSFileManager defaultManager] createDirectoryAtURL:_cachePath withIntermediateDirectories:YES attributes:nil error:nil];
