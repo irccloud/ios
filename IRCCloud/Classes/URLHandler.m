@@ -86,7 +86,7 @@
 
 #define HAS_IMAGE_SUFFIX(l) ([l hasSuffix:@"jpg"] || [l hasSuffix:@"jpeg"] || [l hasSuffix:@"png"] || [l hasSuffix:@"gif"] || [l hasSuffix:@"bmp"])
 
-#define IS_IMGUR(url) (([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) || ([[url.host lowercaseString] isEqualToString:@"i.imgur.com"] && url.path.length > 1 && ([url.path hasSuffix:@".gifv"] || [url.path hasSuffix:@".webm"])))
+#define IS_IMGUR(url) (([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) || ([[url.host lowercaseString] isEqualToString:@"i.imgur.com"] && url.path.length > 1 && ([url.path hasSuffix:@".gifv"] || [url.path hasSuffix:@".webm"] || [url.path hasSuffix:@".mp4"])))
 
 #define IS_FLICKR(url) ([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [[url.path lowercaseString] hasPrefix:@"/photos/"])
 
@@ -364,7 +364,7 @@
                         callback(YES, nil);
                     } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
                         if([[dict objectForKey:@"looping"] intValue] == 1) {
-                            [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"link"]],
+                            [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[[dict objectForKey:@"mp4"] stringByReplacingOccurrencesOfString:@".mp4" withString:@".gif"]],
                                                     @"mp4_loop":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
                                                     @"name":title,
                                                     @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
@@ -372,7 +372,7 @@
                                                     } forKey:original_url];
                             callback(YES, nil);
                         } else {
-                            [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"link"]],
+                            [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[[dict objectForKey:@"mp4"] stringByReplacingOccurrencesOfString:@".mp4" withString:@".gif"]],
                                                     @"mp4":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
                                                     @"name":title,
                                                     @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
