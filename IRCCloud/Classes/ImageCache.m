@@ -96,13 +96,21 @@
 }
 
 -(BOOL)isValidURL:(NSURL *)url {
-    return [_failures objectForKey:url] == nil;
+    return [_failures objectForKey:url.absoluteString] == nil;
+}
+
+-(BOOL)isLoaded:(NSURL *)url {
+    return [_images objectForKey:url.absoluteString] != nil || [_failures objectForKey:url.absoluteString] != nil;
+}
+
+-(BOOL)isLoaded:(NSString *)fileID width:(int)width {
+    return [self isLoaded:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
 }
 
 -(UIImage *)imageForURL:(NSURL *)url {
-    if([_failures objectForKey:url])
+    if([_failures objectForKey:url.absoluteString])
         return nil;
-    else if(![_images objectForKey:url]) {
+    else if(![_images objectForKey:url.absoluteString]) {
         NSURL *cache = [self pathForURL:url];
         if([[NSFileManager defaultManager] fileExistsAtPath:cache.path]) {
             NSData *data = [NSData dataWithContentsOfURL:cache];
@@ -116,7 +124,7 @@
                 [_images setObject:img forKey:url.absoluteString];
             } else {
                 CLS_LOG(@"Unable to load %@ from cache", url);
-                [_failures setObject:@(YES) forKey:url];
+                [_failures setObject:@(YES) forKey:url.absoluteString];
             }
         }
     }
@@ -137,19 +145,21 @@
 -(FLAnimatedImage *)animatedImageForURL:(NSURL *)url {
     if([_failures objectForKey:url])
         return nil;
-    else if(![_images objectForKey:url]) {
+    else if(![_images objectForKey:url.absoluteString]) {
         NSURL *cache = [self pathForURL:url];
-        NSData *data = [NSData dataWithContentsOfURL:cache];
-        char GIF[3];
-        [data getBytes:&GIF length:3];
-        if(GIF[0] != 'G' || GIF[1] != 'I' || GIF[2] != 'F')
-            return nil;
-        FLAnimatedImage *img = [FLAnimatedImage animatedImageWithGIFData:data];
-        if(img.size.width) {
-            [_images setObject:img forKey:url.absoluteString];
-        } else {
-            CLS_LOG(@"Unable to load %@ from cache", url);
-            [_failures setObject:@(YES) forKey:url];
+        if([[NSFileManager defaultManager] fileExistsAtPath:cache.path]) {
+            NSData *data = [NSData dataWithContentsOfURL:cache];
+            char GIF[3];
+            [data getBytes:&GIF length:3];
+            if(GIF[0] != 'G' || GIF[1] != 'I' || GIF[2] != 'F')
+                return nil;
+            FLAnimatedImage *img = [FLAnimatedImage animatedImageWithGIFData:data];
+            if(img.size.width) {
+                [_images setObject:img forKey:url.absoluteString];
+            } else {
+                CLS_LOG(@"Unable to load %@ from cache", url);
+                [_failures setObject:@(YES) forKey:url.absoluteString];
+            }
         }
     }
     if([[_images objectForKey:url.absoluteString] isKindOfClass:FLAnimatedImage.class])
@@ -175,7 +185,7 @@
             [_tasks removeObjectForKey:url];
             if(error) {
                 CLS_LOG(@"Download failed: %@", error);
-                [_failures setObject:@(YES) forKey:url];
+                [_failures setObject:@(YES) forKey:url.absoluteString];
             } else if(location) {
                 NSURL *cache = [self pathForURL:url];
                 [[NSFileManager defaultManager] createDirectoryAtURL:_cachePath withIntermediateDirectories:YES attributes:nil error:nil];
@@ -188,11 +198,15 @@
                     FLAnimatedImage *img = [FLAnimatedImage animatedImageWithGIFData:data];
                     if(img)
                         [_images setObject:img forKey:url.absoluteString];
+                    else
+                        [_failures setObject:@(YES) forKey:url.absoluteString];
                 } else {
                     UIImage *img = [UIImage imageWithData:data];
                     if(img) {
                         img = [UIImage imageWithCGImage:img.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
                         [_images setObject:img forKey:url.absoluteString];
+                    } else {
+                        [_failures setObject:@(YES) forKey:url.absoluteString];
                     }
                 }
             }
@@ -214,7 +228,10 @@
 }
 
 -(NSURL *)pathForURL:(NSURL *)url {
-    return [_cachePath URLByAppendingPathComponent:[self md5:url.absoluteString]];
+    if(url)
+        return [_cachePath URLByAppendingPathComponent:[self md5:url.absoluteString]];
+    else
+        return nil;
 }
 
 -(NSURL *)pathForFileID:(NSString *)fileID {

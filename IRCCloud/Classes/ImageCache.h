@@ -34,6 +34,8 @@ typedef void (^imageCompletionHandler)(BOOL);
 -(void)clear;
 -(void)purge;
 -(BOOL)isValidURL:(NSURL *)url;
+-(BOOL)isLoaded:(NSURL *)url;
+-(BOOL)isLoaded:(NSString *)fileID width:(int)width;
 -(NSURL *)pathForURL:(NSURL *)url;
 -(NSURL *)pathForFileID:(NSString *)fileID;
 -(NSURL *)pathForFileID:(NSString *)fileID width:(int)width;

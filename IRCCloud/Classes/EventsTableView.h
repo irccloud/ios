@@ -64,6 +64,7 @@
     BOOL _requestingBacklog, _ready;
     NSTimer *_heartbeatTimer;
     NSTimer *_scrollTimer;
+    NSTimer *_reloadTimer;
     NSRecursiveLock *_lock;
     
     IBOutlet id<EventsTableViewDelegate> _delegate;
