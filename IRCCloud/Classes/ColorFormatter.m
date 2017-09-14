@@ -2442,7 +2442,7 @@ extern BOOL __compact;
 -(BOOL)isBlockQuote {
     static NSPredicate *_pattern;
     if(!_pattern) {
-        _pattern = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"(^|\\n)>(?![<>]|[\\W_](?:[<>/Dpb|\\\\{}()\\[\\]](?=\\s|$)))([^\\n]+)"];
+        _pattern = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"(^|\\n)>(?![<>]|[\\W_](?:[<>/OoDpb|\\\\{}()\\[\\]](?=\\s|$)))([^\\n]+)"];
     }
     return [_pattern evaluateWithObject:self];
 }
