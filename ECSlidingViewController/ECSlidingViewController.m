@@ -626,7 +626,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     if(sbwidth > 20)
         sbwidth -= 20;
     if(@available(iOS 11, *)) {
-        if(self.view.safeAreaInsets.top > 0)
+        if(self.view.safeAreaInsets.bottom)
             sbheight = 0;
     }
     CGRect frame = self.underLeftView.frame;
@@ -679,7 +679,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     if(sbwidth > 20)
         sbwidth -= 20;
     if(@available(iOS 11, *)) {
-        if(self.view.safeAreaInsets.top > 0)
+        if(self.view.safeAreaInsets.bottom)
             sbheight = 0;
     }
     CGRect frame = self.underRightView.frame;

@@ -2969,6 +2969,11 @@ NSArray *_sortedChannels;
 }
 
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
+    if(@available(iOS 11, *)) {
+        if(self.slidingViewController.view.safeAreaInsets.bottom) {
+            return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeRight;
+        }
+    }
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }
 
@@ -2990,10 +2995,10 @@ NSArray *_sortedChannels;
     if(@available(iOS 11, *)) {
         [UIColor setSafeInsets:self.slidingViewController.view.safeAreaInsets];
         [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
-        if(self.slidingViewController.view.safeAreaInsets.top == 0)
-            [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
-        else
+        if(self.slidingViewController.view.safeAreaInsets.bottom)
             [self updateLayout:0];
+        else
+            [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
     } else {
         [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
     }
@@ -3122,6 +3127,7 @@ NSArray *_sortedChannels;
                 //Not registered yet
             }
         }
+        [self updateLayout];
         [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
         [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
     }];
@@ -3130,7 +3136,7 @@ NSArray *_sortedChannels;
 -(void)_updateEventsInsets {
     _bottomBarOffsetConstraint.constant = _kbSize.height;
     if(@available(iOS 11, *)) {
-        if(self.slidingViewController.view.safeAreaInsets.top > 0 || self.slidingViewController.view.safeAreaInsets.left > 0 || self.slidingViewController.view.safeAreaInsets.bottom > 0 || self.slidingViewController.view.safeAreaInsets.right > 0) {
+        if(self.slidingViewController.view.safeAreaInsets.bottom) {
             if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || _kbSize.height > 0)
                 _bottomBarOffsetConstraint.constant -= 20;
         }
