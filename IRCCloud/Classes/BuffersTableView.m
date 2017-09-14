@@ -75,9 +75,11 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     UIActivityIndicatorView *_activity;
     UIColor *_bgColor;
     UIColor *_highlightColor;
+    CGFloat _borderInset;
 }
 @property int type;
 @property UIColor *bgColor, *highlightColor;
+@property CGFloat borderInset;
 @property (readonly) UILabel *label, *icon;
 @property (readonly) UIView *unreadIndicator, *bg, *border;
 @property (readonly) HighlightsCountView *highlights;
@@ -133,7 +135,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 	[super layoutSubviews];
 	
     CGRect frame = [self.contentView bounds];
-    _border.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
+    _border.frame = CGRectMake(frame.origin.x - _borderInset, frame.origin.y, 6 + _borderInset, frame.size.height);
     frame.size.width -= 8;
     if(_type == TYPE_SERVER) {
         frame.origin.y += 6;
@@ -945,6 +947,8 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         cell.border.backgroundColor = [UIColor bufferBorderColor];
         cell.contentView.backgroundColor = [UIColor bufferBackgroundColor];
         cell.icon.font = _awesomeFont;
+        if(@available(iOS 11, *))
+            cell.borderInset = self.slidingViewController.view.safeAreaInsets.left;
 
         if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
             if([[row objectForKey:@"archived"] intValue])

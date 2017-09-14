@@ -336,7 +336,7 @@ NSArray *_sortedChannels;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.slidingViewController.view.frame = [UIScreen mainScreen].applicationFrame;
+    self.slidingViewController.view.frame = self.view.window.bounds;
 
     [_eventsView viewDidLoad];
 
@@ -2402,6 +2402,9 @@ NSArray *_sortedChannels;
     _message.animateHeightChange = NO;
     if(_message.text.length > 0) {
         CGFloat c = _eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - _message.frame.origin.x - 16;
+        if(@available(iOS 11, *)) {
+            c -= self.slidingViewController.view.safeAreaInsets.right;
+        }
         if(_messageWidthConstraint.constant != c)
             _messageWidthConstraint.constant = c;
         [self.view layoutIfNeeded];
@@ -2411,6 +2414,9 @@ NSArray *_sortedChannels;
         _settingsBtn.alpha = 0;
     } else {
         _messageWidthConstraint.constant = _eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 16;
+        if(@available(iOS 11, *)) {
+            _messageWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
+        }
         [self.view layoutIfNeeded];
         _sendBtn.enabled = NO;
         _sendBtn.alpha = 0;
@@ -2423,6 +2429,14 @@ NSArray *_sortedChannels;
     _message.animateHeightChange = YES;
     _messageHeightConstraint.constant = _message.frame.size.height;
     _bottomBarHeightConstraint.constant = _message.frame.size.height + 8;
+    if(@available(iOS 11, *)) {
+        CGRect frame = _settingsBtn.frame;
+        frame.origin.x = _eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - 10 - self.slidingViewController.view.safeAreaInsets.right;
+        _settingsBtn.frame = frame;
+        frame = _sendBtn.frame;
+        frame.origin.x = _eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - 8 - self.slidingViewController.view.safeAreaInsets.right;
+        _sendBtn.frame = frame;
+    }
     [self _updateEventsInsets];
     [self.view layoutIfNeeded];
 }
@@ -2973,14 +2987,25 @@ NSArray *_sortedChannels;
 
 -(void)updateLayout {
     [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
-    [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
+    if(@available(iOS 11, *)) {
+        [UIColor setSafeInsets:self.slidingViewController.view.safeAreaInsets];
+        [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+        if(self.slidingViewController.view.safeAreaInsets.top == 0)
+            [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
+        else
+            [self updateLayout:0];
+    } else {
+        [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
+    }
 }
 
 -(void)updateLayout:(float)sbHeight {
     CGRect frame = self.slidingViewController.view.frame;
     if(sbHeight >= 20)
         frame.origin.y = (sbHeight - 20);
+
     frame.size = self.slidingViewController.view.window.bounds.size;
+
     if(frame.size.width > 0 && frame.size.height > 0) {
         if(sbHeight > 20)
             frame.size.height -= sbHeight;
@@ -3010,6 +3035,10 @@ NSArray *_sortedChannels;
         _borders.hidden = NO;
         _eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
         _eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
+        if(@available(iOS 11, *)) {
+            _eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
+            _eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
+        }
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
@@ -3034,13 +3063,19 @@ NSArray *_sortedChannels;
         [self.slidingViewController updateUnderLeftLayout];
         [self.slidingViewController updateUnderRightLayout];
     }
-    
+    _buffersView.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
     CGRect frame = _titleView.frame;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
         frame.size.height = (size.width > size.height)?24:40;
         _topicLabel.alpha = (size.width > size.height)?0:1;
     }
     _topicWidthConstraint.constant = frame.size.width = size.width - 128;
+    if(@available(iOS 11, *)) {
+        frame.size.width -= self.slidingViewController.view.safeAreaInsets.left;
+        frame.size.width -= self.slidingViewController.view.safeAreaInsets.right;
+        _topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.left;
+        _topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
+    }
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && (size.width > size.height))
         frame.size.width -= _buffersView.tableView.frame.size.width;
     _connectingView.frame = _titleView.frame = frame;
@@ -3094,6 +3129,12 @@ NSArray *_sortedChannels;
 
 -(void)_updateEventsInsets {
     _bottomBarOffsetConstraint.constant = _kbSize.height;
+    if(@available(iOS 11, *)) {
+        if(self.slidingViewController.view.safeAreaInsets.top > 0 || self.slidingViewController.view.safeAreaInsets.left > 0 || self.slidingViewController.view.safeAreaInsets.bottom > 0 || self.slidingViewController.view.safeAreaInsets.right > 0) {
+            if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || _kbSize.height > 0)
+                _bottomBarOffsetConstraint.constant -= 20;
+        }
+    }
     CGFloat height = _bottomBarHeightConstraint.constant + _kbSize.height;
     CGFloat top = 0;
     if(!_globalMsgContainer.hidden)
@@ -3181,6 +3222,10 @@ NSArray *_sortedChannels;
                 }
                 _eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
                 _eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
+                if(@available(iOS 11, *)) {
+                    _eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
+                    _eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
+                }
             }
         } else {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {

@@ -23,6 +23,7 @@
 @end
 
 @interface UIColor (IRCCloud)
++(void)setSafeInsets:(UIEdgeInsets)insets;
 +(UIColor *)colorWithHue:(CGFloat)hue saturation:(CGFloat)saturation lightness:(CGFloat)brightness alpha:(CGFloat)alpha;
 +(BOOL)isDarkTheme;
 +(void)setTheme:(NSString *)theme;

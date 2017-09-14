@@ -122,6 +122,8 @@ UIColor *__quoteBorderColor;
 UIColor *__mIRCColors_BG[16];
 UIColor *__mIRCColors_FG[16];
 
+UIEdgeInsets __safeInsets;
+
 BOOL __color_theme_is_dark;
 
 NSString *__current_theme;
@@ -242,6 +244,10 @@ BOOL __compact = NO;
     }
         
     return [colors objectAtIndex:(NSUInteger)llabs([[NSNumber numberWithDouble:hash] longLongValue] % (int)(colors.count))];
+}
+
++(void)setSafeInsets:(UIEdgeInsets)insets {
+    __safeInsets = insets;
 }
 
 +(void)setTheme:(NSString *)theme {
@@ -1069,9 +1075,13 @@ BOOL __compact = NO;
         CGContextFillRect(context, CGRectMake(0,0,width,16));
         CGContextSetLineCap(context, kCGLineCapSquare);
         CGContextSetStrokeColorWithColor(context, [self bufferBorderColor].CGColor);
-        CGContextSetLineWidth(context, 6.0);
-        CGContextMoveToPoint(context, 3.0, 0.0);
-        CGContextAddLineToPoint(context, 3.0, 16.0);
+        float borderWidth = 6.0;
+        if(@available(iOS 11, *)) {
+            borderWidth += __safeInsets.left;
+        }
+        CGContextSetLineWidth(context, borderWidth);
+        CGContextMoveToPoint(context, borderWidth / 2, 0.0);
+        CGContextAddLineToPoint(context, borderWidth / 2, 16.0);
         CGContextStrokePath(context);
         CGImageRef cgImage = CGBitmapContextCreateImage(context);
         __buffersDrawerBackgroundImage = [[UIImage imageWithCGImage:cgImage scale:scaleFactor orientation:UIImageOrientationUp] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 6, 0, 0)];
