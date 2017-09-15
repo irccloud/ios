@@ -103,6 +103,14 @@
     return [_failures objectForKey:url.absoluteString] == nil;
 }
 
+-(BOOL)isValidFileID:(NSString *)fileID {
+    return [self isValidURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID} error:nil]]];
+}
+
+-(BOOL)isValidFileID:(NSString *)fileID width:(int)width {
+    return [self isValidURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
+}
+
 -(BOOL)isLoaded:(NSURL *)url {
     return [_images objectForKey:url.absoluteString] != nil || [_failures objectForKey:url.absoluteString] != nil;
 }

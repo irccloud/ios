@@ -2389,13 +2389,17 @@ extern UIImage *__socketClosedBackgroundImage;
                 e.entities = entities;
                 e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue]) + (__compact?18:24);
             } else {
-                e.height = 64;
+                e.height = FONT_SIZE * 2 + (__compact?6:12);
             }
         } else {
-            if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
-                width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-            float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-            e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + (__compact?18:24);
+            if(([e.entities objectForKey:@"id"] && [[ImageCache sharedInstance] isValidFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)]) || ([e.entities objectForKey:@"thumb"] && [[ImageCache sharedInstance] isValidURL:[e.entities objectForKey:@"thumb"]])) {
+                if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
+                    width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+                float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+                e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + (__compact?18:24);
+            } else {
+                e.height = FONT_SIZE * 2 + (__compact?6:12);
+            }
         }
 
         if([e.entities objectForKey:@"id"] || [e.entities objectForKey:@"description"])
@@ -2741,6 +2745,13 @@ extern UIImage *__socketClosedBackgroundImage;
             else
                 extension = [[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1];
             
+            cell.type = ROW_FILE;
+            cell.thumbnail.image = nil;
+            cell.thumbnail.animatedImage = nil;
+            cell.thumbnail.hidden = YES;
+            cell.thumbnailWidth = 0;
+            cell.thumbnailHeight = 0;
+            cell.extension.hidden = NO;
             cell.extension.text = extension.uppercaseString;
             cell.mimeType.text = [e.entities objectForKey:@"mime_type"];
             cell.mimeType.numberOfLines = 1;
