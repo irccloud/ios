@@ -76,6 +76,10 @@
     _template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
 }
 
+-(void)clearFailedURLs {
+    [_failures removeAllObjects];
+}
+
 -(void)purge {
     [[NSFileManager defaultManager] removeItemAtURL:_cachePath error:nil];
     [self clear];

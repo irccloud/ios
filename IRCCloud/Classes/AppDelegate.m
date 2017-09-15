@@ -835,6 +835,7 @@
         self.window.backgroundColor = [UIColor blackColor];
     }
     [[NotificationsDataSource sharedInstance] updateBadgeCount];
+    [[ImageCache sharedInstance] clearFailedURLs];
     [[ImageCache sharedInstance] performSelectorInBackground:@selector(prune) withObject:nil];
 }
 

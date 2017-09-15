@@ -32,6 +32,7 @@ typedef void (^imageCompletionHandler)(BOOL);
 +(ImageCache *)sharedInstance;
 -(void)prune;
 -(void)clear;
+-(void)clearFailedURLs;
 -(void)purge;
 -(BOOL)isValidURL:(NSURL *)url;
 -(BOOL)isLoaded:(NSURL *)url;
