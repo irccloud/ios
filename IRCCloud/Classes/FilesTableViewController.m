@@ -26,11 +26,11 @@
     UILabel *_name;
     UILabel *_metadata;
     UILabel *_extension;
-    FLAnimatedImageView *_thumbnail;
+    YYAnimatedImageView *_thumbnail;
     UIActivityIndicatorView *_spinner;
 }
 @property (readonly) UILabel *date,*name,*metadata,*extension;
-@property (readonly) FLAnimatedImageView *thumbnail;
+@property (readonly) YYAnimatedImageView *thumbnail;
 @property (readonly) UIActivityIndicatorView *spinner;
 @end
 
@@ -62,7 +62,7 @@
         _extension.hidden = YES;
         [self.contentView addSubview:_extension];
 
-        _thumbnail = [[FLAnimatedImageView alloc] init];
+        _thumbnail = [[YYAnimatedImageView alloc] init];
         _thumbnail.contentMode = UIViewContentModeScaleAspectFit;
         [self.contentView addSubview:_thumbnail];
         
@@ -182,13 +182,9 @@
 -(void)_refreshFileID:(NSString *)fileID {
     [[_spinners objectForKey:fileID] stopAnimating];
     [[_spinners objectForKey:fileID] setHidden:YES];
-    FLAnimatedImage *animatedImage = [[ImageCache sharedInstance] animatedImageForFileID:fileID width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale];
-    UIImage *image = [[ImageCache sharedInstance] imageForFileID:fileID width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale];
-    if(image || animatedImage) {
-        if(animatedImage)
-            [[_imageViews objectForKey:fileID] setAnimatedImage:animatedImage];
-        else
-            [[_imageViews objectForKey:fileID] setImage:image];
+    YYImage *image = [[ImageCache sharedInstance] imageForFileID:fileID width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale];
+    if(image) {
+        [[_imageViews objectForKey:fileID] setImage:image];
         [[_imageViews objectForKey:fileID] setHidden:NO];
         [[_extensions objectForKey:fileID] setHidden:YES];
     } else {
@@ -254,13 +250,9 @@
         [_spinners setObject:cell.spinner forKey:[file objectForKey:@"id"]];
         [_imageViews setObject:cell.thumbnail forKey:[file objectForKey:@"id"]];
         [_extensions setObject:cell.extension forKey:[file objectForKey:@"id"]];
-        FLAnimatedImage *animatedImage = [[ImageCache sharedInstance] animatedImageForFileID:[file objectForKey:@"id"] width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale];
-        UIImage *image = [[ImageCache sharedInstance] imageForFileID:[file objectForKey:@"id"] width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale];
-        if(image || animatedImage) {
-            if(animatedImage)
-                [cell.thumbnail setAnimatedImage:animatedImage];
-            else
-                [cell.thumbnail setImage:image];
+        YYImage *image = [[ImageCache sharedInstance] imageForFileID:[file objectForKey:@"id"] width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale];
+        if(image) {
+            [cell.thumbnail setImage:image];
             cell.thumbnail.hidden = NO;
             cell.extension.hidden = YES;
             cell.spinner.hidden = YES;

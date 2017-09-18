@@ -126,13 +126,8 @@
         NSURL *cache = [self pathForURL:url];
         if([[NSFileManager defaultManager] fileExistsAtPath:cache.path]) {
             NSData *data = [NSData dataWithContentsOfURL:cache];
-            char GIF[3];
-            [data getBytes:&GIF length:3];
-            if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F')
-                return nil;
-            UIImage *img = [UIImage imageWithData:data];
+            YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
             if(img.size.width) {
-                img = [UIImage imageWithCGImage:img.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
                 [_images setObject:img forKey:url.absoluteString];
             } else {
                 CLS_LOG(@"Unable to load %@ from cache", url);
@@ -154,40 +149,6 @@
     return [self imageForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
 }
 
--(FLAnimatedImage *)animatedImageForURL:(NSURL *)url {
-    if([_failures objectForKey:url])
-        return nil;
-    else if(![_images objectForKey:url.absoluteString]) {
-        NSURL *cache = [self pathForURL:url];
-        if([[NSFileManager defaultManager] fileExistsAtPath:cache.path]) {
-            NSData *data = [NSData dataWithContentsOfURL:cache];
-            char GIF[3];
-            [data getBytes:&GIF length:3];
-            if(GIF[0] != 'G' || GIF[1] != 'I' || GIF[2] != 'F')
-                return nil;
-            FLAnimatedImage *img = [FLAnimatedImage animatedImageWithGIFData:data];
-            if(img.size.width) {
-                [_images setObject:img forKey:url.absoluteString];
-            } else {
-                CLS_LOG(@"Unable to load %@ from cache", url);
-                [_failures setObject:@(YES) forKey:url.absoluteString];
-            }
-        }
-    }
-    if([[_images objectForKey:url.absoluteString] isKindOfClass:FLAnimatedImage.class])
-        return [_images objectForKey:url.absoluteString];
-    else
-        return nil;
-}
-
--(FLAnimatedImage *)animatedImageForFileID:(NSString *)fileID {
-    return [self animatedImageForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID} error:nil]]];
-}
-
--(FLAnimatedImage *)animatedImageForFileID:(NSString *)fileID width:(int)width {
-    return [self animatedImageForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
-}
-
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler {
     @synchronized (_tasks) {
         if([_tasks objectForKey:url] || [_failures objectForKey:url]) {
@@ -204,22 +165,11 @@
                 [[NSFileManager defaultManager] copyItemAtURL:location toURL:cache error:nil];
                 NSLog(@"Downloaded %@ to %@", url, cache);
                 NSData *data = [NSData dataWithContentsOfURL:cache];
-                char GIF[3];
-                [data getBytes:&GIF length:3];
-                if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F') {
-                    FLAnimatedImage *img = [FLAnimatedImage animatedImageWithGIFData:data];
-                    if(img)
-                        [_images setObject:img forKey:url.absoluteString];
-                    else
-                        [_failures setObject:@(YES) forKey:url.absoluteString];
+                YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
+                if(img.size.width) {
+                    [_images setObject:img forKey:url.absoluteString];
                 } else {
-                    UIImage *img = [UIImage imageWithData:data];
-                    if(img) {
-                        img = [UIImage imageWithCGImage:img.CGImage scale:[UIScreen mainScreen].scale orientation:UIImageOrientationUp];
-                        [_images setObject:img forKey:url.absoluteString];
-                    } else {
-                        [_failures setObject:@(YES) forKey:url.absoluteString];
-                    }
+                    [_failures setObject:@(YES) forKey:url.absoluteString];
                 }
             }
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{

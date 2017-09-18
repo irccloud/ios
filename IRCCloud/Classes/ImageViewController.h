@@ -18,11 +18,11 @@
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import "OpenInChromeController.h"
-#import "FLAnimatedImageView.h"
+#import "YYAnimatedImageView.h"
 #import "URLHandler.h"
 
 @interface ImageViewController : UIViewController<UIScrollViewDelegate,NSURLConnectionDataDelegate,UIPopoverPresentationControllerDelegate,UIGestureRecognizerDelegate> {
-    IBOutlet FLAnimatedImageView *_imageView;
+    IBOutlet YYAnimatedImageView *_imageView;
     IBOutlet UIScrollView *_scrollView;
     MPMoviePlayerController *_movieController;
     __weak IBOutlet UIProgressView *_progressView;

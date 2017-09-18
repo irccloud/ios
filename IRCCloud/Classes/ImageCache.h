@@ -16,7 +16,7 @@
 
 #import <Foundation/Foundation.h>
 #import "CSURITemplate.h"
-#import "FLAnimatedImage.h"
+#import "YYImage.h"
 
 typedef void (^imageCompletionHandler)(BOOL);
 
@@ -42,12 +42,9 @@ typedef void (^imageCompletionHandler)(BOOL);
 -(NSURL *)pathForURL:(NSURL *)url;
 -(NSURL *)pathForFileID:(NSString *)fileID;
 -(NSURL *)pathForFileID:(NSString *)fileID width:(int)width;
--(UIImage *)imageForURL:(NSURL *)url;
--(UIImage *)imageForFileID:(NSString *)fileID;
--(UIImage *)imageForFileID:(NSString *)fileID width:(int)width;
--(FLAnimatedImage *)animatedImageForURL:(NSURL *)url;
--(FLAnimatedImage *)animatedImageForFileID:(NSString *)fileID;
--(FLAnimatedImage *)animatedImageForFileID:(NSString *)fileID width:(int)width;
+-(YYImage *)imageForURL:(NSURL *)url;
+-(YYImage *)imageForFileID:(NSString *)fileID;
+-(YYImage *)imageForFileID:(NSString *)fileID width:(int)width;
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler;
 -(void)fetchFileID:(NSString *)fileID completionHandler:(imageCompletionHandler)handler;
 -(void)fetchFileID:(NSString *)fileID width:(int)width completionHandler:(imageCompletionHandler)handler;

@@ -117,44 +117,6 @@
     }];
 }
 
--(void)_setImage:(UIImage *)img animatedImage:(FLAnimatedImage *)animatedImage {
-    [_scrollView removeGestureRecognizer:_panGesture];
-    [self.view addGestureRecognizer:_panGesture];
-    CGSize size;
-    if(animatedImage) {
-        size = animatedImage.size;
-        _imageView.animatedImage = animatedImage;
-    } else {
-        size = img.size;
-        _imageView.image = img;
-    }
-    _imageView.frame = CGRectMake(0,0,size.width,size.height);
-    CGFloat xScale = _scrollView.bounds.size.width / _imageView.frame.size.width;
-    CGFloat yScale = _scrollView.bounds.size.height / _imageView.frame.size.height;
-    CGFloat minScale = MIN(xScale, yScale);
-    
-    CGFloat maxScale = 4;
-    
-    if (minScale > maxScale) {
-        minScale = maxScale;
-    }
-
-    _scrollView.minimumZoomScale = minScale;
-    _scrollView.maximumZoomScale = maxScale;
-    _scrollView.contentSize = _imageView.frame.size;
-    _scrollView.zoomScale = minScale;
-    [self scrollViewDidZoom:_scrollView];
-
-    [_progressView removeFromSuperview];
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.25];
-    _imageView.alpha = 1;
-    [UIView commitAnimations];
-    if([UIApplication sharedApplication].delegate.window.rootViewController == self)
-        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
-    [Answers logContentViewWithName:nil contentType:@"Image" contentId:nil customAttributes:nil];
-}
-
 //Some centering magic from: http://stackoverflow.com/a/2189336/1406639
 -(void)scrollViewDidZoom:(UIScrollView *)pScrollView {
     CGRect innerFrame = _imageView.frame;
@@ -388,19 +350,40 @@
 }
 
 - (void)_parseImageData:(NSData *)data {
-    FLAnimatedImage *animatedImg = nil;
-    UIImage *img = nil;
-    char GIF[3];
-    [data getBytes:&GIF length:3];
-    if(GIF[0] == 'G' && GIF[1] == 'I' && GIF[2] == 'F') {
-        animatedImg = [FLAnimatedImage animatedImageWithGIFData:data];
-    } else {
-        img = [UIImage imageWithData:data];
-    }
-    if(animatedImg || img) {
+    YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
+    if(img) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             _progressView.progress = 1.f;
-            [self _setImage:img animatedImage:animatedImg];
+            [_scrollView removeGestureRecognizer:_panGesture];
+            [self.view addGestureRecognizer:_panGesture];
+            CGSize size;
+            size = img.size;
+            _imageView.image = img;
+            _imageView.frame = CGRectMake(0,0,size.width,size.height);
+            CGFloat xScale = _scrollView.bounds.size.width / _imageView.frame.size.width;
+            CGFloat yScale = _scrollView.bounds.size.height / _imageView.frame.size.height;
+            CGFloat minScale = MIN(xScale, yScale);
+            
+            CGFloat maxScale = 4;
+            
+            if (minScale > maxScale) {
+                minScale = maxScale;
+            }
+            
+            _scrollView.minimumZoomScale = minScale;
+            _scrollView.maximumZoomScale = maxScale;
+            _scrollView.contentSize = _imageView.frame.size;
+            _scrollView.zoomScale = minScale;
+            [self scrollViewDidZoom:_scrollView];
+            
+            [_progressView removeFromSuperview];
+            [UIView beginAnimations:nil context:nil];
+            [UIView setAnimationDuration:0.25];
+            _imageView.alpha = 1;
+            [UIView commitAnimations];
+            if([UIApplication sharedApplication].delegate.window.rootViewController == self)
+                [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
+            [Answers logContentViewWithName:nil contentType:@"Image" contentId:nil customAttributes:nil];
         }];
     } else {
         [self fail:@"Unable to display image"];
