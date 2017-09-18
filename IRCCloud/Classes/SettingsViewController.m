@@ -558,7 +558,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:!_browserWarning.isOn forKey:@"warnBeforeLaunchingBrowser"];
         [[NSUserDefaults standardUserDefaults] setBool:!_imageViewer.isOn forKey:@"imageViewer"];
         [[NSUserDefaults standardUserDefaults] setBool:!_videoViewer.isOn forKey:@"videoViewer"];
-        [[NSUserDefaults standardUserDefaults] setBool:_inlineWifiOnly.isOn forKey:@"inlineWifiOnly"];
+        [[NSUserDefaults standardUserDefaults] setBool:!_inlineWifiOnly.isOn forKey:@"inlineWifiOnly"];
         [[NSUserDefaults standardUserDefaults] setBool:_defaultSound.isOn forKey:@"defaultSound"];
         [[NSUserDefaults standardUserDefaults] setBool:!_notificationPreviews.isOn forKey:@"disableNotificationPreviews"];
         [[NSUserDefaults standardUserDefaults] setBool:_thirdPartyNotificationPreviews.isOn forKey:@"thirdPartyNotificationPreviews"];
@@ -835,7 +835,7 @@
                          @{@"title":@"Collapse Joins, Parts, Quits", @"accessory":_expandJoinPart},
                          @{@"title":@"Embed Uploaded Files", @"accessory":_disableInlineFiles},
                          @{@"title":@"Embed External Media", @"accessory":_inlineImages},
-                         @{@"title":@"Embed Files Only Over Wi-Fi", @"accessory":_inlineWifiOnly},
+                         @{@"title":@"Embed Using Mobile Data", @"accessory":_inlineWifiOnly},
                          @{@"title":@"Format inline code", @"accessory":_disableCodeSpan},
                          @{@"title":@"Format code blocks", @"accessory":_disableCodeBlock},
                          @{@"title":@"Format quoted text", @"accessory":_disableQuote},
@@ -1095,9 +1095,9 @@
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"inlineWifiOnly"]) {
-        _inlineWifiOnly.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"];
+        _inlineWifiOnly.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"];
     } else {
-        _inlineWifiOnly.on = NO;
+        _inlineWifiOnly.on = YES;
     }
     
     if(_oneLine.on) {
