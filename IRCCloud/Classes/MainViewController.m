@@ -511,7 +511,8 @@ NSArray *_sortedChannels;
                                 [NSLayoutConstraint constraintWithItem:_colorPickerView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeTop multiplier:1.0f constant:-2.0f]
                                 ]];
     
-    [UIMenuController sharedMenuController].menuItems = @[[[UIMenuItem alloc] initWithTitle:@"Color" action:@selector(chooseFGColor:)],
+    [UIMenuController sharedMenuController].menuItems = @[[[UIMenuItem alloc] initWithTitle:@"Paste With Style" action:@selector(pasteRich:)],
+                                                          [[UIMenuItem alloc] initWithTitle:@"Color" action:@selector(chooseFGColor:)],
                                                           [[UIMenuItem alloc] initWithTitle:@"Background" action:@selector(chooseBGColor:)],
                                                           [[UIMenuItem alloc] initWithTitle:@"Reset Colors" action:@selector(resetColors:)],
                                                           ];
@@ -4833,7 +4834,19 @@ Network type: %@\n",
             }
         }
         [self imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image}];
-    } else if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"]) {
+    } else if([UIPasteboard generalPasteboard].string) {
+        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
+        if(_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:_message.selectedRange];
+        
+        [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:_message.font,NSForegroundColorAttributeName:_message.textColor}] atIndex:_message.selectedRange.location];
+        
+        [_message setAttributedText:msg];
+    }
+}
+
+-(void)pasteRich:(id)sender {
+    if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"]) {
         NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
         if(_message.selectedRange.length > 0)
             [msg deleteCharactersInRange:_message.selectedRange];
