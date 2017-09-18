@@ -1,6 +1,10 @@
-You can now download logs to your device as a zip file, and sync with iCloud Drive. You can then open them with any app that can extract zip files.
+Images from external services are now displayed inline if you turn on "Embed external media" in Display Options. You can change the default behaviour everywhere from the Settings screen. These settings will match your preferences in the web/desktop client.
 
-• Sped up nickname and emoji suggestions. If it's still too slow in larger channels, you can now turn off "Suggest nicks as you type" for a channel in Display Options.
-• Fixed tab navigation of nick suggestions when using an external keyboard
-• Fixed display of certain unicode characters when using the monospace font
+You can also now format your messages with bold, italics, underline, and colors. Select the message text you want to format then use the edit menu buttons. You can even paste preformatted text copied from elsewhere. `code spans`, ```code blocks```, and > quoted messages work too.
+
+• Share photos and documents via drag-and-drop on iOS 11
+• Fixed an issue that could cause the app to logout unexpectedly
+• Support for page up / page down scrolling on external keyboards
+• Added support for iPhone X screens
+• Improved animated GIF performance
 • Stability improvements and minor fixes
