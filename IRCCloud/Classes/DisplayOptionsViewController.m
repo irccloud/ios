@@ -487,8 +487,23 @@
     _disableInlineFiles = [[UISwitch alloc] init];
     _disableNickSuggestions = [[UISwitch alloc] init];
     _inlineImages = [[UISwitch alloc] init];
+    [_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
 
     [self refresh];
+}
+
+-(void)thirdPartyNotificationPreviewsToggled:(UISwitch *)sender {
+    if(sender.on) {
+        UIAlertController *ac = [UIAlertController alertControllerWithTitle:@"Warning" message:@"External URLs may load insecurely and could result in your IP address being revealed to external site operators" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [ac addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
+            sender.on = NO;
+        }]];
+        
+        [ac addAction:[UIAlertAction actionWithTitle:@"Enable" style:UIAlertActionStyleDefault handler:nil]];
+        
+        [self presentViewController:ac animated:YES completion:nil];
+    }
 }
 
 -(void)showJoinPartToggled:(id)sender {

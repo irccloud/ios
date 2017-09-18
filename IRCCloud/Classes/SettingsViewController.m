@@ -933,6 +933,7 @@
     _disableCodeBlock = [[UISwitch alloc] init];
     _disableQuote = [[UISwitch alloc] init];
     _inlineImages = [[UISwitch alloc] init];
+    [_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1197,12 +1198,13 @@
     _thirdPartyNotificationPreviews.enabled = _notificationPreviews.on;
 }
 
--(void)thirdPartyNotificationPreviewsToggled:(id)sender {
-    if(_thirdPartyNotificationPreviews.on) {
+-(void)thirdPartyNotificationPreviewsToggled:(UISwitch *)sender {
+    [_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
+    if(sender.on) {
         UIAlertController *ac = [UIAlertController alertControllerWithTitle:@"Warning" message:@"External URLs may load insecurely and could result in your IP address being revealed to external site operators" preferredStyle:UIAlertControllerStyleAlert];
         
         [ac addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-            _thirdPartyNotificationPreviews.on = NO;
+            sender.on = NO;
         }]];
 
         [ac addAction:[UIAlertAction actionWithTitle:@"Enable" style:UIAlertActionStyleDefault handler:nil]];
