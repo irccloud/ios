@@ -141,7 +141,9 @@
     _imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     _imageView.contentMode = UIViewContentModeScaleAspectFit;
-    
+    if(@available(iOS 11, *))
+        _imageView.accessibilityIgnoresInvertColors = YES;
+
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     if(!self.view.backgroundColor)
         self.view.backgroundColor = self.tableView.backgroundColor = [UIColor colorWithRed:0.937255 green:0.937255 blue:0.956863 alpha:1];

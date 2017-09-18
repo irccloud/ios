@@ -64,6 +64,8 @@
 
         _thumbnail = [[YYAnimatedImageView alloc] init];
         _thumbnail.contentMode = UIViewContentModeScaleAspectFit;
+        if(@available(iOS 11, *))
+            _thumbnail.accessibilityIgnoresInvertColors = YES;
         [self.contentView addSubview:_thumbnail];
         
         _spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];

@@ -393,6 +393,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    if(@available(iOS 11, *))
+        _imageView.accessibilityIgnoresInvertColors = YES;
+
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
     [doubleTap setNumberOfTapsRequired:2];
     [_scrollView addGestureRecognizer:doubleTap];

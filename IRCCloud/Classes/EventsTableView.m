@@ -206,6 +206,8 @@ extern UIImage *__socketClosedBackgroundImage;
         [self.contentView addSubview:_avatar];
         
         _thumbnail = [[YYAnimatedImageView alloc] init];
+        if(@available(iOS 11, *))
+            _thumbnail.accessibilityIgnoresInvertColors = YES;
         [self.contentView addSubview:_thumbnail];
         
         _spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
