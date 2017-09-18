@@ -334,14 +334,20 @@
     [d synchronize];
     
     self.splashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"SplashViewController"];
+    if(@available(iOS 11, *))
+        self.splashViewController.view.accessibilityIgnoresInvertColors = YES;
     self.window.rootViewController = self.splashViewController;
     self.loginSplashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"LoginSplashViewController"];
+    if(@available(iOS 11, *))
+        self.loginSplashViewController.view.accessibilityIgnoresInvertColors = YES;
     self.mainViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"MainViewController"];
     self.slideViewController = [[ECSlidingViewController alloc] init];
     self.slideViewController.view.backgroundColor = [UIColor blackColor];
     self.slideViewController.topViewController = [[UINavigationController alloc] initWithNavigationBarClass:[NavBarHax class] toolbarClass:nil];
     [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
     self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
+    if(@available(iOS 11, *))
+        self.slideViewController.view.accessibilityIgnoresInvertColors = YES;
     if(launchOptions && [launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey]) {
         self.mainViewController.bidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:1] intValue];
         self.mainViewController.eidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:2] doubleValue];
