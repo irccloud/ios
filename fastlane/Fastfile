@@ -15,6 +15,10 @@ fastlane_version "2.57.1"
 
 default_platform :ios
 
+def app_vers
+  sh("cat ../build-scripts/VERSION")
+end
+
 platform :ios do
   desc "Check all certs and provisioning profiles from github"
   lane :certs do
@@ -29,11 +33,6 @@ platform :ios do
         "#{app_root}enterprise.NotificationService"
        ])
     end
-  end
-
-  desc "Update version number"
-  lane :bump do |options|
-    increment_version_number(version_number: options[:version])
   end
 
   desc "Build and push to iTunes Connect"
@@ -83,6 +82,11 @@ platform :ios do
         skip_metadata: true,
         skip_screenshots: true
     )
+  end
+
+  desc "Print version"
+  lane :vers do
+    UI.success "Version: #{app_vers()}"
   end
   
   desc "Take screenshots"
@@ -142,7 +146,7 @@ REVIEW_NOTES
     
     skip_screenshots = !options[:screenshots]
     
-    app_version = options[:app_version] || get_version_number()
+    app_version = options[:app_version] || app_vers()
     deliver(
         app_version: app_version,
         app_identifier: app_identifier,

@@ -45,6 +45,11 @@ Update version number
 fastlane ios push
 ```
 Build and push to iTunes Connect
+### ios vers
+```
+fastlane ios vers
+```
+Print version
 ### ios screenshots
 ```
 fastlane ios screenshots
