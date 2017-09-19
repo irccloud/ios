@@ -2995,7 +2995,6 @@ NSArray *_sortedChannels;
     [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
     if(@available(iOS 11, *)) {
         [UIColor setSafeInsets:self.slidingViewController.view.safeAreaInsets];
-        [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
         if(self.slidingViewController.view.safeAreaInsets.bottom)
             [self updateLayout:0];
         else
@@ -3128,6 +3127,7 @@ NSArray *_sortedChannels;
                 //Not registered yet
             }
         }
+        [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
         [self updateLayout];
         [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
         [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
