@@ -3363,6 +3363,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "8b30da1f-abbd-4518-8057-51e0b131c97c";
 				PROVISIONING_PROFILE_SPECIFIER = "AppStore-Enterprise-NotificationService";
 				SKIP_INSTALL = YES;
 			};
@@ -3882,6 +3883,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
+				PROVISIONING_PROFILE = "34e9152f-c289-40ca-b734-b53c562c236c";
 				PROVISIONING_PROFILE_SPECIFIER = "AppStore-Enterprise-ShareExtension";
 				SKIP_INSTALL = YES;
 			};
@@ -4007,6 +4009,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
+				PROVISIONING_PROFILE = "3033dd90-032d-4f54-b068-68488337880f";
 				PROVISIONING_PROFILE_SPECIFIER = "AppStore-Enterprise";
 				WRAPPER_EXTENSION = app;
 			};
