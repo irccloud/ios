@@ -52,9 +52,9 @@ platform :ios do
     
     # Set a build number manually if provided
     # TODO pull this from the Info.plist
-    default_build_number = "VERSION_STRING"
+    default_build_number = "GIT_VERSION"
     if options[:build]
-        increment_build_number(build_number: options[:build])
+        sh "cd .. && agvtool new-version -all #{options[:build]}"
     end
     
     # Build an ipa
@@ -74,7 +74,7 @@ platform :ios do
     
     # Reset the build number
     if options[:build]
-        increment_build_number(build_number: default_build_number)
+        sh "cd .. && agvtool new-version -all #{default_build_number}"
     end
     
     # Upload to iTunes Connect
