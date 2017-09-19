@@ -7,4 +7,5 @@ You can also now format your messages with bold, italics, underline, and colors.
 • Support for page up / page down scrolling on external keyboards
 • Added support for iPhone X screens
 • Improved animated GIF performance
+• Added support for viewing WEBP in app
 • Stability improvements and minor fixes
