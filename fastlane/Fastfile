@@ -41,9 +41,13 @@ platform :ios do
     if options[:enterprise]
         ipa = "IRCEnterprise.ipa"
         scheme = "IRCCloud Enterprise"
+        bundle_id = "com.irccloud.enterprise"
+        profile_root = "AppStore-Enterprise"
     else
         ipa = "IRCCloud.ipa"
         scheme = "IRCCloud"
+        bundle_id = "com.irccloud.IRCCloud"
+        profile_root = "AppStore"
     end
     
     # Set a build number manually if provided
@@ -54,7 +58,19 @@ platform :ios do
     end
     
     # Build an ipa
-    gym(scheme: scheme, configuration: "AppStore")
+    gym(
+      scheme: scheme,
+      configuration: "AppStore",
+      export_method: "app-store",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "#{bundle_id}" => "#{profile_root}",
+          "#{bundle_id}.ShareExtension" => "#{profile_root}-ShareExtension",
+          "#{bundle_id}.NotificationService" => "#{profile_root}-NotificationService",
+        }
+      }
+    )
     
     # Reset the build number
     if options[:build]
