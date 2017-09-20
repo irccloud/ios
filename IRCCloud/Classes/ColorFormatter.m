@@ -1913,12 +1913,14 @@ extern BOOL __compact;
                         boldItalicFont = HelveticaBoldOblique;
                     }
                     if(fg >= mono || bg >= mono) {
-                        [attributes addObject:@{
+                        if(fgColor)
+                            [attributes addObject:@{
                                                 NSBackgroundColorAttributeName:fgColor,
                                                 @"start":@(fg),
                                                 @"length":@(i - fg)
                                                 }];
-                        [attributes addObject:@{
+                        if(bgColor)
+                            [attributes addObject:@{
                                                 NSBackgroundColorAttributeName:bgColor,
                                                 @"start":@(bg),
                                                 @"length":@(i - bg)

@@ -70,14 +70,20 @@
 }
 
 -(void)clear {
-    [_tasks.allValues makeObjectsPerformSelector:@selector(cancel)];
-    [_tasks removeAllObjects];
-    [_images removeAllObjects];
+    @synchronized(_tasks) {
+        [_tasks.allValues makeObjectsPerformSelector:@selector(cancel)];
+        [_tasks removeAllObjects];
+    }
+    @synchronized(_images) {
+        [_images removeAllObjects];
+    }
     _template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
 }
 
 -(void)clearFailedURLs {
-    [_failures removeAllObjects];
+    @synchronized(_failures) {
+        [_failures removeAllObjects];
+    }
 }
 
 -(void)purge {
@@ -100,7 +106,9 @@
 }
 
 -(BOOL)isValidURL:(NSURL *)url {
-    return [_failures objectForKey:url.absoluteString] == nil;
+    @synchronized(_failures) {
+        return [_failures objectForKey:url.absoluteString] == nil;
+    }
 }
 
 -(BOOL)isValidFileID:(NSString *)fileID {
@@ -112,7 +120,9 @@
 }
 
 -(BOOL)isLoaded:(NSURL *)url {
-    return [_images objectForKey:url.absoluteString] != nil || [_failures objectForKey:url.absoluteString] != nil;
+    @synchronized(_images) {
+        return [_images objectForKey:url.absoluteString] != nil || [_failures objectForKey:url.absoluteString] != nil;
+    }
 }
 
 -(BOOL)isLoaded:(NSString *)fileID width:(int)width {
@@ -120,25 +130,29 @@
 }
 
 -(UIImage *)imageForURL:(NSURL *)url {
-    if([_failures objectForKey:url.absoluteString])
-        return nil;
-    else if(![_images objectForKey:url.absoluteString]) {
-        NSURL *cache = [self pathForURL:url];
-        if([[NSFileManager defaultManager] fileExistsAtPath:cache.path]) {
-            NSData *data = [NSData dataWithContentsOfURL:cache];
-            YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
-            if(img.size.width) {
-                [_images setObject:img forKey:url.absoluteString];
-            } else {
-                CLS_LOG(@"Unable to load %@ from cache", url);
-                [_failures setObject:@(YES) forKey:url.absoluteString];
+    @synchronized(_failures) {
+        if([_failures objectForKey:url.absoluteString])
+            return nil;
+    }
+    @synchronized(_images) {
+        if(![_images objectForKey:url.absoluteString]) {
+            NSURL *cache = [self pathForURL:url];
+            if([[NSFileManager defaultManager] fileExistsAtPath:cache.path]) {
+                NSData *data = [NSData dataWithContentsOfURL:cache];
+                YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
+                if(img.size.width) {
+                    [_images setObject:img forKey:url.absoluteString];
+                } else {
+                    CLS_LOG(@"Unable to load %@ from cache", url);
+                    [_failures setObject:@(YES) forKey:url.absoluteString];
+                }
             }
         }
+        if([[_images objectForKey:url.absoluteString] isKindOfClass:UIImage.class])
+            return [_images objectForKey:url.absoluteString];
+        else
+            return nil;
     }
-    if([[_images objectForKey:url.absoluteString] isKindOfClass:UIImage.class])
-        return [_images objectForKey:url.absoluteString];
-    else
-        return nil;
 }
 
 -(UIImage *)imageForFileID:(NSString *)fileID {
@@ -158,7 +172,9 @@
             [_tasks removeObjectForKey:url];
             if(error) {
                 CLS_LOG(@"Download failed: %@", error);
-                [_failures setObject:@(YES) forKey:url.absoluteString];
+                @synchronized(_failures) {
+                    [_failures setObject:@(YES) forKey:url.absoluteString];
+                }
             } else if(location) {
                 NSURL *cache = [self pathForURL:url];
                 [[NSFileManager defaultManager] createDirectoryAtURL:_cachePath withIntermediateDirectories:YES attributes:nil error:nil];
@@ -167,9 +183,13 @@
                 NSData *data = [NSData dataWithContentsOfURL:cache];
                 YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
                 if(img.size.width) {
-                    [_images setObject:img forKey:url.absoluteString];
+                    @synchronized(_images) {
+                        [_images setObject:img forKey:url.absoluteString];
+                    }
                 } else {
-                    [_failures setObject:@(YES) forKey:url.absoluteString];
+                    @synchronized(_failures) {
+                        [_failures setObject:@(YES) forKey:url.absoluteString];
+                    }
                 }
             }
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
