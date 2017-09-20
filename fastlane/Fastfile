@@ -16,7 +16,7 @@ fastlane_version "2.57.1"
 default_platform :ios
 
 def app_vers
-  sh("head ../build-scripts/VERSION").strip
+  File.read('../build-scripts/VERSION').split('\n')[0].strip
 end
 
 platform :ios do
@@ -120,25 +120,14 @@ platform :ios do
 
   desc "Upload metadata"
   lane :metadata do |options|
-    app_review_information = {
-      'first_name' => "first_name",
-      'last_name' => "last_name",
-      'phone_number' => "phone_number",
-      'email_address' => "email_address",
-      'demo_user' => "demo_user",
-      'demo_password' => "demo_password",
-      'notes' => <<-REVIEW_NOTES
-notes
-REVIEW_NOTES
-    }
+    require 'json'
+    review_info = JSON.parse(File.read('review_info.json'))
+    review_info['notes'] = File.read('metadata/review_notes.txt')
 
     if options[:enterprise]
         metadata_path = "./fastlane/metadata-enterprise"
         app_identifier = "com.irccloud.enterprise"
-        app_review_information['notes'] = <<-REVIEW_NOTES
-For Host, please use www.irccloud.com
-#{app_review_information['notes']}
-REVIEW_NOTES
+        review_info['notes'] = File.read('metadata-enterprise/review_notes.txt')
     else
         metadata_path = "./fastlane/metadata"
         app_identifier = "com.irccloud.IRCCloud"
@@ -153,7 +142,7 @@ REVIEW_NOTES
         skip_binary_upload: true,
         skip_screenshots: skip_screenshots,
         metadata_path: metadata_path,
-        app_review_information: app_review_information,
+        app_review_information: review_info,
         automatic_release: true
     )
     precheck(
