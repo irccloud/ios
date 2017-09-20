@@ -116,6 +116,9 @@
 
 #define IS_TWIMG(url) ([url.host.lowercaseString hasSuffix:@".twimg.com"] && [url.path.lowercaseString hasPrefix:@"/media/"] && [url.path rangeOfString:@":"].location != NSNotFound && HAS_IMAGE_SUFFIX([url.path substringToIndex:[url.path rangeOfString:@":"].location].lowercaseString))
 
+#define IS_XKCD(url) (([[url.host lowercaseString] hasSuffix:@".xkcd.com"] || [[url.host lowercaseString] isEqualToString:@"xkcd.com"]) && [url.path rangeOfCharacterFromSet:[[NSCharacterSet characterSetWithCharactersInString:@"0123456789/"] invertedSet]].location == NSNotFound)
+
+
 -(instancetype)init {
     self = [super init];
     
@@ -152,6 +155,8 @@
     } else if([url.host.lowercaseString isEqualToString:@"cl.ly"]) {
         return nil;
     } else if([url.path hasPrefix:@"/wiki/"] && [url.absoluteString containsString:@"/File:"]) {
+        return nil;
+    } else if([url.host.lowercaseString isEqualToString:@"xkcd.com"] || [url.host.lowercaseString hasSuffix:@".xkcd.com"]) {
         return nil;
     } else if([url.host hasSuffix:@"leetfiles.com"]) {
         NSString *u = url.absoluteString;
@@ -246,6 +251,8 @@
                     }
                 }
             }];
+        } else if([url.host.lowercaseString isEqualToString:@"xkcd.com"] || [url.host.lowercaseString hasSuffix:@".xkcd.com"]) {
+            [self _loadXKCD:url result:callback];
         }
     }
 }
@@ -396,11 +403,37 @@
     }];
 }
 
+-(void)_loadXKCD:(NSURL *)original_url result:(mediaURLResult)callback {
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/info.0.json", original_url.absoluteString]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    [request setHTTPShouldHandleCookies:NO];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (error) {
+            NSLog(@"Error fetching xkcd. Error %li : %@", (long)error.code, error.userInfo);
+            callback(NO,error.localizedDescription);
+        } else {
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+            if([dict objectForKey:@"img"]) {
+                [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"img"]],
+                                        @"image":[NSURL URLWithString:[dict objectForKey:@"img"]],
+                                        @"name":[dict objectForKey:@"safe_title"],
+                                        @"description":[dict objectForKey:@"alt"],
+                                        @"url":original_url
+                                        } forKey:original_url];
+                callback(YES, nil);
+            } else {
+                CLS_LOG(@"xkcd failure: %@", dict);
+                callback(NO,@"Unexpected response from server");
+            }
+        }
+    }];
+}
+
 + (BOOL)isImageURL:(NSURL *)url
 {
     NSString *l = [url.path lowercaseString];
     // Use pre-processor macros instead of variables so conditions are still evaluated lazily
-    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GIPHY(url) || IS_WIKI(url) || IS_TWIMG(url));
+    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GIPHY(url) || IS_WIKI(url) || IS_TWIMG(url) || IS_XKCD(url));
 }
 
 + (BOOL)isYouTubeURL:(NSURL *)url
