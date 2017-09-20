@@ -947,9 +947,10 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         cell.border.backgroundColor = [UIColor bufferBorderColor];
         cell.contentView.backgroundColor = [UIColor bufferBackgroundColor];
         cell.icon.font = _awesomeFont;
+#ifndef EXTENSION
         if(@available(iOS 11, *))
             cell.borderInset = self.slidingViewController.view.safeAreaInsets.left;
-
+#endif
         if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
             if([[row objectForKey:@"archived"] intValue])
                 cell.unreadIndicator.backgroundColor = [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1];
