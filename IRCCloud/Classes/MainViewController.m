@@ -4777,7 +4777,8 @@ Network type: %@\n",
         _message.attributedText = msg;
         _message.selectedRange = selection;
     } else {
-        _currentMessageAttributes = _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_message.font };
+        if([UIColor textareaTextColor] && _message.font)
+            _currentMessageAttributes = _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_message.font };
     }
 }
 

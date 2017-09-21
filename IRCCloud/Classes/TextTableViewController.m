@@ -56,7 +56,8 @@
             [text appendFormat:@"%@\n", s];
         }
     } else {
-        [text appendString:_placeholder];
+        if(_placeholder)
+            [text appendString:_placeholder];
     }
     
     NSArray *links;
