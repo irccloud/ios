@@ -4343,16 +4343,18 @@ NSArray *_sortedChannels;
 }
 
 -(void)_startPastebin {
-    PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
-    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
-    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-        nc.modalPresentationStyle = UIModalPresentationFormSheet;
-    else
-        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-    if(self.presentedViewController)
-        [self dismissViewControllerAnimated:NO completion:nil];
-    [self presentViewController:nc animated:YES completion:nil];
+    if(_buffer) {
+        PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        if(self.presentedViewController)
+            [self dismissViewControllerAnimated:NO completion:nil];
+        [self presentViewController:nc animated:YES completion:nil];
+    }
 }
 
 -(void)_showPastebins {

@@ -2035,6 +2035,8 @@ extern UIImage *__socketClosedBackgroundImage;
                     e.formattedMsg = nil;
                 }
                 [self insertEvent:e backlog:true nextIsGrouped:false];
+                if(e.formattedMsg && !e.formatted)
+                    [self _format:e];
                 if(e.height == 0 && e.formatted)
                     [self _calculateHeight:e];
             }

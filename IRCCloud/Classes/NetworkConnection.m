@@ -1281,6 +1281,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(int)say:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    if(!message)
+        message = @"";
     if(to)
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":to} handler:resultHandler];
     else
@@ -1859,9 +1861,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                     _currentCount++;
                 }
             }
-            if(!backlog && [object objectForKey:@"reqid"] && [_resultHandlers objectForKey:@([[object objectForKey:@"reqid"] intValue])]) {
+            int reqid = [[object objectForKey:@"reqid"] intValue];
+            if(!backlog && [object objectForKey:@"reqid"] && [_resultHandlers objectForKey:@(reqid)]) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        ((IRCCloudAPIResultHandler)[_resultHandlers objectForKey:@([[object objectForKey:@"reqid"] intValue])])(object);
+                        ((IRCCloudAPIResultHandler)[_resultHandlers objectForKey:@(reqid)])(object);
                     }];
             }
             if([NSDate timeIntervalSinceReferenceDate] - start > _longestEventTime) {
