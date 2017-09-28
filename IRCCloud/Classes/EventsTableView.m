@@ -324,7 +324,7 @@ extern UIImage *__socketClosedBackgroundImage;
             frame.origin.x += 8;
             frame.origin.y += _thumbnailHeight + 10;
             frame.size.height -= _thumbnailHeight - 8;
-            _spinner.center = self.contentView.center;
+            _spinner.center = CGPointMake(_thumbbackground.center.x, FONT_SIZE +  (__compact?9:12));
             if(!_spinner.hidden && !_spinner.isAnimating)
                 [_spinner startAnimating];
             if(_filename.text.length) {
@@ -2383,7 +2383,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 e.entities = entities;
                 e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue]) + (__compact?18:24);
             } else {
-                e.height = FONT_SIZE * 2 + (__compact?6:12);
+                e.height = FONT_SIZE * 2 + (__compact?18:24);
             }
         } else {
             if(([e.entities objectForKey:@"id"] && [[ImageCache sharedInstance] isValidFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)]) || ([e.entities objectForKey:@"thumb"] && [[ImageCache sharedInstance] isValidURL:[e.entities objectForKey:@"thumb"]])) {
@@ -2392,7 +2392,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
                 e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + (__compact?18:24);
             } else {
-                e.height = FONT_SIZE * 2 + (__compact?6:12);
+                e.height = FONT_SIZE * 2 + (__compact?18:24);
             }
         }
 
@@ -2647,8 +2647,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 cell.thumbnailWidth = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
                 cell.thumbnailHeight = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
             } else {
-                cell.thumbnailWidth = width;
-                cell.thumbnailHeight = 48;
+                cell.thumbnailWidth = FONT_SIZE * 2;
+                cell.thumbnailHeight = FONT_SIZE * 2;
             }
             if([e.entities objectForKey:@"id"]) {
                 cell.mimeType.text = [NSString stringWithFormat:@"%@ • %@", [e.entities objectForKey:@"mime_type"], e.msg];
