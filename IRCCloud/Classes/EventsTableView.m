@@ -324,7 +324,7 @@ extern UIImage *__socketClosedBackgroundImage;
             frame.origin.x += 8;
             frame.origin.y += _thumbnailHeight + 10;
             frame.size.height -= _thumbnailHeight - 8;
-            _spinner.center = CGPointMake(_thumbbackground.center.x, FONT_SIZE +  (__compact?9:12));
+            _spinner.center = CGPointMake(_thumbbackground.center.x, (_thumbnailHeight / 2) + (__compact?4:6));
             if(!_spinner.hidden && !_spinner.isAnimating)
                 [_spinner startAnimating];
             if(_filename.text.length) {
