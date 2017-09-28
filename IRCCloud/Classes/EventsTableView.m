@@ -2376,9 +2376,14 @@ extern UIImage *__socketClosedBackgroundImage;
             }
             if(size.width > 0 && size.height > 0) {
                 NSMutableDictionary *entities = [e.entities mutableCopy];
-                float ratio = width / size.width;
-                size.width = width;
-                size.height = size.height * ratio;
+                if(size.width > width) {
+                    float ratio = width / size.width;
+                    size.width = width;
+                    size.height = size.height * ratio;
+                } else {
+                    size.width *= [UIScreen mainScreen].scale;
+                    size.height *= [UIScreen mainScreen].scale;
+                }
                 [entities setObject:@{@"width":@(size.width), @"height":@(size.height)} forKey:@"properties"];
                 e.entities = entities;
                 e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue]) + (__compact?18:24);
