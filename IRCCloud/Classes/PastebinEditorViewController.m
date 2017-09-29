@@ -102,7 +102,7 @@
             _buffer.draft = _text.text;
         }
         _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
-            if(![result objectForKey:@"success"]) {
+            if(![[result objectForKey:@"success"] boolValue]) {
                 UIAlertView *v = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Failed to send message: %@", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
                 [v show];
             }
@@ -121,7 +121,7 @@
         }
         
         IRCCloudAPIResultHandler pasteHandler = ^(IRCCloudJSONObject *result) {
-            if([result objectForKey:@"success"]) {
+            if([[result objectForKey:@"success"] boolValue]) {
                 if(_pasteID) {
                     [self.tableView endEditing:YES];
                     [self.navigationController popViewControllerAnimated:YES];
@@ -139,7 +139,7 @@
                     }];
                 }
             } else {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save pastebin, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save snippet, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
                 self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:_pasteID?@"Save":@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
             }
@@ -270,6 +270,7 @@
 }
 
 -(void)textViewDidChange:(UITextView *)textView {
+    self.navigationItem.rightBarButtonItem.enabled = (_text.text.length > 0);
     if(textView == _text) {
         int count = 0;
         NSArray *lines = [_text.text componentsSeparatedByString:@"\n"];
