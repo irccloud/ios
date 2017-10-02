@@ -3571,6 +3571,7 @@ NSArray *_sortedChannels;
 -(void)userSelected:(NSString *)nick rect:(CGRect)rect {
     _selectedRect = rect;
     _selectedEvent = nil;
+    _selectedURL = nil;
     _selectedUser = [[UsersDataSource sharedInstance] getUser:nick cid:_buffer.cid bid:_buffer.bid];
     if(_doubleTapTimer) {
         [_doubleTapTimer invalidate];
@@ -3693,6 +3694,7 @@ NSArray *_sortedChannels;
 
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
     _selectedUser = nil;
+    _selectedURL = nil;
     _selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     if([_selectedBuffer.type isEqualToString:@"console"]) {
