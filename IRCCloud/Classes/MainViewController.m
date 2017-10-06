@@ -4445,6 +4445,7 @@ NSArray *_sortedChannels;
             } else {
                 irc = [NSString stringWithFormat:@"%@ %@",e.timestamp,e.msg];
             }
+            irc = [irc stringByReplacingOccurrencesOfString:@"\u00a0" withString:@" "];
             NSAttributedString *msg = [ColorFormatter format:irc defaultColor:nil mono:NO linkify:NO server:nil links:nil];
             pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string,@"IRC formatting type":[irc dataUsingEncoding:NSUTF8StringEncoding]}];
         } else if([action isEqualToString:@"Clear Backlog"]) {
