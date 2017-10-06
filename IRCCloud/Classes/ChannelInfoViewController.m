@@ -31,6 +31,8 @@
         _channel = channel;
         _modeHints = [[NSMutableArray alloc] init];
         _topicChanged = NO;
+        Server *s = [[ServersDataSource sharedInstance] getServer:channel.cid];
+        _topiclen = [[s.isupport objectForKey:@"TOPICLEN"] longValue];
     }
     return self;
 }
@@ -201,6 +203,7 @@
         textView.typingAttributes = _currentMessageAttributes;
     else
         _currentMessageAttributes = textView.typingAttributes;
+    topicHeader.text = [self tableView:self.tableView titleForHeaderInSection:0];
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
@@ -346,13 +349,32 @@
 #pragma mark - Table view data source
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
-    label.text = [self tableView:tableView titleForHeaderInSection:section];
-    label.font = [UIFont systemFontOfSize:14];
-    label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
-    label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-    [header addSubview:label];
+    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,48)];
+
+    if(!topicHeader) {
+        topicHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
+        topicHeader.font = [UIFont systemFontOfSize:14];
+        topicHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
+    }
+    if(!modesHeader) {
+        modesHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
+        modesHeader.font = [UIFont systemFontOfSize:14];
+        modesHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
+    }
+    
+    switch (section) {
+        case 0:
+            [topicHeader removeFromSuperview];
+            topicHeader.text = [self tableView:tableView titleForHeaderInSection:section];
+            [header addSubview:topicHeader];
+            break;
+        case 1:
+            [modesHeader removeFromSuperview];
+            modesHeader.text = [self tableView:tableView titleForHeaderInSection:section];
+            [header addSubview:modesHeader];
+            break;
+    }
+    
     return header;
 }
 
@@ -391,7 +413,9 @@
     [super setEditing:editing animated:animated];
     [self.tableView reloadData];
     if(editing) {
-        [_topicEdit becomeFirstResponder];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [_topicEdit becomeFirstResponder];
+        }];
         _topicChanged = NO;
     }
 }
@@ -423,7 +447,11 @@
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch(section) {
         case 0:
-            return @"TOPIC";
+            if(tableView.isEditing && _topiclen) {
+                return [NSString stringWithFormat:@"TOPIC (%li CHARS)", (_topiclen - [ColorFormatter toIRC:_topicEdit.attributedText].length)];
+            } else {
+                return @"TOPIC";
+            }
         case 1:
             if(_modeHints.count)
                 return [NSString stringWithFormat:@"MODE: +%@", _channel.mode];

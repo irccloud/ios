@@ -22,6 +22,7 @@
 
 @interface ChannelInfoViewController : UITableViewController<UITextViewDelegate,LinkTextViewDelegate,NSTextStorageDelegate,IRCColorPickerViewDelegate> {
     Channel *_channel;
+    long _topiclen;
     UITextView *_topicEdit;
     NSAttributedString *_topic;
     LinkTextView *_topicLabel;
@@ -31,6 +32,8 @@
     int offset;
     IRCColorPickerView *_colorPickerView;
     NSDictionary *_currentMessageAttributes;
+    UILabel *topicHeader;
+    UILabel *modesHeader;
 }
 -(id)initWithChannel:(Channel *)channel;
 @end
