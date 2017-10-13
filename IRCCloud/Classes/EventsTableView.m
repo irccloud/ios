@@ -187,10 +187,9 @@ extern UIImage *__socketClosedBackgroundImage;
         [self.view addSubview:_tableView];
     }
     
-    [_tableView registerNib:[UINib nibWithNibName:@"EventsTableCell" bundle:nil] forCellReuseIdentifier:@"EventsTableCell"];
-    _tableView.rowHeight = UITableViewAutomaticDimension;
+    _eventsTableCell = [UINib nibWithNibName:@"EventsTableCell" bundle:nil];
     _tableView.scrollsToTop = NO;
-    _tableView.estimatedRowHeight = 44;
+    _tableView.estimatedRowHeight = 0;
     _tableView.estimatedSectionHeaderHeight = 0;
     _tableView.estimatedSectionFooterHeight = 0;
     lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
@@ -1206,7 +1205,6 @@ extern UIImage *__socketClosedBackgroundImage;
         e1.type = parent.type;
     e1.formattedMsg = e1.msg;
     [self _format:e1];
-    [self _calculateHeight:e1];
     return e1;
 }
 
@@ -1735,8 +1733,6 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self insertEvent:e backlog:true nextIsGrouped:false];
                 if(e.formattedMsg && !e.formatted)
                     [self _format:e];
-                if(e.height == 0 && e.formatted)
-                    [self _calculateHeight:e];
             }
             _tableView.tableHeaderView = nil;
         }
@@ -2024,110 +2020,35 @@ extern UIImage *__socketClosedBackgroundImage;
                 [s replaceCharactersInRange:[s rangeOfString:@"."] withString:@""];
             e.accessibilityValue = s;
         }
-        [self _calculateHeight:e];
         [_lock unlock];
     }
 }
 
-- (void)_calculateHeight:(Event *)e {
-    static LinkLabel *message = nil;
-    if(!message) {
-        message = [[LinkLabel alloc] init];
-        message.backgroundColor = [UIColor clearColor];
-        message.textColor = [UIColor messageTextColor];
-        message.numberOfLines = 0;
-        message.lineBreakMode = NSLineBreakByWordWrapping;
-        message.userInteractionEnabled = YES;
-        message.baselineAdjustment = UIBaselineAdjustmentNone;
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    [_lock lock];
+    if(indexPath.row >= _data.count) {
+        [_lock unlock];
+        return 0;
     }
-    float avatarWidth = (__avatarsOffPref || __chatOneLinePref)?0:(__largeAvatarHeight+17);
-    float estimatedWidth = _tableView.frame.size.width - 4 - __timestampWidth - avatarWidth - ((e.rowType == ROW_FAILED)?20:0);
-    estimatedWidth -= (__timeLeftPref || (!__avatarsOffPref && !__chatOneLinePref))?12:22;
-    if(__timeLeftPref && !__chatOneLinePref && __avatarsOffPref)
-        estimatedWidth -= 4;
-    
-    if(!__disableQuotePref && e.isQuoted)
-        estimatedWidth -= 12;
-    
-    if(e.isCodeBlock)
-        estimatedWidth -= 8;
-    
-    if(e.rowType == ROW_THUMBNAIL)
-        estimatedWidth -= 26;
-    
-    message.attributedText = e.formatted;
-
-    if(e.rowType == ROW_THUMBNAIL) {
-        message.attributedText = [ColorFormatter format:[e.entities objectForKey:@"description"] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:nil largeEmoji:NO];
-        float width = self.tableView.bounds.size.width/2;
-        if(![[[e.entities objectForKey:@"properties"] objectForKey:@"width"] intValue] || ![[[e.entities objectForKey:@"properties"] objectForKey:@"height"] intValue]) {
-            CGSize size = CGSizeZero;
-            
-            if([e.entities objectForKey:@"id"] && [[ImageCache sharedInstance] isLoaded:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)]) {
-                YYImage *img = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
-                if(img)
-                    size = img.size;
-            } else if([[ImageCache sharedInstance] isLoaded:[e.entities objectForKey:@"thumb"]]) {
-                YYImage *img = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
-                if(img)
-                    size = img.size;
-            }
-            if(size.width > 0 && size.height > 0) {
-                NSMutableDictionary *entities = [e.entities mutableCopy];
-                if(size.width > width) {
-                    float ratio = width / size.width;
-                    size.width = width;
-                    size.height = size.height * ratio;
-                } else {
-                    size.width *= [UIScreen mainScreen].scale;
-                    size.height *= [UIScreen mainScreen].scale;
-                }
-                [entities setObject:@{@"width":@(size.width), @"height":@(size.height)} forKey:@"properties"];
-                e.entities = entities;
-                e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue]) + (__compact?18:24);
-            } else {
-                e.height = FONT_SIZE * 2 + (__compact?18:24);
-            }
-        } else {
-            if(([e.entities objectForKey:@"id"] && [[ImageCache sharedInstance] isValidFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)]) || ([e.entities objectForKey:@"thumb"] && [[ImageCache sharedInstance] isValidURL:[e.entities objectForKey:@"thumb"]])) {
-                if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
-                    width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-                float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-                e.height = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio) + (__compact?18:24);
-            } else {
-                e.height = FONT_SIZE * 2 + (__compact?18:24);
-            }
+    Event *e = [_data objectAtIndex:indexPath.row];
+    [_lock unlock];
+    @synchronized (e) {
+        if(e.height == 0) {
+            UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
+            cell.bounds = CGRectMake(0,0,self.tableView.bounds.size.width,cell.bounds.size.height);
+            [cell layoutIfNeeded];
+            e.height = [cell.contentView systemLayoutSizeFittingSize:cell.bounds.size].height;
         }
-
-        if([e.entities objectForKey:@"id"] || [e.entities objectForKey:@"description"])
-            e.height += floorf([message sizeThatFits:CGSizeMake(estimatedWidth, CGFLOAT_MAX)].height + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0));
-        if([[e.entities objectForKey:@"name"] length])
-            e.height += FONT_SIZE + 2;
-    } else if(e.rowType == ROW_FILE) {
-        e.height = FONT_SIZE * 3 + (__compact?24:30);
-    } else {
-        e.height = floorf([message sizeThatFits:CGSizeMake(estimatedWidth, CGFLOAT_MAX)].height + ((e.rowType == ROW_SOCKETCLOSED)?(FONT_SIZE-2):0));
-        if(!__compact)
-            e.height += MESSAGE_LINE_PADDING;
-        else
-            e.height += 2;
-        e.timestampPosition = [ColorFormatter messageFont:__monospacePref].ascender - (__monospacePref?[ColorFormatter monoTimestampFont].ascender:[ColorFormatter timestampFont].ascender);
-        e.estimatedWidth = estimatedWidth;
-        
-        if(!__chatOneLinePref && e.isHeader && e.formattedNick.length) {
-            e.height += [LinkLabel heightOfString:e.formattedNick constrainedToWidth:estimatedWidth] + (__compact?2:MESSAGE_LINE_PADDING);
-            if(e.height < __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING))
-                e.height = __largeAvatarHeight + (__compact?1:MESSAGE_LINE_PADDING);
-        }
-        
-        if(e.isCodeBlock)
-            e.height += 8;
+        return e.height;
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized (_rowCache) {
-        EventsTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"EventsTableCell" forIndexPath:indexPath];
+        EventsTableCell *cell = [_rowCache objectForKey:@(indexPath.row)];
+        if(!cell)
+            cell = [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
+        [_rowCache setObject:cell forKey:@(indexPath.row)];
         [_lock lock];
         if([indexPath row] >= _data.count) {
             CLS_LOG(@"Requested out of bounds row, refreshing");
@@ -2318,12 +2239,6 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         cell.codeBlockBackground.backgroundColor = [UIColor codeSpanBackgroundColor];
         cell.codeBlockBackground.hidden = !e.isCodeBlock;
-        
-        [cell setNeedsUpdateConstraints];
-        [cell updateConstraintsIfNeeded];
-        
-        [cell setNeedsLayout];
-        [cell layoutIfNeeded];
         return cell;
     }
 }

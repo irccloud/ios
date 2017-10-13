@@ -85,6 +85,8 @@
     NSMutableDictionary *_filePropsCache;
     NSMutableSet *_closedPreviews;
     URLHandler *_urlHandler;
+    
+    UINib *_eventsTableCell;
 }
 @property (readonly) UITableView *tableView;
 @property (readonly) UIView *topUnreadView;
