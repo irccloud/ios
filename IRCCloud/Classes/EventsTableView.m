@@ -2037,7 +2037,7 @@ extern UIImage *__socketClosedBackgroundImage;
             UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
             cell.bounds = CGRectMake(0,0,self.tableView.bounds.size.width,cell.bounds.size.height);
             [cell layoutIfNeeded];
-            e.height = [cell.contentView systemLayoutSizeFittingSize:cell.bounds.size].height;
+            e.height = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
         }
         return e.height;
     }
@@ -2102,6 +2102,8 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.messageOffsetLeft.constant += avatarHeight + 6;
         cell.messageOffsetRight.constant = __timeLeftPref ? 6 : __timestampWidth;
         cell.messageOffsetBottom.constant = 6;
+        
+        cell.nickname.preferredMaxLayoutWidth = cell.message.preferredMaxLayoutWidth = self.tableView.bounds.size.width - __timestampWidth - avatarHeight - 12;
 
         if(e.rowType == ROW_TIMESTAMP || e.rowType == ROW_LASTSEENEID) {
             cell.message.text = @"";
