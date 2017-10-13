@@ -51,7 +51,6 @@
     NSString *_accessibilityLabel;
     NSString *_accessibilityValue;
     NSAttributedString *_formatted;
-    NSAttributedString *_formattedPadded;
     NSAttributedString *_formattedNick;
     NSAttributedString *_formattedRealname;
     NSString *_realname;

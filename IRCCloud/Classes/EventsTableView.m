@@ -1953,12 +1953,6 @@ extern UIImage *__socketClosedBackgroundImage;
         else
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
         
-        if(e.formatted.length) {
-            NSMutableAttributedString *padded = e.formatted.mutableCopy;
-            [padded appendAttributedString:[[NSAttributedString alloc] initWithString:@"\n"]];
-            e.formattedPadded = padded;
-        }
-        
         if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
             NSMutableArray *mutableLinks = links.mutableCopy;
             for(int i = 0; i < mutableLinks.count; i++) {
@@ -2034,6 +2028,8 @@ extern UIImage *__socketClosedBackgroundImage;
     [_lock unlock];
     @synchronized (e) {
         if(e.height == 0) {
+            if(e.formattedMsg && !e.formatted)
+                [self _format:e];
             UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
             cell.bounds = CGRectMake(0,0,self.tableView.bounds.size.width,cell.bounds.size.height);
             [cell layoutIfNeeded];

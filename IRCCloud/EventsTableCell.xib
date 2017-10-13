@@ -15,7 +15,7 @@
             <rect key="frame" x="0.0" y="0.0" width="428" height="44"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="428" height="44"/>
+                <rect key="frame" x="0.0" y="0.0" width="428" height="43.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mCi-xX-5DS">
@@ -78,6 +78,12 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="32" placeholderIntrinsicHeight="32" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oeb-cI-59G">
+                        <rect key="frame" x="110" y="22.5" width="32" height="32"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8:00 AM" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ZM-5c-yUP">
                         <rect key="frame" x="362" y="20.5" width="66" height="20.5"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -94,6 +100,7 @@
                     <constraint firstAttribute="bottom" secondItem="fOD-UD-tHL" secondAttribute="bottom" priority="100" id="2UV-md-BHV"/>
                     <constraint firstItem="9aa-Ko-5ri" firstAttribute="trailing" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-2" id="3qd-ta-bgg"/>
                     <constraint firstItem="mCi-xX-5DS" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="52b-SU-woC"/>
+                    <constraint firstItem="oeb-cI-59G" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" id="5mm-tp-TXv"/>
                     <constraint firstItem="9aa-Ko-5ri" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="7aK-3S-iur"/>
                     <constraint firstItem="FYg-pz-vsM" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="7hL-Sy-lYb"/>
                     <constraint firstItem="fOD-UD-tHL" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="8ZI-LM-dI5"/>
@@ -112,6 +119,7 @@
                     <constraint firstItem="9ZM-5c-yUP" firstAttribute="width" secondItem="fOD-UD-tHL" secondAttribute="width" id="lA1-AB-LS1"/>
                     <constraint firstAttribute="trailing" secondItem="9ZM-5c-yUP" secondAttribute="trailing" id="mfo-0I-29z"/>
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="110" id="nTv-tZ-edl"/>
+                    <constraint firstItem="oeb-cI-59G" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" constant="2" id="qPn-0k-p7r"/>
                     <constraint firstItem="nEj-fz-vAL" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" id="sDo-jb-7ON"/>
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="height" relation="greaterThanOrEqual" secondItem="fOD-UD-tHL" secondAttribute="height" id="u4u-Xj-mxr"/>
                     <constraint firstAttribute="trailing" secondItem="mCi-xX-5DS" secondAttribute="trailing" id="uZX-KQ-OrH"/>
@@ -121,6 +129,7 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="_accessory" destination="oeb-cI-59G" id="uC5-yF-SeU"/>
                 <outlet property="_avatar" destination="9aa-Ko-5ri" id="Pj6-Ze-4N6"/>
                 <outlet property="_bottomBorder" destination="Air-U6-OOz" id="mKT-1S-Zyf"/>
                 <outlet property="_lastSeenEID" destination="2Cd-th-WEc" id="fvk-De-jpw"/>
