@@ -86,7 +86,7 @@
     NSMutableSet *_closedPreviews;
     URLHandler *_urlHandler;
     
-    UINib *_eventsTableCell;
+    UINib *_eventsTableCell, *_eventsTableCell_Thumbnail, *_eventsTableCell_File;
 }
 @property (readonly) UITableView *tableView;
 @property (readonly) UIView *topUnreadView;

@@ -122,6 +122,36 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 @end
 
+@interface EventsTableCell_Thumbnail : EventsTableCell {
+    IBOutlet UIView *_background;
+    IBOutlet YYAnimatedImageView *_thumbnail;
+    IBOutlet NSLayoutConstraint *_thumbnailWidth, *_thumbnailHeight;
+    IBOutlet UILabel *_filename;
+    IBOutlet UIActivityIndicatorView *_spinner;
+}
+@property (readonly) UIView *background;
+@property (readonly) UILabel *filename;
+@property (readonly) YYAnimatedImageView *thumbnail;
+@property (readonly) NSLayoutConstraint *thumbnailWidth, *thumbnailHeight;
+@property (readonly) UIActivityIndicatorView *spinner;
+@end
+
+@implementation EventsTableCell_Thumbnail
+@end
+
+@interface EventsTableCell_File : EventsTableCell {
+    IBOutlet UIView *_background;
+    IBOutlet UILabel *_filename;
+    IBOutlet UILabel *_mimeType;
+    IBOutlet UILabel *_extension;
+}
+@property (readonly) UIView *background;
+@property (readonly) UILabel *filename, *mimeType, *extension;
+@end
+
+@implementation EventsTableCell_File
+@end
+
 @implementation EventsTableView
 
 - (id)init {
@@ -188,6 +218,8 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     
     _eventsTableCell = [UINib nibWithNibName:@"EventsTableCell" bundle:nil];
+    _eventsTableCell_File = [UINib nibWithNibName:@"EventsTableCell_File" bundle:nil];
+    _eventsTableCell_Thumbnail = [UINib nibWithNibName:@"EventsTableCell_Thumbnail" bundle:nil];
     _tableView.scrollsToTop = NO;
     _tableView.estimatedRowHeight = 0;
     _tableView.estimatedSectionHeaderHeight = 0;
@@ -2028,6 +2060,35 @@ extern UIImage *__socketClosedBackgroundImage;
     [_lock unlock];
     @synchronized (e) {
         if(e.height == 0) {
+            if(e.rowType == ROW_THUMBNAIL) {
+                float width = self.tableView.bounds.size.width/2;
+                if(![[[e.entities objectForKey:@"properties"] objectForKey:@"width"] intValue] || ![[[e.entities objectForKey:@"properties"] objectForKey:@"height"] intValue]) {
+                    CGSize size = CGSizeZero;
+                    
+                    if([e.entities objectForKey:@"id"] && [[ImageCache sharedInstance] isLoaded:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)]) {
+                        YYImage *img = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+                        if(img)
+                            size = img.size;
+                    } else if([[ImageCache sharedInstance] isLoaded:[e.entities objectForKey:@"thumb"]]) {
+                        YYImage *img = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
+                        if(img)
+                            size = img.size;
+                    }
+                    if(size.width > 0 && size.height > 0) {
+                        NSMutableDictionary *entities = [e.entities mutableCopy];
+                        if(size.width > width) {
+                            float ratio = width / size.width;
+                            size.width = width;
+                            size.height = size.height * ratio;
+                        } else {
+                            size.width *= [UIScreen mainScreen].scale;
+                            size.height *= [UIScreen mainScreen].scale;
+                        }
+                        [entities setObject:@{@"width":@(size.width), @"height":@(size.height)} forKey:@"properties"];
+                        e.entities = entities;
+                    }
+                }
+            }
             if(e.formattedMsg && !e.formatted)
                 [self _format:e];
             UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
@@ -2042,9 +2103,7 @@ extern UIImage *__socketClosedBackgroundImage;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized (_rowCache) {
         if([indexPath row] >= _data.count) {
-            CLS_LOG(@"Requested out of bounds row, refreshing");
             [_lock unlock];
-            [self refresh];
             return [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
         }
 
@@ -2052,6 +2111,127 @@ extern UIImage *__socketClosedBackgroundImage;
         Event *e = [_data objectAtIndex:indexPath.row];
         [_lock unlock];
 
+        if(e.rowType == ROW_THUMBNAIL) {
+            EventsTableCell_Thumbnail *cell = nil;
+            if([[_rowCache objectForKey:[e UUID]] isKindOfClass:EventsTableCell_Thumbnail.class])
+                cell = [_rowCache objectForKey:[e UUID]];
+            if(!cell)
+                cell = [[_eventsTableCell_Thumbnail instantiateWithOwner:self options:nil] objectAtIndex:0];
+            [_rowCache setObject:cell forKey:[e UUID]];
+            
+            cell.filename.textColor = [UIColor linkColor];
+            cell.filename.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+            cell.filename.text = [e.entities objectForKey:@"name"];
+            
+            if([e.entities objectForKey:@"id"] || [[e.entities objectForKey:@"name"] length] || [[e.entities objectForKey:@"description"] length]) {
+                cell.background.backgroundColor = [UIColor bufferBackgroundColor];
+            } else {
+                cell.background.backgroundColor = [UIColor clearColor];
+            }
+            float width = self.tableView.bounds.size.width/2;
+            if([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] intValue] && [[[e.entities objectForKey:@"properties"] objectForKey:@"height"] intValue]) {
+                if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
+                    width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+                float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+                cell.thumbnailWidth.constant = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
+                cell.thumbnailHeight.constant = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
+            } else {
+                cell.thumbnailWidth.constant = FONT_SIZE * 2;
+                cell.thumbnailHeight.constant = FONT_SIZE * 2;
+            }
+            if([e.entities objectForKey:@"id"]) {
+                cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+            } else {
+                cell.thumbnail.image = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
+            }
+            cell.spinner.hidden = YES;
+            cell.thumbnail.hidden = !(cell.thumbnail.image != nil);
+            if(!cell.thumbnail.image) {
+                if([e.entities objectForKey:@"id"]) {
+                    if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)].path]) {
+                        cell.spinner.hidden = NO;
+                        [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(BOOL success) {
+                            if(success) {
+                                e.height = 0;
+                            } else {
+                                e.rowType = ROW_FILE;
+                            }
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                cell.spinner.hidden = YES;
+                                [self reloadData];
+                            }];
+                        }];
+                    } else {
+                        e.rowType = ROW_FILE;
+                        cell.spinner.hidden = YES;
+                    }
+                } else {
+                    if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:[e.entities objectForKey:@"thumb"]].path]) {
+                        cell.spinner.hidden = NO;
+                        [[ImageCache sharedInstance] fetchURL:[e.entities objectForKey:@"thumb"] completionHandler:^(BOOL success) {
+                            if(success) {
+                                e.height = 0;
+                            } else {
+                                @synchronized(_data) {
+                                    [_data removeObject:e];
+                                }
+                            }
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                cell.spinner.hidden = YES;
+                                [self reloadData];
+                            }];
+                        }];
+                    } else {
+                        cell.spinner.hidden = YES;
+                        @synchronized(_data) {
+                            [_data removeObject:e];
+                        }
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [self reloadData];
+                        }];
+                    }
+                }
+            } else if(![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
+                cell.thumbnail.image = nil;
+                cell.spinner.hidden = NO;
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    NSLog(@"Image dimensions were missing, reloading table");
+                    e.height = 0;
+                    [_tableView reloadData];
+                }];
+            }
+        }
+
+        if(e.rowType == ROW_FILE) {
+            EventsTableCell_File *cell = nil;
+            if([[_rowCache objectForKey:[e UUID]] isKindOfClass:EventsTableCell_File.class])
+                cell = [_rowCache objectForKey:[e UUID]];
+            if(!cell)
+                cell = [[_eventsTableCell_File instantiateWithOwner:self options:nil] objectAtIndex:0];
+            [_rowCache setObject:cell forKey:[e UUID]];
+            
+            NSString *extension = [e.entities objectForKey:@"extension"];
+            if(extension.length)
+                extension = [extension substringFromIndex:1];
+            else
+                extension = [[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1];
+            
+            cell.extension.font = [UIFont boldSystemFontOfSize:FONT_SIZE * 1.5];
+            cell.extension.text = extension.uppercaseString;
+            
+            cell.filename.textColor = [UIColor linkColor];
+            cell.filename.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+            cell.filename.text = [e.entities objectForKey:@"name"];
+
+            cell.mimeType.textColor = [UIColor messageTextColor];
+            cell.mimeType.font = [UIFont systemFontOfSize:FONT_SIZE];
+            cell.mimeType.text = [e.entities objectForKey:@"mime_type"];
+            cell.mimeType.numberOfLines = 1;
+            cell.mimeType.lineBreakMode = NSLineBreakByTruncatingTail;
+            
+            cell.background.backgroundColor = [UIColor bufferBackgroundColor];
+        }
+        
         EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
         if(!cell)
             cell = [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
@@ -2258,6 +2438,30 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.socketClosedBar.hidden = YES;
         }
         
+        if(e.rowType == ROW_FILE) {
+            cell.message.textColor = [UIColor messageTextColor];
+            cell.message.font = [UIFont systemFontOfSize:FONT_SIZE];
+            cell.messageOffsetTop.constant += FONT_SIZE + 4;
+            cell.messageOffsetBottom.constant += FONT_SIZE + 4;
+            cell.messageOffsetLeft.constant += 60;
+            cell.messageOffsetRight.constant += 4;
+        }
+        
+        if(e.rowType == ROW_THUMBNAIL) {
+            cell.message.textColor = [UIColor messageTextColor];
+            cell.message.font = [UIFont systemFontOfSize:FONT_SIZE];
+            if([e.entities objectForKey:@"id"]) {
+                cell.message.text = [NSString stringWithFormat:@"%@ • %@", [e.entities objectForKey:@"mime_type"], e.msg];
+                cell.message.numberOfLines = 1;
+                cell.message.lineBreakMode = NSLineBreakByTruncatingTail;
+            } else {
+                cell.message.text = [e.entities objectForKey:@"description"];
+                cell.message.numberOfLines = 0;
+                cell.message.lineBreakMode = NSLineBreakByWordWrapping;
+            }
+            cell.messageOffsetLeft.constant += 4;
+            cell.messageOffsetRight.constant += 4;
+        }
         return cell;
     }
 }
