@@ -107,13 +107,13 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet UIView *_codeBlockBackground;
     IBOutlet UIView *_lastSeenEIDBackground;
     IBOutlet UILabel *_lastSeenEID;
-    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth;
+    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset;
 }
 @property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
-@property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground;
-@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth;
+@property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
+@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset;
 @end
 
 @implementation EventsTableCell
@@ -2041,28 +2041,25 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized (_rowCache) {
-        EventsTableCell *cell = [_rowCache objectForKey:@(indexPath.row)];
-        if(!cell)
-            cell = [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
-        [_rowCache setObject:cell forKey:@(indexPath.row)];
-        [_lock lock];
         if([indexPath row] >= _data.count) {
             CLS_LOG(@"Requested out of bounds row, refreshing");
-            cell.message.text = @"";
-            cell.timestampLeft.text = cell.timestampRight.text = @"";
-            cell.accessory.hidden = YES;
             [_lock unlock];
             [self refresh];
-            return cell;
+            return [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
         }
+
+        [_lock lock];
         Event *e = [_data objectAtIndex:indexPath.row];
         [_lock unlock];
+
+        EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
+        if(!cell)
+            cell = [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
+        [_rowCache setObject:cell forKey:[e UUID]];
 
         cell.backgroundView = nil;
         cell.backgroundColor = nil;
         cell.contentView.backgroundColor = e.bgColor;
-        cell.quoteBorder.hidden = !e.isQuoted;
-        cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];
         if(e.isHeader) {
             NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithAttributedString:e.formattedNick];
             if(e.formattedRealname && ([e.realname isKindOfClass:[NSString class]] && ![e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) && !__norealnamePref) {
@@ -2093,12 +2090,21 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.accessibilityHint = nil;
         cell.accessibilityElementsHidden = NO;
         
+        cell.messageOffsetTop.constant = 0;
         cell.messageOffsetLeft.constant = __timeLeftPref ? __timestampWidth : 6;
         if(avatarHeight > 0)
             cell.messageOffsetLeft.constant += avatarHeight + 6;
         cell.messageOffsetRight.constant = __timeLeftPref ? 6 : __timestampWidth;
         cell.messageOffsetBottom.constant = 6;
         
+        cell.quoteBorder.hidden = !e.isQuoted;
+        cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];
+        if(e.isQuoted) {
+            cell.messageOffsetLeft.constant += 12;
+            cell.avatarOffset.constant = -14;
+        } else {
+            cell.avatarOffset.constant = -2;
+        }
         cell.nickname.preferredMaxLayoutWidth = cell.message.preferredMaxLayoutWidth = self.tableView.bounds.size.width - __timestampWidth - avatarHeight - 12;
 
         if(e.rowType == ROW_TIMESTAMP || e.rowType == ROW_LASTSEENEID) {
@@ -2237,6 +2243,21 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         cell.codeBlockBackground.backgroundColor = [UIColor codeSpanBackgroundColor];
         cell.codeBlockBackground.hidden = !e.isCodeBlock;
+        if(e.isCodeBlock) {
+            cell.messageOffsetTop.constant += 6;
+            cell.messageOffsetLeft.constant += 6;
+            cell.messageOffsetBottom.constant += 6;
+            cell.messageOffsetRight.constant += 6;
+        }
+        
+        if(e.rowType == ROW_SOCKETCLOSED) {
+            cell.socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
+            cell.socketClosedBar.hidden = NO;
+            cell.messageOffsetBottom.constant = FONT_SIZE - 2;
+        } else {
+            cell.socketClosedBar.hidden = YES;
+        }
+        
         return cell;
     }
 }
@@ -2304,8 +2325,9 @@ extern UIImage *__socketClosedBackgroundImage;
     if(!_ready || !_buffer || _requestingBacklog || [UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
         _stickyAvatar.hidden = YES;
         if(_data.count && _hiddenAvatarRow != -1) {
-            EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
-            cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
+            Event *e = [_data objectAtIndex:_hiddenAvatarRow];
+            EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
+            cell.avatar.hidden = !e.isHeader;
             _hiddenAvatarRow = -1;
         }
         return;
@@ -2326,8 +2348,9 @@ extern UIImage *__socketClosedBackgroundImage;
     } else {
         _stickyAvatar.hidden = YES;
         if(_hiddenAvatarRow != -1) {
-            EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
-            cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
+            Event *e = [_data objectAtIndex:_hiddenAvatarRow];
+            EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
+            cell.avatar.hidden = !e.isHeader;
             _hiddenAvatarRow = -1;
         }
     }
@@ -2341,8 +2364,9 @@ extern UIImage *__socketClosedBackgroundImage;
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Downloading more chat history");
             _stickyAvatar.hidden = YES;
             if(_hiddenAvatarRow != -1) {
-                EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
-                cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
+                Event *e = [_data objectAtIndex:_hiddenAvatarRow];
+                EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
+                cell.avatar.hidden = !e.isHeader;
                 _hiddenAvatarRow = -1;
             }
             return;
@@ -2424,34 +2448,38 @@ extern UIImage *__socketClosedBackgroundImage;
                     _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                     _stickyAvatar.hidden = NO;
                     if(_hiddenAvatarRow != -1) {
-                        EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
-                        cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
+                        Event *e = [_data objectAtIndex:_hiddenAvatarRow];
+                        EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
+                        cell.avatar.hidden = !e.isHeader;
                     }
-                    EventsTableCell *cell = [_rowCache objectForKey:@(topIndexPath.row)];
+                    EventsTableCell *cell = [_rowCache objectForKey:[[_data objectAtIndex: topIndexPath.row] UUID]];
                     cell.avatar.hidden = YES;
                     _hiddenAvatarRow = topIndexPath.row;
                 }
             } else {
                 _stickyAvatar.hidden = YES;
                 if(_hiddenAvatarRow != -1) {
-                    EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
-                    cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
+                    Event *e = [_data objectAtIndex:_hiddenAvatarRow];
+                    EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
+                    cell.avatar.hidden = !e.isHeader;
                     _hiddenAvatarRow = -1;
                 }
             }
         } else {
             _stickyAvatar.hidden = YES;
             if(_hiddenAvatarRow != -1) {
-                EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
-                cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
+                Event *e = [_data objectAtIndex:_hiddenAvatarRow];
+                EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
+                cell.avatar.hidden = !e.isHeader;
                 _hiddenAvatarRow = -1;
             }
         }
     } else {
         _stickyAvatar.hidden = YES;
         if(_hiddenAvatarRow != -1) {
-            EventsTableCell *cell = [_rowCache objectForKey:@(_hiddenAvatarRow)];
-            cell.avatar.hidden = !((Event *)[_data objectAtIndex:_hiddenAvatarRow]).isHeader;
+            Event *e = [_data objectAtIndex:_hiddenAvatarRow];
+            EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
+            cell.avatar.hidden = !e.isHeader;
             _hiddenAvatarRow = -1;
         }
     }

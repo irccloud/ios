@@ -192,6 +192,12 @@
     else
         return (_eid / 1000000) + [NetworkConnection sharedInstance].clockOffset;
 }
+
+-(NSString *)UUID {
+    if(!_UUID)
+        _UUID = [[NSUUID UUID] UUIDString];
+    return _UUID;
+}
 @end
 
 @implementation EventsDataSource

@@ -72,6 +72,17 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qsr-vg-LVN">
+                        <rect key="frame" x="104" y="14.5" width="264" height="35"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="c4u-g2-2uu">
+                        <rect key="frame" x="98" y="20.5" width="6" height="23"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="6" id="AJh-cH-BSg"/>
+                        </constraints>
+                    </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="infinite" placeholderIntrinsicHeight="infinite" text="Hello world!" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V3s-xQ-nVF" customClass="LinkLabel">
                         <rect key="frame" x="110" y="20.5" width="252" height="23"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -93,6 +104,10 @@
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="44" placeholderIntrinsicHeight="44" translatesAutoresizingMaskIntoConstraints="NO" id="9aa-Ko-5ri">
                         <rect key="frame" x="64" y="0.0" width="44" height="44"/>
                     </imageView>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WPz-RI-MPI">
+                        <rect key="frame" x="0.0" y="43.5" width="428" height="0.0"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
                 </subviews>
                 <constraints>
                     <constraint firstItem="Air-U6-OOz" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="151-Ll-lkm"/>
@@ -106,32 +121,45 @@
                     <constraint firstItem="fOD-UD-tHL" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="8ZI-LM-dI5"/>
                     <constraint firstItem="9ZM-5c-yUP" firstAttribute="height" secondItem="fOD-UD-tHL" secondAttribute="height" id="BON-ig-6HA"/>
                     <constraint firstAttribute="bottom" secondItem="FYg-pz-vsM" secondAttribute="bottom" id="Cj4-7B-Dcp"/>
+                    <constraint firstItem="qsr-vg-LVN" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" constant="-6" id="Ifv-QD-BjA"/>
                     <constraint firstItem="nEj-fz-vAL" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="O0z-rZ-iSx"/>
                     <constraint firstItem="KgT-oH-O7i" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailing" id="Q35-43-XyX"/>
                     <constraint firstAttribute="bottom" secondItem="Air-U6-OOz" secondAttribute="bottom" id="RZ7-Q4-bsF"/>
                     <constraint firstItem="9ZM-5c-yUP" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" id="Rj9-Np-F3K"/>
+                    <constraint firstItem="qsr-vg-LVN" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-6" id="RzF-Ou-dcT"/>
                     <constraint firstAttribute="trailing" secondItem="Air-U6-OOz" secondAttribute="trailing" id="S4u-o6-ga1"/>
+                    <constraint firstItem="c4u-g2-2uu" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-12" id="SUj-bj-KgZ"/>
                     <constraint firstAttribute="bottom" secondItem="V3s-xQ-nVF" secondAttribute="bottom" id="Seh-7j-Oie"/>
+                    <constraint firstItem="qsr-vg-LVN" firstAttribute="height" secondItem="V3s-xQ-nVF" secondAttribute="height" constant="12" id="UbJ-gZ-HMg"/>
+                    <constraint firstAttribute="bottom" secondItem="WPz-RI-MPI" secondAttribute="bottom" id="Xxd-3S-pNQ"/>
                     <constraint firstItem="KgT-oH-O7i" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="YGl-z7-rle"/>
                     <constraint firstItem="KgT-oH-O7i" firstAttribute="centerY" secondItem="FYg-pz-vsM" secondAttribute="centerY" id="b8V-19-WU1"/>
                     <constraint firstAttribute="trailing" secondItem="V3s-xQ-nVF" secondAttribute="trailing" constant="66" id="c36-GD-zjI"/>
                     <constraint firstItem="fOD-UD-tHL" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" id="duh-LM-VTp"/>
+                    <constraint firstAttribute="trailing" secondItem="WPz-RI-MPI" secondAttribute="trailing" id="duw-DR-0En"/>
+                    <constraint firstItem="c4u-g2-2uu" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" id="jtU-1T-0IB"/>
                     <constraint firstItem="9ZM-5c-yUP" firstAttribute="width" secondItem="fOD-UD-tHL" secondAttribute="width" id="lA1-AB-LS1"/>
                     <constraint firstAttribute="trailing" secondItem="9ZM-5c-yUP" secondAttribute="trailing" id="mfo-0I-29z"/>
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="110" id="nTv-tZ-edl"/>
+                    <constraint firstItem="WPz-RI-MPI" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="bottom" id="nsU-HK-2Wm"/>
                     <constraint firstItem="oeb-cI-59G" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" constant="2" id="qPn-0k-p7r"/>
                     <constraint firstItem="nEj-fz-vAL" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" id="sDo-jb-7ON"/>
+                    <constraint firstItem="c4u-g2-2uu" firstAttribute="height" secondItem="V3s-xQ-nVF" secondAttribute="height" id="tCR-a6-5SY"/>
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="height" relation="greaterThanOrEqual" secondItem="fOD-UD-tHL" secondAttribute="height" id="u4u-Xj-mxr"/>
                     <constraint firstAttribute="trailing" secondItem="mCi-xX-5DS" secondAttribute="trailing" id="uZX-KQ-OrH"/>
+                    <constraint firstItem="WPz-RI-MPI" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="vII-dc-gBd"/>
                     <constraint firstItem="nEj-fz-vAL" firstAttribute="trailing" secondItem="V3s-xQ-nVF" secondAttribute="trailing" id="wix-a3-K77"/>
                     <constraint firstItem="FYg-pz-vsM" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="x3H-wD-1u6"/>
+                    <constraint firstItem="qsr-vg-LVN" firstAttribute="width" secondItem="V3s-xQ-nVF" secondAttribute="width" constant="12" id="xFe-dn-DNz"/>
                     <constraint firstItem="mCi-xX-5DS" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="yvD-dx-jsg"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="_accessory" destination="oeb-cI-59G" id="uC5-yF-SeU"/>
                 <outlet property="_avatar" destination="9aa-Ko-5ri" id="Pj6-Ze-4N6"/>
+                <outlet property="_avatarOffset" destination="3qd-ta-bgg" id="Hd6-Db-uaE"/>
                 <outlet property="_bottomBorder" destination="Air-U6-OOz" id="mKT-1S-Zyf"/>
+                <outlet property="_codeBlockBackground" destination="qsr-vg-LVN" id="1PD-z8-bhs"/>
                 <outlet property="_lastSeenEID" destination="2Cd-th-WEc" id="fvk-De-jpw"/>
                 <outlet property="_lastSeenEIDBackground" destination="KgT-oH-O7i" id="VVX-Ha-KdL"/>
                 <outlet property="_message" destination="V3s-xQ-nVF" id="gNL-XQ-5Mw"/>
@@ -140,6 +168,8 @@
                 <outlet property="_messageOffsetRight" destination="c36-GD-zjI" id="TkA-Pl-9p3"/>
                 <outlet property="_messageOffsetTop" destination="29E-wE-L1s" id="WyI-2w-E8j"/>
                 <outlet property="_nickname" destination="nEj-fz-vAL" id="PXa-eL-OMV"/>
+                <outlet property="_quoteBorder" destination="c4u-g2-2uu" id="x1Z-yO-aPO"/>
+                <outlet property="_socketClosedBar" destination="WPz-RI-MPI" id="ntm-fR-kM1"/>
                 <outlet property="_timestampLeft" destination="fOD-UD-tHL" id="zah-YF-oz2"/>
                 <outlet property="_timestampRight" destination="9ZM-5c-yUP" id="74i-dE-FoC"/>
                 <outlet property="_timestampWidth" destination="JaC-Af-7TS" id="p4s-yM-2aO"/>

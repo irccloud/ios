@@ -88,6 +88,7 @@
     BOOL _isCodeBlock;
     int _childEventCount;
     NSTimeInterval _parent;
+    NSString *_UUID;
 }
 @property (nonatomic, assign) int cid, bid, rowType, reqId, childEventCount;
 @property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime, parent;
@@ -104,6 +105,7 @@
 -(BOOL)isMessage;
 -(NSString *)ignoreMask;
 -(NSTimeInterval)time;
+-(NSString *)UUID;
 -(Event *)copy;
 @end
 
