@@ -3822,6 +3822,8 @@ NSArray *_sortedChannels;
         }
         _selectedEvent = event;
         _selectedURL = url;
+        if([_selectedURL hasPrefix:@"irccloud-paste-"])
+            _selectedURL = [_selectedURL substringFromIndex:15];
         [self _showUserPopupInRect:rect];
     }
 }

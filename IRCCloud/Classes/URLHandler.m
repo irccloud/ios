@@ -487,9 +487,9 @@
     }
     
 #ifdef ENTERPRISE
-    if([url.host isEqualToString:IRCCLOUD_HOST] && [url.path hasPrefix:@"/pastebin/"]) {
+    if([url.scheme hasPrefix:@"http"] && [url.host isEqualToString:IRCCLOUD_HOST] && [url.path hasPrefix:@"/pastebin/"]) {
 #else
-    if([url.host hasSuffix:@"irccloud.com"] && [url.path hasPrefix:@"/pastebin/"]) {
+    if([url.scheme hasPrefix:@"http"] && [url.host hasSuffix:@"irccloud.com"] && [url.path hasPrefix:@"/pastebin/"]) {
 #endif
         url = [NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@://%@%@",url.scheme,url.host,url.path]];
     }
