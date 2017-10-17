@@ -22,9 +22,6 @@
                         <rect key="frame" x="57" y="0.0" width="309" height="59.5"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="44" placeholderIntrinsicHeight="44" translatesAutoresizingMaskIntoConstraints="NO" id="9aa-Ko-5ri">
-                        <rect key="frame" x="2" y="0.0" width="44" height="44"/>
-                    </imageView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JfP-9Z-IJ9" userLabel="Extension Container">
                         <rect key="frame" x="61" y="4" width="45" height="51.5"/>
                         <subviews>
@@ -65,10 +62,8 @@
                 <constraints>
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="trailing" secondItem="0xX-wE-bEd" secondAttribute="trailing" id="1Uf-cf-EBr"/>
                     <constraint firstAttribute="bottom" secondItem="yrb-QY-YHD" secondAttribute="bottom" id="2fj-9f-GZ5"/>
-                    <constraint firstItem="9aa-Ko-5ri" firstAttribute="trailing" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-64" id="3qd-ta-bgg"/>
                     <constraint firstAttribute="bottom" secondItem="JfP-9Z-IJ9" secondAttribute="bottom" constant="4" id="5sx-hm-B1Q"/>
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="top" secondItem="0xX-wE-bEd" secondAttribute="bottom" id="7Pf-AI-sph"/>
-                    <constraint firstItem="9aa-Ko-5ri" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="7aK-3S-iur"/>
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="leading" secondItem="0xX-wE-bEd" secondAttribute="leading" id="EcY-ej-Gb7"/>
                     <constraint firstItem="JfP-9Z-IJ9" firstAttribute="leading" secondItem="yrb-QY-YHD" secondAttribute="leading" constant="4" id="HrJ-Re-pl3"/>
                     <constraint firstAttribute="bottom" secondItem="V3s-xQ-nVF" secondAttribute="bottom" constant="20" id="Seh-7j-Oie"/>
@@ -85,8 +80,6 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
-                <outlet property="_avatar" destination="9aa-Ko-5ri" id="Pj6-Ze-4N6"/>
-                <outlet property="_avatarOffset" destination="3qd-ta-bgg" id="Hd6-Db-uaE"/>
                 <outlet property="_background" destination="yrb-QY-YHD" id="2kN-Nc-hmd"/>
                 <outlet property="_extension" destination="TjJ-PR-Rlo" id="gud-d4-duA"/>
                 <outlet property="_filename" destination="0xX-wE-bEd" id="GLg-V4-bfU"/>

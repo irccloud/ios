@@ -22,9 +22,6 @@
                         <rect key="frame" x="106" y="0.0" width="257" height="165.5"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="44" placeholderIntrinsicHeight="44" translatesAutoresizingMaskIntoConstraints="NO" id="9aa-Ko-5ri">
-                        <rect key="frame" x="64" y="0.0" width="44" height="44"/>
-                    </imageView>
                     <imageView verifyAmbiguity="off" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="k9p-Ie-CdE" customClass="YYAnimatedImageView">
                         <rect key="frame" x="110" y="4" width="200" height="120"/>
                         <constraints>
@@ -52,9 +49,7 @@
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="trailing" secondItem="0xX-wE-bEd" secondAttribute="trailing" id="1Uf-cf-EBr"/>
                     <constraint firstItem="0xX-wE-bEd" firstAttribute="top" secondItem="k9p-Ie-CdE" secondAttribute="bottom" id="1YQ-D7-GeY"/>
                     <constraint firstItem="k9p-Ie-CdE" firstAttribute="top" secondItem="yrb-QY-YHD" secondAttribute="top" constant="4" id="2fj-9f-GZ5"/>
-                    <constraint firstItem="9aa-Ko-5ri" firstAttribute="trailing" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-2" id="3qd-ta-bgg"/>
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="top" secondItem="0xX-wE-bEd" secondAttribute="bottom" id="7Pf-AI-sph"/>
-                    <constraint firstItem="9aa-Ko-5ri" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="7aK-3S-iur"/>
                     <constraint firstItem="ugL-C9-hxa" firstAttribute="centerY" secondItem="k9p-Ie-CdE" secondAttribute="centerY" id="98T-ez-ZkB"/>
                     <constraint firstItem="yrb-QY-YHD" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-4" id="BMA-CX-gSF"/>
                     <constraint firstItem="k9p-Ie-CdE" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" id="C2v-5d-39z"/>
@@ -69,8 +64,6 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
-                <outlet property="_avatar" destination="9aa-Ko-5ri" id="Pj6-Ze-4N6"/>
-                <outlet property="_avatarOffset" destination="3qd-ta-bgg" id="Hd6-Db-uaE"/>
                 <outlet property="_background" destination="yrb-QY-YHD" id="2kN-Nc-hmd"/>
                 <outlet property="_filename" destination="0xX-wE-bEd" id="GLg-V4-bfU"/>
                 <outlet property="_message" destination="V3s-xQ-nVF" id="gNL-XQ-5Mw"/>
