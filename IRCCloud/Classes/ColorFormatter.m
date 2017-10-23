@@ -2161,7 +2161,8 @@ extern BOOL __compact;
     [output addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, [output length])];
     
     for(NSDictionary *dict in attributes) {
-        [output addAttributes:dict range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];
+        if([[dict objectForKey:@"start"] intValue] >= 0 && [[dict objectForKey:@"length"] intValue] > 0)
+            [output addAttributes:dict range:NSMakeRange([[dict objectForKey:@"start"] intValue], [[dict objectForKey:@"length"] intValue])];
     }
     
     NSRange r = NSMakeRange(0, text.length);
