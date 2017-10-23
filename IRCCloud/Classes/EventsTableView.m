@@ -107,13 +107,13 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet UIView *_codeBlockBackground;
     IBOutlet UIView *_lastSeenEIDBackground;
     IBOutlet UILabel *_lastSeenEID;
-    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset;
+    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset;
 }
 @property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
-@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset;
+@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset;
 @end
 
 @implementation EventsTableCell
@@ -1471,11 +1471,11 @@ extern UIImage *__socketClosedBackgroundImage;
         if(insertPos < _data.count - 1) {
             Event *next = [_data objectAtIndex:insertPos + 1];
             if(![e isMessage] && e.rowType != ROW_LASTSEENEID) {
-                next.isHeader = (next.groupEid < 1 && [next isMessage]);
+                next.isHeader = (next.groupEid < 1 && [next isMessage]) && next.rowType != ROW_ME_MESSAGE;
                 next.height = 0;
                 [_rowCache removeObjectForKey:@(insertPos + 1)];
             }
-            if([next.type isEqualToString:e.type] && [next.from isEqualToString:e.from]) {
+            if(([next.type isEqualToString:e.type] && [next.from isEqualToString:e.from]) || e.rowType == ROW_ME_MESSAGE) {
                 e.isHeader = NO;
                 e.height = 0;
             }
@@ -1485,7 +1485,7 @@ extern UIImage *__socketClosedBackgroundImage;
             Event *prev = [_data objectAtIndex:insertPos - 1];
             if(prev.rowType == ROW_LASTSEENEID)
                 prev = [_data objectAtIndex:insertPos - 2];
-            e.isHeader = !__chatOneLinePref && (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from]));
+            e.isHeader = !__chatOneLinePref && (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from])) && e.rowType != ROW_ME_MESSAGE;
             e.height = 0;
         }
         
@@ -2271,21 +2271,27 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.accessibilityElementsHidden = NO;
         
         cell.messageOffsetTop.constant = 0;
-        cell.messageOffsetLeft.constant = __timeLeftPref ? __timestampWidth : 6;
-        if(avatarHeight > 0)
-            cell.messageOffsetLeft.constant += avatarHeight + 6;
-        cell.messageOffsetRight.constant = __timeLeftPref ? 6 : __timestampWidth;
-        cell.messageOffsetBottom.constant = 6;
+        cell.messageOffsetLeft.constant = (__timeLeftPref ? __timestampWidth : 6) + 10;
+        cell.messageOffsetRight.constant = __timeLeftPref ? 6 : (__timestampWidth + 10);
+        cell.messageOffsetBottom.constant = __compact ? 0 : 4;
         
         cell.quoteBorder.hidden = !e.isQuoted;
         cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];
         if(e.isQuoted) {
             cell.messageOffsetLeft.constant += 12;
-            cell.avatarOffset.constant = -14;
+            cell.avatarOffset.constant = -22;
+            cell.nicknameOffset.constant = -12;
         } else {
-            cell.avatarOffset.constant = -2;
+            cell.avatarOffset.constant = -10;
+            cell.nicknameOffset.constant = 0;
         }
-        cell.nickname.preferredMaxLayoutWidth = cell.message.preferredMaxLayoutWidth = self.tableView.bounds.size.width - __timestampWidth - avatarHeight - 12;
+        if(avatarHeight > 0) {
+            if(__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)
+                cell.avatarOffset.constant = avatarHeight;
+            if(!__chatOneLinePref)
+                cell.messageOffsetLeft.constant += __largeAvatarHeight + 4;
+        }
+        cell.nickname.preferredMaxLayoutWidth = cell.message.preferredMaxLayoutWidth = self.tableView.bounds.size.width - cell.messageOffsetLeft.constant - cell.messageOffsetRight.constant;
 
         if(e.rowType == ROW_TIMESTAMP || e.rowType == ROW_LASTSEENEID) {
             cell.message.text = @"";
@@ -2462,6 +2468,7 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.messageOffsetLeft.constant += 4;
             cell.messageOffsetRight.constant += 4;
         }
+        
         return cell;
     }
 }
