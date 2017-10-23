@@ -107,13 +107,13 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet UIView *_codeBlockBackground;
     IBOutlet UIView *_lastSeenEIDBackground;
     IBOutlet UILabel *_lastSeenEID;
-    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset;
+    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset;
 }
 @property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
-@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset;
+@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset;
 @end
 
 @implementation EventsTableCell
@@ -2391,11 +2391,13 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.lastSeenEID.textColor = [UIColor timestampColor];
             cell.lastSeenEID.superview.backgroundColor = [UIColor contentBackgroundColor];
             cell.lastSeenEID.superview.hidden = NO;
+            cell.lastSeenEIDOffset.constant = __avatarsOffPref ? 0 : cell.messageOffsetLeft.constant;
         } else {
             cell.lastSeenEIDBackground.hidden = YES;
             cell.lastSeenEID.superview.hidden = YES;
             timestamp.text = e.timestamp;
             cell.timestampWidth.constant = __timestampWidth;
+            cell.lastSeenEIDOffset.constant = 0;
         }
         if(e.rowType == ROW_TIMESTAMP) {
             timestamp.font = [ColorFormatter messageFont:__monospacePref];
@@ -2448,7 +2450,7 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.message.textColor = [UIColor messageTextColor];
             cell.message.font = [UIFont systemFontOfSize:FONT_SIZE];
             cell.messageOffsetTop.constant += FONT_SIZE + 4;
-            cell.messageOffsetBottom.constant += FONT_SIZE + 4;
+            cell.messageOffsetBottom.constant += FONT_SIZE + 8;
             cell.messageOffsetLeft.constant += 60;
             cell.messageOffsetRight.constant += 4;
         }
@@ -2652,9 +2654,9 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
             }
             if(e.from.length && !(((Event *)[_data objectAtIndex:firstRow]).rowType == ROW_LASTSEENEID && groupHeight == 26) && (!e.isHeader || groupHeight > __largeAvatarHeight + 14)) {
-                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + (__compact?1:2));
-                if(_stickyAvatarYOffsetConstraint.constant >= offset + (__compact?1:2))
-                    _stickyAvatarYOffsetConstraint.constant = offset + (__compact?1:2);
+                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + (__compact?1:4));
+                if(_stickyAvatarYOffsetConstraint.constant >= offset + (__compact?1:4))
+                    _stickyAvatarYOffsetConstraint.constant = offset + (__compact?1:4);
                 if(_hiddenAvatarRow != topIndexPath.row) {
                     _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                     _stickyAvatar.hidden = NO;
