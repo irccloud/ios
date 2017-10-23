@@ -2291,6 +2291,8 @@ extern UIImage *__socketClosedBackgroundImage;
             if(!__chatOneLinePref)
                 cell.messageOffsetLeft.constant += __largeAvatarHeight + 4;
         }
+        if(__avatarsOffPref)
+            cell.nicknameOffset.constant -= 6;
         cell.nickname.preferredMaxLayoutWidth = cell.message.preferredMaxLayoutWidth = self.tableView.bounds.size.width - cell.messageOffsetLeft.constant - cell.messageOffsetRight.constant;
 
         if(e.rowType == ROW_TIMESTAMP || e.rowType == ROW_LASTSEENEID) {
