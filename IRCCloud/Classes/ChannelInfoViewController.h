@@ -26,6 +26,7 @@
     UITextView *_topicEdit;
     NSAttributedString *_topic;
     LinkTextView *_topicLabel;
+    LinkTextView *_url;
     NSMutableArray *_modeHints;
     NSString *_topicSetBy;
     BOOL _topicChanged;
@@ -33,6 +34,7 @@
     IRCColorPickerView *_colorPickerView;
     NSDictionary *_currentMessageAttributes;
     UILabel *topicHeader;
+    UILabel *urlHeader;
     UILabel *modesHeader;
 }
 -(id)initWithChannel:(Channel *)channel;

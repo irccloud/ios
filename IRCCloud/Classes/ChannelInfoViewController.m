@@ -66,6 +66,16 @@
     _topicLabel.textColor = [UIColor messageTextColor];
     _topicLabel.textContainer.lineFragmentPadding = 0;
 
+    _url = [[LinkTextView alloc] initWithFrame:CGRectZero];
+    _url.editable = NO;
+    _url.scrollEnabled = NO;
+    _url.textContainerInset = UIEdgeInsetsZero;
+    _url.dataDetectorTypes = UIDataDetectorTypeNone;
+    _url.linkDelegate = self;
+    _url.backgroundColor = [UIColor clearColor];
+    _url.textColor = [UIColor messageTextColor];
+    _url.textContainer.lineFragmentPadding = 0;
+    
     _topicEdit = [[UITextView alloc] initWithFrame:CGRectZero];
     _topicEdit.font = [UIFont systemFontOfSize:14];
     _topicEdit.returnKeyType = UIReturnKeyDone;
@@ -306,6 +316,29 @@
         _topicEdit.text = @"";
         _topicSetBy = nil;
     }
+    if([_channel.url isKindOfClass:[NSString class]] && _channel.url.length) {
+        NSArray *links;
+        _url.attributedText = [ColorFormatter format:_channel.url defaultColor:[UIColor textareaTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
+        _url.linkAttributes = [UIColor linkAttributes];
+        
+        for(NSTextCheckingResult *result in links) {
+            if(result.resultType == NSTextCheckingTypeLink) {
+                [_url addLinkWithTextCheckingResult:result];
+            } else {
+                NSString *url = [[_topic attributedSubstringFromRange:result.range] string];
+                if(![url hasPrefix:@"irc"]) {
+                    CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                    if(url_escaped != NULL) {
+                        url = [NSString stringWithFormat:@"irc://%i/%@", server.cid, url_escaped];
+                        CFRelease(url_escaped);
+                    }
+                }
+                [_url addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
+            }
+        }
+    } else {
+        _url.attributedText = nil;
+    }
     if(_channel.mode.length) {
         for(NSDictionary *mode in _channel.modes) {
             unichar m = [[mode objectForKey:@"mode"] characterAtIndex:0];
@@ -356,11 +389,19 @@
         topicHeader.font = [UIFont systemFontOfSize:14];
         topicHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
     }
+    if(!urlHeader) {
+        urlHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
+        urlHeader.font = [UIFont systemFontOfSize:14];
+        urlHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
+    }
     if(!modesHeader) {
         modesHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
         modesHeader.font = [UIFont systemFontOfSize:14];
         modesHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
     }
+    
+    if(section == 1 && !_url.attributedText.length)
+        section++;
     
     switch (section) {
         case 0:
@@ -369,6 +410,11 @@
             [header addSubview:topicHeader];
             break;
         case 1:
+            [urlHeader removeFromSuperview];
+            urlHeader.text = [self tableView:tableView titleForHeaderInSection:section];
+            [header addSubview:urlHeader];
+            break;
+        case 2:
             [modesHeader removeFromSuperview];
             modesHeader.text = [self tableView:tableView titleForHeaderInSection:section];
             [header addSubview:modesHeader];
@@ -391,14 +437,17 @@
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if([_channel.mode isKindOfClass:[NSString class]] && _channel.mode.length)
-        return 2;
+        return 2 + (_url.attributedText.length ? 1 : 0);
     else
-        return 1;
+        return 1 + (_url.attributedText.length ? 1 : 0);
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if(section == 1 && !_url.attributedText.length)
+        section++;
+
     switch(section) {
-        case 1:
+        case 2:
             if(_modeHints.count)
                 return _modeHints.count;
         default:
@@ -428,6 +477,10 @@
         _topicLabel.frame = CGRectMake(8,8,self.tableView.bounds.size.width - offset,height);
         _topicEdit.frame = CGRectMake(4,4,self.tableView.bounds.size.width - offset,140);
         return height + 20;
+    } else if(indexPath.section == 1 && _url.attributedText.length) {
+        CGFloat height = [LinkTextView heightOfString:_url.attributedText constrainedToWidth:self.tableView.bounds.size.width - offset];
+        _url.frame = CGRectMake(8,8,self.tableView.bounds.size.width - offset,height);
+        return height + 20;
     } else {
         if(indexPath.row == 0 && _modeHints.count == 0) {
             return 48;
@@ -445,6 +498,8 @@
 }
 
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if(section == 1 && !_url.attributedText.length)
+        section++;
     switch(section) {
         case 0:
             if(tableView.isEditing && _topiclen) {
@@ -453,6 +508,8 @@
                 return @"TOPIC";
             }
         case 1:
+            return @"CHANNEL URL";
+        case 2:
             if(_modeHints.count)
                 return [NSString stringWithFormat:@"MODE: +%@", _channel.mode];
             else
@@ -466,21 +523,26 @@
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSUInteger section = indexPath.section;
+    if(section == 1 && !_url.attributedText.length)
+        section++;
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"infocell"];
     if(!cell)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"infocell"];
     
-    switch(indexPath.section) {
+    [cell.contentView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
+    switch(section) {
         case 0:
             if(tableView.isEditing) {
-                [_topicLabel removeFromSuperview];
                 [cell.contentView addSubview:_topicEdit];
             } else {
-                [_topicEdit removeFromSuperview];
                 [cell.contentView addSubview:_topicLabel];
             }
             break;
         case 1:
+            [cell.contentView addSubview:_url];
+            break;
+        case 2:
             if(_modeHints.count) {
                 cell.textLabel.text = [[_modeHints objectAtIndex:indexPath.row] objectForKey:@"mode"];
                 cell.detailTextLabel.text = [[_modeHints objectAtIndex:indexPath.row] objectForKey:@"hint"];
