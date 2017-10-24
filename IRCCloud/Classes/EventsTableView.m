@@ -942,7 +942,12 @@ extern UIImage *__socketClosedBackgroundImage;
                 event.rowType = ROW_ME_MESSAGE;
             } else if([type isEqualToString:@"notice"] || [type isEqualToString:@"buffer_msg"]) {
                 event.isCodeBlock = NO;
-                event.color = [UIColor messageTextColor];
+                if(event.rowType == ROW_FAILED)
+                    event.color = [UIColor networkErrorColor];
+                else if(event.pending)
+                    event.color = [UIColor timestampColor];
+                else
+                    event.color = [UIColor messageTextColor];
                 Server *s = [[ServersDataSource sharedInstance] getServer:event.cid];
                 if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OPER]])
                     event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO],BOLD];
@@ -1980,7 +1985,7 @@ extern UIImage *__socketClosedBackgroundImage;
         } else {
             e.isQuoted = NO;
         }
-        if(e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0)
+        if(e.rowType == ROW_FAILED || (e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0))
             e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
         else
             e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
@@ -2297,7 +2302,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
         if(e.rowType == ROW_TIMESTAMP || e.rowType == ROW_LASTSEENEID) {
             cell.message.text = @"";
-        } else if(![cell.message.attributedText.string isEqualToString:e.formatted.string]) {
+        } else if(!cell.message.text.length || e.rowType == ROW_FAILED) {
             cell.message.attributedText = e.formatted;
             
             if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {

@@ -2310,6 +2310,8 @@ NSArray *_sortedChannels;
                     e.rowType = ROW_FAILED;
                     e.color = [UIColor networkErrorColor];
                     e.bgColor = [UIColor errorBackgroundColor];
+                    e.formatted = nil;
+                    e.height = 0;
                     [e.expirationTimer invalidate];
                     e.expirationTimer = nil;
                     [_eventsView.tableView reloadData];
@@ -2333,6 +2335,7 @@ NSArray *_sortedChannels;
         e.color = [UIColor networkErrorColor];
         e.bgColor = [UIColor errorBackgroundColor];
         e.formatted = nil;
+        e.height = 0;
         [_eventsView.tableView reloadData];
     }
 }
