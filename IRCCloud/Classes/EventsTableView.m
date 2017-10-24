@@ -2245,7 +2245,7 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.backgroundView = nil;
         cell.backgroundColor = nil;
         cell.contentView.backgroundColor = e.bgColor;
-        if(e.isHeader) {
+        if(e.isHeader && !__chatOneLinePref) {
             NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithAttributedString:e.formattedNick];
             if(e.formattedRealname && ([e.realname isKindOfClass:[NSString class]] && ![e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) && !__norealnamePref) {
                 [s appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
