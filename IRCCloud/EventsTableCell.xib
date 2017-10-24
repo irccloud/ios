@@ -63,7 +63,7 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8:00 AM" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fOD-UD-tHL">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8:00 AM" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fOD-UD-tHL">
                         <rect key="frame" x="6" y="22.5" width="66" height="20"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="66" id="JaC-Af-7TS"/>
@@ -77,10 +77,10 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="c4u-g2-2uu">
-                        <rect key="frame" x="98" y="22.5" width="6" height="22"/>
+                        <rect key="frame" x="102" y="22.5" width="4" height="22"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="6" id="AJh-cH-BSg"/>
+                            <constraint firstAttribute="width" constant="4" id="AJh-cH-BSg"/>
                         </constraints>
                     </view>
                     <label opaque="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="infinite" placeholderIntrinsicHeight="infinite" text="Hello world!" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V3s-xQ-nVF" customClass="LinkLabel">
@@ -95,7 +95,7 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8:00 AM" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ZM-5c-yUP">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="8:00 AM" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ZM-5c-yUP">
                         <rect key="frame" x="356" y="22.5" width="66" height="20"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
@@ -128,7 +128,7 @@
                     <constraint firstItem="9ZM-5c-yUP" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" id="Rj9-Np-F3K"/>
                     <constraint firstItem="qsr-vg-LVN" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-6" id="RzF-Ou-dcT"/>
                     <constraint firstAttribute="trailing" secondItem="Air-U6-OOz" secondAttribute="trailing" id="S4u-o6-ga1"/>
-                    <constraint firstItem="c4u-g2-2uu" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-12" id="SUj-bj-KgZ"/>
+                    <constraint firstItem="c4u-g2-2uu" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-8" id="SUj-bj-KgZ"/>
                     <constraint firstAttribute="bottom" secondItem="V3s-xQ-nVF" secondAttribute="bottom" id="Seh-7j-Oie"/>
                     <constraint firstItem="qsr-vg-LVN" firstAttribute="height" secondItem="V3s-xQ-nVF" secondAttribute="height" constant="12" id="UbJ-gZ-HMg"/>
                     <constraint firstAttribute="bottom" secondItem="WPz-RI-MPI" secondAttribute="bottom" id="Xxd-3S-pNQ"/>

@@ -2271,18 +2271,18 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.accessibilityElementsHidden = NO;
         
         cell.messageOffsetTop.constant = 0;
-        cell.messageOffsetLeft.constant = (__timeLeftPref ? __timestampWidth : 6) + 10;
+        cell.messageOffsetLeft.constant = (__timeLeftPref ? __timestampWidth : 6) + (__compact ? 6 : 10);
         cell.messageOffsetRight.constant = __timeLeftPref ? 6 : (__timestampWidth + 10);
         cell.messageOffsetBottom.constant = __compact ? 0 : 4;
         
         cell.quoteBorder.hidden = !e.isQuoted;
         cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];
         if(e.isQuoted) {
-            cell.messageOffsetLeft.constant += 12;
-            cell.avatarOffset.constant = -22;
-            cell.nicknameOffset.constant = -12;
+            cell.messageOffsetLeft.constant += 8;
+            cell.avatarOffset.constant = __compact ? -14 : -18;
+            cell.nicknameOffset.constant = -8;
         } else {
-            cell.avatarOffset.constant = -10;
+            cell.avatarOffset.constant = __compact ? -6 : -10;
             cell.nicknameOffset.constant = 0;
         }
         if(avatarHeight > 0) {
@@ -2428,8 +2428,12 @@ extern UIImage *__socketClosedBackgroundImage;
             
             cell.bottomBorder.backgroundColor = [UIColor timestampBottomBorderColor];
             cell.bottomBorder.hidden = NO;
+            cell.messageOffsetBottom.constant = 4;
+            cell.timestampLeft.textAlignment = cell.timestampRight.textAlignment = NSTextAlignmentCenter;
         } else {
             cell.topBorder.hidden = cell.bottomBorder.hidden = YES;
+            cell.timestampLeft.textAlignment = NSTextAlignmentLeft;
+            cell.timestampRight.textAlignment = NSTextAlignmentRight;
         }
         cell.codeBlockBackground.backgroundColor = [UIColor codeSpanBackgroundColor];
         cell.codeBlockBackground.hidden = !e.isCodeBlock;
@@ -2661,9 +2665,9 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
             }
             if(e.from.length && !(((Event *)[_data objectAtIndex:firstRow]).rowType == ROW_LASTSEENEID && groupHeight == 26) && (!e.isHeader || groupHeight > __largeAvatarHeight + 14)) {
-                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + (__compact?1:4));
-                if(_stickyAvatarYOffsetConstraint.constant >= offset + (__compact?1:4))
-                    _stickyAvatarYOffsetConstraint.constant = offset + (__compact?1:4);
+                _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + 4);
+                if(_stickyAvatarYOffsetConstraint.constant >= offset + 4)
+                    _stickyAvatarYOffsetConstraint.constant = offset + 4;
                 if(_hiddenAvatarRow != topIndexPath.row) {
                     _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                     _stickyAvatar.hidden = NO;
