@@ -222,7 +222,7 @@
     else
         _currentMessageAttributes = nil;
 
-    if([text isEqualToString:[UIPasteboard generalPasteboard].string]) {
+    if(text.length && [text isEqualToString:[UIPasteboard generalPasteboard].string]) {
         if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"]) {
             NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
             if(_topicEdit.selectedRange.length > 0)
