@@ -102,14 +102,16 @@ platform :ios do
       "iPhone 4s",
       "iPad Retina",
       "iPad Pro",
-      "iPhone 6 Plus"
+      "iPhone X"
     ] do
       snapshot(
         clear_previous_screenshots: false,
         skip_open_summary: true,
         devices: [device],
         launch_arguments: ["-FASTLANE_SNAPSHOT_DEVICE \"#{device}\""],
+        ios_version: "11.0.1"
       )
+      frameit()
     end
     notification(
       subtitle: "screenshots",
