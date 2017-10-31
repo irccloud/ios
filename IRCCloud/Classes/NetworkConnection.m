@@ -688,6 +688,7 @@ volatile BOOL __socketPaused = NO;
                        channel.topic_time = [[[object objectForKey:@"topic"] objectForKey:@"time"] doubleValue];
                        channel.mode = @"";
                        channel.modes = [[NSMutableArray alloc] init];
+                       channel.url = [object objectForKey:@"url"];
                        channel.valid = YES;
                        channel.key = NO;
                        [_channels updateMode:[object objectForKey:@"mode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
