@@ -3544,6 +3544,10 @@ NSArray *_sortedChannels;
                     [sheet addButtonWithTitle:@"Devoice"];
                 else
                     [sheet addButtonWithTitle:@"Voice"];
+                if([_selectedUser.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound)
+                    [sheet addButtonWithTitle:@"De-halfop"];
+                else
+                    [sheet addButtonWithTitle:@"Halfop"];
                 [sheet addButtonWithTitle:@"Kick"];
                 [sheet addButtonWithTitle:@"Ban"];
             }
@@ -4724,6 +4728,12 @@ Network type: %@\n",
         } else if([action isEqualToString:@"Devoice"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
+        } else if([action isEqualToString:@"Halfop"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_HALFOP:@"h",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
+        } else if([action isEqualToString:@"De-halfop"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_HALFOP:@"h",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
         } else if([action isEqualToString:@"Ban"]) {
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
