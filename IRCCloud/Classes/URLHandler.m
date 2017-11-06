@@ -510,7 +510,7 @@
         [mainViewController launchURL:[NSURL URLWithString:[url.absoluteString stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
     } else if([url.scheme isEqualToString:@"spotify"]) {
         if(![[UIApplication sharedApplication] openURL:url])
-            [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://open.spotify.com/%@",[[url.absoluteString substringFromIndex:8] stringByReplacingOccurrencesOfString:@":" withString:@"/"]]]];
+            [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://open.spotify.com/%@",[[url.absoluteString substringFromIndex:8] stringByReplacingOccurrencesOfString:@":" withString:@"/"]]]];
     } else if([url.scheme isEqualToString:@"facetime"]) {
         [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"facetime-prompt%@",[url.absoluteString substringFromIndex:8]]]];
     } else if([url.scheme isEqualToString:@"tel"]) {
