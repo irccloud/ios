@@ -476,7 +476,6 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [[EventsDataSource sharedInstance] clearHeightCache];
     [_tableView reloadData];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -1231,7 +1230,6 @@ extern UIImage *__socketClosedBackgroundImage;
         e1.msg = @"";
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [[ImageCache sharedInstance] imageForURL:[properties objectForKey:@"thumb"]];
-            e1.height = 0;
             [self reloadData];
         });
     }
@@ -1481,8 +1479,9 @@ extern UIImage *__socketClosedBackgroundImage;
                 [_rowCache removeObjectForKey:@(insertPos + 1)];
             }
             if(([next.type isEqualToString:e.type] && [next.from isEqualToString:e.from]) || e.rowType == ROW_ME_MESSAGE) {
+                if(e.isHeader)
+                    e.height = 0;
                 e.isHeader = NO;
-                e.height = 0;
             }
         }
         
@@ -1490,8 +1489,10 @@ extern UIImage *__socketClosedBackgroundImage;
             Event *prev = [_data objectAtIndex:insertPos - 1];
             if(prev.rowType == ROW_LASTSEENEID)
                 prev = [_data objectAtIndex:insertPos - 2];
+            BOOL wasHeader = e.isHeader;
             e.isHeader = !__chatOneLinePref && (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from])) && e.rowType != ROW_ME_MESSAGE;
-            e.height = 0;
+            if(wasHeader != e.isHeader)
+                e.height = 0;
         }
         
         [_lock unlock];
@@ -1592,6 +1593,9 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)refresh {
     @synchronized(self) {
+        if(self.tableView.bounds.size.width != [EventsDataSource sharedInstance].widthForHeightCache)
+            [[EventsDataSource sharedInstance] clearHeightCache];
+        [EventsDataSource sharedInstance].widthForHeightCache = self.tableView.bounds.size.width;
         [_reloadTimer invalidate];
         
         __24hrPref = NO;

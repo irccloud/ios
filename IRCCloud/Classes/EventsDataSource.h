@@ -115,8 +115,10 @@
     NSMutableDictionary *_dirtyBIDs;
     NSMutableDictionary *_lastEIDs;
     NSDictionary *_formatterMap;
+    NSUInteger _widthForHeightCache;
 }
 @property (readonly) NSDictionary *formatterMap;
+@property NSUInteger widthForHeightCache;
 +(EventsDataSource *)sharedInstance;
 -(void)serialize;
 -(void)clear;
