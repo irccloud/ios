@@ -1545,6 +1545,9 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         _topUnreadView.alpha = 0;
         _bottomUnreadView.alpha = 0;
+        @synchronized (_rowCache) {
+            [_rowCache removeAllObjects];
+        }
     }
     _buffer = buffer;
     if(buffer)
@@ -1727,9 +1730,6 @@ extern UIImage *__socketClosedBackgroundImage;
             backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] eid]-1:0;
         
         [_data removeAllObjects];
-        @synchronized (_rowCache) {
-            [_rowCache removeAllObjects];
-        }
         _minEid = _maxEid = _earliestEid = _newMsgs = _newHighlights = 0;
         _lastSeenEidPos = -1;
         _currentCollapsedEid = 0;
