@@ -30,6 +30,7 @@
 #import "AvatarsDataSource.h"
 #import "ImageCache.h"
 #import "LogExportsTableViewController.h"
+#import "ImageViewController.h"
 
 #ifdef DEBUG
 @implementation NSURLRequest(CertificateHack)
@@ -760,10 +761,13 @@
                 [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
                 self.slideViewController.view.alpha = 1;
                 if(self.window.rootViewController != self.slideViewController) {
+                    if([self.window.rootViewController isKindOfClass:ImageViewController.class])
+                        self.mainViewController.ignoreVisibilityChanges = YES;
                     BOOL fromLoginView = (self.window.rootViewController == self.loginSplashViewController);
                     UIView *v = self.window.rootViewController.view;
                     self.window.rootViewController = self.slideViewController;
                     [self.window insertSubview:v aboveSubview:self.window.rootViewController.view];
+                    self.mainViewController.ignoreVisibilityChanges = NO;
                     if(fromLoginView)
                         [self.loginSplashViewController hideLoginView];
                     [UIView animateWithDuration:0.5f animations:^{

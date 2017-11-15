@@ -1797,8 +1797,10 @@ NSArray *_sortedChannels;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    _isShowingPreview = NO;
     [super viewWillAppear:animated];
+    if(_ignoreVisibilityChanges)
+        return;
+    _isShowingPreview = NO;
     [_eventsView viewWillAppear:animated];
     [self applyTheme];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
@@ -1938,6 +1940,8 @@ NSArray *_sortedChannels;
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
+    if(_ignoreVisibilityChanges)
+        return;
     [_eventsView viewWillDisappear:animated];
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];

@@ -116,8 +116,8 @@
     NSDictionary *_currentMessageAttributes;
     BOOL _textIsChanging;
     UIFont *_defaultTextareaFont;
-    
     id<UIViewControllerPreviewing> __previewer;
+    BOOL _ignoreVisibilityChanges;
 }
 @property (nonatomic) int cidToOpen;
 @property (nonatomic) int bidToOpen;
@@ -127,6 +127,7 @@
 @property (readonly) EventsTableView *eventsView;
 @property (readonly) Buffer *buffer;
 @property BOOL isShowingPreview;
+@property BOOL ignoreVisibilityChanges;
 -(void)bufferSelected:(int)bid;
 -(void)sendButtonPressed:(id)sender;
 -(void)usersButtonPressed:(id)sender;

@@ -582,10 +582,12 @@
     AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
     ImageViewController *ivc = [[ImageViewController alloc] initWithURL:url];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        appDelegate.mainViewController.ignoreVisibilityChanges = YES;
         appDelegate.window.backgroundColor = [UIColor blackColor];
         appDelegate.window.rootViewController = ivc;
         appDelegate.slideViewController.view.frame = appDelegate.window.bounds;
         [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:ivc.view];
+        appDelegate.mainViewController.ignoreVisibilityChanges = NO;
         ivc.view.alpha = 0;
         [UIView animateWithDuration:0.5f animations:^{
             appDelegate.window.rootViewController.view.alpha = 1;
