@@ -747,6 +747,7 @@ extern UIImage *__socketClosedBackgroundImage;
             [self refresh];
             break;
         case kIRCEventUserInfo:
+            [[EventsDataSource sharedInstance] clearFormattingCache];
             for(Event *e in _data) {
                 e.formatted = nil;
                 e.timestamp = nil;
