@@ -119,8 +119,8 @@ UIColor *__codeSpanForegroundColor;
 UIColor *__codeSpanBackgroundColor;
 UIColor *__quoteBorderColor;
 
-UIColor *__mIRCColors_BG[16];
-UIColor *__mIRCColors_FG[16];
+UIColor *__mIRCColors_BG[IRC_COLOR_COUNT];
+UIColor *__mIRCColors_FG[IRC_COLOR_COUNT];
 
 UIEdgeInsets __safeInsets;
 
@@ -253,22 +253,107 @@ BOOL __compact = NO;
 +(void)setTheme:(NSString *)theme {
     NSLog(@"Setting theme: %@", theme);
     
-    __mIRCColors_BG[0] = [UIColor colorFromHexString:@"FFFFFF"]; //white
-    __mIRCColors_BG[1] = [UIColor blackColor];
-    __mIRCColors_BG[2] = [UIColor colorFromHexString:@"000080"]; //navy
-    __mIRCColors_BG[3] = [UIColor colorFromHexString:@"008000"]; //green
-    __mIRCColors_BG[4] = [UIColor colorFromHexString:@"FF0000"]; //red
-    __mIRCColors_BG[5] = [UIColor colorFromHexString:@"800000"]; //maroon
-    __mIRCColors_BG[6] = [UIColor colorFromHexString:@"800080"]; //purple
-    __mIRCColors_BG[7] = [UIColor colorFromHexString:@"FFA500"]; //orange
-    __mIRCColors_BG[8] = [UIColor colorFromHexString:@"FFFF00"]; //yellow
-    __mIRCColors_BG[9] = [UIColor colorFromHexString:@"00FF00"]; //lime
-    __mIRCColors_BG[10] = [UIColor colorFromHexString:@"008080"]; //teal
-    __mIRCColors_BG[11] = [UIColor colorFromHexString:@"00FFFF"]; //cyan
-    __mIRCColors_BG[12] = [UIColor colorFromHexString:@"0000FF"]; //blue
-    __mIRCColors_BG[13] = [UIColor colorFromHexString:@"FF00FF"]; //magenta
-    __mIRCColors_BG[14] = [UIColor colorFromHexString:@"808080"]; //grey
-    __mIRCColors_BG[15] = [UIColor colorFromHexString:@"C0C0C0"]; //silver
+    int i = 0;
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"FFFFFF"]; //white
+    __mIRCColors_BG[i++] = [UIColor blackColor];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"000080"]; //navy
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"008000"]; //green
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"FF0000"]; //red
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"800000"]; //maroon
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"800080"]; //purple
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"FFA500"]; //orange
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"FFFF00"]; //yellow
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"00FF00"]; //lime
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"008080"]; //teal
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"00FFFF"]; //cyan
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"0000FF"]; //blue
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"FF00FF"]; //magenta
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"808080"]; //grey
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"C0C0C0"]; //silver
+    // http://m8y.org/tmp/extended_mirc_color_proposal.html
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"470000"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"472100"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"474700"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"324700"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"004700"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"00472c"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"004747"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"002747"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"000047"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"2e0047"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"470047"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"47002a"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"740000"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"743a00"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"747400"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"517400"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"007400"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"007449"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"007474"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"004074"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"000074"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"4b0074"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"740074"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"740045"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"b50000"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"b56300"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"b5b500"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"7db500"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"00b500"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"00b571"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"00b5b5"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"0063b5"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"0000b5"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"7500b5"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"b500b5"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"b5006b"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ff0000"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ff8c00"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ffff00"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"b2ff00"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"00ff00"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"00ffa0"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"00ffff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"008cff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"0000ff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"a500ff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ff00ff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ff0098"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ff5959"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ffb459"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ffff71"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"cfff60"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"6fff6f"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"65ffc9"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"6dffff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"59b4ff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"5959ff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"c459ff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ff66ff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ff59bc"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ff9c9c"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ffd39c"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ffff9c"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"e2ff9c"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"9cff9c"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"9cffdb"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"9cffff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"9cd3ff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"9c9cff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"dc9cff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ff9cff"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ff94d3"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"000000"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"131313"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"282828"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"363636"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"4d4d4d"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"656565"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"818181"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"9f9f9f"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"bcbcbc"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"e2e2e2"];
+    __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"ffffff"];
 
     if([theme isEqualToString:@"dawn"] || theme == nil) {
         __color_theme_is_dark = NO;
@@ -675,6 +760,10 @@ BOOL __compact = NO;
     __quoteBorderColor = [UIColor colorWithWhite:0.87 alpha:1];
 
     __current_theme = theme?theme:@"dawn";
+    
+    for(int i = 16; i < IRC_COLOR_COUNT; i++) {
+        __mIRCColors_FG[i] = __mIRCColors_BG[i];
+    }
 }
 
 +(void)clearTheme {
@@ -839,7 +928,7 @@ BOOL __compact = NO;
 }
 
 +(UIColor *)mIRCColor:(int)color background:(BOOL)isBackground {
-    if(color < 16)
+    if(color < IRC_COLOR_COUNT)
         return isBackground?__mIRCColors_BG[color]:__mIRCColors_FG[color];
     return nil;
 }
@@ -869,7 +958,7 @@ BOOL __compact = NO;
 }
 
 +(int)mIRCColor:(UIColor *)color {
-    for(int i = 0; i < 16; i++) {
+    for(int i = 0; i < IRC_COLOR_COUNT; i++) {
         if([color isEqualToColor:__mIRCColors_FG[i]] || [color isEqualToColor:__mIRCColors_BG[i]])
             return i;
     }

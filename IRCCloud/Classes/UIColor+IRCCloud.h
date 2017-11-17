@@ -17,6 +17,8 @@
 
 #import <UIKit/UIKit.h>
 
+#define IRC_COLOR_COUNT 99
+
 @interface UITableViewCell (IRCCloudAppearanceHax) <UIAppearance>
 @property (strong, nonatomic) UIColor *textLabelColor UI_APPEARANCE_SELECTOR;
 @property (strong, nonatomic) UIColor *detailTextLabelColor UI_APPEARANCE_SELECTOR;

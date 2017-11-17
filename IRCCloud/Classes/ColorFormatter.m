@@ -2005,7 +2005,7 @@ extern BOOL __compact;
                     if(count > 0) {
                         if(count < 3 && !rgb) {
                             fg_color = [[text substringWithRange:NSMakeRange(i, count)] intValue];
-                            if(fg_color > 15) {
+                            if(fg_color >= IRC_COLOR_COUNT) {
                                 count--;
                                 fg_color /= 10;
                             }
@@ -2040,7 +2040,7 @@ extern BOOL __compact;
                     if(count > 0) {
                         if(count < 3 && !rgb) {
                             int color = [[text substringWithRange:NSMakeRange(i, count)] intValue];
-                            if(color > 15) {
+                            if(color >= IRC_COLOR_COUNT) {
                                 count--;
                                 color /= 10;
                             }
