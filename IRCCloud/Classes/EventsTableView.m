@@ -1767,6 +1767,7 @@ extern UIImage *__socketClosedBackgroundImage;
         
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         if(events.count) {
+            NSMutableDictionary *uuids = [[NSMutableDictionary alloc] init];
             for(Event *e in events) {
                 if(e.childEventCount) {
                     e.formatted = nil;
@@ -1775,6 +1776,11 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self insertEvent:e backlog:true nextIsGrouped:false];
                 if(e.formattedMsg && !e.formatted)
                     [self _format:e];
+                [uuids setObject:@(YES) forKey:e.UUID];
+            }
+            for(NSString *uuid in _rowCache.allKeys) {
+                if(![uuids objectForKey:uuid])
+                    [_rowCache removeObjectForKey:uuid];
             }
             _tableView.tableHeaderView = nil;
         }

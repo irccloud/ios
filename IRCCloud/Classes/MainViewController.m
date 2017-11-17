@@ -57,6 +57,7 @@
 #import "LinksListTableViewController.h"
 #import "WhoWasTableViewController.h"
 #import "LogExportsTableViewController.h"
+#import "ImageCache.h"
 
 #if TARGET_IPHONE_SIMULATOR
 //Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
@@ -1513,6 +1514,7 @@ NSArray *_sortedChannels;
                 if(b.bid == _buffer.bid) {
                     if(b.last_seen_eid < e.eid)
                         b.last_seen_eid = e.eid;
+                    [[ImageCache sharedInstance] clear];
                     [_eventsView refresh];
                 }
             }
@@ -1993,6 +1995,7 @@ NSArray *_sortedChannels;
         [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid maxSize:100];
         [_eventsView setBuffer:_buffer];
     }
+    [[ImageCache sharedInstance] clear];
 }
 
 -(IBAction)serverStatusBarPressed:(id)sender {
