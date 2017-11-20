@@ -2518,8 +2518,55 @@ extern BOOL __compact;
 -(NSString *)stripIRCFormatting {
     return [[ColorFormatter format:self defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
 }
+- (void)wakeUpMainThreadRunloop:(id)arg {
+}
 -(BOOL)isEmojiOnly {
-    return [[ColorFormatter emojiOnlyPattern] evaluateWithObject:self];
+    if(!self || !self.length)
+        return NO;
+    
+    volatile __block BOOL running = YES;
+    __block BOOL result = NO;
+
+    //Regex is the fastest 99% of the time
+    NSThread *t1 = [[NSThread alloc] initWithBlock:^{
+        result = [[ColorFormatter emojiOnlyPattern] evaluateWithObject:self];
+        if(running && ![NSThread currentThread].isCancelled) {
+            running = NO;
+            [self performSelectorOnMainThread:@selector(wakeUpMainThreadRunloop:) withObject:nil waitUntilDone:NO];
+        }
+        [NSThread exit];
+    }];
+    
+    //Occasionally invalid UTF-8 can make Apple's regex matcher very slow, so remove known emoji from the string until it's empty or we run out of emoji
+    NSThread *t2 = [[NSThread alloc] initWithBlock:^{
+        NSString *s = self;
+        for(NSString *e in emojiMap.allValues) {
+            s = [s stringByReplacingOccurrencesOfString:e withString:@""];
+            if(!s.length) {
+                result = YES;
+                break;
+            }
+            if([NSThread currentThread].isCancelled)
+                break;
+        }
+        if(running && ![NSThread currentThread].isCancelled) {
+            running = NO;
+            [self performSelectorOnMainThread:@selector(wakeUpMainThreadRunloop:) withObject:nil waitUntilDone:NO];
+        }
+        [NSThread exit];
+    }];
+
+    [t1 start];
+    [t2 start];
+    
+    while (running) {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+    }
+
+    [t1 cancel];
+    [t2 cancel];
+    
+    return result;
 }
 -(BOOL)isBlockQuote {
     static NSPredicate *_pattern;
