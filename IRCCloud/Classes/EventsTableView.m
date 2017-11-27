@@ -903,7 +903,10 @@ extern UIImage *__socketClosedBackgroundImage;
                 _lastCollapsedEid = -1;
                 [_collapsedEvents clear];
             }
-            
+            EventsTableCell *cell = [_rowCache objectForKey:event.UUID];
+            if(cell) {
+                cell.message.text = nil;
+            }
         } else {
             _currentCollapsedEid = -1;
             _lastCollapsedEid = -1;
