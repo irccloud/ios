@@ -270,7 +270,7 @@ BOOL __compact = NO;
     __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"FF00FF"]; //magenta
     __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"808080"]; //grey
     __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"C0C0C0"]; //silver
-    // http://m8y.org/tmp/extended_mirc_color_proposal.html
+    // http://anti.teamidiot.de/static/nei/*/extended_mirc_color_proposal.html
     __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"470000"];
     __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"472100"];
     __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"474700"];

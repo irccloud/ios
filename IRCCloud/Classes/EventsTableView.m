@@ -1132,7 +1132,10 @@ extern UIImage *__socketClosedBackgroundImage;
                 @synchronized (_filePropsCache) {
                     NSDictionary *properties = [_filePropsCache objectForKey:[entity objectForKey:@"id"]];
                     if(properties) {
-                        [self insertEvent:[self entity:event eid:entity_eid properties:properties] backlog:backlog nextIsGrouped:NO];
+                        Event *e1 = [self entity:event eid:entity_eid properties:properties];
+                        [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
+                        if(!backlog)
+                            [self reloadForEvent:e1];
                     } else {
                         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                             NSDictionary *properties = [_conn propertiesForFile:[entity objectForKey:@"id"]];
@@ -1141,7 +1144,9 @@ extern UIImage *__socketClosedBackgroundImage;
                                     [_filePropsCache setObject:properties forKey:[entity objectForKey:@"id"]];
                                 }
                                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                    [self insertEvent:[self entity:event eid:entity_eid properties:properties] backlog:NO nextIsGrouped:NO];
+                                    Event *e1 = [self entity:event eid:entity_eid properties:properties];
+                                    [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
+                                    [self reloadForEvent:e1];
                                 }];
                             }
                         });
@@ -1179,8 +1184,10 @@ extern UIImage *__socketClosedBackgroundImage;
                                 if([_data containsObject:event]) {
                                     if(success) {
                                         Event *e1 = [self entity:event eid:entity_eid properties:[_urlHandler MediaURLs:result.URL]];
-                                        if([[ImageCache sharedInstance] isValidURL:[e1.entities objectForKey:@"url"]])
-                                            [self insertEvent:e1 backlog:NO nextIsGrouped:NO];
+                                        if([[ImageCache sharedInstance] isValidURL:[e1.entities objectForKey:@"url"]]) {
+                                            [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
+                                            [self reloadForEvent:e1];
+                                        }
                                     } else {
                                         NSLog(@"METADATA FAILED: %@: %@", result.URL, error);
                                     }
@@ -1593,6 +1600,23 @@ extern UIImage *__socketClosedBackgroundImage;
     [_tableView reloadData];
     if(!_buffer.scrolledUp)
         [self _scrollToBottom];
+}
+
+- (void)reloadForEvent:(Event *)e {
+    CGFloat h = _tableView.contentSize.height;
+    [_tableView reloadData];
+    NSInteger bottom = _tableView.indexPathsForVisibleRows.lastObject.row;
+    NSInteger pos = _data.count;
+    while(pos > 0 && pos >= bottom) {
+        pos--;
+        if([_data objectAtIndex:pos] == e)
+            break;
+    }
+    if(pos == bottom || !_buffer.scrolledUp) {
+        [self _scrollToBottom];
+    } else if(pos < bottom) {
+        _tableView.contentOffset = CGPointMake(0, _tableView.contentOffset.y + (_tableView.contentSize.height - h));
+    }
 }
 
 - (void)refresh {
@@ -2162,7 +2186,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         NSLog(@"Image dimensions were missing, reloading table");
                         e.height = 0;
-                        [_tableView reloadData];
+                        [self reloadData];
                     }];
                 } else {
                     if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
@@ -2183,7 +2207,7 @@ extern UIImage *__socketClosedBackgroundImage;
                             }
                             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                 cell.spinner.hidden = YES;
-                                [self reloadData];
+                                [self reloadForEvent:e];
                             }];
                         }];
                     } else {
@@ -2203,7 +2227,7 @@ extern UIImage *__socketClosedBackgroundImage;
                             }
                             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                 cell.spinner.hidden = YES;
-                                [self reloadData];
+                                [self reloadForEvent:e];
                             }];
                         }];
                     } else {
