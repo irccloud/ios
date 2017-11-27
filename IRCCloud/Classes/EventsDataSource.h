@@ -89,6 +89,7 @@
     int _childEventCount;
     NSTimeInterval _parent;
     NSString *_UUID;
+    NSInteger _row;
 }
 @property (nonatomic, assign) int cid, bid, rowType, reqId, childEventCount;
 @property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime, parent;
@@ -100,6 +101,7 @@
 @property (nonatomic, assign) float height, timestampPosition, avatarHeight, estimatedWidth;
 @property (nonatomic, strong) NSArray *links, *realnameLinks;
 @property (nonatomic, strong) NSTimer *expirationTimer;
+@property (nonatomic, assign) NSInteger row;
 -(NSComparisonResult)compare:(Event *)aEvent;
 -(BOOL)isImportant:(NSString *)bufferType;
 -(BOOL)isMessage;

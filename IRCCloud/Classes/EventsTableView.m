@@ -1456,8 +1456,6 @@ extern UIImage *__socketClosedBackgroundImage;
             return;
         }
         
-        [_rowCache removeObjectForKey:@(insertPos)];
-        
         if(eid > _buffer.last_seen_eid && e.isHighlight) {
             [_unseenHighlightPositions addObject:@(insertPos)];
             [_unseenHighlightPositions sortUsingSelector:@selector(compare:)];
@@ -1502,6 +1500,8 @@ extern UIImage *__socketClosedBackgroundImage;
             if(wasHeader != e.isHeader)
                 e.height = 0;
         }
+        
+        e.row = insertPos;
         
         [_lock unlock];
     }
@@ -1606,15 +1606,9 @@ extern UIImage *__socketClosedBackgroundImage;
     CGFloat h = _tableView.contentSize.height;
     [_tableView reloadData];
     NSInteger bottom = _tableView.indexPathsForVisibleRows.lastObject.row;
-    NSInteger pos = _data.count;
-    while(pos > 0 && pos >= bottom) {
-        pos--;
-        if([_data objectAtIndex:pos] == e)
-            break;
-    }
-    if(pos == bottom || !_buffer.scrolledUp) {
+    if(e.row == bottom || !_buffer.scrolledUp) {
         [self _scrollToBottom];
-    } else if(pos < bottom) {
+    } else if(e.row < bottom) {
         _tableView.contentOffset = CGPointMake(0, _tableView.contentOffset.y + (_tableView.contentSize.height - h));
     }
 }
