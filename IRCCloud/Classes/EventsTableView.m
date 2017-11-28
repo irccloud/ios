@@ -2177,8 +2177,6 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.spinner.hidden = YES;
             cell.spinner.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
             cell.thumbnail.hidden = !(cell.thumbnail.image != nil);
-            cell.thumbnailWidth.constant = FONT_SIZE * 2;
-            cell.thumbnailHeight.constant = FONT_SIZE * 2;
             if(cell.thumbnail.image) {
                 if(![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
                     cell.thumbnail.image = nil;
@@ -2194,20 +2192,25 @@ extern UIImage *__socketClosedBackgroundImage;
                     float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
                     cell.thumbnailWidth.constant = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
                     cell.thumbnailHeight.constant = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
+                    if(e.height > 0 && e.height < cell.thumbnailHeight.constant) {
+                        e.height = 0;
+                        [self reloadData];
+                    }
                 }
             } else {
+                cell.thumbnailWidth.constant = FONT_SIZE * 2;
+                cell.thumbnailHeight.constant = FONT_SIZE * 2;
                 if([e.entities objectForKey:@"id"]) {
                     if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)].path]) {
                         cell.spinner.hidden = NO;
                         [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(BOOL success) {
-                            if(success) {
-                                e.height = 0;
-                            } else {
+                            if(!success) {
                                 e.rowType = ROW_FILE;
                             }
                             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                 cell.spinner.hidden = YES;
-                                [self reloadForEvent:e];
+                                e.height = 0;
+                                [self reloadData];
                             }];
                         }];
                     } else {
@@ -2218,16 +2221,15 @@ extern UIImage *__socketClosedBackgroundImage;
                     if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:[e.entities objectForKey:@"thumb"]].path]) {
                         cell.spinner.hidden = NO;
                         [[ImageCache sharedInstance] fetchURL:[e.entities objectForKey:@"thumb"] completionHandler:^(BOOL success) {
-                            if(success) {
-                                e.height = 0;
-                            } else {
+                            if(!success) {
                                 @synchronized(_data) {
                                     [_data removeObject:e];
                                 }
                             }
                             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                e.height = 0;
                                 cell.spinner.hidden = YES;
-                                [self reloadForEvent:e];
+                                [self reloadData];
                             }];
                         }];
                     } else {
@@ -2280,6 +2282,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
         cell.backgroundView = nil;
         cell.backgroundColor = nil;
+        cell.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
         cell.contentView.backgroundColor = e.bgColor;
         if(e.isHeader && !__chatOneLinePref) {
             if(!cell.nickname.text.length) {

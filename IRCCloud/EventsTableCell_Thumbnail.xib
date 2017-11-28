@@ -22,10 +22,10 @@
                         <rect key="frame" x="106" y="0.0" width="257" height="161.5"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <imageView verifyAmbiguity="off" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="k9p-Ie-CdE" customClass="YYAnimatedImageView">
+                    <imageView verifyAmbiguity="off" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" translatesAutoresizingMaskIntoConstraints="NO" id="k9p-Ie-CdE" customClass="YYAnimatedImageView">
                         <rect key="frame" x="110" y="4" width="200" height="120"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="120" id="Mt5-kg-VBc"/>
+                            <constraint firstAttribute="height" priority="999" constant="120" id="Mt5-kg-VBc"/>
                             <constraint firstAttribute="width" constant="200" id="bcH-Lr-aiR"/>
                         </constraints>
                     </imageView>
