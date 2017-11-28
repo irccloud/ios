@@ -562,6 +562,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:_defaultSound.isOn forKey:@"defaultSound"];
         [[NSUserDefaults standardUserDefaults] setBool:!_notificationPreviews.isOn forKey:@"disableNotificationPreviews"];
         [[NSUserDefaults standardUserDefaults] setBool:_thirdPartyNotificationPreviews.isOn forKey:@"thirdPartyNotificationPreviews"];
+        [[NSUserDefaults standardUserDefaults] setBool:_clearFormattingAfterSending.isOn forKey:@"clearFormattingAfterSending"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -829,17 +830,20 @@
                          @{@"title":@"Show Seconds", @"accessory":_seconds},
                          @{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."},
                          @{@"title":@"Colourise Nicknames", @"accessory":_colors},
-                         @{@"title":@"Enlarge Emoji Messages", @"accessory":_disableBigEmoji},
                          @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
-                         @{@"title":@"Show Joins, Parts, Quits", @"accessory":_hideJoinPart},
-                         @{@"title":@"Collapse Joins, Parts, Quits", @"accessory":_expandJoinPart},
-                         @{@"title":@"Embed Uploaded Files", @"accessory":_disableInlineFiles},
-                         @{@"title":@"Embed External Media", @"accessory":_inlineImages},
-                         @{@"title":@"Embed Using Mobile Data", @"accessory":_inlineWifiOnly},
-                         @{@"title":@"Format inline code", @"accessory":_disableCodeSpan},
-                         @{@"title":@"Format code blocks", @"accessory":_disableCodeBlock},
-                         @{@"title":@"Format quoted text", @"accessory":_disableQuote},
+                         @{@"title":@"Enlarge Emoji Messages", @"accessory":_disableBigEmoji},
                          ]},
+              @{@"title":@"Chat & Embeds", @"items":@[
+                        @{@"title":@"Show Joins, Parts, Quits", @"accessory":_hideJoinPart},
+                        @{@"title":@"Collapse Joins, Parts, Quits", @"accessory":_expandJoinPart},
+                        @{@"title":@"Embed Uploaded Files", @"accessory":_disableInlineFiles},
+                        @{@"title":@"Embed External Media", @"accessory":_inlineImages},
+                        @{@"title":@"Embed Using Mobile Data", @"accessory":_inlineWifiOnly},
+                        @{@"title":@"Format inline code", @"accessory":_disableCodeSpan},
+                        @{@"title":@"Format code blocks", @"accessory":_disableCodeBlock},
+                        @{@"title":@"Format quoted text", @"accessory":_disableQuote},
+                        @{@"title":@"Clear colors after sending", @"accessory":_clearFormattingAfterSending},
+                        ]},
               @{@"title":@"Device", @"items":device},
               @{@"title":@"Notifications", @"items":notifications},
               @{@"title":@"Font Size", @"items":@[
@@ -870,7 +874,6 @@
     self.navigationController.navigationBar.clipsToBounds = YES;
 
     _email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
-    _email.placeholder = @"john@example.com";
     _email.text = @"";
     _email.textAlignment = NSTextAlignmentRight;
     _email.autocapitalizationType = UITextAutocapitalizationTypeNone;
@@ -881,7 +884,6 @@
     _email.delegate = self;
     
     _name = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
-    _name.placeholder = @"John Appleseed";
     _name.text = @"";
     _name.textAlignment = NSTextAlignmentRight;
     _name.autocapitalizationType = UITextAutocapitalizationTypeWords;
@@ -934,6 +936,7 @@
     _disableQuote = [[UISwitch alloc] init];
     _inlineImages = [[UISwitch alloc] init];
     [_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
+    _clearFormattingAfterSending = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1166,6 +1169,7 @@
     _defaultSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"defaultSound"];
     _notificationPreviews.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"disableNotificationPreviews"];
     _thirdPartyNotificationPreviews.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"thirdPartyNotificationPreviews"];
+    _clearFormattingAfterSending.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"];
 }
 
 -(void)hideJoinPartToggled:(id)sender {
@@ -1263,6 +1267,21 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     return [[_data objectAtIndex:section] objectForKey:@"title"];
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
+    label.text = [self tableView:tableView titleForHeaderInSection:section].uppercaseString;
+    label.font = [UIFont systemFontOfSize:14];
+    label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
+    label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    [header addSubview:label];
+    return header;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return 48;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

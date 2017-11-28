@@ -2020,10 +2020,12 @@ NSArray *_sortedChannels;
         }
         
         NSAttributedString *messageText = _message.attributedText;
-        [self resetColors:nil];
-        _message.internalTextView.font = _defaultTextareaFont;
-        _message.internalTextView.textColor = [UIColor textareaTextColor];
-        _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"]) {
+            [self resetColors:nil];
+            _message.internalTextView.font = _defaultTextareaFont;
+            _message.internalTextView.textColor = [UIColor textareaTextColor];
+            _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
+        }
         
         if(messageText.length > 1 && [messageText.string hasSuffix:@" "])
             messageText = [messageText attributedSubstringFromRange:NSMakeRange(0, messageText.length - 1)];

@@ -565,7 +565,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _ssl = [[UISwitch alloc] init];
     
     _nickname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
-    _nickname.placeholder = @"john";
     _nickname.text = @"";
     _nickname.textAlignment = NSTextAlignmentRight;
     _nickname.textColor = [UITableViewCell appearance].detailTextLabelColor;
@@ -582,7 +581,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
     }
     
     _realname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
-    _realname.placeholder = @"John Appleseed";
     _realname.text = @"";
     _realname.textAlignment = NSTextAlignmentRight;
     _realname.textColor = [UITableViewCell appearance].detailTextLabelColor;
@@ -760,6 +758,21 @@ static NSString * const ServerHasSSLKey = @"ssl";
             return @"Commands To Run On Connect";
     }
     return nil;
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
+    label.text = [self tableView:tableView titleForHeaderInSection:section].uppercaseString;
+    label.font = [UIFont systemFontOfSize:14];
+    label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
+    label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    [header addSubview:label];
+    return header;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return 48;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

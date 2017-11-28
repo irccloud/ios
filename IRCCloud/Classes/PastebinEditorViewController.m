@@ -325,6 +325,21 @@
     return nil;
 }
 
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
+    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
+    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
+    label.text = [self tableView:tableView titleForHeaderInSection:section].uppercaseString;
+    label.font = [UIFont systemFontOfSize:14];
+    label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
+    label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    [header addSubview:label];
+    return header;
+}
+
+-(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
+    return 48;
+}
+
 -(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
     if(section == 0) {
         return _messageFooter;

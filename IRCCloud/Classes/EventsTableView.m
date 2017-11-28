@@ -1233,12 +1233,6 @@ extern UIImage *__socketClosedBackgroundImage;
             int exp = (int)(log(bytes) / log(1024));
             e1.msg = [NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1]];
         }
-        float width = self.tableView.bounds.size.width/2;
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [[ImageCache sharedInstance] imageForFileID:[properties objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
-            e1.height = 0;
-            [self reloadData];
-        });
     } else {
         e1.rowType = ROW_THUMBNAIL;
         e1.msg = @"";
@@ -2184,7 +2178,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         NSLog(@"Image dimensions were missing, reloading table");
                         e.height = 0;
-                        [self reloadData];
+                        [self reloadForEvent:e];
                     }];
                 } else {
                     if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
@@ -2194,7 +2188,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     cell.thumbnailHeight.constant = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
                     if(e.height > 0 && e.height < cell.thumbnailHeight.constant) {
                         e.height = 0;
-                        [self reloadData];
+                        [self reloadForEvent:e];
                     }
                 }
             } else {
@@ -2210,7 +2204,7 @@ extern UIImage *__socketClosedBackgroundImage;
                             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                 cell.spinner.hidden = YES;
                                 e.height = 0;
-                                [self reloadData];
+                                [self reloadForEvent:e];
                             }];
                         }];
                     } else {
@@ -2229,7 +2223,7 @@ extern UIImage *__socketClosedBackgroundImage;
                             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                 e.height = 0;
                                 cell.spinner.hidden = YES;
-                                [self reloadData];
+                                [self reloadForEvent:e];
                             }];
                         }];
                     } else {
