@@ -3158,7 +3158,7 @@ NSArray *_sortedChannels;
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
-        _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
+        _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsMake(-20,0,_kbSize.height,0);
     }];
 
     if(!_isShowingPreview && (_eventsView.tableView.contentInset.top != top || _eventsView.tableView.contentInset.bottom != height)) {

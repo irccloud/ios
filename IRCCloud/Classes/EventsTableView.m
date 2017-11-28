@@ -198,6 +198,9 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    if(@available(iOS 11, *))
+        self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+
     _rowCache = [[NSMutableDictionary alloc] init];
     
     if(!_headerView) {
@@ -1780,8 +1783,7 @@ extern UIImage *__socketClosedBackgroundImage;
             __timestampWidth += [@":88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
         if(!__24hrPref)
             __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:f}].width;
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 11)
-            __timestampWidth += 4;
+        __timestampWidth += 4;
         
         _file_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
         _paste_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
@@ -2130,6 +2132,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self _format:e];
             UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
             cell.bounds = CGRectMake(0,0,self.tableView.bounds.size.width,cell.bounds.size.height);
+            [cell setNeedsLayout];
             [cell layoutIfNeeded];
             e.height = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
         }
@@ -2279,12 +2282,15 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.backgroundColor = nil;
         cell.contentView.backgroundColor = e.bgColor;
         if(e.isHeader && !__chatOneLinePref) {
-            NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithAttributedString:e.formattedNick];
-            if(e.formattedRealname && ([e.realname isKindOfClass:[NSString class]] && ![e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) && !__norealnamePref) {
-                [s appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
-                [s appendAttributedString:e.formattedRealname];
+            if(!cell.nickname.text.length) {
+                NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithAttributedString:e.formattedNick];
+                if(e.formattedRealname && ([e.realname isKindOfClass:[NSString class]] && ![e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) && !__norealnamePref) {
+                    [s appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
+                    [s appendAttributedString:e.formattedRealname];
+                }
+                cell.nickname.attributedText = s;
+                cell.nickname.lineBreakMode = NSLineBreakByTruncatingTail;
             }
-            cell.nickname.attributedText = s;
             cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
         } else {
             cell.nickname.text = nil;
@@ -2310,7 +2316,7 @@ extern UIImage *__socketClosedBackgroundImage;
         
         cell.messageOffsetTop.constant = 0;
         cell.messageOffsetLeft.constant = (__timeLeftPref ? __timestampWidth : 6) + (__compact ? 6 : 10);
-        cell.messageOffsetRight.constant = __timeLeftPref ? 6 : (__timestampWidth + 10);
+        cell.messageOffsetRight.constant = __timeLeftPref ? 6 : (__timestampWidth + 16);
         cell.messageOffsetBottom.constant = __compact ? 0 : 4;
         
         cell.quoteBorder.hidden = !e.isQuoted;
