@@ -480,6 +480,14 @@ extern UIImage *__socketClosedBackgroundImage;
     return items;
 }
 
+- (void)resumePlayback {
+    for(id cell in _rowCache.allValues) {
+        if([cell isKindOfClass:EventsTableCell_Thumbnail.class]) {
+            [((EventsTableCell_Thumbnail *)cell).movieController play];
+        }
+    }
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [_tableView reloadData];
@@ -2177,8 +2185,8 @@ extern UIImage *__socketClosedBackgroundImage;
                         cell.movieController.view.userInteractionEnabled = NO;
                         cell.movieController.repeatMode = MPMovieRepeatModeOne;
                         [cell.contentView addSubview:cell.movieController.view];
-                        [cell.movieController play];
                     }
+                    [cell.movieController play];
                 } else {
                     cell.thumbnail.image = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
                 }

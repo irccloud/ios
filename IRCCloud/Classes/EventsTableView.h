@@ -112,4 +112,5 @@
 -(void)closePreview:(Event *)event;
 -(NSString *)YUNoHeartbeat;
 -(CGRect)rectForEvent:(Event *)event;
+-(void)resumePlayback;
 @end
