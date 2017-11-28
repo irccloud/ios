@@ -625,19 +625,13 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     if(@available(iOS 11, *)) {
         if(self.view.safeAreaInsets.bottom)
             sbheight = 0;
-        CGRect frame = self.underLeftView.frame;
-        frame.size.height = self.view.bounds.size.height;
-        if([UIApplication sharedApplication].statusBarFrame.size.height > 20)
-            frame.size.height += sbheight;
-        self.underLeftView.frame = frame;
-    } else {
-        CGRect frame = self.underLeftView.frame;
-        frame.origin.y = sbheight;
-        frame.size.height = self.view.bounds.size.height;
-        if([UIApplication sharedApplication].statusBarFrame.size.height <= 20)
-            frame.size.height -= sbheight;
-        self.underLeftView.frame = frame;
     }
+    CGRect frame = self.underLeftView.frame;
+    frame.origin.y = sbheight;
+    frame.size.height = self.view.bounds.size.height;
+    if([UIApplication sharedApplication].statusBarFrame.size.height <= 20)
+        frame.size.height -= sbheight;
+    self.underLeftView.frame = frame;
 }
 
 - (void)updateUnderRightLayout
@@ -681,19 +675,13 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     if(@available(iOS 11, *)) {
         if(self.view.safeAreaInsets.bottom)
             sbheight = 0;
-        CGRect frame = self.underRightView.frame;
-        frame.size.height = self.view.bounds.size.height;
-        if([UIApplication sharedApplication].statusBarFrame.size.height > 20)
-            frame.size.height += sbheight;
-        self.underRightView.frame = frame;
-    } else {
-        CGRect frame = self.underRightView.frame;
-        frame.origin.y = sbheight;
-        frame.size.height = self.view.bounds.size.height;
-        if([UIApplication sharedApplication].statusBarFrame.size.height <= 20)
-            frame.size.height -= sbheight;
-        self.underRightView.frame = frame;
     }
+    CGRect frame = self.underRightView.frame;
+    frame.origin.y = sbheight;
+    frame.size.height = self.view.bounds.size.height;
+    if([UIApplication sharedApplication].statusBarFrame.size.height <= 20)
+        frame.size.height -= sbheight;
+    self.underRightView.frame = frame;
 }
 
 @end

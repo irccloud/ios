@@ -519,6 +519,8 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
+    if(@available(iOS 11, *))
+        self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 
     UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
