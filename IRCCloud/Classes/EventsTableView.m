@@ -567,6 +567,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
                 _bottomRow = -1;
             } else {
+                CLS_LOG(@"Couldn't find bottom row after clearing cached heights, scrolling to bottom");
                 [self _scrollToBottom];
             }
             _ready = YES;
@@ -1126,6 +1127,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if(!backlog) {
             [_tableView reloadData];
             if(!_buffer.scrolledUp) {
+                CLS_LOG(@"Table wasn't scrolled up after inserting new event, scrolling to bottom");
                 [self scrollToBottom];
                 [self _scrollToBottom];
                 if(_topUnreadView.alpha == 0)
@@ -1609,15 +1611,18 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)_reloadData {
     [_tableView reloadData];
-    if(!_buffer.scrolledUp)
+    if(!_buffer.scrolledUp) {
+        CLS_LOG(@"Table wasn't scrolled up after reload, scrolling to bottom");
         [self _scrollToBottom];
+    }
 }
 
 - (void)reloadForEvent:(Event *)e {
     CGFloat h = _tableView.contentSize.height;
     [_tableView reloadData];
     NSInteger bottom = _tableView.indexPathsForVisibleRows.lastObject.row;
-    if(e.row == bottom || !_buffer.scrolledUp) {
+    if(!_buffer.scrolledUp) {
+        CLS_LOG(@"Table wasn't scrolled up after reloadForEvent, scrolling to bottom");
         [self _scrollToBottom];
     } else if(e.row < bottom) {
         _tableView.contentOffset = CGPointMake(0, _tableView.contentOffset.y + (_tableView.contentSize.height - h));
@@ -1911,10 +1916,12 @@ extern UIImage *__socketClosedBackgroundImage;
                 if((_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height) < _tableView.contentSize.height - _tableView.bounds.size.height) {
                     _tableView.contentOffset = CGPointMake(0, (_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height));
                 } else {
+                    CLS_LOG(@"Saved scroll offset was beyond the content bounds, scrolling to bottom");
                     [self _scrollToBottom];
                     [self scrollToBottom];
                 }
             } else if(!_buffer.scrolledUp || (_data.count && _scrollTimer)) {
+                CLS_LOG(@"Table wasn't scrolled up after refresh, scrolling to bottom");
                 [self _scrollToBottom];
                 [self scrollToBottom];
             }
