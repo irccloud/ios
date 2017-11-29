@@ -2183,6 +2183,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         cell.movieController = [[MPMoviePlayerController alloc] initWithContentURL:[e.entities objectForKey:@"mp4_loop"]];
                         cell.movieController.controlStyle = MPMovieControlStyleNone;
                         cell.movieController.view.userInteractionEnabled = NO;
+                        cell.movieController.view.hidden = YES;
                         cell.movieController.repeatMode = MPMovieRepeatModeOne;
                         [cell.contentView addSubview:cell.movieController.view];
                     }
@@ -2195,8 +2196,9 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.spinner.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
             cell.thumbnail.hidden = !(cell.thumbnail.image != nil);
             if(cell.thumbnail.image || cell.movieController) {
-                if(cell.thumbnail.image && ![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
+                if(![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
                     cell.thumbnail.image = nil;
+                    cell.movieController.view.hidden = YES;
                     cell.spinner.hidden = NO;
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         NSLog(@"Image dimensions were missing, reloading table");
@@ -2207,14 +2209,26 @@ extern UIImage *__socketClosedBackgroundImage;
                     if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
                         width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
                     float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-                    cell.thumbnailWidth.constant = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
-                    cell.thumbnailHeight.constant = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
-                    if(e.height > 0 && e.height < cell.thumbnailHeight.constant) {
-                        e.height = 0;
-                        [self reloadForEvent:e];
+                    CGFloat thumbWidth = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
+                    if(thumbWidth > self.tableView.bounds.size.width) {
+                        CLS_LOG(@"invalid thumbnail width: %f ratio: %f", width, ratio);
+                        @synchronized(_data) {
+                            [_data removeObject:e];
+                        }
+                        cell.thumbnailWidth.constant = FONT_SIZE * 2;
+                        cell.thumbnailHeight.constant = FONT_SIZE * 2;
+                        [self.tableView reloadData];
+                    } else {
+                        cell.thumbnailWidth.constant = thumbWidth;
+                        cell.thumbnailHeight.constant = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
+                        if(e.height > 0 && e.height < cell.thumbnailHeight.constant) {
+                            e.height = 0;
+                            [self reloadForEvent:e];
+                        }
+                        [cell.thumbnail layoutIfNeeded];
+                        cell.movieController.view.frame = cell.thumbnail.frame;
+                        cell.movieController.view.hidden = NO;
                     }
-                    [cell.thumbnail layoutIfNeeded];
-                    cell.movieController.view.frame = cell.thumbnail.frame;
                 }
             } else {
                 cell.thumbnailWidth.constant = FONT_SIZE * 2;
