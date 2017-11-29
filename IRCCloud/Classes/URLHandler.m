@@ -366,7 +366,8 @@
                                                 @"image":[NSURL URLWithString:[dict objectForKey:@"link"]],
                                                 @"name":title,
                                                 @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
-                                                @"url":original_url
+                                                @"url":original_url,
+                                                @"properties":@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]}
                                                 } forKey:original_url];
                         callback(YES, nil);
                     } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
@@ -375,7 +376,8 @@
                                                     @"mp4_loop":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
                                                     @"name":title,
                                                     @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
-                                                    @"url":original_url
+                                                    @"url":original_url,
+                                                    @"properties":@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]}
                                                     } forKey:original_url];
                             callback(YES, nil);
                         } else {
@@ -383,7 +385,8 @@
                                                     @"mp4":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
                                                     @"name":title,
                                                     @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
-                                                    @"url":original_url
+                                                    @"url":original_url,
+                                                    @"properties":@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]}
                                                     } forKey:original_url];
                             callback(YES, nil);
                         }

@@ -2177,7 +2177,7 @@ extern UIImage *__socketClosedBackgroundImage;
             if([e.entities objectForKey:@"id"]) {
                 cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
             } else {
-                if([e.entities objectForKey:@"mp4_loop"]) {
+                /*if([e.entities objectForKey:@"mp4_loop"]) {
                     if(!cell.movieController) {
                         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
                         cell.movieController = [[MPMoviePlayerController alloc] initWithContentURL:[e.entities objectForKey:@"mp4_loop"]];
@@ -2188,9 +2188,9 @@ extern UIImage *__socketClosedBackgroundImage;
                         [cell.contentView addSubview:cell.movieController.view];
                     }
                     [cell.movieController play];
-                } else {
+                } else {*/
                     cell.thumbnail.image = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
-                }
+                //}
             }
             cell.spinner.hidden = YES;
             cell.spinner.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
