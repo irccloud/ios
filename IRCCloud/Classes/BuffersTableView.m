@@ -459,27 +459,32 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
             topUnreadIndicatorBorder.backgroundColor = [UIColor highlightBorderColor];
         }
         
-        if(_lastFailurePosition != -1 && last < _lastFailurePosition) {
-            bottomUnreadIndicator.hidden = NO;
-            bottomUnreadIndicator.alpha = 1;
-            bottomUnreadIndicatorColor.backgroundColor = [UIColor networkErrorBackgroundColor];
-            bottomUnreadIndicatorBorder.backgroundColor = [UIColor networkErrorBorderColor];
+        if(last < _data.count) {
+            if(_lastFailurePosition != -1 && last < _lastFailurePosition) {
+                bottomUnreadIndicator.hidden = NO;
+                bottomUnreadIndicator.alpha = 1;
+                bottomUnreadIndicatorColor.backgroundColor = [UIColor networkErrorBackgroundColor];
+                bottomUnreadIndicatorBorder.backgroundColor = [UIColor networkErrorBorderColor];
+            } else {
+                bottomUnreadIndicator.hidden = YES;
+                bottomUnreadIndicator.alpha = 0;
+            }
+            if(_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
+                bottomUnreadIndicator.hidden = NO;
+                bottomUnreadIndicator.alpha = 1;
+                bottomUnreadIndicatorColor.backgroundColor = [UIColor unreadBlueColor];
+                bottomUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
+            }
+            if((_firstHighlightPosition != -1 && last < _firstHighlightPosition) ||
+               (_lastHighlightPosition != -1 && last < _lastHighlightPosition)) {
+                bottomUnreadIndicator.hidden = NO;
+                bottomUnreadIndicator.alpha = 1;
+                bottomUnreadIndicatorColor.backgroundColor = [UIColor redColor];
+                bottomUnreadIndicatorBorder.backgroundColor = [UIColor highlightBorderColor];
+            }
         } else {
             bottomUnreadIndicator.hidden = YES;
             bottomUnreadIndicator.alpha = 0;
-        }
-        if(_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
-            bottomUnreadIndicator.hidden = NO;
-            bottomUnreadIndicator.alpha = 1;
-            bottomUnreadIndicatorColor.backgroundColor = [UIColor unreadBlueColor];
-            bottomUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
-        }
-        if((_firstHighlightPosition != -1 && last < _firstHighlightPosition) ||
-           (_lastHighlightPosition != -1 && last < _lastHighlightPosition)) {
-            bottomUnreadIndicator.hidden = NO;
-            bottomUnreadIndicator.alpha = 1;
-            bottomUnreadIndicatorColor.backgroundColor = [UIColor redColor];
-            bottomUnreadIndicatorBorder.backgroundColor = [UIColor highlightBorderColor];
         }
     }
     topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y + self.tableView.contentInset.top,self.view.frame.size.width, 40);
