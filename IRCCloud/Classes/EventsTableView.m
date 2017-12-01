@@ -2156,7 +2156,7 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized (_rowCache) {
+    //@synchronized (_rowCache) {
         if([indexPath row] >= _data.count) {
             [_lock unlock];
             return [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
@@ -2185,8 +2185,7 @@ extern UIImage *__socketClosedBackgroundImage;
             }
             float width = self.tableView.bounds.size.width/2;
             if([e.entities objectForKey:@"id"]) {
-                if([[ImageCache sharedInstance] isLoaded:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)])
-                    cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+                cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
             } else {
                 /*if([e.entities objectForKey:@"mp4_loop"]) {
                     if(!cell.movieController) {
@@ -2200,8 +2199,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     }
                     [cell.movieController play];
                 } else {*/
-                if([[ImageCache sharedInstance] isLoaded:[e.entities objectForKey:@"thumb"]])
-                    cell.thumbnail.image = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
+                cell.thumbnail.image = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
                 //}
             }
             cell.spinner.hidden = YES;
@@ -2258,14 +2256,6 @@ extern UIImage *__socketClosedBackgroundImage;
                                 [self reloadForEvent:e];
                             }];
                         }];
-                    } else if([[ImageCache sharedInstance] isValidFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)]) {
-                        cell.spinner.hidden = NO;
-                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                            [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
-                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                [self reloadForEvent:e];
-                            }];
-                        });
                     } else {
                         e.rowType = ROW_FILE;
                         cell.spinner.hidden = YES;
@@ -2285,14 +2275,6 @@ extern UIImage *__socketClosedBackgroundImage;
                                 [self reloadForEvent:e];
                             }];
                         }];
-                    } else if([[ImageCache sharedInstance] isValidURL:[e.entities objectForKey:@"thumb"]]) {
-                        cell.spinner.hidden = NO;
-                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                            [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
-                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                [self reloadForEvent:e];
-                            }];
-                        });
                     } else {
                         cell.spinner.hidden = YES;
                         @synchronized(_data) {
@@ -2587,7 +2569,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         
         return cell;
-    }
+    //}
 }
 
 - (void)LinkLabel:(LinkLabel *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {

@@ -120,7 +120,9 @@
 }
 
 -(BOOL)isLoaded:(NSURL *)url {
-    return [_images objectForKey:url.absoluteString] != nil || [_failures objectForKey:url.absoluteString] != nil;
+    @synchronized(_images) {
+        return [_images objectForKey:url.absoluteString] != nil || [_failures objectForKey:url.absoluteString] != nil;
+    }
 }
 
 -(BOOL)isLoaded:(NSString *)fileID width:(int)width {
@@ -132,25 +134,31 @@
         if([_failures objectForKey:url.absoluteString])
             return nil;
     }
+    YYImage *img;
     @synchronized(_images) {
-        if(![_images objectForKey:url.absoluteString]) {
-            NSURL *cache = [self pathForURL:url];
-            if([[NSFileManager defaultManager] fileExistsAtPath:cache.path]) {
-                NSData *data = [NSData dataWithContentsOfURL:cache];
-                YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
-                if(img.size.width) {
+        img = [_images objectForKey:url.absoluteString];
+    }
+    if(!img) {
+        NSURL *cache = [self pathForURL:url];
+        if([[NSFileManager defaultManager] fileExistsAtPath:cache.path]) {
+            NSData *data = [NSData dataWithContentsOfURL:cache];
+            img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
+            if(img.size.width) {
+                @synchronized(_images) {
                     [_images setObject:img forKey:url.absoluteString];
-                } else {
-                    CLS_LOG(@"Unable to load %@ from cache", url);
+                }
+            } else {
+                CLS_LOG(@"Unable to load %@ from cache", url);
+                @synchronized(_failures) {
                     [_failures setObject:@(YES) forKey:url.absoluteString];
                 }
             }
         }
-        if([[_images objectForKey:url.absoluteString] isKindOfClass:UIImage.class])
-            return [_images objectForKey:url.absoluteString];
-        else
-            return nil;
     }
+    if([img isKindOfClass:UIImage.class])
+        return img;
+    else
+        return nil;
 }
 
 -(UIImage *)imageForFileID:(NSString *)fileID {
