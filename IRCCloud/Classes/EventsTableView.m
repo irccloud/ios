@@ -1248,12 +1248,10 @@ extern UIImage *__socketClosedBackgroundImage;
         }
     } else {
         e1.rowType = ROW_THUMBNAIL;
-        e1.msg = @"";
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [[ImageCache sharedInstance] imageForURL:[properties objectForKey:@"thumb"]];
-            [self reloadData];
-        });
+        e1.msg = [properties objectForKey:@"description"];
+        e1.linkify = YES;
     }
+    e1.color = [UIColor messageTextColor];
     e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:parent.bgColor;
     if([parent.type isEqualToString:@"buffer_me_msg"])
         e1.type = @"buffer_msg";
@@ -2554,16 +2552,12 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         
         if(e.rowType == ROW_THUMBNAIL) {
-            cell.message.textColor = [UIColor messageTextColor];
-            cell.message.font = [UIFont systemFontOfSize:FONT_SIZE];
             if([e.entities objectForKey:@"id"]) {
                 cell.message.text = [NSString stringWithFormat:@"%@ • %@", [e.entities objectForKey:@"mime_type"], e.msg];
                 cell.message.numberOfLines = 1;
                 cell.message.lineBreakMode = NSLineBreakByTruncatingTail;
-            } else {
-                cell.message.text = [e.entities objectForKey:@"description"];
-                cell.message.numberOfLines = 0;
-                cell.message.lineBreakMode = NSLineBreakByWordWrapping;
+                cell.message.textColor = [UIColor messageTextColor];
+                cell.message.font = [UIFont systemFontOfSize:FONT_SIZE];
             }
             cell.messageOffsetLeft.constant += 4;
             cell.messageOffsetRight.constant += 4;
