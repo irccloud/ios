@@ -770,6 +770,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 e.formattedRealname = nil;
                 e.height = 0;
             }
+            [_rowCache removeAllObjects];
             [self refresh];
             break;
         default:
@@ -2355,7 +2356,7 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.accessibilityHint = nil;
         cell.accessibilityElementsHidden = NO;
         
-        cell.messageOffsetTop.constant = 0;
+        cell.messageOffsetTop.constant = __compact ? -2 : 0;
         cell.messageOffsetLeft.constant = (__timeLeftPref ? __timestampWidth : 6) + (__compact ? 6 : 10);
         cell.messageOffsetRight.constant = __timeLeftPref ? 6 : (__timestampWidth + 16);
         cell.messageOffsetBottom.constant = __compact ? 0 : 4;
