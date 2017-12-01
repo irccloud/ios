@@ -2791,20 +2791,24 @@ NSArray *_sortedChannels;
         _eventsView.bottomUnreadView.alpha = 0;
         _eventActivity.alpha = 1;
         [_eventActivity startAnimating];
-        NSString *draft = _buffer.draft;
-        _message.delegate = nil;
-        [_message clearText];
-        _message.delegate = self;
-        _buffer.draft = draft;
+        if(changed) {
+            NSString *draft = _buffer.draft;
+            _message.delegate = nil;
+            [_message clearText];
+            _message.delegate = self;
+            _buffer.draft = draft;
+        }
     } completion:^(BOOL finished){
         [_eventsView setBuffer:_buffer];
         [UIView animateWithDuration:0.1 animations:^{
             _eventsView.stickyAvatar.alpha = 1;
             _eventsView.tableView.alpha = 1;
             _eventActivity.alpha = 0;
-            _message.delegate = nil;
-            _message.text = _buffer.draft;
-            _message.delegate = self;
+            if(changed) {
+                _message.delegate = nil;
+                _message.text = _buffer.draft;
+                _message.delegate = self;
+            }
         } completion:^(BOOL finished){
             [_eventActivity stopAnimating];
         }];
