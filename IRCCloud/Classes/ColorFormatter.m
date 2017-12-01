@@ -2431,7 +2431,7 @@ extern BOOL __compact;
 
 +(NSArray *)webURLs:(NSString *)string {
     NSMutableArray *matches = [[NSMutableArray alloc] init];
-    if(string) {
+    if(string.length) {
         NSArray *results = [[self webURL] matchesInString:string.lowercaseString options:0 range:NSMakeRange(0, string.length)];
         NSPredicate *ipAddress = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"[0-9\\.]+"];
         

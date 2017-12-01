@@ -1177,7 +1177,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 _buffer.last_seen_eid = entity_eid;
         }
         
-        if(__inlineMediaPref && event.linkify && event.msg) {
+        if(__inlineMediaPref && event.linkify && event.msg.length) {
             NSTimeInterval entity_eid = event.eid;
 
             NSArray *results = [ColorFormatter webURLs:event.msg];
@@ -1249,8 +1249,10 @@ extern UIImage *__socketClosedBackgroundImage;
         }
     } else {
         e1.rowType = ROW_THUMBNAIL;
-        e1.msg = [properties objectForKey:@"description"];
-        e1.linkify = YES;
+        if([[properties objectForKey:@"description"] isKindOfClass:NSString.class]) {
+            e1.msg = [properties objectForKey:@"description"];
+            e1.linkify = YES;
+        }
     }
     e1.color = [UIColor messageTextColor];
     e1.bgColor = e1.isSelf?[UIColor selfBackgroundColor]:parent.bgColor;
