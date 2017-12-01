@@ -1177,7 +1177,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 _buffer.last_seen_eid = entity_eid;
         }
         
-        if(__inlineMediaPref && event.linkify) {
+        if(__inlineMediaPref && event.linkify && event.msg) {
             NSTimeInterval entity_eid = event.eid;
 
             NSArray *results = [ColorFormatter webURLs:event.msg];
