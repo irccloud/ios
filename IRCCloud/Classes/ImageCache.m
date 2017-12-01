@@ -120,9 +120,7 @@
 }
 
 -(BOOL)isLoaded:(NSURL *)url {
-    @synchronized(_images) {
-        return [_images objectForKey:url.absoluteString] != nil || [_failures objectForKey:url.absoluteString] != nil;
-    }
+    return [_images objectForKey:url.absoluteString] != nil || [_failures objectForKey:url.absoluteString] != nil;
 }
 
 -(BOOL)isLoaded:(NSString *)fileID width:(int)width {
