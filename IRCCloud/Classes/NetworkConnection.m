@@ -591,10 +591,11 @@ volatile BOOL __socketPaused = NO;
                        buffer.deferred = [[object objectForKey:@"deferred"] intValue];
                        buffer.timeout = [[object objectForKey:@"timeout"] intValue];
                        buffer.valid = YES;
+                       Server *server = [[ServersDataSource sharedInstance] getServer:buffer.cid];
+                       buffer.serverIsSlack = server.isSlack;
                        if(buffer.timeout)
                            [[EventsDataSource sharedInstance] removeEventsForBuffer:buffer.bid];
                        if(backlog && buffer.archived) {
-                           Server *server = [[ServersDataSource sharedInstance] getServer:buffer.cid];
                            if(server.deferred_archives)
                                server.deferred_archives--;
                        }

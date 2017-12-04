@@ -35,13 +35,16 @@
             return NSOrderedDescending;
         if(_bid == aBuffer.bid)
             return NSOrderedSame;
-        if([_type isEqualToString:@"channel"])
+        if([_type isEqualToString:@"channel"] || self.isMPDM)
             joinedLeft = [[ChannelsDataSource sharedInstance] channelForBuffer:_bid] != nil;
-        if([[aBuffer type] isEqualToString:@"channel"])
+        if([[aBuffer type] isEqualToString:@"channel"] || aBuffer.isMPDM)
             joinedRight = [[ChannelsDataSource sharedInstance] channelForBuffer:aBuffer.bid] != nil;
-        if([_type isEqualToString:@"conversation"] && [[aBuffer type] isEqualToString:@"channel"])
+        
+        NSString *typeLeft = self.isMPDM ? @"conversation" : _type;
+        NSString *typeRight = aBuffer.isMPDM ? @"conversation" : _type;
+        if([typeLeft isEqualToString:@"conversation"] && [typeRight isEqualToString:@"channel"])
             return NSOrderedDescending;
-        else if([_type isEqualToString:@"channel"] && [[aBuffer type] isEqualToString:@"conversation"])
+        else if([typeLeft isEqualToString:@"channel"] && [typeRight isEqualToString:@"conversation"])
             return NSOrderedAscending;
         else if(joinedLeft > joinedRight)
             return NSOrderedAscending;
@@ -59,6 +62,9 @@
     }
 }
 -(NSString *)normalizedName {
+    if(_serverIsSlack)
+        return self.displayName.lowercaseString;
+    
     if(_chantypes == nil) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
         if(s) {
@@ -69,6 +75,47 @@
     }
     NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
     return [r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""];
+}
+-(BOOL)isMPDM {
+    if(!_serverIsSlack)
+        return NO;
+    
+    static NSPredicate *p;
+    if(!p)
+        p = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"#mpdm-(.*)-\\d"];
+
+    return [p evaluateWithObject:_name];
+}
+-(NSString *)name {
+    return _name;
+}
+-(void)setName:(NSString *)name {
+    _name = name;
+    _displayName = nil;
+}
+-(NSString *)displayName {
+    if(self.isMPDM) {
+        if(!_displayName) {
+            NSString *selfNick = [[ServersDataSource sharedInstance] getServer:_cid].nick.lowercaseString;
+            NSMutableArray *names = [_name componentsSeparatedByString:@"-"].mutableCopy;
+            [names removeObjectAtIndex:0];
+            [names removeObjectAtIndex:names.count - 1];
+            for(int i = 0; i < names.count; i++) {
+                NSString *name = [[names objectAtIndex:i] lowercaseString];
+                if([name length] == 0 || [selfNick isEqualToString:name]) {
+                    [names removeObjectAtIndex:i];
+                    i--;
+                }
+            }
+            [names sortUsingComparator:^NSComparisonResult(NSString *left, NSString *right) {
+                return [left.lowercaseString localizedStandardCompare:right.lowercaseString];
+            }];
+            _displayName = [names componentsJoinedByString:@", "];
+        }
+        return _displayName;
+    } else {
+        return _name;
+    }
 }
 -(NSString *)description {
     return [NSString stringWithFormat:@"{cid: %i, bid: %i, name: %@, type: %@}", _cid, _bid, _name, _type];

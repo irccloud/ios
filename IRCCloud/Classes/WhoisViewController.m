@@ -95,7 +95,9 @@
         [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", [object objectForKey:@"nick"], [object objectForKey:@"bot_msg"]] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
     }
     
-    [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ is connected via: %@", [object objectForKey:@"nick"], [object objectForKey:@"server_addr"]] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
+    if([[object objectForKey:@"server_addr"] length]) {
+        [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ is connected via: %@", [object objectForKey:@"nick"], [object objectForKey:@"server_addr"]] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
+    }
     
     if([[object objectForKey:@"server_extra"] length]) {
         [data appendAttributedString:[ColorFormatter format:@" (" defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil]];

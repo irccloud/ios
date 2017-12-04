@@ -292,7 +292,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                 int type = -1;
                 int key = 0;
                 int joined = 1;
-                if([buffer.type isEqualToString:@"channel"]) {
+                if([buffer.type isEqualToString:@"channel"] || buffer.isMPDM) {
                     type = TYPE_CHANNEL;
                     Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid];
                     if(channel) {
@@ -328,7 +328,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                      @"type":@(type),
                      @"cid":@(buffer.cid),
                      @"bid":@(buffer.bid),
-                     @"name":buffer.name,
+                     @"name":buffer.displayName,
                      @"unread":@(unread),
                      @"highlights":@(highlights),
                      @"archived":@0,

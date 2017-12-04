@@ -38,17 +38,19 @@
     Buffer *_lastBuffer;
     Buffer *_nextBuffer;
     int _extraHighlights;
+    BOOL _serverIsSlack;
+    NSString *_displayName;
 }
 @property (nonatomic, assign) int bid, cid, archived, deferred, timeout, extraHighlights;
 @property (nonatomic, assign) NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom, created;
 @property (nonatomic, assign) CGFloat savedScrollOffset;
 @property (nonatomic, copy) NSString *name, *type, *away_msg, *chantypes;
-@property (nonatomic, assign) BOOL valid, scrolledUp;
+@property (nonatomic, assign) BOOL valid, scrolledUp, serverIsSlack;
 @property (nonatomic, copy) NSString *draft;
 @property (nonatomic, strong) Buffer *lastBuffer, *nextBuffer;
+@property (readonly) NSString *accessibilityValue, *normalizedName, *displayName;
+@property (readonly) BOOL isMPDM;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;
--(NSString *)accessibilityValue;
--(NSString *)normalizedName;
 @end
 
 @interface BuffersDataSource : NSObject {

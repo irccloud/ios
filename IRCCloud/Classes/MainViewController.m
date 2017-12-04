@@ -2530,7 +2530,7 @@ NSArray *_sortedChannels;
             _lock.text = FA_GLOBE;
         _lock.textColor = [UIColor navBarHeadingColor];
     } else {
-        self.navigationItem.title = _titleLabel.text = _buffer.name;
+        self.navigationItem.title = _titleLabel.text = _buffer.displayName;
         _titleLabel.font = [UIFont boldSystemFontOfSize:20];
         _titleLabel.accessibilityValue = _buffer.accessibilityValue;
         _topicLabel.hidden = YES;
@@ -3846,7 +3846,7 @@ NSArray *_sortedChannels;
     if([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected) {
         [[NetworkConnection sharedInstance] connect:NO];
     } else {
-        if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
+        if(_buffer && !_buffer.isMPDM && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithChannel:[[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
