@@ -250,15 +250,20 @@ NSArray *_sortedChannels;
                     [_nickCompletionView setSelection:0];
                     NSString *text = _message.text;
                     if(text.length == 0) {
-                        _message.text = [_nickCompletionView suggestion];
+                        if(_buffer.serverIsSlack)
+                            _message.text = [NSString stringWithFormat:@"@%@",[_nickCompletionView suggestion]];
+                        else
+                            _message.text = [_nickCompletionView suggestion];
                     } else {
                         while(text.length > 0 && [text characterAtIndex:text.length - 1] != ' ') {
                             text = [text substringToIndex:text.length - 1];
                         }
+                        if(_buffer.serverIsSlack)
+                            text = [text stringByAppendingString:@"@"];
                         text = [text stringByAppendingString:[_nickCompletionView suggestion]];
                         _message.text = text;
                     }
-                    if([text rangeOfString:@" "].location == NSNotFound)
+                    if([text rangeOfString:@" "].location == NSNotFound && !_buffer.serverIsSlack)
                         _message.text = [_message.text stringByAppendingString:@":"];
                 }
                 _message.delegate = delegate;
@@ -2357,10 +2362,10 @@ NSArray *_sortedChannels;
         }
     }
     
-    if(_updateSuggestionsTask.atMention)
+    if(_updateSuggestionsTask.atMention || _buffer.serverIsSlack)
         nick = [NSString stringWithFormat:@"@%@", nick];
 
-    if(!isChannel && ![text hasPrefix:@":"] && [text rangeOfString:@" "].location == NSNotFound)
+    if(!isChannel && !_buffer.serverIsSlack && ![text hasPrefix:@":"] && [text rangeOfString:@" "].location == NSNotFound)
         nick = [nick stringByAppendingString:@": "];
     else
         nick = [nick stringByAppendingString:@" "];
@@ -3456,7 +3461,7 @@ NSArray *_sortedChannels;
     [self.slidingViewController resetTopView];
     
     if(_message.text.length == 0) {
-        _message.text = [NSString stringWithFormat:@"%@: ",_selectedUser.nick];
+        _message.text = _buffer.serverIsSlack ? [NSString stringWithFormat:@"@%@ ",_selectedUser.nick] : [NSString stringWithFormat:@"%@: ",_selectedUser.nick];
     } else {
         NSString *from = _selectedUser.nick;
         NSInteger oldPosition = _message.selectedRange.location;
@@ -3473,7 +3478,7 @@ NSArray *_sortedChannels;
         char nextChar = (range.location != NSNotFound && range.location + range.length < text.length)?[text characterAtIndex:range.location + range.length]:0;
         if(match != NSNotFound && (nextChar == 0 || nextChar == ' ' || nextChar == ':')) {
             NSMutableString *newtext = [[NSMutableString alloc] init];
-            if(match > 1 && [text characterAtIndex:match - 1] == ' ')
+            if(match > 1 && ([text characterAtIndex:match - 1] == ' ' || [text characterAtIndex:match - 1] == '@'))
                 [newtext appendString:[text substringWithRange:NSMakeRange(0, match - 1)]];
             else
                 [newtext appendString:[text substringWithRange:NSMakeRange(0, match)]];
@@ -3488,6 +3493,8 @@ NSArray *_sortedChannels;
                 newtext = (NSMutableString *)[newtext substringWithRange:NSMakeRange(0, newtext.length - 1)];
             if([newtext isEqualToString:@":"])
                 newtext = (NSMutableString *)@"";
+            if([newtext isEqualToString:@"@"])
+                newtext = (NSMutableString *)@"";
             _message.text = newtext;
             if(match < newtext.length)
                 _message.selectedRange = NSMakeRange(match, 0);
@@ -3498,6 +3505,8 @@ NSArray *_sortedChannels;
                 text = [NSString stringWithFormat:@" %@", from];
             } else {
                 NSMutableString *newtext = [[NSMutableString alloc] initWithString:[text substringWithRange:NSMakeRange(0, oldPosition)]];
+                if(_buffer.serverIsSlack && ![newtext hasSuffix:@"@"])
+                    from = [NSString stringWithFormat:@"@%@", from];
                 if(![newtext hasSuffix:@" "])
                     from = [NSString stringWithFormat:@" %@", from];
                 if(![[text substringWithRange:NSMakeRange(oldPosition, text.length - oldPosition)] hasPrefix:@" "])
@@ -5052,15 +5061,20 @@ Network type: %@\n",
         NSString *text = _message.text;
         _message.delegate = nil;
         if(text.length == 0) {
-            _message.text = [_nickCompletionView suggestion];
+            if(_buffer.serverIsSlack)
+                _message.text = [NSString stringWithFormat:@"@%@", [_nickCompletionView suggestion]];
+            else
+                _message.text = [_nickCompletionView suggestion];
         } else {
             while(text.length > 0 && [text characterAtIndex:text.length - 1] != ' ') {
                 text = [text substringToIndex:text.length - 1];
             }
+            if(_buffer.serverIsSlack)
+                text = [text stringByAppendingString:@"@"];
             text = [text stringByAppendingString:[_nickCompletionView suggestion]];
             _message.text = text;
         }
-        if([text rangeOfString:@" "].location == NSNotFound)
+        if([text rangeOfString:@" "].location == NSNotFound && !_buffer.serverIsSlack)
             _message.text = [_message.text stringByAppendingString:@":"];
         _message.delegate = self;
     }
