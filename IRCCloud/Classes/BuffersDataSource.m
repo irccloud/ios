@@ -41,7 +41,7 @@
             joinedRight = [[ChannelsDataSource sharedInstance] channelForBuffer:aBuffer.bid] != nil;
         
         NSString *typeLeft = self.isMPDM ? @"conversation" : _type;
-        NSString *typeRight = aBuffer.isMPDM ? @"conversation" : _type;
+        NSString *typeRight = aBuffer.isMPDM ? @"conversation" : aBuffer.type;
         if([typeLeft isEqualToString:@"conversation"] && [typeRight isEqualToString:@"channel"])
             return NSOrderedDescending;
         else if([typeLeft isEqualToString:@"channel"] && [typeRight isEqualToString:@"conversation"])
