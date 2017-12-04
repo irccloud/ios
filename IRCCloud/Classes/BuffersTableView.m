@@ -266,6 +266,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                      @"status":server.status,
                      @"fail_info":server.fail_info,
                      @"ssl":@(server.ssl),
+                     @"slack":@(server.isSlack),
                      @"count":@(buffers.count)
                      }];
                     
@@ -988,10 +989,15 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         switch(cell.type) {
             case TYPE_SERVER:
                 cell.accessibilityLabel = @"Network";
-                if([[row objectForKey:@"ssl"] intValue])
-                    cell.icon.text = FA_SHIELD;
-                else
-                    cell.icon.text = FA_GLOBE;
+                if([[row objectForKey:@"slack"] intValue]) {
+                    cell.icon.text = FA_SLACK;
+                } else {
+                    if([[row objectForKey:@"ssl"] intValue])
+                        cell.icon.text = FA_SHIELD;
+                    else
+                        cell.icon.text = FA_GLOBE;
+                }
+
                 cell.icon.hidden = NO;
                 if(selected) {
                     cell.highlightColor = [UIColor selectedBufferHighlightColor];

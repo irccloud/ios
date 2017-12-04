@@ -340,6 +340,10 @@ volatile BOOL __socketPaused = NO;
             server.deferred_archives = [[object objectForKey:@"deferred_archives"] intValue];
         else
             server.deferred_archives = 0;
+        if([[object objectForKey:@"ircserver"] isKindOfClass:[NSString class]])
+            server.ircserver = [object objectForKey:@"ircserver"];
+        else
+            server.ircserver = nil;
         if(!backlog && !_resuming)
             [self postObject:server forEvent:kIRCEventMakeServer];
     };

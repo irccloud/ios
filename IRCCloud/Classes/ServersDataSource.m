@@ -116,6 +116,18 @@
     [_ignore setIgnores:_ignores];
 }
 
+-(BOOL)isSlack {
+    return [_hostname hasSuffix:@".slack.com"] || [_ircserver hasSuffix:@".slack.com"];
+}
+
+-(NSString *)slackBaseURL {
+    NSString *host = _hostname;
+    if(![host hasSuffix:@".slack.com"])
+        host = _ircserver;
+    if([host hasSuffix:@".slack.com"])
+        return [NSString stringWithFormat:@"https://%@", host];
+    return nil;
+}
 @end
 
 @implementation ServersDataSource

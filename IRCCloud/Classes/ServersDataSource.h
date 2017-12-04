@@ -22,6 +22,7 @@
     int _cid;
     NSString *_name;
     NSString *_hostname;
+    NSString *_ircserver;
     int _port;
     NSString *_nick;
     NSString *_status;
@@ -45,13 +46,15 @@
     Ignore *_ignore;
 }
 @property (nonatomic, assign) int cid, port, ssl, order, deferred_archives;
-@property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname;
+@property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname, *ircserver;
 @property (nonatomic, copy) NSDictionary *fail_info, *PREFIX;
 @property (nonatomic, copy) NSDictionary *isupport;
 @property (readonly) Ignore *ignore;
 -(NSComparisonResult)compare:(Server *)aServer;
 -(NSArray *)ignores;
 -(void)setIgnores:(NSArray *)ignores;
+-(BOOL)isSlack;
+-(NSString *)slackBaseURL;
 @end
 
 @interface ServersDataSource : NSObject {
