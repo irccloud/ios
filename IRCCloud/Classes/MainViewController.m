@@ -2524,7 +2524,9 @@ NSArray *_sortedChannels;
         _titleLabel.font = [UIFont boldSystemFontOfSize:18];
         _topicLabel.text = [NSString stringWithFormat:@"%@:%i", s.hostname, s.port];
         _lock.hidden = NO;
-        if(s.ssl > 0)
+        if(s.isSlack)
+            _lock.text = FA_SLACK;
+        else if(s.ssl > 0)
             _lock.text = FA_SHIELD;
         else
             _lock.text = FA_GLOBE;
