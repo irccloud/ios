@@ -48,6 +48,7 @@
 @property (nonatomic, strong) Buffer *lastBuffer, *nextBuffer;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;
 -(NSString *)accessibilityValue;
+-(NSString *)normalizedName;
 @end
 
 @interface BuffersDataSource : NSObject {

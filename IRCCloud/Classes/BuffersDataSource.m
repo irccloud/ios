@@ -48,17 +48,8 @@
         else if(joinedLeft < joinedRight)
             return NSOrderedDescending;
         else {
-            if(_chantypes == nil) {
-                Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
-                if(s) {
-                    _chantypes = s.CHANTYPES;
-                    if(_chantypes == nil || _chantypes.length == 0)
-                        _chantypes = @"#";
-                }
-            }
-            NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
-            NSString *nameLeft = _name?[r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""]:@"";
-            NSString *nameRight = aBuffer.name?[r stringByReplacingMatchesInString:[aBuffer.name lowercaseString] options:0 range:NSMakeRange(0, aBuffer.name.length) withTemplate:@""]:@"";
+            NSString *nameLeft = self.normalizedName;
+            NSString *nameRight = aBuffer.normalizedName;
             
             if([nameLeft compare:nameRight] == NSOrderedSame)
                 return (_bid < aBuffer.bid)?NSOrderedAscending:NSOrderedDescending;
@@ -66,6 +57,18 @@
                 return [nameLeft localizedStandardCompare:nameRight];
         }
     }
+}
+-(NSString *)normalizedName {
+    if(_chantypes == nil) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
+        if(s) {
+            _chantypes = s.CHANTYPES;
+            if(_chantypes == nil || _chantypes.length == 0)
+                _chantypes = @"#";
+        }
+    }
+    NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
+    return [r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""];
 }
 -(NSString *)description {
     return [NSString stringWithFormat:@"{cid: %i, bid: %i, name: %@, type: %@}", _cid, _bid, _name, _type];
