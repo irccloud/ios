@@ -316,9 +316,10 @@
         _topicEdit.text = @"";
         _topicSetBy = nil;
     }
-    if([_channel.url isKindOfClass:[NSString class]] && _channel.url.length) {
+    if(([_channel.url isKindOfClass:[NSString class]] && _channel.url.length) || server.isSlack) {
+        NSString *url = server.isSlack ? [NSString stringWithFormat:@"%@/%@", server.slackBaseURL, _channel.name] : _channel.url;
         NSArray *links;
-        _url.attributedText = [ColorFormatter format:_channel.url defaultColor:[UIColor textareaTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
+        _url.attributedText = [ColorFormatter format:url defaultColor:[UIColor textareaTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
         _url.linkAttributes = [UIColor linkAttributes];
         
         for(NSTextCheckingResult *result in links) {
