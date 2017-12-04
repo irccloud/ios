@@ -74,6 +74,7 @@
     encodeObject(_MODE_OP);
     encodeObject(_MODE_HALFOP);
     encodeObject(_MODE_VOICED);
+    encodeObject(_ircserver);
 }
 -(id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
@@ -103,6 +104,7 @@
         decodeObject(_MODE_OP);
         decodeObject(_MODE_HALFOP);
         decodeObject(_MODE_VOICED);
+        decodeObject(_ircserver);
         _ignore = [[Ignore alloc] init];
         [_ignore setIgnores:_ignores];
     }

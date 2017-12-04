@@ -480,7 +480,6 @@ NSArray *_sortedChannels;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
     _message.translatesAutoresizingMaskIntoConstraints = NO;
-    _message.internalTextView.allowsEditingTextAttributes = YES;
     _defaultTextareaFont = _message.internalTextView.font;
     _messageWidthConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:0.0f];
     _messageHeightConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:36.0f];
@@ -511,12 +510,6 @@ NSArray *_sortedChannels;
                                 [NSLayoutConstraint constraintWithItem:_colorPickerView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:_eventsView.tableView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f],
                                 [NSLayoutConstraint constraintWithItem:_colorPickerView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeTop multiplier:1.0f constant:-2.0f]
                                 ]];
-    
-    [UIMenuController sharedMenuController].menuItems = @[[[UIMenuItem alloc] initWithTitle:@"Paste With Style" action:@selector(pasteRich:)],
-                                                          [[UIMenuItem alloc] initWithTitle:@"Color" action:@selector(chooseFGColor:)],
-                                                          [[UIMenuItem alloc] initWithTitle:@"Background" action:@selector(chooseBGColor:)],
-                                                          [[UIMenuItem alloc] initWithTitle:@"Reset Colors" action:@selector(resetColors:)],
-                                                          ];
     
     _connectingProgress = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
     [_connectingProgress sizeToFit];
@@ -2821,6 +2814,19 @@ NSArray *_sortedChannels;
     [self.slidingViewController resetTopView];
     [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
     [self updateSuggestions:NO];
+    
+    if([[ServersDataSource sharedInstance] getServer:_buffer.cid].isSlack) {
+        [UIMenuController sharedMenuController].menuItems = @[];
+        [self resetColors:nil];
+        _message.internalTextView.allowsEditingTextAttributes = NO;
+    } else {
+        [UIMenuController sharedMenuController].menuItems = @[[[UIMenuItem alloc] initWithTitle:@"Paste With Style" action:@selector(pasteRich:)],
+                                                              [[UIMenuItem alloc] initWithTitle:@"Color" action:@selector(chooseFGColor:)],
+                                                              [[UIMenuItem alloc] initWithTitle:@"Background" action:@selector(chooseBGColor:)],
+                                                              [[UIMenuItem alloc] initWithTitle:@"Reset Colors" action:@selector(resetColors:)],
+                                                              ];
+        _message.internalTextView.allowsEditingTextAttributes = YES;
+    }
 }
 
 -(void)userActivityWasContinued:(NSUserActivity *)userActivity {
