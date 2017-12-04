@@ -252,7 +252,7 @@
         bufferConfigItem.title = @"Conversation";
         if(_buffer) {
             if(![_buffer.type isEqualToString:@"console"])
-                bufferConfigItem.value = _buffer.name;
+                bufferConfigItem.value = _buffer.displayName;
             else
                 bufferConfigItem.value = nil;
         } else {
