@@ -2537,7 +2537,7 @@ NSArray *_sortedChannels;
         _lock.text = FA_LOCK;
         _lock.textColor = [UIColor navBarHeadingColor];
         if([_buffer.type isEqualToString:@"channel"]) {
-            _titleLabel.accessibilityLabel = @"Channel";
+            _titleLabel.accessibilityLabel = _buffer.isMPDM ? @"Conversation with" : @"Channel";
             BOOL lock = NO;
             Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid];
             if(channel) {

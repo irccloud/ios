@@ -121,6 +121,9 @@
     return [NSString stringWithFormat:@"{cid: %i, bid: %i, name: %@, type: %@}", _cid, _bid, _name, _type];
 }
 -(NSString *)accessibilityValue {
+    if(self.isMPDM)
+        return self.displayName;
+    
     if(_chantypes == nil) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
         if(s) {
