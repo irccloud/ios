@@ -296,7 +296,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                     type = buffer.isMPDM ? TYPE_CONVERSATION : TYPE_CHANNEL;
                     Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid];
                     if(channel) {
-                        if(channel.key)
+                        if(channel.key || (buffer.serverIsSlack && [channel hasMode:@"s"]))
                             key = 1;
                     } else {
                         joined = 0;
@@ -694,7 +694,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                 if([b.type isEqualToString:@"channel"]) {
                     Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:b.bid];
                     if(channel) {
-                        if(channel.key)
+                        if(channel.key || (b.serverIsSlack && [channel hasMode:@"s"]))
                             [m setObject:@1 forKey:@"key"];
                         else
                             [m setObject:@0 forKey:@"key"];
