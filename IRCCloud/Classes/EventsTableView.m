@@ -2695,6 +2695,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 [UIView commitAnimations];
                 _newMsgs = 0;
                 _newHighlights = 0;
+                CLS_LOG(@"Scroll view is at the bottom, clearing scrolledUp flag");
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
                 _buffer.savedScrollOffset = -1;

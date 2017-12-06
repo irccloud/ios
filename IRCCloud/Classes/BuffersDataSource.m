@@ -371,9 +371,6 @@
     }
     for(Buffer *buffer in copy) {
         buffer.valid = NO;
-        buffer.scrolledUp = NO;
-        buffer.scrolledUpFrom = -1;
-        buffer.savedScrollOffset = -1;
     }
 }
 
