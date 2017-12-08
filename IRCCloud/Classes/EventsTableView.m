@@ -952,7 +952,9 @@ extern UIImage *__socketClosedBackgroundImage;
         event.childEventCount = 0;
         
         if(!event.formatted) {
-            if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
+            if(event.rowType == ROW_THUMBNAIL) {
+                event.formattedMsg = event.msg;
+            } else if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
                 if(event.nick.length)
                     event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO]];
                 else if(event.server.length)
@@ -1148,7 +1150,7 @@ extern UIImage *__socketClosedBackgroundImage;
             }
         }
         
-        if(!__disableInlineFilesPref) {
+        if(!__disableInlineFilesPref && event.rowType != ROW_THUMBNAIL) {
             NSTimeInterval entity_eid = event.eid;
             for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
                 entity_eid = event.eid + ++event.childEventCount;
@@ -1183,7 +1185,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 _buffer.last_seen_eid = entity_eid;
         }
         
-        if(__inlineMediaPref && event.linkify && event.msg.length) {
+        if(__inlineMediaPref && event.linkify && event.msg.length && event.rowType != ROW_THUMBNAIL) {
             NSTimeInterval entity_eid = event.eid;
 
             NSArray *results = [ColorFormatter webURLs:event.msg];
