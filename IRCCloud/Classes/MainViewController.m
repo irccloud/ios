@@ -3402,7 +3402,9 @@ NSArray *_sortedChannels;
     [sheet addButtonWithTitle:@"Display Options"];
     [sheet addButtonWithTitle:@"Download Logs"];
     [sheet addButtonWithTitle:@"Settings"];
+#ifndef DEBUG
     [sheet addButtonWithTitle:@"Send Feedback"];
+#endif
     [sheet addButtonWithTitle:@"Logout"];
     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
@@ -4660,47 +4662,16 @@ Network type: %@\n",
             [d removeObjectForKey:@"AppleITunesStoreItemKinds"];
             [report appendFormat:@"%@\n", d];
 
-            NSURL *caches = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
-            NSArray *folders = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[caches URLByAppendingPathComponent:@"com.crashlytics.data"] includingPropertiesForKeys:nil options:0 error:nil];
-            if(folders.count) {
-                folders = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[[folders[0] URLByAppendingPathComponent:@"v3"] URLByAppendingPathComponent:@"active"] includingPropertiesForKeys:nil options:0 error:nil];
+#ifdef ENTERPRISE
+            NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
+#else
+            NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
+#endif
+            if(sharedcontainer) {
+                NSURL *logfile = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"log.txt"];
                 
-                if(folders.count) {
-                    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-                    formatter.dateFormat = @"yyyy-MM-dd HH:mm:ss.SSS ";
-                    NSMutableArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:folders[0] includingPropertiesForKeys:nil options:0 error:nil].mutableCopy;
-                    if(files.count) {
-                        [files sortUsingComparator:^ (NSURL *a, NSURL *b) {
-                            id da = [[a resourceValuesForKeys:[NSArray arrayWithObject:NSURLAttributeModificationDateKey] error:nil] objectForKey:NSURLCreationDateKey];
-                            id db = [[b resourceValuesForKeys:[NSArray arrayWithObject:NSURLAttributeModificationDateKey] error:nil] objectForKey:NSURLCreationDateKey];
-                            return [da compare:db];
-                        }];
-                        [report appendString:@"==========\nConsole log:\n"];
-                        for(NSURL *file in files.reverseObjectEnumerator) {
-                            if([file.lastPathComponent hasPrefix:@"log_"] && [file.lastPathComponent hasSuffix:@".clsrecord"]) {
-                                NSArray *lines = [[NSString stringWithContentsOfURL:file encoding:NSUTF8StringEncoding error:nil] componentsSeparatedByString:@"\n"];
-                                if(lines.count) {
-                                    for(NSString *line in lines) {
-                                        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[NSData dataWithBytes:[line UTF8String] length:[line length]] options:kNilOptions error:nil];
-                                        NSString *msg = [[dict objectForKey:@"log"] objectForKey:@"msg"];
-                                        if(msg.length) {
-                                            NSDate *date = [NSDate dateWithTimeIntervalSince1970:[[[dict objectForKey:@"log"] objectForKey:@"time"] doubleValue] / 1000.0f];
-                                            [report appendString:[formatter stringFromDate:date]];
-                                            
-                                            for (NSInteger i = 0; i < msg.length; i += 2) {
-                                                NSString *hex = [msg substringWithRange:NSMakeRange(i, 2)];
-                                                int decimalValue = 0;
-                                                sscanf([hex UTF8String], "%x", &decimalValue);
-                                                [report appendFormat:@"%c", decimalValue];
-                                            }
-                                            [report appendString:@"\n"];
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                [report appendString:@"==========\nConsole log:\n"];
+                [report appendFormat:@"%@\n", [NSString stringWithContentsOfURL:logfile encoding:NSUTF8StringEncoding error:nil]];
             }
             
             if(report.length) {

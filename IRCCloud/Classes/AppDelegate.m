@@ -16,7 +16,6 @@
 
 #import <SafariServices/SafariServices.h>
 #import <Fabric/Fabric.h>
-#import <Crashlytics/Crashlytics.h>
 #import <AdSupport/AdSupport.h>
 #import <Intents/Intents.h>
 #import "AppDelegate.h"
@@ -84,6 +83,18 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+#ifndef DEBUG
+#ifdef ENTERPRISE
+    NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
+#else
+    NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
+#endif
+    if(sharedcontainer) {
+        NSURL *logfile = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"log.txt"];
+
+        freopen([logfile.path cStringUsingEncoding:NSASCIIStringEncoding],"w+",stderr);
+    }
+#endif
 #ifdef CRASHLYTICS_TOKEN
     [Fabric with:@[CrashlyticsKit]];
 #endif

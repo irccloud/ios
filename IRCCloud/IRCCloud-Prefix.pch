@@ -28,3 +28,6 @@
 #define decodeBool(x) x = [aDecoder decodeBoolForKey:OBJC_STRINGIFY(x)]
 
 #define SupportedOrientationsReturnType UIInterfaceOrientationMask
+
+#undef CLS_LOG
+#define CLS_LOG(__FORMAT__, ...) CLSNSLog((@"%s line %d $ " __FORMAT__), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)

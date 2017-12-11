@@ -2611,6 +2611,9 @@ extern UIImage *__socketClosedBackgroundImage;
         if(!_buffer.scrolledUp) {
             _buffer.scrolledUpFrom = [[_data lastObject] eid];
             _buffer.scrolledUp = YES;
+#ifndef APPSTORE
+            CLS_LOG(@"Top unread bar tapped, setting scrolledUp flag");
+#endif
         }
         if(_lastSeenEidPos > 0) {
             [UIView beginAnimations:nil context:nil];
@@ -2642,6 +2645,9 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         _buffer.scrolledUp = NO;
         _buffer.scrolledUpFrom = -1;
+#ifndef APPSTORE
+        CLS_LOG(@"Bottom unread bar tapped, clearing scrolledUp flag");
+#endif
     }
 }
 
@@ -2716,7 +2722,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 _newMsgs = 0;
                 _newHighlights = 0;
 #ifndef APPSTORE
-                CLS_LOG(@"Scroll view is at the bottom, clearing scrolledUp flag");
+                CLS_LOG(@"Scroll view is at the bottom, clearing scrolledUp flag. ContentOffset: %f ContentHeight: %f", tableView.contentOffset.y, tableView.contentSize.height);
 #endif
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
@@ -2725,6 +2731,9 @@ extern UIImage *__socketClosedBackgroundImage;
             } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
                 _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
                 _buffer.scrolledUp = YES;
+#ifndef APPSTORE
+                CLS_LOG(@"Scroll view is scrolled up, setting scrolledUp flag");
+#endif
             }
             
             if(_lastSeenEidPos >= 0) {
