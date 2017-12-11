@@ -2541,7 +2541,7 @@ NSArray *_sortedChannels;
             BOOL lock = NO;
             Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid];
             if(channel) {
-                if(channel.key || (_buffer.serverIsSlack && [channel hasMode:@"s"]))
+                if(channel.key || (_buffer.serverIsSlack && !_buffer.isMPDM && [channel hasMode:@"s"]))
                     lock = YES;
                 if([channel.topic_text isKindOfClass:[NSString class]] && channel.topic_text.length) {
                     _topicLabel.hidden = NO;
