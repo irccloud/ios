@@ -691,10 +691,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cZW-xP-lCa" userLabel="Borders">
-                                <rect key="frame" x="-1" y="0.0" width="770" height="956"/>
+                                <rect key="frame" x="-1" y="0.0" width="770" height="960"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8dM-P4-uec">
-                                        <rect key="frame" x="1" y="0.0" width="768" height="956"/>
+                                        <rect key="frame" x="1" y="0.0" width="768" height="960"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </view>
                                 </subviews>
@@ -707,7 +707,7 @@
                                 </constraints>
                             </view>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="t8Z-Pu-wcU">
-                                <rect key="frame" x="0.0" y="0.0" width="768" height="956"/>
+                                <rect key="frame" x="0.0" y="0.0" width="768" height="960"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="768" id="Quf-Ug-9cF"/>
@@ -783,7 +783,7 @@
                                 </connections>
                             </view>
                             <view alpha="0.0" contentMode="scaleToFill" placeholderIntrinsicWidth="768" placeholderIntrinsicHeight="32" translatesAutoresizingMaskIntoConstraints="NO" id="scS-39-nDE" userLabel="Bottom Unread View" customClass="UIControl">
-                                <rect key="frame" x="0.0" y="880" width="768" height="32"/>
+                                <rect key="frame" x="0.0" y="884" width="768" height="32"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="↓" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="14" translatesAutoresizingMaskIntoConstraints="NO" id="MQi-6s-Aew">
                                         <rect key="frame" x="6" y="7" width="13" height="17"/>
@@ -822,7 +822,7 @@
                                 </connections>
                             </view>
                             <view hidden="YES" autoresizesSubviews="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="768" placeholderIntrinsicHeight="32" translatesAutoresizingMaskIntoConstraints="NO" id="QgU-LW-Wne" userLabel="Server Status Bar" customClass="UIControl">
-                                <rect key="frame" x="0.0" y="880" width="768" height="32"/>
+                                <rect key="frame" x="0.0" y="884" width="768" height="32"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="756" translatesAutoresizingMaskIntoConstraints="NO" id="sIl-WH-w2W">
                                         <rect key="frame" x="6" y="6" width="756" height="20"/>
@@ -846,10 +846,10 @@
                                 </connections>
                             </view>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="37K-X6-4EC">
-                                <rect key="frame" x="374" y="468" width="20" height="20"/>
+                                <rect key="frame" x="374" y="470" width="20" height="20"/>
                             </activityIndicatorView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" text="Double-tap to quickly reply to the sender" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="290" translatesAutoresizingMaskIntoConstraints="NO" id="biy-MM-eKX">
-                                <rect key="frame" x="239" y="825" width="290" height="55"/>
+                                <rect key="frame" x="239" y="829" width="290" height="55"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="55" id="8Ck-Wn-AOK"/>
                                     <constraint firstAttribute="width" constant="290" id="EmZ-vM-uzU"/>
@@ -859,7 +859,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" text="Swipe with 2 fingers to return to the previous channel or conversation" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="290" translatesAutoresizingMaskIntoConstraints="NO" id="Me3-jh-nJf">
-                                <rect key="frame" x="239" y="825" width="290" height="55"/>
+                                <rect key="frame" x="239" y="829" width="290" height="55"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="290" id="TRm-q9-E0j"/>
                                     <constraint firstAttribute="height" constant="55" id="bXb-fr-AbV"/>
@@ -869,7 +869,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" text="Swipe left and right to quickly open and close the sidebars" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="290" translatesAutoresizingMaskIntoConstraints="NO" id="IOs-dt-XUa">
-                                <rect key="frame" x="239" y="825" width="290" height="55"/>
+                                <rect key="frame" x="239" y="829" width="290" height="55"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="55" id="DY5-aL-REE"/>
                                     <constraint firstAttribute="width" constant="290" id="e9j-Ou-nSL"/>
@@ -900,7 +900,7 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fW5-GL-Rkw">
-                                <rect key="frame" x="0.0" y="912" width="768" height="44"/>
+                                <rect key="frame" x="0.0" y="916" width="768" height="44"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="SuG-V2-yni"/>
