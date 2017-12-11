@@ -143,7 +143,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     }
     _bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
     _unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
-    _icon.frame = CGRectMake(frame.origin.x + 12, frame.origin.y + 12, 16, 16);
+    _icon.frame = CGRectMake(frame.origin.x + 12, frame.origin.y + 10, 16, 18);
     if(!_activity.hidden) {
         frame.size.width -= _activity.frame.size.width + 12;
         _activity.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 10, _activity.frame.size.width, _activity.frame.size.height);
