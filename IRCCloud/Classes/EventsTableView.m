@@ -1595,6 +1595,9 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)_scrollToBottom {
+#ifndef APPSTORE
+    CLS_LOG(@"_scrollToBottom: %@", [NSThread callStackSymbols]);
+#endif
     [_lock lock];
     _scrollTimer = nil;
     _buffer.scrolledUp = NO;
@@ -1611,6 +1614,9 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)scrollToBottom {
+#ifndef APPSTORE
+    CLS_LOG(@"scrollToBottom: %@", [NSThread callStackSymbols]);
+#endif
     [_scrollTimer invalidate];
     
     _scrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_scrollToBottom) userInfo:nil repeats:NO];
@@ -1644,6 +1650,9 @@ extern UIImage *__socketClosedBackgroundImage;
 #endif
         [self _scrollToBottom];
     } else if(e.row < bottom) {
+#ifndef APPSTORE
+        CLS_LOG(@"Event reloaded, adjusting content offset. old height: %f new height: %f difference: %f", h, _tableView.contentSize.height, (_tableView.contentSize.height - h));
+#endif
         _tableView.contentOffset = CGPointMake(0, _tableView.contentOffset.y + (_tableView.contentSize.height - h));
     }
 }
@@ -1943,6 +1952,9 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
             } else if(_buffer.scrolledUp && _buffer.savedScrollOffset > 0) {
                 if((_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height) < _tableView.contentSize.height - _tableView.bounds.size.height) {
+#ifndef APPSTORE
+                    CLS_LOG(@"Restoring saved contentOffset");
+#endif
                     _tableView.contentOffset = CGPointMake(0, (_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height));
                 } else {
 #ifndef APPSTORE
@@ -2732,7 +2744,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 _newMsgs = 0;
                 _newHighlights = 0;
 #ifndef APPSTORE
-                CLS_LOG(@"Scroll view is at the bottom, clearing scrolledUp flag. ContentOffset: %f ContentHeight: %f", tableView.contentOffset.y, tableView.contentSize.height);
+                CLS_LOG(@"Scroll view is at the bottom, clearing scrolledUp flag. ContentOffset: %f ContentHeight: %f Table Height: %f", tableView.contentOffset.y, tableView.contentSize.height, tableView.frame.size.height);
 #endif
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
