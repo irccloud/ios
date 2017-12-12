@@ -2300,6 +2300,9 @@ NSArray *_sortedChannels;
                     e.realname = s.server_realname;
                 [[EventsDataSource sharedInstance] addEvent:e];
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+#ifndef APPSTORE
+                    CLS_LOG(@"Scrolling down after sending a message");
+#endif
                     [_eventsView scrollToBottom];
                     [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
                 }];
@@ -3194,6 +3197,9 @@ NSArray *_sortedChannels;
         [_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(top, 0, height, 0)];
 
         if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) {
+#ifndef APPSTORE
+            CLS_LOG(@"Adjusting content offset after changing insets");
+#endif
             if(floorf(_eventsView.tableView.contentOffset.y + diff + (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) > floorf(_eventsView.tableView.contentSize.height))
                 [_eventsView _scrollToBottom];
             else if(diff > 0 || _buffer.scrolledUp)
