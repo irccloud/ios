@@ -526,6 +526,7 @@ NSArray *_sortedChannels;
     self.navigationItem.titleView = _titleView;
     _connectingProgress.hidden = YES;
     _connectingProgress.progress = 0;
+    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [self _themeChanged];
     [self connectivityChanged:nil];
     [self updateLayout];
@@ -3086,8 +3087,13 @@ NSArray *_sortedChannels;
         self.navigationController.view.center = self.slidingViewController.view.center;
     } else {
         _borders.hidden = YES;
-        _eventsViewWidthConstraint.constant = size.width;
-        _eventsViewOffsetXConstraint.constant = 0;
+        if(@available(iOS 11, *)) {
+            _eventsViewWidthConstraint.constant = size.width + self.slidingViewController.view.safeAreaInsets.left;
+            _eventsViewOffsetXConstraint.constant = self.slidingViewController.view.safeAreaInsets.left / 2;
+        } else {
+            _eventsViewWidthConstraint.constant = size.width;
+            _eventsViewOffsetXConstraint.constant = 0;
+        }
         if(!self.slidingViewController.underLeftViewController)
             self.slidingViewController.underLeftViewController = _buffersView;
         if(!self.navigationItem.leftBarButtonItem)

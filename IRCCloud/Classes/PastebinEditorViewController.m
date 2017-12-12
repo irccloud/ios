@@ -327,7 +327,12 @@
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
+    UILabel *label;
+    if(@available(iOS 11, *)) {
+        label = [[UILabel alloc] initWithFrame:CGRectMake(16 + self.view.safeAreaInsets.left,0,self.view.frame.size.width - 32, 20)];
+    } else {
+        label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
+    }
     label.text = [self tableView:tableView titleForHeaderInSection:section].uppercaseString;
     label.font = [UIFont systemFontOfSize:14];
     label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
@@ -342,6 +347,11 @@
 
 -(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
     if(section == 0) {
+        if(@available(iOS 11, *)) {
+            CGRect frame = _messageFooter.frame;
+            frame.origin.x = self.view.safeAreaInsets.left;
+            _messageFooter.frame = frame;
+        }
         return _messageFooter;
     }
     return nil;

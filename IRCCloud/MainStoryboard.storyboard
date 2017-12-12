@@ -687,14 +687,14 @@
                         <viewControllerLayoutGuide type="bottom" id="9R7-ni-VzZ"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="cMl-aC-QBW">
-                        <rect key="frame" x="0.0" y="0.0" width="768" height="956"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="960"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cZW-xP-lCa" userLabel="Borders">
-                                <rect key="frame" x="-1" y="0.0" width="770" height="960"/>
+                                <rect key="frame" x="-1" y="0.0" width="770" height="1024"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8dM-P4-uec">
-                                        <rect key="frame" x="1" y="0.0" width="768" height="960"/>
+                                        <rect key="frame" x="1" y="0.0" width="768" height="1024"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </view>
                                 </subviews>
@@ -916,7 +916,7 @@
                             <constraint firstItem="fW5-GL-Rkw" firstAttribute="top" secondItem="Me3-jh-nJf" secondAttribute="bottom" constant="32" id="FAp-B3-jyQ"/>
                             <constraint firstItem="9R7-ni-VzZ" firstAttribute="top" secondItem="t8Z-Pu-wcU" secondAttribute="bottom" id="FHj-D8-qMZ"/>
                             <constraint firstItem="QgU-LW-Wne" firstAttribute="leading" secondItem="t8Z-Pu-wcU" secondAttribute="leading" id="FKB-gP-fFL"/>
-                            <constraint firstItem="9R7-ni-VzZ" firstAttribute="top" secondItem="cZW-xP-lCa" secondAttribute="bottom" id="GRR-In-OzF"/>
+                            <constraint firstItem="9R7-ni-VzZ" firstAttribute="top" secondItem="cZW-xP-lCa" secondAttribute="bottom" constant="-64" id="GRR-In-OzF"/>
                             <constraint firstItem="fW5-GL-Rkw" firstAttribute="centerX" secondItem="t8Z-Pu-wcU" secondAttribute="centerX" id="IbI-A6-63q"/>
                             <constraint firstItem="fW5-GL-Rkw" firstAttribute="top" secondItem="scS-39-nDE" secondAttribute="bottom" id="J0Y-Xk-O0Z"/>
                             <constraint firstItem="cdg-2x-04N" firstAttribute="top" secondItem="t8Z-Pu-wcU" secondAttribute="top" id="JUW-xp-JDU"/>
@@ -1024,6 +1024,7 @@
                         <outlet property="_headerView" destination="tmc-fI-0Xs" id="BFZ-vI-cNO"/>
                         <outlet property="_loadMoreBacklog" destination="Sya-Jj-2rP" id="YVU-7f-mst"/>
                         <outlet property="_stickyAvatar" destination="WXm-cx-Mj2" id="RZb-zC-iTA"/>
+                        <outlet property="_stickyAvatarXOffsetConstraint" destination="lLW-ey-6EA" id="CNi-70-m2S"/>
                         <outlet property="_stickyAvatarYOffsetConstraint" destination="Uac-VW-eBx" id="MSL-Dc-ffe"/>
                         <outlet property="_tableView" destination="t8Z-Pu-wcU" id="eMn-Er-9RS"/>
                         <outlet property="_topHighlightsCountView" destination="NXY-Lp-a7w" id="6Ba-t0-uOx"/>

@@ -386,17 +386,29 @@
     UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,48)];
 
     if(!topicHeader) {
-        topicHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
+        if(@available(iOS 11, *)) {
+            topicHeader = [[UILabel alloc] initWithFrame:CGRectMake(16 + self.view.safeAreaInsets.left,24,self.view.frame.size.width - 32, 20)];
+        } else {
+            topicHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
+        }
         topicHeader.font = [UIFont systemFontOfSize:14];
         topicHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
     }
     if(!urlHeader) {
-        urlHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
+        if(@available(iOS 11, *)) {
+            urlHeader = [[UILabel alloc] initWithFrame:CGRectMake(16 + self.view.safeAreaInsets.left,24,self.view.frame.size.width - 32, 20)];
+        } else {
+            urlHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
+        }
         urlHeader.font = [UIFont systemFontOfSize:14];
         urlHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
     }
     if(!modesHeader) {
-        modesHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
+        if(@available(iOS 11, *)) {
+            modesHeader = [[UILabel alloc] initWithFrame:CGRectMake(16 + self.view.safeAreaInsets.left,24,self.view.frame.size.width - 32, 20)];
+        } else {
+            modesHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
+        }
         modesHeader.font = [UIFont systemFontOfSize:14];
         modesHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
     }
@@ -427,7 +439,12 @@
 
 -(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
     UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
-    UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(16,4,self.view.frame.size.width - 32, 20)];
+    UILabel *label;
+    if(@available(iOS 11, *)) {
+        label = [[UILabel alloc] initWithFrame:CGRectMake(16 + self.view.safeAreaInsets.left,4,self.view.frame.size.width - 32, 20)];
+    } else {
+        label = [[UILabel alloc] initWithFrame:CGRectMake(16,4,self.view.frame.size.width - 32, 20)];
+    }
     label.text = [self tableView:tableView titleForFooterInSection:section];
     label.font = [UIFont systemFontOfSize:12];
     label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;

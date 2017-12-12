@@ -46,6 +46,7 @@
     IBOutlet NSLayoutConstraint *_topUnreadLabelXOffsetConstraint;
     IBOutlet NSLayoutConstraint *_bottomUnreadLabelXOffsetConstraint;
     IBOutlet NSLayoutConstraint *_stickyAvatarYOffsetConstraint;
+    IBOutlet NSLayoutConstraint *_stickyAvatarXOffsetConstraint;
     IBOutlet UIImageView *_stickyAvatar;
     IBOutlet UIButton *_loadMoreBacklog;
     

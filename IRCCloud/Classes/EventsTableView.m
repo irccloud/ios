@@ -1655,6 +1655,16 @@ extern UIImage *__socketClosedBackgroundImage;
         [EventsDataSource sharedInstance].widthForHeightCache = self.tableView.bounds.size.width;
         [_reloadTimer invalidate];
         
+        if(@available(iOS 11, *)) {
+            if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && self.view.bounds.size.width > self.view.bounds.size.height && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
+                _stickyAvatarXOffsetConstraint.constant = 10;
+            } else {
+                _stickyAvatarXOffsetConstraint.constant = 10 + self.slidingViewController.view.safeAreaInsets.left;
+            }
+        } else {
+            _stickyAvatarXOffsetConstraint.constant = 10;
+        }
+
         __24hrPref = NO;
         __secondsPref = NO;
         __timeLeftPref = NO;
