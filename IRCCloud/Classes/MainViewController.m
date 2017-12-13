@@ -3200,9 +3200,14 @@ NSArray *_sortedChannels;
 #ifndef APPSTORE
             CLS_LOG(@"Adjusting content offset after changing insets");
 #endif
-            if(floorf(_eventsView.tableView.contentOffset.y + diff + (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) > floorf(_eventsView.tableView.contentSize.height))
-                [_eventsView _scrollToBottom];
-            else if(diff > 0 || _buffer.scrolledUp)
+            if(floorf(_eventsView.tableView.contentOffset.y + diff + (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) > floorf(_eventsView.tableView.contentSize.height)) {
+                if(!_buffer.scrolledUp)
+                    [_eventsView _scrollToBottom];
+#ifndef APPSTORE
+                else
+                    CLS_LOG(@"Buffer was scrolled up, ignoring");
+#endif
+            } else if(diff > 0 || _buffer.scrolledUp)
                 _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
             else if([[UIDevice currentDevice].systemVersion isEqualToString:@"8.1"]) //The last line seems to get eaten when the table is fully scrolled down on iOS 8.1
                 _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + fabs(diff));

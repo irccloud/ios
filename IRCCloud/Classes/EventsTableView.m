@@ -1596,7 +1596,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)_scrollToBottom {
 #ifndef APPSTORE
-    CLS_LOG(@"_scrollToBottom: %@", [NSThread callStackSymbols]);
+    CLS_LOG(@"_scrollToBottom");
 #endif
     [_lock lock];
     _scrollTimer = nil;
@@ -1615,7 +1615,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)scrollToBottom {
 #ifndef APPSTORE
-    CLS_LOG(@"scrollToBottom: %@", [NSThread callStackSymbols]);
+    CLS_LOG(@"scrollToBottom");
 #endif
     [_scrollTimer invalidate];
     
@@ -1795,6 +1795,7 @@ extern UIImage *__socketClosedBackgroundImage;
         
         [_lock lock];
         [_scrollTimer invalidate];
+        _scrollTimer = nil;
         _ready = NO;
         NSInteger oldPosition = (_requestingBacklog && _data.count && [_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)].count)?[[[_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)] objectAtIndex: 0] row]:-1;
         NSTimeInterval backlogEid = (_requestingBacklog && _data.count && oldPosition < _data.count)?[[_data objectAtIndex:oldPosition] groupEid]-1:0;
@@ -2753,6 +2754,8 @@ extern UIImage *__socketClosedBackgroundImage;
             } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
                 _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
                 _buffer.scrolledUp = YES;
+                [_scrollTimer invalidate];
+                _scrollTimer = nil;
 #ifndef APPSTORE
                 CLS_LOG(@"Scroll view is scrolled up, setting scrolledUp flag");
 #endif
