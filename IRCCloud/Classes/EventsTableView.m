@@ -490,7 +490,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [_tableView reloadData];
+    [self _reloadData];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
@@ -814,7 +814,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
                 [_lock unlock];
                 if(!backlog)
-                    [_tableView reloadData];
+                    [self _reloadData];
                 return;
             }
             
@@ -1132,7 +1132,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         
         if(!backlog) {
-            [_tableView reloadData];
+            [self _reloadData];
             if(!_buffer.scrolledUp) {
 #ifndef APPSTORE
                 CLS_LOG(@"Table wasn't scrolled up after inserting new event, scrolling to bottom");
@@ -1539,7 +1539,7 @@ extern UIImage *__socketClosedBackgroundImage;
     _ready = NO;
     [_heartbeatTimer invalidate];
     _heartbeatTimer = nil;
-    [_scrollTimer invalidate];
+    [_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
     _scrollTimer = nil;
     _requestingBacklog = NO;
     if(buffer != _buffer) {
@@ -1599,6 +1599,7 @@ extern UIImage *__socketClosedBackgroundImage;
     CLS_LOG(@"_scrollToBottom");
 #endif
     [_lock lock];
+    [_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
     _scrollTimer = nil;
     _buffer.scrolledUp = NO;
     _buffer.scrolledUpFrom = -1;
@@ -1614,6 +1615,11 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)scrollToBottom {
+    if(![NSThread currentThread].isMainThread) {
+        CLS_LOG(@"scrollToBottom called on wrong thread");
+        [self performSelectorOnMainThread:@selector(scrollToBottom) withObject:nil waitUntilDone:YES];
+        return;
+    }
 #ifndef APPSTORE
     CLS_LOG(@"scrollToBottom");
 #endif
@@ -1631,8 +1637,17 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)_reloadData {
+#ifndef APPSTORE
+    CLS_LOG(@"_reloadData");
+#endif
+    CGPoint offset = _tableView.contentOffset;
     [_tableView reloadData];
-    if(!_buffer.scrolledUp) {
+    if(_buffer.scrolledUp) {
+#ifndef APPSTORE
+        CLS_LOG(@"Restoring scroll position");
+#endif
+        _tableView.contentOffset = offset;
+    } else {
 #ifndef APPSTORE
         CLS_LOG(@"Table wasn't scrolled up after reload, scrolling to bottom");
 #endif
@@ -1642,7 +1657,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)reloadForEvent:(Event *)e {
     CGFloat h = _tableView.contentSize.height;
-    [_tableView reloadData];
+    [self _reloadData];
     NSInteger bottom = _tableView.indexPathsForVisibleRows.lastObject.row;
     if(!_buffer.scrolledUp) {
 #ifndef APPSTORE
@@ -1658,6 +1673,9 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)refresh {
+#ifndef APPSTORE
+    CLS_LOG(@"refresh");
+#endif
     @synchronized(self) {
         if(self.tableView.bounds.size.width != [EventsDataSource sharedInstance].widthForHeightCache)
             [[EventsDataSource sharedInstance] clearHeightCache];
@@ -1794,7 +1812,7 @@ extern UIImage *__socketClosedBackgroundImage;
         [UIColor socketClosedBackgroundColor];
         
         [_lock lock];
-        [_scrollTimer invalidate];
+        [_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
         _scrollTimer = nil;
         _ready = NO;
         NSInteger oldPosition = (_requestingBacklog && _data.count && [_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)].count)?[[[_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset)] objectAtIndex: 0] row]:-1;
@@ -2754,7 +2772,7 @@ extern UIImage *__socketClosedBackgroundImage;
             } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
                 _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
                 _buffer.scrolledUp = YES;
-                [_scrollTimer invalidate];
+                [_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
                 _scrollTimer = nil;
 #ifndef APPSTORE
                 CLS_LOG(@"Scroll view is scrolled up, setting scrolledUp flag");
@@ -2915,7 +2933,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
     }
     [_lock unlock];
-    [_tableView reloadData];
+    [self _reloadData];
 }
 
 -(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {

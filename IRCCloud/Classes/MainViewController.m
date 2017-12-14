@@ -1658,7 +1658,7 @@ NSArray *_sortedChannels;
                             e.bgColor = [UIColor errorBackgroundColor];
                             [e.expirationTimer invalidate];
                             e.expirationTimer = nil;
-                            [_eventsView.tableView reloadData];
+                            [_eventsView reloadData];
                         }
                     }];
                     if(e.reqId < 0)
@@ -2328,7 +2328,7 @@ NSArray *_sortedChannels;
                     e.height = 0;
                     [e.expirationTimer invalidate];
                     e.expirationTimer = nil;
-                    [_eventsView.tableView reloadData];
+                    [_eventsView reloadData];
                 }
             }];
             if(e.reqId < 0)
@@ -2350,7 +2350,7 @@ NSArray *_sortedChannels;
         e.bgColor = [UIColor errorBackgroundColor];
         e.formatted = nil;
         e.height = 0;
-        [_eventsView.tableView reloadData];
+        [_eventsView reloadData];
     }
 }
 
@@ -3960,7 +3960,7 @@ NSArray *_sortedChannels;
                 _selectedEvent.reqId = [[NetworkConnection sharedInstance] say:_selectedEvent.command to:_buffer.name cid:_buffer.cid handler:nil];
                 if(_selectedEvent.msg)
                     [_pendingEvents addObject:_selectedEvent];
-                [_eventsView.tableView reloadData];
+                [_eventsView reloadData];
                 if(_selectedEvent.reqId < 0)
                     _selectedEvent.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:_selectedEvent repeats:NO];
             }
