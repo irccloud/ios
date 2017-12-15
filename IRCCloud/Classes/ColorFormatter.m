@@ -2083,9 +2083,11 @@ extern BOOL __compact;
                     if(count > 0) {
                         if(count < 3 && !rgb) {
                             fg_color = [[text substringWithRange:NSMakeRange(i, count)] intValue];
-                            if(fg_color >= IRC_COLOR_COUNT) {
+                            if(fg_color > IRC_COLOR_COUNT) {
                                 count--;
                                 fg_color /= 10;
+                            } else if(fg_color == 99) {
+                                fg_color = -1;
                             }
                         } else {
                             fgColor = [UIColor colorFromHexString:[text substringWithRange:NSMakeRange(i, count)]];
@@ -2118,11 +2120,15 @@ extern BOOL __compact;
                     if(count > 0) {
                         if(count < 3 && !rgb) {
                             int color = [[text substringWithRange:NSMakeRange(i, count)] intValue];
-                            if(color >= IRC_COLOR_COUNT) {
+                            if(color > IRC_COLOR_COUNT) {
                                 count--;
                                 color /= 10;
                             }
-                            bgColor = [UIColor mIRCColor:color background:YES];
+                            if(color == 99) {
+                                bgColor = nil;
+                            } else {
+                                bgColor = [UIColor mIRCColor:color background:YES];
+                            }
                         } else {
                             bgColor = [UIColor colorFromHexString:[text substringWithRange:NSMakeRange(i, count)]];
                         }
