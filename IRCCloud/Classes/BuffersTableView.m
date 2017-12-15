@@ -433,7 +433,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 -(void)_updateUnreadIndicators {
 #ifndef EXTENSION
     [self.tableView visibleCells];
-    NSArray *rows = [self.tableView indexPathsForVisibleRows];
+    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.scrollIndicatorInsets)];
     if(rows.count) {
         NSInteger first = [[rows objectAtIndex:0] row];
         NSInteger last = [[rows lastObject] row];
@@ -490,7 +490,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         }
     }
     topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y + self.tableView.contentInset.top,self.view.frame.size.width, 40);
-    bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y,self.view.frame.size.width, 40);
+    bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y - self.tableView.scrollIndicatorInsets.bottom,self.view.frame.size.width, 40);
 #endif
 }
 
@@ -526,8 +526,12 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
-    if(@available(iOS 11, *))
+    self.automaticallyAdjustsScrollViewInsets = NO;
+    if(@available(iOS 11, *)) {
         self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        self.tableView.insetsLayoutMarginsFromSafeArea = NO;
+        self.tableView.insetsContentViewsToSafeArea = NO;
+    }
 
     UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
@@ -1233,7 +1237,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                 [self.tableView reloadData];
                 [self _updateUnreadIndicators];
                 if(_selectedRow != -1) {
-                    NSArray *a = [self.tableView indexPathsForVisibleRows];
+                    NSArray *a = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.scrollIndicatorInsets)];
                     if([[a objectAtIndex:0] row] > _selectedRow || [[a lastObject] row] < _selectedRow)
                         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
                 }
