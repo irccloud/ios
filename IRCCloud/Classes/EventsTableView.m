@@ -1658,6 +1658,7 @@ extern UIImage *__socketClosedBackgroundImage;
 - (void)reloadForEvent:(Event *)e {
     CGFloat h = _tableView.contentSize.height;
     [self _reloadData];
+    [_tableView visibleCells];
     NSInteger bottom = _tableView.indexPathsForVisibleRows.lastObject.row;
     if(!_buffer.scrolledUp) {
 #ifndef APPSTORE

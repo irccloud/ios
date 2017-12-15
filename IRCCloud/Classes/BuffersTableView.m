@@ -432,7 +432,8 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 
 -(void)_updateUnreadIndicators {
 #ifndef EXTENSION
-    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
+    [self.tableView visibleCells];
+    NSArray *rows = [self.tableView indexPathsForVisibleRows];
     if(rows.count) {
         NSInteger first = [[rows objectAtIndex:0] row];
         NSInteger last = [[rows lastObject] row];

@@ -5007,6 +5007,7 @@ Network type: %@\n",
 }
 
 -(void)onPgUpPressed:(UIKeyCommand *)sender {
+    [_eventsView.tableView visibleCells];
     NSIndexPath *first = [_eventsView.tableView indexPathsForVisibleRows].firstObject;
     if(first && first.row > 0) {
         [_eventsView.tableView scrollToRowAtIndexPath:first atScrollPosition:UITableViewScrollPositionBottom animated:YES];
@@ -5014,6 +5015,7 @@ Network type: %@\n",
 }
 
 -(void)onPgDownPressed:(UIKeyCommand *)sender {
+    [_eventsView.tableView visibleCells];
     NSIndexPath *last = [_eventsView.tableView indexPathsForVisibleRows].lastObject;
     if(last && last.row > 0) {
         [_eventsView.tableView scrollToRowAtIndexPath:last atScrollPosition:UITableViewScrollPositionTop animated:YES];
