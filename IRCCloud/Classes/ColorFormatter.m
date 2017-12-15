@@ -2088,6 +2088,7 @@ extern BOOL __compact;
                                 fg_color /= 10;
                             } else if(fg_color == 99) {
                                 fg_color = -1;
+                                fgColor = nil;
                             }
                         } else {
                             fgColor = [UIColor colorFromHexString:[text substringWithRange:NSMakeRange(i, count)]];
