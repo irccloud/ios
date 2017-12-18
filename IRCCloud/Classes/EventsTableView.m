@@ -1877,6 +1877,12 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         
         if(backlogEid > 0) {
+            for(NSInteger i = _data.count-1 ; i >= 0; i--) {
+                Event *e = [_data objectAtIndex:i];
+                if(e.eid == backlogEid)
+                    backlogEid--;
+            }
+            
             Event *e = [[Event alloc] init];
             e.eid = backlogEid;
             e.type = TYPE_BACKLOG;
