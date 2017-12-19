@@ -403,13 +403,15 @@ NSArray *_sortedChannels;
     
     if(!_buffersView) {
         _buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
-        _buffersView.view.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+        _buffersView.view.autoresizingMask = UIViewAutoresizingNone;
+        _buffersView.view.translatesAutoresizingMaskIntoConstraints = NO;
         _buffersView.delegate = self;
     }
 
     if(!_usersView) {
         _usersView = [[UsersTableView alloc] initWithStyle:UITableViewStylePlain];
-        _usersView.view.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+        _usersView.view.autoresizingMask = UIViewAutoresizingNone;
+        _usersView.view.translatesAutoresizingMaskIntoConstraints = NO;
         _usersView.delegate = self;
     }
     
@@ -3186,17 +3188,24 @@ NSArray *_sortedChannels;
         top += _eventsView.topUnreadView.frame.size.height;
     if(!_serverStatusBar.hidden)
         height += _serverStatusBar.bounds.size.height;
+    if(@available(iOS 11, *)) {
+        height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
+    }
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
-        _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
-        if(@available(iOS 11, *)) { //Sometimes iOS 11 automatically adds the keyboard padding even though I told it not to
-            if(_buffersView.tableView.adjustedContentInset.bottom > 0) {
-                _buffersView.tableView.contentInset = UIEdgeInsetsZero;
+        if(@available(iOS 11, *)) {
+            CGFloat bottom = _kbSize.height ? (_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom/2) : self.slidingViewController.view.safeAreaInsets.bottom;
+            _buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
+            _usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
+            _buffersView.tableView.contentInset = UIEdgeInsetsZero;
+            if(_buffersView.tableView.adjustedContentInset.bottom > 0) { //Sometimes iOS 11 automatically adds the keyboard padding even though I told it not to
+                bottom -= _buffersView.tableView.adjustedContentInset.bottom;
             }
-            if(_usersView.tableView.adjustedContentInset.bottom > 0) {
-                _usersView.tableView.contentInset = UIEdgeInsetsZero;
-            }
+            _buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,bottom,0);
+            _usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,bottom,0);
+        } else {
+            _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
+            _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
         }
     }];
 

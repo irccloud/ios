@@ -577,14 +577,14 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     }
 
     if(!bottomUnreadIndicatorColor) {
-        bottomUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,1,self.view.frame.size.width,15)];
+        bottomUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,1,self.view.frame.size.width,45)];
         bottomUnreadIndicatorColor.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         bottomUnreadIndicatorColor.userInteractionEnabled = NO;
         bottomUnreadIndicatorColor.backgroundColor = [UIColor unreadBlueColor];
     }
 
     if(!bottomUnreadIndicatorBorder) {
-        bottomUnreadIndicatorBorder = [[UIView alloc] initWithFrame:CGRectMake(0,24,self.view.frame.size.width,16)];
+        bottomUnreadIndicatorBorder = [[UIView alloc] initWithFrame:CGRectMake(0,24,self.view.frame.size.width,46)];
         bottomUnreadIndicatorBorder.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         bottomUnreadIndicatorBorder.userInteractionEnabled = NO;
         bottomUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
@@ -592,7 +592,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     }
     
     if(!bottomUnreadIndicator) {
-        bottomUnreadIndicator = [[UIControl alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,40)];
+        bottomUnreadIndicator = [[UIControl alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,80)];
         bottomUnreadIndicator.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
         bottomUnreadIndicator.autoresizesSubviews = YES;
         bottomUnreadIndicator.userInteractionEnabled = YES;

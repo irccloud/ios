@@ -629,9 +629,9 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     }
     CGRect frame = self.underLeftView.frame;
     frame.origin.y = sbheight;
-    frame.size.height = self.view.bounds.size.height;
-    if([UIApplication sharedApplication].statusBarFrame.size.height <= 20)
-        frame.size.height -= sbheight;
+    frame.size.height = self.view.bounds.size.height - sbheight;
+    if([UIApplication sharedApplication].statusBarFrame.size.height > 20)
+        frame.size.height += 20;
     self.underLeftView.frame = frame;
 }
 
@@ -680,9 +680,9 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     }
     CGRect frame = self.underRightView.frame;
     frame.origin.y = sbheight;
-    frame.size.height = self.view.bounds.size.height;
-    if([UIApplication sharedApplication].statusBarFrame.size.height <= 20)
-        frame.size.height -= sbheight;
+    frame.size.height = self.view.bounds.size.height - sbheight;
+    if([UIApplication sharedApplication].statusBarFrame.size.height > 20)
+        frame.size.height += 20;
     self.underRightView.frame = frame;
 }
 
