@@ -4671,6 +4671,7 @@ NSArray *_sortedChannels;
                 [[NetworkConnection sharedInstance] whois:_buffer.name server:_buffer.name cid:_buffer.cid handler:nil];
             }
         } else if([action isEqualToString:@"Send Feedback"]) {
+            CLS_LOG(@"Feedback Requested");
 #ifdef APPSTORE
             NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 #else
@@ -4702,6 +4703,7 @@ Network type: %@\n",
             NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
 #endif
             if(sharedcontainer) {
+                fflush(stderr);
                 NSURL *logfile = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"log.txt"];
                 
                 [report appendString:@"==========\nConsole log:\n"];

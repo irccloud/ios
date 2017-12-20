@@ -2702,6 +2702,9 @@ extern UIImage *__socketClosedBackgroundImage;
 #pragma mark - Table view delegate
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+#ifndef APPSTORE
+    CLS_LOG(@"Events table view drag started");
+#endif
     [_delegate dismissKeyboard];
 }
 
