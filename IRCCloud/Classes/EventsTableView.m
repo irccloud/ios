@@ -2728,6 +2728,7 @@ extern UIImage *__socketClosedBackgroundImage;
     UITableView *tableView = _tableView;
     NSInteger firstRow = -1;
     NSInteger lastRow = -1;
+    [tableView visibleCells];
     NSArray *rows = [tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(tableView.bounds, tableView.contentInset)];
     if(rows.count) {
         firstRow = [[rows objectAtIndex:0] row];
@@ -2765,7 +2766,9 @@ extern UIImage *__socketClosedBackgroundImage;
             if(lastRow < _data.count)
                 _buffer.savedScrollOffset = floorf(tableView.contentOffset.y - tableView.tableHeaderView.bounds.size.height);
             
-            if(floorf(tableView.contentOffset.y) >= floorf(tableView.contentSize.height - (tableView.bounds.size.height - tableView.contentInset.top - tableView.contentInset.bottom))) {
+            CGRect frame = [tableView convertRect:[tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count - 1 inSection:0]] toView:tableView.superview];
+            
+            if(frame.origin.y + frame.size.height <= tableView.frame.origin.y + tableView.frame.size.height - tableView.contentInset.top - tableView.contentInset.bottom) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
                 _bottomUnreadView.alpha = 0;
@@ -2779,8 +2782,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 _buffer.scrolledUpFrom = -1;
                 _buffer.savedScrollOffset = -1;
                 [self sendHeartbeat];
-            } else if (!_buffer.scrolledUp && (lastRow+1) < _data.count) {
-                _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow+1] eid];
+            } else if (!_buffer.scrolledUp && lastRow < _data.count) {
+                _buffer.scrolledUpFrom = [[_data objectAtIndex:lastRow] eid];
                 _buffer.scrolledUp = YES;
                 [_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
                 _scrollTimer = nil;
