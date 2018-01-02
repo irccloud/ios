@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 
 @class YTPlayerView;
 
@@ -110,9 +111,9 @@ typedef NS_ENUM(NSInteger, YTPlayerError) {
  * YTPlayerView::loadWithPlaylistId: or their variants to set the video or playlist
  * to populate the view with.
  */
-@interface YTPlayerView : UIView<UIWebViewDelegate>
+@interface YTPlayerView : UIView<WKNavigationDelegate>
 
-@property(nonatomic, strong, readonly) UIWebView *webView;
+@property(nonatomic, strong, readonly) WKWebView *webView;
 
 /** A delegate to be notified on playback events. */
 @property(nonatomic, weak) id<YTPlayerViewDelegate> delegate;

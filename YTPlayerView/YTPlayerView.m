@@ -14,6 +14,38 @@
 
 #import "YTPlayerView.h"
 
+//Category to add blocking javascript evaluation compatible w/ UIWebView, from https://stackoverflow.com/a/27981872
+@interface WKWebView(SynchronousEvaluateJavaScript)
+- (NSString *)stringByEvaluatingJavaScriptFromString:(NSString *)script;
+@end
+
+@implementation WKWebView(SynchronousEvaluateJavaScript)
+
+- (NSString *)stringByEvaluatingJavaScriptFromString:(NSString *)script
+{
+    __block NSString *resultString = nil;
+    __block BOOL finished = NO;
+    
+    [self evaluateJavaScript:script completionHandler:^(id result, NSError *error) {
+        if (error == nil) {
+            if (result != nil) {
+                resultString = [NSString stringWithFormat:@"%@", result];
+            }
+        } else {
+            NSLog(@"evaluateJavaScript error : %@", error.localizedDescription);
+        }
+        finished = YES;
+    }];
+    
+    while (!finished)
+    {
+        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
+    }
+    
+    return resultString;
+}
+@end
+
 // These are instances of NSString because we get them from parsing a URL. It would be silly to
 // convert these into an integer just to have to convert the URL query string value into an integer
 // as well for the sake of doing a value comparison. A full list of response error codes can be
@@ -99,27 +131,27 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
 #pragma mark - Player methods
 
 - (void)playVideo {
-  [self stringFromEvaluatingJavaScript:@"player.playVideo();"];
+  [_webView evaluateJavaScript:@"player.playVideo();" completionHandler:nil];
 }
 
 - (void)pauseVideo {
   [self notifyDelegateOfYouTubeCallbackUrl:[NSURL URLWithString:[NSString stringWithFormat:@"ytplayer://onStateChange?data=%@", kYTPlayerStatePausedCode]]];
-  [self stringFromEvaluatingJavaScript:@"player.pauseVideo();"];
+  [_webView evaluateJavaScript:@"player.pauseVideo();" completionHandler:nil];
 }
 
 - (void)stopVideo {
-  [self stringFromEvaluatingJavaScript:@"player.stopVideo();"];
+  [_webView evaluateJavaScript:@"player.stopVideo();" completionHandler:nil];
 }
 
 - (void)seekToSeconds:(float)seekToSeconds allowSeekAhead:(BOOL)allowSeekAhead {
   NSNumber *secondsValue = [NSNumber numberWithFloat:seekToSeconds];
   NSString *allowSeekAheadValue = [self stringForJSBoolean:allowSeekAhead];
   NSString *command = [NSString stringWithFormat:@"player.seekTo(%@, %@);", secondsValue, allowSeekAheadValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 - (void)clearVideo {
-  [self stringFromEvaluatingJavaScript:@"player.clearVideo();"];
+  [_webView evaluateJavaScript:@"player.clearVideo();" completionHandler:nil];
 }
 
 #pragma mark - Cueing methods
@@ -131,7 +163,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.cueVideoById('%@', %@, '%@');",
       videoId, startSecondsValue, qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 - (void)cueVideoById:(NSString *)videoId
@@ -142,7 +174,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSNumber *endSecondsValue = [NSNumber numberWithFloat:endSeconds];
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.cueVideoById({'videoId': '%@', 'startSeconds': %@, 'endSeconds': %@, 'suggestedQuality': '%@'});", videoId, startSecondsValue, endSecondsValue, qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 - (void)loadVideoById:(NSString *)videoId
@@ -152,7 +184,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.loadVideoById('%@', %@, '%@');",
       videoId, startSecondsValue, qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 - (void)loadVideoById:(NSString *)videoId
@@ -163,7 +195,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSNumber *endSecondsValue = [NSNumber numberWithFloat:endSeconds];
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.loadVideoById({'videoId': '%@', 'startSeconds': %@, 'endSeconds': %@, 'suggestedQuality': '%@'});",videoId, startSecondsValue, endSecondsValue, qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 - (void)cueVideoByURL:(NSString *)videoURL
@@ -173,7 +205,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.cueVideoByUrl('%@', %@, '%@');",
       videoURL, startSecondsValue, qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 - (void)cueVideoByURL:(NSString *)videoURL
@@ -185,7 +217,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.cueVideoByUrl('%@', %@, %@, '%@');",
       videoURL, startSecondsValue, endSecondsValue, qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 - (void)loadVideoByURL:(NSString *)videoURL
@@ -195,7 +227,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.loadVideoByUrl('%@', %@, '%@');",
       videoURL, startSecondsValue, qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 - (void)loadVideoByURL:(NSString *)videoURL
@@ -207,7 +239,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.loadVideoByUrl('%@', %@, %@, '%@');",
       videoURL, startSecondsValue, endSecondsValue, qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 #pragma mark - Cueing methods for lists
@@ -257,18 +289,18 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
 #pragma mark - Setting the playback rate
 
 - (float)playbackRate {
-  NSString *returnValue = [self stringFromEvaluatingJavaScript:@"player.getPlaybackRate();"];
+  NSString *returnValue = [_webView stringByEvaluatingJavaScriptFromString:@"player.getPlaybackRate();"];
   return [returnValue floatValue];
 }
 
 - (void)setPlaybackRate:(float)suggestedRate {
   NSString *command = [NSString stringWithFormat:@"player.setPlaybackRate(%f);", suggestedRate];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 - (NSArray *)availablePlaybackRates {
   NSString *returnValue =
-      [self stringFromEvaluatingJavaScript:@"player.getAvailablePlaybackRates();"];
+      [_webView stringByEvaluatingJavaScriptFromString:@"player.getAvailablePlaybackRates();"];
 
   NSData *playbackRateData = [returnValue dataUsingEncoding:NSUTF8StringEncoding];
   NSError *jsonDeserializationError;
@@ -287,60 +319,60 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
 - (void)setLoop:(BOOL)loop {
   NSString *loopPlayListValue = [self stringForJSBoolean:loop];
   NSString *command = [NSString stringWithFormat:@"player.setLoop(%@);", loopPlayListValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 - (void)setShuffle:(BOOL)shuffle {
   NSString *shufflePlayListValue = [self stringForJSBoolean:shuffle];
   NSString *command = [NSString stringWithFormat:@"player.setShuffle(%@);", shufflePlayListValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 #pragma mark - Playback status
 
 - (float)videoLoadedFraction {
-  return [[self stringFromEvaluatingJavaScript:@"player.getVideoLoadedFraction();"] floatValue];
+    return [[_webView stringByEvaluatingJavaScriptFromString:@"player.getVideoLoadedFraction();"] floatValue];
 }
 
 - (YTPlayerState)playerState {
-  NSString *returnValue = [self stringFromEvaluatingJavaScript:@"player.getPlayerState();"];
-  return [YTPlayerView playerStateForString:returnValue];
+  NSString *returnValue = [_webView stringByEvaluatingJavaScriptFromString:@"player.getPlayerState();"];
+    return [YTPlayerView playerStateForString:returnValue];
 }
 
 - (float)currentTime {
-  return [[self stringFromEvaluatingJavaScript:@"player.getCurrentTime();"] floatValue];
+    return [[_webView stringByEvaluatingJavaScriptFromString:@"player.getCurrentTime();"] floatValue];
 }
 
 // Playback quality
 - (YTPlaybackQuality)playbackQuality {
-  NSString *qualityValue = [self stringFromEvaluatingJavaScript:@"player.getPlaybackQuality();"];
-  return [YTPlayerView playbackQualityForString:qualityValue];
+  NSString *qualityValue = [_webView stringByEvaluatingJavaScriptFromString:@"player.getPlaybackQuality();"];
+    return [YTPlayerView playbackQualityForString:qualityValue];
 }
 
 - (void)setPlaybackQuality:(YTPlaybackQuality)suggestedQuality {
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.setPlaybackQuality('%@');", qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 #pragma mark - Video information methods
 
 - (NSTimeInterval)duration {
-  return [[self stringFromEvaluatingJavaScript:@"player.getDuration();"] doubleValue];
+    return [[_webView stringByEvaluatingJavaScriptFromString:@"player.getDuration();"] doubleValue];
 }
 
 - (NSURL *)videoUrl {
-  return [NSURL URLWithString:[self stringFromEvaluatingJavaScript:@"player.getVideoUrl();"]];
+    return [NSURL URLWithString:[_webView stringByEvaluatingJavaScriptFromString:@"player.getVideoUrl();"]];
 }
 
 - (NSString *)videoEmbedCode {
-  return [self stringFromEvaluatingJavaScript:@"player.getVideoEmbedCode();"];
+    return [_webView stringByEvaluatingJavaScriptFromString:@"player.getVideoEmbedCode();"];
 }
 
 #pragma mark - Playlist methods
 
 - (NSArray *)playlist {
-  NSString *returnValue = [self stringFromEvaluatingJavaScript:@"player.getPlaylist();"];
+  NSString *returnValue = [_webView stringByEvaluatingJavaScriptFromString:@"player.getPlaylist();"];
 
   NSData *playlistData = [returnValue dataUsingEncoding:NSUTF8StringEncoding];
   NSError *jsonDeserializationError;
@@ -355,31 +387,31 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
 }
 
 - (int)playlistIndex {
-  NSString *returnValue = [self stringFromEvaluatingJavaScript:@"player.getPlaylistIndex();"];
+  NSString *returnValue = [_webView stringByEvaluatingJavaScriptFromString:@"player.getPlaylistIndex();"];
   return [returnValue intValue];
 }
 
 #pragma mark - Playing a video in a playlist
 
 - (void)nextVideo {
-  [self stringFromEvaluatingJavaScript:@"player.nextVideo();"];
+  [_webView evaluateJavaScript:@"player.nextVideo();" completionHandler:nil];
 }
 
 - (void)previousVideo {
-  [self stringFromEvaluatingJavaScript:@"player.previousVideo();"];
+  [_webView evaluateJavaScript:@"player.previousVideo();" completionHandler:nil];
 }
 
 - (void)playVideoAt:(int)index {
   NSString *command =
       [NSString stringWithFormat:@"player.playVideoAt(%@);", [NSNumber numberWithInt:index]];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 #pragma mark - Helper methods
 
 - (NSArray *)availableQualityLevels {
   NSString *returnValue =
-      [self stringFromEvaluatingJavaScript:@"player.getAvailableQualityLevels().toString();"];
+      [_webView stringByEvaluatingJavaScriptFromString:@"player.getAvailableQualityLevels().toString();"];
   if(!returnValue) return nil;
 
   NSArray *rawQualityValues = [returnValue componentsSeparatedByString:@","];
@@ -391,18 +423,18 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   return levels;
 }
 
-- (BOOL)webView:(UIWebView *)webView
-    shouldStartLoadWithRequest:(NSURLRequest *)request
-                navigationType:(UIWebViewNavigationType)navigationType {
-  if ([request.URL.host isEqual: self.originURL.host]) {
-    return YES;
-  } else if ([request.URL.scheme isEqual:@"ytplayer"]) {
-    [self notifyDelegateOfYouTubeCallbackUrl:request.URL];
-    return NO;
-  } else if ([request.URL.scheme isEqual: @"http"] || [request.URL.scheme isEqual:@"https"]) {
-    return [self handleHttpNavigationToUrl:request.URL];
-  }
-  return YES;
+-(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+    NSURLRequest *request = navigationAction.request;
+    if ([request.URL.host isEqual: self.originURL.host]) {
+        decisionHandler(WKNavigationActionPolicyAllow);
+    } else if ([request.URL.scheme isEqual:@"ytplayer"]) {
+        [self notifyDelegateOfYouTubeCallbackUrl:request.URL];
+        decisionHandler(WKNavigationActionPolicyCancel);
+    } else if ([request.URL.scheme isEqual: @"http"] || [request.URL.scheme isEqual:@"https"]) {
+        decisionHandler([self handleHttpNavigationToUrl:request.URL]);
+    } else {
+        decisionHandler(WKNavigationActionPolicyAllow);
+    }
 }
 
 /**
@@ -586,7 +618,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   }
 }
 
-- (BOOL)handleHttpNavigationToUrl:(NSURL *) url {
+- (WKNavigationActionPolicy)handleHttpNavigationToUrl:(NSURL *) url {
   // Usually this means the user has clicked on the YouTube logo or an error message in the
   // player. Most URLs should open in the browser. The only http(s) URL that should open in this
   // UIWebView is the URL for the embed, which is of the format:
@@ -629,10 +661,10 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
                                     range:NSMakeRange(0, [url.absoluteString length])];
 
   if (ytMatch || adMatch || oauthMatch || staticProxyMatch) {
-    return YES;
+    return WKNavigationActionPolicyAllow;
   } else {
     [[UIApplication sharedApplication] openURL:url];
-    return NO;
+    return WKNavigationActionPolicyCancel;
   }
 }
 
@@ -720,9 +752,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
 
   NSString *embedHTML = [NSString stringWithFormat:embedHTMLTemplate, playerVarsJsonString];
   [self.webView loadHTMLString:embedHTML baseURL: self.originURL];
-  [self.webView setDelegate:self];
-  self.webView.allowsInlineMediaPlayback = YES;
-  self.webView.mediaPlaybackRequiresUserAction = NO;
+  [self.webView setNavigationDelegate:self];
   return YES;
 }
 
@@ -746,7 +776,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.cuePlaylist(%@, %@, %@, '%@');",
       cueingString, indexValue, startSecondsValue, qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 /**
@@ -769,7 +799,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSString *qualityValue = [YTPlayerView stringForPlaybackQuality:suggestedQuality];
   NSString *command = [NSString stringWithFormat:@"player.loadPlaylist(%@, %@, %@, '%@');",
       cueingString, indexValue, startSecondsValue, qualityValue];
-  [self stringFromEvaluatingJavaScript:command];
+  [_webView evaluateJavaScript:command completionHandler:nil];
 }
 
 /**
@@ -789,16 +819,6 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
 }
 
 /**
- * Private method for evaluating JavaScript in the WebView.
- *
- * @param jsToExecute The JavaScript code in string format that we want to execute.
- * @return JavaScript response from evaluating code.
- */
-- (NSString *)stringFromEvaluatingJavaScript:(NSString *)jsToExecute {
-  return [self.webView stringByEvaluatingJavaScriptFromString:jsToExecute];
-}
-
-/**
  * Private method to convert a Objective-C BOOL value to JS boolean value.
  *
  * @param boolValue Objective-C BOOL value.
@@ -809,12 +829,16 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
 }
 
 #pragma mark Exposed for Testing
-- (void)setWebView:(UIWebView *)webView {
+- (void)setWebView:(WKWebView *)webView {
   _webView = webView;
 }
 
-- (UIWebView *)createNewWebView {
-  UIWebView *webView = [[UIWebView alloc] initWithFrame:self.bounds];
+- (WKWebView *)createNewWebView {
+    WKPreferences *p = [[WKPreferences alloc] init];
+    p.javaScriptEnabled = YES;
+    WKWebViewConfiguration *c = [[WKWebViewConfiguration alloc] init];
+    c.preferences = p;
+  WKWebView *webView = [[WKWebView alloc] initWithFrame:self.bounds configuration:c];
   webView.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
   webView.scrollView.scrollEnabled = NO;
   webView.scrollView.bounces = NO;

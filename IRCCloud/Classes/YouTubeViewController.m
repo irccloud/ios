@@ -191,7 +191,7 @@
     }];
     [_activity stopAnimating];
     _player.delegate = nil;
-    _player.webView.delegate = nil;
+    _player.webView.navigationDelegate = nil;
     [_player stopVideo];
     [_player.webView stopLoading];
 }
