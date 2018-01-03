@@ -975,9 +975,12 @@ NSArray *_sortedChannels;
                 msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"description"], [o objectForKey:@"msg"]];
             else if([type isEqualToString:@"no_such_server"])
                 msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"server"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"unknown_command"])
-                msg = [NSString stringWithFormat:@"Unknown command: %@", [o objectForKey:@"command"]];
-            else if([type isEqualToString:@"help_not_found"])
+            else if([type isEqualToString:@"unknown_command"]) {
+                NSString *m = [o objectForKey:@"msg"];
+                if(!m.length)
+                    m = @"Unknown command";
+                msg = [NSString stringWithFormat:@"%@: %@", m, [o objectForKey:@"command"]];
+            } else if([type isEqualToString:@"help_not_found"])
                 msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"topic"], [o objectForKey:@"msg"]];
             else if([type isEqualToString:@"accept_exists"])
                 msg = [NSString stringWithFormat:@"%@ %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
