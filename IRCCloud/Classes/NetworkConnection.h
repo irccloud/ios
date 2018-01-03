@@ -245,4 +245,6 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(int)deleteAccount:(NSString *)password handler:(IRCCloudAPIResultHandler)handler;
 -(NSDictionary *)getLogExports;
 -(int)exportLog:(NSString *)timezone cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)handler;
+-(int)renameChannel:(NSString *)name cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)handler;
+-(int)renameConversation:(NSString *)name cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)handler;
 @end

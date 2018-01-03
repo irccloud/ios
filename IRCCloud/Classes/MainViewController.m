@@ -97,7 +97,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 #define TAG_DELETE 9
 #define TAG_JOIN 10
 #define TAG_BUGREPORT 11
-#define TAG_WELCOME_3_0 12
+#define TAG_RENAME 12
 
 extern NSDictionary *emojiMap;
 
@@ -3422,6 +3422,7 @@ NSArray *_sortedChannels;
         } else {
             [sheet addButtonWithTitle:@"Rejoin"];
             [sheet addButtonWithTitle:(_buffer.archived)?@"Unarchive":@"Archive"];
+            [sheet addButtonWithTitle:@"Rename"];
         }
         [sheet addButtonWithTitle:@"Delete"];
     } else {
@@ -3431,6 +3432,7 @@ NSArray *_sortedChannels;
         } else {
             [sheet addButtonWithTitle:@"Archive"];
         }
+        [sheet addButtonWithTitle:@"Rename"];
         [sheet addButtonWithTitle:@"Delete"];
     }
     [sheet addButtonWithTitle:@"Ignore List"];
@@ -3762,6 +3764,36 @@ NSArray *_sortedChannels;
     [_alertView show];
 }
 
+-(void)_renameBuffer:(Buffer *)b msg:(NSString *)msg {
+    if(!msg) {
+        msg = [NSString stringWithFormat:@"Choose a new name for this %@", b.type];
+    } else {
+        if([msg isEqualToString:@"invalid_name"]) {
+            if([b.type isEqualToString:@"channel"])
+                msg = @"You must choose a valid channel name";
+            else
+                msg = @"You must choose a valid nick name";
+        } else if([msg isEqualToString:@"not_conversation"]) {
+            msg = @"You can only rename private messages";
+        } else if([msg isEqualToString:@"not_channel"]) {
+            msg = @"You can only rename channels";
+        } else if([msg isEqualToString:@"name_exists"]) {
+            msg = @"That name is already taken";
+        } else if([msg isEqualToString:@"channel_joined"]) {
+            msg = @"You can only rename parted channels";
+        }
+        msg = [NSString stringWithFormat:@"Error renaming: %@. Please choose a new name for this %@", msg, b.type];
+    }
+    Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
+    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Rename", nil];
+    _alertView.tag = TAG_RENAME;
+    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [_alertView textFieldAtIndex:0].delegate = self;
+    [_alertView textFieldAtIndex:0].text = b.name;
+    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+    [_alertView show];
+}
+
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
     _selectedUser = nil;
     _selectedURL = nil;
@@ -3805,6 +3837,9 @@ NSArray *_sortedChannels;
                     [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
                 }]];
             }
+            [alert addAction:[UIAlertAction actionWithTitle:@"Rename" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [self _renameBuffer:_selectedBuffer msg:nil];
+            }]];
         }
         [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
             [self _deleteSelectedBuffer];
@@ -3819,6 +3854,9 @@ NSArray *_sortedChannels;
                 [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
             }]];
         }
+        [alert addAction:[UIAlertAction actionWithTitle:@"Rename" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [self _renameBuffer:_selectedBuffer msg:nil];
+        }]];
         [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
             [self _deleteSelectedBuffer];
         }]];
@@ -4019,18 +4057,20 @@ NSArray *_sortedChannels;
             }
             _bugReport = nil;
             break;
-        case TAG_WELCOME_3_0:
-            if([title isEqualToString:@"Settings"]) {
-                SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
-                else
-                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-                [self presentViewController:nc animated:YES completion:nil];
-            } else if([title isEqualToString:@"Release Notes"]) {
-                [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://github.com/irccloud/ios/releases"]];
+        case TAG_RENAME:
+            if([title isEqualToString:@"Rename"]) {
+                id handler = ^(IRCCloudJSONObject *result) {
+                    if([[result objectForKey:@"success"] intValue] == 0) {
+                        CLS_LOG(@"Rename failed: %@", result);
+                        [self _renameBuffer:_selectedBuffer msg:[result objectForKey:@"message"]];
+                    }
+                };
+                if([alertView textFieldAtIndex:0].text.length) {
+                    if([_selectedBuffer.type isEqualToString:@"channel"])
+                        [[NetworkConnection sharedInstance] renameChannel:[alertView textFieldAtIndex:0].text cid:_selectedBuffer.cid bid:_selectedBuffer.bid handler:handler];
+                    else
+                        [[NetworkConnection sharedInstance] renameConversation:[alertView textFieldAtIndex:0].text cid:_selectedBuffer.cid bid:_selectedBuffer.bid handler:handler];
+                }
             }
             break;
     }
@@ -4556,6 +4596,8 @@ NSArray *_sortedChannels;
             [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Rejoin"]) {
             [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid handler:nil];
+        } else if([action isEqualToString:@"Rename"]) {
+            [self _renameBuffer:_selectedBuffer msg:nil];
         } else if([action isEqualToString:@"Ban List"]) {
             [[NetworkConnection sharedInstance] mode:@"b" chan:_selectedBuffer.name cid:_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Disconnect"]) {

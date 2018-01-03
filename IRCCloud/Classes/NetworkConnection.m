@@ -652,6 +652,14 @@ volatile BOOL __socketPaused = NO;
                        if(!backlog && !_resuming)
                            [self postObject:object forEvent:kIRCEventRenameConversation];
                    },
+                   @"rename_channel": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       [_buffers updateName:[object objectForKey:@"new_name"] buffer:object.bid];
+                       Channel *c = [_channels channelForBuffer:object.bid];
+                       if(c)
+                           c.name = [object objectForKey:@"new_name"];
+                       if(!backlog && !_resuming)
+                           [self postObject:object forEvent:kIRCEventRenameConversation];
+                   },
                    @"status_changed": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        CLS_LOG(@"cid%i changed to status %@ (backlog: %i resuming: %i)", object.cid, [object objectForKey:@"new_status"], backlog, _resuming);
                        [_servers updateStatus:[object objectForKey:@"new_status"] failInfo:[object objectForKey:@"fail_info"] server:object.cid];
@@ -1517,6 +1525,14 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     } else {
         return [self _sendRequest:@"export-log" args:@{@"timezone":timezone} handler:resultHandler];
     }
+}
+
+-(int)renameChannel:(NSString *)name cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"rename-channel" args:@{@"cid":@(cid), @"id":@(bid), @"name":name} handler:resultHandler];
+}
+
+-(int)renameConversation:(NSString *)name cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"rename-conversation" args:@{@"cid":@(cid), @"id":@(bid), @"name":name} handler:resultHandler];
 }
 
 -(void)_createJSONParser {
