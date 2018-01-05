@@ -18,6 +18,7 @@
 #import "NetworkConnection.h"
 #import "CSURITemplate.h"
 #import "UIColor+IRCCloud.h"
+#import "AppDelegate.h"
 
 @interface PastebinEditorCell : UITableViewCell
 
@@ -105,6 +106,7 @@
             if(![[result objectForKey:@"success"] boolValue]) {
                 UIAlertView *v = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Failed to send message: %@", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
                 [v show];
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
             }
         }];
     } else {
@@ -189,6 +191,7 @@
                     [self.tableView endEditing:YES];
                     [self dismissViewControllerAnimated:YES completion:nil];
                     _buffer.draft = @"";
+                    [((AppDelegate *)[UIApplication sharedApplication].delegate).mainViewController clearText];
                 }];
             }
             break;

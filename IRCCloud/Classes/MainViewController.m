@@ -3966,6 +3966,10 @@ NSArray *_sortedChannels;
     _selectedBuffer = b;
 }
 
+-(void)clearText {
+    [_message clearText];
+}
+
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     

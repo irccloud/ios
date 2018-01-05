@@ -139,4 +139,5 @@
 -(void)refresh;
 -(void)_setSelectedBuffer:(Buffer *)b;
 -(void)applyTheme;
+-(void)clearText;
 @end
