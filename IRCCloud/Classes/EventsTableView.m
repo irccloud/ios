@@ -2274,7 +2274,7 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.spinner.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
             cell.thumbnail.hidden = !(cell.thumbnail.image != nil);
             if(cell.thumbnail.image || cell.movieController) {
-                if(![[e.entities objectForKey:@"properties"] objectForKey:@"height"]) {
+                if(![[[e.entities objectForKey:@"properties"] objectForKey:@"height"] intValue]) {
                     cell.thumbnail.image = nil;
                     cell.movieController.view.hidden = YES;
                     cell.spinner.hidden = NO;
@@ -2288,7 +2288,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
                     float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
                     CGFloat thumbWidth = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
-                    if(thumbWidth > self.tableView.bounds.size.width) {
+                    if(thumbWidth == 0 || thumbWidth > self.tableView.bounds.size.width) {
                         CLS_LOG(@"invalid thumbnail width: %f ratio: %f", width, ratio);
                         @synchronized(_data) {
                             [_data removeObject:e];

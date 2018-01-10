@@ -364,32 +364,41 @@
                     if([[dict objectForKey:@"title"] isKindOfClass:NSString.class] && [[dict objectForKey:@"title"] length])
                         title = [dict objectForKey:@"title"];
                     if([[dict objectForKey:@"type"] hasPrefix:@"image/"] && [[dict objectForKey:@"animated"] intValue] == 0) {
-                        [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"link"]],
-                                                @"image":[NSURL URLWithString:[dict objectForKey:@"link"]],
-                                                @"name":title,
-                                                @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
-                                                @"url":original_url,
-                                                @"properties":@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]}
-                                                } forKey:original_url];
+                        NSMutableDictionary *d = @{@"thumb":[NSURL URLWithString:[dict objectForKey:@"link"]],
+                                            @"image":[NSURL URLWithString:[dict objectForKey:@"link"]],
+                                            @"name":title,
+                                            @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
+                                            @"url":original_url,
+                                            }.mutableCopy;
+                        if([[dict objectForKey:@"width"] intValue] && [[dict objectForKey:@"height"] intValue]) {
+                            [d setObject:@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]} forKey:@"properties"];
+                        }
+                        [_mediaURLs setObject:d forKey:original_url];
                         callback(YES, nil);
                     } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
                         if([[dict objectForKey:@"looping"] intValue] == 1) {
-                            [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[[dict objectForKey:@"mp4"] stringByReplacingOccurrencesOfString:@".mp4" withString:@".gif"]],
-                                                    @"mp4_loop":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
-                                                    @"name":title,
-                                                    @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
-                                                    @"url":original_url,
-                                                    @"properties":@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]}
-                                                    } forKey:original_url];
+                            NSMutableDictionary *d = @{@"thumb":[NSURL URLWithString:[[dict objectForKey:@"mp4"] stringByReplacingOccurrencesOfString:@".mp4" withString:@".gif"]],
+                                                       @"mp4_loop":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
+                                                       @"name":title,
+                                                       @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
+                                                       @"url":original_url,
+                                                       }.mutableCopy;
+                            if([[dict objectForKey:@"width"] intValue] && [[dict objectForKey:@"height"] intValue]) {
+                                [d setObject:@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]} forKey:@"properties"];
+                            }
+                            [_mediaURLs setObject:d forKey:original_url];
                             callback(YES, nil);
                         } else {
-                            [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[[dict objectForKey:@"mp4"] stringByReplacingOccurrencesOfString:@".mp4" withString:@".gif"]],
-                                                    @"mp4":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
-                                                    @"name":title,
-                                                    @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
-                                                    @"url":original_url,
-                                                    @"properties":@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]}
-                                                    } forKey:original_url];
+                            NSMutableDictionary *d = @{@"thumb":[NSURL URLWithString:[[dict objectForKey:@"mp4"] stringByReplacingOccurrencesOfString:@".mp4" withString:@".gif"]],
+                                                       @"mp4":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
+                                                       @"name":title,
+                                                       @"description":[[dict objectForKey:@"description"] isKindOfClass:NSString.class]?[dict objectForKey:@"description"]:@"",
+                                                       @"url":original_url,
+                                                       }.mutableCopy;
+                            if([[dict objectForKey:@"width"] intValue] && [[dict objectForKey:@"height"] intValue]) {
+                                [d setObject:@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]} forKey:@"properties"];
+                            }
+                            [_mediaURLs setObject:d forKey:original_url];
                             callback(YES, nil);
                         }
                     } else {
