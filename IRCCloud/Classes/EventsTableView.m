@@ -567,9 +567,6 @@ extern UIImage *__socketClosedBackgroundImage;
                 [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_bottomRow inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
                 _bottomRow = -1;
             } else {
-#ifndef APPSTORE
-                CLS_LOG(@"Couldn't find bottom row after clearing cached heights, scrolling to bottom");
-#endif
                 [self _scrollToBottom];
             }
             _ready = YES;
@@ -607,9 +604,6 @@ extern UIImage *__socketClosedBackgroundImage;
         NSLog(@"Backlog loaded in current buffer, will find and remove the last seen EID marker");
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if(_buffer.scrolledUp) {
-#ifndef APPSTORE
-                NSLog(@"Table was scrolled up, adjusting scroll offset");
-#endif
                 [_lock lock];
                 int row = 0;
                 NSInteger toprow = [_tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
@@ -1134,9 +1128,6 @@ extern UIImage *__socketClosedBackgroundImage;
         if(!backlog) {
             [self _reloadData];
             if(!_buffer.scrolledUp) {
-#ifndef APPSTORE
-                CLS_LOG(@"Table wasn't scrolled up after inserting new event, scrolling to bottom");
-#endif
                 [self scrollToBottom];
                 [self _scrollToBottom];
                 if(_topUnreadView.alpha == 0)
@@ -1547,9 +1538,6 @@ extern UIImage *__socketClosedBackgroundImage;
         [[ImageCache sharedInstance] clear];
     }
     if(_buffer && _buffer.scrolledUp) {
-#ifndef APPSTORE
-        NSLog(@"Table was scrolled up, adjusting scroll offset");
-#endif
         [_lock lock];
         int row = 0;
         NSInteger toprow = [_tableView indexPathForRowAtPoint:CGPointMake(0,_buffer.savedScrollOffset)].row;
@@ -1558,9 +1546,6 @@ extern UIImage *__socketClosedBackgroundImage;
         for(Event *event in _data) {
             if((event.rowType == ROW_LASTSEENEID && [[EventsDataSource sharedInstance] unreadStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type] == 0) || event.rowType == ROW_BACKLOG) {
                 if(toprow > row) {
-#ifndef APPSTORE
-                    NSLog(@"Adjusting scroll offset");
-#endif
                     _buffer.savedScrollOffset -= 26;
                 }
             }
@@ -1595,9 +1580,6 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)_scrollToBottom {
-#ifndef APPSTORE
-    CLS_LOG(@"_scrollToBottom");
-#endif
     [_lock lock];
     [_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
     _scrollTimer = nil;
@@ -1620,9 +1602,6 @@ extern UIImage *__socketClosedBackgroundImage;
         [self performSelectorOnMainThread:@selector(scrollToBottom) withObject:nil waitUntilDone:YES];
         return;
     }
-#ifndef APPSTORE
-    CLS_LOG(@"scrollToBottom");
-#endif
     [_scrollTimer invalidate];
     
     _scrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_scrollToBottom) userInfo:nil repeats:NO];
@@ -1637,20 +1616,11 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)_reloadData {
-#ifndef APPSTORE
-    CLS_LOG(@"_reloadData");
-#endif
     CGPoint offset = _tableView.contentOffset;
     [_tableView reloadData];
     if(_buffer.scrolledUp) {
-#ifndef APPSTORE
-        CLS_LOG(@"Restoring scroll position");
-#endif
         _tableView.contentOffset = offset;
     } else {
-#ifndef APPSTORE
-        CLS_LOG(@"Table wasn't scrolled up after reload, scrolling to bottom");
-#endif
         [self _scrollToBottom];
     }
 }
@@ -1661,22 +1631,13 @@ extern UIImage *__socketClosedBackgroundImage;
     [_tableView visibleCells];
     NSInteger bottom = _tableView.indexPathsForVisibleRows.lastObject.row;
     if(!_buffer.scrolledUp) {
-#ifndef APPSTORE
-        CLS_LOG(@"Table wasn't scrolled up after reloadForEvent, scrolling to bottom");
-#endif
         [self _scrollToBottom];
     } else if(e.row < bottom) {
-#ifndef APPSTORE
-        CLS_LOG(@"Event reloaded, adjusting content offset. old height: %f new height: %f difference: %f", h, _tableView.contentSize.height, (_tableView.contentSize.height - h));
-#endif
         _tableView.contentOffset = CGPointMake(0, _tableView.contentOffset.y + (_tableView.contentSize.height - h));
     }
 }
 
 - (void)refresh {
-#ifndef APPSTORE
-    CLS_LOG(@"refresh");
-#endif
     @synchronized(self) {
         if(self.tableView.bounds.size.width != [EventsDataSource sharedInstance].widthForHeightCache)
             [[EventsDataSource sharedInstance] clearHeightCache];
@@ -1978,21 +1939,12 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
             } else if(_buffer.scrolledUp && _buffer.savedScrollOffset > 0) {
                 if((_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height) < _tableView.contentSize.height - _tableView.bounds.size.height) {
-#ifndef APPSTORE
-                    CLS_LOG(@"Restoring saved contentOffset");
-#endif
                     _tableView.contentOffset = CGPointMake(0, (_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height));
                 } else {
-#ifndef APPSTORE
-                    CLS_LOG(@"Saved scroll offset was beyond the content bounds, scrolling to bottom");
-#endif
                     [self _scrollToBottom];
                     [self scrollToBottom];
                 }
             } else if(!_buffer.scrolledUp || (_data.count && _scrollTimer)) {
-#ifndef APPSTORE
-                CLS_LOG(@"Table wasn't scrolled up after refresh, scrolling to bottom");
-#endif
                 [self _scrollToBottom];
                 [self scrollToBottom];
             }
@@ -2659,9 +2611,6 @@ extern UIImage *__socketClosedBackgroundImage;
         if(!_buffer.scrolledUp) {
             _buffer.scrolledUpFrom = [[_data lastObject] eid];
             _buffer.scrolledUp = YES;
-#ifndef APPSTORE
-            CLS_LOG(@"Top unread bar tapped, setting scrolledUp flag");
-#endif
         }
         if(_lastSeenEidPos > 0) {
             [UIView beginAnimations:nil context:nil];
@@ -2693,18 +2642,12 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         _buffer.scrolledUp = NO;
         _buffer.scrolledUpFrom = -1;
-#ifndef APPSTORE
-        CLS_LOG(@"Bottom unread bar tapped, clearing scrolledUp flag");
-#endif
     }
 }
 
 #pragma mark - Table view delegate
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-#ifndef APPSTORE
-    CLS_LOG(@"Events table view drag started");
-#endif
     [_delegate dismissKeyboard];
 }
 
@@ -2775,9 +2718,6 @@ extern UIImage *__socketClosedBackgroundImage;
                 [UIView commitAnimations];
                 _newMsgs = 0;
                 _newHighlights = 0;
-#ifndef APPSTORE
-                CLS_LOG(@"Scroll view is at the bottom, clearing scrolledUp flag. ContentOffset: %f ContentHeight: %f Table Height: %f", tableView.contentOffset.y, tableView.contentSize.height, tableView.frame.size.height);
-#endif
                 _buffer.scrolledUp = NO;
                 _buffer.scrolledUpFrom = -1;
                 _buffer.savedScrollOffset = -1;
@@ -2787,9 +2727,6 @@ extern UIImage *__socketClosedBackgroundImage;
                 _buffer.scrolledUp = YES;
                 [_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
                 _scrollTimer = nil;
-#ifndef APPSTORE
-                CLS_LOG(@"Scroll view is scrolled up, setting scrolledUp flag");
-#endif
             }
             
             if(_lastSeenEidPos >= 0) {
