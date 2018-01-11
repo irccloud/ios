@@ -212,7 +212,7 @@
         } else if([_avatarURL hasPrefix:@"https://"]) {
             if([_avatarURL containsString:@"{size}"]) {
                 CSURITemplate *template = [CSURITemplate URITemplateWithString:_avatarURL error:nil];
-                _cachedAvatarURL = [NSURL URLWithString:[template relativeStringWithVariables:@{@"size":@(size)} error:nil]];
+                _cachedAvatarURL = [NSURL URLWithString:[template relativeStringWithVariables:@{@"size":@"72"} error:nil]];
             } else {
                 _cachedAvatarURL = [NSURL URLWithString:_avatarURL];
             }

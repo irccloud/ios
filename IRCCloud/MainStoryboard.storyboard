@@ -719,6 +719,10 @@
                             </tableView>
                             <imageView hidden="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="48" placeholderIntrinsicHeight="48" translatesAutoresizingMaskIntoConstraints="NO" id="WXm-cx-Mj2">
                                 <rect key="frame" x="10" y="0.0" width="48" height="48"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="48" id="Xg8-nI-bU5"/>
+                                    <constraint firstAttribute="height" constant="48" id="zKP-km-Cs5"/>
+                                </constraints>
                             </imageView>
                             <view alpha="0.0" contentMode="scaleToFill" placeholderIntrinsicWidth="768" placeholderIntrinsicHeight="32" translatesAutoresizingMaskIntoConstraints="NO" id="fvC-nM-NHm" userLabel="Top Unread View" customClass="UIControl">
                                 <rect key="frame" x="0.0" y="0.0" width="768" height="32"/>
@@ -1024,6 +1028,8 @@
                         <outlet property="_headerView" destination="tmc-fI-0Xs" id="BFZ-vI-cNO"/>
                         <outlet property="_loadMoreBacklog" destination="Sya-Jj-2rP" id="YVU-7f-mst"/>
                         <outlet property="_stickyAvatar" destination="WXm-cx-Mj2" id="RZb-zC-iTA"/>
+                        <outlet property="_stickyAvatarHeightConstraint" destination="zKP-km-Cs5" id="lgb-f8-WPN"/>
+                        <outlet property="_stickyAvatarWidthConstraint" destination="Xg8-nI-bU5" id="0VB-Yo-ymh"/>
                         <outlet property="_stickyAvatarXOffsetConstraint" destination="lLW-ey-6EA" id="CNi-70-m2S"/>
                         <outlet property="_stickyAvatarYOffsetConstraint" destination="Uac-VW-eBx" id="MSL-Dc-ffe"/>
                         <outlet property="_tableView" destination="t8Z-Pu-wcU" id="eMn-Er-9RS"/>

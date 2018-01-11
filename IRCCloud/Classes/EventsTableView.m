@@ -108,13 +108,13 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet UIView *_codeBlockBackground;
     IBOutlet UIView *_lastSeenEIDBackground;
     IBOutlet UILabel *_lastSeenEID;
-    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset;
+    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight;
 }
 @property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
-@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset;
+@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight;
 @end
 
 @implementation EventsTableCell
@@ -2365,6 +2365,8 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
 
+    cell.avatarWidth.constant = cell.avatarHeight.constant = avatarHeight;
+    
     if(__avatarsOffPref) {
         cell.avatar.image = nil;
     } else {
@@ -2803,6 +2805,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 _stickyAvatarYOffsetConstraint.constant = rect.origin.y + rect.size.height - (__largeAvatarHeight + 4);
                 if(_stickyAvatarYOffsetConstraint.constant >= offset + 4)
                     _stickyAvatarYOffsetConstraint.constant = offset + 4;
+                _stickyAvatarWidthConstraint.constant = _stickyAvatarHeightConstraint.constant = __largeAvatarHeight;
                 if(_hiddenAvatarRow != topIndexPath.row) {
                     _stickyAvatar.image = nil;
                     if(__avatarImages) {

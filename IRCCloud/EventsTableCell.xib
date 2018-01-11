@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13528" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13526"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -101,8 +101,12 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="44" placeholderIntrinsicHeight="44" translatesAutoresizingMaskIntoConstraints="NO" id="9aa-Ko-5ri">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9aa-Ko-5ri">
                         <rect key="frame" x="66" y="4" width="44" height="44"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="44" id="AhO-xV-4Mx"/>
+                            <constraint firstAttribute="height" constant="44" id="N6m-U7-nrr"/>
+                        </constraints>
                     </imageView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WPz-RI-MPI">
                         <rect key="frame" x="0.0" y="44.5" width="428" height="0.0"/>
@@ -157,7 +161,9 @@
             <connections>
                 <outlet property="_accessory" destination="oeb-cI-59G" id="uC5-yF-SeU"/>
                 <outlet property="_avatar" destination="9aa-Ko-5ri" id="Pj6-Ze-4N6"/>
+                <outlet property="_avatarHeight" destination="N6m-U7-nrr" id="kVI-in-0LW"/>
                 <outlet property="_avatarOffset" destination="3qd-ta-bgg" id="Hd6-Db-uaE"/>
+                <outlet property="_avatarWidth" destination="AhO-xV-4Mx" id="JeY-ph-t5R"/>
                 <outlet property="_bottomBorder" destination="Air-U6-OOz" id="mKT-1S-Zyf"/>
                 <outlet property="_codeBlockBackground" destination="qsr-vg-LVN" id="1PD-z8-bhs"/>
                 <outlet property="_lastSeenEID" destination="2Cd-th-WEc" id="fvk-De-jpw"/>
