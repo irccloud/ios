@@ -2368,15 +2368,19 @@ extern UIImage *__socketClosedBackgroundImage;
         NSURL *avatarURL = [e avatar:avatarHeight * [UIScreen mainScreen].scale];
         if(avatarURL) {
             UIImage *image = [[ImageCache sharedInstance] imageForURL:avatarURL];
-            if(image)
+            if(image) {
                 cell.avatar.image = image;
-            else if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:avatarURL].path])
+                cell.avatar.layer.cornerRadius = 5.0;
+                cell.avatar.layer.masksToBounds = YES;
+            } else if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:avatarURL].path]) {
                 [[ImageCache sharedInstance] fetchURL:avatarURL completionHandler:^(BOOL success) {
                     if(success)
                         [self reloadForEvent:e];
                 }];
+            }
         }
         if(!cell.avatar.image) {
+            cell.avatar.layer.cornerRadius = 0;
             if(e.from.length) {
                 cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
             } else if(e.rowType == ROW_ME_MESSAGE && e.nick.length) {
