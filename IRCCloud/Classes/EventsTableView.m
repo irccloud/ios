@@ -1586,8 +1586,6 @@ extern UIImage *__socketClosedBackgroundImage;
     [_lock lock];
     [_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
     _scrollTimer = nil;
-    _buffer.scrolledUp = NO;
-    _buffer.scrolledUpFrom = -1;
     if(_data.count) {
         if(_tableView.contentSize.height > (_tableView.frame.size.height - _tableView.contentInset.top - _tableView.contentInset.bottom))
             [_tableView setContentOffset:CGPointMake(0, (_tableView.contentSize.height - _tableView.frame.size.height) + _tableView.contentInset.bottom)];
@@ -1596,6 +1594,8 @@ extern UIImage *__socketClosedBackgroundImage;
         if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
             [self scrollViewDidScroll:_tableView];
     }
+    _buffer.scrolledUp = NO;
+    _buffer.scrolledUpFrom = -1;
     [_lock unlock];
 }
 
