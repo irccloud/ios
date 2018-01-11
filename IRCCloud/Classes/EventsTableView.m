@@ -293,7 +293,7 @@ extern UIImage *__socketClosedBackgroundImage;
         NSString *extension = [e.entities objectForKey:@"extension"];
             if(!extension.length)
                 extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
-            url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [_file_url_template relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]];
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]];
         } else {
             url = [e.entities objectForKey:@"url"];
         }
@@ -1233,6 +1233,8 @@ extern UIImage *__socketClosedBackgroundImage;
     e1.hostmask = parent.hostmask;
     e1.parent = parent.eid;
     e1.entities = properties;
+    e1.avatar = parent.avatar;
+    e1.avatarURL = parent.avatarURL;
 
     if([properties objectForKey:@"id"]) {
         if([[properties objectForKey:@"mime_type"] hasPrefix:@"image/"])
@@ -1814,9 +1816,6 @@ extern UIImage *__socketClosedBackgroundImage;
             __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:f}].width;
         __timestampWidth += 4;
         
-        _file_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
-        _paste_url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
-        
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         if(events.count) {
             NSMutableDictionary *uuids = [[NSMutableDictionary alloc] init];
@@ -2065,7 +2064,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 NSTextCheckingResult *r = [mutableLinks objectAtIndex:i];
                 if(r.resultType == NSTextCheckingTypeLink) {
                     for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
-                        NSString *url = [_file_url_template relativeStringWithVariables:@{@"id":[file objectForKey:@"id"]} error:nil];
+                        NSString *url = [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[file objectForKey:@"id"]} error:nil];
                         if(([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] || [[file objectForKey:@"mime_type"] hasPrefix:@"video/"]) && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
                             NSString *extension = [file objectForKey:@"extension"];
                             if(!extension.length)
@@ -2075,7 +2074,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         }
                     }
                     for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
-                        NSString *url = [_paste_url_template relativeStringWithVariables:@{@"id":[paste objectForKey:@"id"]} error:nil];
+                        NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":[paste objectForKey:@"id"]} error:nil];
                         if(([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
                             r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", url, [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
                             [mutableLinks setObject:r atIndexedSubscript:i];
@@ -2176,420 +2175,436 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    //@synchronized (_rowCache) {
-        if([indexPath row] >= _data.count) {
-            [_lock unlock];
-            return [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
-        }
-
-        [_lock lock];
-        Event *e = [_data objectAtIndex:indexPath.row];
+    if([indexPath row] >= _data.count) {
         [_lock unlock];
+        return [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
+    }
 
-        if(e.rowType == ROW_THUMBNAIL) {
-            EventsTableCell_Thumbnail *cell = nil;
-            if([[_rowCache objectForKey:[e UUID]] isKindOfClass:EventsTableCell_Thumbnail.class])
-                cell = [_rowCache objectForKey:[e UUID]];
-            if(!cell)
-                cell = [[_eventsTableCell_Thumbnail instantiateWithOwner:self options:nil] objectAtIndex:0];
-            [_rowCache setObject:cell forKey:[e UUID]];
-            
-            cell.filename.textColor = [UIColor linkColor];
-            cell.filename.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
-            cell.filename.text = [e.entities objectForKey:@"name"];
-            
-            if([e.entities objectForKey:@"id"] || [[e.entities objectForKey:@"name"] length] || [[e.entities objectForKey:@"description"] length]) {
-                cell.background.backgroundColor = [UIColor bufferBackgroundColor];
-            } else {
-                cell.background.backgroundColor = [UIColor clearColor];
-            }
-            float width = self.tableView.bounds.size.width/2;
-            if([e.entities objectForKey:@"id"]) {
-                cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
-            } else {
-                /*if([e.entities objectForKey:@"mp4_loop"]) {
-                    if(!cell.movieController) {
-                        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
-                        cell.movieController = [[MPMoviePlayerController alloc] initWithContentURL:[e.entities objectForKey:@"mp4_loop"]];
-                        cell.movieController.controlStyle = MPMovieControlStyleNone;
-                        cell.movieController.view.userInteractionEnabled = NO;
-                        cell.movieController.view.hidden = YES;
-                        cell.movieController.repeatMode = MPMovieRepeatModeOne;
-                        [cell.contentView addSubview:cell.movieController.view];
-                    }
-                    [cell.movieController play];
-                } else {*/
-                cell.thumbnail.image = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
-                //}
-            }
-            cell.spinner.hidden = YES;
-            cell.spinner.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
-            cell.thumbnail.hidden = !(cell.thumbnail.image != nil);
-            if(cell.thumbnail.image || cell.movieController) {
-                if(![[[e.entities objectForKey:@"properties"] objectForKey:@"height"] intValue]) {
-                    cell.thumbnail.image = nil;
+    [_lock lock];
+    Event *e = [_data objectAtIndex:indexPath.row];
+    [_lock unlock];
+
+    if(e.rowType == ROW_THUMBNAIL) {
+        EventsTableCell_Thumbnail *cell = nil;
+        if([[_rowCache objectForKey:[e UUID]] isKindOfClass:EventsTableCell_Thumbnail.class])
+            cell = [_rowCache objectForKey:[e UUID]];
+        if(!cell)
+            cell = [[_eventsTableCell_Thumbnail instantiateWithOwner:self options:nil] objectAtIndex:0];
+        [_rowCache setObject:cell forKey:[e UUID]];
+        
+        cell.filename.textColor = [UIColor linkColor];
+        cell.filename.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+        cell.filename.text = [e.entities objectForKey:@"name"];
+        
+        if([e.entities objectForKey:@"id"] || [[e.entities objectForKey:@"name"] length] || [[e.entities objectForKey:@"description"] length]) {
+            cell.background.backgroundColor = [UIColor bufferBackgroundColor];
+        } else {
+            cell.background.backgroundColor = [UIColor clearColor];
+        }
+        float width = self.tableView.bounds.size.width/2;
+        if([e.entities objectForKey:@"id"]) {
+            cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+        } else {
+            /*if([e.entities objectForKey:@"mp4_loop"]) {
+                if(!cell.movieController) {
+                    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
+                    cell.movieController = [[MPMoviePlayerController alloc] initWithContentURL:[e.entities objectForKey:@"mp4_loop"]];
+                    cell.movieController.controlStyle = MPMovieControlStyleNone;
+                    cell.movieController.view.userInteractionEnabled = NO;
                     cell.movieController.view.hidden = YES;
-                    cell.spinner.hidden = NO;
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        NSLog(@"Image dimensions were missing, reloading table");
+                    cell.movieController.repeatMode = MPMovieRepeatModeOne;
+                    [cell.contentView addSubview:cell.movieController.view];
+                }
+                [cell.movieController play];
+            } else {*/
+            cell.thumbnail.image = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
+            //}
+        }
+        cell.spinner.hidden = YES;
+        cell.spinner.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
+        cell.thumbnail.hidden = !(cell.thumbnail.image != nil);
+        if(cell.thumbnail.image || cell.movieController) {
+            if(![[[e.entities objectForKey:@"properties"] objectForKey:@"height"] intValue]) {
+                cell.thumbnail.image = nil;
+                cell.movieController.view.hidden = YES;
+                cell.spinner.hidden = NO;
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    NSLog(@"Image dimensions were missing, reloading table");
+                    e.height = 0;
+                    [self reloadForEvent:e];
+                }];
+            } else {
+                if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
+                    width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+                float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
+                CGFloat thumbWidth = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
+                if(thumbWidth == 0 || thumbWidth > self.tableView.bounds.size.width) {
+                    CLS_LOG(@"invalid thumbnail width: %f ratio: %f", width, ratio);
+                    @synchronized(_data) {
+                        [_data removeObject:e];
+                    }
+                    cell.thumbnailWidth.constant = FONT_SIZE * 2;
+                    cell.thumbnailHeight.constant = FONT_SIZE * 2;
+                    [self.tableView reloadData];
+                } else {
+                    cell.thumbnailWidth.constant = thumbWidth;
+                    cell.thumbnailHeight.constant = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
+                    if(e.height > 0 && e.height < cell.thumbnailHeight.constant) {
                         e.height = 0;
                         [self reloadForEvent:e];
-                    }];
-                } else {
-                    if(width > [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue])
-                        width = [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-                    float ratio = width / [[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue];
-                    CGFloat thumbWidth = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"width"] floatValue] * ratio);
-                    if(thumbWidth == 0 || thumbWidth > self.tableView.bounds.size.width) {
-                        CLS_LOG(@"invalid thumbnail width: %f ratio: %f", width, ratio);
-                        @synchronized(_data) {
-                            [_data removeObject:e];
-                        }
-                        cell.thumbnailWidth.constant = FONT_SIZE * 2;
-                        cell.thumbnailHeight.constant = FONT_SIZE * 2;
-                        [self.tableView reloadData];
-                    } else {
-                        cell.thumbnailWidth.constant = thumbWidth;
-                        cell.thumbnailHeight.constant = ceilf([[[e.entities objectForKey:@"properties"] objectForKey:@"height"] floatValue] * ratio);
-                        if(e.height > 0 && e.height < cell.thumbnailHeight.constant) {
-                            e.height = 0;
-                            [self reloadForEvent:e];
-                        }
-                        [cell.thumbnail layoutIfNeeded];
-                        cell.movieController.view.frame = cell.thumbnail.frame;
-                        cell.movieController.view.hidden = NO;
                     }
+                    [cell.thumbnail layoutIfNeeded];
+                    cell.movieController.view.frame = cell.thumbnail.frame;
+                    cell.movieController.view.hidden = NO;
                 }
-            } else {
-                cell.thumbnailWidth.constant = FONT_SIZE * 2;
-                cell.thumbnailHeight.constant = FONT_SIZE * 2;
-                if([e.entities objectForKey:@"id"]) {
-                    if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)].path]) {
-                        cell.spinner.hidden = NO;
-                        [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(BOOL success) {
-                            if(!success) {
-                                e.rowType = ROW_FILE;
-                            }
-                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                cell.spinner.hidden = YES;
-                                e.height = 0;
-                                [self reloadForEvent:e];
-                            }];
-                        }];
-                    } else {
-                        e.rowType = ROW_FILE;
-                        cell.spinner.hidden = YES;
-                    }
-                } else {
-                    if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:[e.entities objectForKey:@"thumb"]].path]) {
-                        cell.spinner.hidden = NO;
-                        [[ImageCache sharedInstance] fetchURL:[e.entities objectForKey:@"thumb"] completionHandler:^(BOOL success) {
-                            if(!success) {
-                                @synchronized(_data) {
-                                    [_data removeObject:e];
-                                }
-                            }
-                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                e.height = 0;
-                                cell.spinner.hidden = YES;
-                                [self reloadForEvent:e];
-                            }];
-                        }];
-                    } else {
-                        cell.spinner.hidden = YES;
-                        @synchronized(_data) {
-                            [_data removeObject:e];
+            }
+        } else {
+            cell.thumbnailWidth.constant = FONT_SIZE * 2;
+            cell.thumbnailHeight.constant = FONT_SIZE * 2;
+            if([e.entities objectForKey:@"id"]) {
+                if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)].path]) {
+                    cell.spinner.hidden = NO;
+                    [[ImageCache sharedInstance] fetchFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale) completionHandler:^(BOOL success) {
+                        if(!success) {
+                            e.rowType = ROW_FILE;
                         }
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [self reloadData];
+                            cell.spinner.hidden = YES;
+                            e.height = 0;
+                            [self reloadForEvent:e];
                         }];
-                    }
-                }
-            }
-        }
-
-        if(e.rowType == ROW_FILE) {
-            EventsTableCell_File *cell = nil;
-            if([[_rowCache objectForKey:[e UUID]] isKindOfClass:EventsTableCell_File.class])
-                cell = [_rowCache objectForKey:[e UUID]];
-            if(!cell)
-                cell = [[_eventsTableCell_File instantiateWithOwner:self options:nil] objectAtIndex:0];
-            [_rowCache setObject:cell forKey:[e UUID]];
-            
-            NSString *extension = [e.entities objectForKey:@"extension"];
-            if(extension.length)
-                extension = [extension substringFromIndex:1];
-            else
-                extension = [[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1];
-            
-            cell.extension.font = [UIFont boldSystemFontOfSize:FONT_SIZE * 1.5];
-            cell.extension.text = extension.uppercaseString;
-            
-            cell.filename.textColor = [UIColor linkColor];
-            cell.filename.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
-            cell.filename.text = [e.entities objectForKey:@"name"];
-
-            cell.mimeType.textColor = [UIColor messageTextColor];
-            cell.mimeType.font = [UIFont systemFontOfSize:FONT_SIZE];
-            cell.mimeType.text = [e.entities objectForKey:@"mime_type"];
-            cell.mimeType.numberOfLines = 1;
-            cell.mimeType.lineBreakMode = NSLineBreakByTruncatingTail;
-            
-            cell.background.backgroundColor = [UIColor bufferBackgroundColor];
-        }
-        
-        EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
-        if(!cell)
-            cell = [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
-        [_rowCache setObject:cell forKey:[e UUID]];
-
-        cell.backgroundView = nil;
-        cell.backgroundColor = nil;
-        cell.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
-        cell.contentView.backgroundColor = e.bgColor;
-        if(e.isHeader && !__chatOneLinePref) {
-            if(!cell.nickname.text.length) {
-                NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithAttributedString:e.formattedNick];
-                if(e.formattedRealname && ([e.realname isKindOfClass:[NSString class]] && ![e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) && !__norealnamePref) {
-                    [s appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
-                    [s appendAttributedString:e.formattedRealname];
-                }
-                cell.nickname.attributedText = s;
-                cell.nickname.lineBreakMode = NSLineBreakByTruncatingTail;
-            }
-            cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
-        } else {
-            cell.nickname.text = nil;
-            cell.avatar.hidden = !((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && e.parent == 0 && e.groupEid < 1);
-        }
-        float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
-        if(e.from.length && !__avatarsOffPref) {
-            cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
-        } else if(e.rowType == ROW_ME_MESSAGE && !__avatarsOffPref && e.nick.length) {
-            cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.nick bid:e.bid] getImage:__smallAvatarHeight isSelf:e.isSelf];
-        } else {
-            cell.avatar.image = nil;
-        }
-        cell.timestampLeft.font = cell.timestampRight.font = cell.lastSeenEID.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
-        cell.message.linkDelegate = self;
-        cell.nickname.linkDelegate = self;
-        cell.accessory.font = [ColorFormatter awesomeFont];
-        cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
-        cell.accessibilityLabel = e.accessibilityLabel;
-        cell.accessibilityValue = e.accessibilityValue;
-        cell.accessibilityHint = nil;
-        cell.accessibilityElementsHidden = NO;
-        
-        cell.messageOffsetTop.constant = __compact ? -2 : 0;
-        cell.messageOffsetLeft.constant = (__timeLeftPref ? __timestampWidth : 6) + (__compact ? 6 : 10);
-        cell.messageOffsetRight.constant = __timeLeftPref ? 6 : (__timestampWidth + 16);
-        cell.messageOffsetBottom.constant = __compact ? 0 : 4;
-        
-        cell.quoteBorder.hidden = !e.isQuoted;
-        cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];
-        if(e.isQuoted) {
-            cell.messageOffsetLeft.constant += 8;
-            cell.avatarOffset.constant = __compact ? -14 : -18;
-            cell.nicknameOffset.constant = -8;
-        } else {
-            cell.avatarOffset.constant = __compact ? -6 : -10;
-            cell.nicknameOffset.constant = 0;
-        }
-        if(avatarHeight > 0) {
-            if(__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)
-                cell.avatarOffset.constant = avatarHeight;
-            if(!__chatOneLinePref)
-                cell.messageOffsetLeft.constant += __largeAvatarHeight + 4;
-        }
-        if(__avatarsOffPref)
-            cell.nicknameOffset.constant -= 6;
-        cell.nickname.preferredMaxLayoutWidth = cell.message.preferredMaxLayoutWidth = self.tableView.bounds.size.width - cell.messageOffsetLeft.constant - cell.messageOffsetRight.constant;
-
-        if(e.rowType == ROW_TIMESTAMP || e.rowType == ROW_LASTSEENEID) {
-            cell.message.text = @"";
-        } else if(!cell.message.text.length || e.rowType == ROW_FAILED) {
-            cell.message.attributedText = e.formatted;
-            
-            if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
-                if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
-                    if(e.groupEid == e.eid + 1) {
-                        cell.accessory.text = FA_MINUS_SQUARE_O;
-                        cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
-                        cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status messages heading. at %@", e.timestamp];
-                        cell.accessibilityHint = @"Collapses this group";
-                    } else {
-                        cell.accessory.text = FA_ANGLE_RIGHT;
-                        cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
-                        cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status message. at %@", e.timestamp];
-                        cell.accessibilityHint = @"Collapses this group";
-                    }
+                    }];
                 } else {
-                    cell.accessory.text = FA_PLUS_SQUARE_O;
-                    cell.accessibilityLabel = [NSString stringWithFormat:@"Collapsed status messages. at %@", e.timestamp];
-                    cell.accessibilityHint = @"Expands this group";
+                    e.rowType = ROW_FILE;
+                    cell.spinner.hidden = YES;
                 }
-                cell.accessory.hidden = NO;
-            } else if(e.rowType == ROW_FAILED) {
-                cell.accessory.hidden = NO;
-                cell.accessory.text = FA_EXCLAMATION_TRIANGLE;
-                cell.accessory.textColor = [UIColor networkErrorColor];
             } else {
-                cell.accessory.hidden = YES;
-            }
-            
-            if(e.links.count) {
-                if(e.pending || [e.color isEqual:[UIColor timestampColor]])
-                    cell.message.linkAttributes = _lightLinkAttributes;
-                else
-                    cell.message.linkAttributes = _linkAttributes;
-                @try {
-                    for(NSTextCheckingResult *result in e.links) {
-                        if(result.resultType == NSTextCheckingTypeLink) {
-                            if(result.URL)
-                                [cell.message addLinkWithTextCheckingResult:result];
-                        } else {
-                            NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
-                            if(![url hasPrefix:@"irc"]) {
-                                CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                                if(url_escaped != NULL) {
-                                    url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
-                                    CFRelease(url_escaped);
-                                }
+                if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:[e.entities objectForKey:@"thumb"]].path]) {
+                    cell.spinner.hidden = NO;
+                    [[ImageCache sharedInstance] fetchURL:[e.entities objectForKey:@"thumb"] completionHandler:^(BOOL success) {
+                        if(!success) {
+                            @synchronized(_data) {
+                                [_data removeObject:e];
                             }
-                            NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
-                            if(u)
-                                [cell.message addLinkToURL:u withRange:result.range];
                         }
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            e.height = 0;
+                            cell.spinner.hidden = YES;
+                            [self reloadForEvent:e];
+                        }];
+                    }];
+                } else {
+                    cell.spinner.hidden = YES;
+                    @synchronized(_data) {
+                        [_data removeObject:e];
                     }
-                }
-                @catch (NSException *exception) {
-                    NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
-                }
-            }
-            if(cell.nickname.text.length && e.realnameLinks.count) {
-                cell.nickname.linkAttributes = _lightLinkAttributes;
-                @try {
-                    for(NSTextCheckingResult *result in e.realnameLinks) {
-                        if(result.resultType == NSTextCheckingTypeLink) {
-                            if(result.URL)
-                                [cell.nickname addLinkToURL:result.URL withRange:NSMakeRange(result.range.location + e.formattedNick.length + 1, result.range.length)];
-                        } else {
-                            NSString *url = [[e.formattedRealname attributedSubstringFromRange:result.range] string];
-                            if(![url hasPrefix:@"irc"]) {
-                                CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                                if(url_escaped != NULL) {
-                                    url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
-                                    CFRelease(url_escaped);
-                                }
-                            }
-                            NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
-                            if(u)
-                                [cell.nickname addLinkToURL:u withRange:NSMakeRange(result.range.location + e.formattedNick.length + 1, result.range.length)];
-                        }
-                    }
-                }
-                @catch (NSException *exception) {
-                    NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [self reloadData];
+                    }];
                 }
             }
         }
-        cell.timestampLeft.hidden = !__timeLeftPref;
-        cell.timestampRight.hidden = __timeLeftPref;
-        UILabel *timestamp = __timeLeftPref ? cell.timestampLeft : cell.timestampRight;
-        if(e.rowType == ROW_LASTSEENEID) {
-            timestamp.hidden = YES;
-            cell.lastSeenEIDBackground.backgroundColor = [UIColor timestampColor];
-            cell.lastSeenEIDBackground.hidden = NO;
-            cell.lastSeenEID.textColor = [UIColor timestampColor];
-            cell.lastSeenEID.superview.backgroundColor = [UIColor contentBackgroundColor];
-            cell.lastSeenEID.superview.hidden = NO;
-            cell.lastSeenEIDOffset.constant = __avatarsOffPref ? 0 : cell.messageOffsetLeft.constant;
-        } else {
-            cell.lastSeenEIDBackground.hidden = YES;
-            cell.lastSeenEID.superview.hidden = YES;
-            timestamp.text = e.timestamp;
-            cell.timestampWidth.constant = __timestampWidth;
-            cell.lastSeenEIDOffset.constant = 0;
+    }
+
+    if(e.rowType == ROW_FILE) {
+        EventsTableCell_File *cell = nil;
+        if([[_rowCache objectForKey:[e UUID]] isKindOfClass:EventsTableCell_File.class])
+            cell = [_rowCache objectForKey:[e UUID]];
+        if(!cell)
+            cell = [[_eventsTableCell_File instantiateWithOwner:self options:nil] objectAtIndex:0];
+        [_rowCache setObject:cell forKey:[e UUID]];
+        
+        NSString *extension = [e.entities objectForKey:@"extension"];
+        if(extension.length)
+            extension = [extension substringFromIndex:1];
+        else
+            extension = [[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1];
+        
+        cell.extension.font = [UIFont boldSystemFontOfSize:FONT_SIZE * 1.5];
+        cell.extension.text = extension.uppercaseString;
+        
+        cell.filename.textColor = [UIColor linkColor];
+        cell.filename.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+        cell.filename.text = [e.entities objectForKey:@"name"];
+
+        cell.mimeType.textColor = [UIColor messageTextColor];
+        cell.mimeType.font = [UIFont systemFontOfSize:FONT_SIZE];
+        cell.mimeType.text = [e.entities objectForKey:@"mime_type"];
+        cell.mimeType.numberOfLines = 1;
+        cell.mimeType.lineBreakMode = NSLineBreakByTruncatingTail;
+        
+        cell.background.backgroundColor = [UIColor bufferBackgroundColor];
+    }
+
+    EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
+    if(!cell)
+        cell = [[_eventsTableCell instantiateWithOwner:self options:nil] objectAtIndex:0];
+    [_rowCache setObject:cell forKey:[e UUID]];
+
+    cell.backgroundView = nil;
+    cell.backgroundColor = nil;
+    cell.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+    cell.contentView.backgroundColor = e.bgColor;
+    if(e.isHeader && !__chatOneLinePref) {
+        if(!cell.nickname.text.length) {
+            NSMutableAttributedString *s = [[NSMutableAttributedString alloc] initWithAttributedString:e.formattedNick];
+            if(e.formattedRealname && ([e.realname isKindOfClass:[NSString class]] && ![e.realname.lowercaseString isEqualToString:e.from.lowercaseString]) && !__norealnamePref) {
+                [s appendAttributedString:[[NSAttributedString alloc] initWithString:@" "]];
+                [s appendAttributedString:e.formattedRealname];
+            }
+            cell.nickname.attributedText = s;
+            cell.nickname.lineBreakMode = NSLineBreakByTruncatingTail;
         }
-        if(e.rowType == ROW_TIMESTAMP) {
-            timestamp.font = [ColorFormatter messageFont:__monospacePref];
-            timestamp.textColor = [UIColor messageTextColor];
-            cell.timestampWidth.constant = tableView.bounds.size.width;
-        } else if(e.isHighlight && !e.isSelf) {
-            timestamp.textColor = [UIColor highlightTimestampColor];
-        } else if(e.rowType == ROW_FAILED || [e.bgColor isEqual:[UIColor errorBackgroundColor]]) {
-            timestamp.textColor = [UIColor networkErrorColor];
-        } else {
-            timestamp.textColor = [UIColor timestampColor];
+        cell.avatar.hidden = __avatarsOffPref || (indexPath.row == _hiddenAvatarRow);
+    } else {
+        cell.nickname.text = nil;
+        cell.avatar.hidden = !((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && e.parent == 0 && e.groupEid < 1);
+    }
+    float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
+
+    if(__avatarsOffPref) {
+        cell.avatar.image = nil;
+    } else {
+        NSURL *avatarURL = [e avatar:avatarHeight * [UIScreen mainScreen].scale];
+        if(avatarURL) {
+            UIImage *image = [[ImageCache sharedInstance] imageForURL:avatarURL];
+            if(image)
+                cell.avatar.image = image;
+            else if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:avatarURL].path])
+                [[ImageCache sharedInstance] fetchURL:avatarURL completionHandler:^(BOOL success) {
+                    if(success)
+                        [self reloadForEvent:e];
+                }];
         }
-        if(e.rowType == ROW_BACKLOG) {
-            timestamp.hidden = YES;
-            cell.lastSeenEIDBackground.backgroundColor = [UIColor backlogDividerColor];
-            cell.lastSeenEIDBackground.hidden = NO;
-            cell.accessibilityElementsHidden = YES;
-        } else if(e.rowType == ROW_LASTSEENEID) {
-            timestamp.backgroundColor = [UIColor contentBackgroundColor];
-        } else {
-            timestamp.backgroundColor = [UIColor clearColor];
+        if(!cell.avatar.image) {
+            if(e.from.length) {
+                cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
+            } else if(e.rowType == ROW_ME_MESSAGE && e.nick.length) {
+                cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.nick bid:e.bid] getImage:__smallAvatarHeight isSelf:e.isSelf];
+            } else {
+                cell.avatar.image = nil;
+            }
         }
-        if(e.rowType == ROW_TIMESTAMP) {
-            cell.topBorder.backgroundColor = [UIColor timestampTopBorderColor];
-            cell.topBorder.hidden = NO;
-            
-            cell.bottomBorder.backgroundColor = [UIColor timestampBottomBorderColor];
-            cell.bottomBorder.hidden = NO;
-            cell.messageOffsetBottom.constant = 4;
-            cell.timestampLeft.textAlignment = cell.timestampRight.textAlignment = NSTextAlignmentCenter;
+    }
+    cell.timestampLeft.font = cell.timestampRight.font = cell.lastSeenEID.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
+    cell.message.linkDelegate = self;
+    cell.nickname.linkDelegate = self;
+    cell.accessory.font = [ColorFormatter awesomeFont];
+    cell.accessory.textColor = [UIColor expandCollapseIndicatorColor];
+    cell.accessibilityLabel = e.accessibilityLabel;
+    cell.accessibilityValue = e.accessibilityValue;
+    cell.accessibilityHint = nil;
+    cell.accessibilityElementsHidden = NO;
+
+    cell.messageOffsetTop.constant = __compact ? -2 : 0;
+    cell.messageOffsetLeft.constant = (__timeLeftPref ? __timestampWidth : 6) + (__compact ? 6 : 10);
+    cell.messageOffsetRight.constant = __timeLeftPref ? 6 : (__timestampWidth + 16);
+    cell.messageOffsetBottom.constant = __compact ? 0 : 4;
+
+    cell.quoteBorder.hidden = !e.isQuoted;
+    cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];
+    if(e.isQuoted) {
+        cell.messageOffsetLeft.constant += 8;
+        cell.avatarOffset.constant = __compact ? -14 : -18;
+        cell.nicknameOffset.constant = -8;
+    } else {
+        cell.avatarOffset.constant = __compact ? -6 : -10;
+        cell.nicknameOffset.constant = 0;
+    }
+    if(avatarHeight > 0) {
+        if(__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)
+            cell.avatarOffset.constant = avatarHeight;
+        if(!__chatOneLinePref)
+            cell.messageOffsetLeft.constant += __largeAvatarHeight + 4;
+    }
+    if(__avatarsOffPref)
+        cell.nicknameOffset.constant -= 6;
+    cell.nickname.preferredMaxLayoutWidth = cell.message.preferredMaxLayoutWidth = self.tableView.bounds.size.width - cell.messageOffsetLeft.constant - cell.messageOffsetRight.constant;
+
+    if(e.rowType == ROW_TIMESTAMP || e.rowType == ROW_LASTSEENEID) {
+        cell.message.text = @"";
+    } else if(!cell.message.text.length || e.rowType == ROW_FAILED) {
+        cell.message.attributedText = e.formatted;
+        
+        if((e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE || e.rowType == ROW_FAILED || e.rowType == ROW_SOCKETCLOSED) && e.groupEid > 0 && (e.groupEid != e.eid || [_expandedSectionEids objectForKey:@(e.groupEid)])) {
+            if([_expandedSectionEids objectForKey:@(e.groupEid)]) {
+                if(e.groupEid == e.eid + 1) {
+                    cell.accessory.text = FA_MINUS_SQUARE_O;
+                    cell.contentView.backgroundColor = [UIColor collapsedHeadingBackgroundColor];
+                    cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status messages heading. at %@", e.timestamp];
+                    cell.accessibilityHint = @"Collapses this group";
+                } else {
+                    cell.accessory.text = FA_ANGLE_RIGHT;
+                    cell.contentView.backgroundColor = [UIColor contentBackgroundColor];
+                    cell.accessibilityLabel = [NSString stringWithFormat:@"Expanded status message. at %@", e.timestamp];
+                    cell.accessibilityHint = @"Collapses this group";
+                }
+            } else {
+                cell.accessory.text = FA_PLUS_SQUARE_O;
+                cell.accessibilityLabel = [NSString stringWithFormat:@"Collapsed status messages. at %@", e.timestamp];
+                cell.accessibilityHint = @"Expands this group";
+            }
+            cell.accessory.hidden = NO;
+        } else if(e.rowType == ROW_FAILED) {
+            cell.accessory.hidden = NO;
+            cell.accessory.text = FA_EXCLAMATION_TRIANGLE;
+            cell.accessory.textColor = [UIColor networkErrorColor];
         } else {
-            cell.topBorder.hidden = cell.bottomBorder.hidden = YES;
-            cell.timestampLeft.textAlignment = NSTextAlignmentLeft;
-            cell.timestampRight.textAlignment = NSTextAlignmentRight;
-        }
-        cell.codeBlockBackground.backgroundColor = [UIColor codeSpanBackgroundColor];
-        cell.codeBlockBackground.hidden = !e.isCodeBlock;
-        if(e.isCodeBlock) {
-            cell.messageOffsetTop.constant += 6;
-            cell.messageOffsetLeft.constant += 6;
-            cell.messageOffsetBottom.constant += 6;
-            cell.messageOffsetRight.constant += 6;
+            cell.accessory.hidden = YES;
         }
         
-        if(e.rowType == ROW_SOCKETCLOSED) {
-            cell.socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
-            cell.socketClosedBar.hidden = NO;
-            if(!e.msg.length) {
-                cell.message.text = nil;
-                cell.timestampLeft.text = nil;
-                cell.timestampRight.text = nil;
+        if(e.links.count) {
+            if(e.pending || [e.color isEqual:[UIColor timestampColor]])
+                cell.message.linkAttributes = _lightLinkAttributes;
+            else
+                cell.message.linkAttributes = _linkAttributes;
+            @try {
+                for(NSTextCheckingResult *result in e.links) {
+                    if(result.resultType == NSTextCheckingTypeLink) {
+                        if(result.URL)
+                            [cell.message addLinkWithTextCheckingResult:result];
+                    } else {
+                        NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
+                        if(![url hasPrefix:@"irc"]) {
+                            CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                            if(url_escaped != NULL) {
+                                url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
+                                CFRelease(url_escaped);
+                            }
+                        }
+                        NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
+                        if(u)
+                            [cell.message addLinkToURL:u withRange:result.range];
+                    }
+                }
             }
-            cell.messageOffsetBottom.constant = FONT_SIZE;
-        } else {
-            cell.socketClosedBar.hidden = YES;
+            @catch (NSException *exception) {
+                NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
+            }
         }
+        if(cell.nickname.text.length && e.realnameLinks.count) {
+            cell.nickname.linkAttributes = _lightLinkAttributes;
+            @try {
+                for(NSTextCheckingResult *result in e.realnameLinks) {
+                    if(result.resultType == NSTextCheckingTypeLink) {
+                        if(result.URL)
+                            [cell.nickname addLinkToURL:result.URL withRange:NSMakeRange(result.range.location + e.formattedNick.length + 1, result.range.length)];
+                    } else {
+                        NSString *url = [[e.formattedRealname attributedSubstringFromRange:result.range] string];
+                        if(![url hasPrefix:@"irc"]) {
+                            CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+                            if(url_escaped != NULL) {
+                                url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
+                                CFRelease(url_escaped);
+                            }
+                        }
+                        NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
+                        if(u)
+                            [cell.nickname addLinkToURL:u withRange:NSMakeRange(result.range.location + e.formattedNick.length + 1, result.range.length)];
+                    }
+                }
+            }
+            @catch (NSException *exception) {
+                NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
+            }
+        }
+    }
+    cell.timestampLeft.hidden = !__timeLeftPref;
+    cell.timestampRight.hidden = __timeLeftPref;
+    UILabel *timestamp = __timeLeftPref ? cell.timestampLeft : cell.timestampRight;
+    if(e.rowType == ROW_LASTSEENEID) {
+        timestamp.hidden = YES;
+        cell.lastSeenEIDBackground.backgroundColor = [UIColor timestampColor];
+        cell.lastSeenEIDBackground.hidden = NO;
+        cell.lastSeenEID.textColor = [UIColor timestampColor];
+        cell.lastSeenEID.superview.backgroundColor = [UIColor contentBackgroundColor];
+        cell.lastSeenEID.superview.hidden = NO;
+        cell.lastSeenEIDOffset.constant = __avatarsOffPref ? 0 : cell.messageOffsetLeft.constant;
+    } else {
+        cell.lastSeenEIDBackground.hidden = YES;
+        cell.lastSeenEID.superview.hidden = YES;
+        timestamp.text = e.timestamp;
+        cell.timestampWidth.constant = __timestampWidth;
+        cell.lastSeenEIDOffset.constant = 0;
+    }
+    if(e.rowType == ROW_TIMESTAMP) {
+        timestamp.font = [ColorFormatter messageFont:__monospacePref];
+        timestamp.textColor = [UIColor messageTextColor];
+        cell.timestampWidth.constant = tableView.bounds.size.width;
+    } else if(e.isHighlight && !e.isSelf) {
+        timestamp.textColor = [UIColor highlightTimestampColor];
+    } else if(e.rowType == ROW_FAILED || [e.bgColor isEqual:[UIColor errorBackgroundColor]]) {
+        timestamp.textColor = [UIColor networkErrorColor];
+    } else {
+        timestamp.textColor = [UIColor timestampColor];
+    }
+    if(e.rowType == ROW_BACKLOG) {
+        timestamp.hidden = YES;
+        cell.lastSeenEIDBackground.backgroundColor = [UIColor backlogDividerColor];
+        cell.lastSeenEIDBackground.hidden = NO;
+        cell.accessibilityElementsHidden = YES;
+    } else if(e.rowType == ROW_LASTSEENEID) {
+        timestamp.backgroundColor = [UIColor contentBackgroundColor];
+    } else {
+        timestamp.backgroundColor = [UIColor clearColor];
+    }
+    if(e.rowType == ROW_TIMESTAMP) {
+        cell.topBorder.backgroundColor = [UIColor timestampTopBorderColor];
+        cell.topBorder.hidden = NO;
         
-        if(e.rowType == ROW_FILE) {
+        cell.bottomBorder.backgroundColor = [UIColor timestampBottomBorderColor];
+        cell.bottomBorder.hidden = NO;
+        cell.messageOffsetBottom.constant = 4;
+        cell.timestampLeft.textAlignment = cell.timestampRight.textAlignment = NSTextAlignmentCenter;
+    } else {
+        cell.topBorder.hidden = cell.bottomBorder.hidden = YES;
+        cell.timestampLeft.textAlignment = NSTextAlignmentLeft;
+        cell.timestampRight.textAlignment = NSTextAlignmentRight;
+    }
+    cell.codeBlockBackground.backgroundColor = [UIColor codeSpanBackgroundColor];
+    cell.codeBlockBackground.hidden = !e.isCodeBlock;
+    if(e.isCodeBlock) {
+        cell.messageOffsetTop.constant += 6;
+        cell.messageOffsetLeft.constant += 6;
+        cell.messageOffsetBottom.constant += 6;
+        cell.messageOffsetRight.constant += 6;
+    }
+
+    if(e.rowType == ROW_SOCKETCLOSED) {
+        cell.socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
+        cell.socketClosedBar.hidden = NO;
+        if(!e.msg.length) {
+            cell.message.text = nil;
+            cell.timestampLeft.text = nil;
+            cell.timestampRight.text = nil;
+        }
+        cell.messageOffsetBottom.constant = FONT_SIZE;
+    } else {
+        cell.socketClosedBar.hidden = YES;
+    }
+
+    if(e.rowType == ROW_FILE) {
+        cell.message.textColor = [UIColor messageTextColor];
+        cell.message.font = [UIFont systemFontOfSize:FONT_SIZE];
+        cell.messageOffsetTop.constant += FONT_SIZE + 4;
+        cell.messageOffsetBottom.constant += FONT_SIZE + 8;
+        cell.messageOffsetLeft.constant += 60;
+        cell.messageOffsetRight.constant += 4;
+    }
+
+    if(e.rowType == ROW_THUMBNAIL) {
+        if([e.entities objectForKey:@"id"]) {
+            cell.message.text = [NSString stringWithFormat:@"%@ • %@", [e.entities objectForKey:@"mime_type"], e.msg];
+            cell.message.numberOfLines = 1;
+            cell.message.lineBreakMode = NSLineBreakByTruncatingTail;
             cell.message.textColor = [UIColor messageTextColor];
             cell.message.font = [UIFont systemFontOfSize:FONT_SIZE];
-            cell.messageOffsetTop.constant += FONT_SIZE + 4;
-            cell.messageOffsetBottom.constant += FONT_SIZE + 8;
-            cell.messageOffsetLeft.constant += 60;
-            cell.messageOffsetRight.constant += 4;
         }
-        
-        if(e.rowType == ROW_THUMBNAIL) {
-            if([e.entities objectForKey:@"id"]) {
-                cell.message.text = [NSString stringWithFormat:@"%@ • %@", [e.entities objectForKey:@"mime_type"], e.msg];
-                cell.message.numberOfLines = 1;
-                cell.message.lineBreakMode = NSLineBreakByTruncatingTail;
-                cell.message.textColor = [UIColor messageTextColor];
-                cell.message.font = [UIFont systemFontOfSize:FONT_SIZE];
-            }
-            cell.messageOffsetLeft.constant += 4;
-            cell.messageOffsetRight.constant += 4;
-        }
-        
-        return cell;
-    //}
+        cell.messageOffsetLeft.constant += 4;
+        cell.messageOffsetRight.constant += 4;
+    }
+
+    return cell;
 }
 
 - (void)LinkLabel:(LinkLabel *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
@@ -2780,7 +2795,21 @@ extern UIImage *__socketClosedBackgroundImage;
                 if(_stickyAvatarYOffsetConstraint.constant >= offset + 4)
                     _stickyAvatarYOffsetConstraint.constant = offset + 4;
                 if(_hiddenAvatarRow != topIndexPath.row) {
-                    _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
+                    _stickyAvatar.image = nil;
+                    NSURL *avatarURL = [e avatar:__largeAvatarHeight * [UIScreen mainScreen].scale];
+                    if(avatarURL) {
+                        UIImage *image = [[ImageCache sharedInstance] imageForURL:avatarURL];
+                        if(image)
+                            _stickyAvatar.image = image;
+                        else
+                            [[ImageCache sharedInstance] fetchURL:avatarURL completionHandler:^(BOOL success) {
+                                if(success)
+                                    [self scrollViewDidScroll:self.tableView];
+                            }];
+                    }
+                    if(!_stickyAvatar.image) {
+                        _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
+                    }
                     _stickyAvatar.hidden = NO;
                     if(_hiddenAvatarRow != -1) {
                         Event *e = [_data objectAtIndex:_hiddenAvatarRow];
@@ -2858,7 +2887,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     NSString *extension = [e.entities objectForKey:@"extension"];
                     if(!extension.length)
                         extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
-                    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [_file_url_template relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]]];
+                    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]]];
                 } else {
                     [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[e.entities objectForKey:@"url"]];
                 }

@@ -25,6 +25,7 @@
 #import "UsersDataSource.h"
 #import "EventsDataSource.h"
 #import "NotificationsDataSource.h"
+#import "CSURITemplate.h"
 
 extern NSString *IRCCLOUD_HOST;
 extern NSString *IRCCLOUD_PATH;
@@ -175,6 +176,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 @property NSDictionary *config;
 @property (readonly) BOOL ready;
 @property (readonly) NSOperationQueue *queue;
+@property CSURITemplate *fileURITemplate, *pasteURITemplate, *avatarURITemplate, *avatarRedirectURITemplate;
 
 +(NetworkConnection*)sharedInstance;
 +(void)sync;

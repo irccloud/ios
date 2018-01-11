@@ -15,7 +15,6 @@
 //  limitations under the License.
 
 #import <Foundation/Foundation.h>
-#import "CSURITemplate.h"
 #import "YYImage.h"
 
 typedef void (^imageCompletionHandler)(BOOL);
@@ -23,7 +22,6 @@ typedef void (^imageCompletionHandler)(BOOL);
 @interface ImageCache : NSObject {
     NSURL *_cachePath;
     NSURLSession *_session;
-    CSURITemplate *_template;
     NSMutableDictionary *_tasks;
     NSMutableDictionary *_images;
     NSMutableDictionary *_failures;

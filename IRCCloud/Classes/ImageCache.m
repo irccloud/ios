@@ -77,7 +77,6 @@
     @synchronized(_images) {
         [_images removeAllObjects];
     }
-    _template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
 }
 
 -(void)clearFailedURLs {
@@ -112,11 +111,11 @@
 }
 
 -(BOOL)isValidFileID:(NSString *)fileID {
-    return [self isValidURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID} error:nil]]];
+    return [self isValidURL:[NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID} error:nil]]];
 }
 
 -(BOOL)isValidFileID:(NSString *)fileID width:(int)width {
-    return [self isValidURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
+    return [self isValidURL:[NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
 }
 
 -(BOOL)isLoaded:(NSURL *)url {
@@ -126,7 +125,7 @@
 }
 
 -(BOOL)isLoaded:(NSString *)fileID width:(int)width {
-    return [self isLoaded:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
+    return [self isLoaded:[NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
 }
 
 -(UIImage *)imageForURL:(NSURL *)url {
@@ -162,11 +161,11 @@
 }
 
 -(UIImage *)imageForFileID:(NSString *)fileID {
-    return [self imageForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID} error:nil]]];
+    return [self imageForURL:[NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID} error:nil]]];
 }
 
 -(UIImage *)imageForFileID:(NSString *)fileID width:(int)width {
-    return [self imageForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
+    return [self imageForURL:[NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
 }
 
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler {
@@ -208,11 +207,11 @@
 }
 
 -(void)fetchFileID:(NSString *)fileID completionHandler:(imageCompletionHandler)handler {
-    return [self fetchURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID} error:nil]] completionHandler:handler];
+    return [self fetchURL:[NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID} error:nil]] completionHandler:handler];
 }
 
 -(void)fetchFileID:(NSString *)fileID width:(int)width completionHandler:(imageCompletionHandler)handler {
-    return [self fetchURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]] completionHandler:handler];
+    return [self fetchURL:[NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]] completionHandler:handler];
 }
 
 -(NSURL *)pathForURL:(NSURL *)url {
@@ -223,11 +222,11 @@
 }
 
 -(NSURL *)pathForFileID:(NSString *)fileID {
-    return [self pathForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID} error:nil]]];
+    return [self pathForURL:[NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID} error:nil]]];
 }
 
 -(NSURL *)pathForFileID:(NSString *)fileID width:(int)width {
-    return [self pathForURL:[NSURL URLWithString:[_template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
+    return [self pathForURL:[NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
 }
 
 

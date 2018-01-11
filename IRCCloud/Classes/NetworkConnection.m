@@ -1184,6 +1184,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(![[_config objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
         _globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [_config objectForKey:@"ios_app"]];
 #endif
+    self.fileURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
+    self.pasteURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
+    self.avatarURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"avatar_uri_template"] error:nil];
+    self.avatarRedirectURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"avatar_redirect_uri_template"] error:nil];
     return _config;
 }
 

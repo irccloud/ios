@@ -15,7 +15,6 @@
 //  limitations under the License.
 
 #import <UIKit/UIKit.h>
-#import "CSURITemplate.h"
 
 @protocol FilesTableViewDelegate<NSObject>
 -(void)filesTableViewControllerDidSelectFile:(NSDictionary *)file message:(NSString *)message;
@@ -32,7 +31,6 @@
     id<FilesTableViewDelegate> _delegate;
     UIView *_footerView;
     NSDictionary *_selectedFile;
-    CSURITemplate *_url_template;
 }
 @property id<FilesTableViewDelegate> delegate;
 @end

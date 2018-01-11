@@ -124,6 +124,9 @@
         decodeObject(_entities);
         decodeFloat(_timestampPosition);
         decodeDouble(_serverTime);
+        decodeObject(_avatar);
+        decodeObject(_avatarURL);
+        
         if(_rowType == ROW_TIMESTAMP)
             _bgColor = [UIColor timestampBackgroundColor];
         else if(_rowType == ROW_LASTSEENEID)
@@ -179,11 +182,14 @@
     encodeObject(_day);
     encodeObject(_ignoreMask);
     encodeObject(_chan);
-    if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
-        encodeObject(_bgColor);
     encodeObject(_entities);
     encodeFloat(_timestampPosition);
     encodeDouble(_serverTime);
+    encodeObject(_avatar);
+    encodeObject(_avatarURL);
+    
+    if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
+        encodeObject(_bgColor);
 }
 
 -(NSTimeInterval)time {
@@ -197,6 +203,34 @@
     if(!_UUID)
         _UUID = [[NSUUID UUID] UUIDString];
     return _UUID;
+}
+
+-(NSURL *)avatar:(int)size {
+    if(!_cachedAvatarURL || size != _cachedAvatarSize) {
+        if(_avatar.length) {
+            _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":_avatar, @"modifiers":[NSString stringWithFormat:@"w%i", size]} error:nil]];
+        } else if([_avatarURL hasPrefix:@"https://"]) {
+            if([_avatarURL containsString:@"{size}"]) {
+                CSURITemplate *template = [CSURITemplate URITemplateWithString:_avatarURL error:nil];
+                _cachedAvatarURL = [NSURL URLWithString:[template relativeStringWithVariables:@{@"size":@(size)} error:nil]];
+            } else {
+                _cachedAvatarURL = [NSURL URLWithString:_avatarURL];
+            }
+        } else {
+            _cachedAvatarURL = nil;
+#ifndef ENTERPRISE
+            NSString *ident = [_hostmask substringToIndex:[_hostmask rangeOfString:@"@"].location];
+            if([ident hasPrefix:@"uid"] || [ident hasPrefix:@"sid"]) {
+                ident = [ident substringFromIndex:3];
+                if([ident intValue])
+                    _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarRedirectURITemplate relativeStringWithVariables:@{@"id":ident, @"modifiers":[NSString stringWithFormat:@"w%i", size]} error:nil]];
+            }
+#endif
+        }
+    }
+    if(_cachedAvatarURL)
+        _cachedAvatarSize = size;
+    return _cachedAvatarURL;
 }
 @end
 
@@ -992,7 +1026,9 @@
     event.monospace = NO;
     event.entities = [object objectForKey:@"entities"];
     event.serverTime = [[object objectForKey:@"server_time"] doubleValue];
-    
+    event.avatar = [object objectForKey:@"avatar"];
+    event.avatarURL = [object objectForKey:@"avatar_url"];
+
     void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:object.type];
     if(formatter)
         formatter(event, object);

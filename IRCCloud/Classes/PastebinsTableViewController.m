@@ -214,7 +214,6 @@
     [super viewDidLoad];
     self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
     self.navigationController.navigationBar.clipsToBounds = YES;
-    _url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
     
     _footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
     _footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
@@ -450,7 +449,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     _selectedPaste = [_pastes objectAtIndex:indexPath.row];
     if(_selectedPaste) {
-        NSString *url = [_url_template relativeStringWithVariables:_selectedPaste error:nil];
+        NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:_selectedPaste error:nil];
         url = [url stringByAppendingFormat:@"?id=%@&own_paste=%@", [_selectedPaste objectForKey:@"id"], [_selectedPaste objectForKey:@"own_paste"]];
         PastebinViewController *c = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"PastebinViewController"];
         [c setUrl:[NSURL URLWithString:url]];

@@ -20,7 +20,6 @@
 #import "CollapsedEvents.h"
 #import "NetworkConnection.h"
 #import "HighlightsCountView.h"
-#import "CSURITemplate.h"
 #import "LinkLabel.h"
 #import "URLHandler.h"
 
@@ -73,9 +72,6 @@
     NSDictionary *_linkAttributes;
     NSDictionary *_lightLinkAttributes;
 
-    CSURITemplate *_file_url_template;
-    CSURITemplate *_paste_url_template;
-    
     NSString *_groupIndent;
     id<UIViewControllerPreviewing> __previewer;
     UILongPressGestureRecognizer *lp;

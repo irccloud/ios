@@ -15,7 +15,6 @@
 //  limitations under the License.
 
 #import <UIKit/UIKit.h>
-#import "CSURITemplate.h"
 
 @protocol PastebinsTableViewDelegate<NSObject>
 -(void)pastebinsTableViewControllerDidSelectFile:(NSDictionary *)file message:(NSString *)message;
@@ -28,7 +27,6 @@
     id<PastebinsTableViewDelegate> _delegate;
     UIView *_footerView;
     NSDictionary *_selectedPaste;
-    CSURITemplate *_url_template;
     NSDictionary *_fileTypeMap;
     NSMutableDictionary *_extensions;
 }

@@ -70,9 +70,7 @@
 }
 
 -(void)_fetchPaste {
-    CSURITemplate *url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
-
-    NSString *url = [url_template relativeStringWithVariables:@{@"id":_pasteID, @"type":@"json"} error:nil];
+    NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":_pasteID, @"type":@"json"} error:nil];
     
     NSURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {

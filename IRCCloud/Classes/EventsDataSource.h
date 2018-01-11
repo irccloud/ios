@@ -90,10 +90,14 @@
     NSTimeInterval _parent;
     NSString *_UUID;
     NSInteger _row;
+    NSString *_avatar;
+    NSString *_avatarURL;
+    int _cachedAvatarSize;
+    NSURL *_cachedAvatarURL;
 }
 @property (nonatomic, assign) int cid, bid, rowType, reqId, childEventCount;
 @property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime, parent;
-@property (nonatomic, copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue;
+@property (nonatomic, copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue, *avatar, *avatarURL;
 @property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted, isCodeBlock;
 @property (nonatomic, copy) NSDictionary *ops,*entities;
 @property (nonatomic, strong) UIColor *color, *bgColor;
@@ -109,6 +113,7 @@
 -(NSTimeInterval)time;
 -(NSString *)UUID;
 -(Event *)copy;
+-(NSURL *)avatar:(int)size;
 @end
 
 @interface EventsDataSource : NSObject {

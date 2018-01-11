@@ -104,7 +104,6 @@
     self.navigationItem.title = @"File Uploads";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];
-    _url_template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
     _formatter = [[NSDateFormatter alloc] init];
     _formatter.dateStyle = NSDateFormatterLongStyle;
     _formatter.timeStyle = NSDateFormatterMediumStyle;
@@ -333,7 +332,7 @@
         int exp = (int)(log(bytes) / log(1024));
         [c setFilename:[_selectedFile objectForKey:@"name"] metadata:[NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [_selectedFile objectForKey:@"mime_type"]]];
         [c setImage:[[ImageCache sharedInstance] imageForFileID:[_selectedFile objectForKey:@"id"] width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale]];
-        [c setURL:[_url_template relativeStringWithVariables:_selectedFile error:nil]];
+        [c setURL:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:_selectedFile error:nil]];
         [self.navigationController pushViewController:c animated:YES];
     }
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

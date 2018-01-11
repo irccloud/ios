@@ -57,12 +57,10 @@
             if(![NetworkConnection sharedInstance].config)
                 [NetworkConnection sharedInstance].config = [[NetworkConnection sharedInstance] requestConfiguration];
             
-            CSURITemplate *template = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
-
             if([type hasPrefix:@"image/"])
-                attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", ([UIScreen mainScreen].bounds.size.width/2) * [UIScreen mainScreen].scale]} error:nil]];
+                attachment = [NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", ([UIScreen mainScreen].bounds.size.width/2) * [UIScreen mainScreen].scale]} error:nil]];
             else
-                attachment = [NSURL URLWithString:[template relativeStringWithVariables:@{@"id":fileID} error:nil]];
+                attachment = [NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID} error:nil]];
         } else if([d boolForKey:@"thirdPartyNotificationPreviews"]) {
             NSDictionary *extensions = @{@"png":(NSString *)kUTTypePNG,
                                          @"jpg":(NSString *)kUTTypeJPEG,
