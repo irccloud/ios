@@ -567,6 +567,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:!_notificationPreviews.isOn forKey:@"disableNotificationPreviews"];
         [[NSUserDefaults standardUserDefaults] setBool:_thirdPartyNotificationPreviews.isOn forKey:@"thirdPartyNotificationPreviews"];
         [[NSUserDefaults standardUserDefaults] setBool:_clearFormattingAfterSending.isOn forKey:@"clearFormattingAfterSending"];
+        [[NSUserDefaults standardUserDefaults] setBool:_avatarImages.isOn forKey:@"avatarImages"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -836,6 +837,7 @@
                          @{@"title":@"Colourise Nicknames", @"accessory":_colors},
                          @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
                          @{@"title":@"Enlarge Emoji Messages", @"accessory":_disableBigEmoji},
+                         @{@"title":@"Avatar Images", @"accessory":_avatarImages},
                          ]},
               @{@"title":@"Chat & Embeds", @"items":@[
                         @{@"title":@"Show Joins, Parts, Quits", @"accessory":_hideJoinPart},
@@ -941,6 +943,7 @@
     _inlineImages = [[UISwitch alloc] init];
     [_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
     _clearFormattingAfterSending = [[UISwitch alloc] init];
+    _avatarImages = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1174,6 +1177,7 @@
     _notificationPreviews.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"disableNotificationPreviews"];
     _thirdPartyNotificationPreviews.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"thirdPartyNotificationPreviews"];
     _clearFormattingAfterSending.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"];
+    _avatarImages.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"];
 }
 
 -(void)hideJoinPartToggled:(id)sender {

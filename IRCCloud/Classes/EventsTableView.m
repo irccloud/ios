@@ -88,6 +88,7 @@ BOOL __disableBigEmojiPref = NO;
 BOOL __disableCodeSpanPref = NO;
 BOOL __disableCodeBlockPref = NO;
 BOOL __disableQuotePref = NO;
+BOOL __avatarImages = YES;
 int __smallAvatarHeight;
 int __largeAvatarHeight = 32;
 
@@ -1673,6 +1674,7 @@ extern UIImage *__socketClosedBackgroundImage;
         __disableCodeBlockPref = NO;
         __disableQuotePref = NO;
         __inlineMediaPref = NO;
+        __avatarImages = YES;
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         if(prefs) {
             __monospacePref = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
@@ -1690,6 +1692,7 @@ extern UIImage *__socketClosedBackgroundImage;
             __disableCodeSpanPref = [[prefs objectForKey:@"chat-nocodespan"] boolValue];
             __disableCodeBlockPref = [[prefs objectForKey:@"chat-nocodeblock"] boolValue];
             __disableQuotePref = [[prefs objectForKey:@"chat-noquote"] boolValue];
+            __avatarImages = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"];
 
             NSDictionary *hiddenMap;
             
@@ -2365,18 +2368,20 @@ extern UIImage *__socketClosedBackgroundImage;
     if(__avatarsOffPref) {
         cell.avatar.image = nil;
     } else {
-        NSURL *avatarURL = [e avatar:avatarHeight * [UIScreen mainScreen].scale];
-        if(avatarURL) {
-            UIImage *image = [[ImageCache sharedInstance] imageForURL:avatarURL];
-            if(image) {
-                cell.avatar.image = image;
-                cell.avatar.layer.cornerRadius = 5.0;
-                cell.avatar.layer.masksToBounds = YES;
-            } else if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:avatarURL].path]) {
-                [[ImageCache sharedInstance] fetchURL:avatarURL completionHandler:^(BOOL success) {
-                    if(success)
-                        [self reloadForEvent:e];
-                }];
+        if(__avatarImages) {
+            NSURL *avatarURL = [e avatar:avatarHeight * [UIScreen mainScreen].scale];
+            if(avatarURL) {
+                UIImage *image = [[ImageCache sharedInstance] imageForURL:avatarURL];
+                if(image) {
+                    cell.avatar.image = image;
+                    cell.avatar.layer.cornerRadius = 5.0;
+                    cell.avatar.layer.masksToBounds = YES;
+                } else if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:avatarURL].path]) {
+                    [[ImageCache sharedInstance] fetchURL:avatarURL completionHandler:^(BOOL success) {
+                        if(success)
+                            [self reloadForEvent:e];
+                    }];
+                }
             }
         }
         if(!cell.avatar.image) {
@@ -2800,16 +2805,18 @@ extern UIImage *__socketClosedBackgroundImage;
                     _stickyAvatarYOffsetConstraint.constant = offset + 4;
                 if(_hiddenAvatarRow != topIndexPath.row) {
                     _stickyAvatar.image = nil;
-                    NSURL *avatarURL = [e avatar:__largeAvatarHeight * [UIScreen mainScreen].scale];
-                    if(avatarURL) {
-                        UIImage *image = [[ImageCache sharedInstance] imageForURL:avatarURL];
-                        if(image)
-                            _stickyAvatar.image = image;
-                        else
-                            [[ImageCache sharedInstance] fetchURL:avatarURL completionHandler:^(BOOL success) {
-                                if(success)
-                                    [self scrollViewDidScroll:self.tableView];
-                            }];
+                    if(__avatarImages) {
+                        NSURL *avatarURL = [e avatar:__largeAvatarHeight * [UIScreen mainScreen].scale];
+                        if(avatarURL) {
+                            UIImage *image = [[ImageCache sharedInstance] imageForURL:avatarURL];
+                            if(image)
+                                _stickyAvatar.image = image;
+                            else
+                                [[ImageCache sharedInstance] fetchURL:avatarURL completionHandler:^(BOOL success) {
+                                    if(success)
+                                        [self scrollViewDidScroll:self.tableView];
+                                }];
+                        }
                     }
                     if(!_stickyAvatar.image) {
                         _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];

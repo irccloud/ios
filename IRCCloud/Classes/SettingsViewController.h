@@ -68,6 +68,7 @@
     UISwitch *_disableQuote;
     UISwitch *_inlineImages;
     UISwitch *_clearFormattingAfterSending;
+    UISwitch *_avatarImages;
     NSString *_version;
     UISlider *_fontSize;
     NSString *_oldTheme;
