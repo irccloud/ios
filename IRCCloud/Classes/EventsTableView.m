@@ -2809,17 +2809,21 @@ extern UIImage *__socketClosedBackgroundImage;
                         NSURL *avatarURL = [e avatar:__largeAvatarHeight * [UIScreen mainScreen].scale];
                         if(avatarURL) {
                             UIImage *image = [[ImageCache sharedInstance] imageForURL:avatarURL];
-                            if(image)
+                            if(image) {
                                 _stickyAvatar.image = image;
-                            else
+                                _stickyAvatar.layer.cornerRadius = 5.0;
+                                _stickyAvatar.layer.masksToBounds = YES;
+                            } else {
                                 [[ImageCache sharedInstance] fetchURL:avatarURL completionHandler:^(BOOL success) {
                                     if(success)
                                         [self scrollViewDidScroll:self.tableView];
                                 }];
+                            }
                         }
                     }
                     if(!_stickyAvatar.image) {
                         _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
+                        _stickyAvatar.layer.cornerRadius = 0;
                     }
                     _stickyAvatar.hidden = NO;
                     if(_hiddenAvatarRow != -1) {
