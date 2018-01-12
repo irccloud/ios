@@ -1729,6 +1729,9 @@ extern BOOL __compact;
                      @"ladybug":@"🐞",
                      @"ladybeetle":@"🐞",
                      @"coccinellid":@"🐞",
+                     @"cursing":@"🤬",
+                     @"swearing":@"🤬",
+                     @"fuck":@"🤬",
                      };
     
     static NSRegularExpression *_pattern;
