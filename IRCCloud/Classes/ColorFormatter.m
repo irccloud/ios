@@ -2325,7 +2325,7 @@ extern BOOL __compact;
                 for(NSTextCheckingResult *match in results) {
                     NSRange matchRange = [match rangeAtIndex:2];
                     unichar lastChar = [[output string] characterAtIndex:matchRange.location + matchRange.length - 1];
-                    if([self unbalanced:output.string] || lastChar == '.' || lastChar == '?' || lastChar == '!' || lastChar == ',' || lastChar == ':' || lastChar == ';') {
+                    if([self unbalanced:[output.string substringWithRange:matchRange]] || lastChar == '.' || lastChar == '?' || lastChar == '!' || lastChar == ',' || lastChar == ':' || lastChar == ';') {
                         matchRange.length--;
                     }
                     if(matchRange.length > 1) {
