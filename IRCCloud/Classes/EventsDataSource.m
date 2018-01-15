@@ -206,7 +206,7 @@
 }
 
 -(NSURL *)avatar:(int)size {
-    if(!_cachedAvatarURL || size != _cachedAvatarSize) {
+    if([self isMessage] && (!_cachedAvatarURL || size != _cachedAvatarSize)) {
         if(_avatar.length) {
             _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":_avatar, @"modifiers":[NSString stringWithFormat:@"w%i", size]} error:nil]];
         } else if([_avatarURL hasPrefix:@"https://"]) {
