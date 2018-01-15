@@ -39,8 +39,14 @@
 #else
         NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
 #endif
+        int memoryCacheSize = 1024*1024*16; //16MB
+        int diskCacheSize = 1024*1024*500; //500MB
+        NSURLCache *httpCache = [[NSURLCache alloc] initWithMemoryCapacity:memoryCacheSize diskCapacity:diskCacheSize diskPath:@"httpCache"];
+        [NSURLCache setSharedURLCache:httpCache];
         _cachePath = [sharedcontainer URLByAppendingPathComponent:@"imagecache"];
         _session = [NSURLSession sharedSession];
+        _session.configuration.URLCache = httpCache;
+        _session.configuration.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
         _tasks = [[NSMutableDictionary alloc] init];
         _images = [[NSMutableDictionary alloc] init];
         _failures = [[NSMutableDictionary alloc] init];
@@ -173,6 +179,7 @@
         if([_tasks objectForKey:url] || [_failures objectForKey:url]) {
             return;
         }
+        
         NSURLSessionDownloadTask *task = [[NSURLSession sharedSession] downloadTaskWithURL:url completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
             [_tasks removeObjectForKey:url];
             if(error) {
