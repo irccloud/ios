@@ -46,4 +46,5 @@ typedef void (^imageCompletionHandler)(BOOL);
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler;
 -(void)fetchFileID:(NSString *)fileID completionHandler:(imageCompletionHandler)handler;
 -(void)fetchFileID:(NSString *)fileID width:(int)width completionHandler:(imageCompletionHandler)handler;
+-(NSTimeInterval)ageOfCache:(NSURL *)url;
 @end

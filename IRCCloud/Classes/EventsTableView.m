@@ -2373,12 +2373,22 @@ extern UIImage *__socketClosedBackgroundImage;
         if(__avatarImages) {
             NSURL *avatarURL = [e avatar:avatarHeight * [UIScreen mainScreen].scale];
             if(avatarURL) {
+                BOOL needsRefresh = NO;
+                if(![[ImageCache sharedInstance] isLoaded:avatarURL])
+                    needsRefresh = [[ImageCache sharedInstance] ageOfCache:avatarURL] >= 600;
+                
+                if(needsRefresh) {
+                    NSLog(@"Avatar needs refresh: %@", avatarURL);
+                }
+                
                 UIImage *image = [[ImageCache sharedInstance] imageForURL:avatarURL];
                 if(image) {
                     cell.avatar.image = image;
                     cell.avatar.layer.cornerRadius = 5.0;
                     cell.avatar.layer.masksToBounds = YES;
-                } else if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:avatarURL].path]) {
+                }
+                
+                if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:avatarURL].path] || needsRefresh) {
                     [[ImageCache sharedInstance] fetchURL:avatarURL completionHandler:^(BOOL success) {
                         if(success)
                             [self reloadForEvent:e];

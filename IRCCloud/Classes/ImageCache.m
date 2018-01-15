@@ -229,5 +229,12 @@
     return [self pathForURL:[NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%i", width]} error:nil]]];
 }
 
+-(NSTimeInterval)ageOfCache:(NSURL *)url {
+    NSString *path = [self pathForURL:url].path;
+    if([[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        return fabs([[[[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil] fileModificationDate] timeIntervalSinceNow]);
+    }
+    return -1;
+}
 
 @end
