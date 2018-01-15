@@ -219,11 +219,13 @@
         } else {
             _cachedAvatarURL = nil;
 #ifndef ENTERPRISE
-            NSString *ident = [_hostmask substringToIndex:[_hostmask rangeOfString:@"@"].location];
-            if([ident hasPrefix:@"uid"] || [ident hasPrefix:@"sid"]) {
-                ident = [ident substringFromIndex:3];
-                if([ident intValue])
-                    _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarRedirectURITemplate relativeStringWithVariables:@{@"id":ident, @"modifiers":[NSString stringWithFormat:@"w%i", size]} error:nil]];
+            if([_hostmask rangeOfString:@"@"].location != NSNotFound) {
+                NSString *ident = [_hostmask substringToIndex:[_hostmask rangeOfString:@"@"].location];
+                if([ident hasPrefix:@"uid"] || [ident hasPrefix:@"sid"]) {
+                    ident = [ident substringFromIndex:3];
+                    if([ident intValue])
+                        _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarRedirectURITemplate relativeStringWithVariables:@{@"id":ident, @"modifiers":[NSString stringWithFormat:@"w%i", size]} error:nil]];
+                }
             }
 #endif
         }
