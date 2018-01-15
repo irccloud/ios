@@ -2324,10 +2324,11 @@ extern BOOL __compact;
             if(results.count) {
                 for(NSTextCheckingResult *match in results) {
                     NSRange matchRange = [match rangeAtIndex:2];
-                    if([[[output string] substringWithRange:matchRange] hasSuffix:@"."]) {
-                        NSRange ranges[1] = {NSMakeRange(matchRange.location, matchRange.length - 1)};
-                        [matches addObject:[NSTextCheckingResult regularExpressionCheckingResultWithRanges:ranges count:1 regularExpression:match.regularExpression]];
-                    } else {
+                    unichar lastChar = [[output string] characterAtIndex:matchRange.location + matchRange.length - 1];
+                    if([self unbalanced:output.string] || lastChar == '.' || lastChar == '?' || lastChar == '!' || lastChar == ',' || lastChar == ':' || lastChar == ';') {
+                        matchRange.length--;
+                    }
+                    if(matchRange.length > 1) {
                         NSRange ranges[1] = {NSMakeRange(matchRange.location, matchRange.length)};
                         [matches addObject:[NSTextCheckingResult regularExpressionCheckingResultWithRanges:ranges count:1 regularExpression:match.regularExpression]];
                     }
@@ -2492,7 +2493,7 @@ extern BOOL __compact;
                 if(range.location + range.length < string.length && [string characterAtIndex:range.location + range.length - 1] != '/' && [string characterAtIndex:range.location + range.length] == '/')
                     range.length++;
                 NSString *url = [string substringWithRange:result.range];
-                if([self unbalanced:url] || [url hasSuffix:@"."] || [url hasSuffix:@"?"] || [url hasSuffix:@"!"] || [url hasSuffix:@","]) {
+                if([self unbalanced:url] || [url hasSuffix:@"."] || [url hasSuffix:@"?"] || [url hasSuffix:@"!"] || [url hasSuffix:@","] || [url hasSuffix:@":"] || [url hasSuffix:@";"]) {
                     url = [url substringToIndex:url.length - 1];
                     range.length--;
                 }
