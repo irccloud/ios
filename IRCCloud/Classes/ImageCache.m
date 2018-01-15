@@ -180,7 +180,7 @@
             return;
         }
         
-        NSURLSessionDownloadTask *task = [[NSURLSession sharedSession] downloadTaskWithURL:url completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
+        NSURLSessionDownloadTask *task = [_session downloadTaskWithURL:url completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
             [_tasks removeObjectForKey:url];
             if(error) {
                 CLS_LOG(@"Download failed: %@", error);
