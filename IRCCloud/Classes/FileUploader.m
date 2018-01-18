@@ -40,6 +40,7 @@
 #ifndef EXTENSION
     [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
+    CLS_LOG(@"File upload cancelled");
     _cancelled = YES;
     _bid = -1;
     _msg = _filename = _originalFilename = _mimeType = nil;
@@ -465,8 +466,10 @@
 #ifndef EXTENSION
     [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
-    if(_cancelled)
+    if(_cancelled) {
+        CLS_LOG(@"Upload finished but it was cancelled");
         return;
+    }
     NSDictionary *d = [NSJSONSerialization JSONObjectWithData:_response options:kNilOptions error:nil];
     if(d) {
         CLS_LOG(@"Upload finished: %@", d);
@@ -527,9 +530,7 @@
     if(error) {
 #ifndef EXTENSION
         if([error.domain isEqualToString:NSURLErrorDomain]) {
-            if(error.code == NSURLErrorUnknown)
-                return;
-            if(error.code == NSURLErrorBackgroundSessionWasDisconnected) {
+            if(error.code == NSURLErrorUnknown || error.code == NSURLErrorBackgroundSessionWasDisconnected) {
                 CLS_LOG(@"Lost connection to background upload service, retrying in-process");
                 NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/upload", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10];
                 [request setHTTPShouldHandleCookies:NO];
