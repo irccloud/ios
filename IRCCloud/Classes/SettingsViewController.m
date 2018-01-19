@@ -568,6 +568,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:_thirdPartyNotificationPreviews.isOn forKey:@"thirdPartyNotificationPreviews"];
         [[NSUserDefaults standardUserDefaults] setBool:_clearFormattingAfterSending.isOn forKey:@"clearFormattingAfterSending"];
         [[NSUserDefaults standardUserDefaults] setBool:_avatarImages.isOn forKey:@"avatarImages"];
+        [[NSUserDefaults standardUserDefaults] setBool:_backgroundUploads.isOn forKey:@"backgroundUploads"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -802,7 +803,8 @@
     }
     [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":_saveToCameraRoll}];
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
-    
+    [photos addObject:@{@"title":@"Upload In The Background", @"accessory":_backgroundUploads}];
+
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
     if(@available(iOS 10, *)) {
         [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":_defaultSound}];
@@ -944,6 +946,7 @@
     [_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
     _clearFormattingAfterSending = [[UISwitch alloc] init];
     _avatarImages = [[UISwitch alloc] init];
+    _backgroundUploads = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1178,6 +1181,7 @@
     _thirdPartyNotificationPreviews.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"thirdPartyNotificationPreviews"];
     _clearFormattingAfterSending.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"];
     _avatarImages.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"];
+    _backgroundUploads.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"];
 }
 
 -(void)hideJoinPartToggled:(id)sender {

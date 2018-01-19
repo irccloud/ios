@@ -218,37 +218,45 @@
 #endif
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
-    NSURLSession *session;
-    NSURLSessionConfiguration *config;
-    config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
-#ifdef ENTERPRISE
-    config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
-#else
-    config.sharedContainerIdentifier = @"group.com.irccloud.share";
-#endif
-    config.HTTPCookieStorage = nil;
-    config.URLCache = nil;
-    config.requestCachePolicy = NSURLCacheStorageNotAllowed;
-    config.discretionary = NO;
-    session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-    _body = [[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding];
-    NSURLSessionTask *task = [session downloadTaskWithRequest:request];
     
-    if(session.configuration.identifier) {
-        NSMutableDictionary *tasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
-        if(!tasks)
-            tasks = [[NSMutableDictionary alloc] init];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"]) {
+        NSURLSession *session;
+        NSURLSessionConfiguration *config;
+        config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+#ifdef ENTERPRISE
+        config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
+#else
+        config.sharedContainerIdentifier = @"group.com.irccloud.share";
+#endif
+        config.HTTPCookieStorage = nil;
+        config.URLCache = nil;
+        config.requestCachePolicy = NSURLCacheStorageNotAllowed;
+        config.discretionary = NO;
+        session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+        _body = [[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding];
+        NSURLSessionTask *task = [session downloadTaskWithRequest:request];
         
-        if(_msg)
-            [tasks setObject:@{@"service":@"imgur", @"bid":@(_bid), @"msg":_msg} forKey:session.configuration.identifier];
-        else
-            [tasks setObject:@{@"service":@"imgur", @"bid":@(_bid)} forKey:session.configuration.identifier];
+        if(session.configuration.identifier) {
+            NSMutableDictionary *tasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
+            if(!tasks)
+                tasks = [[NSMutableDictionary alloc] init];
+            
+            if(_msg)
+                [tasks setObject:@{@"service":@"imgur", @"bid":@(_bid), @"msg":_msg} forKey:session.configuration.identifier];
+            else
+                [tasks setObject:@{@"service":@"imgur", @"bid":@(_bid)} forKey:session.configuration.identifier];
 
-        [d setObject:tasks forKey:@"uploadtasks"];
-        [d synchronize];
+            [d setObject:tasks forKey:@"uploadtasks"];
+            [d synchronize];
+        }
+
+        [task resume];
+    } else {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            _connection = [NSURLConnection connectionWithRequest:request delegate:self];
+            [_connection start];
+        }];
     }
-
-    [task resume];
     CFRelease(data_escaped);
 }
 

@@ -398,27 +398,34 @@
     if(_metadatadelegate)
         [_metadatadelegate fileUploadWillUpload:file.length mimeType:_mimeType];
 
-    NSURLSession *session;
-    NSURLSessionConfiguration *config;
-    config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"]) {
+        NSURLSession *session;
+        NSURLSessionConfiguration *config;
+        config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
 #ifdef ENTERPRISE
-    config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
+        config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
 #else
-    config.sharedContainerIdentifier = @"group.com.irccloud.share";
+        config.sharedContainerIdentifier = @"group.com.irccloud.share";
 #endif
-    config.HTTPCookieStorage = nil;
-    config.URLCache = nil;
-    config.requestCachePolicy = NSURLCacheStorageNotAllowed;
-    config.discretionary = NO;
-    session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-    NSURLSessionTask *task = [session downloadTaskWithRequest:request];
-    
-    if(session.configuration.identifier) {
-        _backgroundID = session.configuration.identifier;
-        [self _updateBackgroundUploadMetadata];
-    }
+        config.HTTPCookieStorage = nil;
+        config.URLCache = nil;
+        config.requestCachePolicy = NSURLCacheStorageNotAllowed;
+        config.discretionary = NO;
+        session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+        NSURLSessionTask *task = [session downloadTaskWithRequest:request];
+        
+        if(session.configuration.identifier) {
+            _backgroundID = session.configuration.identifier;
+            [self _updateBackgroundUploadMetadata];
+        }
 
-    [task resume];
+        [task resume];
+    } else {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            _connection = [NSURLConnection connectionWithRequest:request delegate:self];
+            [_connection start];
+        }];
+    }
 }
 
 -(void)_updateBackgroundUploadMetadata {
