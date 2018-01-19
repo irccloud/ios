@@ -332,9 +332,7 @@
     if(error) {
 #ifndef EXTENSION
         if([error.domain isEqualToString:NSURLErrorDomain]) {
-            if(error.code == NSURLErrorUnknown)
-                return;
-            if(error.code == NSURLErrorBackgroundSessionWasDisconnected) {
+            if(error.code == NSURLErrorUnknown || error.code == NSURLErrorBackgroundSessionWasDisconnected) {
                 CLS_LOG(@"Lost connection to background upload service, retrying in-process");
 #ifdef MASHAPE_KEY
                 NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://imgur-apiv3.p.mashape.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];

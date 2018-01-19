@@ -387,7 +387,7 @@
 #ifndef EXTENSION
     [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/upload", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/upload", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", _boundary] forHTTPHeaderField:@"Content-Type"];
     [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
@@ -527,12 +527,14 @@
     [d setObject:uploadtasks forKey:@"uploadtasks"];
     [d synchronize];
 
+    CLS_LOG(@"HTTP request completed with status code %i", (int)((NSHTTPURLResponse *)task.response).statusCode);
+    
     if(error) {
 #ifndef EXTENSION
         if([error.domain isEqualToString:NSURLErrorDomain]) {
             if(error.code == NSURLErrorUnknown || error.code == NSURLErrorBackgroundSessionWasDisconnected) {
                 CLS_LOG(@"Lost connection to background upload service, retrying in-process");
-                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/upload", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:10];
+                NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/upload", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
                 [request setHTTPShouldHandleCookies:NO];
                 [request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", _boundary] forHTTPHeaderField:@"Content-Type"];
                 [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
