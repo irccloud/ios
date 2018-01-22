@@ -44,9 +44,12 @@
     NSString *_MODE_OPER, *_MODE_OWNER, *_MODE_ADMIN, *_MODE_OP, *_MODE_HALFOP, *_MODE_VOICED;
     int _deferred_archives;
     Ignore *_ignore;
+    int _orgId;
+    NSString *_avatar;
+    int _avatars_supported;
 }
-@property (nonatomic, assign) int cid, port, ssl, order, deferred_archives;
-@property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname, *ircserver;
+@property (nonatomic, assign) int cid, port, ssl, order, deferred_archives, orgId, avatars_supported;;
+@property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname, *ircserver, *avatar;
 @property (nonatomic, copy) NSDictionary *fail_info, *PREFIX;
 @property (nonatomic, copy) NSDictionary *isupport;
 @property (readonly) Ignore *ignore;

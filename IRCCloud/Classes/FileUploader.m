@@ -29,7 +29,7 @@
     _msg = message;
     _filenameSet = YES;
     if(_finished && _id.length) {
-        [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename originalFilename:_originalFilename]];
+        [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename originalFilename:_originalFilename avatar:_avatar orgId:_orgId]];
     } else {
         if(_backgroundID)
             [self _updateBackgroundUploadMetadata];
@@ -52,17 +52,21 @@
 - (void)handleResult:(NSDictionary *)result {
     if([[result objectForKey:@"success"] intValue] == 1 && [[result objectForKey:@"file"] objectForKey:@"url"]) {
         CLS_LOG(@"Finalize success: %@", result);
-        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:_bid];
-        if(b) {
-            if(_msg.length) {
-                if(![_msg hasSuffix:@" "])
-                    _msg = [_msg stringByAppendingString:@" "];
-            } else {
-                _msg = @"";
-            }
-            _msg = [_msg stringByAppendingFormat:@"%@", [[result objectForKey:@"file"] objectForKey:@"url"]];
-            [[NetworkConnection sharedInstance] POSTsay:_msg to:b.name cid:b.cid];
+        if(_avatar) {
             [_delegate fileUploadDidFinish];
+        } else {
+            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:_bid];
+            if(b) {
+                if(_msg.length) {
+                    if(![_msg hasSuffix:@" "])
+                        _msg = [_msg stringByAppendingString:@" "];
+                } else {
+                    _msg = @"";
+                }
+                _msg = [_msg stringByAppendingFormat:@"%@", [[result objectForKey:@"file"] objectForKey:@"url"]];
+                [[NetworkConnection sharedInstance] POSTsay:_msg to:b.name cid:b.cid];
+                [_delegate fileUploadDidFinish];
+            }
         }
     } else {
         CLS_LOG(@"Finalize failed: %@", result);
@@ -387,7 +391,7 @@
 #ifndef EXTENSION
     [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
 #endif
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/upload", IRCCLOUD_HOST]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/%@", IRCCLOUD_HOST, _avatar?@"upload-avatar":@"upload"]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", _boundary] forHTTPHeaderField:@"Content-Type"];
     [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
@@ -439,7 +443,7 @@
     if(!tasks)
         tasks = [[NSMutableDictionary alloc] init];
     
-    [tasks setObject:@{@"service":@"irccloud", @"bid":@(_bid), @"original_filename":_originalFilename?_originalFilename:@"", @"msg":_msg?_msg:@"", @"filename":_filename?_filename:@""} forKey:_backgroundID];
+    [tasks setObject:@{@"service":@"irccloud", @"bid":@(_bid), @"original_filename":_originalFilename?_originalFilename:@"", @"msg":_msg?_msg:@"", @"filename":_filename?_filename:@"", @"avatar":@(_avatar), @"orgId":@(_orgId)} forKey:_backgroundID];
     
     [d setObject:tasks forKey:@"uploadtasks"];
     
@@ -483,8 +487,8 @@
         if([[d objectForKey:@"success"] intValue] == 1) {
             _id = [d objectForKey:@"id"];
             _finished = YES;
-            if(_filenameSet) {
-                [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename?_filename:@"" originalFilename:_originalFilename?_originalFilename:@""]];
+            if(_filenameSet || _avatar) {
+                [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename?_filename:@"" originalFilename:_originalFilename?_originalFilename:@"" avatar:_avatar orgId:_orgId]];
             }
         } else {
             [_delegate fileUploadDidFail:[d objectForKey:@"message"]];

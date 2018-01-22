@@ -27,6 +27,7 @@
 #import "OpenInChromeController.h"
 #import "OpenInFirefoxControllerObjC.h"
 #import "AvatarsDataSource.h"
+#import "AvatarsTableViewController.h"
 
 @interface BrowserViewController : UITableViewController {
     NSMutableArray *_browsers;
@@ -679,6 +680,10 @@
                     @{@"title":@"Email Address", @"accessory":_email},
                     @{@"title":@"Full Name", @"accessory":_name},
                     @{@"title":@"Auto Away", @"accessory":_autoaway},
+                    @{@"title":@"Public Avatar", @"value":@"", @"selected":^{
+                        AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:-1];
+                        [self.navigationController pushViewController:atv animated:YES];
+                    }},
                     @{@"title":@"Change Password", @"selected":^{
                         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Change Password" message:nil preferredStyle:UIAlertControllerStyleAlert];
                         

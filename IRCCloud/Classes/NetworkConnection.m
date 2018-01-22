@@ -344,6 +344,18 @@ volatile BOOL __socketPaused = NO;
             server.ircserver = [object objectForKey:@"ircserver"];
         else
             server.ircserver = nil;
+        if([[object objectForKey:@"orgid"] isKindOfClass:[NSNumber class]])
+            server.orgId = [[object objectForKey:@"orgid"] intValue];
+        else
+            server.orgId = 0;
+        if([[object objectForKey:@"avatar"] isKindOfClass:[NSString class]])
+            server.avatar = [object objectForKey:@"avatar"];
+        else
+            server.avatar = nil;
+        if([[object objectForKey:@"avatars_supported"] isKindOfClass:[NSNumber class]])
+            server.avatars_supported = [[object objectForKey:@"avatars_supported"] intValue];
+        else
+            server.avatars_supported = 0;
         if(!backlog && !_resuming)
             [self postObject:server forEvent:kIRCEventMakeServer];
     };
@@ -982,7 +994,9 @@ volatile BOOL __socketPaused = NO;
                                            @"links_response":@(kIRCEventLinksResponse),
                                            @"whowas_response":@(kIRCEventWhoWas),
                                            @"trace_response":@(kIRCEventTraceResponse),
-                                           @"export_finished":@(kIRCEventLogExportFinished)};
+                                           @"export_finished":@(kIRCEventLogExportFinished),
+                                           @"avatar_change":@(kIRCEventAvatarChange)
+                                           };
         void (^broadcast)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
             if(!backlog && !_resuming)
                 [self postObject:object forEvent:[[broadcastMap objectForKey:object.type] intValue]];
@@ -1491,8 +1505,16 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"reorder-connections" args:@{@"cids":cids} handler:resultHandler];
 }
 
--(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename {
-    return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename}];
+-(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename avatar:(BOOL)avatar orgId:(int)orgId {
+    if(avatar) {
+        if(orgId == -1) {
+            return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"primary":@"1"}];
+        } else {
+            return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"org":[NSString stringWithFormat:@"%i", orgId]}];
+        }
+    } else {
+        return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename}];
+    }
 }
 
 -(int)deleteFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)resultHandler {
@@ -1538,6 +1560,21 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(int)renameConversation:(NSString *)name cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)resultHandler {
     return [self _sendRequest:@"rename-conversation" args:@{@"cid":@(cid), @"id":@(bid), @"name":name} handler:resultHandler];
 }
+
+-(int)setAvatar:(NSString *)avatarId orgId:(int)orgId handler:(IRCCloudAPIResultHandler)resultHandler {
+    if(orgId == -1) {
+        if(avatarId)
+            return [self _sendRequest:@"set-avatar" args:@{@"id":avatarId} handler:resultHandler];
+        else
+            return [self _sendRequest:@"set-avatar" args:@{@"clear":@"1"} handler:resultHandler];
+    } else {
+        if(avatarId)
+            return [self _sendRequest:@"set-avatar" args:@{@"id":avatarId, @"org":@(orgId)} handler:resultHandler];
+        else
+            return [self _sendRequest:@"set-avatar" args:@{@"clear":@"1", @"org":@(orgId)} handler:resultHandler];
+    }
+}
+
 
 -(void)_createJSONParser {
     _parser = [SBJson5Parser multiRootParserWithBlock:^(id item, BOOL *stop) {

@@ -275,6 +275,8 @@
 		223C407D1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223C407B1C60FE880081B02B /* IRCCloudSafariViewController.m */; };
 		223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		224291651EB22B1000878455 /* URLtoBIDTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 224291641EB22B1000878455 /* URLtoBIDTests.m */; };
+		224333D020162C1B0007A0D3 /* AvatarsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 224333CF20162C1B0007A0D3 /* AvatarsTableViewController.m */; };
+		224333D120162C1B0007A0D3 /* AvatarsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 224333CF20162C1B0007A0D3 /* AvatarsTableViewController.m */; };
 		224589C71DCA19BB00D3110A /* CollapsedEventsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 224589C61DCA19BB00D3110A /* CollapsedEventsTests.m */; };
 		2245E3771B542D0200B763D7 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2245E3761B542D0200B763D7 /* AVKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		2245E3781B542D0E00B763D7 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2245E3761B542D0200B763D7 /* AVKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -914,6 +916,8 @@
 		223DA90A16DFC626006FF808 /* EventsTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsTableView.h; sourceTree = "<group>"; };
 		223DA90B16DFC626006FF808 /* EventsTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsTableView.m; sourceTree = "<group>"; };
 		224291641EB22B1000878455 /* URLtoBIDTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLtoBIDTests.m; sourceTree = "<group>"; };
+		224333CE20162C1B0007A0D3 /* AvatarsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvatarsTableViewController.h; sourceTree = "<group>"; };
+		224333CF20162C1B0007A0D3 /* AvatarsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AvatarsTableViewController.m; sourceTree = "<group>"; };
 		224589C41DCA19BB00D3110A /* IRCCloudUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IRCCloudUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		224589C61DCA19BB00D3110A /* CollapsedEventsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CollapsedEventsTests.m; sourceTree = "<group>"; };
 		224589C81DCA19BB00D3110A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1561,6 +1565,8 @@
 				228A05AF16D3DB7B0029769C /* AppDelegate.m */,
 				22E54ADE1D10593B00891FE4 /* AvatarsDataSource.h */,
 				22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */,
+				224333CE20162C1B0007A0D3 /* AvatarsTableViewController.h */,
+				224333CF20162C1B0007A0D3 /* AvatarsTableViewController.m */,
 				2236F5FC16DA8928007BE535 /* BuffersDataSource.h */,
 				2236F5FD16DA8928007BE535 /* BuffersDataSource.m */,
 				2236F60416DBCA85007BE535 /* BuffersTableView.h */,
@@ -2659,6 +2665,7 @@
 				225D974D18AA995900065087 /* WebSocket.m in Sources */,
 				225D974E18AA995900065087 /* WebSocketConnectConfig.m in Sources */,
 				225D974F18AA995900065087 /* WebSocketFragment.m in Sources */,
+				224333D120162C1B0007A0D3 /* AvatarsTableViewController.m in Sources */,
 				22BB94AB1D425D3800BFB6F0 /* SamlLoginViewController.m in Sources */,
 				223876221F70047E00943160 /* YYAnimatedImageView.m in Sources */,
 				225D975018AA995900065087 /* WebSocketMessage.m in Sources */,
@@ -2781,6 +2788,7 @@
 				22B4287016D831A800498507 /* WebSocket.m in Sources */,
 				22B4287A16D831A800498507 /* WebSocketConnectConfig.m in Sources */,
 				22B4287C16D831A800498507 /* WebSocketFragment.m in Sources */,
+				224333D020162C1B0007A0D3 /* AvatarsTableViewController.m in Sources */,
 				22BB94AA1D425A4F00BFB6F0 /* SamlLoginViewController.m in Sources */,
 				2238761D1F70047D00943160 /* YYAnimatedImageView.m in Sources */,
 				22B4287E16D831A800498507 /* WebSocketMessage.m in Sources */,

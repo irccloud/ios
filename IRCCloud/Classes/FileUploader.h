@@ -37,6 +37,8 @@
     BOOL _filenameSet;
     BOOL _finished;
     BOOL _cancelled;
+    BOOL _avatar;
+    int _orgId;
     NSString *_id;
     NSString *_msg;
     NSMutableData *_body;
@@ -48,9 +50,9 @@
 }
 @property NSObject<FileUploaderDelegate> *delegate;
 @property NSObject<FileUploaderMetadataDelegate> *metadatadelegate;
-@property int bid;
+@property int bid, orgId;
 @property NSString *originalFilename, *mimeType;
-@property BOOL finished;
+@property BOOL finished, avatar;
 -(void)uploadVideo:(NSURL *)file;
 -(void)uploadFile:(NSURL *)file;
 -(void)uploadFile:(NSString *)filename UTI:(NSString *)UTI data:(NSData *)data;

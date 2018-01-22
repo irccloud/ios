@@ -75,6 +75,9 @@
     encodeObject(_MODE_HALFOP);
     encodeObject(_MODE_VOICED);
     encodeObject(_ircserver);
+    encodeInt(_orgId);
+    encodeObject(_avatar);
+    encodeInt(_avatars_supported);
 }
 -(id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
@@ -105,6 +108,9 @@
         decodeObject(_MODE_HALFOP);
         decodeObject(_MODE_VOICED);
         decodeObject(_ircserver);
+        decodeInt(_orgId);
+        decodeObject(_avatar);
+        decodeInt(_avatars_supported);
         _ignore = [[Ignore alloc] init];
         [_ignore setIgnores:_ignores];
     }

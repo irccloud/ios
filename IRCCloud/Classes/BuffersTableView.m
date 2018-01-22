@@ -847,6 +847,7 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         case kIRCEventWhoWas:
         case kIRCEventAuthFailure:
         case kIRCEventAlert:
+        case kIRCEventAvatarChange:
             break;
         case kIRCEventJoin:
         case kIRCEventPart:

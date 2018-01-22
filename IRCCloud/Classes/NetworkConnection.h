@@ -95,6 +95,7 @@ typedef enum {
     kIRCEventWhoWas,
     kIRCEventTraceResponse,
     kIRCEventLogExportFinished,
+    kIRCEventAvatarChange,
     kIRCEventAuthFailure,
     kIRCEventAlert,
     kIRCEventRefresh
@@ -232,7 +233,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(NSDictionary *)requestPassword:(NSString *)email token:(NSString *)token;
 -(int)resendVerifyEmailWithHandler:(IRCCloudAPIResultHandler)handler;
 -(int)changeEmail:(NSString *)email password:(NSString *)password handler:(IRCCloudAPIResultHandler)handler;
--(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename;
+-(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename avatar:(BOOL)avatar orgId:(int)orgId;
 -(NSDictionary *)getFiles:(int)page;
 -(int)deleteFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)handler;
 -(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension handler:(IRCCloudAPIResultHandler)handler;
@@ -249,4 +250,5 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(int)exportLog:(NSString *)timezone cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)handler;
 -(int)renameChannel:(NSString *)name cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)handler;
 -(int)renameConversation:(NSString *)name cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)handler;
+-(int)setAvatar:(NSString *)avatarId orgId:(int)orgId handler:(IRCCloudAPIResultHandler)resultHandler;
 @end
