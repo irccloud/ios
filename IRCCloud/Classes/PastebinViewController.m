@@ -156,21 +156,14 @@
 }
 
 -(void)_fetch {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [[NSURLCache sharedURLCache] removeAllCachedResponses];
-    NSURL *url = [NSURL URLWithString:[_url stringByAppendingFormat:@"?mobile=ios&version=%@&theme=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]]];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:[NSString stringWithFormat:@"session=%@", [NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
-    
-    [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:[NSHTTPCookie cookieWithProperties:@{
-                                                                                                  NSHTTPCookieName:@"session",
-                                                                                                  NSHTTPCookieValue:[NetworkConnection sharedInstance].session,
-                                                                                                  NSHTTPCookieDomain:url.host,
-                                                                                                  NSHTTPCookiePath:@"/",
-                                                                                                  NSHTTPCookieVersion:@"0",
-                                                                                                  }]];
-    [_webView loadRequest:request];
+    if([_url hasPrefix:[NSString stringWithFormat:@"https://%@/pastebin/", IRCCLOUD_HOST]] || [_url hasPrefix:@"https://www.irccloud.com/pastebin/"]) {
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+        [[NSURLCache sharedURLCache] removeAllCachedResponses];
+        NSURL *url = [NSURL URLWithString:[_url stringByAppendingFormat:@"?mobile=ios&version=%@&theme=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]]];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+        [request setHTTPShouldHandleCookies:NO];
+        [_webView loadRequest:request];
+    }
 }
 
 -(void)_doneButtonPressed {
