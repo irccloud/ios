@@ -22,6 +22,7 @@
     NSArray *_avatars;
     Server *_server;
     FileUploader *_uploader;
+    BOOL _failed;
 }
 -(id)initWithServer:(int)cid;
 @end

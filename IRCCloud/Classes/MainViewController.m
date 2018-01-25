@@ -4097,6 +4097,7 @@ NSArray *_sortedChannels;
     picker.delegate = (id)self;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
         [UIColor clearTheme];
+        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
         [self presentViewController:picker animated:YES completion:nil];
     } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone]) {
         [UIColor clearTheme];
@@ -4536,18 +4537,16 @@ NSArray *_sortedChannels;
             [self _chooseFile];
         }]];
     }
-    if([[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported) {
-        [alert addAction:[UIAlertAction actionWithTitle:@"Change Avatar" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:_buffer.cid];
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:atv];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            [self presentViewController:nc animated:YES completion:nil];
-        }]];
-    }
+    [alert addAction:[UIAlertAction actionWithTitle:[[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported?@"Change Avatar":@"Change Public Avatar" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:[[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported?_buffer.cid:-1];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:atv];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:nc animated:YES completion:nil];
+    }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
     alert.popoverPresentationController.sourceRect = CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height);
     alert.popoverPresentationController.sourceView = self.view;

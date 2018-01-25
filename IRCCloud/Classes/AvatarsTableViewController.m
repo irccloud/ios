@@ -83,7 +83,10 @@
 
 -(void)cancelButtonPressed {
     [_uploader cancel];
-    [self.parentViewController dismissViewControllerAnimated:YES completion:nil];
+    if(self.navigationController.viewControllers.count == 1)
+        [self.parentViewController dismissViewControllerAnimated:YES completion:nil];
+    else
+        [self.navigationController popViewControllerAnimated:YES];
 }
 
 -(void)addButtonPressed {
@@ -119,12 +122,15 @@
     } else {
         picker.modalPresentationStyle = UIModalPresentationPopover;
         picker.popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItem;
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)
+            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
         [self presentViewController:picker animated:YES completion:nil];
     }
 }
 
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
     [picker dismissViewControllerAnimated:YES completion:nil];
 
     NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
@@ -135,12 +141,18 @@
     
     CLS_LOG(@"Image file chosen: %@ %@", refURL, mediaURL);
     if(img || refURL || mediaURL) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            UIActivityIndicatorView *activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+            [activity startAnimating];
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:activity];
+        }];
         if(picker.sourceType == UIImagePickerControllerSourceTypeCamera && [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"]) {
             if(img)
                 UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
             else if(UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(mediaURL.path))
                 UISaveVideoAtPathToSavedPhotosAlbum(mediaURL.path, nil, nil, nil);
         }
+        _failed = NO;
         FileUploader *u = [[FileUploader alloc] init];
         u.delegate = self;
         u.avatar = YES;
@@ -194,27 +206,55 @@
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
 
 -(void)fileUploadProgress:(float)progress {
-    NSLog(@"Upload progress: %f", progress);
+    CLS_LOG(@"Avatar upload progress: %f", progress);
 }
 
 -(void)fileUploadDidFail:(NSString *)reason {
-    NSLog(@"Upload failed: %@", reason);
+    _failed = YES;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        CLS_LOG(@"File upload failed: %@", reason);
+        NSString *msg;
+        if([reason isEqualToString:@"upload_limit_reached"]) {
+            msg = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
+        } else if([reason isEqualToString:@"upload_already_exists"]) {
+            msg = @"You’ve already uploaded this file";
+        } else if([reason isEqualToString:@"banned_content"]) {
+            msg = @"Banned content";
+        } else {
+            msg = @"Failed to upload avatar. Please try again shortly.";
+        }
+        [self dismissViewControllerAnimated:YES completion:nil];
+        [[[UIAlertView alloc] initWithTitle:@"Upload Failed" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
+    }];
 }
 
 -(void)fileUploadDidFinish {
-    NSLog(@"Upload finished");
+    if(!_failed)
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            CLS_LOG(@"Avatar upload finished");
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(addButtonPressed)];
+            [self cancelButtonPressed];
+        }];
 }
 
 -(void)fileUploadWasCancelled {
-    NSLog(@"Upload cancelled");
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        CLS_LOG(@"Avatar upload cancelled");
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(addButtonPressed)];
+    }];
 }
 
 -(void)fileUploadTooLarge {
-    NSLog(@"Upload too large");
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        CLS_LOG(@"File upload too large");
+        [[[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(addButtonPressed)];
+    }];
 }
 
 -(void)handleEvent:(NSNotification *)notification {
@@ -222,6 +262,7 @@
     
     switch(event) {
         case kIRCEventMakeServer:
+        case kIRCEventUserInfo:
         case kIRCEventAvatarChange:
         {
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -265,7 +306,7 @@
                               }];
         }
     }
-    if([[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"] length]) {
+    if([[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"] isKindOfClass:NSString.class] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"] length]) {
         NSURL *url = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"], @"modifiers":[NSString stringWithFormat:@"w%i", (int)(64 * [UIScreen mainScreen].scale)]} error:nil]];
         if(![[ImageCache sharedInstance] imageForURL:url]) {
             [[ImageCache sharedInstance] fetchURL:url completionHandler:^(BOOL success) {
@@ -314,10 +355,6 @@
         NSDictionary *row = [_avatars objectAtIndex:[indexPath row]];
         cell.textLabel.text = [row objectForKey:@"label"];
         cell.avatar.image = [[ImageCache sharedInstance] imageForURL:[row objectForKey:@"url"]];
-        if([_server.avatar isEqualToString:[row objectForKey:@"id"]])
-            cell.accessoryType = UITableViewCellAccessoryCheckmark;
-        else
-            cell.accessoryType = UITableViewCellAccessoryNone;
         return cell;
     }
 }
@@ -328,14 +365,24 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [[NetworkConnection sharedInstance] setAvatar:nil orgId:[[[_avatars objectAtIndex:indexPath.row] objectForKey:@"orgId"] intValue] handler:nil];
+        [[NetworkConnection sharedInstance] setAvatar:nil orgId:[[[_avatars objectAtIndex:indexPath.row] objectForKey:@"orgId"] intValue] handler:^(IRCCloudJSONObject *result) {
+            if(![[result objectForKey:@"success"] intValue]) {
+                [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to clear avatar: %@", [result objectForKey:@"message"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
+            }
+        }];
     }
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized(_avatars) {
         NSDictionary *row = [_avatars objectAtIndex:[indexPath row]];
-        [[NetworkConnection sharedInstance] setAvatar:[row objectForKey:@"id"] orgId:_server.orgId handler:nil];
+        [[NetworkConnection sharedInstance] setAvatar:[row objectForKey:@"id"] orgId:_server.orgId handler:^(IRCCloudJSONObject *result) {
+            if([[result objectForKey:@"success"] intValue]) {
+                [self cancelButtonPressed];
+            } else {
+                [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to set avatar: %@", [result objectForKey:@"message"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
+            }
+        }];
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
 }

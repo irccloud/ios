@@ -1182,7 +1182,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    if(self.session.length)
+    if(self.session.length && [url.scheme isEqualToString:@"https"] && [url.host isEqualToString:IRCCLOUD_HOST])
         [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
     
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
@@ -1564,9 +1564,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(int)setAvatar:(NSString *)avatarId orgId:(int)orgId handler:(IRCCloudAPIResultHandler)resultHandler {
     if(orgId == -1) {
         if(avatarId)
-            return [self _sendRequest:@"set-avatar" args:@{@"id":avatarId} handler:resultHandler];
+            return [self _sendRequest:@"set-avatar" args:@{@"id":avatarId, @"primary":@"1"} handler:resultHandler];
         else
-            return [self _sendRequest:@"set-avatar" args:@{@"clear":@"1"} handler:resultHandler];
+            return [self _sendRequest:@"set-avatar" args:@{@"clear":@"1", @"primary":@"1"} handler:resultHandler];
     } else {
         if(avatarId)
             return [self _sendRequest:@"set-avatar" args:@{@"id":avatarId, @"org":@(orgId)} handler:resultHandler];
