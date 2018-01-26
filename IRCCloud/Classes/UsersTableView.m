@@ -164,7 +164,7 @@
             }*/
             [data addObject:@{
              @"type":@TYPE_USER,
-             @"text":user.nick,
+             @"text":user.display_name,
              @"color":user.away?[UIColor memberListAwayTextColor]:[UIColor memberListTextColor],
              @"bgColor":groupColor,
              @"last":@(user == users.lastObject && ![heading isEqualToString:@"Members"]),

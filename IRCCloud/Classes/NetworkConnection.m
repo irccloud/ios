@@ -420,6 +420,10 @@ volatile BOOL __socketPaused = NO;
             user.away = 0;
             user.away_msg = @"";
             user.ircserver = [object objectForKey:@"ircserver"];
+            if([[object objectForKey:@"display_name"] isKindOfClass:NSString.class])
+                user.display_name = [object objectForKey:@"display_name"];
+            else
+                user.display_name = nil;
             if(!_resuming)
                 [self postObject:object forEvent:kIRCEventJoin];
         }
@@ -727,6 +731,10 @@ volatile BOOL __socketPaused = NO;
                            user.mode = [member objectForKey:@"mode"];
                            user.away = [[member objectForKey:@"away"] intValue];
                            user.ircserver = [member objectForKey:@"ircserver"];
+                           if([[member objectForKey:@"display_name"] isKindOfClass:NSString.class])
+                               user.display_name = [member objectForKey:@"display_name"];
+                           else
+                               user.display_name = nil;
                            [_users addUser:user];
                        }
                        if(!backlog && !_resuming)

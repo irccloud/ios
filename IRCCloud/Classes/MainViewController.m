@@ -175,14 +175,18 @@ NSArray *_sortedChannels;
                     return;
                 
                 NSString *nick = user.nick.lowercaseString;
+                NSString *displayName = user.display_name.lowercaseString;
                 NSUInteger location = [nick rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location;
                 if([text rangeOfCharacterFromSet:[NSCharacterSet alphanumericCharacterSet]].location == 0 && location != NSNotFound && location > 0) {
                     nick = [nick substringFromIndex:location];
                 }
                 
-                if((text.length == 0 || [nick hasPrefix:text]) && ![suggestions_set containsObject:user.nick.lowercaseString]) {
+                if((text.length == 0 || [nick hasPrefix:text] || [displayName hasPrefix:text]) && ![suggestions_set containsObject:user.nick.lowercaseString]) {
                     [suggestions_set addObject:user.nick.lowercaseString];
-                    [suggestions addObject:user.nick];
+                    if(![user.nick isEqualToString:user.display_name])
+                        [suggestions addObject:[NSString stringWithFormat:@"%@\u00a0(%@)",user.display_name,user.nick]];
+                    else
+                        [suggestions addObject:user.nick];
                 }
             }
         }
@@ -3576,7 +3580,7 @@ NSArray *_sortedChannels;
     NSString *title = @"";;
     if(_selectedUser) {
         if([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad))
-            title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.nick,[_selectedUser.hostmask stripIRCFormatting]];
+            title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.display_name,[_selectedUser.hostmask stripIRCFormatting]];
         else
             title = _selectedUser.nick;
     }
@@ -5122,7 +5126,7 @@ Network type: %@\n",
     if(_nickCompletionView.count == 0)
         [self updateSuggestions:YES];
     if(_nickCompletionView.count > 0) {
-        int s = _nickCompletionView.selection;
+        NSInteger s = _nickCompletionView.selection;
         if(s == -1 || s == _nickCompletionView.count - 1)
             s = 0;
         else

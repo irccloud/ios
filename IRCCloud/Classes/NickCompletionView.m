@@ -109,18 +109,24 @@
 -(NSString *)suggestion {
     if(_selection == -1 || _selection >= _suggestions.count)
         return nil;
-    return [_suggestions objectAtIndex:_selection];
+    NSString *suggestion = [_suggestions objectAtIndex:_selection];
+    if([suggestion rangeOfString:@"\u00a0("].location != NSNotFound) {
+        NSUInteger nickIndex = [suggestion rangeOfString:@"(" options:NSBackwardsSearch].location;
+        suggestion = [suggestion substringWithRange:NSMakeRange(nickIndex + 1, suggestion.length - nickIndex - 2)];
+    }
+    
+    return suggestion;
 }
 
 -(NSUInteger)count {
     return _suggestions.count;
 }
 
--(int)selection {
+-(NSInteger)selection {
     return _selection;
 }
 
--(void)setSelection:(int)selection {
+-(void)setSelection:(NSInteger)selection {
     _selection = selection;
     [_collectionView selectItemAtIndexPath:[NSIndexPath indexPathForRow:selection inSection:0] animated:YES scrollPosition:UICollectionViewScrollPositionCenteredHorizontally];
 }
@@ -146,7 +152,8 @@
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [[UIDevice currentDevice] playInputClick];
-    [_completionDelegate nickSelected:[_suggestions objectAtIndex:indexPath.row]];
+    _selection = indexPath.row;
+    [_completionDelegate nickSelected:self.suggestion];
 }
 
 -(BOOL)enableInputClicksWhenVisible {

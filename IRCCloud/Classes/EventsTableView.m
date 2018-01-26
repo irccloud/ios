@@ -1111,7 +1111,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO], event.msg];
             } else if([type isEqualToString:@"channel_name_change"]) {
                 if(event.from.length) {
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.msg];
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], event.msg];
                 } else {
                     NSString *from = @"The server ";
                     if(event.server.length)

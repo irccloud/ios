@@ -896,6 +896,7 @@
                               if(object) {
                                   event.msg = [NSString stringWithFormat:@"renamed the channel: %@ → %c%@%c", [object objectForKey:@"old_name"], BOLD, [object objectForKey:@"new_name"], BOLD];
                               }
+                              event.color = [UIColor timestampColor];
                           },
       };
     }
@@ -991,7 +992,10 @@
     event.type = object.type;
     event.msg = [[object objectForKey:@"msg"] precomposedStringWithCanonicalMapping];
     event.hostmask = [object objectForKey:@"hostmask"];
-    event.from = [object objectForKey:@"from"];
+    if([[object objectForKey:@"display_name"] isKindOfClass:NSString.class])
+        event.from = [object objectForKey:@"display_name"];
+    else
+        event.from = [object objectForKey:@"from"];
     event.fromMode = [object objectForKey:@"from_mode"];
     if([object objectForKey:@"newnick"])
         event.nick = [object objectForKey:@"newnick"];

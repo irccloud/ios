@@ -29,7 +29,7 @@
 
 -(void)setNick:(NSString *)nick {
     _nick = nick;
-    _lowercase_nick = nick.lowercaseString;
+    _lowercase_nick = self.display_name.lowercaseString;
 }
 
 -(NSString *)lowercase_nick {
@@ -38,8 +38,16 @@
     return _lowercase_nick;
 }
 
--(void)setLowercase_nick:(NSString *)lowercase_nick {
-    _lowercase_nick = lowercase_nick;
+-(NSString *)display_name {
+    if(_display_name.length)
+        return _display_name;
+    else
+        return _nick;
+}
+
+-(void)setDisplay_name:(NSString *)display_name {
+    _display_name = display_name;
+    _lowercase_nick = self.display_name.lowercaseString;
 }
 
 -(NSComparisonResult)compare:(User *)aUser {

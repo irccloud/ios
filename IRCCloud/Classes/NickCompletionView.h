@@ -24,11 +24,11 @@
     UICollectionView *_collectionView;
     NSArray *_suggestions;
     UIFont *_font;
-    int _selection;
+    NSInteger _selection;
 }
 @property (readonly) UIFont *font;
 @property (nonatomic, assign) id<NickCompletionViewDelegate> completionDelegate;
-@property int selection;
+@property NSInteger selection;
 -(void)setSuggestions:(NSArray *)suggestions;
 -(NSUInteger)count;
 -(NSString *)suggestion;
