@@ -1502,7 +1502,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 next.height = 0;
                 [_rowCache removeObjectForKey:@(insertPos + 1)];
             }
-            if(([next.type isEqualToString:e.type] && [next.from isEqualToString:e.from] && [next.avatarURL isEqualToString:e.avatarURL]) || e.rowType == ROW_ME_MESSAGE) {
+            if(([next.type isEqualToString:e.type] && [next.from isEqualToString:e.from] && [[next avatar:__largeAvatarHeight].absoluteString isEqualToString:[e avatar:__largeAvatarHeight].absoluteString]) || e.rowType == ROW_ME_MESSAGE) {
                 if(e.isHeader)
                     e.height = 0;
                 e.isHeader = NO;
@@ -1514,7 +1514,7 @@ extern UIImage *__socketClosedBackgroundImage;
             if(prev.rowType == ROW_LASTSEENEID)
                 prev = [_data objectAtIndex:insertPos - 2];
             BOOL wasHeader = e.isHeader;
-            e.isHeader = !__chatOneLinePref && (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from] || ![prev.avatarURL isEqualToString:e.avatarURL])) && e.rowType != ROW_ME_MESSAGE;
+            e.isHeader = !__chatOneLinePref && (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from] || ![[prev avatar:__largeAvatarHeight].absoluteString isEqualToString:[e avatar:__largeAvatarHeight].absoluteString])) && e.rowType != ROW_ME_MESSAGE;
             if(wasHeader != e.isHeader)
                 e.height = 0;
         }
