@@ -2034,7 +2034,7 @@ extern UIImage *__socketClosedBackgroundImage;
     @synchronized (e) {
         NSArray *links;
         [_lock lock];
-        if(!__disableBigEmojiPref) {
+        if(!__disableBigEmojiPref && ([e.type isEqualToString:@"buffer_msg"] || [e.type isEqualToString:@"notice"])) {
             NSMutableString *msg = [[e.msg stripIRCFormatting] mutableCopy];
             if(msg) {
                 [ColorFormatter emojify:msg];
