@@ -126,7 +126,8 @@
         decodeDouble(_serverTime);
         decodeObject(_avatar);
         decodeObject(_avatarURL);
-        
+        decodeObject(_fromNick);
+
         if(_rowType == ROW_TIMESTAMP)
             _bgColor = [UIColor timestampBackgroundColor];
         else if(_rowType == ROW_LASTSEENEID)
@@ -187,7 +188,8 @@
     encodeDouble(_serverTime);
     encodeObject(_avatar);
     encodeObject(_avatarURL);
-    
+    encodeObject(_fromNick);
+
     if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
         encodeObject(_bgColor);
 }
@@ -997,6 +999,7 @@
     else
         event.from = [object objectForKey:@"from"];
     event.fromMode = [object objectForKey:@"from_mode"];
+    event.fromNick = [object objectForKey:@"from"];
     if([object objectForKey:@"newnick"])
         event.nick = [object objectForKey:@"newnick"];
     else

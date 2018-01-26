@@ -3489,7 +3489,9 @@ NSArray *_sortedChannels;
             _selectedUser = [[UsersDataSource sharedInstance] getUser:from cid:event.cid bid:event.bid];
             if(!_selectedUser) {
                 _selectedUser = [[User alloc] init];
-                _selectedUser.nick = from;
+                _selectedUser.nick = event.fromNick;
+                _selectedUser.display_name = event.from;
+                _selectedUser.hostmask = event.hostmask;
             }
             [self _mention];
         }
