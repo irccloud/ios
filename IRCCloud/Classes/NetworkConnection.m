@@ -937,6 +937,13 @@ volatile BOOL __socketPaused = NO;
                    @"session_deleted": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        [self logout];
                        [self postObject:object forEvent:kIRCEventSessionDeleted];
+                   },
+                   @"display_name_change": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       if(!backlog) {
+                           [_users updateDisplayName:[object objectForKey:@"display_name"] nick:[object objectForKey:@"nick"] cid:object.cid];
+                           if(!_resuming)
+                               [self postObject:object forEvent:kIRCEventNickChange];
+                       }
                    }
                }.mutableCopy;
         

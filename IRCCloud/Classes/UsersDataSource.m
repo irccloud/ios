@@ -226,6 +226,21 @@
     }
 }
 
+-(void)updateDisplayName:(NSString *)displayName nick:(NSString *)nick cid:(int)cid {
+    @synchronized(_users) {
+        for(NSDictionary *d in _users.allValues) {
+            for(User *u in d.allValues) {
+                if(u.cid == cid && [u.nick isEqualToString:nick]) {
+                    [[_users objectForKey:@(u.bid)] removeObjectForKey:u.lowercase_nick];
+                    u.display_name = displayName;
+                    [[_users objectForKey:@(u.bid)] setObject:u forKey:u.lowercase_nick];
+                    break;
+                }
+            }
+        }
+    }
+}
+
 -(void)updateAway:(int)away msg:(NSString *)msg nick:(NSString *)nick cid:(int)cid {
     @synchronized(_users) {
         for(NSDictionary *buffer in _users.allValues) {
