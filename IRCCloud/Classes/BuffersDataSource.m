@@ -21,6 +21,8 @@
 #import "UsersDataSource.h"
 #import "ServersDataSource.h"
 
+NSString *__DEFAULT_CHANTYPES__;
+
 @implementation Buffer
 -(NSComparisonResult)compare:(Buffer *)aBuffer {
     @synchronized (self) {
@@ -65,12 +67,12 @@
     if(_serverIsSlack)
         return self.displayName.lowercaseString;
     
-    if(_chantypes == nil) {
+    if(_chantypes == nil || _chantypes == __DEFAULT_CHANTYPES__) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
         if(s) {
             _chantypes = s.CHANTYPES;
             if(_chantypes == nil || _chantypes.length == 0)
-                _chantypes = @"#";
+                _chantypes = __DEFAULT_CHANTYPES__;
         }
     }
     NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
@@ -124,12 +126,12 @@
     if(self.isMPDM)
         return self.displayName;
     
-    if(_chantypes == nil) {
+    if(_chantypes == nil || _chantypes == __DEFAULT_CHANTYPES__) {
         Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
         if(s) {
             _chantypes = [s.isupport objectForKey:@"CHANTYPES"];
             if(_chantypes == nil || _chantypes.length == 0)
-                _chantypes = @"#";
+                _chantypes = __DEFAULT_CHANTYPES__;
         }
     }
     NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
@@ -195,6 +197,7 @@
 -(id)init {
     self = [super init];
     if(self) {
+        __DEFAULT_CHANTYPES__ = @"#&!+";
         [NSKeyedArchiver setClassName:@"IRCCloud.Buffer" forClass:Buffer.class];
         [NSKeyedUnarchiver setClass:Buffer.class forClassName:@"IRCCloud.Buffer"];
 

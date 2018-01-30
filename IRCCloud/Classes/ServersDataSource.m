@@ -327,6 +327,10 @@
             server.CHANTYPES = [server.isupport objectForKey:@"CHANTYPES"];
         else
             server.CHANTYPES = nil;
+        
+        for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:cid]) {
+            b.chantypes = server.CHANTYPES;
+        }
     }
 }
 
