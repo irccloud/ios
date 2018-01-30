@@ -224,6 +224,12 @@
     
     for(User *user in users) {
         if(user.nick.length) {
+            if([user.nick isEqualToString:s.nick]) {
+                if(user.display_name.length)
+                    s.from = user.display_name;
+                else
+                    s.from = user.nick;
+            }
             NSString *mode = user.mode.lowercaseString;
             if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && ([PREFIX objectForKey:s?s.MODE_OPER:@"Y"] || [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"])) {
                 [opers addObject:user];

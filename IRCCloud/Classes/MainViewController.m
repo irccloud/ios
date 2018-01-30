@@ -2283,8 +2283,12 @@ NSArray *_sortedChannels;
                 if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
                     e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
                 e.isSelf = YES;
-                e.from = s.nick;
+                e.from = s.from;
                 e.nick = s.nick;
+                e.fromNick = s.nick;
+                e.avatar = s.avatar;
+                e.avatarURL = s.avatarURL;
+                e.hostmask = s.usermask;
                 if(u)
                     e.fromMode = u.mode;
                 e.msg = formattedMsg;
@@ -2305,9 +2309,7 @@ NSArray *_sortedChannels;
                 e.isHighlight = NO;
                 e.reqId = -1;
                 e.pending = YES;
-                Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-                if(s)
-                    e.realname = s.server_realname;
+                e.realname = s.server_realname;
                 [[EventsDataSource sharedInstance] addEvent:e];
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
 #ifndef APPSTORE

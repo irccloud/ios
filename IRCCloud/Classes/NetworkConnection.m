@@ -352,6 +352,10 @@ volatile BOOL __socketPaused = NO;
             server.avatar = [object objectForKey:@"avatar"];
         else
             server.avatar = nil;
+        if([[object objectForKey:@"avatar_url"] isKindOfClass:[NSString class]])
+            server.avatarURL = [object objectForKey:@"avatar_url"];
+        else
+            server.avatarURL = nil;
         if([[object objectForKey:@"avatars_supported"] isKindOfClass:[NSNumber class]])
             server.avatars_supported = [[object objectForKey:@"avatars_supported"] intValue];
         else
