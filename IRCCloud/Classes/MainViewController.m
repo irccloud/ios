@@ -2288,7 +2288,7 @@ NSArray *_sortedChannels;
                 e.fromNick = s.nick;
                 e.avatar = s.avatar;
                 e.avatarURL = s.avatarURL;
-                e.hostmask = s.usermask;
+                e.hostmask = [NSString stringWithFormat:@"uid%@@",[[NetworkConnection sharedInstance].userInfo objectForKey:@"id"]];
                 if(u)
                     e.fromMode = u.mode;
                 e.msg = formattedMsg;
