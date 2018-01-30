@@ -1009,7 +1009,10 @@
     else
         event.realname = nil;
     event.oldNick = [object objectForKey:@"oldnick"];
-    event.server = [object objectForKey:@"server"];
+    if([[object objectForKey:@"from_realname"] isKindOfClass:[NSString class]])
+        event.server = [object objectForKey:@"server"];
+    else
+        event.server = nil;
     event.diff = [object objectForKey:@"diff"];
     event.isHighlight = [[object objectForKey:@"highlight"] boolValue];
     event.isSelf = [[object objectForKey:@"self"] boolValue];
@@ -1037,6 +1040,10 @@
     event.serverTime = [[object objectForKey:@"server_time"] doubleValue];
     event.avatar = [object objectForKey:@"avatar"];
     event.avatarURL = [object objectForKey:@"avatar_url"];
+    
+    if([event isMessage] && !event.from.length && event.server.length) {
+        event.from = event.fromNick = event.server;
+    }
 
     void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:object.type];
     if(formatter)

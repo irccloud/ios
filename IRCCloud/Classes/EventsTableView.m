@@ -1514,7 +1514,13 @@ extern UIImage *__socketClosedBackgroundImage;
             if(prev.rowType == ROW_LASTSEENEID)
                 prev = [_data objectAtIndex:insertPos - 2];
             BOOL wasHeader = e.isHeader;
-            e.isHeader = !__chatOneLinePref && (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from] || ![[prev avatar:__largeAvatarHeight].absoluteString isEqualToString:[e avatar:__largeAvatarHeight].absoluteString])) && e.rowType != ROW_ME_MESSAGE;
+            NSString *prevAvatar = [prev avatar:__largeAvatarHeight].absoluteString;
+            NSString *avatar = [e avatar:__largeAvatarHeight].absoluteString;
+            BOOL newAvatar = NO;
+            if(prevAvatar || avatar) {
+                newAvatar = ![avatar isEqualToString:prevAvatar];
+            }
+            e.isHeader = !__chatOneLinePref && (e.groupEid < 1 && [e isMessage] && (![prev.type isEqualToString:e.type] || ![prev.from isEqualToString:e.from] || newAvatar)) && e.rowType != ROW_ME_MESSAGE;
             if(wasHeader != e.isHeader)
                 e.height = 0;
         }
