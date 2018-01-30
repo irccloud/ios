@@ -1948,7 +1948,8 @@ extern BOOL __compact;
     }
     NSMutableArray *attributes = [[NSMutableArray alloc] init];
     NSMutableArray *arrowIndex = [[NSMutableArray alloc] init];
-    
+    NSMutableArray *thinSpaceIndex = [[NSMutableArray alloc] init];
+
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", [input stringByReplacingOccurrencesOfString:@"  " withString:@"\u00A0 "], CLEAR];
     BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
     if(!disableConvert) {
@@ -1963,6 +1964,11 @@ extern BOOL __compact;
             case 0x21D0:
                 if(i < text.length - 1 && [text characterAtIndex:i+1] == 0xFE0E) {
                     [arrowIndex addObject:@(i)];
+                }
+                break;
+            case 0x2009:
+                if(i < text.length - 1) {
+                    [thinSpaceIndex addObject:@(i)];
                 }
                 break;
             case BOLD:
@@ -2366,6 +2372,11 @@ extern BOOL __compact;
         
         [output addAttributes:@{NSFontAttributeName:largeEmojiFont} range:NSMakeRange(start, text.length - start)];
     }
+    
+    for(NSNumber *i in thinSpaceIndex) {
+        [output addAttributes:@{NSFontAttributeName:Helvetica} range:NSMakeRange([i intValue], 2)];
+    }
+
     return output;
 }
 
