@@ -735,16 +735,16 @@
         if(showSymbol) {
             if([PREFIX objectForKey:mode]) {
                 if([mode_colors objectForKey:mode.lowercaseString]) {
-                    [output appendFormat:@"%c%@%@%c\u2009", COLOR_RGB, [mode_colors objectForKey:mode.lowercaseString], [PREFIX objectForKey:mode], COLOR_RGB];
+                    [output appendFormat:@"%c%@%@%c\u202f", COLOR_RGB, [mode_colors objectForKey:mode.lowercaseString], [PREFIX objectForKey:mode], COLOR_RGB];
                 } else {
-                    [output appendFormat:@"%@\u2009", [PREFIX objectForKey:mode]];
+                    [output appendFormat:@"%@\u202f", [PREFIX objectForKey:mode]];
                 }
             }
         } else {
             if([mode_colors objectForKey:mode.lowercaseString]) {
-                [output appendFormat:@"%c%@•%c\u2009", COLOR_RGB, [mode_colors objectForKey:mode.lowercaseString], COLOR_RGB];
+                [output appendFormat:@"%c%@•%c\u202f", COLOR_RGB, [mode_colors objectForKey:mode.lowercaseString], COLOR_RGB];
             } else {
-                [output appendString:@"•\u2009"];
+                [output appendString:@"•\u202f"];
             }
         }
     }

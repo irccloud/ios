@@ -1966,7 +1966,7 @@ extern BOOL __compact;
                     [arrowIndex addObject:@(i)];
                 }
                 break;
-            case 0x2009:
+            case 0x202f:
                 if(i < text.length - 1) {
                     [thinSpaceIndex addObject:@(i)];
                 }
