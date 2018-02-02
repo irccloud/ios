@@ -1038,9 +1038,15 @@
     event.monospace = NO;
     event.entities = [object objectForKey:@"entities"];
     event.serverTime = [[object objectForKey:@"server_time"] doubleValue];
-    event.avatar = [object objectForKey:@"avatar"];
-    event.avatarURL = [object objectForKey:@"avatar_url"];
-    
+    if([[object objectForKey:@"avatar"] isKindOfClass:[NSString class]])
+        event.avatar = [object objectForKey:@"avatar"];
+    else
+        event.avatar = nil;
+    if([[object objectForKey:@"avatar_url"] isKindOfClass:[NSString class]])
+        event.avatarURL = [object objectForKey:@"avatar_url"];
+    else
+        event.avatarURL = nil;
+
     if([event isMessage] && !event.from.length && event.server.length) {
         event.from = event.fromNick = event.server;
     }

@@ -1239,8 +1239,10 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                 [self _updateUnreadIndicators];
                 if(_selectedRow != -1) {
                     NSArray *a = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.scrollIndicatorInsets)];
-                    if([[a objectAtIndex:0] row] > _selectedRow || [[a lastObject] row] < _selectedRow)
-                        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+                    if(a.count) {
+                        if([[a objectAtIndex:0] row] > _selectedRow || [[a lastObject] row] < _selectedRow)
+                            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+                    }
                 }
             }];
         } else {
