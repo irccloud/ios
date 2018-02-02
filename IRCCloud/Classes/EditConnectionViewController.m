@@ -21,6 +21,7 @@
 #import "UIColor+IRCCloud.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "FontAwesome.h"
+#import "ColorFormatter.h"
 
 @interface NetworkListViewController : UITableViewController {
     id<NetworkListDelegate> _delegate;
@@ -637,12 +638,12 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _channels.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     
     if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] == 0) {
-        UILabel *unverified = [[UILabel alloc] init];
-        unverified.backgroundColor = [UIColor clearColor];
+        UITextView *unverified = [[UITextView alloc] init];
+        unverified.backgroundColor = [UIColor networkErrorBackgroundColor];
         unverified.textAlignment = NSTextAlignmentCenter;
-        unverified.numberOfLines = 0;
-        unverified.textColor = [UIColor messageTextColor];
-        unverified.text = @"\nYou can't connect to external servers until you confirm your email address.\n\nIf you're still waiting for the email, you can tap here to send yourself another confirmation.";
+        unverified.textColor = [UIColor networkErrorColor];
+        unverified.font = [UIFont systemFontOfSize:FONT_SIZE];
+        unverified.text = @"You can't connect to external servers until you confirm your email address.\n\nIf you're still waiting for the email, you can tap here to send yourself another confirmation.";
         unverified.tag = 1;
         unverified.userInteractionEnabled = YES;
 
