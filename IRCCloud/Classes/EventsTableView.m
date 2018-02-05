@@ -859,10 +859,10 @@ extern UIImage *__socketClosedBackgroundImage;
                 if(!nextIsGrouped) {
                     NSString *groupMsg = [_collapsedEvents collapse];
                     if(groupMsg == nil && [type isEqualToString:@"nickchange"])
-                        groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+                        groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO displayName:nil], BOLD];
                     if(groupMsg == nil && [type isEqualToString:@"user_channel_mode"]) {
                         if(event.from.length > 0)
-                            groupMsg = [NSString stringWithFormat:@"%c%@%c was set to: %c%@%c by %c%@%c", BOLD, event.nick, BOLD, BOLD, event.diff, BOLD, BOLD, [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO], BOLD];
+                            groupMsg = [NSString stringWithFormat:@"%c%@%c was set to: %c%@%c by %c%@%c", BOLD, event.nick, BOLD, BOLD, event.diff, BOLD, BOLD, [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO displayName:nil], BOLD];
                         else
                             groupMsg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", event.nick, BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
                     }
@@ -893,10 +893,10 @@ extern UIImage *__socketClosedBackgroundImage;
                 msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[_collapsedEvents collapse];
             }
             if(msg == nil && [type isEqualToString:@"nickchange"])
-                msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], BOLD];
+                msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO displayName:nil], BOLD];
             if(msg == nil && [type isEqualToString:@"user_channel_mode"]) {
                 if(event.from.length > 0)
-                    msg = [NSString stringWithFormat:@"%c%@%c was set to: %c%@%c by %c%@%c", BOLD, event.nick, BOLD, BOLD, event.diff, BOLD, BOLD, [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO], BOLD];
+                    msg = [NSString stringWithFormat:@"%c%@%c was set to: %c%@%c by %c%@%c", BOLD, event.nick, BOLD, BOLD, event.diff, BOLD, BOLD, [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO displayName:nil], BOLD];
                 else
                     msg = [NSString stringWithFormat:@"%@ was set to: %c%@%c by the server %c%@%c", event.nick, BOLD, event.diff, BOLD, BOLD, event.server, BOLD];
                 _currentCollapsedEid = eid;
@@ -929,7 +929,7 @@ extern UIImage *__socketClosedBackgroundImage;
             
             if(!event.formatted.length || !event.formattedMsg.length) {
                 if((__chatOneLinePref || ![event isMessage]) && [event.from length] && event.rowType != ROW_THUMBNAIL && event.rowType != ROW_FILE) {
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43"], event.msg];
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43" displayName:event.from], event.msg];
                 } else {
                     event.formattedMsg = event.msg;
                 }
@@ -951,14 +951,14 @@ extern UIImage *__socketClosedBackgroundImage;
                 event.formattedMsg = event.msg;
             } else if([type isEqualToString:@"channel_mode"] && event.nick.length > 0) {
                 if(event.nick.length)
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO]];
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ by %@", event.msg, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO displayName:nil]];
                 else if(event.server.length)
                     event.formattedMsg = [NSString stringWithFormat:@"%@ by the server %c%@%c", event.msg, BOLD, event.server, CLEAR];
             } else if([type isEqualToString:@"buffer_me_msg"]) {
                 NSString *msg = event.msg;
                 if(!__disableCodeSpanPref)
                     msg = [msg insertCodeSpans];
-                event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:colors], msg];
+                event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.nick], msg];
                 event.rowType = ROW_ME_MESSAGE;
             } else if([type isEqualToString:@"notice"] || [type isEqualToString:@"buffer_msg"]) {
                 event.isCodeBlock = NO;
@@ -970,17 +970,17 @@ extern UIImage *__socketClosedBackgroundImage;
                     event.color = [UIColor messageTextColor];
                 Server *s = [[ServersDataSource sharedInstance] getServer:event.cid];
                 if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OPER]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO],BOLD];
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO displayName:nil],BOLD];
                 else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OWNER]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Owners" mode:s.MODE_OWNER colorize:NO],BOLD];
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Owners" mode:s.MODE_OWNER colorize:NO displayName:nil],BOLD];
                 else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_ADMIN]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Admins" mode:s.MODE_ADMIN colorize:NO],BOLD];
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Admins" mode:s.MODE_ADMIN colorize:NO displayName:nil],BOLD];
                 else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OP]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Ops" mode:s.MODE_OP colorize:NO],BOLD];
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Ops" mode:s.MODE_OP colorize:NO displayName:nil],BOLD];
                 else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_HALFOP]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Half Ops" mode:s.MODE_HALFOP colorize:NO],BOLD];
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Half Ops" mode:s.MODE_HALFOP colorize:NO displayName:nil],BOLD];
                 else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_VOICED]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Voiced" mode:s.MODE_VOICED colorize:NO],BOLD];
+                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[_collapsedEvents formatNick:@"Voiced" mode:s.MODE_VOICED colorize:NO displayName:nil],BOLD];
                 else
                     event.formattedMsg = @"";
                 
@@ -1079,9 +1079,9 @@ extern UIImage *__socketClosedBackgroundImage;
                         e1.formattedMsg = event.formattedMsg;
                         e1.parent = event.eid;
                         [self _addItem:e1 eid:e1.eid];
-                        event.formattedMsg = [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors];
+                        event.formattedMsg = [_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from];
                     } else {
-                        event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:colors], event.formattedMsg];
+                        event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from], event.formattedMsg];
                     }
                 }
             } else if([type isEqualToString:@"kicked_channel"]) {
@@ -1095,7 +1095,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 else
                     event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
                 if(event.hostmask && event.hostmask.length)
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO]];
+                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil]];
                 else
                     event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by the server %c%@%@%c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, event.nick, CLEAR];
                 if(event.msg.length > 0 && ![event.msg isEqualToString:event.nick])
@@ -1103,15 +1103,15 @@ extern UIImage *__socketClosedBackgroundImage;
             } else if([type isEqualToString:@"channel_mode_list_change"]) {
                 if(event.from.length == 0) {
                     if(event.nick.length)
-                        event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO], event.msg];
+                        event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO displayName:nil], event.msg];
                     else if(event.server.length)
                         event.formattedMsg = [NSString stringWithFormat:@"The server %c%@%c %@", BOLD, event.server, CLEAR, event.msg];
                 }
             } else if([type isEqualToString:@"user_chghost"]) {
-                event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO], event.msg];
+                event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], event.msg];
             } else if([type isEqualToString:@"channel_name_change"]) {
                 if(event.from.length) {
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString], event.msg];
+                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.from mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString displayName:nil], event.msg];
                 } else {
                     NSString *from = @"The server ";
                     if(event.server.length)
@@ -2050,7 +2050,7 @@ extern UIImage *__socketClosedBackgroundImage;
             e.isEmojiOnly = NO;
         }
         if(e.from.length)
-            e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.from mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf) defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43"] defaultColor:e.color mono:__monospacePref linkify:NO server:nil links:nil];
+            e.formattedNick = [ColorFormatter format:[_collapsedEvents formatNick:e.fromNick mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf) defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43" displayName:e.from] defaultColor:e.color mono:__monospacePref linkify:NO server:nil links:nil];
         if([e.realname isKindOfClass:[NSString class]] && e.realname.length) {
             e.formattedRealname = [ColorFormatter format:e.realname defaultColor:[UIColor collapsedRowTextColor] mono:__monospacePref linkify:YES server:_server links:&links];
             e.realnameLinks = links;
@@ -2405,9 +2405,9 @@ extern UIImage *__socketClosedBackgroundImage;
         if(!cell.avatar.image) {
             cell.avatar.layer.cornerRadius = 0;
             if(e.from.length) {
-                cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
+                cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from nick:e.fromNick bid:e.bid] getImage:avatarHeight isSelf:e.isSelf];
             } else if(e.rowType == ROW_ME_MESSAGE && e.nick.length) {
-                cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.nick bid:e.bid] getImage:__smallAvatarHeight isSelf:e.isSelf];
+                cell.avatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.nick nick:e.fromNick bid:e.bid] getImage:__smallAvatarHeight isSelf:e.isSelf];
             } else {
                 cell.avatar.image = nil;
             }
@@ -2841,7 +2841,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         }
                     }
                     if(!_stickyAvatar.image) {
-                        _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
+                        _stickyAvatar.image = [[[AvatarsDataSource sharedInstance] getAvatar:e.from nick:e.fromNick bid:e.bid] getImage:__largeAvatarHeight isSelf:e.isSelf];
                         _stickyAvatar.layer.cornerRadius = 0;
                     }
                     _stickyAvatar.hidden = NO;

@@ -19,12 +19,13 @@
 @interface Avatar : NSObject {
     int _bid;
     NSString *_nick;
+    NSString *_displayName;
     NSMutableDictionary *_images;
     NSMutableDictionary *_selfImages;
     NSTimeInterval _lastAccessTime;
 }
 @property (nonatomic, assign) int bid;
-@property (nonatomic, copy) NSString *nick;
+@property (nonatomic, copy) NSString *nick, *displayName;
 @property (nonatomic, readonly) NSTimeInterval lastAccessTime;
 -(UIImage *)getImage:(int)size isSelf:(BOOL)isSelf;
 @end
@@ -34,5 +35,5 @@
 }
 +(AvatarsDataSource *)sharedInstance;
 -(void)clear;
--(Avatar *)getAvatar:(NSString *)nick bid:(int)bid;
+-(Avatar *)getAvatar:(NSString *)displayName nick:(NSString *)nick bid:(int)bid;
 @end

@@ -472,7 +472,11 @@
                           },
                           @"buffer_me_msg":^(Event *event, IRCCloudJSONObject *object) {
                               if(object) {
-                                  event.nick = event.from;
+                                  if([[object objectForKey:@"display_name"] isKindOfClass:NSString.class])
+                                      event.nick = [object objectForKey:@"display_name"];
+                                  else
+                                      event.nick = [object objectForKey:@"from"];
+                                  event.fromNick = [object objectForKey:@"from"];
                                   event.from = @"";
                               }
                           },

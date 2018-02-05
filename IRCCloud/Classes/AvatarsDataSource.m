@@ -49,9 +49,9 @@
         }
         
         NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[_\\W]+" options:NSRegularExpressionCaseInsensitive error:nil];
-        NSString *text = [r stringByReplacingMatchesInString:[_nick uppercaseString] options:0 range:NSMakeRange(0, _nick.length) withTemplate:@""];
+        NSString *text = [r stringByReplacingMatchesInString:[_displayName uppercaseString] options:0 range:NSMakeRange(0, _displayName.length) withTemplate:@""];
         if(!text.length)
-            text = [_nick uppercaseString];
+            text = [_displayName uppercaseString];
         text = [text substringToIndex:1];
         CGSize textSize = [text sizeWithAttributes:@{NSFontAttributeName:font, NSForegroundColorAttributeName:[UIColor contentBackgroundColor]}];
         CGPoint p = CGPointMake((size / 2) - (textSize.width / 2),(size / 2) - (textSize.height / 2) - 0.5);
@@ -85,9 +85,12 @@
     return self;
 }
 
--(Avatar *)getAvatar:(NSString *)nick bid:(int)bid {
-    if(!nick.length)
+-(Avatar *)getAvatar:(NSString *)displayName nick:(NSString *)nick bid:(int)bid {
+    if(!displayName.length)
         return nil;
+    
+    if(!nick.length)
+        nick = displayName;
     
     if(![_avatars objectForKey:@(bid)]) {
         [_avatars setObject:[[NSMutableDictionary alloc] init] forKey:@(bid)];
@@ -97,10 +100,11 @@
         Avatar *a = [[Avatar alloc] init];
         a.bid = bid;
         a.nick = nick;
-        [[_avatars objectForKey:@(bid)] setObject:a forKey:nick];
+        a.displayName = displayName;
+        [[_avatars objectForKey:@(bid)] setObject:a forKey:displayName];
     }
     
-    return [[_avatars objectForKey:@(bid)] objectForKey:nick];
+    return [[_avatars objectForKey:@(bid)] objectForKey:displayName];
 }
 
 -(void)clear {
