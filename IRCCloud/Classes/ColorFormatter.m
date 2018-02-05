@@ -1967,9 +1967,7 @@ extern BOOL __compact;
                 }
                 break;
             case 0x202f:
-                if(i < text.length - 1) {
-                    [thinSpaceIndex addObject:@(i)];
-                }
+                [thinSpaceIndex addObject:@(i)];
                 break;
             case BOLD:
                 if(bold == -1) {
@@ -2374,7 +2372,7 @@ extern BOOL __compact;
     }
     
     for(NSNumber *i in thinSpaceIndex) {
-        [output addAttributes:@{NSFontAttributeName:Helvetica} range:NSMakeRange([i intValue], 2)];
+        [output addAttributes:@{NSFontAttributeName:Helvetica} range:NSMakeRange([i intValue], 1)];
     }
 
     return output;
