@@ -421,7 +421,10 @@
         } else {
             c = [[CollapsedEvent alloc] init];
             c.eid = event.eid;
-            c.nick = event.nick;
+            if(event.from.length)
+                c.nick = event.from;
+            else
+                c.nick = event.nick;
             c.hostname = event.hostmask;
             c.fromMode = event.fromMode;
             c.chan = event.chan;
