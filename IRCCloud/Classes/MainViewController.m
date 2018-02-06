@@ -2024,328 +2024,330 @@ NSArray *_sortedChannels;
 }
 
 -(void)sendButtonPressed:(id)sender {
-    if(_message.text && _message.text.length) {
-        id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
-        SEL sel = NSSelectorFromString(@"acceptAutocorrection");
-        if([k respondsToSelector:sel]) {
-            objc_msgSend(k, sel);
-        }
-        
-        NSAttributedString *messageText = _message.attributedText;
-        if([[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"]) {
-            [self resetColors:nil];
-            _message.internalTextView.font = _defaultTextareaFont;
-            _message.internalTextView.textColor = [UIColor textareaTextColor];
-            _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
-        }
-        
-        if(messageText.length > 1 && [messageText.string hasSuffix:@" "])
-            messageText = [messageText attributedSubstringFromRange:NSMakeRange(0, messageText.length - 1)];
+    @synchronized(_message) {
+        if(_message.text && _message.text.length) {
+            id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+            SEL sel = NSSelectorFromString(@"acceptAutocorrection");
+            if([k respondsToSelector:sel]) {
+                objc_msgSend(k, sel);
+            }
+            
+            NSAttributedString *messageText = _message.attributedText;
+            if([[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"]) {
+                [self resetColors:nil];
+                _message.internalTextView.font = _defaultTextareaFont;
+                _message.internalTextView.textColor = [UIColor textareaTextColor];
+                _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
+            }
+            
+            if(messageText.length > 1 && [messageText.string hasSuffix:@" "])
+                messageText = [messageText attributedSubstringFromRange:NSMakeRange(0, messageText.length - 1)];
 
-        NSString *messageString = messageText.string;
-        
-        Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-        if(s) {
-            if([messageString isEqualToString:@"/ignore"]) {
-                [_message clearText];
-                _buffer.draft = nil;
-                IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
-                itv.ignores = s.ignores;
-                itv.cid = s.cid;
-                itv.navigationItem.title = @"Ignore List";
-                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
-                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
-                else
-                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-                [self presentViewController:nc animated:YES completion:nil];
-                return;
-            } else if([messageString isEqualToString:@"/clear"]) {
-                [_message clearText];
-                _buffer.draft = nil;
-                [[EventsDataSource sharedInstance] removeEventsForBuffer:_buffer.bid];
-                [_eventsView refresh];
-                return;
-#ifndef APPSTORE
-            } else if([messageString isEqualToString:@"/crash"]) {
-                CLS_LOG(@"/crash requested");
-                [[Crashlytics sharedInstance] crash];
-            } else if([messageString isEqualToString:@"/compact 1"]) {
-                CLS_LOG(@"Set compact");
-                NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
-                [p setObject:@YES forKey:@"ascii-compact"];
-                SBJson5Writer *writer = [[SBJson5Writer alloc] init];
-                NSString *json = [writer stringWithObject:p];
-                [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
-                [_message clearText];
-                _buffer.draft = nil;
-                return;
-            } else if([messageString isEqualToString:@"/compact 0"]) {
-                NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
-                [p setObject:@NO forKey:@"ascii-compact"];
-                SBJson5Writer *writer = [[SBJson5Writer alloc] init];
-                NSString *json = [writer stringWithObject:p];
-                [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
-                [_message clearText];
-                _buffer.draft = nil;
-                return;
-            } else if([messageString isEqualToString:@"/mono 1"]) {
-                CLS_LOG(@"Set monospace");
-                NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
-                [p setObject:@"mono" forKey:@"font"];
-                SBJson5Writer *writer = [[SBJson5Writer alloc] init];
-                NSString *json = [writer stringWithObject:p];
-                [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
-                [_message clearText];
-                _buffer.draft = nil;
-                return;
-            } else if([messageString isEqualToString:@"/mono 0"]) {
-                NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
-                [p setObject:@"sans" forKey:@"font"];
-                SBJson5Writer *writer = [[SBJson5Writer alloc] init];
-                NSString *json = [writer stringWithObject:p];
-                [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
-                [_message clearText];
-                _buffer.draft = nil;
-                return;
-            } else if([messageString hasPrefix:@"/fontsize "]) {
-                [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:
-                                                                  MIN(FONT_MAX, MAX(FONT_MIN, [[messageString substringFromIndex:10] intValue]))
-                                                                  ]
-                                                          forKey:@"fontSize"];
-                if([ColorFormatter shouldClearFontCache]) {
-                    [ColorFormatter clearFontCache];
-                    [ColorFormatter loadFonts];
-                }
-                [[EventsDataSource sharedInstance] clearFormattingCache];
-                [[AvatarsDataSource sharedInstance] clear];
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:nil userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventUserInfo]}];
-                }];
-                [_message clearText];
-                _buffer.draft = nil;
-                return;
-            } else if([messageString isEqualToString:@"/read"]) {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:_eventsView.YUNoHeartbeat delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-                [alert show];
-                [_message clearText];
-                _buffer.draft = nil;
-                return;
-#endif
-            } else if(messageString.length > 1080 || [messageString isEqualToString:@"/paste"] || [messageString hasPrefix:@"/paste "] || [messageString rangeOfString:@"\n"].location < messageString.length - 1) {
-                BOOL prompt = YES;
-                if([[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
-                    prompt = ![[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] boolValue];
-                } else {
-                    prompt = YES;
-                }
-
-                if(prompt || [messageString isEqualToString:@"/paste"] || [messageString hasPrefix:@"/paste "]) {
-                    if([messageString isEqualToString:@"/paste"])
-                       [_message clearText];
-                    else if([messageString hasPrefix:@"/paste "])
-                        messageString = [messageString substringFromIndex:7];
-                    _buffer.draft = messageString;
-                    PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
-                    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
+            NSString *messageString = messageText.string;
+            
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            if(s) {
+                if([messageString isEqualToString:@"/ignore"]) {
+                    [_message clearText];
+                    _buffer.draft = nil;
+                    IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
+                    itv.ignores = s.ignores;
+                    itv.cid = s.cid;
+                    itv.navigationItem.title = @"Ignore List";
+                    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
                     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
                         nc.modalPresentationStyle = UIModalPresentationFormSheet;
                     else
                         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-                    if(self.presentedViewController)
-                        [self dismissViewControllerAnimated:NO completion:nil];
                     [self presentViewController:nc animated:YES completion:nil];
                     return;
-                }
+                } else if([messageString isEqualToString:@"/clear"]) {
+                    [_message clearText];
+                    _buffer.draft = nil;
+                    [[EventsDataSource sharedInstance] removeEventsForBuffer:_buffer.bid];
+                    [_eventsView refresh];
+                    return;
 #ifndef APPSTORE
-            } else if([messageString isEqualToString:@"/buffers"]) {
-                [_message clearText];
-                _buffer.draft = nil;
-                NSMutableString *msg = [[NSMutableString alloc] init];
-                [msg appendString:@"=== Buffers ===\n"];
-                NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:_buffer.cid];
-                for(Buffer *buffer in buffers) {
-                    [msg appendFormat:@"CID: %i BID: %i Name: %@ lastSeenEID: %f unread: %i highlight: %i\n", buffer.cid, buffer.bid, buffer.name, buffer.last_seen_eid, [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type], [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type]];
-                    NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid];
-                    Event *e = [events firstObject];
-                    [msg appendFormat:@"First event: %f %@\n", e.eid, e.type];
-                    e = [events lastObject];
-                    [msg appendFormat:@"Last event: %f %@\n", e.eid, e.type];
-                    [msg appendString:@"======\n"];
+                } else if([messageString isEqualToString:@"/crash"]) {
+                    CLS_LOG(@"/crash requested");
+                    [[Crashlytics sharedInstance] crash];
+                } else if([messageString isEqualToString:@"/compact 1"]) {
+                    CLS_LOG(@"Set compact");
+                    NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
+                    [p setObject:@YES forKey:@"ascii-compact"];
+                    SBJson5Writer *writer = [[SBJson5Writer alloc] init];
+                    NSString *json = [writer stringWithObject:p];
+                    [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
+                    [_message clearText];
+                    _buffer.draft = nil;
+                    return;
+                } else if([messageString isEqualToString:@"/compact 0"]) {
+                    NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
+                    [p setObject:@NO forKey:@"ascii-compact"];
+                    SBJson5Writer *writer = [[SBJson5Writer alloc] init];
+                    NSString *json = [writer stringWithObject:p];
+                    [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
+                    [_message clearText];
+                    _buffer.draft = nil;
+                    return;
+                } else if([messageString isEqualToString:@"/mono 1"]) {
+                    CLS_LOG(@"Set monospace");
+                    NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
+                    [p setObject:@"mono" forKey:@"font"];
+                    SBJson5Writer *writer = [[SBJson5Writer alloc] init];
+                    NSString *json = [writer stringWithObject:p];
+                    [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
+                    [_message clearText];
+                    _buffer.draft = nil;
+                    return;
+                } else if([messageString isEqualToString:@"/mono 0"]) {
+                    NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
+                    [p setObject:@"sans" forKey:@"font"];
+                    SBJson5Writer *writer = [[SBJson5Writer alloc] init];
+                    NSString *json = [writer stringWithObject:p];
+                    [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
+                    [_message clearText];
+                    _buffer.draft = nil;
+                    return;
+                } else if([messageString hasPrefix:@"/fontsize "]) {
+                    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:
+                                                                      MIN(FONT_MAX, MAX(FONT_MIN, [[messageString substringFromIndex:10] intValue]))
+                                                                      ]
+                                                              forKey:@"fontSize"];
+                    if([ColorFormatter shouldClearFontCache]) {
+                        [ColorFormatter clearFontCache];
+                        [ColorFormatter loadFonts];
+                    }
+                    [[EventsDataSource sharedInstance] clearFormattingCache];
+                    [[AvatarsDataSource sharedInstance] clear];
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:nil userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventUserInfo]}];
+                    }];
+                    [_message clearText];
+                    _buffer.draft = nil;
+                    return;
+                } else if([messageString isEqualToString:@"/read"]) {
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:_eventsView.YUNoHeartbeat delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                    [alert show];
+                    [_message clearText];
+                    _buffer.draft = nil;
+                    return;
+#endif
+                } else if(messageString.length > 1080 || [messageString isEqualToString:@"/paste"] || [messageString hasPrefix:@"/paste "] || [messageString rangeOfString:@"\n"].location < messageString.length - 1) {
+                    BOOL prompt = YES;
+                    if([[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
+                        prompt = ![[[[NetworkConnection sharedInstance] prefs] objectForKey:@"pastebin-disableprompt"] boolValue];
+                    } else {
+                        prompt = YES;
+                    }
+
+                    if(prompt || [messageString isEqualToString:@"/paste"] || [messageString hasPrefix:@"/paste "]) {
+                        if([messageString isEqualToString:@"/paste"])
+                           [_message clearText];
+                        else if([messageString hasPrefix:@"/paste "])
+                            messageString = [messageString substringFromIndex:7];
+                        _buffer.draft = messageString;
+                        PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
+                        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
+                        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                        else
+                            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                        if(self.presentedViewController)
+                            [self dismissViewControllerAnimated:NO completion:nil];
+                        [self presentViewController:nc animated:YES completion:nil];
+                        return;
+                    }
+#ifndef APPSTORE
+                } else if([messageString isEqualToString:@"/buffers"]) {
+                    [_message clearText];
+                    _buffer.draft = nil;
+                    NSMutableString *msg = [[NSMutableString alloc] init];
+                    [msg appendString:@"=== Buffers ===\n"];
+                    NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:_buffer.cid];
+                    for(Buffer *buffer in buffers) {
+                        [msg appendFormat:@"CID: %i BID: %i Name: %@ lastSeenEID: %f unread: %i highlight: %i\n", buffer.cid, buffer.bid, buffer.name, buffer.last_seen_eid, [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type], [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type]];
+                        NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid];
+                        Event *e = [events firstObject];
+                        [msg appendFormat:@"First event: %f %@\n", e.eid, e.type];
+                        e = [events lastObject];
+                        [msg appendFormat:@"Last event: %f %@\n", e.eid, e.type];
+                        [msg appendString:@"======\n"];
+                    }
+                    
+                    Event *e = [[Event alloc] init];
+                    e.cid = s.cid;
+                    e.bid = _buffer.bid;
+                    e.eid = [[NSDate date] timeIntervalSince1970] * 1000000;
+                    if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
+                        e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
+                    e.isSelf = YES;
+                    e.from = nil;
+                    e.nick = nil;
+                    e.msg = msg;
+                    e.type = @"buffer_msg";
+                    e.color = [UIColor timestampColor];
+                    if([_buffer.name isEqualToString:s.nick])
+                        e.bgColor = [UIColor whiteColor];
+                    else
+                        e.bgColor = [UIColor selfBackgroundColor];
+                    e.rowType = 0;
+                    e.formatted = nil;
+                    e.formattedMsg = nil;
+                    e.groupMsg = nil;
+                    e.linkify = YES;
+                    e.targetMode = nil;
+                    e.isHighlight = NO;
+                    e.reqId = -1;
+                    e.pending = YES;
+                    [_eventsView scrollToBottom];
+                    [[EventsDataSource sharedInstance] addEvent:e];
+                    [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
+                    return;
+#endif
+                } else if([messageString isEqualToString:@"/badge"]) {
+                    [_message clearText];
+                    _buffer.draft = nil;
+                    if(@available(iOS 9, *)) {
+                        [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                NSMutableString *msg = [[NSMutableString alloc] init];
+                                [msg appendFormat:@"Notification Center currently has %lu notifications\n", (unsigned long)notifications.count];
+                                for(UNNotification *n in notifications) {
+                                    NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+                                    [msg appendFormat:@"ID: %@ BID: %i EID: %f\n", n.request.identifier, [[d objectAtIndex:1] intValue], [[d objectAtIndex:2] doubleValue]];
+                                }
+                                
+                                for(UNNotification *n in notifications) {
+                                    NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+                                    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
+                                    [msg appendFormat:@"BID %i last_seen_eid: %f extraHighlights: %i\n", b.bid, b.last_seen_eid, b.extraHighlights];
+                                    if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
+                                        [msg appendFormat:@"Stale notification: %@\n", n.request.identifier];
+                                    }
+                                }
+                                
+                                CLS_LOG(@"%@", msg);
+                                
+                                Event *e = [[Event alloc] init];
+                                e.cid = s.cid;
+                                e.bid = _buffer.bid;
+                                e.eid = [[NSDate date] timeIntervalSince1970] * 1000000;
+                                if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
+                                    e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
+                                e.isSelf = YES;
+                                e.from = nil;
+                                e.nick = nil;
+                                e.msg = msg;
+                                e.type = @"buffer_msg";
+                                e.color = [UIColor timestampColor];
+                                if([_buffer.name isEqualToString:s.nick])
+                                    e.bgColor = [UIColor whiteColor];
+                                else
+                                    e.bgColor = [UIColor selfBackgroundColor];
+                                e.rowType = 0;
+                                e.formatted = nil;
+                                e.formattedMsg = nil;
+                                e.groupMsg = nil;
+                                e.linkify = YES;
+                                e.targetMode = nil;
+                                e.isHighlight = NO;
+                                e.reqId = -1;
+                                e.pending = YES;
+                                [_eventsView scrollToBottom];
+                                [[EventsDataSource sharedInstance] addEvent:e];
+                                [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
+                            }];
+                        }];
+                    }
                 }
                 
+                User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
                 Event *e = [[Event alloc] init];
-                e.cid = s.cid;
-                e.bid = _buffer.bid;
-                e.eid = [[NSDate date] timeIntervalSince1970] * 1000000;
-                if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
-                    e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
-                e.isSelf = YES;
-                e.from = nil;
-                e.nick = nil;
-                e.msg = msg;
-                e.type = @"buffer_msg";
-                e.color = [UIColor timestampColor];
-                if([_buffer.name isEqualToString:s.nick])
-                    e.bgColor = [UIColor whiteColor];
-                else
+                NSMutableString *msg = messageString.mutableCopy;
+                NSMutableString *formattedMsg = [ColorFormatter toIRC:messageText].mutableCopy;
+                
+                BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
+                if(!disableConvert)
+                    [ColorFormatter emojify:formattedMsg];
+                
+                if([msg hasPrefix:@"//"])
+                    [msg deleteCharactersInRange:NSMakeRange(0, 1)];
+                else if([msg hasPrefix:@"/"] && ![[msg lowercaseString] hasPrefix:@"/me "])
+                    msg = nil;
+                if(msg) {
+                    e.cid = s.cid;
+                    e.bid = _buffer.bid;
+                    e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset) * 1000000;
+                    if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
+                        e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
+                    e.isSelf = YES;
+                    e.from = s.from;
+                    e.nick = s.nick;
+                    e.fromNick = s.nick;
+                    e.avatar = s.avatar;
+                    e.avatarURL = s.avatarURL;
+                    e.hostmask = [NSString stringWithFormat:@"uid%@@",[[NetworkConnection sharedInstance].userInfo objectForKey:@"id"]];
+                    if(u)
+                        e.fromMode = u.mode;
+                    e.msg = formattedMsg;
+                    if(msg && [[msg lowercaseString] hasPrefix:@"/me "]) {
+                        e.type = @"buffer_me_msg";
+                        e.msg = [formattedMsg substringFromIndex:4];
+                    } else {
+                        e.type = @"buffer_msg";
+                    }
+                    e.color = [UIColor timestampColor];
                     e.bgColor = [UIColor selfBackgroundColor];
-                e.rowType = 0;
-                e.formatted = nil;
-                e.formattedMsg = nil;
-                e.groupMsg = nil;
-                e.linkify = YES;
-                e.targetMode = nil;
-                e.isHighlight = NO;
-                e.reqId = -1;
-                e.pending = YES;
-                [_eventsView scrollToBottom];
-                [[EventsDataSource sharedInstance] addEvent:e];
-                [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
-                return;
+                    e.rowType = 0;
+                    e.formatted = nil;
+                    e.formattedMsg = nil;
+                    e.groupMsg = nil;
+                    e.linkify = YES;
+                    e.targetMode = nil;
+                    e.isHighlight = NO;
+                    e.reqId = -1;
+                    e.pending = YES;
+                    e.realname = s.server_realname;
+                    [[EventsDataSource sharedInstance] addEvent:e];
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+#ifndef APPSTORE
+                        CLS_LOG(@"Scrolling down after sending a message");
 #endif
-            } else if([messageString isEqualToString:@"/badge"]) {
-                [_message clearText];
-                _buffer.draft = nil;
-                if(@available(iOS 9, *)) {
-                    [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            NSMutableString *msg = [[NSMutableString alloc] init];
-                            [msg appendFormat:@"Notification Center currently has %lu notifications\n", (unsigned long)notifications.count];
-                            for(UNNotification *n in notifications) {
-                                NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
-                                [msg appendFormat:@"ID: %@ BID: %i EID: %f\n", n.request.identifier, [[d objectAtIndex:1] intValue], [[d objectAtIndex:2] doubleValue]];
-                            }
-                            
-                            for(UNNotification *n in notifications) {
-                                NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
-                                Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
-                                [msg appendFormat:@"BID %i last_seen_eid: %f extraHighlights: %i\n", b.bid, b.last_seen_eid, b.extraHighlights];
-                                if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
-                                    [msg appendFormat:@"Stale notification: %@\n", n.request.identifier];
-                                }
-                            }
-                            
-                            CLS_LOG(@"%@", msg);
-                            
-                            Event *e = [[Event alloc] init];
-                            e.cid = s.cid;
-                            e.bid = _buffer.bid;
-                            e.eid = [[NSDate date] timeIntervalSince1970] * 1000000;
-                            if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
-                                e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
-                            e.isSelf = YES;
-                            e.from = nil;
-                            e.nick = nil;
-                            e.msg = msg;
-                            e.type = @"buffer_msg";
-                            e.color = [UIColor timestampColor];
-                            if([_buffer.name isEqualToString:s.nick])
-                                e.bgColor = [UIColor whiteColor];
-                            else
-                                e.bgColor = [UIColor selfBackgroundColor];
-                            e.rowType = 0;
-                            e.formatted = nil;
-                            e.formattedMsg = nil;
-                            e.groupMsg = nil;
-                            e.linkify = YES;
-                            e.targetMode = nil;
-                            e.isHighlight = NO;
-                            e.reqId = -1;
-                            e.pending = YES;
-                            [_eventsView scrollToBottom];
-                            [[EventsDataSource sharedInstance] addEvent:e];
-                            [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
-                        }];
+                        [_eventsView scrollToBottom];
+                        [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
                     }];
                 }
-            }
-            
-            User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
-            Event *e = [[Event alloc] init];
-            NSMutableString *msg = messageString.mutableCopy;
-            NSMutableString *formattedMsg = [ColorFormatter toIRC:messageText].mutableCopy;
-            
-            BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
-            if(!disableConvert)
-                [ColorFormatter emojify:formattedMsg];
-            
-            if([msg hasPrefix:@"//"])
-                [msg deleteCharactersInRange:NSMakeRange(0, 1)];
-            else if([msg hasPrefix:@"/"] && ![[msg lowercaseString] hasPrefix:@"/me "])
-                msg = nil;
-            if(msg) {
-                e.cid = s.cid;
-                e.bid = _buffer.bid;
-                e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset) * 1000000;
-                if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
-                    e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
-                e.isSelf = YES;
-                e.from = s.from;
-                e.nick = s.nick;
-                e.fromNick = s.nick;
-                e.avatar = s.avatar;
-                e.avatarURL = s.avatarURL;
-                e.hostmask = [NSString stringWithFormat:@"uid%@@",[[NetworkConnection sharedInstance].userInfo objectForKey:@"id"]];
-                if(u)
-                    e.fromMode = u.mode;
-                e.msg = formattedMsg;
-                if(msg && [[msg lowercaseString] hasPrefix:@"/me "]) {
-                    e.type = @"buffer_me_msg";
-                    e.msg = [formattedMsg substringFromIndex:4];
-                } else {
-                    e.type = @"buffer_msg";
-                }
-                e.color = [UIColor timestampColor];
-                e.bgColor = [UIColor selfBackgroundColor];
-                e.rowType = 0;
-                e.formatted = nil;
-                e.formattedMsg = nil;
-                e.groupMsg = nil;
-                e.linkify = YES;
-                e.targetMode = nil;
-                e.isHighlight = NO;
-                e.reqId = -1;
-                e.pending = YES;
-                e.realname = s.server_realname;
-                [[EventsDataSource sharedInstance] addEvent:e];
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-#ifndef APPSTORE
-                    CLS_LOG(@"Scrolling down after sending a message");
-#endif
-                    [_eventsView scrollToBottom];
-                    [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
+                e.to = _buffer.name;
+                e.command = formattedMsg;
+                if(e.msg)
+                    [_pendingEvents addObject:e];
+                [_message clearText];
+                _buffer.draft = nil;
+                msg = e.command.mutableCopy;
+                if(!disableConvert)
+                    [ColorFormatter emojify:msg];
+                e.reqId = [[NetworkConnection sharedInstance] say:msg to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
+                    if(![[result objectForKey:@"success"] boolValue]) {
+                        [_pendingEvents removeObject:e];
+                        e.height = 0;
+                        e.pending = NO;
+                        e.rowType = ROW_FAILED;
+                        e.color = [UIColor networkErrorColor];
+                        e.bgColor = [UIColor errorBackgroundColor];
+                        e.formatted = nil;
+                        e.height = 0;
+                        [e.expirationTimer invalidate];
+                        e.expirationTimer = nil;
+                        [_eventsView reloadData];
+                    }
                 }];
+                if(e.reqId < 0)
+                    e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
+                CLS_LOG(@"Sending message with reqid %i", e.reqId);
             }
-            e.to = _buffer.name;
-            e.command = formattedMsg;
-            if(e.msg)
-                [_pendingEvents addObject:e];
-            [_message clearText];
-            _buffer.draft = nil;
-            msg = e.command.mutableCopy;
-            if(!disableConvert)
-                [ColorFormatter emojify:msg];
-            e.reqId = [[NetworkConnection sharedInstance] say:msg to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
-                if(![[result objectForKey:@"success"] boolValue]) {
-                    [_pendingEvents removeObject:e];
-                    e.height = 0;
-                    e.pending = NO;
-                    e.rowType = ROW_FAILED;
-                    e.color = [UIColor networkErrorColor];
-                    e.bgColor = [UIColor errorBackgroundColor];
-                    e.formatted = nil;
-                    e.height = 0;
-                    [e.expirationTimer invalidate];
-                    e.expirationTimer = nil;
-                    [_eventsView reloadData];
-                }
-            }];
-            if(e.reqId < 0)
-                e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
-            CLS_LOG(@"Sending message with reqid %i", e.reqId);
         }
     }
 }

@@ -573,7 +573,10 @@ volatile BOOL __socketPaused = NO;
                                [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"chat-norealname"] forKey:@"chat-norealname"];
                            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
                        }
-
+                       if([[p objectForKey:@"labs"] objectForKey:@"avatars"]) {
+                           if(![[NSUserDefaults standardUserDefaults] objectForKey:@"avatarImages"])
+                               [[NSUserDefaults standardUserDefaults] setObject:[[p objectForKey:@"labs"] objectForKey:@"avatars"] forKey:@"avatarImages"];
+                       }
                        [[NSUserDefaults standardUserDefaults] synchronize];
                        [_events reformat];
 #endif
