@@ -2177,6 +2177,8 @@ NSArray *_sortedChannels;
                         [msg appendString:@"======\n"];
                     }
                     
+                    CLS_LOG(@"%@", msg);
+                    
                     Event *e = [[Event alloc] init];
                     e.cid = s.cid;
                     e.bid = _buffer.bid;
