@@ -569,7 +569,9 @@
         [[NSUserDefaults standardUserDefaults] setBool:_thirdPartyNotificationPreviews.isOn forKey:@"thirdPartyNotificationPreviews"];
         [[NSUserDefaults standardUserDefaults] setBool:_clearFormattingAfterSending.isOn forKey:@"clearFormattingAfterSending"];
         [[NSUserDefaults standardUserDefaults] setBool:_avatarImages.isOn forKey:@"avatarImages"];
+#ifndef APPSTORE
         [[NSUserDefaults standardUserDefaults] setBool:_backgroundUploads.isOn forKey:@"backgroundUploads"];
+#endif
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -808,7 +810,9 @@
     }
     [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":_saveToCameraRoll}];
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
+#ifndef APPSTORE
     [photos addObject:@{@"title":@"Upload In The Background", @"accessory":_backgroundUploads}];
+#endif
 
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
     if(@available(iOS 10, *)) {
@@ -1186,7 +1190,9 @@
     _thirdPartyNotificationPreviews.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"thirdPartyNotificationPreviews"];
     _clearFormattingAfterSending.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"];
     _avatarImages.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"];
+#ifndef APPSTORE
     _backgroundUploads.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"];
+#endif
 }
 
 -(void)hideJoinPartToggled:(id)sender {

@@ -402,7 +402,9 @@
     if(_metadatadelegate)
         [_metadatadelegate fileUploadWillUpload:file.length mimeType:_mimeType];
 
+#ifndef APPSTORE
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"]) {
+#endif
         NSURLSession *session;
         NSURLSessionConfiguration *config;
         config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
@@ -424,12 +426,14 @@
         }
 
         [task resume];
+#ifndef APPSTORE
     } else {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             _connection = [NSURLConnection connectionWithRequest:request delegate:self];
             [_connection start];
         }];
     }
+#endif
 }
 
 -(void)_updateBackgroundUploadMetadata {
