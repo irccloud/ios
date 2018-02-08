@@ -4550,7 +4550,7 @@ NSArray *_sortedChannels;
             [self _chooseFile];
         }]];
     }
-#ifdef ENTERPRISE
+#ifndef ENTERPRISE
     [alert addAction:[UIAlertAction actionWithTitle:[[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported?@"Change Avatar":@"Change Public Avatar" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:[[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported?_buffer.cid:-1];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:atv];
