@@ -224,8 +224,7 @@
                     CLS_LOG(@"Setting iOS icon badge to %lu", (unsigned long)count);
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [UIApplication sharedApplication].applicationIconBadgeNumber = count;
-                    if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected)
-                        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:nil userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventRefresh]}];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:nil userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventRefresh]}];
                 }];
             }];
         }];
