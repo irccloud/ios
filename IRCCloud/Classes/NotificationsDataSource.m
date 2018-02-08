@@ -208,7 +208,7 @@
                     NSTimeInterval eid = [[d objectAtIndex:2] doubleValue];
                     if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || eid <= b.last_seen_eid) {
                         [identifiers addObject:n.request.identifier];
-                    } else if(![[EventsDataSource sharedInstance] event:eid buffer:b.bid]) {
+                    } else if(b && ![[EventsDataSource sharedInstance] event:eid buffer:b.bid]) {
                         b.extraHighlights++;
                         [dirtyBuffers addObject:b];
                         CLS_LOG(@"bid%i has notification eid%.0f that's not in the loaded backlog, extraHighlights: %i", b.bid, eid, b.extraHighlights);
