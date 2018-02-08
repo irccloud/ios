@@ -890,6 +890,13 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                     [self refreshBuffer:b];
             }
             break;
+        case kIRCEventRefresh:
+            if([notification.object isKindOfClass:NSSet.class]) {
+                for(Buffer *b in notification.object) {
+                    [self refreshBuffer:b];
+                }
+                break;
+            }
         case kIRCEventMakeServer:
         case kIRCEventMakeBuffer:
         case kIRCEventDeleteBuffer:
@@ -899,7 +906,6 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
         case kIRCEventRenameConversation:
         case kIRCEventConnectionDeleted:
         case kIRCEventReorderConnections:
-        case kIRCEventRefresh:
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
             break;
         default:

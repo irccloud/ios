@@ -194,8 +194,11 @@
                 NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
                 NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
                 NSMutableArray *identifiers = [[NSMutableArray alloc] init];
+                NSMutableSet *dirtyBuffers = [[NSMutableSet alloc] init];
                 
                 for(Buffer *b in buffers) {
+                    if(b.extraHighlights)
+                        [dirtyBuffers addObject:b];
                     b.extraHighlights = 0;
                 }
                 
@@ -207,6 +210,7 @@
                         [identifiers addObject:n.request.identifier];
                     } else if(![[EventsDataSource sharedInstance] event:eid buffer:b.bid]) {
                         b.extraHighlights++;
+                        [dirtyBuffers addObject:b];
                         CLS_LOG(@"bid%i has notification eid%.0f that's not in the loaded backlog, extraHighlights: %i", b.bid, eid, b.extraHighlights);
                     }
                 }
@@ -224,7 +228,7 @@
                     CLS_LOG(@"Setting iOS icon badge to %lu", (unsigned long)count);
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [UIApplication sharedApplication].applicationIconBadgeNumber = count;
-                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:nil userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventRefresh]}];
+                    [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:dirtyBuffers userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventRefresh]}];
                 }];
             }];
         }];
