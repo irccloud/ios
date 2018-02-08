@@ -2845,7 +2845,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         _stickyAvatar.layer.cornerRadius = 0;
                     }
                     _stickyAvatar.hidden = NO;
-                    if(_hiddenAvatarRow != -1) {
+                    if(_hiddenAvatarRow != -1 && _hiddenAvatarRow < _data.count) {
                         Event *e = [_data objectAtIndex:_hiddenAvatarRow];
                         EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
                         cell.avatar.hidden = !e.isHeader;
