@@ -231,7 +231,7 @@
             }
         }
     }
-    if(_cachedAvatarURL && ![_cachedAvatarURL.host hasSuffix:@".irccloud-cdn.com"] && ![_cachedAvatarURL.host hasSuffix:@".slack-edge.com"]) {
+    if(_cachedAvatarURL && !_avatar.length && ![[ServersDataSource sharedInstance] getServer:_cid].isSlack) {
         BOOL inlineMediaPref = NO;
         Buffer *buffer = [[BuffersDataSource sharedInstance] getBuffer:_bid];
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
