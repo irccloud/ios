@@ -4550,6 +4550,7 @@ NSArray *_sortedChannels;
             [self _chooseFile];
         }]];
     }
+#ifdef ENTERPRISE
     [alert addAction:[UIAlertAction actionWithTitle:[[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported?@"Change Avatar":@"Change Public Avatar" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:[[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported?_buffer.cid:-1];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:atv];
@@ -4560,6 +4561,7 @@ NSArray *_sortedChannels;
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentViewController:nc animated:YES completion:nil];
     }]];
+#endif
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
     alert.popoverPresentationController.sourceRect = CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height);
     alert.popoverPresentationController.sourceView = self.view;

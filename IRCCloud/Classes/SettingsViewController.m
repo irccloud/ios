@@ -682,10 +682,12 @@
                     @{@"title":@"Email Address", @"accessory":_email},
                     @{@"title":@"Full Name", @"accessory":_name},
                     @{@"title":@"Auto Away", @"accessory":_autoaway},
+#ifdef ENTERPRISE
                     @{@"title":@"Public Avatar", @"value":@"", @"selected":^{
                         AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:-1];
                         [self.navigationController pushViewController:atv animated:YES];
                     }},
+#endif
                     @{@"title":@"Change Password", @"selected":^{
                         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Change Password" message:nil preferredStyle:UIAlertControllerStyleAlert];
                         
