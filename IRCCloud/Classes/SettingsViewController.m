@@ -843,6 +843,9 @@
                          @{@"title":@"Show Real Names", @"accessory":_noRealName},
                          @{@"title":@"Right Hand Side Timestamps", @"accessory":_timeLeft},
                          @{@"title":@"User Icons", @"accessory":_avatarsOff},
+#ifndef ENTERPRISE
+                         @{@"title":@"Avatars", @"accessory":_avatarImages},
+#endif
                          @{@"title":@"Compact Spacing", @"accessory":_compact},
                          @{@"title":@"24-Hour Clock", @"accessory":_24hour},
                          @{@"title":@"Show Seconds", @"accessory":_seconds},
@@ -850,7 +853,6 @@
                          @{@"title":@"Colourise Nicknames", @"accessory":_colors},
                          @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
                          @{@"title":@"Enlarge Emoji Messages", @"accessory":_disableBigEmoji},
-                         @{@"title":@"Avatar Images", @"accessory":_avatarImages},
                          ]},
               @{@"title":@"Chat & Embeds", @"items":@[
                         @{@"title":@"Show Joins, Parts, Quits", @"accessory":_hideJoinPart},
