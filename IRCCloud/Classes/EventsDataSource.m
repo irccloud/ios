@@ -209,6 +209,7 @@
 
 -(NSURL *)avatar:(int)size {
 #ifndef ENTERPRISE
+    BOOL isIRCCloudAvatar = NO;
     if([self isMessage] && (!_cachedAvatarURL || size != _cachedAvatarSize)) {
         if(_avatar.length) {
             _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":_avatar, @"modifiers":[NSString stringWithFormat:@"w%i", size]} error:nil]];
@@ -225,13 +226,15 @@
                 NSString *ident = [_hostmask substringToIndex:[_hostmask rangeOfString:@"@"].location];
                 if([ident hasPrefix:@"uid"] || [ident hasPrefix:@"sid"]) {
                     ident = [ident substringFromIndex:3];
-                    if([ident intValue])
+                    if([ident intValue]) {
                         _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarRedirectURITemplate relativeStringWithVariables:@{@"id":ident, @"modifiers":[NSString stringWithFormat:@"w%i", size]} error:nil]];
+                        isIRCCloudAvatar = YES;
+                    }
                 }
             }
         }
     }
-    if(_cachedAvatarURL && !_avatar.length && ![[ServersDataSource sharedInstance] getServer:_cid].isSlack) {
+    if(_cachedAvatarURL && !_avatar.length && !isIRCCloudAvatar && ![[ServersDataSource sharedInstance] getServer:_cid].isSlack) {
         BOOL inlineMediaPref = NO;
         Buffer *buffer = [[BuffersDataSource sharedInstance] getBuffer:_bid];
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
