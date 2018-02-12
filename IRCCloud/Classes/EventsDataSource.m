@@ -223,7 +223,7 @@
         } else {
             _cachedAvatarURL = nil;
             if([_hostmask rangeOfString:@"@"].location != NSNotFound) {
-                NSString *ident = _isSelf?[NSString stringWithFormat:@"uid%@@",[[NetworkConnection sharedInstance].userInfo objectForKey:@"id"]]:[_hostmask substringToIndex:[_hostmask rangeOfString:@"@"].location];
+                NSString *ident = [_hostmask substringToIndex:[_hostmask rangeOfString:@"@"].location];
                 if([ident hasPrefix:@"uid"] || [ident hasPrefix:@"sid"]) {
                     ident = [ident substringFromIndex:3];
                     if([ident intValue]) {
