@@ -1729,9 +1729,19 @@ extern BOOL __compact;
                      @"ladybug":@"🐞",
                      @"ladybeetle":@"🐞",
                      @"coccinellid":@"🐞",
+                     @"angry_swearing":@"🤬",
+                     @"mad_swearing":@"🤬",
+                     @"pissed_off":@"🤬",
                      @"cursing":@"🤬",
                      @"swearing":@"🤬",
                      @"fuck":@"🤬",
+                     @"angel_face":@"😇",
+                     @"smiling_devil":@"😈",
+                     @"frowning_devil":@"👿",
+                     @"mad_rage":@"😡",
+                     @"angry_rage":@"😡",
+                     @"mad":@"😠",
+                     @"steam_train":@"🚂",
                      };
     
     static NSRegularExpression *_pattern;
