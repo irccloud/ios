@@ -376,7 +376,10 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized(_avatars) {
         NSDictionary *row = [_avatars objectAtIndex:[indexPath row]];
-        [[NetworkConnection sharedInstance] setAvatar:[row objectForKey:@"id"] orgId:_server.orgId handler:^(IRCCloudJSONObject *result) {
+        int orgId = -1;
+        if(_server && _server.orgId)
+            orgId = _server.orgId;
+        [[NetworkConnection sharedInstance] setAvatar:[row objectForKey:@"id"] orgId:orgId handler:^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] intValue]) {
                 [self cancelButtonPressed];
             } else {

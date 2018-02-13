@@ -687,6 +687,7 @@
                         AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:-1];
                         [self.navigationController pushViewController:atv animated:YES];
                     }},
+                    @{@"title":@"Avatars FAQ", @"selected":^{[(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq#faq-avatars"]];}},
 #endif
                     @{@"title":@"Change Password", @"selected":^{
                         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Change Password" message:nil preferredStyle:UIAlertControllerStyleAlert];
