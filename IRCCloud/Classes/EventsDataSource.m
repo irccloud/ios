@@ -233,46 +233,46 @@
                 }
             }
         }
-    }
-    if(_cachedAvatarURL && !_avatar.length && !isIRCCloudAvatar && ![[ServersDataSource sharedInstance] getServer:_cid].isSlack) {
-        BOOL inlineMediaPref = NO;
-        Buffer *buffer = [[BuffersDataSource sharedInstance] getBuffer:_bid];
-        NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
-        if(buffer && prefs) {
-            inlineMediaPref = [[prefs objectForKey:@"inlineimages"] boolValue];
-            if(inlineMediaPref) {
-                NSDictionary *disableMap;
-                
-                if([buffer.type isEqualToString:@"channel"]) {
-                    disableMap = [prefs objectForKey:@"channel-inlineimages-disable"];
+        if(_cachedAvatarURL && !_avatar.length && !isIRCCloudAvatar && ![[ServersDataSource sharedInstance] getServer:_cid].isSlack) {
+            BOOL inlineMediaPref = NO;
+            Buffer *buffer = [[BuffersDataSource sharedInstance] getBuffer:_bid];
+            NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+            if(buffer && prefs) {
+                inlineMediaPref = [[prefs objectForKey:@"inlineimages"] boolValue];
+                if(inlineMediaPref) {
+                    NSDictionary *disableMap;
+                    
+                    if([buffer.type isEqualToString:@"channel"]) {
+                        disableMap = [prefs objectForKey:@"channel-inlineimages-disable"];
+                    } else {
+                        disableMap = [prefs objectForKey:@"buffer-inlineimages-disable"];
+                    }
+                    
+                    if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] boolValue])
+                        inlineMediaPref = NO;
                 } else {
-                    disableMap = [prefs objectForKey:@"buffer-inlineimages-disable"];
+                    NSDictionary *enableMap;
+                    
+                    if([buffer.type isEqualToString:@"channel"]) {
+                        enableMap = [prefs objectForKey:@"channel-inlineimages"];
+                    } else {
+                        enableMap = [prefs objectForKey:@"buffer-inlineimages"];
+                    }
+                    
+                    if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] boolValue])
+                        inlineMediaPref = YES;
                 }
                 
-                if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] boolValue])
+                if([[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"] && ![NetworkConnection sharedInstance].isWifi) {
                     inlineMediaPref = NO;
-            } else {
-                NSDictionary *enableMap;
-                
-                if([buffer.type isEqualToString:@"channel"]) {
-                    enableMap = [prefs objectForKey:@"channel-inlineimages"];
-                } else {
-                    enableMap = [prefs objectForKey:@"buffer-inlineimages"];
                 }
-                
-                if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",buffer.bid]] boolValue])
-                    inlineMediaPref = YES;
             }
-            
-            if([[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"] && ![NetworkConnection sharedInstance].isWifi) {
-                inlineMediaPref = NO;
-            }
+            if(!inlineMediaPref)
+                _cachedAvatarURL = nil;
         }
-        if(!inlineMediaPref)
-            _cachedAvatarURL = nil;
-        else
-            _cachedAvatarSize = size;
     }
+    if(_cachedAvatarURL)
+        _cachedAvatarSize = size;
 #endif
     return _cachedAvatarURL;
 }
