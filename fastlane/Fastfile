@@ -147,9 +147,6 @@ platform :ios do
         app_review_information: review_info,
         automatic_release: true
     )
-    precheck(
-        app_identifier: app_identifier
-    )
   end
 
   desc "Make sure all devices are added to the ad-hoc profile"
