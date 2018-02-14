@@ -2074,7 +2074,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 if(r.resultType == NSTextCheckingTypeLink) {
                     for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
                         NSString *url = [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[file objectForKey:@"id"]} error:nil];
-                        if(([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] || [[file objectForKey:@"mime_type"] hasPrefix:@"video/"]) && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
+                        if(url && ([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] || [[file objectForKey:@"mime_type"] hasPrefix:@"video/"]) && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
                             NSString *extension = [file objectForKey:@"extension"];
                             if(!extension.length)
                                 extension = [@"." stringByAppendingString:[[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
@@ -2084,7 +2084,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     }
                     for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
                         NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":[paste objectForKey:@"id"]} error:nil];
-                        if(([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
+                        if(url && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
                             r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", url, [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
                             [mutableLinks setObject:r atIndexedSubscript:i];
                         }
