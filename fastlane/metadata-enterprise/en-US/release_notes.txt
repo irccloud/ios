@@ -1,4 +1,17 @@
-• Topic editing now displays how many available characters are remaining
-• Fixed an issue with loading text snippets in the app
-• Fixed a crash caused by certain formatting characters
+• Improved support for connecting to Slack IRC gateways, including support for multi-person DMs and Slack-style mentions
+• Channel URLs are now visible in the Channel Info dialog
+• Support for Unicode 10 :emocode:s
+• Added a new setting to remember the IRC color after sending messages
+• Embedded imgur and instagram descriptions are now auto-linkified
+• Conversations and channels you’ve left can now be renamed
+• Adjusted the spacing between nicks and mode symbols when using the monospace font
+• Fixed: The backspace key should work correctly while editing a channel topic
+• Fixed: Messages could overlap and thumbnails could have a large empty space below them
+• Fixed: The app could hang when displaying certain emoji combinations
+• Fixed: The scroll position should no longer jump when loading thumbnails
+• Fixed: The in-call / tethering banner should display correct on iOS 11
+• Fixed: The bottom unread indicator no longer covers the last channel in the sidebar
+• Fixed: The text input field should no longer unexpectedly clear when resuming the app
+• Fixed: The unread messages bar has the correct background color on the Dawn theme
+• Fixed: The youtube player now releases the Control Center media controls after playback ends
 • Stability improvements and minor fixes
