@@ -280,6 +280,25 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+-(void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"avatars-off"] || ![[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"]) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Enable Avatars" message:@"Viewing avatars in messages requires both the User Icons and Avatars settings to be enabled.  Would you like to enable them now?" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Enable" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [[NSUserDefaults standardUserDefaults] setObject:@(NO) forKey:@"avatars-off"];
+            [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:@"avatarImages"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        }]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+        alert.popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItem;
+        alert.popoverPresentationController.sourceView = self.view;
+        [self presentViewController:alert animated:YES completion:nil];
+
+    }
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
 
