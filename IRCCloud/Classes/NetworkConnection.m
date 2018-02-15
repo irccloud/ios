@@ -1946,11 +1946,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                     _currentCount++;
                 }
             }
-            int reqid = [[object objectForKey:@"reqid"] intValue];
-            if(!backlog && [object objectForKey:@"reqid"] && [_resultHandlers objectForKey:@(reqid)]) {
+            if(!backlog && [object objectForKey:@"reqid"]) {
+                IRCCloudAPIResultHandler handler = [_resultHandlers objectForKey:@([[object objectForKey:@"reqid"] intValue])];
+                if(handler) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        ((IRCCloudAPIResultHandler)[_resultHandlers objectForKey:@(reqid)])(object);
+                        handler(object);
                     }];
+                }
             }
             if([NSDate timeIntervalSinceReferenceDate] - start > _longestEventTime) {
                 _longestEventTime = [NSDate timeIntervalSinceReferenceDate] - start;
