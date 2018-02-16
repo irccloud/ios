@@ -4175,71 +4175,93 @@ NSArray *_sortedChannels;
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
-    [self applyTheme];
-    FileMetadataViewController *fvc = nil;
-    NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
-    NSURL *mediaURL = [info valueForKey:UIImagePickerControllerMediaURL];
-    UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
-    if(!img)
-        img = [info objectForKey:UIImagePickerControllerOriginalImage];
-    
-    CLS_LOG(@"Image file chosen: %@ %@", refURL, mediaURL);
-    if(img || refURL || mediaURL) {
-        if(picker.sourceType == UIImagePickerControllerSourceTypeCamera && [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"]) {
-            if(img)
-                UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
-            else if(UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(mediaURL.path))
-                UISaveVideoAtPathToSavedPhotosAlbum(mediaURL.path, nil, nil, nil);
-        }
-        if((!img || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-            FileUploader *u = [[FileUploader alloc] init];
-            u.delegate = self;
-            u.bid = _buffer.bid;
-            fvc = [[FileMetadataViewController alloc] initWithUploader:u];
-            if(picker == nil || picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
-                [fvc showCancelButton];
+    [picker dismissViewControllerAnimated:YES completion:^{
+        [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+        [self applyTheme];
+        FileMetadataViewController *fvc = nil;
+        NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
+        NSURL *mediaURL = [info valueForKey:UIImagePickerControllerMediaURL];
+        UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
+        if(!img)
+            img = [info objectForKey:UIImagePickerControllerOriginalImage];
+        
+        CLS_LOG(@"Image file chosen: %@ %@", refURL, mediaURL);
+        if(img || refURL || mediaURL) {
+            if(picker.sourceType == UIImagePickerControllerSourceTypeCamera && [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"]) {
+                if(img)
+                    UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
+                else if(UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(mediaURL.path))
+                    UISaveVideoAtPathToSavedPhotosAlbum(mediaURL.path, nil, nil, nil);
             }
-
-            if(refURL) {
-                CLS_LOG(@"Loading metadata from asset library");
-                ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
-                    ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
-                    CLS_LOG(@"Got filename: %@", imageRep.filename);
-                    u.originalFilename = imageRep.filename;
-                    if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
-                        CLS_LOG(@"Uploading file URL");
-                        u.originalFilename = [u.originalFilename stringByReplacingOccurrencesOfString:@".MOV" withString:@".MP4"];
-                        [u uploadVideo:[info objectForKey:UIImagePickerControllerMediaURL]];
-                        [fvc viewWillAppear:NO];
-                    } else if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
-                        CLS_LOG(@"Uploading file data");
-                        NSMutableData *data = [[NSMutableData alloc] initWithCapacity:(NSUInteger)imageRep.size];
-                        uint8_t buffer[4096];
-                        long long len = 0;
-                        while(len < imageRep.size) {
-                            long long i = [imageRep getBytes:buffer fromOffset:len length:4096 error:nil];
-                            [data appendBytes:buffer length:(NSUInteger)i];
-                            len += i;
-                        }
-                        [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
-                        [fvc viewWillAppear:NO];
-                    } else {
-                        CLS_LOG(@"Uploading UIImage");
-                        [u uploadImage:img];
-                        [fvc viewWillAppear:NO];
-                    }
-                    if(imageRep.fullScreenImage) {
-                        UIImage *thumbnail = [FileUploader image:[UIImage imageWithCGImage:imageRep.fullScreenImage] scaledCopyOfSize:CGSizeMake(2048, 2048)];
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [fvc setImage:thumbnail];
-                        }];
-                    }
-                };
+            if((!img || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+                FileUploader *u = [[FileUploader alloc] init];
+                u.delegate = self;
+                u.bid = _buffer.bid;
+                fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+                if(picker == nil || picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
+                    [fvc showCancelButton];
+                }
                 
-                ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
-                [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:^(NSError *e) {
-                    CLS_LOG(@"Error getting asset: %@", e);
+                if(refURL) {
+                    CLS_LOG(@"Loading metadata from asset library");
+                    ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
+                        ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
+                        CLS_LOG(@"Got filename: %@", imageRep.filename);
+                        u.originalFilename = imageRep.filename;
+                        if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
+                            CLS_LOG(@"Uploading file URL");
+                            u.originalFilename = [u.originalFilename stringByReplacingOccurrencesOfString:@".MOV" withString:@".MP4"];
+                            [u uploadVideo:[info objectForKey:UIImagePickerControllerMediaURL]];
+                            [fvc viewWillAppear:NO];
+                        } else if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
+                            CLS_LOG(@"Uploading file data");
+                            NSMutableData *data = [[NSMutableData alloc] initWithCapacity:(NSUInteger)imageRep.size];
+                            uint8_t buffer[4096];
+                            long long len = 0;
+                            while(len < imageRep.size) {
+                                long long i = [imageRep getBytes:buffer fromOffset:len length:4096 error:nil];
+                                [data appendBytes:buffer length:(NSUInteger)i];
+                                len += i;
+                            }
+                            [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
+                            [fvc viewWillAppear:NO];
+                        } else {
+                            CLS_LOG(@"Uploading UIImage");
+                            [u uploadImage:img];
+                            [fvc viewWillAppear:NO];
+                        }
+                        if(imageRep.fullScreenImage) {
+                            UIImage *thumbnail = [FileUploader image:[UIImage imageWithCGImage:imageRep.fullScreenImage] scaledCopyOfSize:CGSizeMake(2048, 2048)];
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                [fvc setImage:thumbnail];
+                            }];
+                        }
+                    };
+                    
+                    ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
+                    [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:^(NSError *e) {
+                        CLS_LOG(@"Error getting asset: %@", e);
+                        if(img) {
+                            [u uploadImage:img];
+                            UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                [fvc setImage:thumbnail];
+                            }];
+                        } else if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
+                            [u uploadVideo:mediaURL];
+                        } else {
+                            [u uploadFile:mediaURL];
+                        }
+                        [fvc viewWillAppear:NO];
+                    }];
+                } else if([info objectForKey:@"gifData"]) {
+                    CLS_LOG(@"Uploading GIF from Pasteboard");
+                    [u uploadFile:[NSString stringWithFormat:@"%li.GIF", time(NULL)] UTI:@"image/gif" data:[info objectForKey:@"gifData"]];
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [fvc setImage:img];
+                    }];
+                } else {
+                    CLS_LOG(@"no asset library URL, uploading image data instead");
                     if(img) {
                         [u uploadImage:img];
                         UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
@@ -4251,72 +4273,52 @@ NSArray *_sortedChannels;
                     } else {
                         [u uploadFile:mediaURL];
                     }
-                    [fvc viewWillAppear:NO];
-                }];
-            } else if([info objectForKey:@"gifData"]) {
-                CLS_LOG(@"Uploading GIF from Pasteboard");
-                [u uploadFile:[NSString stringWithFormat:@"%li.GIF", time(NULL)] UTI:@"image/gif" data:[info objectForKey:@"gifData"]];
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [fvc setImage:img];
-                }];
-            } else {
-                CLS_LOG(@"no asset library URL, uploading image data instead");
-                if(img) {
-                    [u uploadImage:img];
-                    UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [fvc setImage:thumbnail];
-                    }];
-                } else if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
-                    [u uploadVideo:mediaURL];
-                } else {
-                    [u uploadFile:mediaURL];
                 }
+            } else {
+                [self _showConnectingView];
+                _connectingStatus.text = @"Uploading";
+                _connectingProgress.progress = 0;
+                _connectingProgress.hidden = YES;
+                ImageUploader *u = [[ImageUploader alloc] init];
+                u.delegate = self;
+                u.bid = _buffer.bid;
+                [u upload:img];
             }
-        } else {
-            [self _showConnectingView];
-            _connectingStatus.text = @"Uploading";
-            _connectingProgress.progress = 0;
-            _connectingProgress.hidden = YES;
-            ImageUploader *u = [[ImageUploader alloc] init];
-            u.delegate = self;
-            u.bid = _buffer.bid;
-            [u upload:img];
         }
-    }
-    
-    UINavigationController *nc = nil;
-    
-    if(fvc) {
-        nc = [[UINavigationController alloc] initWithRootViewController:fvc];
-        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-    }
-    
-    if(_popover) {
-        [_popover dismissPopoverAnimated:YES];
-        if(nc)
-            [self presentViewController:nc animated:YES completion:nil];
-    } else if(self.presentedViewController) {
-        [self dismissViewControllerAnimated:YES completion:^{
-            [self _resetStatusBar];
+        
+        UINavigationController *nc = nil;
+        
+        if(fvc) {
+            nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        }
+        
+        if(_popover) {
+            [_popover dismissPopoverAnimated:YES];
             if(nc)
                 [self presentViewController:nc animated:YES completion:nil];
-        }];
-    } else if(nc) {
-        [self presentViewController:nc animated:YES completion:nil];
-    }
-    
-    if(!nc)
-        [self dismissViewControllerAnimated:YES completion:^{
-            [self _resetStatusBar];
-        }];
-    
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
-        [UIApplication sharedApplication].idleTimerDisabled = YES;
+        } else if(self.presentedViewController) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                [self _resetStatusBar];
+                if(nc)
+                    [self presentViewController:nc animated:YES completion:nil];
+            }];
+        } else if(nc) {
+            [self presentViewController:nc animated:YES completion:nil];
+        }
+        
+        if(!nc)
+            [self dismissViewControllerAnimated:YES completion:^{
+                [self _resetStatusBar];
+            }];
+        
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
+            [UIApplication sharedApplication].idleTimerDisabled = YES;
+    }];
 }
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
