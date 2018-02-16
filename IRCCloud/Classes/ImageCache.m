@@ -147,16 +147,20 @@
         NSURL *cache = [self pathForURL:url];
         if([[NSFileManager defaultManager] fileExistsAtPath:cache.path]) {
             NSData *data = [NSData dataWithContentsOfURL:cache];
-            img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
-            if(img.size.width) {
-                @synchronized(_images) {
-                    [_images setObject:img forKey:url.absoluteString];
+            if(data.length) {
+                img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
+                if(img.size.width) {
+                    @synchronized(_images) {
+                        [_images setObject:img forKey:url.absoluteString];
+                    }
+                } else {
+                    CLS_LOG(@"Unable to load %@ from cache", url);
+                    @synchronized(_failures) {
+                        [_failures setObject:@(YES) forKey:url.absoluteString];
+                    }
                 }
             } else {
-                CLS_LOG(@"Unable to load %@ from cache", url);
-                @synchronized(_failures) {
-                    [_failures setObject:@(YES) forKey:url.absoluteString];
-                }
+                [[NSFileManager defaultManager] removeItemAtPath:cache.path error:nil];
             }
         }
     }
@@ -193,12 +197,19 @@
                 [[NSFileManager defaultManager] copyItemAtURL:location toURL:cache error:nil];
                 NSLog(@"Downloaded %@ to %@", url, cache);
                 NSData *data = [NSData dataWithContentsOfURL:cache];
-                YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
-                if(img.size.width) {
-                    @synchronized(_images) {
-                        [_images setObject:img forKey:url.absoluteString];
+                if(data.length) {
+                    YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
+                    if(img.size.width) {
+                        @synchronized(_images) {
+                            [_images setObject:img forKey:url.absoluteString];
+                        }
+                    } else {
+                        @synchronized(_failures) {
+                            [_failures setObject:@(YES) forKey:url.absoluteString];
+                        }
                     }
                 } else {
+                    [[NSFileManager defaultManager] removeItemAtURL:cache error:nil];
                     @synchronized(_failures) {
                         [_failures setObject:@(YES) forKey:url.absoluteString];
                     }
