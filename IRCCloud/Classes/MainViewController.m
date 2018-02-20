@@ -121,6 +121,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)run {
+    self.isEmoji = NO;
     NSMutableSet *suggestions_set = [[NSMutableSet alloc] init];
     NSMutableArray *suggestions = [[NSMutableArray alloc] init];
     
@@ -201,6 +202,7 @@ NSArray *_sortedChannels;
                 if([emocode hasPrefix:q]) {
                     NSString *emoji = [emojiMap objectForKey:emocode];
                     if(![suggestions_set containsObject:emoji]) {
+                        self.isEmoji = YES;
                         [suggestions_set addObject:emoji];
                         [suggestions addObject:emoji];
                     }
@@ -2383,7 +2385,7 @@ NSArray *_sortedChannels;
         }
     }
     
-    if(_updateSuggestionsTask.atMention || _buffer.serverIsSlack)
+    if(_updateSuggestionsTask.atMention || (!_updateSuggestionsTask.isEmoji && _buffer.serverIsSlack))
         nick = [NSString stringWithFormat:@"@%@", nick];
 
     if(!isChannel && !_buffer.serverIsSlack && ![text hasPrefix:@":"] && [text rangeOfString:@" "].location == NSNotFound)

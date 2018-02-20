@@ -41,7 +41,7 @@
 @property UIExpandingTextView *message;
 @property Buffer *buffer;
 @property NickCompletionView *nickCompletionView;
-@property BOOL force, atMention, cancelled;
+@property BOOL force, atMention, cancelled, isEmoji;
 
 -(void)cancel;
 -(void)run;
