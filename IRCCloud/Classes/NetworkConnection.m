@@ -397,12 +397,6 @@ volatile BOOL __socketPaused = NO;
                     }
                 }
             }
-        } else {
-            CLS_LOG(@"Event recieved for invalid BID, reconnecting!");
-            _streamId = nil;
-            [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
-            _state = kIRCCloudStateDisconnected;
-            [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
         }
     };
     
