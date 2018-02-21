@@ -428,8 +428,8 @@
     } else {
         CGPoint touch = [recognizer locationInView:_imageView];
         
-        CGFloat w = _scrollView.bounds.size.width;
-        CGFloat h = _scrollView.bounds.size.height;
+        CGFloat w = _imageView.bounds.size.width / _scrollView.maximumZoomScale;
+        CGFloat h = _imageView.bounds.size.height / _scrollView.maximumZoomScale;
         CGFloat x = touch.x-(w/2.0);
         CGFloat y = touch.y-(h/2.0);
         
