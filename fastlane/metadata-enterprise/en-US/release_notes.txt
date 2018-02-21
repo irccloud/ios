@@ -1,3 +1,12 @@
+This is a quick bug/crash fix release, previous release notes after this list
+
+• Choosing an emoji from the suggestions list no longer creates a @mention on Slack connections
+• Double-tapping to zoom an image should now work properly on small images
+• Uploading an image should no longer send the URL multiple times
+• Fixed an issue that could cause the app to disconnect unexpectedly if a nick on your ignore list sends a PM
+
+---
+
 • Improved support for connecting to Slack IRC gateways, including support for multi-person DMs and Slack-style mentions
 • Channel URLs are now visible in the Channel Info dialog
 • Support for Unicode 10 :emocode:s

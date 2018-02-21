@@ -1,3 +1,12 @@
+This is a quick bug/crash fix release, previous release notes after this list
+
+• Choosing an emoji from the suggestions list no longer creates a @mention on Slack connections
+• Double-tapping to zoom an image should now work properly on small images
+• Uploading an image should no longer send the URL multiple times
+• Fixed an issue that could cause the app to disconnect unexpectedly if a nick on your ignore list sends a PM
+
+---
+
 It's been a while! We've got quite a few fixes in this version as well as a new feature we're trying out.
 
 Public Avatars
