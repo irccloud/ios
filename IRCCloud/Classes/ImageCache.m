@@ -180,7 +180,7 @@
 
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler {
     @synchronized (_tasks) {
-        if([_tasks objectForKey:url] || [_failures objectForKey:url]) {
+        if(url == nil || [_tasks objectForKey:url] || [_failures objectForKey:url]) {
             return;
         }
         
