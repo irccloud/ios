@@ -45,6 +45,8 @@
 @property (strong, nonatomic) ECSlidingViewController *slideViewController;
 @property (strong, nonatomic) SplashViewController *splashViewController;
 
+@property BOOL movedToBackground;
+
 -(void)showLoginView;
 -(void)showMainView:(BOOL)animated;
 -(void)showConnectionView;

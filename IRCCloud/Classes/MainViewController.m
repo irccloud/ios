@@ -1714,7 +1714,7 @@ NSArray *_sortedChannels;
         if([notification.object bid] == 0) {
           [self _themeChanged];
         }
-        if([ServersDataSource sharedInstance].count < 1) {
+        if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && !((AppDelegate *)([UIApplication sharedApplication].delegate)).movedToBackground && [ServersDataSource sharedInstance].count < 1) {
             [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
             return;
         }
