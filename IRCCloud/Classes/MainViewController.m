@@ -1765,6 +1765,9 @@ NSArray *_sortedChannels;
     if(@available(iOS 9, *)) {
         CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
         height = [UIScreen mainScreen].applicationFrame.size.height + [UIApplication sharedApplication].statusBarFrame.size.height - origin.y;
+        if(@available(iOS 11, *)) {
+            height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
+        }
     }
     if(height != _kbSize.height) {
         _kbSize = size;
