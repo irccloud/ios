@@ -812,6 +812,24 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
+#ifndef DEBUG
+#ifdef ENTERPRISE
+    NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
+#else
+    NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
+#endif
+    if(sharedcontainer) {
+        NSURL *logfile = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"log.txt"];
+        
+        NSDate *yesterday = [NSDate dateWithTimeIntervalSinceNow:(-60*60*24)];
+        NSDate *modificationDate = nil;
+        [logfile getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
+
+        if([yesterday compare:modificationDate] == NSOrderedDescending) {
+            freopen([logfile.path cStringUsingEncoding:NSASCIIStringEncoding],"w+",stderr);
+        }
+    }
+#endif
     _conn = [NetworkConnection sharedInstance];
     _movedToBackground = YES;
     _conn.failCount = 0;
