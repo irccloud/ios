@@ -2275,7 +2275,7 @@ NSArray *_sortedChannels;
                 User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
                 Event *e = [[Event alloc] init];
                 NSMutableString *msg = messageString.mutableCopy;
-                NSMutableString *formattedMsg = [ColorFormatter toIRC:messageText].mutableCopy;
+                NSMutableString *formattedMsg = s.isSlack?messageString.mutableCopy:[ColorFormatter toIRC:messageText].mutableCopy;
                 
                 BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
                 if(!disableConvert)
