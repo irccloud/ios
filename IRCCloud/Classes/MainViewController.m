@@ -168,6 +168,7 @@ NSArray *_sortedChannels;
                 if(text.length > 0 && channel.name.length > 0 && [channel.name characterAtIndex:0] == [text characterAtIndex:0] && channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text] && ![suggestions_set containsObject:channel.name.lowercaseString] && ![[BuffersDataSource sharedInstance] getBuffer:channel.bid].isMPDM) {
                     [suggestions_set addObject:channel.name.lowercaseString];
                     [suggestions addObject:channel.name];
+                    self.isEmoji = YES;
                 }
             }
             
