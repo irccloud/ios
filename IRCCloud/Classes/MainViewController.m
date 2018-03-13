@@ -1642,7 +1642,7 @@ NSArray *_sortedChannels;
                 [self performSelector:@selector(connectivityChanged:) withObject:nil afterDelay:1];
             } else {
                 UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Disconnected");
-                if([[NetworkConnection sharedInstance] reachable]) {
+                if([[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable) {
                     _connectingStatus.text = @"Disconnected";
                     if([NetworkConnection sharedInstance].session.length && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                         CLS_LOG(@"I'm disconnected but IRCCloud is reachable, reconnecting");
