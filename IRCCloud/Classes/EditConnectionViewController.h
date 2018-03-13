@@ -33,6 +33,7 @@
     UITextView *_commands;
     UITextView *_channels;
     int _cid;
+    int _slack;
     NSString *_netname;
     NSURL *_url;
     BOOL keyboardShown;

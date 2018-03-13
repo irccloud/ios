@@ -125,7 +125,7 @@
 }
 
 -(BOOL)isSlack {
-    return [_hostname hasSuffix:@".slack.com"] || [_ircserver hasSuffix:@".slack.com"];
+    return _slack || [_hostname hasSuffix:@".slack.com"] || [_ircserver hasSuffix:@".slack.com"];
 }
 
 -(NSString *)slackBaseURL {

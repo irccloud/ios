@@ -49,8 +49,9 @@
     NSString *_avatar;
     NSString *_avatarURL;
     int _avatars_supported;
+    int _slack;
 }
-@property (nonatomic, assign) int cid, port, ssl, order, deferred_archives, orgId, avatars_supported;;
+@property (nonatomic, assign) int cid, port, ssl, order, deferred_archives, orgId, avatars_supported, slack;
 @property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname, *ircserver, *avatar, *avatarURL, *from;
 @property (nonatomic, copy) NSDictionary *fail_info, *PREFIX;
 @property (nonatomic, copy) NSDictionary *isupport;

@@ -360,6 +360,10 @@ volatile BOOL __socketPaused = NO;
             server.avatars_supported = [[object objectForKey:@"avatars_supported"] intValue];
         else
             server.avatars_supported = 0;
+        if([[object objectForKey:@"slack"] isKindOfClass:[NSNumber class]])
+            server.slack = [[object objectForKey:@"slack"] intValue];
+        else
+            server.slack = 0;
         if(!backlog && !_resuming)
             [self postObject:server forEvent:kIRCEventMakeServer];
     };
@@ -1591,6 +1595,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
+-(int)setNetworkName:(NSString *)name cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"set-netname" args:@{@"cid":@(cid), @"netname":name} handler:resultHandler];
+}
 
 -(void)_createJSONParser {
     _parser = [SBJson5Parser multiRootParserWithBlock:^(id item, BOOL *stop) {

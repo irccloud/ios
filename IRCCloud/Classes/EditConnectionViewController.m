@@ -344,7 +344,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
                 [self.tableView endEditing:YES];
                 [self dismissViewControllerAnimated:YES completion:nil];
                 [[NSNotificationCenter defaultCenter] removeObserver:self];
-            } else {
+            } else if([[result objectForKey:@"cid"] intValue]) {
                 _cid = [[result objectForKey:@"cid"] intValue];
             }
         } else {
@@ -372,6 +372,8 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     if(_cid == -1) {
         [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text handler:handler];
+    } else if(_slack) {
+        [[NetworkConnection sharedInstance] setNetworkName:_network.text cid:_cid handler:handler];
     } else {
         _netname = _network.text;
         if([_netname.lowercaseString isEqualToString:_server.text.lowercaseString])
@@ -430,6 +432,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     } else {
         Server *server = [[ServersDataSource sharedInstance] getServer:_cid];
         if(server) {
+            _slack = server.slack;
             _network.text = _netname = server.name;
             if(_netname.length == 0)
                 _network.text = _netname = server.hostname;
@@ -726,13 +729,21 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return (_cid==-1)?5:4;
+    if(_slack)
+        return 1;
+    else if(_cid == -1)
+        return 5;
+    else
+        return 4;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch(section) {
         case 0:
-            return 4;
+            if(_slack)
+                return 1;
+            else
+                return 4;
         case 1:
             return 2;
         case 2:
@@ -798,7 +809,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
             switch(row) {
                 case 0:
                     if(_cid!=-1 || _url) {
-                        cell.textLabel.text = @"Network";
+                        cell.textLabel.text = @"Name";
                         cell.accessoryView = _network;
                     } else {
                         cell.textLabel.text = @"Network";
