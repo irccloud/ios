@@ -49,6 +49,7 @@
     NSMutableDictionary *disableNotifyAll = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hideJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *expandJoinPart = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *collapseJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *expandDisco = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *enableReadOnSelect = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *disableReadOnSelect = [[NSMutableDictionary alloc] init];
@@ -158,6 +159,17 @@
             [prefs setObject:expandJoinPart forKey:@"channel-expandJoinPart"];
         else
             [prefs removeObjectForKey:@"channel-expandJoinPart"];
+        
+        if([[prefs objectForKey:@"channel-collapseJoinPart"] isKindOfClass:[NSDictionary class]])
+            [collapseJoinPart addEntriesFromDictionary:[prefs objectForKey:@"channel-collapseJoinPart"]];
+        if(!_collapseJoinPart.on)
+            [collapseJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [collapseJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(collapseJoinPart.count)
+            [prefs setObject:collapseJoinPart forKey:@"channel-collapseJoinPart"];
+        else
+            [prefs removeObjectForKey:@"channel-collapseJoinPart"];
         
         if([[prefs objectForKey:@"channel-hiddenMembers"] isKindOfClass:[NSDictionary class]])
             [hiddenMembers addEntriesFromDictionary:[prefs objectForKey:@"channel-hiddenMembers"]];
@@ -272,6 +284,17 @@
             else
                 [prefs removeObjectForKey:@"buffer-expandJoinPart"];
             
+            if([[prefs objectForKey:@"buffer-collapseJoinPart"] isKindOfClass:[NSDictionary class]])
+                [collapseJoinPart addEntriesFromDictionary:[prefs objectForKey:@"buffer-collapseJoinPart"]];
+            if(!_collapseJoinPart.on)
+                [collapseJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [collapseJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(collapseJoinPart.count)
+                [prefs setObject:expandJoinPart forKey:@"buffer-collapseJoinPart"];
+            else
+                [prefs removeObjectForKey:@"buffer-collapseJoinPart"];
+
             if([[prefs objectForKey:@"buffer-files-disableinline"] isKindOfClass:[NSDictionary class]])
                 [disableInlineFiles addEntriesFromDictionary:[prefs objectForKey:@"buffer-files-disableinline"]];
             if(_disableInlineFiles.on)
@@ -383,11 +406,17 @@
         else
             _showJoinPart.on = YES;
 
-        if([[[prefs objectForKey:@"channel-expandJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _collapseJoinPart.on = NO;
-        else
-            _collapseJoinPart.on = YES;
-        
+        if([[prefs objectForKey:@"expandJoinPart"] intValue]) {
+            if([[[prefs objectForKey:@"channel-collapseJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _collapseJoinPart.on = YES;
+            else
+                _collapseJoinPart.on = NO;
+        } else {
+            if([[[prefs objectForKey:@"channel-expandJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _collapseJoinPart.on = NO;
+            else
+                _collapseJoinPart.on = YES;
+        }
         if([[[prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
             _showMembers.on = NO;
         else
@@ -440,11 +469,18 @@
         else
             _showJoinPart.on = YES;
 
-        if([[[prefs objectForKey:@"buffer-expandJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _collapseJoinPart.on = NO;
-        else
-            _collapseJoinPart.on = YES;
-        
+        if([[prefs objectForKey:@"expandJoinPart"] intValue]) {
+            if([[[prefs objectForKey:@"buffer-collapseJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _collapseJoinPart.on = YES;
+            else
+                _collapseJoinPart.on = NO;
+        } else {
+            if([[[prefs objectForKey:@"buffer-expandJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                _collapseJoinPart.on = NO;
+            else
+                _collapseJoinPart.on = YES;
+        }
+
         if([[[prefs objectForKey:@"buffer-expandDisco"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
             _expandDisco.on = NO;
         else

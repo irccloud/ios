@@ -1712,19 +1712,32 @@ extern UIImage *__socketClosedBackgroundImage;
                 __hideJoinPartPref = YES;
             }
             
-            NSDictionary *expandMap;
-            
-            if([_buffer.type isEqualToString:@"channel"]) {
-                expandMap = [prefs objectForKey:@"channel-expandJoinPart"];
-            } else if([_buffer.type isEqualToString:@"console"]) {
-                expandMap = [prefs objectForKey:@"buffer-expandDisco"];
+            __expandJoinPartPref = [[prefs objectForKey:@"expandJoinPart"] boolValue];
+            if(__expandJoinPartPref) {
+                NSDictionary *collapseMap;
+                
+                if([_buffer.type isEqualToString:@"channel"]) {
+                    collapseMap = [prefs objectForKey:@"channel-collapseJoinPart"];
+                } else {
+                    collapseMap = [prefs objectForKey:@"buffer-collapseJoinPart"];
+                }
+                
+                if((collapseMap && [[collapseMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
+                    __expandJoinPartPref = NO;
             } else {
-                expandMap = [prefs objectForKey:@"buffer-expandJoinPart"];
+                NSDictionary *expandMap;
+                
+                if([_buffer.type isEqualToString:@"channel"]) {
+                    expandMap = [prefs objectForKey:@"channel-expandJoinPart"];
+                } else if([_buffer.type isEqualToString:@"console"]) {
+                    expandMap = [prefs objectForKey:@"buffer-expandDisco"];
+                } else {
+                    expandMap = [prefs objectForKey:@"buffer-expandJoinPart"];
+                }
+                
+                if((expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
+                    __expandJoinPartPref = YES;
             }
-            
-            if([[prefs objectForKey:@"expandJoinPart"] boolValue] || (expandMap && [[expandMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]))
-                __expandJoinPartPref = YES;
-            
             NSDictionary *disableFilesMap;
             
             if([_buffer.type isEqualToString:@"channel"]) {
