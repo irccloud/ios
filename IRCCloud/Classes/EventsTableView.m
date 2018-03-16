@@ -1593,10 +1593,7 @@ extern UIImage *__socketClosedBackgroundImage;
     [_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
     _scrollTimer = nil;
     if(_data.count) {
-        if(_tableView.contentSize.height > (_tableView.frame.size.height - _tableView.contentInset.top - _tableView.contentInset.bottom))
-            [_tableView setContentOffset:CGPointMake(0, (_tableView.contentSize.height - _tableView.frame.size.height) + _tableView.contentInset.bottom)];
-        else
-            [_tableView setContentOffset:CGPointMake(0, -_tableView.contentInset.top)];
+        [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
         if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
             [self scrollViewDidScroll:_tableView];
     }
@@ -1648,6 +1645,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)refresh {
     @synchronized(self) {
+        NSDate *start = [NSDate date];
         if(self.tableView.bounds.size.width != [EventsDataSource sharedInstance].widthForHeightCache)
             [[EventsDataSource sharedInstance] clearHeightCache];
         [EventsDataSource sharedInstance].widthForHeightCache = self.tableView.bounds.size.width;
@@ -2024,6 +2022,8 @@ extern UIImage *__socketClosedBackgroundImage;
             if(_buffer.deferred && _conn.state == kIRCCloudStateConnected && _conn.ready) {
                 [self loadMoreBacklogButtonPressed:nil];
             }
+            
+            NSLog(@"Refresh finished in %f seconds", [start timeIntervalSinceNow] * -1.0);
         }];
     }
 }
@@ -2188,12 +2188,24 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self _format:e];
             UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
             cell.bounds = CGRectMake(0,0,self.tableView.bounds.size.width,cell.bounds.size.height);
-            [cell setNeedsLayout];
-            [cell layoutIfNeeded];
             e.height = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
         }
         return e.height;
     }
+}
+
+-(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    [_lock lock];
+    if(indexPath.row >= _data.count) {
+        [_lock unlock];
+        return 0;
+    }
+    Event *e = [_data objectAtIndex:indexPath.row];
+    [_lock unlock];
+    if(e.height)
+        return e.height;
+    else
+        return FONT_SIZE;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -2690,10 +2702,7 @@ extern UIImage *__socketClosedBackgroundImage;
         _bottomUnreadView.alpha = 0;
         [UIView commitAnimations];
         if(_data.count) {
-            if(_tableView.contentSize.height > (_tableView.frame.size.height - _tableView.contentInset.top - _tableView.contentInset.bottom))
-                [_tableView setContentOffset:CGPointMake(0, (_tableView.contentSize.height - _tableView.frame.size.height) + _tableView.contentInset.bottom) animated:YES];
-            else
-                [_tableView setContentOffset:CGPointMake(0, -_tableView.contentInset.top) animated:YES];
+            [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         }
         _buffer.scrolledUp = NO;
         _buffer.scrolledUpFrom = -1;
