@@ -508,21 +508,25 @@
                     break;
                 case kCollapsedEventJoin:
                     if(_showChan)
-                        output = [NSString stringWithFormat:@"%c%@→\U0000FE0E\u00a0%@%c%@ joined %@ (%@)", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e], e.chan, e.hostname];
+                        output = [NSString stringWithFormat:@"%c%@→\U0000FE0E\u00a0%@%c%@ joined %@", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e], e.chan];
                     else
-                        output = [NSString stringWithFormat:@"%c%@→\U0000FE0E\u00a0%@%c%@ joined (%@)", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e], e.hostname];
+                        output = [NSString stringWithFormat:@"%c%@→\U0000FE0E\u00a0%@%c%@ joined", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e]];
+                    if(!_server.isSlack)
+                        output = [output stringByAppendingFormat:@" (%@)", e.hostname];
                     break;
                 case kCollapsedEventPart:
                     if(_showChan)
-                        output = [NSString stringWithFormat:@"%c%@←\U0000FE0E\u00a0%@%c%@ left %@ (%@)", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e], e.chan, e.hostname];
+                        output = [NSString stringWithFormat:@"%c%@←\U0000FE0E\u00a0%@%c%@ left %@", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e], e.chan];
                     else
-                        output = [NSString stringWithFormat:@"%c%@←\U0000FE0E\u00a0%@%c%@ left (%@)", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e], e.hostname];
+                        output = [NSString stringWithFormat:@"%c%@←\U0000FE0E\u00a0%@%c%@ left", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e]];
+                    if(!_server.isSlack)
+                        output = [output stringByAppendingFormat:@" (%@)", e.hostname];
                     if(e.msg.length > 0)
                         output = [output stringByAppendingFormat:@": %@", e.msg];
                     break;
                 case kCollapsedEventQuit:
                     output = [NSString stringWithFormat:@"%c%@⇐\U0000FE0E\u00a0%@%c%@ quit", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e]];
-                    if(e.hostname.length > 0)
+                    if(!_server.isSlack && e.hostname.length > 0)
                         output = [output stringByAppendingFormat:@" (%@)", e.hostname];
                     if(e.msg.length > 0)
                         output = [output stringByAppendingFormat:@": %@", e.msg];

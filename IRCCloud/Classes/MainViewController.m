@@ -3594,7 +3594,7 @@ NSArray *_sortedChannels;
     [self dismissKeyboard];
     NSString *title = @"";;
     if(_selectedUser) {
-        if([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad))
+        if(!_buffer.serverIsSlack && ([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)))
             title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.display_name,[_selectedUser.hostmask stripIRCFormatting]];
         else
             title = _selectedUser.nick;
@@ -3614,12 +3614,16 @@ NSArray *_sortedChannels;
             [sheet addButtonWithTitle:@"Copy Message"];
     }
     if(_selectedUser) {
-        [sheet addButtonWithTitle:@"Whois"];
+        if(_buffer.serverIsSlack)
+            [sheet addButtonWithTitle:@"Slack Profile"];
+        if(!_buffer.serverIsSlack)
+            [sheet addButtonWithTitle:@"Whois"];
         [sheet addButtonWithTitle:@"Send a Message"];
         [sheet addButtonWithTitle:@"Mention"];
-        [sheet addButtonWithTitle:@"Invite to Channel"];
+        if(!_buffer.serverIsSlack)
+            [sheet addButtonWithTitle:@"Invite to Channel"];
         [sheet addButtonWithTitle:@"Ignore"];
-        if([_buffer.type isEqualToString:@"channel"]) {
+        if(!_buffer.serverIsSlack && [_buffer.type isEqualToString:@"channel"]) {
             Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
             if([me.mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
@@ -3637,7 +3641,8 @@ NSArray *_sortedChannels;
                 [sheet addButtonWithTitle:@"Ban"];
             }
         }
-        [sheet addButtonWithTitle:@"Copy Hostmask"];
+        if(!_buffer.serverIsSlack)
+            [sheet addButtonWithTitle:@"Copy Hostmask"];
     }
     
     if(_selectedEvent)
@@ -4879,6 +4884,10 @@ Network type: %@\n",
             [_alertView textFieldAtIndex:0].delegate = self;
             [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
             [_alertView show];
+        } else if([action isEqualToString:@"Slack Profile"]) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/team/%@", s.slackBaseURL, _selectedUser.nick]];
+            [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
         }
     }
 }

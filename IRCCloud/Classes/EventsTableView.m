@@ -2188,6 +2188,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self _format:e];
             UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
             cell.bounds = CGRectMake(0,0,self.tableView.bounds.size.width,cell.bounds.size.height);
+            [cell layoutIfNeeded];
             e.height = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
         }
         return e.height;
