@@ -328,6 +328,7 @@ volatile BOOL __socketPaused = NO;
         server.nickserv_pass = [object objectForKey:@"nickserv_pass"];
         server.join_commands = [object objectForKey:@"join_commands"];
         server.fail_info = [object objectForKey:@"fail_info"];
+        server.caps = [object objectForKey:@"caps"];
         server.away = (backlog && [_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
         if([[self.userInfo objectForKey:@"autoaway"] intValue] && [server.away isEqualToString:@"Auto-away"])
             server.away = @"";
@@ -1339,6 +1340,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":to} handler:resultHandler];
     else
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":@"*"} handler:resultHandler];
+}
+
+-(int)reply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid handler:(IRCCloudAPIResultHandler)resultHandler {
+    if(!message)
+        message = @"";
+    return [self _sendRequest:@"reply" args:@{@"cid":@(cid), @"reply":message, @"to":to, @"msgid":msgid} handler:resultHandler];
 }
 
 -(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids handler:(IRCCloudAPIResultHandler)resultHandler {

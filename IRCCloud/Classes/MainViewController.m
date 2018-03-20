@@ -2338,21 +2338,42 @@ NSArray *_sortedChannels;
                 msg = e.command.mutableCopy;
                 if(!disableConvert)
                     [ColorFormatter emojify:msg];
-                e.reqId = [[NetworkConnection sharedInstance] say:msg to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
-                    if(![[result objectForKey:@"success"] boolValue]) {
-                        [_pendingEvents removeObject:e];
-                        e.height = 0;
-                        e.pending = NO;
-                        e.rowType = ROW_FAILED;
-                        e.color = [UIColor networkErrorColor];
-                        e.bgColor = [UIColor errorBackgroundColor];
-                        e.formatted = nil;
-                        e.height = 0;
-                        [e.expirationTimer invalidate];
-                        e.expirationTimer = nil;
-                        [_eventsView reloadData];
-                    }
-                }];
+                if(_msgid) {
+                    e.isReply = YES;
+                    e.entities = @{@"reply":_msgid};
+                    e.reqId = [[NetworkConnection sharedInstance] reply:msg to:_buffer.name cid:_buffer.cid msgid:_msgid handler:^(IRCCloudJSONObject *result) {
+                        if(![[result objectForKey:@"success"] boolValue]) {
+                            [_pendingEvents removeObject:e];
+                            e.entities = @{@"reply":_msgid};
+                            e.height = 0;
+                            e.pending = NO;
+                            e.rowType = ROW_FAILED;
+                            e.color = [UIColor networkErrorColor];
+                            e.bgColor = [UIColor errorBackgroundColor];
+                            e.formatted = nil;
+                            e.height = 0;
+                            [e.expirationTimer invalidate];
+                            e.expirationTimer = nil;
+                            [_eventsView reloadData];
+                        }
+                    }];
+                } else {
+                    e.reqId = [[NetworkConnection sharedInstance] say:msg to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
+                        if(![[result objectForKey:@"success"] boolValue]) {
+                            [_pendingEvents removeObject:e];
+                            e.height = 0;
+                            e.pending = NO;
+                            e.rowType = ROW_FAILED;
+                            e.color = [UIColor networkErrorColor];
+                            e.bgColor = [UIColor errorBackgroundColor];
+                            e.formatted = nil;
+                            e.height = 0;
+                            [e.expirationTimer invalidate];
+                            e.expirationTimer = nil;
+                            [_eventsView reloadData];
+                        }
+                    }];
+                }
                 if(e.reqId < 0)
                     e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:5 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
                 CLS_LOG(@"Sending message with reqid %i", e.reqId);
@@ -2609,6 +2630,15 @@ NSArray *_sortedChannels;
             }
         }
     }
+    if(_msgid) {
+        _topicLabel.text = _titleLabel.text;
+        _topicLabel.hidden = NO;
+        _titleLabel.text = @"Thread";
+        _titleLabel.font = [UIFont boldSystemFontOfSize:18];
+        _lock.hidden = YES;
+        _titleLabel.accessibilityLabel = @"Thread from";
+        _titleLabel.accessibilityValue = _topicLabel.text;
+    }
     if(_lock.hidden == NO && _lock.alpha == 1)
         _titleOffsetXConstraint.constant = _lock.frame.size.width / 2;
     else
@@ -2730,6 +2760,7 @@ NSArray *_sortedChannels;
 
     if(changed) {
         [self resetColors:nil];
+        _msgid = _eventsView.msgid = nil;
         _message.internalTextView.font = _defaultTextareaFont;
         _message.internalTextView.textColor = [UIColor textareaTextColor];
         _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
@@ -3261,13 +3292,23 @@ NSArray *_sortedChannels;
     [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
 }
 
+-(void)_closeThread {
+    _eventsView.msgid = _msgid = nil;
+    [_eventsView refresh];
+    [self _updateTitleArea];
+    [self _updateUserListVisibility];
+}
+
 -(void)_updateUserListVisibility {
     /*if(![NSThread currentThread].isMainThread) {
         [self performSelectorOnMainThread:@selector(_updateUserListVisibility) withObject:nil waitUntilDone:YES];
         return;
     }*/
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
-        if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
+        if(_msgid) {
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_closeThread)];
+            self.slidingViewController.underRightViewController = nil;
+        } else if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
             self.navigationItem.rightBarButtonItem = _usersButtonItem;
             if(self.slidingViewController.underRightViewController == nil)
                 self.slidingViewController.underRightViewController = _usersView;
@@ -3485,6 +3526,11 @@ NSArray *_sortedChannels;
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"This message could not be sent" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Try Again", nil];
         alert.tag = TAG_FAILEDMSG;
         [alert show];
+    } else if(e.rowType == ROW_REPLY_COUNT) {
+        _eventsView.msgid = _msgid = [[e.entities objectForKey:@"parent"] msgid];
+        [_eventsView refresh];
+        [self _updateTitleArea];
+        [self _updateUserListVisibility];
     } else {
         [_eventsView clearLastSeenMarker];
     }
@@ -3612,6 +3658,9 @@ NSArray *_sortedChannels;
             [sheet addButtonWithTitle:@"Close Preview"];
         if(_selectedEvent.msg.length)
             [sheet addButtonWithTitle:@"Copy Message"];
+        if(_selectedEvent.msgid && ([_selectedEvent.type isEqualToString:@"buffer_msg"] || [_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [_selectedEvent.type isEqualToString:@"notice"])) {
+            [sheet addButtonWithTitle:@"Reply / View Thread"];
+        }
     }
     if(_selectedUser) {
         if(_buffer.serverIsSlack)
@@ -4888,6 +4937,14 @@ Network type: %@\n",
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/team/%@", s.slackBaseURL, _selectedUser.nick]];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
+        } else if([action isEqualToString:@"Reply / View Thread"]) {
+            NSString *msgid = [_selectedEvent.entities objectForKey:@"reply"];
+            if(!msgid)
+                msgid = _selectedEvent.msgid;
+            _eventsView.msgid = _msgid = msgid;
+            [_eventsView refresh];
+            [self _updateTitleArea];
+            [self _updateUserListVisibility];
         }
     }
 }

@@ -57,7 +57,8 @@
     NSMutableDictionary *inlineImages = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *disableInlineImages = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
-    
+    NSMutableDictionary *replyCollapse = [[NSMutableDictionary alloc] init];
+
     if([_buffer.type isEqualToString:@"channel"]) {
         NSMutableDictionary *disableNickSuggestions = [[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] mutableCopy];
         if(!disableNickSuggestions)
@@ -214,6 +215,17 @@
             [prefs setObject:disableInlineImages forKey:@"channel-inlineimages-disable"];
         else
             [prefs removeObjectForKey:@"channel-inlineimages-disable"];
+        
+        if([[prefs objectForKey:@"channel-reply-collapse"] isKindOfClass:[NSDictionary class]])
+            [replyCollapse addEntriesFromDictionary:[prefs objectForKey:@"channel-reply-collapse"]];
+        if(_replyCollapse.on)
+            [replyCollapse setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [replyCollapse removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(replyCollapse.count)
+            [prefs setObject:disableInlineImages forKey:@"channel-reply-collapse"];
+        else
+            [prefs removeObjectForKey:@"channel-reply-collapse"];
 } else {
         if([[prefs objectForKey:@"buffer-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
             [disableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableReadOnSelect"]];
@@ -305,6 +317,17 @@
                 [prefs setObject:disableInlineFiles forKey:@"buffer-files-disableinline"];
             else
                 [prefs removeObjectForKey:@"buffer-files-disableinline"];
+            
+            if([[prefs objectForKey:@"buffer-reply-collapse"] isKindOfClass:[NSDictionary class]])
+                [replyCollapse addEntriesFromDictionary:[prefs objectForKey:@"buffer-reply-collapse"]];
+            if(_replyCollapse.on)
+                [replyCollapse setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [replyCollapse removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(replyCollapse.count)
+                [prefs setObject:disableInlineImages forKey:@"buffer-reply-collapse"];
+            else
+                [prefs removeObjectForKey:@"buffer-reply-collapse"];
         }
         
         if([_buffer.type isEqualToString:@"console"]) {
@@ -439,6 +462,11 @@
             if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
                 _inlineImages.on = YES;
         }
+        
+        if([[[prefs objectForKey:@"channel-reply-collapse"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+            _replyCollapse.on = YES;
+        else
+            _replyCollapse.on = NO;
     } else {
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
             if([[[prefs objectForKey:@"buffer-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
@@ -503,6 +531,11 @@
             if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
                 _inlineImages.on = YES;
         }
+
+        if([[[prefs objectForKey:@"buffer-reply-collapse"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+            _replyCollapse.on = YES;
+        else
+            _replyCollapse.on = NO;
     }
     _collapseJoinPart.enabled = _showJoinPart.on;
     _disableNickSuggestions.on = !([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]);
@@ -522,6 +555,7 @@
     _readOnSelect = [[UISwitch alloc] init];
     _disableInlineFiles = [[UISwitch alloc] init];
     _disableNickSuggestions = [[UISwitch alloc] init];
+    _replyCollapse = [[UISwitch alloc] init];
     _inlineImages = [[UISwitch alloc] init];
     [_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
 
@@ -566,11 +600,11 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if([_buffer.type isEqualToString:@"channel"])
-        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?8:9;
+        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?9:10;
     else if([_buffer.type isEqualToString:@"console"])
         return 3;
     else
-        return 6;
+        return 7;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -622,10 +656,14 @@
             cell.accessoryView = _collapseJoinPart;
             break;
         case 7:
+            cell.textLabel.text = @"Collapse reply threads";
+            cell.accessoryView = _replyCollapse;
+            break;
+        case 8:
             cell.textLabel.text = @"Embed uploaded files";
             cell.accessoryView = _disableInlineFiles;
             break;
-        case 8:
+        case 9:
             cell.textLabel.text = @"Embed external media";
             cell.accessoryView = _inlineImages;
             break;

@@ -30,6 +30,7 @@
     UISwitch *_disableInlineFiles;
     UISwitch *_disableNickSuggestions;
     UISwitch *_inlineImages;
+    UISwitch *_replyCollapse;
 }
 @property (strong, nonatomic) Buffer *buffer;
 @end

@@ -27,11 +27,13 @@
 #define ROW_ME_MESSAGE 6
 #define ROW_THUMBNAIL 7
 #define ROW_FILE 8
+#define ROW_REPLY_COUNT 9
 #define TYPE_TIMESTMP @"__timestamp__"
 #define TYPE_BACKLOG @"__backlog__"
 #define TYPE_LASTSEENEID @"__lastseeneid"
 #define TYPE_THUMBNAIL @"__thumbnail__"
 #define TYPE_FILE @"__file__"
+#define TYPE_REPLY_COUNT @"__reply_count__"
 
 @interface Event : NSObject<NSCoding> {
     int _cid;
@@ -95,16 +97,21 @@
     NSString *_avatarURL;
     int _cachedAvatarSize;
     NSURL *_cachedAvatarURL;
+    NSString *_msgid;
+    BOOL _isReply;
+    int _replyCount;
+    NSMutableSet *_replyNicks;
 }
-@property (nonatomic, assign) int cid, bid, rowType, reqId, childEventCount;
+@property (nonatomic, assign) int cid, bid, rowType, reqId, childEventCount, replyCount;
 @property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime, parent;
-@property (nonatomic, copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue, *avatar, *avatarURL, *fromNick;
-@property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted, isCodeBlock;
+@property (nonatomic, copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue, *avatar, *avatarURL, *fromNick, *msgid;
+@property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted, isCodeBlock, hasReply, isReply;
 @property (nonatomic, copy) NSDictionary *ops,*entities;
 @property (nonatomic, strong) UIColor *color, *bgColor;
 @property (nonatomic, copy) NSAttributedString *formatted, *formattedNick, *formattedRealname, *formattedPadded;
 @property (nonatomic, assign) float height, timestampPosition, avatarHeight, estimatedWidth;
 @property (nonatomic, strong) NSArray *links, *realnameLinks;
+@property (nonatomic, strong) NSMutableSet *replyNicks;
 @property (nonatomic, strong) NSTimer *expirationTimer;
 @property (nonatomic, assign) NSInteger row;
 -(NSComparisonResult)compare:(Event *)aEvent;

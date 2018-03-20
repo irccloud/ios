@@ -55,10 +55,12 @@
     NSMutableArray *_data;
     NSMutableArray *_unseenHighlightPositions;
     NSMutableDictionary *_expandedSectionEids;
+    NSMutableDictionary *_msgids;
     Buffer *_buffer;
     Server *_server;
     CollapsedEvents *_collapsedEvents;
     NetworkConnection *_conn;
+    NSString *_msgid;
     
     NSTimeInterval _maxEid, _minEid, _currentCollapsedEid, _earliestEid, _eidToOpen, _lastCollapsedEid;
     NSInteger _newMsgs, _newHighlights, _lastSeenEidPos, _bottomRow;
@@ -85,7 +87,7 @@
     NSMutableSet *_closedPreviews;
     URLHandler *_urlHandler;
     
-    UINib *_eventsTableCell, *_eventsTableCell_Thumbnail, *_eventsTableCell_File;
+    UINib *_eventsTableCell, *_eventsTableCell_Thumbnail, *_eventsTableCell_File, *_eventsTableCell_ReplyCount;
 }
 @property (readonly) UITableView *tableView;
 @property (readonly) UIView *topUnreadView;
@@ -97,6 +99,7 @@
 @property (nonatomic) NSTimeInterval eidToOpen;
 @property (readonly) UIImageView *stickyAvatar;
 @property Buffer *buffer;
+@property NSString *msgid;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(IBAction)topUnreadBarClicked:(id)sender;
 -(IBAction)bottomUnreadBarClicked:(id)sender;

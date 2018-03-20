@@ -127,6 +127,7 @@
         decodeObject(_avatar);
         decodeObject(_avatarURL);
         decodeObject(_fromNick);
+        decodeObject(_msgid);
 
         if(_rowType == ROW_TIMESTAMP)
             _bgColor = [UIColor timestampBackgroundColor];
@@ -189,6 +190,7 @@
     encodeObject(_avatar);
     encodeObject(_avatarURL);
     encodeObject(_fromNick);
+    encodeObject(_msgid);
 
     if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
         encodeObject(_bgColor);
@@ -1090,6 +1092,10 @@
         event.avatarURL = [object objectForKey:@"avatar_url"];
     else
         event.avatarURL = nil;
+    if([[object objectForKey:@"msgid"] isKindOfClass:[NSString class]])
+        event.msgid = [object objectForKey:@"msgid"];
+    else
+        event.msgid = nil;
 
     if([event isMessage] && !event.from.length && event.server.length) {
         event.from = event.fromNick = event.server;

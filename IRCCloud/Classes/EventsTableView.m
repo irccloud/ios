@@ -89,6 +89,7 @@ BOOL __disableCodeSpanPref = NO;
 BOOL __disableCodeBlockPref = NO;
 BOOL __disableQuotePref = NO;
 BOOL __avatarImages = YES;
+BOOL __replyCollapsePref = NO;
 int __smallAvatarHeight;
 int __largeAvatarHeight = 32;
 
@@ -97,7 +98,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
 @interface EventsTableCell : UITableViewCell {
     IBOutlet UIImageView *_avatar;
-    IBOutlet UILabel *_timestampLeft,*_timestampRight;
+    IBOutlet UILabel *_timestampLeft,*_timestampRight,*_reply;
     IBOutlet LinkLabel *_message;
     IBOutlet LinkLabel *_nickname;
     IBOutlet UIView *_socketClosedBar;
@@ -108,13 +109,13 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet UIView *_codeBlockBackground;
     IBOutlet UIView *_lastSeenEIDBackground;
     IBOutlet UILabel *_lastSeenEID;
-    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight;
+    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight,*_replyCenter;
 }
-@property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID;
+@property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID, *reply;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
-@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight;
+@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight, *replyCenter;
 @end
 
 @implementation EventsTableCell
@@ -154,6 +155,15 @@ extern UIImage *__socketClosedBackgroundImage;
 @end
 
 @implementation EventsTableCell_File
+@end
+
+@interface EventsTableCell_ReplyCount : EventsTableCell {
+    IBOutlet UILabel *_replyCount;
+}
+@property (readonly) UILabel *replyCount;
+@end
+
+@implementation EventsTableCell_ReplyCount
 @end
 
 @implementation EventsTableView
@@ -227,6 +237,7 @@ extern UIImage *__socketClosedBackgroundImage;
     _eventsTableCell = [UINib nibWithNibName:@"EventsTableCell" bundle:nil];
     _eventsTableCell_File = [UINib nibWithNibName:@"EventsTableCell_File" bundle:nil];
     _eventsTableCell_Thumbnail = [UINib nibWithNibName:@"EventsTableCell_Thumbnail" bundle:nil];
+    _eventsTableCell_ReplyCount = [UINib nibWithNibName:@"EventsTableCell_ReplyCount" bundle:nil];
     _tableView.scrollsToTop = NO;
     _tableView.estimatedRowHeight = 0;
     _tableView.estimatedSectionHeaderHeight = 0;
@@ -1121,6 +1132,31 @@ extern UIImage *__socketClosedBackgroundImage;
             }
         }
         
+        if(event.msgid)
+            [_msgids setObject:event forKey:event.msgid];
+        if([event.entities objectForKey:@"reply"]) {
+            Event *parent = [_msgids objectForKey:[event.entities objectForKey:@"reply"]];
+            parent.replyCount = parent.replyCount + 1;
+            if(!parent.replyNicks)
+                parent.replyNicks = [[NSMutableSet alloc] init];
+            [parent.replyNicks addObject:event.from];
+        }
+        event.isReply = [event.entities objectForKey:@"reply"] != nil;
+        if(event.isReply && __replyCollapsePref) {
+            Event *parent = [_msgids objectForKey:[event.entities objectForKey:@"reply"]];
+            if(!parent.childEventCount) {
+                Event *e1 = [self entity:parent eid:parent.eid + ++parent.childEventCount properties:nil];
+                e1.rowType = ROW_REPLY_COUNT;
+                e1.type = TYPE_REPLY_COUNT;
+                e1.msg = e1.formattedMsg = nil;
+                e1.formatted = nil;
+                e1.entities = @{@"parent":parent};
+                [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
+            }
+            if(!backlog)
+                [self reloadData];
+            return;
+        }
         [self _addItem:event eid:eid];
         if(!backlog && !event.formatted && event.formattedMsg.length > 0) {
             [self _format:event];
@@ -1653,12 +1689,12 @@ extern UIImage *__socketClosedBackgroundImage;
         
         if(@available(iOS 11, *)) {
             if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && self.view.bounds.size.width > self.view.bounds.size.height && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
-                _stickyAvatarXOffsetConstraint.constant = 10;
+                _stickyAvatarXOffsetConstraint.constant = 20;
             } else {
-                _stickyAvatarXOffsetConstraint.constant = 10 + self.slidingViewController.view.safeAreaInsets.left;
+                _stickyAvatarXOffsetConstraint.constant = 20 + self.slidingViewController.view.safeAreaInsets.left;
             }
         } else {
-            _stickyAvatarXOffsetConstraint.constant = 10;
+            _stickyAvatarXOffsetConstraint.constant = 20;
         }
 
         __24hrPref = NO;
@@ -1679,6 +1715,7 @@ extern UIImage *__socketClosedBackgroundImage;
         __disableQuotePref = NO;
         __inlineMediaPref = NO;
         __avatarImages = YES;
+        __replyCollapsePref = NO;
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         if(prefs) {
             __monospacePref = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
@@ -1776,6 +1813,22 @@ extern UIImage *__socketClosedBackgroundImage;
                 __disableInlineFilesPref = YES;
                 __inlineMediaPref = NO;
             }
+            
+            NSDictionary *replyCollapseMap;
+            
+            if([_buffer.type isEqualToString:@"channel"]) {
+                replyCollapseMap = [prefs objectForKey:@"channel-reply-collapse"];
+            } else {
+                replyCollapseMap = [prefs objectForKey:@"buffer-reply-collapse"];
+            }
+            
+            if([[prefs objectForKey:@"reply-collapse"] boolValue] || (replyCollapseMap && [[replyCollapseMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
+                __replyCollapsePref = YES;
+            }
+            
+            if(_msgid)
+                __replyCollapsePref = NO;
+
         }
         __largeAvatarHeight = MIN(32, roundf(FONT_SIZE * 2) + (__compact ? 1 : 6));
         if(__monospacePref)
@@ -1818,6 +1871,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if (__smallAvatarHeight % 2) {
             __smallAvatarHeight += 1;
         }
+        _msgids = [[NSMutableDictionary alloc] init];
         
         if(!_buffer) {
             [_lock unlock];
@@ -1844,6 +1898,9 @@ extern UIImage *__socketClosedBackgroundImage;
                     e.formatted = nil;
                     e.formattedMsg = nil;
                 }
+                e.replyCount = 0;
+                if(_msgid && !([e.msgid isEqualToString:_msgid] || [[e.entities objectForKey:@"reply"] isEqualToString:_msgid]))
+                    continue;
                 [self insertEvent:e backlog:true nextIsGrouped:false];
                 if(e.formattedMsg && !e.formatted)
                     [self _format:e];
@@ -2370,6 +2427,29 @@ extern UIImage *__socketClosedBackgroundImage;
         
         cell.background.backgroundColor = [UIColor bufferBackgroundColor];
     }
+    
+    if(e.rowType == ROW_REPLY_COUNT) {
+        EventsTableCell_ReplyCount *cell = nil;
+        if([[_rowCache objectForKey:[e UUID]] isKindOfClass:EventsTableCell_File.class])
+            cell = [_rowCache objectForKey:[e UUID]];
+        if(!cell)
+            cell = [[_eventsTableCell_ReplyCount instantiateWithOwner:self options:nil] objectAtIndex:0];
+        [_rowCache setObject:cell forKey:[e UUID]];
+        
+        Event *parent = [e.entities objectForKey:@"parent"];
+        cell.reply.font = [ColorFormatter awesomeFont];
+        cell.reply.textColor = [UIColor colorFromHexString:[UIColor colorForNick:parent.msgid]];
+        cell.reply.text = FA_COMMENT;
+        cell.reply.hidden = NO;
+        cell.reply.alpha = 0.4;
+        cell.replyCount.font = [ColorFormatter messageFont:__monospacePref];
+        cell.replyCount.textColor = [UIColor messageTextColor];
+        cell.replyCount.text = [NSString stringWithFormat:@"%i %@", parent.replyCount, parent.replyCount == 1 ? @"reply" : @"replies"];
+        if(parent.replyNicks.count)
+            cell.replyCount.text = [NSString stringWithFormat:@"%@: %@", cell.replyCount.text, [parent.replyNicks.allObjects componentsJoinedByString:@", "]];
+        cell.replyCount.alpha = 0.4;
+        cell.replyCount.preferredMaxLayoutWidth = self.tableView.bounds.size.width / 2;
+    }
 
     EventsTableCell *cell = [_rowCache objectForKey:[e UUID]];
     if(!cell)
@@ -2450,7 +2530,7 @@ extern UIImage *__socketClosedBackgroundImage;
     cell.accessibilityElementsHidden = NO;
 
     cell.messageOffsetTop.constant = __compact ? -2 : 0;
-    cell.messageOffsetLeft.constant = (__timeLeftPref ? __timestampWidth : 6) + (__compact ? 6 : 10);
+    cell.messageOffsetLeft.constant = (__timeLeftPref ? __timestampWidth : 6) + (__compact ? 6 : 10) + 10;
     cell.messageOffsetRight.constant = __timeLeftPref ? 6 : (__timestampWidth + 16);
     cell.messageOffsetBottom.constant = __compact ? 0 : 4;
 
@@ -2634,6 +2714,21 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.messageOffsetBottom.constant = FONT_SIZE;
     } else {
         cell.socketClosedBar.hidden = YES;
+    }
+    
+    if(!__replyCollapsePref) {
+        if(e.isReply || e.replyCount) {
+            cell.reply.font = [ColorFormatter awesomeFont];
+            cell.reply.textColor = [UIColor colorFromHexString:[UIColor colorForNick:e.isReply ? [e.entities objectForKey:@"reply"] : e.msgid]];
+            cell.reply.text = e.isReply ? FA_COMMENT : FA_COMMENTS;
+            cell.reply.hidden = NO;
+            cell.reply.alpha = 0.4;
+            cell.replyCenter.priority = (e.replyCount && e.isHeader && !__avatarsOffPref && !__chatOneLinePref) ? 999 : 1;
+        } else {
+            cell.reply.hidden = YES;
+        }
+    } else if(e.rowType != ROW_REPLY_COUNT) {
+        cell.reply.hidden = YES;
     }
 
     if(e.rowType == ROW_FILE) {

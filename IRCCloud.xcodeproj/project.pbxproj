@@ -378,6 +378,8 @@
 		225D979918AA995900065087 /* licenses.txt in Resources */ = {isa = PBXBuildFile; fileRef = 224FCF321787286000FC3879 /* licenses.txt */; };
 		225D979A18AA995900065087 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
 		225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
+		225EC2BB2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib in Resources */ = {isa = PBXBuildFile; fileRef = 225EC2BA2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib */; };
+		225EC2BC2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib in Resources */ = {isa = PBXBuildFile; fileRef = 225EC2BA2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib */; };
 		2264A30119659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
 		2264A30219659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
 		2265DC891C722E6B00382C7C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2265DC881C722E6B00382C7C /* MessageUI.framework */; };
@@ -949,6 +951,7 @@
 		2253BA261770CDC500CCA77F /* ChannelListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelListTableViewController.h; sourceTree = "<group>"; };
 		225D979F18AA995900065087 /* IRCEnterprise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCEnterprise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IRCCloud-Enterprise-Info.plist"; sourceTree = "<group>"; };
+		225EC2BA2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EventsTableCell_ReplyCount.xib; sourceTree = "<group>"; };
 		2264A2FF19659BB100DCFDDD /* URLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLHandler.h; sourceTree = "<group>"; };
 		2264A30019659BB100DCFDDD /* URLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLHandler.m; sourceTree = "<group>"; };
 		2265DC881C722E6B00382C7C /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
@@ -1509,6 +1512,7 @@
 			children = (
 				221EB2F21F962C2C00A71428 /* EventsTableCell_File.xib */,
 				221EB2F31F962C2D00A71428 /* EventsTableCell_Thumbnail.xib */,
+				225EC2BA2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib */,
 				221EB2ED1F8F965E00A71428 /* EventsTableCell.xib */,
 				22EB4CF31CCEE296004F9CFC /* ImageViewController.xib */,
 				22DB253D1982E2890008728E /* IRCEnterprise.entitlements */,
@@ -2317,6 +2321,7 @@
 				225D979318AA995900065087 /* ARChromeActivity~ipad.png in Resources */,
 				22D268C31BF4F40800B682AE /* MainStoryboard.storyboard in Resources */,
 				22EE12851C9B20DF00E7AE8D /* Firefox.png in Resources */,
+				225EC2BC2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib in Resources */,
 				221EB2F11F8F965E00A71428 /* EventsTableCell.xib in Resources */,
 				221EB2F51F962C2D00A71428 /* EventsTableCell_File.xib in Resources */,
 				225D979418AA995900065087 /* Safari.png in Resources */,
@@ -2358,6 +2363,7 @@
 				2236BD6A1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
 				22EEA95418D0B198007D5022 /* Icons.xcassets in Resources */,
 				2236BD631BAA5E0900015753 /* FontAwesome.otf in Resources */,
+				225EC2BB2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib in Resources */,
 				221EB2F01F8F965E00A71428 /* EventsTableCell.xib in Resources */,
 				221EB2F41F962C2D00A71428 /* EventsTableCell_File.xib in Resources */,
 				22A363B219D0884D00500478 /* 1Password.xcassets in Resources */,
