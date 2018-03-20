@@ -2439,7 +2439,7 @@ extern UIImage *__socketClosedBackgroundImage;
         Event *parent = [e.entities objectForKey:@"parent"];
         cell.reply.font = [ColorFormatter awesomeFont];
         cell.reply.textColor = [UIColor colorFromHexString:[UIColor colorForNick:parent.msgid]];
-        cell.reply.text = FA_COMMENT;
+        cell.reply.text = FA_COMMENTS;
         cell.reply.hidden = NO;
         cell.reply.alpha = 0.4;
         cell.replyCount.font = [ColorFormatter messageFont:__monospacePref];
@@ -2720,7 +2720,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if(e.isReply || e.replyCount) {
             cell.reply.font = [ColorFormatter awesomeFont];
             cell.reply.textColor = [UIColor colorFromHexString:[UIColor colorForNick:e.isReply ? [e.entities objectForKey:@"reply"] : e.msgid]];
-            cell.reply.text = e.isReply ? FA_COMMENT : FA_COMMENTS;
+            cell.reply.text = e.isReply ? FA_COMMENTS : FA_COMMENT;
             cell.reply.hidden = NO;
             cell.reply.alpha = 0.4;
             cell.replyCenter.priority = (e.replyCount && e.isHeader && !__avatarsOffPref && !__chatOneLinePref) ? 999 : 1;
