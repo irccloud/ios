@@ -109,13 +109,13 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet UIView *_codeBlockBackground;
     IBOutlet UIView *_lastSeenEIDBackground;
     IBOutlet UILabel *_lastSeenEID;
-    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight,*_replyCenter;
+    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight,*_replyCenter,*_replyXOffset;
 }
 @property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID, *reply;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
-@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight, *replyCenter;
+@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight, *replyCenter, *replyXOffset;
 @end
 
 @implementation EventsTableCell
@@ -2479,9 +2479,13 @@ extern UIImage *__socketClosedBackgroundImage;
 
     cell.avatarWidth.constant = cell.avatarHeight.constant = avatarHeight;
     
+    cell.replyXOffset.constant = __timeLeftPref ? -__timestampWidth : 0;
+    
     if(__avatarsOffPref) {
         cell.avatar.image = nil;
+        cell.replyXOffset.constant += 4;
     } else {
+        cell.replyXOffset.constant -= 4;
         if(__avatarImages) {
             NSURL *avatarURL = [e avatar:avatarHeight * [UIScreen mainScreen].scale];
             if(avatarURL) {
@@ -2718,12 +2722,12 @@ extern UIImage *__socketClosedBackgroundImage;
     
     if(!__replyCollapsePref) {
         if(e.isReply || e.replyCount) {
-            cell.reply.font = [ColorFormatter awesomeFont];
+            cell.reply.font = [ColorFormatter replyThreadFont];
             cell.reply.textColor = [UIColor colorFromHexString:[UIColor colorForNick:e.isReply ? [e.entities objectForKey:@"reply"] : e.msgid]];
             cell.reply.text = e.isReply ? FA_COMMENTS : FA_COMMENT;
             cell.reply.hidden = NO;
             cell.reply.alpha = 0.4;
-            cell.replyCenter.priority = (e.replyCount && e.isHeader && !__avatarsOffPref && !__chatOneLinePref) ? 999 : 1;
+            cell.replyCenter.priority = (e.isHeader && !__avatarsOffPref && !__chatOneLinePref) ? 999 : 1;
         } else {
             cell.reply.hidden = YES;
         }

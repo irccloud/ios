@@ -44,6 +44,7 @@
 +(UIFont *)monoTimestampFont;
 +(UIFont *)awesomeFont;
 +(UIFont *)messageFont:(BOOL)mono;
++(UIFont *)replyThreadFont;
 +(void)emojify:(NSMutableString *)text;
 +(NSString *)toIRC:(NSAttributedString *)string;
 +(NSAttributedString *)stripUnsupportedAttributes:(NSAttributedString *)input fontSize:(CGFloat)fontSize;

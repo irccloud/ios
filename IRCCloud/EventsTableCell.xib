@@ -64,7 +64,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fOD-UD-tHL">
-                        <rect key="frame" x="6" y="2" width="66" height="0.0"/>
+                        <rect key="frame" x="68" y="2" width="66" height="0.0"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="66" id="JaC-Af-7TS"/>
                         </constraints>
@@ -102,7 +102,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="g7o-m6-B7g">
-                        <rect key="frame" x="62" y="2" width="0.0" height="0.0"/>
+                        <rect key="frame" x="62" y="4" width="0.0" height="0.0"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -124,12 +124,12 @@
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="top" secondItem="nEj-fz-vAL" secondAttribute="bottom" id="29E-wE-L1s"/>
                     <constraint firstAttribute="bottom" secondItem="fOD-UD-tHL" secondAttribute="bottom" priority="100" id="2UV-md-BHV"/>
                     <constraint firstItem="9aa-Ko-5ri" firstAttribute="trailing" secondItem="V3s-xQ-nVF" secondAttribute="leading" id="3qd-ta-bgg"/>
-                    <constraint firstItem="g7o-m6-B7g" firstAttribute="top" secondItem="nEj-fz-vAL" secondAttribute="bottom" priority="750" id="4gQ-Xa-Sui"/>
+                    <constraint firstItem="g7o-m6-B7g" firstAttribute="top" secondItem="nEj-fz-vAL" secondAttribute="bottom" priority="750" constant="2" id="4gQ-Xa-Sui"/>
                     <constraint firstItem="mCi-xX-5DS" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="52b-SU-woC"/>
                     <constraint firstItem="oeb-cI-59G" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" id="5mm-tp-TXv"/>
                     <constraint firstItem="9aa-Ko-5ri" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="4" id="7aK-3S-iur"/>
                     <constraint firstItem="FYg-pz-vsM" firstAttribute="centerX" secondItem="KgT-oH-O7i" secondAttribute="centerX" id="7hL-Sy-lYb"/>
-                    <constraint firstItem="fOD-UD-tHL" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="6" id="8ZI-LM-dI5"/>
+                    <constraint firstItem="fOD-UD-tHL" firstAttribute="leading" secondItem="g7o-m6-B7g" secondAttribute="trailing" constant="6" id="8ZI-LM-dI5"/>
                     <constraint firstItem="9ZM-5c-yUP" firstAttribute="height" secondItem="fOD-UD-tHL" secondAttribute="height" id="BON-ig-6HA"/>
                     <constraint firstAttribute="bottom" secondItem="FYg-pz-vsM" secondAttribute="bottom" id="Cj4-7B-Dcp"/>
                     <constraint firstItem="qsr-vg-LVN" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" constant="-6" id="Ifv-QD-BjA"/>
@@ -188,6 +188,7 @@
                 <outlet property="_quoteBorder" destination="c4u-g2-2uu" id="x1Z-yO-aPO"/>
                 <outlet property="_reply" destination="g7o-m6-B7g" id="0sJ-rV-fY8"/>
                 <outlet property="_replyCenter" destination="c8G-Dm-16A" id="Rw4-qp-IN7"/>
+                <outlet property="_replyXOffset" destination="gEz-B6-BGn" id="ThU-3N-seU"/>
                 <outlet property="_socketClosedBar" destination="WPz-RI-MPI" id="ntm-fR-kM1"/>
                 <outlet property="_timestampLeft" destination="fOD-UD-tHL" id="zah-YF-oz2"/>
                 <outlet property="_timestampRight" destination="9ZM-5c-yUP" id="74i-dE-FoC"/>

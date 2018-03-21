@@ -223,7 +223,7 @@
         else
             [replyCollapse removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
         if(replyCollapse.count)
-            [prefs setObject:disableInlineImages forKey:@"channel-reply-collapse"];
+            [prefs setObject:replyCollapse forKey:@"channel-reply-collapse"];
         else
             [prefs removeObjectForKey:@"channel-reply-collapse"];
 } else {
@@ -325,7 +325,7 @@
             else
                 [replyCollapse removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             if(replyCollapse.count)
-                [prefs setObject:disableInlineImages forKey:@"buffer-reply-collapse"];
+                [prefs setObject:replyCollapse forKey:@"buffer-reply-collapse"];
             else
                 [prefs removeObjectForKey:@"buffer-reply-collapse"];
         }
