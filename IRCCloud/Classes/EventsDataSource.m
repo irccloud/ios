@@ -209,6 +209,13 @@
     return _UUID;
 }
 
+-(NSString *)reply {
+    if([_entities objectForKey:@"reply"])
+        return [_entities objectForKey:@"reply"];
+    else
+        return [[_entities objectForKey:@"known_client_tags"] objectForKey:@"reply"];
+}
+
 -(NSURL *)avatar:(int)size {
 #ifndef ENTERPRISE
     BOOL isIRCCloudAvatar = NO;

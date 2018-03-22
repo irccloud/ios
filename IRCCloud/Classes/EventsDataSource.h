@@ -122,6 +122,7 @@
 -(NSString *)UUID;
 -(Event *)copy;
 -(NSURL *)avatar:(int)size;
+-(NSString *)reply;
 @end
 
 @interface EventsDataSource : NSObject {

@@ -796,7 +796,7 @@ extern UIImage *__socketClosedBackgroundImage;
         
         if(_minEid == 0)
             _minEid = event.eid;
-        if(event.eid == _buffer.min_eid) {
+        if(event.eid == _buffer.min_eid || (_msgid && [_msgid isEqualToString:event.msgid])) {
             _tableView.tableHeaderView = nil;
         }
         if(event.eid < _earliestEid || _earliestEid == 0)
@@ -1134,17 +1134,17 @@ extern UIImage *__socketClosedBackgroundImage;
         
         if(event.msgid)
             [_msgids setObject:event forKey:event.msgid];
-        if([event.entities objectForKey:@"reply"]) {
-            Event *parent = [_msgids objectForKey:[event.entities objectForKey:@"reply"]];
+        if(event.reply) {
+            Event *parent = [_msgids objectForKey:event.reply];
             parent.replyCount = parent.replyCount + 1;
             if(!parent.replyNicks)
                 parent.replyNicks = [[NSMutableSet alloc] init];
             [parent.replyNicks addObject:event.from];
         }
-        event.isReply = [event.entities objectForKey:@"reply"] != nil;
+        event.isReply = event.reply != nil;
         if(event.isReply && __replyCollapsePref) {
-            Event *parent = [_msgids objectForKey:[event.entities objectForKey:@"reply"]];
-            if(!parent.childEventCount) {
+            Event *parent = [_msgids objectForKey:event.reply];
+            if(parent && !parent.childEventCount) {
                 Event *e1 = [self entity:parent eid:parent.eid + ++parent.childEventCount properties:nil];
                 e1.rowType = ROW_REPLY_COUNT;
                 e1.type = TYPE_REPLY_COUNT;
@@ -1899,8 +1899,11 @@ extern UIImage *__socketClosedBackgroundImage;
                     e.formattedMsg = nil;
                 }
                 e.replyCount = 0;
-                if(_msgid && !([e.msgid isEqualToString:_msgid] || [[e.entities objectForKey:@"reply"] isEqualToString:_msgid]))
+                if(_msgid && !([e.msgid isEqualToString:_msgid] || [e.reply isEqualToString:_msgid])) {
+                    if(e.eid < _earliestEid || _earliestEid == 0)
+                        _earliestEid = e.eid;
                     continue;
+                }
                 [self insertEvent:e backlog:true nextIsGrouped:false];
                 if(e.formattedMsg && !e.formatted)
                     [self _format:e];
@@ -1981,7 +1984,7 @@ extern UIImage *__socketClosedBackgroundImage;
             _earliestEid = ((Event *)[events objectAtIndex:0]).eid;
         if(events.count && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && _conn.ready && _tableView.contentSize.height > _tableView.bounds.size.height) {
             _tableView.tableHeaderView = _headerView;
-        } else if((!_data.count || _earliestEid > _buffer.min_eid) && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && _conn.ready) {
+        } else if((!_data.count || _earliestEid > _buffer.min_eid) && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && _conn.ready && !(_msgid && [_msgids objectForKey:_msgid])) {
             _tableView.tableHeaderView = _backlogFailedView;
         } else {
             _tableView.tableHeaderView = nil;
@@ -2723,7 +2726,7 @@ extern UIImage *__socketClosedBackgroundImage;
     if(!__replyCollapsePref) {
         if(e.isReply || e.replyCount) {
             cell.reply.font = [ColorFormatter replyThreadFont];
-            cell.reply.textColor = [UIColor colorFromHexString:[UIColor colorForNick:e.isReply ? [e.entities objectForKey:@"reply"] : e.msgid]];
+            cell.reply.textColor = [UIColor colorFromHexString:[UIColor colorForNick:e.isReply ? e.reply : e.msgid]];
             cell.reply.text = e.isReply ? FA_COMMENTS : FA_COMMENT;
             cell.reply.hidden = NO;
             cell.reply.alpha = 0.4;
@@ -2905,7 +2908,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
             }
             
-            if(tableView.tableHeaderView != _headerView && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && firstRow > 0 && lastRow < _data.count && _conn.state == kIRCCloudStateConnected)
+            if(tableView.tableHeaderView != _headerView && _earliestEid > _buffer.min_eid && _buffer.min_eid > 0 && firstRow > 0 && lastRow < _data.count && _conn.state == kIRCCloudStateConnected && !(_msgid && [_msgids objectForKey:_msgid]))
                 tableView.tableHeaderView = _headerView;
         }
     }

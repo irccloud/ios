@@ -4938,7 +4938,7 @@ Network type: %@\n",
             NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/team/%@", s.slackBaseURL, _selectedUser.nick]];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
         } else if([action isEqualToString:@"Reply / View Thread"]) {
-            NSString *msgid = [_selectedEvent.entities objectForKey:@"reply"];
+            NSString *msgid = _selectedEvent.reply;
             if(!msgid)
                 msgid = _selectedEvent.msgid;
             _eventsView.msgid = _msgid = msgid;
