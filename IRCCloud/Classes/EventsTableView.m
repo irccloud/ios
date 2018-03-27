@@ -1158,7 +1158,7 @@ extern UIImage *__socketClosedBackgroundImage;
             return;
         }
         [self _addItem:event eid:eid];
-        if(!backlog && !event.formatted && event.formattedMsg.length > 0) {
+        if(!event.formatted && event.formattedMsg.length > 0) {
             [self _format:event];
         }
         
@@ -2248,6 +2248,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self _format:e];
             UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
             cell.bounds = CGRectMake(0,0,self.tableView.bounds.size.width,cell.bounds.size.height);
+            [cell setNeedsLayout];
             [cell layoutIfNeeded];
             e.height = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
         }
