@@ -3660,7 +3660,7 @@ NSArray *_sortedChannels;
         if(_selectedEvent.msg.length)
             [sheet addButtonWithTitle:@"Copy Message"];
         if(_selectedEvent.msgid && ([_selectedEvent.type isEqualToString:@"buffer_msg"] || [_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [_selectedEvent.type isEqualToString:@"notice"])) {
-            [sheet addButtonWithTitle:@"Reply / View Thread"];
+            [sheet addButtonWithTitle:@"Reply"];
         }
     }
     if(_selectedUser) {
@@ -4938,7 +4938,7 @@ Network type: %@\n",
             Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/team/%@", s.slackBaseURL, _selectedUser.nick]];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
-        } else if([action isEqualToString:@"Reply / View Thread"]) {
+        } else if([action isEqualToString:@"Reply"]) {
             NSString *msgid = _selectedEvent.reply;
             if(!msgid)
                 msgid = _selectedEvent.msgid;
