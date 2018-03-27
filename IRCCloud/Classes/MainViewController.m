@@ -3292,11 +3292,15 @@ NSArray *_sortedChannels;
     [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
 }
 
--(void)_closeThread {
-    _eventsView.msgid = _msgid = nil;
+-(void)setMsgId:(NSString *)msgId {
+    _eventsView.msgid = _msgid = msgId;
     [_eventsView refresh];
     [self _updateTitleArea];
     [self _updateUserListVisibility];
+}
+
+-(void)_closeThread {
+    [self setMsgId:nil];
 }
 
 -(void)_updateUserListVisibility {
@@ -3527,10 +3531,7 @@ NSArray *_sortedChannels;
         alert.tag = TAG_FAILEDMSG;
         [alert show];
     } else if(e.rowType == ROW_REPLY_COUNT) {
-        _eventsView.msgid = _msgid = [[e.entities objectForKey:@"parent"] msgid];
-        [_eventsView refresh];
-        [self _updateTitleArea];
-        [self _updateUserListVisibility];
+        [self setMsgId:[[e.entities objectForKey:@"parent"] msgid]];
     } else {
         [_eventsView clearLastSeenMarker];
     }
@@ -4941,10 +4942,7 @@ Network type: %@\n",
             NSString *msgid = _selectedEvent.reply;
             if(!msgid)
                 msgid = _selectedEvent.msgid;
-            _eventsView.msgid = _msgid = msgid;
-            [_eventsView refresh];
-            [self _updateTitleArea];
-            [self _updateUserListVisibility];
+            [self setMsgId:msgid];
         }
     }
 }

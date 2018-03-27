@@ -109,6 +109,7 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet UIView *_codeBlockBackground;
     IBOutlet UIView *_lastSeenEIDBackground;
     IBOutlet UILabel *_lastSeenEID;
+    IBOutlet UIControl *_replyButton;
     IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight,*_replyCenter,*_replyXOffset;
 }
 @property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID, *reply;
@@ -116,6 +117,7 @@ extern UIImage *__socketClosedBackgroundImage;
 @property (readonly) UIImageView *avatar;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
 @property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight, *replyCenter, *replyXOffset;
+@property (readonly) UIControl *replyButton;
 @end
 
 @implementation EventsTableCell
@@ -2445,6 +2447,7 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.reply.textColor = [UIColor colorFromHexString:[UIColor colorForNick:parent.msgid]];
         cell.reply.text = FA_COMMENTS;
         cell.reply.hidden = NO;
+        cell.replyButton.hidden = NO;
         cell.reply.alpha = 0.4;
         cell.replyCount.font = [ColorFormatter messageFont:__monospacePref];
         cell.replyCount.textColor = [UIColor messageTextColor];
@@ -2730,6 +2733,7 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.reply.textColor = [UIColor colorFromHexString:[UIColor colorForNick:e.isReply ? e.reply : e.msgid]];
             cell.reply.text = e.isReply ? FA_COMMENTS : FA_COMMENT;
             cell.reply.hidden = NO;
+            cell.replyButton.hidden = NO;
             cell.reply.alpha = 0.4;
             cell.replyCenter.priority = (e.isHeader && !__avatarsOffPref && !__chatOneLinePref) ? 999 : 1;
         } else {
@@ -2737,8 +2741,16 @@ extern UIImage *__socketClosedBackgroundImage;
         }
     } else if(e.rowType != ROW_REPLY_COUNT) {
         cell.reply.hidden = YES;
+        cell.replyButton.hidden = YES;
     }
 
+    if(cell.replyButton && !cell.replyButton.hidden) {
+        [cell.replyButton addTarget:self action:@selector(_replyButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+        cell.replyButton.tag = indexPath.row;
+    } else {
+        [cell.replyButton removeTarget:self action:@selector(_replyButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
     if(e.rowType == ROW_FILE) {
         cell.message.textColor = [UIColor messageTextColor];
         cell.message.font = [UIFont systemFontOfSize:FONT_SIZE];
@@ -3007,6 +3019,19 @@ extern UIImage *__socketClosedBackgroundImage;
             _hiddenAvatarRow = -1;
         }
     }
+}
+
+-(void)_replyButtonPressed:(UIControl *)sender {
+    [_lock lock];
+    Event *e = [_data objectAtIndex:sender.tag];
+    [_lock unlock];
+
+    if(_msgid)
+        [(MainViewController *)_delegate setMsgId:nil];
+    else if(e.reply)
+        [(MainViewController *)_delegate setMsgId:e.reply];
+    else
+        [(MainViewController *)_delegate setMsgId:e.msgid];
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

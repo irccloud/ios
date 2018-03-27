@@ -107,6 +107,14 @@
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
                     </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="LfV-F3-NEI" customClass="UIControl">
+                        <rect key="frame" x="46" y="-8" width="32" height="24"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="32" id="Dt7-Fu-LjK"/>
+                            <constraint firstAttribute="height" constant="24" id="mpP-7e-Sxk"/>
+                        </constraints>
+                    </view>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9aa-Ko-5ri">
                         <rect key="frame" x="66" y="4" width="44" height="44"/>
                         <constraints>
@@ -132,6 +140,7 @@
                     <constraint firstItem="fOD-UD-tHL" firstAttribute="leading" secondItem="g7o-m6-B7g" secondAttribute="trailing" constant="6" id="8ZI-LM-dI5"/>
                     <constraint firstItem="9ZM-5c-yUP" firstAttribute="height" secondItem="fOD-UD-tHL" secondAttribute="height" id="BON-ig-6HA"/>
                     <constraint firstAttribute="bottom" secondItem="FYg-pz-vsM" secondAttribute="bottom" id="Cj4-7B-Dcp"/>
+                    <constraint firstItem="LfV-F3-NEI" firstAttribute="centerX" secondItem="g7o-m6-B7g" secondAttribute="centerX" id="Hqs-Dl-E76"/>
                     <constraint firstItem="qsr-vg-LVN" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" constant="-6" id="Ifv-QD-BjA"/>
                     <constraint firstItem="nEj-fz-vAL" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="2" id="O0z-rZ-iSx"/>
                     <constraint firstItem="KgT-oH-O7i" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailing" id="Q35-43-XyX"/>
@@ -156,6 +165,7 @@
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="110" id="nTv-tZ-edl"/>
                     <constraint firstItem="WPz-RI-MPI" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="bottom" id="nsU-HK-2Wm"/>
                     <constraint firstItem="oeb-cI-59G" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" constant="2" id="qPn-0k-p7r"/>
+                    <constraint firstItem="LfV-F3-NEI" firstAttribute="centerY" secondItem="g7o-m6-B7g" secondAttribute="centerY" id="rZj-7T-xvk"/>
                     <constraint firstItem="nEj-fz-vAL" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" id="sDo-jb-7ON"/>
                     <constraint firstItem="c4u-g2-2uu" firstAttribute="height" secondItem="V3s-xQ-nVF" secondAttribute="height" id="tCR-a6-5SY"/>
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="height" relation="greaterThanOrEqual" secondItem="fOD-UD-tHL" secondAttribute="height" id="u4u-Xj-mxr"/>
@@ -187,6 +197,7 @@
                 <outlet property="_nicknameOffset" destination="sDo-jb-7ON" id="wIq-hF-pR1"/>
                 <outlet property="_quoteBorder" destination="c4u-g2-2uu" id="x1Z-yO-aPO"/>
                 <outlet property="_reply" destination="g7o-m6-B7g" id="0sJ-rV-fY8"/>
+                <outlet property="_replyButton" destination="LfV-F3-NEI" id="sev-gg-kJs"/>
                 <outlet property="_replyCenter" destination="c8G-Dm-16A" id="Rw4-qp-IN7"/>
                 <outlet property="_replyXOffset" destination="gEz-B6-BGn" id="ThU-3N-seU"/>
                 <outlet property="_socketClosedBar" destination="WPz-RI-MPI" id="ntm-fR-kM1"/>

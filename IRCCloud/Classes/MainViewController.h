@@ -139,6 +139,7 @@
 -(void)launchURL:(NSURL *)url;
 -(void)refresh;
 -(void)_setSelectedBuffer:(Buffer *)b;
+-(void)setMsgId:(NSString *)msgId;
 -(void)applyTheme;
 -(void)clearText;
 @end
