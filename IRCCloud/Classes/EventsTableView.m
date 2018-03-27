@@ -3026,12 +3026,14 @@ extern UIImage *__socketClosedBackgroundImage;
     Event *e = [_data objectAtIndex:sender.tag];
     [_lock unlock];
 
-    if(_msgid)
+    if(_msgid) {
+        _eidToOpen = e.eid;
         [(MainViewController *)_delegate setMsgId:nil];
-    else if(e.reply)
+    } else if(e.reply) {
         [(MainViewController *)_delegate setMsgId:e.reply];
-    else
+    } else {
         [(MainViewController *)_delegate setMsgId:e.msgid];
+    }
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
