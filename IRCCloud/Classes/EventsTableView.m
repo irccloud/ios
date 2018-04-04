@@ -2733,14 +2733,18 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.reply.text = e.isReply ? FA_COMMENTS : FA_COMMENT;
             cell.reply.hidden = NO;
             cell.replyButton.hidden = NO;
+            cell.replyButton.userInteractionEnabled = YES;
             cell.reply.alpha = 0.4;
             cell.replyCenter.priority = (e.isHeader && !__avatarsOffPref && !__chatOneLinePref) ? 999 : 1;
         } else {
             cell.reply.hidden = YES;
+            cell.replyButton.hidden = YES;
+            cell.replyButton.userInteractionEnabled = NO;
         }
     } else if(e.rowType != ROW_REPLY_COUNT) {
         cell.reply.hidden = YES;
         cell.replyButton.hidden = YES;
+        cell.replyButton.userInteractionEnabled = NO;
     }
 
     if(cell.replyButton && !cell.replyButton.hidden) {
