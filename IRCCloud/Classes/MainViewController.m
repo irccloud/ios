@@ -3659,7 +3659,7 @@ NSArray *_sortedChannels;
             [sheet addButtonWithTitle:@"Close Preview"];
         if(_selectedEvent.msg.length)
             [sheet addButtonWithTitle:@"Copy Message"];
-        if(_selectedEvent.msgid && ([_selectedEvent.type isEqualToString:@"buffer_msg"] || [_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [_selectedEvent.type isEqualToString:@"notice"])) {
+        if(!_msgid && _selectedEvent.msgid && ([_selectedEvent.type isEqualToString:@"buffer_msg"] || [_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [_selectedEvent.type isEqualToString:@"notice"])) {
             [sheet addButtonWithTitle:@"Reply"];
         }
     }

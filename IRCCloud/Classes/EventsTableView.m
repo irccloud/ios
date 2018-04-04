@@ -804,6 +804,10 @@ extern UIImage *__socketClosedBackgroundImage;
         if(event.eid < _earliestEid || _earliestEid == 0)
             _earliestEid = event.eid;
         
+        if(_msgid && !([event.msgid isEqualToString:_msgid] || [event.reply isEqualToString:_msgid])) {
+            return;
+        }
+        
         NSTimeInterval eid = event.eid;
         NSString *type = event.type;
         if([type hasPrefix:@"you_"]) {
@@ -1901,11 +1905,6 @@ extern UIImage *__socketClosedBackgroundImage;
                     e.formattedMsg = nil;
                 }
                 e.replyCount = 0;
-                if(_msgid && !([e.msgid isEqualToString:_msgid] || [e.reply isEqualToString:_msgid])) {
-                    if(e.eid < _earliestEid || _earliestEid == 0)
-                        _earliestEid = e.eid;
-                    continue;
-                }
                 [self insertEvent:e backlog:true nextIsGrouped:false];
                 if(e.formattedMsg && !e.formatted)
                     [self _format:e];
