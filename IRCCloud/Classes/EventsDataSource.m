@@ -221,7 +221,7 @@
     BOOL isIRCCloudAvatar = NO;
     if([self isMessage] && (!_cachedAvatarURL || size != _cachedAvatarSize)) {
         if(_avatar.length) {
-            _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":_avatar, @"modifiers":[NSString stringWithFormat:@"w%i", size]} error:nil]];
+            _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":_avatar, @"modifiers":[NSString stringWithFormat:@"s%i", size]} error:nil]];
         } else if([_avatarURL hasPrefix:@"https://"]) {
             if([_avatarURL containsString:@"{size}"]) {
                 CSURITemplate *template = [CSURITemplate URITemplateWithString:_avatarURL error:nil];
@@ -236,7 +236,7 @@
                 if([ident hasPrefix:@"uid"] || [ident hasPrefix:@"sid"]) {
                     ident = [ident substringFromIndex:3];
                     if([ident intValue]) {
-                        _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarRedirectURITemplate relativeStringWithVariables:@{@"id":ident, @"modifiers":[NSString stringWithFormat:@"w%i", size]} error:nil]];
+                        _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarRedirectURITemplate relativeStringWithVariables:@{@"id":ident, @"modifiers":[NSString stringWithFormat:@"s%i", size]} error:nil]];
                         isIRCCloudAvatar = YES;
                     }
                 }
