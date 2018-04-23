@@ -4618,8 +4618,11 @@ NSArray *_sortedChannels;
         }]];
     }
 #ifndef ENTERPRISE
-    [alert addAction:[UIAlertAction actionWithTitle:[[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported?@"Change Avatar":@"Change Public Avatar" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-        AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:[[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported?_buffer.cid:-1];
+    BOOL avatars_supported = [[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported;
+    if([[ServersDataSource sharedInstance] getServer:_buffer.cid].isSlack)
+        avatars_supported = NO;
+    [alert addAction:[UIAlertAction actionWithTitle:avatars_supported?@"Change Avatar":@"Change Public Avatar" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:avatars_supported?_buffer.cid:-1];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:atv];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
