@@ -246,12 +246,14 @@
                 }
             }
             if(!_cachedAvatarURL) {
-                NSString *n = [_realname stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].lowercaseString;
-                NSArray *results = [[ColorFormatter email] matchesInString:n options:0 range:NSMakeRange(0, n.length)];
-                if(results.count == 1) {
-                    NSString *email = [n substringWithRange:[results.firstObject range]];
-                    _cachedAvatarURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.gravatar.com/avatar/%@?size=%i&default=404", [ImageCache md5:email].lowercaseString, size]];
-                    isIRCCloudAvatar = NO;
+                NSString *n = _realname.lowercaseString;
+                if(n.length) {
+                    NSArray *results = [[ColorFormatter email] matchesInString:n options:0 range:NSMakeRange(0, n.length)];
+                    if(results.count == 1) {
+                        NSString *email = [n substringWithRange:[results.firstObject range]];
+                        _cachedAvatarURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.gravatar.com/avatar/%@?size=%i&default=404", [ImageCache md5:email].lowercaseString, size]];
+                        isIRCCloudAvatar = NO;
+                    }
                 }
             }
         }
