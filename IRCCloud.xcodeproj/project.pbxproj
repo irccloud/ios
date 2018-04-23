@@ -627,6 +627,10 @@
 		22D649271B1E0719003BFD86 /* CSURITemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649231B1E0719003BFD86 /* CSURITemplate.m */; };
 		22D6492A1B1E371D003BFD86 /* PastebinsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649291B1E371D003BFD86 /* PastebinsTableViewController.m */; };
 		22D6492B1B1E371D003BFD86 /* PastebinsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649291B1E371D003BFD86 /* PastebinsTableViewController.m */; };
+		22D76CCA208E288E005C34E5 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
+		22D76CCB208E288F005C34E5 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
+		22D76CCC208E289D005C34E5 /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
+		22D76CCD208E289E005C34E5 /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
 		22DB24FC1982DF2B0008728E /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		22DB24FD1982DF2B0008728E /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		22DB24FE1982DF2B0008728E /* BuffersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60516DBCA85007BE535 /* BuffersTableView.m */; };
@@ -2465,6 +2469,7 @@
 				229324311E8945D700ADAA22 /* RSSwizzle.m in Sources */,
 				22103508197EFC6200AB414F /* BuffersDataSource.m in Sources */,
 				222C80E31E4A112D00A243E7 /* SBJson5StreamTokeniser.m in Sources */,
+				22D76CCC208E289D005C34E5 /* ColorFormatter.m in Sources */,
 				2293241F1E8945D700ADAA22 /* registry_search.c in Sources */,
 				2293243D1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				222C80D71E4A111700A243E7 /* SBJson5Parser.m in Sources */,
@@ -2477,6 +2482,7 @@
 				229324611E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				229324131E8945D700ADAA22 /* assert.c in Sources */,
 				2210350D197EFC6200AB414F /* NetworkConnection.m in Sources */,
+				22D76CCA208E288E005C34E5 /* ImageCache.m in Sources */,
 				2210350E197EFC6200AB414F /* ServersDataSource.m in Sources */,
 				222C80E61E4A112D00A243E7 /* SBJson5Writer.m in Sources */,
 				229324791E8945D700ADAA22 /* TrustKit.m in Sources */,
@@ -2916,6 +2922,7 @@
 				229324321E8945D700ADAA22 /* RSSwizzle.m in Sources */,
 				22DB25001982DF2B0008728E /* BuffersDataSource.m in Sources */,
 				222C80E71E4A112D00A243E7 /* SBJson5StreamTokeniser.m in Sources */,
+				22D76CCD208E289E005C34E5 /* ColorFormatter.m in Sources */,
 				229324201E8945D700ADAA22 /* registry_search.c in Sources */,
 				2293243E1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				222C80D81E4A111800A243E7 /* SBJson5Parser.m in Sources */,
@@ -2928,6 +2935,7 @@
 				229324621E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				229324141E8945D700ADAA22 /* assert.c in Sources */,
 				22DB25051982DF2B0008728E /* NetworkConnection.m in Sources */,
+				22D76CCB208E288F005C34E5 /* ImageCache.m in Sources */,
 				22DB25061982DF2B0008728E /* ServersDataSource.m in Sources */,
 				222C80EA1E4A112D00A243E7 /* SBJson5Writer.m in Sources */,
 				2293247A1E8945D700ADAA22 /* TrustKit.m in Sources */,

@@ -96,7 +96,7 @@
     [self clear];
 }
 
-- (NSString *)md5:(NSString *)string {
++ (NSString *)md5:(NSString *)string {
     const char *cstr = [string UTF8String];
     unsigned char result[16];
     CC_MD5(cstr, (unsigned int)strlen(cstr), result);
@@ -112,7 +112,7 @@
 
 -(BOOL)isValidURL:(NSURL *)url {
     @synchronized(_failures) {
-        return [_failures objectForKey:url.absoluteString] == nil;
+        return url != nil && [_failures objectForKey:url.absoluteString] == nil;
     }
 }
 
@@ -234,7 +234,7 @@
 
 -(NSURL *)pathForURL:(NSURL *)url {
     if(url)
-        return [_cachePath URLByAppendingPathComponent:[self md5:url.absoluteString]];
+        return [_cachePath URLByAppendingPathComponent:[ImageCache md5:url.absoluteString]];
     else
         return nil;
 }

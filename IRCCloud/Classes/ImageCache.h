@@ -28,6 +28,7 @@ typedef void (^imageCompletionHandler)(BOOL);
 }
 
 +(ImageCache *)sharedInstance;
++(NSString *)md5:(NSString *)string;
 -(void)prune;
 -(void)clear;
 -(void)clearFailedURLs;

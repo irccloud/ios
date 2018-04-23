@@ -2512,7 +2512,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 
                 if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:avatarURL].path] || needsRefresh) {
                     [[ImageCache sharedInstance] fetchURL:avatarURL completionHandler:^(BOOL success) {
-                        if(success)
+                        if(success || [[ImageCache sharedInstance] isValidURL:[e avatar:avatarHeight * [UIScreen mainScreen].scale]])
                             [self reloadForEvent:e];
                     }];
                 }

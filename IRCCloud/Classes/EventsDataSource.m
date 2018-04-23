@@ -24,6 +24,7 @@
 #import "UsersDataSource.h"
 #import "Ignore.h"
 #import "NetworkConnection.h"
+#import "ImageCache.h"
 
 @implementation Event
 -(NSComparisonResult)compare:(Event *)aEvent {
@@ -219,7 +220,7 @@
 -(NSURL *)avatar:(int)size {
 #ifndef ENTERPRISE
     BOOL isIRCCloudAvatar = NO;
-    if([self isMessage] && (!_cachedAvatarURL || size != _cachedAvatarSize)) {
+    if([self isMessage] && (!_cachedAvatarURL || size != _cachedAvatarSize || ![[ImageCache sharedInstance] isValidURL:_cachedAvatarURL])) {
         if(_avatar.length) {
             _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":_avatar, @"modifiers":[NSString stringWithFormat:@"s%i", size]} error:nil]];
         } else if([_avatarURL hasPrefix:@"https://"]) {
@@ -237,8 +238,20 @@
                     ident = [ident substringFromIndex:3];
                     if([ident intValue]) {
                         _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarRedirectURITemplate relativeStringWithVariables:@{@"id":ident, @"modifiers":[NSString stringWithFormat:@"s%i", size]} error:nil]];
-                        isIRCCloudAvatar = YES;
+                        if([[ImageCache sharedInstance] isValidURL:_cachedAvatarURL])
+                            isIRCCloudAvatar = YES;
+                        else
+                            _cachedAvatarURL = nil;
                     }
+                }
+            }
+            if(!_cachedAvatarURL) {
+                NSString *n = [_realname stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]].lowercaseString;
+                NSArray *results = [[ColorFormatter email] matchesInString:n options:0 range:NSMakeRange(0, n.length)];
+                if(results.count == 1) {
+                    NSString *email = [n substringWithRange:[results.firstObject range]];
+                    _cachedAvatarURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.gravatar.com/avatar/%@?size=%i&default=404", [ImageCache md5:email].lowercaseString, size]];
+                    isIRCCloudAvatar = NO;
                 }
             }
         }
