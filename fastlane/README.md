@@ -21,6 +21,11 @@ or alternatively using `brew cask install fastlane`
 fastlane ios certs
 ```
 Check all certs and provisioning profiles from github
+### ios apn
+```
+fastlane ios apn
+```
+Generate new push certs
 ### ios push
 ```
 fastlane ios push

@@ -35,6 +35,20 @@ platform :ios do
     end
   end
 
+  desc "Generate new push certs"
+  lane :apn do |options|
+    if options[:enterprise]
+        bundle_id = "com.irccloud.enterprise"
+    else
+        bundle_id = "com.irccloud.IRCCloud"
+    end
+
+    get_push_certificate(
+      generate_p12: false,
+      app_identifier: bundle_id
+    )
+  end
+
   desc "Build and push to iTunes Connect"
   lane :push do |options|
     if options[:enterprise]
