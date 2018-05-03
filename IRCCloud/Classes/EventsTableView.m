@@ -2139,11 +2139,12 @@ extern UIImage *__socketClosedBackgroundImage;
         } else {
             e.isQuoted = NO;
         }
+        NSString *formattedMsg = e.formattedMsg;
         if(e.rowType == ROW_FAILED || (e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0))
-            e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref];
-        else
-            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref];
-        
+            formattedMsg = [NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg];
+
+        e.formatted = [ColorFormatter format:formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref mentionOffset:formattedMsg.length - e.msg.length];
+
         if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
             NSMutableArray *mutableLinks = links.mutableCopy;
             for(int i = 0; i < mutableLinks.count; i++) {

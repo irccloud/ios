@@ -1938,9 +1938,9 @@ extern BOOL __compact;
 }
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
-    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO mentions:nil colorizeMentions:NO];
+    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO mentions:nil colorizeMentions:NO mentionOffset:0];
 }
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)m colorizeMentions:(BOOL)colorizeMentions {
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)m colorizeMentions:(BOOL)colorizeMentions mentionOffset:(NSInteger)mentionOffset {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, mono = -1, strike = -1;
     UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil, *oldBgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
@@ -1971,10 +1971,16 @@ extern BOOL __compact;
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", [input stringByReplacingOccurrencesOfString:@"  " withString:@"\u00A0 "], CLEAR];
     
     if(mentions) {
-        for(NSArray *mention in mentions.allValues) {
-            for(int i = 0; i < mention.count; i++) {
-                [text replaceCharactersInRange:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue]) withString:[@"" stringByPaddingToLength:[[[mention objectAtIndex:i] objectAtIndex:1] intValue] withString:@"A" startingAtIndex:0]];
+        for(NSString *key in mentions.allKeys) {
+            NSArray *mention = [mentions objectForKey:key];
+            NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
+            for(NSArray *old_position in mention) {
+                NSMutableArray *position = old_position.mutableCopy;
+                [position setObject:@([[position objectAtIndex:0] intValue] + mentionOffset) atIndexedSubscript:0];
+                [text replaceCharactersInRange:NSMakeRange([[position objectAtIndex:0] intValue], [[position objectAtIndex:1] intValue]) withString:[@"" stringByPaddingToLength:[[position objectAtIndex:1] intValue] withString:@"A" startingAtIndex:0]];
+                [new_mention addObject:position];
             }
+            [mentions setObject:new_mention forKey:key];
         }
     }
     
