@@ -90,6 +90,7 @@ BOOL __disableCodeBlockPref = NO;
 BOOL __disableQuotePref = NO;
 BOOL __avatarImages = YES;
 BOOL __replyCollapsePref = NO;
+BOOL __colorizeMentionsPref = NO;
 int __smallAvatarHeight;
 int __largeAvatarHeight = 32;
 
@@ -1707,6 +1708,7 @@ extern UIImage *__socketClosedBackgroundImage;
         __secondsPref = NO;
         __timeLeftPref = NO;
         __nickColorsPref = NO;
+        __colorizeMentionsPref = NO;
         __hideJoinPartPref = NO;
         __expandJoinPartPref = NO;
         __avatarsOffPref = NO;
@@ -1726,6 +1728,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if(prefs) {
             __monospacePref = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
             __nickColorsPref = [[prefs objectForKey:@"nick-colors"] boolValue];
+            __colorizeMentionsPref = [[prefs objectForKey:@"mention-colors"] boolValue];
             __secondsPref = [[prefs objectForKey:@"time-seconds"] boolValue];
             __24hrPref = [[prefs objectForKey:@"time-24hr"] boolValue];
             __timeLeftPref = [[NSUserDefaults standardUserDefaults] boolForKey:@"time-left"];
@@ -2137,9 +2140,9 @@ extern UIImage *__socketClosedBackgroundImage;
             e.isQuoted = NO;
         }
         if(e.rowType == ROW_FAILED || (e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0))
-            e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
+            e.formatted = [ColorFormatter format:[NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg] defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref];
         else
-            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly];
+            e.formatted = [ColorFormatter format:e.formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref];
         
         if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
             NSMutableArray *mutableLinks = links.mutableCopy;

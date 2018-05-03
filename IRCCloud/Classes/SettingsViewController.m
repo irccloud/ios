@@ -505,6 +505,7 @@
         [prefs setObject:[NSNumber numberWithBool:_seconds.isOn] forKey:@"time-seconds"];
         [prefs setObject:[NSNumber numberWithBool:_symbols.isOn] forKey:@"mode-showsymbol"];
         [prefs setObject:[NSNumber numberWithBool:_colors.isOn] forKey:@"nick-colors"];
+        [prefs setObject:[NSNumber numberWithBool:_colorizeMentions.isOn] forKey:@"mention-colors"];
         [prefs setObject:[NSNumber numberWithBool:!_emocodes.isOn] forKey:@"emoji-disableconvert"];
         [prefs setObject:[NSNumber numberWithBool:!_pastebin.isOn] forKey:@"pastebin-disableprompt"];
         if([prefs objectForKey:@"font"]) {
@@ -852,6 +853,7 @@
                          @{@"title":@"Show Seconds", @"accessory":_seconds},
                          @{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."},
                          @{@"title":@"Colourise Nicknames", @"accessory":_colors},
+                         @{@"title":@"Colourise Mentions", @"accessory":_colorizeMentions},
                          @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
                          @{@"title":@"Enlarge Emoji Messages", @"accessory":_disableBigEmoji},
                          ]},
@@ -961,6 +963,7 @@
     _clearFormattingAfterSending = [[UISwitch alloc] init];
     _avatarImages = [[UISwitch alloc] init];
     _backgroundUploads = [[UISwitch alloc] init];
+    _colorizeMentions = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1039,6 +1042,12 @@
         _colors.on = [[prefs objectForKey:@"nick-colors"] boolValue];
     } else {
         _colors.on = NO;
+    }
+    
+    if([[prefs objectForKey:@"mention-colors"] isKindOfClass:[NSNumber class]]) {
+        _colorizeMentions.on = [[prefs objectForKey:@"mention-colors"] boolValue];
+    } else {
+        _colorizeMentions.on = NO;
     }
     
     if([[prefs objectForKey:@"emoji-disableconvert"] isKindOfClass:[NSNumber class]]) {

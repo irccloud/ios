@@ -1938,13 +1938,14 @@ extern BOOL __compact;
 }
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
-    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO];
+    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO mentions:nil colorizeMentions:NO];
 }
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji {
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)m colorizeMentions:(BOOL)colorizeMentions {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, mono = -1, strike = -1;
     UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil, *oldBgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
     NSMutableArray *matches = [[NSMutableArray alloc] init];
+    NSMutableDictionary *mentions = m.mutableCopy;
     
     if(!Courier) {
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -1968,12 +1969,41 @@ extern BOOL __compact;
     NSMutableArray *thinSpaceIndex = [[NSMutableArray alloc] init];
 
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", [input stringByReplacingOccurrencesOfString:@"  " withString:@"\u00A0 "], CLEAR];
+    
+    if(mentions) {
+        for(NSArray *mention in mentions.allValues) {
+            for(int i = 0; i < mention.count; i++) {
+                [text replaceCharactersInRange:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue]) withString:[@"" stringByPaddingToLength:[[[mention objectAtIndex:i] objectAtIndex:1] intValue] withString:@"A" startingAtIndex:0]];
+            }
+        }
+    }
+    
     BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
     if(!disableConvert) {
         [self emojify:text];
     }
     
+    NSUInteger oldLength = 0;
     for(int i = 0; i < text.length; i++) {
+        if(oldLength) {
+            NSInteger delta = oldLength - text.length;
+            if(mentions && delta) {
+                for(NSString *key in mentions.allKeys) {
+                    NSArray *mention = [mentions objectForKey:key];
+                    NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
+                    for(NSArray *position in mention) {
+                        if([[position objectAtIndex:0] intValue] > i) {
+                            [new_mention addObject:@[@([[position objectAtIndex:0] intValue] - delta),
+                                                     @([[position objectAtIndex:1] intValue])]];
+                        } else {
+                            [new_mention addObject:position];
+                        }
+                    }
+                    [mentions setObject:new_mention forKey:key];
+                }
+            }
+        }
+        oldLength = text.length;
         switch([text characterAtIndex:i]) {
             case 0x2190:
             case 0x2192:
@@ -2390,6 +2420,20 @@ extern BOOL __compact;
     
     for(NSNumber *i in thinSpaceIndex) {
         [output addAttributes:@{NSFontAttributeName:Helvetica} range:NSMakeRange([i intValue], 1)];
+    }
+    
+    if(mentions) {
+        for(NSString *nick in mentions.allKeys) {
+            NSArray *mention = [mentions objectForKey:nick];
+            for(int i = 0; i < mention.count; i++) {
+                [output replaceCharactersInRange:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue]) withString:nick];
+                if(colorizeMentions) {
+                    [output addAttribute:NSForegroundColorAttributeName value:[UIColor colorFromHexString:[UIColor colorForNick:nick]] range:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue])];
+                } else {
+                    [output addAttribute:NSForegroundColorAttributeName value:[UIColor collapsedRowNickColor] range:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue])];
+                }
+            }
+        }
     }
 
     return output;

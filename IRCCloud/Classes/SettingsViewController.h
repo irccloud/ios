@@ -70,6 +70,7 @@
     UISwitch *_clearFormattingAfterSending;
     UISwitch *_avatarImages;
     UISwitch *_backgroundUploads;
+    UISwitch *_colorizeMentions;
     NSString *_version;
     UISlider *_fontSize;
     NSString *_oldTheme;
