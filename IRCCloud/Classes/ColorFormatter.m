@@ -2427,7 +2427,7 @@ extern BOOL __compact;
             NSArray *mention = [mentions objectForKey:nick];
             for(int i = 0; i < mention.count; i++) {
                 [output replaceCharactersInRange:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue]) withString:nick];
-                if(colorizeMentions) {
+                if(colorizeMentions && ![nick isEqualToString:server.nick]) {
                     [output addAttribute:NSForegroundColorAttributeName value:[UIColor colorFromHexString:[UIColor colorForNick:nick]] range:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue])];
                 } else {
                     [output addAttribute:NSForegroundColorAttributeName value:[UIColor collapsedRowNickColor] range:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue])];
