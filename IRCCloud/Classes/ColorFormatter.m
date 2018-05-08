@@ -2434,7 +2434,9 @@ extern BOOL __compact;
             for(int i = 0; i < mention.count; i++) {
                 int start = [[[mention objectAtIndex:i] objectAtIndex:0] intValue];
                 int length = [[[mention objectAtIndex:i] objectAtIndex:1] intValue];
-                NSString *name = [[UsersDataSource sharedInstance] getDisplayName:nick cid:server.cid];
+                NSString *name = nick;
+                if(start > 0 && [output.string characterAtIndex:start-1] == '@')
+                    name = [[UsersDataSource sharedInstance] getDisplayName:nick cid:server.cid];
                 [output replaceCharactersInRange:NSMakeRange(start, length) withString:name];
                 if(colorizeMentions && ![nick isEqualToString:server.nick]) {
                     [output addAttribute:NSForegroundColorAttributeName value:[UIColor colorFromHexString:[UIColor colorForNick:nick]] range:NSMakeRange(start, name.length)];
