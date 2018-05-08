@@ -219,6 +219,10 @@ static NSString * const ServerHasSSLKey = @"ssl";
     return self;
 }
 
+-(void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 //From: http://stackoverflow.com/a/13867108/1406639
 - (void)keyboardWillShow:(NSNotification *)aNotification
 {
