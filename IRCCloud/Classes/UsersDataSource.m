@@ -186,6 +186,7 @@
 -(void)clear {
     @synchronized(_users) {
         [_users removeAllObjects];
+        [_displayNames removeAllObjects];
     }
 }
 
