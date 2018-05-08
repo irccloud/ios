@@ -1938,9 +1938,9 @@ extern BOOL __compact;
 }
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
-    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO mentions:nil colorizeMentions:NO mentionOffset:0];
+    return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO mentions:nil colorizeMentions:NO mentionOffset:0 mentionData:nil];
 }
-+(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)m colorizeMentions:(BOOL)colorizeMentions mentionOffset:(NSInteger)mentionOffset {
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)m colorizeMentions:(BOOL)colorizeMentions mentionOffset:(NSInteger)mentionOffset mentionData:(NSDictionary *)mentionData {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, mono = -1, strike = -1;
     UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil, *oldBgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
@@ -2435,8 +2435,12 @@ extern BOOL __compact;
                 int start = [[[mention objectAtIndex:i] objectAtIndex:0] intValue];
                 int length = [[[mention objectAtIndex:i] objectAtIndex:1] intValue];
                 NSString *name = nick;
-                if(start > 0 && [output.string characterAtIndex:start-1] == '@')
-                    name = [[UsersDataSource sharedInstance] getDisplayName:nick cid:server.cid];
+                if(start > 0 && [output.string characterAtIndex:start-1] == '@') {
+                    if([mentionData objectForKey:nick])
+                        name = [[mentionData objectForKey:nick] objectForKey:@"display_name"];
+                    else
+                        name = [[UsersDataSource sharedInstance] getDisplayName:nick cid:server.cid];
+                }
                 [output replaceCharactersInRange:NSMakeRange(start, length) withString:name];
                 if(colorizeMentions && ![nick isEqualToString:server.nick]) {
                     [output addAttribute:NSForegroundColorAttributeName value:[UIColor colorFromHexString:[UIColor colorForNick:nick]] range:NSMakeRange(start, name.length)];
