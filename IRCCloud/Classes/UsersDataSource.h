@@ -43,7 +43,6 @@
 
 @interface UsersDataSource : NSObject {
     NSMutableDictionary *_users;
-    NSMutableDictionary *_displayNames;
 }
 +(UsersDataSource *)sharedInstance;
 -(void)serialize;
