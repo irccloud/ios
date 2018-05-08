@@ -59,4 +59,5 @@
 -(void)updateHostmask:(NSString *)hostmask nick:(NSString *)nick cid:(int)cid bid:(int)bid;
 -(void)updateMode:(NSString *)mode nick:(NSString *)nick cid:(int)cid bid:(int)bid;
 -(void)updateDisplayName:(NSString *)displayName nick:(NSString *)nick cid:(int)cid;
+-(NSString *)getDisplayName:(NSString *)nick cid:(int)cid;
 @end

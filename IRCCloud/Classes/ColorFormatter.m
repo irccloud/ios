@@ -2432,11 +2432,30 @@ extern BOOL __compact;
         for(NSString *nick in mentions.allKeys) {
             NSArray *mention = [mentions objectForKey:nick];
             for(int i = 0; i < mention.count; i++) {
-                [output replaceCharactersInRange:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue]) withString:nick];
+                int start = [[[mention objectAtIndex:i] objectAtIndex:0] intValue];
+                int length = [[[mention objectAtIndex:i] objectAtIndex:1] intValue];
+                NSString *name = [[UsersDataSource sharedInstance] getDisplayName:nick cid:server.cid];
+                [output replaceCharactersInRange:NSMakeRange(start, length) withString:name];
                 if(colorizeMentions && ![nick isEqualToString:server.nick]) {
-                    [output addAttribute:NSForegroundColorAttributeName value:[UIColor colorFromHexString:[UIColor colorForNick:nick]] range:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue])];
+                    [output addAttribute:NSForegroundColorAttributeName value:[UIColor colorFromHexString:[UIColor colorForNick:nick]] range:NSMakeRange(start, name.length)];
                 } else {
-                    [output addAttribute:NSForegroundColorAttributeName value:[UIColor collapsedRowNickColor] range:NSMakeRange([[[mention objectAtIndex:i] objectAtIndex:0] intValue], [[[mention objectAtIndex:i] objectAtIndex:1] intValue])];
+                    [output addAttribute:NSForegroundColorAttributeName value:[UIColor collapsedRowNickColor] range:NSMakeRange(start, name.length)];
+                }
+                NSInteger delta = nick.length - name.length;
+                if(delta) {
+                    for(NSString *key in mentions.allKeys) {
+                        NSArray *mention = [mentions objectForKey:key];
+                        NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
+                        for(NSArray *position in mention) {
+                            if([[position objectAtIndex:0] intValue] > start) {
+                                [new_mention addObject:@[@([[position objectAtIndex:0] intValue] - delta),
+                                                         @([[position objectAtIndex:1] intValue])]];
+                            } else {
+                                [new_mention addObject:position];
+                            }
+                        }
+                        [mentions setObject:new_mention forKey:key];
+                    }
                 }
             }
         }

@@ -202,6 +202,18 @@
     }
 }
 
+-(NSString *)getDisplayName:(NSString *)nick cid:(int)cid {
+    @synchronized(_users) {
+        for(NSDictionary *buffer in _users.allValues) {
+            for(User *u in buffer.allValues) {
+                if(u && u.cid == cid && [u.nick isEqualToString:nick] && u.display_name.length)
+                    return u.display_name;
+            }
+        }
+        return nick;
+    }
+}
+
 -(void)removeUser:(NSString *)nick cid:(int)cid bid:(int)bid {
     @synchronized(_users) {
         [[_users objectForKey:@(bid)] removeObjectForKey:[nick lowercaseString]];
