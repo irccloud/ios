@@ -124,8 +124,8 @@
             
             @try {
                 _users = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
-                cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"displayNames"];
-                _displayNames = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                //cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"displayNames"];
+                //_displayNames = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
             } @catch(NSException *e) {
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
@@ -137,8 +137,9 @@
         }
         if(!_users)
             _users = [[NSMutableDictionary alloc] init];
-        if(!_displayNames)
-            _displayNames = [[NSMutableDictionary alloc] init];
+        /*if(!_displayNames)
+            _displayNames = [[NSMutableDictionary alloc] init];*/
+        _displayNames = nil;
     }
     return self;
 }
@@ -163,7 +164,7 @@
         }
     }
 
-    cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"displayNames"];
+    /*cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"displayNames"];
     
     NSMutableDictionary *displayNames = [[NSMutableDictionary alloc] init];
     @synchronized(_users) {
@@ -180,13 +181,13 @@
         @catch (NSException *exception) {
             [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
         }
-    }
+    }*/
 }
 
 -(void)clear {
     @synchronized(_users) {
         [_users removeAllObjects];
-        [_displayNames removeAllObjects];
+        //[_displayNames removeAllObjects];
     }
 }
 
@@ -199,8 +200,8 @@
             [_users setObject:users forKey:@(user.bid)];
         }
         [users setObject:user forKey:user.lowercase_nick];
-        if(user.display_name.length)
-            [self updateDisplayName:user.display_name nick:user.nick cid:user.cid];
+        //if(user.display_name.length)
+          //  [self updateDisplayName:user.display_name nick:user.nick cid:user.cid];
     }
 #endif
 }
@@ -229,18 +230,27 @@
 }
 
 -(NSString *)getDisplayName:(NSString *)nick cid:(int)cid {
-    @synchronized(_displayNames) {
+    /*@synchronized(_displayNames) {
         if([[_displayNames objectForKey:@(cid)] objectForKey:nick.lowercaseString])
             return [[_displayNames objectForKey:@(cid)] objectForKey:nick.lowercaseString];
         else
             return nick;
+    }*/
+    @synchronized(_users) {
+        for(NSDictionary *buffer in _users.allValues) {
+            for(User *u in buffer.allValues) {
+                if(u && u.cid == cid && [u.nick isEqualToString:nick] && u.display_name.length)
+                    return u.display_name;
+            }
+        }
+        return nick;
     }
 }
 
 -(void)removeUser:(NSString *)nick cid:(int)cid bid:(int)bid {
     @synchronized(_users) {
         [[_users objectForKey:@(bid)] removeObjectForKey:[nick lowercaseString]];
-        [[_displayNames objectForKey:@(cid)] removeObjectForKey:[nick lowercaseString]];
+        //[[_displayNames objectForKey:@(cid)] removeObjectForKey:[nick lowercaseString]];
     }
 }
 
@@ -258,10 +268,10 @@
             user.old_nick = oldNick;
             [[_users objectForKey:@(bid)] removeObjectForKey:[oldNick lowercaseString]];
             [[_users objectForKey:@(bid)] setObject:user forKey:[nick lowercaseString]];
-            [[_displayNames objectForKey:@(cid)] removeObjectForKey:[oldNick lowercaseString]];
+            /*[[_displayNames objectForKey:@(cid)] removeObjectForKey:[oldNick lowercaseString]];
             if(user.display_name.length && ![user.display_name isEqualToString:user.nick]) {
                 [[_displayNames objectForKey:@(cid)] setObject:user.display_name forKey:[nick lowercaseString]];
-            }
+            }*/
         }
     }
 }
@@ -280,14 +290,14 @@
                 }
             }
         }
-        if([displayName isKindOfClass:NSString.class] && ![displayName isEqualToString:nick]) {
+        /*if([displayName isKindOfClass:NSString.class] && ![displayName isEqualToString:nick]) {
             NSMutableDictionary *displaynames = [_displayNames objectForKey:@(cid)];
             if(!displaynames) {
                 displaynames = [[NSMutableDictionary alloc] init];
                 [_displayNames setObject:displaynames forKey:@(cid)];
             }
             [displaynames setObject:displayName forKey:nick.lowercaseString];
-        }
+        }*/
     }
 }
 
