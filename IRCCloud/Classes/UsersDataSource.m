@@ -39,7 +39,7 @@
 }
 
 -(NSString *)display_name {
-    if(_display_name.length)
+    if([_display_name isKindOfClass:NSString.class] &&_display_name.length)
         return _display_name;
     else
         return _nick;
@@ -271,18 +271,22 @@
             for(User *u in d.allValues) {
                 if(u.cid == cid && [u.nick isEqualToString:nick]) {
                     [[_users objectForKey:@(u.bid)] removeObjectForKey:u.lowercase_nick];
-                    u.display_name = displayName;
-                    [[_users objectForKey:@(u.bid)] setObject:u forKey:u.lowercase_nick];
+                    if([displayName isKindOfClass:NSString.class]) {
+                        u.display_name = displayName;
+                        [[_users objectForKey:@(u.bid)] setObject:u forKey:u.lowercase_nick];
+                    }
                     break;
                 }
             }
         }
-        NSMutableDictionary *displaynames = [_displayNames objectForKey:@(cid)];
-        if(!displaynames) {
-            displaynames = [[NSMutableDictionary alloc] init];
-            [_displayNames setObject:displaynames forKey:@(cid)];
+        if([displayName isKindOfClass:NSString.class]) {
+            NSMutableDictionary *displaynames = [_displayNames objectForKey:@(cid)];
+            if(!displaynames) {
+                displaynames = [[NSMutableDictionary alloc] init];
+                [_displayNames setObject:displaynames forKey:@(cid)];
+            }
+            [displaynames setObject:displayName forKey:nick.lowercaseString];
         }
-        [displaynames setObject:displayName forKey:nick.lowercaseString];
     }
 }
 
