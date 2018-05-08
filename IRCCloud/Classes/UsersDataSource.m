@@ -257,8 +257,8 @@
             user.old_nick = oldNick;
             [[_users objectForKey:@(bid)] removeObjectForKey:[oldNick lowercaseString]];
             [[_users objectForKey:@(bid)] setObject:user forKey:[nick lowercaseString]];
-            if(user.display_name.length) {
-                [[_displayNames objectForKey:@(cid)] removeObjectForKey:[oldNick lowercaseString]];
+            [[_displayNames objectForKey:@(cid)] removeObjectForKey:[oldNick lowercaseString]];
+            if(user.display_name.length && ![user.display_name isEqualToString:user.nick]) {
                 [[_displayNames objectForKey:@(cid)] setObject:user.display_name forKey:[nick lowercaseString]];
             }
         }
@@ -279,7 +279,7 @@
                 }
             }
         }
-        if([displayName isKindOfClass:NSString.class]) {
+        if([displayName isKindOfClass:NSString.class] && ![displayName isEqualToString:nick]) {
             NSMutableDictionary *displaynames = [_displayNames objectForKey:@(cid)];
             if(!displaynames) {
                 displaynames = [[NSMutableDictionary alloc] init];
