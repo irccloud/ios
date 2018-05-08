@@ -292,6 +292,11 @@ NSArray *_sortedChannels;
     return self;
 }
 
+-(void)dealloc {
+    AudioServicesDisposeSystemSoundID(alertSound);
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 - (void)_themeChanged {
     if(![_currentTheme isEqualToString:[UIColor currentTheme]]) {
         _currentTheme = [UIColor currentTheme];
