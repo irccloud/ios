@@ -75,11 +75,6 @@
     [self refresh];
 }
 
-- (void)viewDidUnload {
-    [super viewDidUnload];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
 -(void)refresh {
     servers = [[ServersDataSource sharedInstance] getServers].mutableCopy;
     [self.tableView reloadData];

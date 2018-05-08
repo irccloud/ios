@@ -742,12 +742,6 @@ NSArray *_sortedChannels;
     }
 }
 
-- (void)viewDidUnload {
-    [super viewDidUnload];
-    AudioServicesDisposeSystemSoundID(alertSound);
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
 - (void)_updateUnreadIndicator {
     @synchronized(_buffer) {
         int unreadCount = 0;
@@ -3061,10 +3055,6 @@ NSArray *_sortedChannels;
         }
     }
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
-}
-
--(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
-    return YES;
 }
 
 -(void)statusBarFrameWillChange:(NSNotification *)n {

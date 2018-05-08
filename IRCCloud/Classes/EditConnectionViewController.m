@@ -107,10 +107,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }
 
--(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
-    return YES;
-}
-
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -493,10 +489,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }
 
--(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
-    return YES;
-}
-
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
     if(touch.view.tag == 1) {
         [[NetworkConnection sharedInstance] resendVerifyEmailWithHandler:^(IRCCloudJSONObject *result) {
@@ -669,10 +661,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
         unverified.frame = CGRectMake(0,0,self.tableView.bounds.size.width,size.height + 12);
         self.tableView.tableHeaderView = unverified;
     }
-}
-
--(void)finalize {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView {

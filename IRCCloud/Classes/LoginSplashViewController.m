@@ -837,8 +837,4 @@
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskPortrait:UIInterfaceOrientationMaskAll;
 }
 
--(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
-    return orientation == UIInterfaceOrientationPortrait || [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPhone;
-}
-
 @end

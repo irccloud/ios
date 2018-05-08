@@ -69,11 +69,17 @@
              ];
 }
 
--(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
-    int margin = UIInterfaceOrientationIsLandscape(toInterfaceOrientation)?YTMARGIN:0;
-    CGFloat width = self.view.bounds.size.width - margin;
-    CGFloat height = (width / 16.0f) * 9.0f;
-    _player.frame = CGRectMake(margin/2, (self.view.bounds.size.height - height) / 2.0f, width, height);
+-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        int margin = (size.width > size.height)?YTMARGIN:0;
+        CGFloat width = self.view.bounds.size.width - margin;
+        CGFloat height = (width / 16.0f) * 9.0f;
+        _player.frame = CGRectMake(margin/2, (self.view.bounds.size.height - height) / 2.0f, width, height);
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        
+    }
+    ];
 }
 
 - (void)viewDidLoad {

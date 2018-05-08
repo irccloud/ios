@@ -83,10 +83,6 @@
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }
 
--(BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation {
-    return YES;
-}
-
 -(UIView *)viewForZoomingInScrollView:(UIScrollView *)inScroll {
     return _imageView;
 }
@@ -408,11 +404,6 @@
     
     if(_previewing)
         _toolbar.hidden = YES;
-}
-
--(void)viewDidUnload {
-    [super viewDidUnload];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {

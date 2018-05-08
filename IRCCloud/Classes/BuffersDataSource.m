@@ -397,8 +397,4 @@ NSString *__DEFAULT_CHANTYPES__;
         }
     }
 }
-
--(void)finalize {
-    NSLog(@"BuffersDataSource: HALP! I'm being garbage collected!");
-}
 @end

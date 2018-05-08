@@ -101,8 +101,13 @@
 
 @implementation UsersTableView
 
--(void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    [self.tableView reloadData];
+-(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+        [self.tableView reloadData];
+    }
+     ];
 }
 
 - (void)handleEvent:(NSNotification *)notification {
@@ -335,12 +340,6 @@
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [self refresh];
-    _refreshTimer = nil;
-}
-
-- (void)viewDidUnload {
-    [super viewDidUnload];
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
     _refreshTimer = nil;
 }
 
