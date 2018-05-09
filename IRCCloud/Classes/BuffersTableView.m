@@ -337,14 +337,14 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                      @"type":@(type),
                      @"cid":@(buffer.cid),
                      @"bid":@(buffer.bid),
-                     @"name":buffer.displayName,
+                     @"name":buffer.displayName?buffer.displayName:buffer.name,
                      @"unread":@(unread),
                      @"highlights":@(highlights),
                      @"archived":@0,
                      @"joined":@(joined),
                      @"key":@(key),
                      @"timeout":@(buffer.timeout),
-                     @"hint":buffer.accessibilityValue,
+                     @"hint":buffer.accessibilityValue?buffer.accessibilityValue:@"",
                      @"status":server.status
                      }];
                     if(unread > 0 && firstUnreadPosition == -1)
@@ -391,11 +391,11 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
                              @"type":@(type),
                              @"cid":@(buffer.cid),
                              @"bid":@(buffer.bid),
-                             @"name":buffer.name,
+                             @"name":buffer.displayName?buffer.displayName:buffer.name,
                              @"unread":@0,
                              @"highlights":@0,
                              @"archived":@1,
-                             @"hint":buffer.accessibilityValue,
+                             @"hint":buffer.accessibilityValue?buffer.accessibilityValue:@"",
                              @"key":@0,
                              }];
                             if(buffer.bid == _selectedBuffer.bid)
