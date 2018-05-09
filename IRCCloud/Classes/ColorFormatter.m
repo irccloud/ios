@@ -2438,7 +2438,7 @@ extern BOOL __compact;
                 if(start > 0 && [output.string characterAtIndex:start-1] == '@') {
                     if([mentionData objectForKey:nick])
                         name = [[mentionData objectForKey:nick] objectForKey:@"display_name"];
-                    else
+                    else if(server.isSlack)
                         name = [[UsersDataSource sharedInstance] getDisplayName:nick cid:server.cid];
                 }
                 [output replaceCharactersInRange:NSMakeRange(start, length) withString:name];
