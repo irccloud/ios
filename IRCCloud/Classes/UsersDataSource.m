@@ -206,6 +206,8 @@
     @synchronized(_users) {
         for(NSDictionary *buffer in _users.allValues) {
             for(User *u in buffer.allValues) {
+                if(u && u.cid != cid)
+                    break;
                 if(u && u.cid == cid && [u.nick isEqualToString:nick] && u.display_name.length)
                     return u.display_name;
             }
