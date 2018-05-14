@@ -2442,7 +2442,7 @@ extern BOOL __compact;
                         name = [[UsersDataSource sharedInstance] getDisplayName:nick cid:server.cid];
                 }
                 [output replaceCharactersInRange:NSMakeRange(start, length) withString:name];
-                if(colorizeMentions && ![nick isEqualToString:server.nick]) {
+                if(colorizeMentions && ![nick.lowercaseString isEqualToString:server.nick.lowercaseString]) {
                     [output addAttribute:NSForegroundColorAttributeName value:[UIColor colorFromHexString:[UIColor colorForNick:nick]] range:NSMakeRange(start, name.length)];
                 } else {
                     [output addAttribute:NSForegroundColorAttributeName value:[UIColor collapsedRowNickColor] range:NSMakeRange(start, name.length)];
