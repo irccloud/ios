@@ -1028,15 +1028,17 @@ extern UIImage *__socketClosedBackgroundImage;
                             if(start > 0) {
                                 Event *e = [event copy];
                                 e.eid = event.eid + ++event.childEventCount;
-                                e.formattedMsg = lastChunk;
+                                e.msg = e.formattedMsg = lastChunk;
                                 if(!__disableCodeSpanPref)
-                                    e.formattedMsg = [e.formattedMsg insertCodeSpans];
+                                    e.msg = e.formattedMsg = [e.formattedMsg insertCodeSpans];
                                 e.timestamp = @"";
                                 e.parent = event.eid;
                                 e.isHeader = NO;
+                                e.entities = nil;
                                 [self _addItem:e eid:e.eid];
                             } else {
                                 eventMsg = lastChunk;
+                                event.entities = nil;
                             }
                             if(result.range.location == 0 && !__chatOneLinePref) {
                                 eventMsg = [msg substringWithRange:NSMakeRange(3, result.range.length - 6)];
@@ -1046,13 +1048,14 @@ extern UIImage *__socketClosedBackgroundImage;
                             } else {
                                 Event *e = [event copy];
                                 e.eid = event.eid + ++event.childEventCount;
-                                e.formattedMsg = [msg substringWithRange:NSMakeRange(result.range.location + 3, result.range.length - 6)];
+                                e.msg = e.formattedMsg = [msg substringWithRange:NSMakeRange(result.range.location + 3, result.range.length - 6)];
                                 e.timestamp = @"";
                                 e.parent = event.eid;
                                 e.isCodeBlock = YES;
                                 e.isHeader = NO;
                                 e.color = [UIColor codeSpanForegroundColor];
                                 e.monospace = YES;
+                                e.entities = nil;
                                 [self _addItem:e eid:e.eid];
                             }
                             start = result.range.location + result.range.length;
@@ -1060,7 +1063,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         if(start < msg.length) {
                             Event *e = [event copy];
                             e.eid = event.eid + ++event.childEventCount;
-                            e.formattedMsg = [msg substringWithRange:NSMakeRange(start, msg.length - start)];
+                            e.msg = e.formattedMsg = [msg substringWithRange:NSMakeRange(start, msg.length - start)];
                             if([e.formattedMsg hasPrefix:@" "] && e.formattedMsg.length > 1)
                                 e.formattedMsg = [e.formattedMsg substringFromIndex:1];
                             if(!__disableCodeSpanPref)
@@ -1068,6 +1071,7 @@ extern UIImage *__socketClosedBackgroundImage;
                             e.timestamp = @"";
                             e.parent = event.eid;
                             e.isHeader = NO;
+                            e.entities = nil;
                             if(e.formattedMsg.length)
                                 [self _addItem:e eid:e.eid];
                         }
