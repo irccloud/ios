@@ -2440,7 +2440,11 @@ extern BOOL __compact;
                         name = [[mentionData objectForKey:nick] objectForKey:@"display_name"];
                     else if(server.isSlack)
                         name = [[UsersDataSource sharedInstance] getDisplayName:nick cid:server.cid];
+                    if(!name)
+                        name = nick;
                 }
+                if(!name)
+                    continue;
                 [output replaceCharactersInRange:NSMakeRange(start, length) withString:name];
                 if(colorizeMentions && ![nick.lowercaseString isEqualToString:server.nick.lowercaseString]) {
                     [output addAttribute:NSForegroundColorAttributeName value:[UIColor colorFromHexString:[UIColor colorForNick:nick]] range:NSMakeRange(start, name.length)];
