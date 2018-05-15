@@ -1971,16 +1971,23 @@ extern BOOL __compact;
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", [input stringByReplacingOccurrencesOfString:@"  " withString:@"\u00A0 "], CLEAR];
     
     if(mentions) {
+        NSLog(@"offset: %li m: %@", (long)mentionOffset, m);
+        
         for(NSString *key in mentions.allKeys) {
             NSArray *mention = [mentions objectForKey:key];
             NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
             for(NSArray *old_position in mention) {
                 NSMutableArray *position = old_position.mutableCopy;
-                [position setObject:@([[position objectAtIndex:0] intValue] + mentionOffset) atIndexedSubscript:0];
-                [text replaceCharactersInRange:NSMakeRange([[position objectAtIndex:0] intValue], [[position objectAtIndex:1] intValue]) withString:[@"" stringByPaddingToLength:[[position objectAtIndex:1] intValue] withString:@"A" startingAtIndex:0]];
-                [new_mention addObject:position];
+                if([[position objectAtIndex:0] intValue] + mentionOffset >= 0 && [[position objectAtIndex:0] intValue] + mentionOffset + [[position objectAtIndex:1] intValue] < input.length) {
+                    [position setObject:@([[position objectAtIndex:0] intValue] + mentionOffset) atIndexedSubscript:0];
+                    [text replaceCharactersInRange:NSMakeRange([[position objectAtIndex:0] intValue], [[position objectAtIndex:1] intValue]) withString:[@"" stringByPaddingToLength:[[position objectAtIndex:1] intValue] withString:@"A" startingAtIndex:0]];
+                    [new_mention addObject:position];
+                }
             }
-            [mentions setObject:new_mention forKey:key];
+            if(new_mention.count)
+                [mentions setObject:new_mention forKey:key];
+            else
+                [mentions removeObjectForKey:key];
         }
     }
     

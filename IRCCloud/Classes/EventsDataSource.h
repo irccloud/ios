@@ -100,6 +100,7 @@
     NSString *_msgid;
     BOOL _isReply;
     int _replyCount;
+    NSInteger _mentionOffset;
     NSMutableSet *_replyNicks;
 }
 @property (nonatomic, assign) int cid, bid, rowType, reqId, childEventCount, replyCount;
@@ -113,7 +114,7 @@
 @property (nonatomic, strong) NSArray *links, *realnameLinks;
 @property (nonatomic, strong) NSMutableSet *replyNicks;
 @property (nonatomic, strong) NSTimer *expirationTimer;
-@property (nonatomic, assign) NSInteger row;
+@property (nonatomic, assign) NSInteger row, mentionOffset;
 -(NSComparisonResult)compare:(Event *)aEvent;
 -(BOOL)isImportant:(NSString *)bufferType;
 -(BOOL)isMessage;

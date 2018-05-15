@@ -978,6 +978,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     msg = [msg insertCodeSpans];
                 event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.nick], msg];
                 event.rowType = ROW_ME_MESSAGE;
+                event.mentionOffset = event.formattedMsg.length - event.msg.length;
             } else if([type isEqualToString:@"notice"] || [type isEqualToString:@"buffer_msg"]) {
                 event.isCodeBlock = NO;
                 if(event.rowType == ROW_FAILED)
@@ -1002,6 +1003,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 else
                     event.formattedMsg = @"";
                 
+                event.mentionOffset = event.formattedMsg.length;
+                
                 NSString *eventMsg = event.msg;
 
                 if(!__disableCodeBlockPref && eventMsg) {
@@ -1023,8 +1026,11 @@ extern UIImage *__socketClosedBackgroundImage;
                             NSString *lastChunk = @"";
                             if(result.range.location)
                                 lastChunk = [msg substringWithRange:NSMakeRange(start, result.range.location - start)];
-                            if([lastChunk hasPrefix:@" "] && lastChunk.length > 1)
+                            BOOL strippedSpace = NO;
+                            if([lastChunk hasPrefix:@" "] && lastChunk.length > 1) {
                                 lastChunk = [lastChunk substringFromIndex:1];
+                                strippedSpace = YES;
+                            }
                             if(start > 0) {
                                 Event *e = [event copy];
                                 e.eid = event.eid + ++event.childEventCount;
@@ -1034,11 +1040,12 @@ extern UIImage *__socketClosedBackgroundImage;
                                 e.timestamp = @"";
                                 e.parent = event.eid;
                                 e.isHeader = NO;
-                                e.entities = nil;
+                                e.mentionOffset = -start;
+                                if(strippedSpace)
+                                    e.mentionOffset--;
                                 [self _addItem:e eid:e.eid];
                             } else {
                                 eventMsg = lastChunk;
-                                event.entities = nil;
                             }
                             if(result.range.location == 0 && !__chatOneLinePref) {
                                 eventMsg = [msg substringWithRange:NSMakeRange(3, result.range.length - 6)];
@@ -1064,14 +1071,16 @@ extern UIImage *__socketClosedBackgroundImage;
                             Event *e = [event copy];
                             e.eid = event.eid + ++event.childEventCount;
                             e.msg = e.formattedMsg = [msg substringWithRange:NSMakeRange(start, msg.length - start)];
-                            if([e.formattedMsg hasPrefix:@" "] && e.formattedMsg.length > 1)
+                            e.mentionOffset = -start;
+                            if([e.formattedMsg hasPrefix:@" "] && e.formattedMsg.length > 1) {
                                 e.formattedMsg = [e.formattedMsg substringFromIndex:1];
+                                e.mentionOffset--;
+                            }
                             if(!__disableCodeSpanPref)
                                 e.formattedMsg = [e.formattedMsg insertCodeSpans];
                             e.timestamp = @"";
                             e.parent = event.eid;
                             e.isHeader = NO;
-                            e.entities = nil;
                             if(e.formattedMsg.length)
                                 [self _addItem:e eid:e.eid];
                         }
@@ -1103,7 +1112,9 @@ extern UIImage *__socketClosedBackgroundImage;
                         [self _addItem:e1 eid:e1.eid];
                         event.formattedMsg = [_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from];
                     } else {
+                        NSInteger oldLength = event.formattedMsg.length;
                         event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from], event.formattedMsg];
+                        event.mentionOffset += event.formattedMsg.length - oldLength;
                     }
                 }
             } else if([type isEqualToString:@"kicked_channel"]) {
@@ -1142,7 +1153,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
             }
         }
-        
+
         if(event.msgid)
             [_msgids setObject:event forKey:event.msgid];
         if(event.reply) {
@@ -2147,7 +2158,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if(e.rowType == ROW_FAILED || (e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0))
             formattedMsg = [NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg];
 
-        e.formatted = [ColorFormatter format:formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref mentionOffset:formattedMsg.length - e.msg.length mentionData:[e.entities objectForKey:@"mention_data"]];
+        e.formatted = [ColorFormatter format:formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref mentionOffset:e.mentionOffset + (formattedMsg.length - e.formattedMsg.length) mentionData:[e.entities objectForKey:@"mention_data"]];
 
         if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
             NSMutableArray *mutableLinks = links.mutableCopy;
