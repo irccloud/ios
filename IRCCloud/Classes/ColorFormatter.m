@@ -1971,8 +1971,6 @@ extern BOOL __compact;
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", [input stringByReplacingOccurrencesOfString:@"  " withString:@"\u00A0 "], CLEAR];
     
     if(mentions) {
-        NSLog(@"offset: %li m: %@", (long)mentionOffset, m);
-        
         for(NSString *key in mentions.allKeys) {
             NSArray *mention = [mentions objectForKey:key];
             NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
