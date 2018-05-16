@@ -236,7 +236,7 @@
                 NSString *ident = [_hostmask substringToIndex:[_hostmask rangeOfString:@"@"].location];
                 if([ident hasPrefix:@"uid"] || [ident hasPrefix:@"sid"]) {
                     ident = [ident substringFromIndex:3];
-                    if([ident intValue]) {
+                    if(ident.length && [ident intValue]) {
                         _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarRedirectURITemplate relativeStringWithVariables:@{@"id":ident, @"modifiers":[NSString stringWithFormat:@"s%i", size]} error:nil]];
                         if([[ImageCache sharedInstance] isValidURL:_cachedAvatarURL])
                             isIRCCloudAvatar = YES;
