@@ -1940,6 +1940,21 @@ extern BOOL __compact;
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links {
     return [self format:input defaultColor:color mono:mono linkify:linkify server:server links:links largeEmoji:NO mentions:nil colorizeMentions:NO mentionOffset:0 mentionData:nil];
 }
++(void)_offsetMentions:(NSMutableDictionary *)mentions start:(NSInteger)start offset:(NSInteger)offset {
+    for(NSString *key in mentions.allKeys) {
+        NSArray *mention = [mentions objectForKey:key];
+        NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
+        for(NSArray *position in mention) {
+            if([[position objectAtIndex:0] intValue] > start) {
+                [new_mention addObject:@[@([[position objectAtIndex:0] intValue] - offset),
+                                         @([[position objectAtIndex:1] intValue])]];
+            } else {
+                [new_mention addObject:position];
+            }
+        }
+        [mentions setObject:new_mention forKey:key];
+    }
+}
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)m colorizeMentions:(BOOL)colorizeMentions mentionOffset:(NSInteger)mentionOffset mentionData:(NSDictionary *)mentionData {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, mono = -1, strike = -1;
     UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil, *oldBgColor = nil;
@@ -1991,7 +2006,23 @@ extern BOOL __compact;
     
     BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
     if(!disableConvert) {
-        [self emojify:text];
+        NSInteger offset = 0;
+        NSArray *results = [[self emoji] matchesInString:[text lowercaseString] options:0 range:NSMakeRange(0, text.length)];
+        for(NSTextCheckingResult *result in results) {
+            for(int i = 1; i < result.numberOfRanges; i++) {
+                NSRange range = [result rangeAtIndex:i];
+                range.location -= offset;
+                NSString *token = [text substringWithRange:range];
+                if([emojiMap objectForKey:token.lowercaseString]) {
+                    NSString *emoji = [emojiMap objectForKey:token.lowercaseString];
+                    [text replaceCharactersInRange:NSMakeRange(range.location - 1, range.length + 2) withString:emoji];
+                    offset += range.length - emoji.length + 2;
+                    if(mentions) {
+                        [self _offsetMentions:mentions start:range.location offset:range.length - emoji.length + 2];
+                    }
+                }
+            }
+        }
     }
     
     NSUInteger oldLength = 0;
@@ -1999,19 +2030,7 @@ extern BOOL __compact;
         if(oldLength) {
             NSInteger delta = oldLength - text.length;
             if(mentions && delta) {
-                for(NSString *key in mentions.allKeys) {
-                    NSArray *mention = [mentions objectForKey:key];
-                    NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
-                    for(NSArray *position in mention) {
-                        if([[position objectAtIndex:0] intValue] > i) {
-                            [new_mention addObject:@[@([[position objectAtIndex:0] intValue] - delta),
-                                                     @([[position objectAtIndex:1] intValue])]];
-                        } else {
-                            [new_mention addObject:position];
-                        }
-                    }
-                    [mentions setObject:new_mention forKey:key];
-                }
+                [self _offsetMentions:mentions start:i offset:delta];
             }
         }
         oldLength = text.length;
