@@ -1921,6 +1921,10 @@ extern BOOL __compact;
 }
 
 +(void)emojify:(NSMutableString *)text {
+    [self _emojify:text mentions:nil];
+}
+
++(void)_emojify:(NSMutableString *)text mentions:(NSMutableDictionary *)mentions {
     NSInteger offset = 0;
     NSArray *results = [[self emoji] matchesInString:[text lowercaseString] options:0 range:NSMakeRange(0, text.length)];
     for(NSTextCheckingResult *result in results) {
@@ -1932,6 +1936,9 @@ extern BOOL __compact;
                 NSString *emoji = [emojiMap objectForKey:token.lowercaseString];
                 [text replaceCharactersInRange:NSMakeRange(range.location - 1, range.length + 2) withString:emoji];
                 offset += range.length - emoji.length + 2;
+                if(mentions) {
+                    [self _offsetMentions:mentions start:range.location offset:range.length - emoji.length + 2];
+                }
             }
         }
     }
@@ -2006,23 +2013,7 @@ extern BOOL __compact;
     
     BOOL disableConvert = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"emoji-disableconvert"] boolValue];
     if(!disableConvert) {
-        NSInteger offset = 0;
-        NSArray *results = [[self emoji] matchesInString:[text lowercaseString] options:0 range:NSMakeRange(0, text.length)];
-        for(NSTextCheckingResult *result in results) {
-            for(int i = 1; i < result.numberOfRanges; i++) {
-                NSRange range = [result rangeAtIndex:i];
-                range.location -= offset;
-                NSString *token = [text substringWithRange:range];
-                if([emojiMap objectForKey:token.lowercaseString]) {
-                    NSString *emoji = [emojiMap objectForKey:token.lowercaseString];
-                    [text replaceCharactersInRange:NSMakeRange(range.location - 1, range.length + 2) withString:emoji];
-                    offset += range.length - emoji.length + 2;
-                    if(mentions) {
-                        [self _offsetMentions:mentions start:range.location offset:range.length - emoji.length + 2];
-                    }
-                }
-            }
-        }
+        [self _emojify:text mentions:mentions];
     }
     
     NSUInteger oldLength = 0;
