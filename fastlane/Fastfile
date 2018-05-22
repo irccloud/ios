@@ -55,12 +55,12 @@ platform :ios do
         ipa = "IRCEnterprise.ipa"
         scheme = "IRCCloud Enterprise"
         bundle_id = "com.irccloud.enterprise"
-        profile_root = "AppStore-Enterprise"
+        profile_root = "App Store Enterprise"
     else
         ipa = "IRCCloud.ipa"
         scheme = "IRCCloud"
         bundle_id = "com.irccloud.IRCCloud"
-        profile_root = "AppStore"
+        profile_root = "App Store"
     end
     
     # Set a build number manually if provided
@@ -79,8 +79,8 @@ platform :ios do
         method: "app-store",
         provisioningProfiles: {
           "#{bundle_id}" => "#{profile_root}",
-          "#{bundle_id}.ShareExtension" => "#{profile_root}-ShareExtension",
-          "#{bundle_id}.NotificationService" => "#{profile_root}-NotificationService",
+          "#{bundle_id}.ShareExtension" => "#{profile_root} ShareExtension",
+          "#{bundle_id}.NotificationService" => "#{profile_root} NotificationService",
         }
       }
     )
