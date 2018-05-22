@@ -3171,7 +3171,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "AppStore-ShareExtension";
+				PROVISIONING_PROFILE_SPECIFIER = "App Store ShareExtension";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -3282,7 +3282,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "AppStore-NotificationService";
+				PROVISIONING_PROFILE_SPECIFIER = "App Store NotificationService";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -3393,7 +3393,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "AppStore-Enterprise-NotificationService";
+				PROVISIONING_PROFILE_SPECIFIER = "App Store Enterprise NotificationService";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -3917,7 +3917,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
-				PROVISIONING_PROFILE_SPECIFIER = "AppStore-Enterprise-ShareExtension";
+				PROVISIONING_PROFILE_SPECIFIER = "App Store Enterprise ShareExtension";
 				SKIP_INSTALL = YES;
 			};
 			name = AppStore;
@@ -4008,7 +4008,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = AppStore;
+				PROVISIONING_PROFILE_SPECIFIER = "App Store";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
@@ -4040,7 +4040,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
-				PROVISIONING_PROFILE_SPECIFIER = "AppStore-Enterprise";
+				PROVISIONING_PROFILE_SPECIFIER = "App Store Enterprise";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
