@@ -1,36 +1,8 @@
-This is a quick bug/crash fix release, previous release notes after this list
-
-• Choosing an emoji from the suggestions list no longer creates a @mention on Slack connections
-• Double-tapping to zoom an image should now work properly on small images
-• Uploading an image should no longer send the URL multiple times
-• Fixed an issue that could cause the app to disconnect unexpectedly if a nick on your ignore list sends a PM
-
----
-
-It's been a while! We've got quite a few fixes in this version as well as a new feature we're trying out.
-
-Public Avatars
-
-You can now choose an image to use as a public avatar visible to other IRCCloud users. Take a photo or choose a picture from your account settings screen and make sure you have both the "User icons" and "Avatars" settings enabled in the "Message Layout" settings.
-
-Faces can make IRC a friendlier place, but feel free to just use a picture of your dog or favourite eldritch symbol if you prefer!
-
-Fixes and improvements
-
-• Improved support for connecting to Slack IRC gateways, including support for multi-person DMs and Slack-style mentions
-• Channel URLs are now visible in the Channel Info dialog
-• Support for Unicode 10 :emocode:s
-• Added a new setting to remember the IRC color after sending messages
-• Embedded imgur and instagram descriptions are now auto-linkified
-• Conversations and channels you’ve left can now be renamed
-• Adjusted the spacing between nicks and mode symbols when using the monospace font
-• Fixed: The backspace key should work correctly while editing a channel topic
-• Fixed: Messages could overlap and thumbnails could have a large empty space below them
-• Fixed: The app could hang when displaying certain emoji combinations
-• Fixed: The scroll position should no longer jump when loading thumbnails
-• Fixed: The in-call / tethering banner should display correct on iOS 11
-• Fixed: The bottom unread indicator no longer covers the last channel in the sidebar
-• Fixed: The text input field should no longer unexpectedly clear when resuming the app
-• Fixed: The unread messages bar has the correct background color on the Dawn theme
-• Fixed: The youtube player now releases the Control Center media controls after playback ends
+• Added support for reply threads on team servers and Slack workspaces
+• Added an option to colourise mentions
+• Added gravatar support as a fallback for users with an email address in their realname
+• Channel suggestions no longer insert an @ on Slack connections
+• Fixed per-channel collapse join/part/quit setting
+• Fixed pasting images from the clipboard
+• Removed gap between text area and software keyboard on iPhone X
 • Stability improvements and minor fixes
