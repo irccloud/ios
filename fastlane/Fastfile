@@ -11,7 +11,7 @@
 
 # This is the minimum version number required.
 # Update this, if you use features of a newer version
-fastlane_version "2.58.0"
+fastlane_version "2.96.0"
 
 default_platform :ios
 
@@ -136,7 +136,7 @@ platform :ios do
 
   desc "Upload metadata"
   lane :metadata do |options|
-    require 'json'
+    fastlane_require 'json'
     review_info = JSON.parse(File.read('review_info.json'))
     review_info['notes'] = File.read('metadata/review_notes.txt')
 
