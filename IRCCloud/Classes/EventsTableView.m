@@ -943,11 +943,13 @@ extern UIImage *__socketClosedBackgroundImage;
         } else {
             _currentCollapsedEid = -1;
             _lastCollapsedEid = -1;
+            event.mentionOffset = 0;
             [_collapsedEvents clear];
             
             if(!event.formatted.length || !event.formattedMsg.length) {
                 if((__chatOneLinePref || ![event isMessage]) && [event.from length] && event.rowType != ROW_THUMBNAIL && event.rowType != ROW_FILE) {
                     event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43" displayName:event.from], event.msg];
+                    event.mentionOffset = event.formattedMsg.length - event.msg.length;
                 } else {
                     event.formattedMsg = event.msg;
                 }
@@ -1151,6 +1153,9 @@ extern UIImage *__socketClosedBackgroundImage;
                         from = [from stringByAppendingFormat:@"%@ ",event.server];
                     event.formattedMsg = [NSString stringWithFormat:@"%@%@", from, event.msg];
                 }
+            } else if([type isEqualToString:@"channel_topic"]) {
+                if([event.msg hasPrefix:@"set the topic: "])
+                    event.mentionOffset += 15;
             }
         }
 
