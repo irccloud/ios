@@ -2468,19 +2468,7 @@ extern BOOL __compact;
                 }
                 NSInteger delta = nick.length - name.length;
                 if(delta) {
-                    for(NSString *key in mentions.allKeys) {
-                        NSArray *mention = [mentions objectForKey:key];
-                        NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
-                        for(NSArray *position in mention) {
-                            if([[position objectAtIndex:0] intValue] > start) {
-                                [new_mention addObject:@[@([[position objectAtIndex:0] intValue] - delta),
-                                                         @([[position objectAtIndex:1] intValue])]];
-                            } else {
-                                [new_mention addObject:position];
-                            }
-                        }
-                        [mentions setObject:new_mention forKey:key];
-                    }
+                    [self _offsetMentions:mentions start:start offset:delta];
                 }
             }
         }
