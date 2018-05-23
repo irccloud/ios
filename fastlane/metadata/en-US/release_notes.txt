@@ -1,3 +1,4 @@
+• This release fixes some crashes from 4.3
 • Added support for reply threads on team servers and Slack workspaces
 • Added an option to colourise mentions
 • Added gravatar support as a fallback for users with an email address in their realname

@@ -1,3 +1,4 @@
+• This release fixes some crashes from 4.3
 • Added an option to colourise mentions
 • Fixed per-channel collapse join/part/quit setting
 • Fixed pasting images from the clipboard
