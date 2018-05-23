@@ -2458,7 +2458,7 @@ extern BOOL __compact;
                     if(!name)
                         name = nick;
                 }
-                if(!name)
+                if(!name || start < 0 || start + length >= output.length)
                     continue;
                 [output replaceCharactersInRange:NSMakeRange(start, length) withString:name];
                 if(colorizeMentions && ![nick.lowercaseString isEqualToString:server.nick.lowercaseString]) {
