@@ -2040,9 +2040,11 @@ NSArray *_sortedChannels;
             NSAttributedString *messageText = _message.attributedText;
             if([[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"]) {
                 [self resetColors:nil];
-                _message.internalTextView.font = _defaultTextareaFont;
-                _message.internalTextView.textColor = [UIColor textareaTextColor];
-                _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
+                if(_defaultTextareaFont) {
+                    _message.internalTextView.font = _defaultTextareaFont;
+                    _message.internalTextView.textColor = [UIColor textareaTextColor];
+                    _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
+                }
             }
             
             if(messageText.length > 1 && [messageText.string hasSuffix:@" "])
@@ -2760,9 +2762,11 @@ NSArray *_sortedChannels;
     if(changed) {
         [self resetColors:nil];
         _msgid = _eventsView.msgid = nil;
-        _message.internalTextView.font = _defaultTextareaFont;
-        _message.internalTextView.textColor = [UIColor textareaTextColor];
-        _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
+        if(_defaultTextareaFont) {
+            _message.internalTextView.font = _defaultTextareaFont;
+            _message.internalTextView.textColor = [UIColor textareaTextColor];
+            _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
+        }
     }
     
     Buffer *lastBuffer = _buffer;
