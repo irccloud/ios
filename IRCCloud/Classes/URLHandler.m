@@ -191,7 +191,7 @@
                 [self _loadImgur:[imageID substringFromIndex:8] type:@"gallery" result:callback original_url:url];
             } else if([imageID hasPrefix:@"a/"]) {
                 [self _loadImgur:[imageID substringFromIndex:2] type:@"album" result:callback original_url:url];
-            } else if([imageID hasPrefix:@"t/"]) {
+            } else if([imageID hasPrefix:@"t/"] && [[imageID substringFromIndex:2] rangeOfString:@"/"].location != NSNotFound) {
                 [self _loadImgur:[[imageID substringFromIndex:2] substringFromIndex:[[imageID substringFromIndex:2] rangeOfString:@"/"].location] type:@"image" result:callback original_url:url];
             } else {
                 callback(NO, @"Invalid URL");
