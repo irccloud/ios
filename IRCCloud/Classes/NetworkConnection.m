@@ -576,6 +576,10 @@ volatile BOOL __socketPaused = NO;
                            if(![[NSUserDefaults standardUserDefaults] objectForKey:@"avatarImages"])
                                [[NSUserDefaults standardUserDefaults] setObject:[[p objectForKey:@"labs"] objectForKey:@"avatars"] forKey:@"avatarImages"];
                        }
+                       if([p objectForKey:@"hiddenMembers"]) {
+                           if(![[NSUserDefaults standardUserDefaults] objectForKey:@"hiddenMembers"])
+                               [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"hiddenMembers"] forKey:@"hiddenMembers"];
+                       }
                        [[NSUserDefaults standardUserDefaults] synchronize];
                        [_events reformat];
 #endif

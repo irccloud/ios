@@ -570,6 +570,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:_thirdPartyNotificationPreviews.isOn forKey:@"thirdPartyNotificationPreviews"];
         [[NSUserDefaults standardUserDefaults] setBool:_clearFormattingAfterSending.isOn forKey:@"clearFormattingAfterSending"];
         [[NSUserDefaults standardUserDefaults] setBool:_avatarImages.isOn forKey:@"avatarImages"];
+        [[NSUserDefaults standardUserDefaults] setBool:!_hiddenMembers.isOn forKey:@"hiddenMembers"];
 #ifndef APPSTORE
         [[NSUserDefaults standardUserDefaults] setBool:_backgroundUploads.isOn forKey:@"backgroundUploads"];
 #endif
@@ -787,6 +788,7 @@
     [device addObject:@{@"title":@"Preferred Browser", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"], @"selected":^{ [self.navigationController pushViewController:[[BrowserViewController alloc] init] animated:YES]; }}];
     if([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
         [device addObject:@{@"title":@"Show Sidebars In Landscape", @"accessory":_tabletMode}];
+        [device addObject:@{@"title":@"Always show channel members", @"accessory":_hiddenMembers}];
     }
     [device addObject:@{@"title":@"Ask To Post A Snippet", @"accessory":_pastebin}];
     [device addObject:@{@"title":@"Open Images in Browser", @"accessory":_imageViewer}];
@@ -960,6 +962,7 @@
     _avatarImages = [[UISwitch alloc] init];
     _backgroundUploads = [[UISwitch alloc] init];
     _colorizeMentions = [[UISwitch alloc] init];
+    _hiddenMembers = [[UISwitch alloc] init];
 
     _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     _highlights.text = @"";
@@ -1130,6 +1133,12 @@
         _inlineWifiOnly.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"];
     } else {
         _inlineWifiOnly.on = YES;
+    }
+    
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"hiddenMembers"]) {
+        _hiddenMembers.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"hiddenMembers"];
+    } else {
+        _hiddenMembers.on = YES;
     }
     
     if(_oneLine.on) {

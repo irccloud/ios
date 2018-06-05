@@ -3320,7 +3320,7 @@ NSArray *_sortedChannels;
             self.slidingViewController.underRightViewController = nil;
         }
     } else {
-        if(self.view.bounds.size.width > self.view.bounds.size.height && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"]) {
+        if(self.view.bounds.size.width > self.view.bounds.size.height && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && ![[NSUserDefaults standardUserDefaults] boolForKey:@"hiddenMembers"]) {
             if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone]) {
                 if(self.slidingViewController.underRightViewController) {
                     self.slidingViewController.underRightViewController = nil;

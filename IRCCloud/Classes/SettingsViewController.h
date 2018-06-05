@@ -71,6 +71,7 @@
     UISwitch *_avatarImages;
     UISwitch *_backgroundUploads;
     UISwitch *_colorizeMentions;
+    UISwitch *_hiddenMembers;
     NSString *_version;
     UISlider *_fontSize;
     NSString *_oldTheme;
