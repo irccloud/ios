@@ -99,7 +99,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
 @interface EventsTableCell : UITableViewCell {
     IBOutlet UIImageView *_avatar;
-    IBOutlet UILabel *_timestampLeft,*_timestampRight,*_reply;
+    IBOutlet UILabel *_timestampLeft,*_timestampRight,*_reply,*_datestamp;
     IBOutlet LinkLabel *_message;
     IBOutlet LinkLabel *_nickname;
     IBOutlet UIView *_socketClosedBar;
@@ -113,7 +113,7 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet UIControl *_replyButton;
     IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight,*_replyCenter,*_replyXOffset,*_avatarTop;
 }
-@property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID, *reply;
+@property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID, *reply, *datestamp;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
@@ -2158,7 +2158,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         NSString *formattedMsg = e.formattedMsg;
         if(e.rowType == ROW_FAILED || (e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0))
-            formattedMsg = [NSString stringWithFormat:(__monospacePref || e.monospace)?@"   %@":@"     %@",e.formattedMsg];
+            formattedMsg = [NSString stringWithFormat:(__monospacePref || e.monospace)?@"  %@":@"     %@",e.formattedMsg];
 
         e.formatted = [ColorFormatter format:formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref mentionOffset:e.mentionOffset + (formattedMsg.length - e.formattedMsg.length) mentionData:[e.entities objectForKey:@"mention_data"]];
 
@@ -2676,6 +2676,7 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     cell.timestampLeft.hidden = !__timeLeftPref;
     cell.timestampRight.hidden = __timeLeftPref;
+    cell.datestamp.hidden = YES;
     UILabel *timestamp = __timeLeftPref ? cell.timestampLeft : cell.timestampRight;
     if(e.rowType == ROW_LASTSEENEID) {
         timestamp.hidden = YES;
@@ -2693,9 +2694,12 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.lastSeenEIDOffset.constant = 0;
     }
     if(e.rowType == ROW_TIMESTAMP) {
+        timestamp.hidden = YES;
+        timestamp = cell.datestamp;
+        timestamp.hidden = NO;
+        timestamp.text = e.timestamp;
         timestamp.font = [ColorFormatter messageFont:__monospacePref];
         timestamp.textColor = [UIColor messageTextColor];
-        cell.timestampWidth.constant = tableView.bounds.size.width;
     } else if(e.isHighlight && !e.isSelf) {
         timestamp.textColor = [UIColor highlightTimestampColor];
     } else if(e.rowType == ROW_FAILED || [e.bgColor isEqual:[UIColor errorBackgroundColor]]) {
