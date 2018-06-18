@@ -1914,7 +1914,7 @@ extern UIImage *__socketClosedBackgroundImage;
             __timestampWidth += [@":88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
         if(!__24hrPref)
             __timestampWidth += [@" AM" sizeWithAttributes:@{NSFontAttributeName:f}].width;
-        __timestampWidth += 4;
+        __timestampWidth += 8;
         
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
         if(events.count) {
