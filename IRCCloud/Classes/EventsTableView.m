@@ -2158,7 +2158,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         NSString *formattedMsg = e.formattedMsg;
         if(e.rowType == ROW_FAILED || (e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0))
-            formattedMsg = [NSString stringWithFormat:(__monospacePref || e.monospace)?@"  %@":@"     %@",e.formattedMsg];
+            formattedMsg = [NSString stringWithFormat:(__monospacePref || e.monospace)?@"  %@":@"    %@",e.formattedMsg];
 
         e.formatted = [ColorFormatter format:formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref mentionOffset:e.mentionOffset + (formattedMsg.length - e.formattedMsg.length) mentionData:[e.entities objectForKey:@"mention_data"]];
 
@@ -2504,7 +2504,7 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
 
-    cell.avatarTop.constant = (avatarHeight > __smallAvatarHeight)?4:2;
+    cell.avatarTop.constant = (avatarHeight > __smallAvatarHeight || !__compact)?4:2;
     cell.avatarWidth.constant = cell.avatarHeight.constant = avatarHeight;
     
     cell.replyXOffset.constant = __timeLeftPref ? -__timestampWidth : 0;
