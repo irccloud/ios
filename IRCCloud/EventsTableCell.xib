@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14105" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -145,7 +146,6 @@
                     <constraint firstItem="nEj-fz-vAL" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="2" id="O0z-rZ-iSx"/>
                     <constraint firstItem="KgT-oH-O7i" firstAttribute="trailing" secondItem="H2p-sc-9uM" secondAttribute="trailing" id="Q35-43-XyX"/>
                     <constraint firstAttribute="bottom" secondItem="Air-U6-OOz" secondAttribute="bottom" id="RZ7-Q4-bsF"/>
-                    <constraint firstItem="9ZM-5c-yUP" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" id="Rj9-Np-F3K"/>
                     <constraint firstItem="qsr-vg-LVN" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-6" id="RzF-Ou-dcT"/>
                     <constraint firstAttribute="trailing" secondItem="Air-U6-OOz" secondAttribute="trailing" id="S4u-o6-ga1"/>
                     <constraint firstItem="c4u-g2-2uu" firstAttribute="leading" secondItem="V3s-xQ-nVF" secondAttribute="leading" constant="-8" id="SUj-bj-KgZ"/>
@@ -153,12 +153,13 @@
                     <constraint firstItem="qsr-vg-LVN" firstAttribute="height" secondItem="V3s-xQ-nVF" secondAttribute="height" constant="12" id="UbJ-gZ-HMg"/>
                     <constraint firstAttribute="bottom" secondItem="WPz-RI-MPI" secondAttribute="bottom" id="Xxd-3S-pNQ"/>
                     <constraint firstItem="KgT-oH-O7i" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="YGl-z7-rle"/>
+                    <constraint firstItem="9ZM-5c-yUP" firstAttribute="firstBaseline" secondItem="V3s-xQ-nVF" secondAttribute="firstBaseline" id="Yw2-Z2-HwK"/>
                     <constraint firstItem="KgT-oH-O7i" firstAttribute="centerY" secondItem="FYg-pz-vsM" secondAttribute="centerY" id="b8V-19-WU1"/>
                     <constraint firstAttribute="trailing" secondItem="V3s-xQ-nVF" secondAttribute="trailing" constant="66" id="c36-GD-zjI"/>
                     <constraint firstItem="g7o-m6-B7g" firstAttribute="centerY" secondItem="9aa-Ko-5ri" secondAttribute="centerY" priority="1" id="c8G-Dm-16A"/>
-                    <constraint firstItem="fOD-UD-tHL" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" id="duh-LM-VTp"/>
                     <constraint firstAttribute="trailing" secondItem="WPz-RI-MPI" secondAttribute="trailing" id="duw-DR-0En"/>
                     <constraint firstItem="g7o-m6-B7g" firstAttribute="trailing" secondItem="9aa-Ko-5ri" secondAttribute="leading" constant="-4" id="gEz-B6-BGn"/>
+                    <constraint firstItem="fOD-UD-tHL" firstAttribute="firstBaseline" secondItem="V3s-xQ-nVF" secondAttribute="firstBaseline" id="hup-Wf-qD2"/>
                     <constraint firstItem="c4u-g2-2uu" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" id="jtU-1T-0IB"/>
                     <constraint firstItem="9ZM-5c-yUP" firstAttribute="width" secondItem="fOD-UD-tHL" secondAttribute="width" id="lA1-AB-LS1"/>
                     <constraint firstAttribute="trailing" secondItem="9ZM-5c-yUP" secondAttribute="trailing" constant="6" id="mfo-0I-29z"/>
@@ -182,6 +183,7 @@
                 <outlet property="_avatar" destination="9aa-Ko-5ri" id="Pj6-Ze-4N6"/>
                 <outlet property="_avatarHeight" destination="N6m-U7-nrr" id="kVI-in-0LW"/>
                 <outlet property="_avatarOffset" destination="3qd-ta-bgg" id="Hd6-Db-uaE"/>
+                <outlet property="_avatarTop" destination="7aK-3S-iur" id="MaW-Rz-gTQ"/>
                 <outlet property="_avatarWidth" destination="AhO-xV-4Mx" id="JeY-ph-t5R"/>
                 <outlet property="_bottomBorder" destination="Air-U6-OOz" id="mKT-1S-Zyf"/>
                 <outlet property="_codeBlockBackground" destination="qsr-vg-LVN" id="1PD-z8-bhs"/>

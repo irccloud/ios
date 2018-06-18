@@ -111,13 +111,13 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet UIView *_lastSeenEIDBackground;
     IBOutlet UILabel *_lastSeenEID;
     IBOutlet UIControl *_replyButton;
-    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight,*_replyCenter,*_replyXOffset;
+    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight,*_replyCenter,*_replyXOffset,*_avatarTop;
 }
 @property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID, *reply;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
-@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight, *replyCenter, *replyXOffset;
+@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight, *replyCenter, *replyXOffset, *avatarTop;
 @property (readonly) UIControl *replyButton;
 @end
 
@@ -1896,10 +1896,7 @@ extern UIImage *__socketClosedBackgroundImage;
         [_unseenHighlightPositions removeAllObjects];
         _hiddenAvatarRow = -1;
         _stickyAvatar.hidden = YES;
-        __smallAvatarHeight = roundf(FONT_SIZE) + 1;
-        if (__smallAvatarHeight % 2) {
-            __smallAvatarHeight += 1;
-        }
+        __smallAvatarHeight = roundf(FONT_SIZE) - 1;
         _msgids = [[NSMutableDictionary alloc] init];
         
         if(!_buffer) {
@@ -2507,6 +2504,7 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
 
+    cell.avatarTop.constant = (avatarHeight > __smallAvatarHeight)?4:2;
     cell.avatarWidth.constant = cell.avatarHeight.constant = avatarHeight;
     
     cell.replyXOffset.constant = __timeLeftPref ? -__timestampWidth : 0;
