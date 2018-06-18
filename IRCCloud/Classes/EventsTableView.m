@@ -2690,7 +2690,7 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.lastSeenEIDBackground.hidden = YES;
         cell.lastSeenEID.superview.hidden = YES;
         timestamp.text = e.timestamp;
-        cell.timestampWidth.constant = __timestampWidth;
+        cell.timestampWidth.constant = __timestampWidth - 6;
         cell.lastSeenEIDOffset.constant = 0;
     }
     if(e.rowType == ROW_TIMESTAMP) {
@@ -2724,11 +2724,8 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.bottomBorder.backgroundColor = [UIColor timestampBottomBorderColor];
         cell.bottomBorder.hidden = NO;
         cell.messageOffsetBottom.constant = 4;
-        cell.timestampLeft.textAlignment = cell.timestampRight.textAlignment = NSTextAlignmentCenter;
     } else {
         cell.topBorder.hidden = cell.bottomBorder.hidden = YES;
-        cell.timestampLeft.textAlignment = NSTextAlignmentLeft;
-        cell.timestampRight.textAlignment = NSTextAlignmentRight;
     }
     cell.codeBlockBackground.backgroundColor = [UIColor codeSpanBackgroundColor];
     cell.codeBlockBackground.hidden = !e.isCodeBlock;
