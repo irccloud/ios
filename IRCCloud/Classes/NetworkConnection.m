@@ -580,6 +580,9 @@ volatile BOOL __socketPaused = NO;
                            if(![[NSUserDefaults standardUserDefaults] objectForKey:@"hiddenMembers"])
                                [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"hiddenMembers"] forKey:@"hiddenMembers"];
                        }
+                       if([object objectForKey:@"id"]) {
+                           [[NSUserDefaults standardUserDefaults] setObject:[object objectForKey:@"id"] forKey:@"last_uid"];
+                       }
                        [[NSUserDefaults standardUserDefaults] synchronize];
                        [_events reformat];
 #endif
@@ -2274,6 +2277,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"uploadsAvailable"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"theme"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"logs_cache"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"last_uid"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [UIColor setTheme:@"dawn"];
     [self clearPrefs];
