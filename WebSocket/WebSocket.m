@@ -620,6 +620,11 @@ WebSocketWaitingState waitingState;
 
     //parse the data, if possible
     if (fragment.canBeParsed) {
+        if (fragment.hasMask) {
+            //client is not allowed to receive data that is masked and must fail the connection
+            [self close:WebSocketCloseStatusProtocolError message:@"Server cannot mask data."];
+            return offset;
+        }
         [fragment parseContent];
 
         //if we have a complete fragment, handle it

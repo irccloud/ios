@@ -20,14 +20,6 @@
 
 #import "WebSocketFragment.h"
 
-#ifndef htonll
-#define htonll(x) __DARWIN_OSSwapInt64(x) 
-#endif
-
-#ifndef ntohll
-#define ntohll(x) __DARWIN_OSSwapInt64(x) 
-#endif
-
 @implementation WebSocketFragment {
 }
 
@@ -121,7 +113,6 @@
         if (self.hasMask)
         {
             self.payloadData = [self unmask:self.mask data:aData range:NSMakeRange(payloadStart, payloadLength)];
-            self.mask = 0;
         }
         else
         {
@@ -212,10 +203,10 @@
                     return NO;
                 }
                 
-                unsigned short len;
+                uint16_t len;
                 memcpy(&len, &buffer[index], sizeof(len));
                 index += sizeof(len);
-                dataLength = ntohs(len);
+                dataLength = CFSwapInt16(len);
             }
             else if (dataLength == 127)
             {
@@ -225,10 +216,10 @@
                     return NO;
                 }
                 
-                unsigned long long len;
+                uint64_t len;
                 memcpy(&len, &buffer[index], sizeof(len));
                 index += sizeof(len);
-                dataLength = ntohl(len);                   
+                dataLength = CFSwapInt64(len);
             }
             
             //if applicable, set mask value
