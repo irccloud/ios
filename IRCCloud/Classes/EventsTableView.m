@@ -2505,6 +2505,8 @@ extern UIImage *__socketClosedBackgroundImage;
     float avatarHeight = __avatarsOffPref?0:((__chatOneLinePref || e.rowType == ROW_ME_MESSAGE)?__smallAvatarHeight:__largeAvatarHeight);
 
     cell.avatarTop.constant = (avatarHeight > __smallAvatarHeight || !__compact)?4:2;
+    if(__chatOneLinePref && e.isEmojiOnly)
+        cell.avatarTop.constant += FONT_SIZE;
     cell.avatarWidth.constant = cell.avatarHeight.constant = avatarHeight;
     
     cell.replyXOffset.constant = __timeLeftPref ? -__timestampWidth : 0;
