@@ -2152,6 +2152,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         if(!__disableQuotePref && e.rowType == ROW_MESSAGE && e.formattedMsg.length > 1 && [e.formattedMsg isBlockQuote]) {
             e.formattedMsg = [e.formattedMsg substringFromIndex:1];
+            e.mentionOffset--;
             e.isQuoted = YES;
         } else {
             e.isQuoted = NO;
